@@ -1,21 +1,19 @@
-/*
-  This file is part of XWord
-  Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
-  
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either
-  version 3 of the License, or (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+// This file is part of XWord    
+// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 //------------------------------------------------------------------------------
@@ -120,7 +118,8 @@ XGrid::SetSize(size_t width, size_t height)
 
             // Otherwise respect the wrapping,
             // so we can iterate over all squares
-            else {
+            else
+            {
                 square.m_next[DIR_DOWN]  [FIND_PREV] = 
                     row > 0 ? 
                         &At(col,     row - 1)
@@ -263,7 +262,7 @@ XGrid::HasClue(size_t col, size_t row, size_t * number) const
 
     // Clues are located in squares where a black square (or the edge)
     //   is above or left and where a white square is below or right.
-    // Pay attention to the parentheses here, or the order of operations screws up
+    // Pay attention to the parentheses here, the order of operations is tricky
     if ( (col == 0 || At(col-1, row).IsBlack())
         && (col < GetWidth()-1 && At(col+1, row).IsWhite()) )
     {
@@ -279,74 +278,6 @@ XGrid::HasClue(size_t col, size_t row, size_t * number) const
         *number = At(col, row).number;
 
     return ret;
-}
-
-
-// Find functions
-bool FIND_ACROSS_CLUE  (const XSquare * square)
-{
-    return square->clueFlag & ACROSS_CLUE;
-}
-
-bool FIND_DOWN_CLUE    (const XSquare * square)
-{
-    return square->clueFlag & DOWN_CLUE;
-}
-
-bool FIND_WHITE_SQUARE (const XSquare * square)
-{
-    return square->IsWhite();
-}
-
-bool FIND_BLANK_SQUARE (const XSquare * square)
-{
-    return square->IsBlank();
-}
-
-bool FIND_BLACK_SQUARE (const XSquare * square)
-{
-    return square->IsBlack();
-}
-
-bool FIND_CLUE_GREATER_THAN (int num1, int num2)
-{
-    return num1 > num2;
-}
-
-bool FIND_CLUE_LESS_THAN    (int num1, int num2)
-{
-    return num1 != 0 && num1 < num2;
-}
-
-bool FIND_CLUE_DIFFERENT    (int num1, int num2)
-{ 
-    return num1 != 0 && num1 != num2;
-}
-
-// functor for FIND_WORD
-FIND_WORD::FIND_WORD(bool direction, const XSquare * square)
-    : m_direction(direction), m_number(square->clue[direction])
-{}
-
-bool FIND_WORD::operator () (const XSquare * square)
-{
-    return square->clue[m_direction] != 0
-        && square->clue[m_direction] != m_number;
-}
-
-// functor for FIND_CLUE
-FIND_CLUE::FIND_CLUE(bool direction, const XSquare * square)
-    : m_clueType(direction == DIR_ACROSS ? ACROSS_CLUE : DOWN_CLUE),
-      m_number(square->number)
-{
-    wxASSERT(m_number != 0 && square->clueFlag & m_clueType);
-}
-
-bool FIND_CLUE::operator () (const XSquare * square)
-{
-    return square->number != 0
-        && (square->clueFlag & m_clueType) != 0
-        && square->number != m_number;
 }
 
 
@@ -550,4 +481,76 @@ XGrid::CheckWord(XSquare * start, XSquare * end, bool checkBlank)
     }
 
     return incorrect;
+}
+
+
+
+// Find functions
+bool FIND_ACROSS_CLUE  (const XSquare * square)
+{
+    return (square->clueFlag & ACROSS_CLUE) != 0;
+}
+
+bool FIND_DOWN_CLUE    (const XSquare * square)
+{
+    return (square->clueFlag & DOWN_CLUE) != 0;
+}
+
+bool FIND_WHITE_SQUARE (const XSquare * square)
+{
+    return square->IsWhite();
+}
+
+bool FIND_BLANK_SQUARE (const XSquare * square)
+{
+    return square->IsBlank();
+}
+
+bool FIND_BLACK_SQUARE (const XSquare * square)
+{
+    return square->IsBlack();
+}
+
+bool FIND_CLUE_GREATER_THAN (int num1, int num2)
+{
+    return num1 > num2;
+}
+
+bool FIND_CLUE_LESS_THAN    (int num1, int num2)
+{
+    return num1 != 0 && num1 < num2;
+}
+
+bool FIND_CLUE_DIFFERENT    (int num1, int num2)
+{ 
+    return num1 != 0 && num1 != num2;
+}
+
+// Functor for FIND_WORD
+//----------------------
+FIND_WORD::FIND_WORD(bool direction, const XSquare * square)
+    : m_direction(direction), m_number(square->clue[direction])
+{}
+
+bool FIND_WORD::operator () (const XSquare * square)
+{
+    return square->clue[m_direction] != 0
+        && square->clue[m_direction] != m_number;
+}
+
+
+// Functor for FIND_CLUE
+//----------------------
+FIND_CLUE::FIND_CLUE(bool direction, const XSquare * square)
+    : m_clueType(direction == DIR_ACROSS ? ACROSS_CLUE : DOWN_CLUE),
+      m_number(square->number)
+{
+    wxASSERT(m_number != 0 && square->clueFlag & m_clueType);
+}
+
+bool FIND_CLUE::operator () (const XSquare * square)
+{
+    return square->number != 0
+        && (square->clueFlag & m_clueType) != 0
+        && square->number != m_number;
 }
