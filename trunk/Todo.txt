@@ -1,0 +1,15 @@
+Todo:
+
+Reorganize load/save
+
+Printing
+
+Load NOTEPAD section from text files
+
+Keep a record of extra sections and their data so we don't lose data
+
+Finish Status bar
+
+Work on Tool Manager and AuiToolbar (especially adding or removing buttons -- drag and drop support?)
+
+Save tool and menu layout in config file (separate XML file?)
