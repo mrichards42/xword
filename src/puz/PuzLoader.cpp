@@ -1,21 +1,19 @@
-/*
-  This file is part of XWord
-  Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
-  
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either
-  version 3 of the License, or (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+// This file is part of XWord    
+// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 // TODO:
@@ -539,8 +537,9 @@ LoadText(XPuzzle * puz, const wxChar * filename)
 
     if (ReadTextLine(f) != _T("<ACROSS>"))
         return LoadError(_T("Expected <ACROSS>"));
-    int i;
-    for (i = 0; i < acrossClues; ++i) {
+
+    for (size_t i = 0; i < acrossClues; ++i)
+    {
         across.push_back(ReadTextLine(f));
         if (across.back() == _T("<DOWN>") || across.back() == _T(""))
             return LoadError(_T("Not enough across clues"));
@@ -548,7 +547,8 @@ LoadText(XPuzzle * puz, const wxChar * filename)
 
     if (ReadTextLine(f) != _T("<DOWN>"))
         return LoadError(_T("Expected <DOWN>"));
-    for (i = 0; i < downClues; ++i) {
+    for (size_t i = 0; i < downClues; ++i)
+    {
         down.push_back(ReadTextLine(f));
         if (down.back() == _T(""))
             return LoadError(_T("Not enough down clues"));
@@ -562,10 +562,11 @@ LoadText(XPuzzle * puz, const wxChar * filename)
     std::vector<wxString>::const_iterator across_it = across.begin();
     std::vector<wxString>::const_iterator down_it   = down.begin();
 
-    int row, col;
-    for (row = 0; row < puz->m_grid.GetHeight(); ++row) {
-        for (col = 0; col < puz->m_grid.GetWidth(); ++col) {
-            int clue = puz->m_grid.HasClue(col, row);
+    for (size_t row = 0; row < puz->m_grid.GetHeight(); ++row)
+    {
+        for (size_t col = 0; col < puz->m_grid.GetWidth(); ++col)
+        {
+            const int clue = puz->m_grid.HasClue(col, row);
             if (clue & ACROSS_CLUE)
                 puz->m_clues.push_back(*across_it++);
             if (clue & DOWN_CLUE)
@@ -633,17 +634,19 @@ LoadPyz(XPuzzle * puz, const wxChar * filename)
     if (! ReadTextLine(f).ToLong(&time))
         return LoadError(_T("No Time Value"));
     puz->m_time = time;
-    long width, height;
-    ReadTextLine(f).ToLong(&width);
-    ReadTextLine(f).ToLong(&height);
+    unsigned long width, height;
+    ReadTextLine(f).ToULong(&width);
+    ReadTextLine(f).ToULong(&height);
     puz->m_grid.SetSize(width, height);
 
     // Solution grid
     wxString gridString;
-    int i;
-    for (i = 0; i < height; ++i) {
+
+    for (size_t i = 0; i < height; ++i)
+    {
         wxString line = ReadTextLine(f);
-        if (line.length() != width) {
+        if (line.length() != width)
+        {
             return LoadError(_T("Incorrect solution grid width"));
         }
         gridString.Append(line);
@@ -654,9 +657,11 @@ LoadPyz(XPuzzle * puz, const wxChar * filename)
 
     // User grid
     gridString = wxEmptyString;
-    for (i = 0; i < height; ++i) {
+    for (size_t i = 0; i < height; ++i)
+    {
         wxString line = ReadTextLine(f);
-        if (line.length() != width) {
+        if (line.length() != width)
+        {
             return LoadError(_T("Incorrect user grid width"));
         }
         gridString.Append(line);
@@ -667,14 +672,16 @@ LoadPyz(XPuzzle * puz, const wxChar * filename)
 
     // Gext
     gridString = wxEmptyString;
-    for (i = 0; i < height; ++i) {
+    for (size_t i = 0; i < height; ++i)
+    {
         long val;
         wxString line = ReadTextLine(f);
-        if (line.length() != width) {
+        if (line.length() != width)
+        {
             return LoadError(_T("Incorrect GEXT grid width"));
         }
-        size_t j;
-        for (j = 0; j < width; ++j) {
+        for (size_t j = 0; j < width; ++j)
+        {
             if (! line.Mid(j,1).ToLong(&val))
                 return LoadError(_T("Incorrect value in GEXT"));
             gridString += wxChar(val);
@@ -693,10 +700,10 @@ LoadPyz(XPuzzle * puz, const wxChar * filename)
     std::vector<wxString> down;
 
     // Read across and down clues 
-    for (i = 0; i < acrossClues; ++i)
+    for (size_t i = 0; i < acrossClues; ++i)
         across.push_back(ReadTextLine(f));
 
-    for (i = 0; i < downClues; ++i)
+    for (size_t i = 0; i < downClues; ++i)
         down.push_back(ReadTextLine(f));
 
     // Read m_across and m_down into m_clues
@@ -704,10 +711,12 @@ LoadPyz(XPuzzle * puz, const wxChar * filename)
     std::vector<wxString>::const_iterator across_it = across.begin();
     std::vector<wxString>::const_iterator down_it   = down.begin();
 
-    int row, col;
-    for (row = 0; row < puz->m_grid.GetHeight(); ++row) {
-        for (col = 0; col < puz->m_grid.GetWidth(); ++col) {
-            int clue = puz->m_grid.HasClue(col, row);
+    wxASSERT(height == puz->m_grid.GetHeight() && width == puz->m_grid.GetWidth());
+    for (size_t row = 0; row < height; ++row)
+    {
+        for (size_t col = 0; col < width; ++col)
+        {
+            const int clue = puz->m_grid.HasClue(col, row);
             if (clue & ACROSS_CLUE)
                 puz->m_clues.push_back(*across_it++);
             if (clue & DOWN_CLUE)

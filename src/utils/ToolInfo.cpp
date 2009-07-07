@@ -16,35 +16,5 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#ifndef MY_CLUE_PANEL_H
-#define MY_CLUE_PANEL_H
-
-// For compilers that don't support precompilation, include "wx/wx.h"
-#include <wx/wxprec.h>
- 
-#ifndef WX_PRECOMP
-#    include <wx/wx.h>
-#endif
-
-#include "ClueListBox.hpp"
-
-class CluePanel
-    : public wxPanel
-{
-public:
-    explicit CluePanel(wxWindow* parent, wxWindowID id, const wxString & heading, bool direction, long style = wxBORDER_NONE);
-    ~CluePanel();
-
-    wxStaticText * m_heading;
-    ClueListBox * m_clueList;
-
-private:
-    // Check to see if the panel is very small
-    // If it is, display the clue box next to the heading
-    void OnSize(wxSizeEvent & evt);
-
-    DECLARE_EVENT_TABLE()
-};
-
-
-#endif MY_CLUE_PANEL_H
+#include "ToolInfo.hpp"
+#include <boost/foreach.hpp> // don't even try to fix all of these, just get boost if it won't compile, please
