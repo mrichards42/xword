@@ -103,7 +103,9 @@ public:
     void SetDirection(bool direction) { SetSquareFocus(NULL, direction); }
     void SetDirection()               { SetDirection( ! m_direction); }
 
-    void SetFocusedClue(int cluenum, bool direction);
+    void SetFocusedClue   (int cluenum, bool direction)
+        { ChangeFocusedClue(cluenum, direction); SetSquareFocus(); }
+    void ChangeFocusedClue(int cluenum, bool direction);
 
     // Will not trigger an event
     XSquare * ChangeSquareFocus(XSquare * square, bool direction);

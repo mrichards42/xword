@@ -19,6 +19,8 @@
 #include "App.hpp"
 #include <wx/cmdline.h>
 #include "MyFrame.hpp"
+#include <cstdlib>
+#include <ctime>
 
 IMPLEMENT_APP(MyApp)
 
@@ -76,6 +78,9 @@ MyApp::OnInit()
     // Open a file
     else if (param_count > 0)
         filename = cmd.GetParam(0);
+
+    // Seed random number generator (for making keys)
+    srand( time(NULL) );
 
     // Create the frame
     // ------------------------------------
