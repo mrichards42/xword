@@ -26,11 +26,11 @@
 
 // GEXT flags (just learned the one for X and for a circle!)
 // Perhaps there are some flags that use 0x01 - 0x08?
-const unsigned char XFLAG_CLEAR  = 0x00;
-const unsigned char XFLAG_BLACK  = 0x10;
-const unsigned char XFLAG_X      = 0x20;
-const unsigned char XFLAG_RED    = 0x40;
-const unsigned char XFLAG_CIRCLE = 0x80;
+const wxByte XFLAG_CLEAR  = 0x00;
+const wxByte XFLAG_BLACK  = 0x10;
+const wxByte XFLAG_X      = 0x20;
+const wxByte XFLAG_RED    = 0x40;
+const wxByte XFLAG_CIRCLE = 0x80;
 
 
 // Clue types
@@ -73,18 +73,26 @@ public:
     // Defaults to a black square
     explicit XSquare(int a_col = -1,
                      int a_row = -1,
-                     char a_solution = '.',
-                     char a_text = '.',
-                     unsigned char a_flag = XFLAG_CLEAR,
+                     wxChar a_solution = '.',
+                     wxChar a_text = '.',
+                     wxByte a_flag = XFLAG_CLEAR,
                      short a_number = 0,
-                     short a_clueFlag = NO_CLUE)
+                     short a_clueFlag = NO_CLUE,
+                     const wxString & a_rebus = wxEmptyString,
+                     const wxString & a_rebusSol = wxEmptyString,
+                     unsigned short a_rebusSym = 0,
+                     unsigned short a_rebusSymSol = 0)
         : col(a_col),
           row(a_row),
           solution(a_solution),
           text(a_text),
           flag(a_flag),
           number(a_number),
-          clueFlag(a_clueFlag)
+          clueFlag(a_clueFlag),
+          rebus(a_rebus),
+          rebusSol(a_rebusSol),
+          rebusSym(a_rebusSym),
+          rebusSymSol(a_rebusSymSol)
     {
         clue[DIR_ACROSS] = 0;
         clue[DIR_DOWN]   = 0;
@@ -111,10 +119,16 @@ public:
     int col;
     int row;
 
-    // square information
-    char  solution;
-    char  text;
-    unsigned char flag;
+    // Square information
+    wxChar   solution;
+    wxChar   text;
+    wxByte flag;
+
+    // Rebus stuff
+    wxString rebus;
+    wxString rebusSol;
+    unsigned short rebusSym;
+    unsigned short rebusSymSol;
 
     // Clue information
     short number;
@@ -122,22 +136,27 @@ public:
     short clue[2]; // clue this belongs to; across and down
 
     // Flag functions
-    void ReplaceFlag (unsigned char flag1, unsigned char flag2)
+    void ReplaceFlag (wxByte flag1, wxByte flag2)
         { RemoveFlag(flag1); AddFlag(flag2); }
-    void AddFlag     (unsigned char a_flag)       { flag |=   a_flag; }
-    void RemoveFlag  (unsigned char a_flag)       { flag &= ~ a_flag; }
-    bool HasFlag     (unsigned char a_flag) const
+    void AddFlag     (wxByte a_flag)       { flag |=   a_flag; }
+    void RemoveFlag  (wxByte a_flag)       { flag &= ~ a_flag; }
+    bool HasFlag     (wxByte a_flag) const
         { return (flag & a_flag) != 0; }
 
     // Information functions
-    bool IsWhite() const { return ! IsBlack(); }
-    bool IsBlack() const { return solution == '.'; }
-    bool IsBlank() const { return text == '-'; }
+    bool IsRebus()      const { return ! rebusSol.empty(); }
+    bool HasRebusText() const { return ! rebus.empty(); }
+    bool IsWhite()      const { return ! IsBlack(); }
+    bool IsBlack()      const { return solution == '.'; }
+    bool IsBlank()      const { return text == '-'; }
 
     bool Check(bool checkBlank = false)  const
     {
         if (IsBlack() || (IsBlank() && ! checkBlank))
             return true;
+
+        if (IsRebus() || HasRebusText())
+            return rebus == rebusSol;
 
         return solution == text;
     }

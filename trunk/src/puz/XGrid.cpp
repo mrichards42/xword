@@ -50,12 +50,15 @@
 #include "XGrid.hpp"
 #include <map>
 #include <wx/log.h>
+#include "Scrambler.hpp"
 
 
 XGrid::XGrid(size_t width, size_t height)
     : m_width(0), m_height(0)
 {
-    SetSize(width, height);
+    Clear();
+    if (width > 0 || height > 0)
+        SetSize(width, height);
 }
 
 
@@ -149,6 +152,24 @@ XGrid::SetSize(size_t width, size_t height)
         }
     }
 }
+
+
+
+bool
+XGrid::ScrambleSolution(unsigned short key)
+{
+    XGridScrambler scrambler(*this);
+    return scrambler.ScrambleSolution(key);
+}
+
+
+bool
+XGrid::UnscrambleSolution(unsigned short key)
+{
+    XGridScrambler scrambler(*this);
+    return scrambler.UnscrambleSolution(key);
+}
+
 
 
 void
@@ -248,36 +269,6 @@ XGrid::GetGext() const
     }
 
     return gext;
-}
-
-
-
-int
-XGrid::HasClue(size_t col, size_t row, size_t * number) const
-{
-    int ret = NO_CLUE;
-    // Can't be a clue if it is a black square
-    if (At(col, row).IsBlack())
-        return NO_CLUE;
-
-    // Clues are located in squares where a black square (or the edge)
-    //   is above or left and where a white square is below or right.
-    // Pay attention to the parentheses here, the order of operations is tricky
-    if ( (col == 0 || At(col-1, row).IsBlack())
-        && (col < GetWidth()-1 && At(col+1, row).IsWhite()) )
-    {
-        ret |= ACROSS_CLUE;
-    }
-    if ( (row == 0 || At(col, row-1).IsBlack())
-        && (row < GetHeight()-1 && At(col, row+1).IsWhite()) )
-    {
-        ret |= DOWN_CLUE;
-    }
-
-    if (number != NULL && ret != NO_CLUE)
-        *number = At(col, row).number;
-
-    return ret;
 }
 
 
@@ -412,15 +403,15 @@ XGrid::CountClues(size_t * across, size_t * down) const
     // Count number of across and down clues
     int acrossClues = 0;
     int downClues = 0;
-    int row, col;
-    for (row = 0; row < GetHeight(); ++row)
-        for (col = 0; col < GetWidth(); ++col) {
-            int clue = HasClue(col, row);
-            if (clue & ACROSS_CLUE)
-                ++acrossClues;
-            if (clue & DOWN_CLUE)
-                ++downClues;
-        }
+    for (const XSquare * square = First();
+         square != NULL;
+         square = square->Next())
+    {
+        if ( (square->clueFlag & ACROSS_CLUE) != 0 )
+            ++acrossClues;
+        if ( (square->clueFlag & DOWN_CLUE) != 0 )
+            ++downClues;
+     }
     *across = acrossClues;
     *down = acrossClues;
 }
