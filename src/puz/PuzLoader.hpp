@@ -15,6 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+//------------------------------------------------------------------------------
+// PuzLoader: a namespace to encapsulate loading and saving crossword puzzles.
+//------------------------------------------------------------------------------
 
 #ifndef PUZ_LOADER_H
 #define PUZ_LOADER_H
@@ -22,32 +25,31 @@
 #include <wx/string.h>
 #include <vector>
 
-// forward declaration
 class XPuzzle;
 
-// A namespace to encapsulate loading and saving puzzle files
-// This works like a class with two static functions
 namespace PuzLoader
 {
-    bool Load(XPuzzle * puz,
-              const wxString & filename,
-              wxString ext = wxEmptyString);
 
-    bool Save(XPuzzle * puz,
-              const wxString & filename,
-              wxString ext = wxEmptyString);
+bool Load(XPuzzle * puz,
+          const wxString & filename,
+          wxString ext = wxEmptyString);
 
-    bool CanSave(const wxString & ext);
-    bool CanLoad(const wxString & ext);
+bool Save(XPuzzle * puz,
+          const wxString & filename,
+          wxString ext = wxEmptyString);
 
-    struct TypeDesc {
-        wxString ext;
-        wxString description;
-    };
+bool CanSave(const wxString & ext);
+bool CanLoad(const wxString & ext);
 
-    // Spits out a string that can be passed to wxWidgets file dialogs
-    std::vector<TypeDesc> GetSaveTypes();
-    std::vector<TypeDesc> GetLoadTypes();
-};
+// Return a vector of extensions (without the '.')
+std::vector<wxString> GetSaveTypes();
+std::vector<wxString> GetLoadTypes();
+
+// Return a a string compatible with the wxWidgets file dialogs:
+// "File type 1 (*.ext)|*.ext | File type 2 (*.ext)|*.ext " . . . etc.
+wxString GetSaveTypeString();
+wxString GetLoadTypeString();
+
+} // namespace PuzLoader
 
 #endif // PUZ_LOADER_H

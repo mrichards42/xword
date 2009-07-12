@@ -24,6 +24,7 @@
 #include "XGrid.hpp"
 #include "PuzLoader.hpp"
 
+
 class XPuzzle
 {
 public:
@@ -65,8 +66,21 @@ public:
 
     XGrid m_grid;
 
+    // This is here so we don't have to include HandlerCommon.hpp
+    // There are issues with the timing of includes, etc.
+    typedef std::vector<unsigned char> ByteArray;
+
+    struct section
+    {
+        section(const wxString & a_name, const ByteArray & a_data)
+            : name(a_name), data(a_data)
+        {}
+        wxString name;
+        ByteArray data;
+    };
+
     // Extra random sections . . . just save them and append to the file later
-    std::vector<wxString> m_extraSections;
+    std::vector<section> m_extraSections;
 
 protected:
     bool m_isOk;
@@ -97,7 +111,6 @@ public:
 inline bool
 XPuzzle::Load(const wxString & filename, const wxString & ext)
 {
-    m_filename = filename;
     m_modified = false;
     m_isOk = PuzLoader::Load(this, filename, ext);
     return m_isOk;
@@ -107,7 +120,6 @@ XPuzzle::Load(const wxString & filename, const wxString & ext)
 inline bool
 XPuzzle::Save(const wxString & filename, const wxString & ext)
 {
-    m_filename = filename;
     m_modified = false;
     return PuzLoader::Save(this, filename, ext);
 }
@@ -116,7 +128,8 @@ XPuzzle::Save(const wxString & filename, const wxString & ext)
 inline void
 XPuzzle::Clear()
 {
-    m_grid.SetSize(0, 0);
+    m_isOk = false;
+    m_grid.Clear();
     m_clues.clear();
     m_across.clear();
     m_down.clear();
@@ -128,5 +141,6 @@ XPuzzle::Clear()
     m_complete = false;
     m_extraSections.clear();
 }
+
 
 #endif // X_PUZZLE_H

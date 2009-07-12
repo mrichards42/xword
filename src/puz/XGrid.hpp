@@ -24,6 +24,24 @@
 #include <wx/gdicmn.h> // wxPoint
 #include "XSquare.hpp"
 
+class XGridScrambler;
+
+
+// Puzzle types (see PuzHandler.hpp for an explanation)
+enum XGridFlag
+{
+    XFLAG_NORMAL      = 0x0000,
+    XFLAG_NO_SOLUTION = 0x0002,
+    XFLAG_SCRAMBLED   = 0x0004
+};
+
+enum XGridType
+{
+    XTYPE_NORMAL      = 0x0001,
+    XTYPE_DIAGRAMLESS = 0x0401
+};
+
+
 // Parameters for FindSquare
 const bool NO_WRAP_LINES = false;
 const bool WRAP_LINES    = true;
@@ -38,6 +56,7 @@ const bool NO_SKIP_BLACK_SQUARES = false;
 
 class XGrid
 {
+    friend class XGridScrambler;
 public:
     explicit XGrid(size_t width = 0, size_t height = 0);
     ~XGrid();
@@ -87,6 +106,22 @@ public:
                              bool skipBlack = NO_SKIP_BLACK_SQUARES,
                              bool wrapLines = NO_WRAP_LINES);
 
+    void Clear();
+
+    bool IsScrambled() const { return (m_flag & XFLAG_SCRAMBLED) != 0; }
+    bool ScrambleSolution  (unsigned short key = 0);
+    bool UnscrambleSolution(unsigned short key);
+
+    unsigned short  GetKey()   const { return m_key; }
+    unsigned short  GetCksum() const { return m_cksum; }
+
+    unsigned short GetType()   const { return m_type; }
+    unsigned short GetFlag()   const { return m_flag; }
+
+    void SetType (unsigned short type)  { m_type = type; }
+    void SetFlag (unsigned short flag)  { m_flag = flag; }
+    void SetCksum(unsigned short cksum) { m_cksum = cksum; }
+    void SetKey  (unsigned short key)   { m_key = key; }
 
     void SetSolution(const char * solution); // this will call SetupGrid()
     void SetGrid(const char * grid);
@@ -104,9 +139,7 @@ public:
                    const XSquare * start,
                    const XSquare * end) const;
 
-
-    int HasClue(size_t col, size_t row, size_t * number = NULL) const;
-    void SetupGrid(); // Called to setup numbers, etc. after SetSolution
+    void SetupGrid(); // Called to setup numbers, etc.
     void CountClues(size_t * across, size_t * down) const;
 
 
@@ -121,6 +154,13 @@ public:
 
     Grid_t m_grid;
 
+    short m_type;
+    short m_flag;
+
+    // These are used for grid scrambling
+    unsigned short m_key;
+    unsigned short m_cksum;
+
 protected:
     size_t m_width, m_height;
     XSquare * m_first;
@@ -132,6 +172,20 @@ protected:
 
 #undef GET_FUNCTION
 
+
+inline void
+XGrid::Clear()
+{
+    m_type = XTYPE_NORMAL;
+    m_flag = XFLAG_NORMAL;
+    m_key = 0;
+    m_cksum = 0;
+    m_first = NULL;
+    m_last = NULL;
+    m_firstWhite = NULL;
+    m_lastWhite = NULL;
+    SetSize(0,0);
+}
 
 
 inline bool
