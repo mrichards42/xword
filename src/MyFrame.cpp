@@ -30,11 +30,16 @@
 #include "GridCtrl.hpp"
 #include "MyStatusBar.hpp"
 
+#include <wx/numdlg.h>
+
 #include "widgets/MyAuiToolBar.hpp" // Change behavior of drop down menu
+
+#include "utils/DragAndDrop.hpp" // File drag and drop
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_OPEN,              MyFrame::OnOpenPuzzle)
     EVT_MENU           (ID_SAVE,              MyFrame::OnSavePuzzle)
+    EVT_MENU           (ID_CLOSE,             MyFrame::OnClosePuzzle)
     EVT_MENU           (ID_QUIT,              MyFrame::OnQuit)
 
     EVT_MENU           (ID_ZOOM_IN,           MyFrame::OnZoomIn)
@@ -43,6 +48,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_CHECK_GRID,        MyFrame::OnCheckGrid)
     EVT_MENU           (ID_CHECK_WORD,        MyFrame::OnCheckWord)
     EVT_MENU           (ID_CHECK_LETTER,      MyFrame::OnCheckLetter)
+
+    EVT_MENU           (ID_SCRAMBLE,          MyFrame::OnScramble)
+    EVT_MENU           (ID_UNSCRAMBLE,        MyFrame::OnUnscramble)
 
     EVT_MENU           (ID_LAYOUT_PANES,      MyFrame::OnLayout)
     EVT_MENU           (ID_LOAD_PERSPECTIVE,  MyFrame::OnLoadPerspective)
@@ -58,6 +66,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
     EVT_ACTIVATE       (                      MyFrame::OnActivate)
     EVT_CLOSE          (                      MyFrame::OnClose)
+
+#ifdef __WXDEBUG__
+    EVT_MENU           (ID_DUMP_STATUS,       MyFrame::OnDumpStatus)
+#endif
 END_EVENT_TABLE()
 
 
@@ -67,13 +79,17 @@ const int iconSize = 24;
 
 static const ToolDesc toolDesc[] =
 {
-    { ID_OPEN, wxITEM_NORMAL, _T("&Open\tCtrl+O"), _T("open") },
-    { ID_SAVE, wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
-    { ID_QUIT, wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
+    { ID_OPEN,  wxITEM_NORMAL, _T("&Open\tCtrl+O"), _T("open") },
+    { ID_SAVE,  wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
+    { ID_CLOSE, wxITEM_NORMAL, _T("&Close\tCtrl+W") },
+    { ID_QUIT,  wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
 
     { ID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in")  },
     { ID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom Fit"), _T("zoom_fit") },
     { ID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out") },
+
+    { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble...") },
+    { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("Unscramble...") },
 
     { ID_CHECK_LETTER, wxITEM_NORMAL, _T("Check Letter"), _T("check_letter") },
     { ID_CHECK_WORD,   wxITEM_NORMAL, _T("Check Word"),   _T("check_word") },
@@ -88,6 +104,10 @@ static const ToolDesc toolDesc[] =
     { ID_TIMER, wxITEM_CHECK, _T("Timer"), _T("timer") },
 
 //    { ID_CUSTOMIZE,         _T("Customize . . ."),     _T("") },
+
+#ifdef __WXDEBUG__
+    { ID_DUMP_STATUS, wxITEM_NORMAL, _T("Dump status") },
+#endif
 
     { TOOL_NONE }
 };
@@ -107,6 +127,7 @@ MyFrame::MyFrame()
     //  3. SetupManager() and CreateWindows() before ManageWindows()
 
     wxLogDebug(_T("Creating Frame"));
+    SetDropTarget(new XWordFileDropTarget(this));
 
     m_toolMgr.SetDesc(toolDesc);
     SetupManager();
@@ -210,6 +231,7 @@ MyFrame::MakeMenuBar()
     wxMenu * menu = new wxMenu();
         m_toolMgr.GetTool(ID_OPEN)->Add(menu, menuIconSize, menuIconSize);
         m_toolMgr.GetTool(ID_SAVE)->Add(menu, menuIconSize, menuIconSize);
+        m_toolMgr.GetTool(ID_CLOSE)->Add(menu, menuIconSize, menuIconSize);
         m_toolMgr.GetTool(ID_QUIT)->Add(menu, menuIconSize, menuIconSize);
         menu->AppendSeparator();
         m_toolMgr.GetTool(ID_ZOOM_IN)->Add(menu, menuIconSize, menuIconSize);
@@ -231,12 +253,22 @@ MyFrame::MakeMenuBar()
             m_toolMgr.GetTool(ID_CHECK_WORD)->Add(subMenu, menuIconSize, menuIconSize);
             m_toolMgr.GetTool(ID_CHECK_GRID)->Add(subMenu, menuIconSize, menuIconSize);
         menu->AppendSubMenu(subMenu, _T("Check"));
+        menu->AppendSeparator();
+        m_toolMgr.GetTool(ID_SCRAMBLE)->Add(menu);
+        m_toolMgr.GetTool(ID_UNSCRAMBLE)->Add(menu);
     mb->Append(menu, _T("&Solution"));
 
     // Tools Menu
     menu = new wxMenu();
         m_toolMgr.GetTool(ID_TIMER)->Add(menu, menuIconSize, menuIconSize);
     mb->Append(menu, _T("&Tools"));
+
+    // Debug menu
+#ifdef __WXDEBUG__
+    menu = new wxMenu();
+        m_toolMgr.GetTool(ID_DUMP_STATUS)->Add(menu);
+    mb->Append(menu, _T("&Debug"));
+#endif
 
     return mb;
 }
@@ -468,6 +500,9 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
     if (m_puz.IsOk())
         SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
                   m_puz.m_filename, sw.Time()));
+    else
+        SetStatus(_T("No file loaded"));
+
     Thaw();
 
     return m_puz.IsOk();
@@ -487,6 +522,34 @@ MyFrame::SavePuzzle(const wxString & filename, const wxString & ext)
     SetStatus(m_puz.m_filename + wxString::Format(_T("   Save time: %d ms"),
                                                    sw.Time()) );
     return success;
+}
+
+
+bool
+MyFrame::ClosePuzzle()
+{
+    // No puzzle is open
+    if (! m_puz.IsOk())
+        return true;
+
+    if (m_puz.m_modified)
+    {
+        int ret = wxMessageBox(
+                  _T("Current Puzzle not saved.  Save before closing?"),
+                  _T("XWord Message"),
+                  wxYES_NO | wxCANCEL | wxICON_QUESTION
+              );
+
+        if (ret == wxCANCEL)
+            return false;
+
+        if (ret == wxYES)
+            SavePuzzle(m_puz.m_filename);
+    }
+
+    SetStatus(_T("No file loaded"));
+    m_puz.Clear();
+    return true;
 }
 
 
@@ -528,16 +591,26 @@ MyFrame::ShowPuzzle()
     {
         SetStatus(m_puz.m_filename);
         EnableTools(true);
-        m_grid->SetSquareFocus(m_grid->GetClueNumber(1), DIR_ACROSS);
-        m_across->SetClueNumber(1);//, FOCUSED_CLUE);
-        m_down  ->SetClueNumber(1);//, CROSSING_CLUE);
-        m_cluePrompt->SetLabel(m_across->GetClueText());
+
+
+        if (m_puz.m_grid.IsScrambled())
+        {
+            m_toolMgr.Disable(ID_SCRAMBLE);
+            m_toolMgr.Enable(ID_UNSCRAMBLE);
+        }
+        else
+        {
+            m_toolMgr.Enable(ID_SCRAMBLE);
+            m_toolMgr.Disable(ID_UNSCRAMBLE);
+        }
+
+
+        m_grid->SetFocusedClue(1, DIR_ACROSS);
         // Inform user if puzzle is already completed
         CheckPuzzle();
     }
     else
     {
-        SetStatus(_T("Error opening file"));
         EnableTools(false);
         m_cluePrompt->SetLabel(wxEmptyString);
     }
@@ -551,41 +624,14 @@ MyFrame::ShowPuzzle()
 // Tool and Menu event handlers
 //--------------------------------------------------------
 
-// Used to generate file type strings for open and save
-inline wxString
-MakeTypeString(std::vector<PuzLoader::TypeDesc> types)
-{
-    wxString typeStr;
-    BOOST_FOREACH(PuzLoader::TypeDesc & desc, types)
-    {
-        typeStr << wxString::Format(_T("%s (*.%s)|*.%s|"),
-                                    desc.description,
-                                    desc.ext,
-                                    desc.ext);
-    }
-
-    wxString alltypes;
-    BOOST_FOREACH(PuzLoader::TypeDesc & desc, types)
-    {
-        alltypes << _T("*.") << desc.ext << _T(";");
-    }
-    alltypes.RemoveLast();
-
-    typeStr << wxString::Format(_T("Supported types (%s)|%s"),
-                                alltypes,
-                                alltypes)
-            << _T("|All Files (*.*)|*.*");
-
-    return typeStr;
-}
-
 void
 MyFrame::OnOpenPuzzle(wxCommandEvent & WXUNUSED(evt))
 {
     wxString filename = wxFileSelector(
                             _T("Open Puzzle"),
                             wxEmptyString, wxEmptyString, _T("puz"),
-                            MakeTypeString(PuzLoader::GetLoadTypes()),
+                            PuzLoader::GetLoadTypeString()
+                                        + _T("|All Files (*.*)|*.*"),
                             wxFD_OPEN
                         );
 
@@ -609,7 +655,8 @@ MyFrame::OnSavePuzzle(wxCommandEvent & WXUNUSED(evt))
     if (! m_puz.m_modified)
         filename = wxFileSelector(_T("Save Puzzle As"),
                                   wxEmptyString, wxEmptyString, _T("puz"),
-                                  MakeTypeString(PuzLoader::GetSaveTypes()),
+                                  PuzLoader::GetSaveTypeString()
+                                        + _T("|All Files (*.*)|*.*"),
                                   wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     else
         filename = m_puz.m_filename;
@@ -622,29 +669,19 @@ MyFrame::OnSavePuzzle(wxCommandEvent & WXUNUSED(evt))
 
 
 
+
 void
 MyFrame::OnClose(wxCloseEvent & evt)
 {
-    if (! m_puz.m_modified || ! evt.CanVeto())
+    SaveConfig();
+
+    if (! evt.CanVeto() || ClosePuzzle())
     {
         Destroy();
         return;
     }
-
-    int ret = wxMessageBox(
-                  _T("Current Puzzle not saved.  Save before closing?"),
-                  _T("XWord Message"),
-                  wxYES_NO | wxCANCEL | wxICON_QUESTION
-              );
-
-    if (ret == wxCANCEL)
-        evt.Veto();
     else
-    {
-        if (ret == wxYES)
-            SavePuzzle(m_puz.m_filename);
-        Destroy();
-    }
+        evt.Veto();
 }
 
 
@@ -675,6 +712,73 @@ MyFrame::OnZoomOut(wxCommandEvent & WXUNUSED(evt))
     m_toolMgr.Check(ID_ZOOM_FIT, false);
     m_grid->ZoomOut();
 }
+
+
+
+void
+MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
+{
+    int key = wxGetNumberFromUser(
+                    _T("Enter a four-digit key"),
+                    _T("Key (0 to generate automatically):"),
+                    _T("Scrambing solution"),
+                    0,
+                    0,
+                    9999);
+
+    if (key < 1000)
+        key = 0;
+
+    if (key < 0)
+        return;
+
+    if (m_grid->GetXGrid()->ScrambleSolution(key))
+    {
+        wxMessageBox(wxString::Format(_T("Solution scrambled.  Key is %d"),
+                                      m_grid->GetXGrid()->GetKey()),
+                     _T("XWord Message"));
+
+        m_toolMgr.Disable(ID_SCRAMBLE);
+        m_toolMgr.Enable(ID_UNSCRAMBLE);
+    }
+    else // This should never be the case
+    {
+        wxMessageBox(_T("Scrambling failed!"));
+
+        wxTrap();
+    }
+}
+
+
+void
+MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
+{
+    int key = wxGetNumberFromUser(
+                    _T("Enter the four-digit key"),
+                    _T("Key:"),
+                    _T("Unscrambling solution"),
+                    0,
+                    1000,
+                    9999);
+
+    if (key < 1000)
+        return;
+
+    if (m_grid->GetXGrid()->UnscrambleSolution(key))
+    {
+        wxMessageBox(_T("Solution unscrambled!"),
+                     _T("XWord Message"));
+
+        m_toolMgr.Enable(ID_SCRAMBLE);
+        m_toolMgr.Disable(ID_UNSCRAMBLE);
+    }
+    else // This happens if the wrong key is entered
+    {
+        wxMessageBox(_T("Wrong Key!"));
+        wxTrap();
+    }
+}
+
 
 
 
@@ -764,6 +868,9 @@ MyFrame::OnActivate(wxActivateEvent & evt) {
 
 
 
+
+
+
 void
 MyFrame::OnSavePerspective(wxCommandEvent & WXUNUSED(evt))
 {
@@ -841,7 +948,7 @@ MyFrame::OnGridFocus(wxPuzEvent & evt)
 void
 MyFrame::OnClueFocus(wxPuzEvent & evt)
 {
-    m_grid->SetFocusedClue(evt.GetClueNumber(), evt.GetDirection());
+    m_grid->ChangeFocusedClue(evt.GetClueNumber(), evt.GetDirection());
     m_cluePrompt->SetLabel(evt.GetClueText());
 
     int crossingClue = m_grid->GetFocusedSquare()->WordStart(! evt.GetDirection())->number;
@@ -887,3 +994,163 @@ MyFrame::CheckPuzzle()
     else
         m_status->SetAlert(_T(""));
 }
+
+
+
+
+
+
+// Dumps information about the current state of the grid to a debug output
+//
+// Only applies in debug builds
+
+#ifdef __WXDEBUG__
+void
+MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
+{
+    XGrid * grid = m_grid->GetXGrid();
+    wxDialog dlg(this, wxID_ANY,
+                 wxString(_T("Debug: Current Puzzle Status")),
+                 wxDefaultPosition, wxDefaultSize,
+                 wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+
+    wxTextCtrl * text = new wxTextCtrl(&dlg, wxID_ANY,
+                                       wxEmptyString,
+                                       wxDefaultPosition,
+                                       wxDefaultSize,
+                                       wxTE_MULTILINE);
+
+    text->SetFont( wxFont(8, wxFONTFAMILY_MODERN,
+                          wxFONTSTYLE_NORMAL,
+                          wxFONTWEIGHT_NORMAL) );
+
+
+    wxBoxSizer * sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(text, 1, wxEXPAND | wxALL, 5);
+    dlg.SetSizer(sizer);
+
+    if (! m_puz.IsOk())
+    {
+        (*text) << _T("No file is loaded");
+        dlg.ShowModal();
+        return;
+    }
+
+    (*text) << _T("Grid size (w x h): ") << _T("\n")
+            << (int)grid->GetWidth() << _T(" x ")
+            << (int)grid->GetHeight() << _T("\n");
+
+    (*text) << _T("\n");
+
+
+    (*text) << _T("Solution:") << _T("\n");
+
+    for (XSquare * square = grid->First();
+         square != NULL;
+         square = square->Next())
+    {
+        (*text) << square->solution;
+        if (square->IsLast(DIR_ACROSS))
+            (*text) << _T("\n");
+    }
+
+    (*text) << _T("\n");
+
+    (*text) << _T("User grid:") << _T("\n");
+
+    for (XSquare * square = grid->First();
+         square != NULL;
+         square = square->Next())
+    {
+        (*text) << square->text;
+        if (square->IsLast(DIR_ACROSS))
+            (*text) << _T("\n");
+    }
+
+    (*text) << _T("\n");
+
+    (*text) << _T("Grid flag:") << _T("\n");
+    if ((grid->GetFlag() & XFLAG_NO_SOLUTION) != 0)
+        (*text) << _T("NO_SOLUTION") << _T("\n");
+    if ((grid->GetFlag() & XFLAG_SCRAMBLED) != 0)
+        (*text) << _T("SCRAMBLED") << _T("\n");
+    if (grid->GetFlag() == XFLAG_NORMAL)
+        (*text) << _T("NORMAL") << _T("\n");
+
+     (*text) << _T("\n");
+
+    (*text) << _T("Grid type:") << _T("\n");
+    if (grid->GetType() == XTYPE_DIAGRAMLESS)
+        (*text) << _T("DIAGRAMLESS") << _T("\n");
+    if (grid->GetType() == XTYPE_NORMAL)
+        (*text) << _T("NORMAL") << _T("\n");
+
+    (*text) << _T("\n");
+
+    (*text) << _T("Grid key:") << _T("\n");
+    if (grid->GetKey() == 0)
+        (*text) << _T("(None)") << _T("\n");
+    else
+        (*text) << grid->GetKey() << _T("\n");
+
+    (*text) << _T("\n");
+
+    (*text) << _T("Grid checksum (hex):") << _T("\n");
+    if (grid->GetCksum() == 0)
+        (*text) << _T("(None)") << _T("\n");
+    else
+        (*text) << wxString::Format(_T("%x"), grid->GetCksum())  << _T("\n");
+
+    (*text) << _T("\n");
+
+    (*text) << _T("User rebus:") <<_T("\n");
+    for (XSquare * square = grid->First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (! square->rebus.empty())
+            (*text) << _T("[") << square->rebus << _T("]");
+        else if (square->rebusSym != 0)
+            (*text) << _T("[ (") << square->rebusSym << _T(") ]");
+        else
+            (*text) << _T("[ ]");
+
+        if (square->IsLast(DIR_ACROSS))
+            (*text) << _T("\n");
+    }
+
+    (*text) << _T("\n");
+
+    (*text) << _T("Solution rebus:") <<_T("\n");
+    for (XSquare * square = grid->First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (! square->rebusSol.empty())
+            (*text) << _T("[") << square->rebusSol << _T("]");
+        else if (square->rebusSymSol != 0)
+            (*text) << _T("[ (") << square->rebusSymSol << _T(") ]");
+        else
+            (*text) << _T("[ ]");
+
+        if (square->IsLast(DIR_ACROSS))
+            (*text) << _T("\n");
+    }
+
+    (*text) << _T("\n");
+
+    (*text) << _T("Unrecognized sections:") <<_T("\n");
+
+    std::vector<XPuzzle::section>::iterator it;
+    for (it  = m_puz.m_extraSections.begin();
+         it != m_puz.m_extraSections.end();
+         ++it)
+    {
+        (*text) << it->name
+                << wxString::Format(_T("  (length = %d)"), it->data.size())
+                << _T("\n");
+    }
+
+    dlg.ShowModal();
+}
+#endif // __WXDEBUG__

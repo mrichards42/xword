@@ -49,6 +49,9 @@ class PerspectiveDialog;
 
 #include "utils/ToolManager.hpp"
 
+// Drag and drop
+class XWordFileDropTarget;
+
 // Config headers
 #include <wx/wfstream.h>    // for wxFileInputStream and wxFileOutputStream
 #include <wx/fileconf.h>
@@ -62,19 +65,32 @@ enum
 {
     ID_OPEN = wxID_HIGHEST,
     ID_SAVE,
+    ID_CLOSE,
+
     ID_QUIT,
+
     ID_ZOOM_IN,
     ID_ZOOM_FIT,
     ID_ZOOM_OUT,
     ID_CHECK_LETTER,
     ID_CHECK_WORD,
     ID_CHECK_GRID,
+
+    ID_SCRAMBLE,
+    ID_UNSCRAMBLE,
+
     ID_LAYOUT_PANES,
     ID_LOAD_PERSPECTIVE,
     ID_SAVE_PERSPECTIVE,
+
     ID_SHOW_NOTES,
     ID_SHOW_NOTES_NEW,
-    ID_TIMER
+
+    ID_TIMER,
+
+#ifdef __WXDEBUG__
+    ID_DUMP_STATUS
+#endif
 };
 
 class MyFrame
@@ -90,6 +106,9 @@ public:
 
     bool SavePuzzle(const wxString & filename,
                     const wxString & ext = wxEmptyString);
+
+    // Return true if no puzzle is opened after the function
+    bool ClosePuzzle();
 
     void SetStatus(const wxString & text) { m_status->SetStatus(text); }
 
@@ -185,20 +204,22 @@ protected:
     //----------------------------------------------
 
     // Menus and toolbars
-    void OnOpenPuzzle(wxCommandEvent & WXUNUSED(evt));
-    void OnSavePuzzle(wxCommandEvent & WXUNUSED(evt));
-    void OnQuit(wxCommandEvent & WXUNUSED(evt)) { Close(); }
+    void OnOpenPuzzle (wxCommandEvent & WXUNUSED(evt));
+    void OnSavePuzzle (wxCommandEvent & WXUNUSED(evt));
+    void OnClosePuzzle(wxCommandEvent & WXUNUSED(evt))
+        { ClosePuzzle(); ShowPuzzle(); }
+    void OnQuit       (wxCommandEvent & WXUNUSED(evt))   { Close(); }
 
     void OnZoomIn (wxCommandEvent & WXUNUSED(evt));
     void OnZoomFit(wxCommandEvent & WXUNUSED(evt));
     void OnZoomOut(wxCommandEvent & WXUNUSED(evt));
 
-    void OnCheckGrid  (wxCommandEvent & WXUNUSED(evt))
-        { m_grid->CheckGrid(); }
-    void OnCheckWord  (wxCommandEvent & WXUNUSED(evt))
-        { m_grid->CheckWord(); }
-    void OnCheckLetter(wxCommandEvent & WXUNUSED(evt))
-        { m_grid->CheckLetter(); }
+    void OnCheckGrid  (wxCommandEvent & evt)  { m_grid->CheckGrid(); }
+    void OnCheckWord  (wxCommandEvent & evt)  { m_grid->CheckWord(); }
+    void OnCheckLetter(wxCommandEvent & evt)  { m_grid->CheckLetter(); }
+
+    void OnScramble(wxCommandEvent & WXUNUSED(evt));
+    void OnUnscramble(wxCommandEvent & WXUNUSED(evt));
 
     void OnLayout(wxCommandEvent & WXUNUSED(evt));
     void OnLoadPerspective(wxCommandEvent & WXUNUSED(evt));
@@ -216,6 +237,10 @@ protected:
     // Frame Events
     void OnActivate(wxActivateEvent & evt);
     void OnClose(wxCloseEvent & evt);
+
+#ifdef __WXDEBUG__
+    void OnDumpStatus(wxCommandEvent & WXUNUSED(evt));
+#endif
 
     DECLARE_EVENT_TABLE()
 };
@@ -286,13 +311,25 @@ MyFrame::ShowPane(const wxString & name, bool show)
 
 
 inline void
-MyFrame::EnableTools(bool enable) {
-    m_toolMgr.GetTool(ID_TIMER)->Enable(enable);
-    m_toolMgr.GetTool(ID_CHECK_LETTER)->Enable(enable);
-    m_toolMgr.GetTool(ID_CHECK_WORD)->Enable(enable);
-    m_toolMgr.GetTool(ID_CHECK_GRID)->Enable(enable);
-    m_toolMgr.GetTool(ID_SHOW_NOTES)->Enable(enable);
-    m_toolMgr.GetTool(ID_SAVE)->Enable(enable);
+MyFrame::EnableTools(bool enable)
+{
+    m_toolMgr.Enable(ID_SAVE,         enable);
+    m_toolMgr.Enable(ID_CLOSE,        enable);
+
+    m_toolMgr.Enable(ID_ZOOM_IN,      enable);
+    m_toolMgr.Enable(ID_ZOOM_OUT,     enable);
+    m_toolMgr.Enable(ID_ZOOM_FIT,     enable);
+
+    m_toolMgr.Enable(ID_SCRAMBLE,     enable);
+    m_toolMgr.Enable(ID_UNSCRAMBLE,   enable);
+
+    m_toolMgr.Enable(ID_CHECK_LETTER, enable);
+    m_toolMgr.Enable(ID_CHECK_WORD,   enable);
+    m_toolMgr.Enable(ID_CHECK_GRID,   enable);
+
+    m_toolMgr.Enable(ID_SHOW_NOTES,   enable);
+
+    m_toolMgr.Enable(ID_TIMER,        enable);
 }
 
 

@@ -153,12 +153,6 @@ GridCtrl::OnPaint(wxPaintEvent & evt)
 void
 GridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
 {
-#ifdef __WXDEBUG__
-        int _scrollX, _scrollY;
-        GetScrollPixelsPerUnit(&_scrollX, &_scrollY);
-        wxASSERT(_scrollX == GetSquareSize() && _scrollY == GetSquareSize());
-#endif
-
     wxLogDebug(_T("GridCtrl::DrawGrid"));
 
     if (m_grid == NULL || m_grid->IsEmpty())
@@ -166,6 +160,12 @@ GridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
         wxLogDebug(_T("Grid is empty"));
         return;
     }
+
+#ifdef __WXDEBUG__
+        int _scrollX, _scrollY;
+        GetScrollPixelsPerUnit(&_scrollX, &_scrollY);
+        wxASSERT(_scrollX == GetSquareSize() && _scrollY == GetSquareSize());
+#endif
 
     if (m_rect.IsEmpty() || m_boxSize == 0)
     {
@@ -431,7 +431,7 @@ GridCtrl::SetSquareFocus(XSquare * square, bool direction)
 
 
 void
-GridCtrl::SetFocusedClue(int cluenum, bool direction)
+GridCtrl::ChangeFocusedClue(int cluenum, bool direction)
 {
     XSquare * square = GetClueNumber(cluenum);
     if (square == NULL)
@@ -444,7 +444,6 @@ GridCtrl::SetFocusedClue(int cluenum, bool direction)
                                direction) );
 
     ChangeSquareFocus(square, direction);
-
 }
 
 
@@ -788,6 +787,12 @@ GridCtrl::CheckLetter(int options)
 void
 GridCtrl::OnLeftDown(wxMouseEvent & evt)
 {
+    if (! m_grid || m_grid->IsEmpty())
+    {
+        evt.Skip();
+        return;
+    }
+
     wxPoint pt = evt.GetPosition();
     XSquare * square = HitTest(pt.x, pt.y);
     if (square != NULL && square->IsWhite())
@@ -800,6 +805,9 @@ GridCtrl::OnLeftDown(wxMouseEvent & evt)
 void
 GridCtrl::OnRightDown(wxMouseEvent & evt)
 {
+    if (! m_grid || m_grid->IsEmpty())
+        return;
+
     if (HasStyle(CONTEXT_MENU))
         return;
 
@@ -819,7 +827,7 @@ GridCtrl::OnRightDown(wxMouseEvent & evt)
 void
 GridCtrl::OnKeyDown(wxKeyEvent & evt)
 {
-    if (! m_grid)
+    if (! m_grid || m_grid->IsEmpty())
     {
         evt.Skip();
         return;
@@ -1158,6 +1166,8 @@ GridCtrl::IsFocusedWord(const XSquare & square)
 XSquare *
 GridCtrl::GetClueNumber(int num)
 {
+    wxASSERT(m_grid != NULL);
+    wxASSERT(m_grid->FirstWhite() != NULL);
     for (XSquare * square = m_grid->FirstWhite();
          square != NULL;
          square = square->Next())
