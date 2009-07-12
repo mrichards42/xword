@@ -316,11 +316,27 @@
 				Name="Header Files"
 				>
 				<File
+					RelativePath=".\src\puz\HandlerCommon.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\puz\PuzCk.hpp"
 					>
 				</File>
 				<File
+					RelativePath=".\src\puz\PuzHandler.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\puz\PuzLoader.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\Scrambler.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\TxtHandler.hpp"
 					>
 				</File>
 				<File
@@ -340,7 +356,15 @@
 				Name="Source Files"
 				>
 				<File
+					RelativePath=".\src\puz\HanderCommon.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\puz\PuzLoader.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\Scrambler.cpp"
 					>
 				</File>
 				<File
@@ -355,6 +379,10 @@
 			<Filter
 				Name="Header Files"
 				>
+				<File
+					RelativePath=".\src\utils\DragAndDrop.hpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\utils\ToolInfo.hpp"
 					>
