@@ -16,30 +16,35 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-// TODO:
-//   - Make the chars wxChars, so we can better support unicode
-//   - Or perhaps have both standard and unicode m_solution
-
 #ifndef X_SQUARE_H
 #define X_SQUARE_H
 
-
-// GEXT flags (just learned the one for X and for a circle!)
-// Perhaps there are some flags that use 0x01 - 0x08?
-const wxByte XFLAG_CLEAR  = 0x00;
-const wxByte XFLAG_BLACK  = 0x10;
-const wxByte XFLAG_X      = 0x20;
-const wxByte XFLAG_RED    = 0x40;
-const wxByte XFLAG_CIRCLE = 0x80;
+#include <wx/string.h>
+#include <map>
 
 
-// Clue types
-enum ClueType
+
+// GEXT flags
+enum XFlag
+{
+    XFLAG_CLEAR  = 0x00,
+    XFLAG_PENCIL = 0x08,
+    XFLAG_BLACK  = 0x10,
+    XFLAG_X      = 0x20,
+    XFLAG_RED    = 0x40,
+    XFLAG_CIRCLE = 0x80
+};
+
+
+
+// Clue flags
+enum ClueFlag
 {
     NO_CLUE     = 0x00,
     ACROSS_CLUE = 0x01,
     DOWN_CLUE   = 0x02,
 };
+
 
 // Forward/backward
 enum FindIncrement
@@ -56,160 +61,246 @@ enum GridDirection
     DIR_DOWN
 };
 
-// Macro to simplify GetX() functions
-#define GET_FUNCTION(type, declaration, member)         \
-    const type declaration const { return member; }   \
-          type declaration       { return member; }   \
+// Used with Check()
+enum CheckTest
+{
+    CHECK_BLANK,
+    NO_CHECK_BLANK
+};
 
 
-
+// To be used as friends
 class XGrid;
+class HandlerBase;
+class XGridScrambler;
+class XSquareModule;
 
 class XSquare
 {
 friend class XGrid;
+friend class XGridScrambler;
+friend class HandlerBase;
+friend class XSquareModule;
 
 public:
-    // Defaults to a black square
-    explicit XSquare(int a_col = -1,
-                     int a_row = -1,
-                     wxChar a_solution = '.',
-                     wxChar a_text = '.',
-                     wxByte a_flag = XFLAG_CLEAR,
-                     short a_number = 0,
-                     short a_clueFlag = NO_CLUE,
-                     const wxString & a_rebus = wxEmptyString,
-                     const wxString & a_rebusSol = wxEmptyString,
-                     unsigned short a_rebusSym = 0,
-                     unsigned short a_rebusSymSol = 0)
-        : col(a_col),
-          row(a_row),
-          solution(a_solution),
-          text(a_text),
-          flag(a_flag),
-          number(a_number),
-          clueFlag(a_clueFlag),
-          rebus(a_rebus),
-          rebusSol(a_rebusSol),
-          rebusSym(a_rebusSym),
-          rebusSymSol(a_rebusSymSol)
-    {
-        clue[DIR_ACROSS] = 0;
-        clue[DIR_DOWN]   = 0;
-
-        m_next[DIR_ACROSS][FIND_PREV] = NULL;
-        m_next[DIR_ACROSS][FIND_NEXT] = NULL;
-        m_next[DIR_DOWN]  [FIND_PREV] = NULL;
-        m_next[DIR_DOWN]  [FIND_NEXT] = NULL;
-
-        m_isLast[DIR_ACROSS][FIND_PREV] = false;
-        m_isLast[DIR_ACROSS][FIND_NEXT] = false;
-        m_isLast[DIR_DOWN]  [FIND_PREV] = false;
-        m_isLast[DIR_DOWN]  [FIND_NEXT] = false;
-
-        m_wordStart[DIR_ACROSS] = NULL;
-        m_wordEnd  [DIR_ACROSS] = NULL;
-        m_wordStart[DIR_DOWN]   = NULL;
-        m_wordEnd  [DIR_DOWN]   = NULL;
-    }
-
-    ~XSquare() {}
+    XSquare();
 
     // Location information
-    int col;
-    int row;
+    //---------------------
+    short GetCol() const { return m_col; }
+    short GetRow() const { return m_row; }
 
-    // Square information
-    wxChar   solution;
-    wxChar   text;
-    wxByte flag;
 
-    // Rebus stuff
-    wxString rebus;
-    wxString rebusSol;
-    unsigned short rebusSym;
-    unsigned short rebusSymSol;
+    // General information
+    //--------------------
+    bool IsWhite()      const { return ! IsBlack(); }
+    bool IsBlack()      const { return m_solution == _T("."); }
+    bool IsBlank()      const { return m_text == _T("-"); }
 
-    // Clue information
-    short number;
-    short clueFlag;
-    short clue[2]; // clue this belongs to; across and down
 
-    // Flag functions
+    // Text
+    //-----
+    const wxString & GetText()     const { return m_text; }
+    const wxString & GetSolution() const { return m_solution; }
+
+    char GetPlainText()     const { return Ascii(m_text); }
+    char GetPlainSolution() const { return m_asciiSolution; }
+
+    bool HasTextRebus()      const;
+    bool HasSolutionRebus()  const;
+    bool HasTextSymbol()     const;
+    bool HasSolutionSymbol() const;
+
+    int GetTextSymbol()      const;
+    int GetSolutionSymbol()  const;
+
+    void SetText(const wxString & text) { m_text = text; }
+
+    bool Check(bool checkBlank = NO_CHECK_BLANK) const;
+
+
+    // Clue
+    //-----
+    short GetNumber() const { return m_number; }
+    short GetClueFlag() const { return m_clueFlag; }
+    bool HasClue(bool direction) const
+        { return (m_clueFlag & (direction + 1)) != 0; }
+
+
+    // Flag (GEXT)
+    //------------
+    bool HasFlag     (wxByte flag) const { return (m_flag & flag) != 0; }
+    void AddFlag     (wxByte flag)       { m_flag |=   flag; }
+    void RemoveFlag  (wxByte flag)       { m_flag &= ~ flag; }
     void ReplaceFlag (wxByte flag1, wxByte flag2)
         { RemoveFlag(flag1); AddFlag(flag2); }
-    void AddFlag     (wxByte a_flag)       { flag |=   a_flag; }
-    void RemoveFlag  (wxByte a_flag)       { flag &= ~ a_flag; }
-    bool HasFlag     (wxByte a_flag) const
-        { return (flag & a_flag) != 0; }
 
-    // Information functions
-    bool IsRebus()      const { return ! rebusSol.empty(); }
-    bool HasRebusText() const { return ! rebus.empty(); }
-    bool IsWhite()      const { return ! IsBlack(); }
-    bool IsBlack()      const { return solution == '.'; }
-    bool IsBlank()      const { return text == '-'; }
-
-    bool Check(bool checkBlank = false)  const
-    {
-        if (IsBlack() || (IsBlank() && ! checkBlank))
-            return true;
-
-        if (IsRebus() || HasRebusText())
-            return rebus == rebusSol;
-
-        return solution == text;
-    }
 
     // Linked-list
-    //     - functions (rather than member access) needed for const-corectness
-    GET_FUNCTION(XSquare *,
-                Next(bool direction = DIR_ACROSS, bool increment = FIND_NEXT),
-                m_next[direction][increment])
+    //------------
+    XSquare * Next(bool dir = DIR_ACROSS, bool inc = FIND_NEXT)
+        { return m_next[dir][inc]; }
+    XSquare * Prev(bool dir = DIR_ACROSS, bool inc = FIND_NEXT)
+        { return m_next[dir][!inc]; }
+    XSquare * GetWordStart(bool dir)
+        { return m_wordStart[dir]; }
+    XSquare * GetWordEnd(bool dir)
+        { return m_wordEnd[dir]; }
 
-    GET_FUNCTION(XSquare *,
-                Prev(bool direction = DIR_ACROSS, bool increment = FIND_NEXT),
-                m_next[direction][1-increment])
-
-    GET_FUNCTION(XSquare *,
-                WordStart(bool direction),
-                m_wordStart[direction])
-
-    GET_FUNCTION(XSquare *,
-                WordEnd(bool direction),
-                m_wordEnd[direction])
-
-
-    // Test to see if word is the last or first in its column/row
     bool IsLast(bool direction, int increment = FIND_NEXT) const
-    {
-        return m_isLast [direction][increment];
-    }
+        { return m_isLast [direction][increment]; }
 
     bool IsFirst(bool direction, int increment = FIND_NEXT) const
-    {
-        return IsLast(direction, ! increment);
-    }
+        { return IsLast(direction, ! increment); }
+
+    // Const overloads
+    const XSquare * Next(bool dir = DIR_ACROSS, bool inc = FIND_NEXT) const
+        { return m_next[dir][inc]; }
+    const XSquare * Prev(bool dir = DIR_ACROSS, bool inc = FIND_NEXT) const
+        { return m_next[dir][!inc]; }
+    const XSquare * GetWordStart(bool dir) const
+        { return m_wordStart[dir]; }
+    const XSquare * GetWordEnd(bool dir) const
+        { return m_wordEnd[dir]; }
+
 
 protected:
-    // Note that these protected members will be set by XGrid
-    // when the grid is resized
+    // Location information
+    int m_col;
+    int m_row;
 
-    // Linked-list functionality (across/down, previous/next)
-    // This is incredibly important, as it makes searching the grid ~20x faster,
-    //     because there are no calls to At() and no loop variables
-    XSquare * m_next[2][2];
+    // Text
+    wxString m_solution;
+    wxString m_text;
+    char m_asciiSolution;
 
-    // last or first in column row (based on direction and increment)
-    bool m_isLast[2][2];
+    // Clue number
+    short m_number;
+    short m_clueFlag;
 
-    // These two aren't separated by increment (start/end) because they will 
-    // only be called when it is known whether start or end is required
-    XSquare * m_wordStart[2];
-    XSquare * m_wordEnd  [2];
+    // Flag (GEXT)
+    wxByte m_flag;
+
+    // Linked-list
+    //------------
+
+    // XGrid is responsible for setting the linked-list and spatial info
+
+    // This makes searching the grid ~20x faster, because there are no calls
+    // to At().
+
+    XSquare * m_next[2][2];  // [ across / down ] [ prev / next ]
+
+    bool m_isLast[2][2];   // [ across / down ] [ prev / next ]
+
+    XSquare * m_wordStart[2];  // [ across / down ]
+    XSquare * m_wordEnd  [2];  // [ across / down ]
+
+
+private:
+    // Character replacement table (to ASCII)
+    //---------------------------------------
+    static std::map<wxChar, char> sm_charTable;
+    static void InitCharTable();
+
+    // ASCII lookup functions
+    static char Ascii(wxChar chr);
+    static char Ascii(const wxString & str) { return Ascii(str.at(0)); }
 };
 
 
-#undef GET_FUNCTION
+
+//------------------------------------------------------------------------------
+// Inline functions
+//------------------------------------------------------------------------------
+
+inline
+bool
+XSquare::HasTextRebus() const
+{
+    wxASSERT(! m_text.empty());
+    return ! m_text.IsSameAs( static_cast<wxChar>(GetPlainText()) );
+}
+
+
+inline
+bool
+XSquare::HasSolutionRebus() const
+{
+    wxASSERT(! m_solution.empty());
+    return ! m_solution.IsSameAs( static_cast<wxChar>(GetPlainSolution()) );
+}
+
+
+inline
+bool
+XSquare::HasTextSymbol() const
+{
+    wxASSERT(! m_text.empty());
+    return m_text.length() == 3
+        && m_text.at(0) == _T('[') && m_text.at(2) == _T(']');
+}
+
+
+inline
+bool
+XSquare::HasSolutionSymbol() const
+{
+    wxASSERT(! m_solution.empty());
+    return m_solution.length() == 3
+        && m_solution.at(0) == _T('[') && m_solution.at(2) == _T(']');
+}
+
+
+inline
+int
+XSquare::GetTextSymbol() const
+{
+    wxASSERT(HasTextSymbol());
+    return static_cast<int>(m_text.at(1));
+}
+
+
+inline
+int
+XSquare::GetSolutionSymbol() const
+{
+    wxASSERT(HasSolutionSymbol());
+    return static_cast<int>(m_solution.at(1));
+}
+
+
+
+
+inline
+bool
+XSquare::Check(bool checkBlank)  const
+{
+    wxASSERT(! m_text.empty() && ! m_solution.empty());
+    if (IsBlack())
+        return true;
+    if (IsBlank())
+        return ! checkBlank;
+
+    if (HasTextRebus())
+        return m_solution == m_text;
+    else
+        return GetPlainText() == GetPlainSolution();
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Character table functions
+//------------------------------------------------------------------------------
+
+inline
+char
+XSquare::Ascii(wxChar chr)
+{
+    wxASSERT(sm_charTable.find(chr) != sm_charTable.end());
+    return sm_charTable[chr];
+}
 
 #endif // X_SQUARE_H

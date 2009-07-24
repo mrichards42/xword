@@ -63,22 +63,25 @@ enum
 //   places
 //---------------------------------------------------------------------------
 
-class GridCtrl
+extern const wxChar * XGridCtrlNameStr;
+
+class XGridCtrl
     : public wxScrolledWindow
 {
 public:
-    GridCtrl() { Init(); }
+    XGridCtrl() { Init(); }
 
-    explicit GridCtrl(wxWindow * parent,
+    explicit XGridCtrl(wxWindow * parent,
                       wxWindowID id = -1,
                       const wxPoint & pos = wxDefaultPosition,
                       const wxSize & size = wxDefaultSize,
                       XGrid * grid = NULL,
                       long style = DEFAULT_GRID_STYLE
-                                 | wxVSCROLL | wxHSCROLL)
+                                 | wxVSCROLL | wxHSCROLL,
+                      const wxString & name = XGridCtrlNameStr)
     {
         Init();
-        Create(parent, id, pos, size, grid, style);
+        Create(parent, id, pos, size, grid, style, name);
     }
 
     bool Create(wxWindow * parent,
@@ -87,11 +90,14 @@ public:
                 const wxSize & size = wxDefaultSize,
                 XGrid * grid = NULL,
                 long style = DEFAULT_GRID_STYLE
-                           | wxVSCROLL | wxHSCROLL);
+                           | wxVSCROLL | wxHSCROLL,
+                const wxString & name = XGridCtrlNameStr);
 
-    ~GridCtrl();
+    ~XGridCtrl();
 
-    void SetGrid(XGrid * grid);
+    void SetFocus() { SetFocusIgnoringChildren(); }
+
+    void SetXGrid(XGrid * grid);
           XGrid * GetXGrid()       { return m_grid; }
     const XGrid * GetXGrid() const { return m_grid; }
 
@@ -119,7 +125,7 @@ public:
     void RefreshSquare(XSquare & square)
         { wxClientDC dc(this); DoPrepareDC(dc); RefreshSquare(dc, square); }
 
-    void SetLetter(XSquare & square, char letter = _T('-'));
+    void SetSquareText(XSquare & square, const wxString & text = _T('-'));
 
     XSquare * GetFocusedSquare() { return m_focusedSquare; }
 
@@ -192,8 +198,9 @@ public:
 
     template <typename T>
     XSquare * FindSquare(XSquare * start,
-                         T type, bool direction,
-                         int increment = FIND_NEXT,
+                         T type,
+                         bool direction,
+                         bool increment = FIND_NEXT,
                          bool skipBlack = NO_SKIP_BLACK_SQUARES,
                          bool wrapLines = NO_WRAP_LINES);
 
@@ -201,7 +208,7 @@ public:
     XSquare * FindNextSquare(XSquare * start,
                              T type,
                              bool direction,
-                             int increment = FIND_NEXT,
+                             bool increment = FIND_NEXT,
                              bool skipBlack = NO_SKIP_BLACK_SQUARES,
                              bool wrapLines = NO_WRAP_LINES);
 
@@ -272,7 +279,7 @@ private:
     void OnLeftDown   (wxMouseEvent & evt);
     void OnRightDown  (wxMouseEvent & evt);
     void OnKeyDown    (wxKeyEvent & evt);
-    void OnLetter     (char key, int mod);
+    void OnLetter     (wxChar key, int mod);
     void OnArrow      (bool arrowDirection, bool increment, int mod);
     void OnTab        (int mod);
     void OnHome       (int mod);
@@ -281,6 +288,8 @@ private:
     void OnDelete     (int mod);
 
     DECLARE_EVENT_TABLE()
+    DECLARE_NO_COPY_CLASS(XGridCtrl)
+    DECLARE_DYNAMIC_CLASS(XGridCtrl)
 };
 
 
@@ -295,7 +304,7 @@ private:
 
 // Colors
 inline void
-GridCtrl::SetColors(const wxColor & square,
+XGridCtrl::SetColors(const wxColor & square,
                     const wxColor & focus,
                     const wxColor & word)
 {
@@ -308,7 +317,7 @@ GridCtrl::SetColors(const wxColor & square,
 
 // Fonts
 inline bool
-GridCtrl::SetFont(const wxFont & font)
+XGridCtrl::SetFont(const wxFont & font)
 {
     SetNumberFont(font);
     SetLetterFont(font);
@@ -316,14 +325,14 @@ GridCtrl::SetFont(const wxFont & font)
 }
 
 inline void
-GridCtrl::SetNumberFont(const wxFont & font)
+XGridCtrl::SetNumberFont(const wxFont & font)
 {
     m_numberFont = font;
     ScaleFont(&m_numberFont, m_boxSize * NUMBER_SCALE);
 }
 
 inline void
-GridCtrl::SetLetterFont(const wxFont & font)
+XGridCtrl::SetLetterFont(const wxFont & font)
 {
     m_letterFont = font;
     ScaleFont(&m_letterFont, m_boxSize * LETTER_SCALE);
@@ -331,7 +340,7 @@ GridCtrl::SetLetterFont(const wxFont & font)
 
 
 inline bool
-GridCtrl::IsFocusedLetter(const XSquare & Square)
+XGridCtrl::IsFocusedLetter(const XSquare & Square)
 {
     return m_focusedSquare == &Square;
 }
@@ -340,20 +349,21 @@ GridCtrl::IsFocusedLetter(const XSquare & Square)
 
 
 inline wxPoint
-GridCtrl::TopLeft(const XSquare & square)
+XGridCtrl::TopLeft(const XSquare & square)
 {
-    return wxPoint(m_rect.x + m_borderSize + square.col*GetSquareSize(),
-                   m_rect.y + m_borderSize + square.row*GetSquareSize());
+    return wxPoint(m_rect.x + m_borderSize + square.GetCol() * GetSquareSize(),
+                   m_rect.y + m_borderSize + square.GetRow() * GetSquareSize());
 }
 
 
 inline wxPoint
-GridCtrl::BottomRight(const XSquare & square)
+XGridCtrl::BottomRight(const XSquare & square)
 {
-    return wxPoint(m_rect.x + 2 * m_borderSize + square.col*GetSquareSize(),
-                   m_rect.y + 2 * m_borderSize + square.row*GetSquareSize());
+    wxPoint pt = TopLeft(square);
+    pt.x += GetSquareSize();
+    pt.y += GetSquareSize();
+    return pt;
 }
-
 
 
 
@@ -362,9 +372,14 @@ GridCtrl::BottomRight(const XSquare & square)
 
 
 template <typename T>
+inline
 XSquare *
-GridCtrl::FindSquare(XSquare * start, T type, bool direction, int increment,
-                     bool skipBlack, bool wrapLines)
+XGridCtrl::FindSquare(XSquare * start,
+                      T type,
+                      bool direction,
+                      bool increment,
+                      bool skipBlack,
+                      bool wrapLines)
 {
     return m_grid->FindSquare(start, type, direction, increment,
                               skipBlack, wrapLines);
@@ -372,9 +387,14 @@ GridCtrl::FindSquare(XSquare * start, T type, bool direction, int increment,
 
 
 template <typename T>
+inline
 XSquare *
-GridCtrl::FindNextSquare(XSquare * start, T type, bool direction, int increment,
-                         bool skipBlack, bool wrapLines)
+XGridCtrl::FindNextSquare(XSquare * start,
+                          T type,
+                          bool direction,
+                          bool increment,
+                          bool skipBlack,
+                          bool wrapLines)
 {
     return m_grid->FindNextSquare(start, type, direction, increment,
                                   skipBlack, wrapLines);

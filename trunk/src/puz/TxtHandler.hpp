@@ -18,172 +18,119 @@
 #ifndef TXT_HANDLER_H
 #define TXT_HANDLER_H
 
-bool LoadTxt(XPuzzle * puz, const wxString & filename);
-bool SaveTxt(XPuzzle * puz, const wxString & filename);
+#include "HandlerBase.hpp"
+#include <wx/txtstrm.h>
+#include <stack>
 
-
-bool
-LoadTxt(XPuzzle * puz, const wxChar * filename)
+class TxtHandler : public HandlerBase
 {
-    try
+protected:
+    void DoLoad();
+
+    void LoadVersion1Grid();
+    void LoadVersion2Grid();
+
+    wxString GetExtension()   const { return _T("txt"); }
+    wxString GetDescription() const { return _T("Plain text format"); }
+    bool CanLoad() const { return true; }
+    bool CanSave() const { return false; }
+
+private:
+    wxTextInputStream * m_inText;
+
+    enum
     {
-        // Reset all puzzle contents
-        puz->Clear();
+        NO_STRIP_WHITESPACE,
+        STRIP_WHITESPACE
+    };
 
-        wxLogDebug(_T("Loading Text file %s"), filename);
-        wxFileInputStream input(filename);
-        // wxConvLibc is locale dependent: it doesn't kill (c)
-        wxTextInputStream f(input, _T("\t"), wxConvLibc);
+    wxString ReadLine(bool strip = STRIP_WHITESPACE);
 
-        wxString version = ReadTextLine(f);
-        // We'll get to <ACROSS PUZZLE V2> sometime
-        if (! (version == _T("<ACROSS PUZZLE>")) )
-            return LoadError(_T("Expected <ACROSS PUZZLE>"));
+    // Throw an exception if the next line does not equal name.
+    void CheckSection(const wxString & name);
+    
+    // Return value indicates if the next line equals test.
+    // If it does, the function eats the line.
+    // Otherwise, it does not eat the line.
+    bool TestLine(const wxString & test, bool strip = STRIP_WHITESPACE);
 
-        wxLogDebug(_T("Has Header"));
+    void UngetLine(const wxString & line);
 
-        if (ReadTextLine(f) != _T("<TITLE>"))
-            return LoadError(_T("Expected <TITLE>"));
-        puz->m_title = ReadTextLine(f);
+    // Store extra lines from TestLine
+    std::stack<wxString> m_lastLines;
 
-        wxLogDebug(_T("Has Title"));
-
-        if (ReadTextLine(f) != _T("<AUTHOR>"))
-            return LoadError(_T("Expected <AUTHOR>"));
-        puz->m_author = ReadTextLine(f);
-
-        wxLogDebug(_T("Has Author"));
-
-        if (ReadTextLine(f) != _T("<COPYRIGHT>"))
-            return LoadError(_T("Expected <COPYRIGHT>"));
-        puz->m_copyright = ReadTextLine(f);
-        if (! puz->m_copyright.empty())
-            puz->m_copyright.Prepend(_T("© "));
-
-        wxLogDebug(_T("Has Copyright"));
-
-        if (ReadTextLine(f) != _T("<SIZE>"))
-            return LoadError(_T("Expected <SIZE>"));
-        wxStringTokenizer tok(ReadTextLine(f), _T(" x"), wxTOKEN_STRTOK);
-        long width, height;
-        // This looks a bit messy, but achieves all steps at once
-        if (! (tok.HasMoreTokens() && tok.GetNextToken().ToLong(&width)
-               && tok.HasMoreTokens() && tok.GetNextToken().ToLong(&height)) )
-        {
-            return LoadError(_T("Incorrect size spec"));
-        }
-        puz->m_grid.SetSize(width, height);
-        wxLogDebug(_T("width: %d, height: %d"), width, height);
-
-        if (ReadTextLine(f) != _T("<GRID>"))
-            return LoadError(_T("Expected <GRID>"));
-
-        wxString gridString;
-        if (! ReadGridString(f, width, height, &gridString))
-            return false;
-        SetGridSolution(puz, gridString.mb_str());
-
-        puz->m_grid.ClearGrid(); // Set up grid black squares
+    size_t m_line;
+};
 
 
-        // Count across and down clues
-        size_t acrossClues, downClues;
-        puz->m_grid.CountClues(&acrossClues, &downClues);
 
-        // Read across and down clues
-        std::vector<wxString> across;
-        std::vector<wxString> down;
+//------------------------------------------------------------------------------
+// Inline functions
+//------------------------------------------------------------------------------
 
-        if (ReadTextLine(f) != _T("<ACROSS>"))
-            return LoadError(_T("Expected <ACROSS>"));
+inline
+wxString
+TxtHandler::ReadLine(bool strip)
+{
+    wxString ret;
 
-        for (size_t i = 0; i < acrossClues; ++i)
-        {
-            across.push_back(ReadTextLine(f));
-            if (across.back() == _T("<DOWN>") || across.back() == _T(""))
-                return LoadError(_T("Not enough across clues"));
-        }
-
-        if (ReadTextLine(f) != _T("<DOWN>"))
-            return LoadError(_T("Expected <DOWN>"));
-        for (size_t i = 0; i < downClues; ++i)
-        {
-            down.push_back(ReadTextLine(f));
-            if (down.back() == _T(""))
-                return LoadError(_T("Not enough down clues"));
-        }
-
-        // Read <NOTEPAD> section
-
-
-        // Read m_across and m_down into m_clues
-        // Iterators should always be valid due to some handiwork from earlier
-        std::vector<wxString>::const_iterator across_it = across.begin();
-        std::vector<wxString>::const_iterator down_it   = down.begin();
-
-        for (size_t row = 0; row < puz->m_grid.GetHeight(); ++row)
-        {
-            for (size_t col = 0; col < puz->m_grid.GetWidth(); ++col)
-            {
-                const int clue = puz->m_grid.HasClue(col, row);
-                if (clue & ACROSS_CLUE)
-                    puz->m_clues.push_back(*across_it++);
-                if (clue & DOWN_CLUE)
-                    puz->m_clues.push_back(*down_it++);
-            }
-        }
-
-        SetupClues(puz);
-
-        return true;
-    }
-    catch (PuzLoadError exception)
+    // See if we have any lines on the stack already
+    if (! m_lastLines.empty())
     {
-        wxMessageBox(exception.message);
+        ret = m_lastLines.top();
+        m_lastLines.pop();
     }
-    catch (...)
+    else // Noting in the stack, read a line from the stream
+        ret = m_inText->ReadLine();
+
+    ++m_line;
+
+    if (strip)
+        return ret.Trim(true).Trim(false); // Left and right sides
+
+    return ret;
+}
+
+
+inline
+void
+TxtHandler::CheckSection(const wxString & name)
+{
+    if (ReadLine() != name)
+        throw PuzLoadError(_T("Missing %s header"), name);
+}
+
+inline
+bool
+TxtHandler::TestLine(const wxString & test, bool strip)
+{
+    // Only strip this line for the test.  In case whitespace characters are
+    // meaningful, we should preserve them if we have to UngetLine().
+    wxString line = ReadLine(NO_STRIP_WHITESPACE);
+
+    if (strip == true)
     {
-        wxMessageBox(_T("Error loading file"));
+        if (line.Trim(true).Trim(false) == test)
+            return true;
     }
+    else
+    {
+        if (line == test)
+            return true;
+    }
+
+    UngetLine(line);
     return false;
 }
 
 
-bool
-SaveTxt(XPuzzle * puz, const wxChar * filename)
+inline
+void
+TxtHandler::UngetLine(const wxString & line)
 {
-    wxFileOutputStream f(filename);
-    if (! f.IsOk())
-        return false;
-
-    wxTextOutputStream out(f);
-
-    out << _T("<ACROSS PUZZLE>") << endl
-        << _T("<TITLE>") << endl
-        << puz->m_title << endl
-        << _T("<AUTHOR>") << endl
-        << puz->m_author << endl
-        << _T("<COPYRIGHT>") << endl
-        << puz->m_copyright << endl
-        << _T("<SIZE>") << endl
-        << wxString::Format(_T("%dx%d"), puz->m_grid.GetWidth(), puz->m_grid.GetHeight()) << endl
-        << _T("<GRID>") << endl;
-
-    int width = puz->m_grid.GetWidth();
-    wxString sol = puz->m_grid.GetSolution();
-    size_t pos;
-    for (pos = 0; pos < sol.length(); pos += width)
-        out << sol.Mid(pos, width) << endl;
-
-    XPuzzle::ClueList::iterator it;
-    out << _T("<ACROSS>") << endl;
-    for (it = puz->m_across.begin(); it != puz->m_across.end(); ++it)
-        out << it->Text() << endl;
-    out << _T("<DOWN>") << endl;
-    for (it = puz->m_down.begin(); it != puz->m_down.end(); ++it)
-        out << it->Text() << endl;
-
-    return true;
+    wxASSERT(m_line != 0);
+    --m_line;
+    m_lastLines.push(line);
 }
 
 #endif // TXT_HANDLER_H

@@ -22,7 +22,7 @@
 struct PuzCk
 {
     unsigned short c_primary;         //
-    unsigned char  formatstr[12];     // 'ACROSS&DOWN\0'
+             char  formatstr[12];     // 'ACROSS&DOWN\0'
     unsigned short c_cib;             //
     unsigned char  c_masked[8];       //
     unsigned char  version[4];        // '1.2\0' or something like it

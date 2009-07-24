@@ -25,7 +25,20 @@ BEGIN_EVENT_TABLE(wxCachedVListBox, wxVListBox)
     EVT_SIZE (wxCachedVListBox::OnSize)
 END_EVENT_TABLE()
 
+IMPLEMENT_ABSTRACT_CLASS(wxCachedVListBox, wxVListBox)
 
+const wxChar * wxCachedVListBoxNameStr = _T("CachedVListBox");
+
+bool
+wxCachedVListBox::Create(wxWindow *parent,
+                         wxWindowID id,
+                         const wxPoint& pos,
+                         const wxSize& size,
+                         long style,
+                         const wxString & name)
+{
+    return wxVListBox::Create(parent, id, pos, size, style, name);
+}
 
 void
 wxCachedVListBox::OnSize(wxSizeEvent & evt)

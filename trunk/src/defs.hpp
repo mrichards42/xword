@@ -23,10 +23,6 @@
 static const double NUMBER_SCALE = 2./5.;
 static const double LETTER_SCALE = 5./6.;
 
-// Focused direction
-static const bool CROSSING_CLUE = false;
-static const bool FOCUSED_CLUE  = true;
-
 // Styles
 enum GridStyle
 {

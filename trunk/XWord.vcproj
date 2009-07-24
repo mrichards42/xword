@@ -316,7 +316,11 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\src\puz\HandlerCommon.hpp"
+					RelativePath=".\src\puz\Checksummer.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\HandlerBase.hpp"
 					>
 				</File>
 				<File
@@ -325,10 +329,6 @@
 				</File>
 				<File
 					RelativePath=".\src\puz\PuzHandler.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\PuzLoader.hpp"
 					>
 				</File>
 				<File
@@ -356,11 +356,15 @@
 				Name="Source Files"
 				>
 				<File
-					RelativePath=".\src\puz\HanderCommon.cpp"
+					RelativePath=".\src\puz\Checksummer.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\PuzLoader.cpp"
+					RelativePath=".\src\puz\HandlerBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\PuzHandler.cpp"
 					>
 				</File>
 				<File
@@ -368,7 +372,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\puz\TxtHandler.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\puz\XGrid.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\XPuzzle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\XSquare.cpp"
 					>
 				</File>
 			</Filter>
@@ -379,6 +395,10 @@
 			<Filter
 				Name="Header Files"
 				>
+				<File
+					RelativePath=".\src\utils\ByteArray.hpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\utils\DragAndDrop.hpp"
 					>
@@ -399,6 +419,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\utils\ByteArray.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\utils\ToolInfo.cpp"
 					>
@@ -428,14 +452,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\widgets\MyAuiToolBar.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\MyAuiToolBarArt.hpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\widgets\odlistbox.hpp"
 					>
 				</File>
@@ -451,10 +467,6 @@
 			<Filter
 				Name="Source Files"
 				>
-				<File
-					RelativePath=".\src\widgets\MyAuiToolBar.cpp"
-					>
-				</File>
 				<File
 					RelativePath=".\src\widgets\SizedText.cpp"
 					>
@@ -501,10 +513,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\GridCtrl.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\MyConfig.hpp"
 				>
 			</File>
@@ -518,6 +526,10 @@
 			</File>
 			<File
 				RelativePath=".\src\PuzEvent.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\XGridCtrl.hpp"
 				>
 			</File>
 		</Filter>
@@ -537,10 +549,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\GridCtrl.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\MyConfig.cpp"
 				>
 			</File>
@@ -554,6 +562,10 @@
 			</File>
 			<File
 				RelativePath=".\src\PuzEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\XGridCtrl.cpp"
 				>
 			</File>
 		</Filter>

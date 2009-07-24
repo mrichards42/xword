@@ -26,7 +26,6 @@ wxPuzEvent::wxPuzEvent(wxEventType evtType, int id)
     : wxCommandEvent(evtType, id)
 {
     m_direction  = false; // == DIR_ACROSS
-    m_position   = wxDefaultPosition;
     m_acrossClue = 0;
     m_downClue   = 0;
     m_clueText   = _T("");

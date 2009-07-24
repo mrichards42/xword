@@ -28,6 +28,8 @@
 #include <wx/dcmemory.h> // for use with OnMeasureItem
 #include <vector>
 
+extern const wxChar * wxCachedVListBoxNameStr;
+
 class wxCachedVListBox
     : public wxVListBox
 {
@@ -38,9 +40,19 @@ public:
                      wxWindowID id,
                      const wxPoint& pos = wxDefaultPosition,
                      const wxSize& size = wxDefaultSize,
-                     long style = 0)
-        : wxVListBox(parent, id, pos, size, style)
-    {}
+                     long style = 0,
+                     const wxString & name = wxCachedVListBoxNameStr)
+    {
+        Init();
+        Create(parent, id, pos, size, style, name);
+    }
+
+    bool Create(wxWindow *parent,
+                wxWindowID id,
+                const wxPoint& pos = wxDefaultPosition,
+                const wxSize& size = wxDefaultSize,
+                long style = 0,
+                const wxString & name = wxCachedVListBoxNameStr);
 
     virtual ~wxCachedVListBox() {}
 
@@ -96,6 +108,7 @@ protected:
     void OnSize(wxSizeEvent & evt);
 
     DECLARE_EVENT_TABLE()
+    DECLARE_ABSTRACT_CLASS(wxCachedVListBox)
 };
 
 #endif // CACHED_V_LIST_BOX_H

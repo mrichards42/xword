@@ -20,7 +20,7 @@
 #include "XGrid.hpp"
 #include <wx/string.h>
 #include <ctime>
-#include "HandlerCommon.hpp" // checksumming
+#include "Checksummer.hpp"
 
 #include <wx/log.h>
 
@@ -30,50 +30,12 @@ XGridScrambler::XGridScrambler(XGrid & grid)
 
 
 
-//--------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Scrambling functions
-//--------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 bool
-XGridScrambler::ScrambleSolution(unsigned short key)
-{
-    if (key == 0)
-        key = MakeKey();
-
-    unsigned short cksum = DoScramble(key);
-    if (cksum != 0)
-    {
-        m_grid.m_key = key;
-        m_grid.m_cksum = cksum;
-        return true;
-    }
-
-    return false;
-}
-
-
-unsigned short
-XGridScrambler::MakeKey()
-{
-    // If we already have a key, use that one
-    if (m_grid.m_key != 0)
-        return m_grid.m_key;
-
-    // Generate 4 random numbers for the key
-    unsigned short key;
-    key = rand() % 9 + 1;
-    key = key * 10 + rand() % 10;
-    key = key * 10 + rand() % 10;
-    key = key * 10 + rand() % 10;
-
-    return key;
-}
-
-
-
-
-unsigned short
-XGridScrambler::DoScramble(unsigned short key_int)
+XGridScrambler::ScrambleSolution(unsigned short key_int)
 {
     bool ok = m_grid.GetWidth() > 0 && m_grid.GetHeight() > 0;
     ok = ok && (m_grid.m_flag & XFLAG_NO_SOLUTION) == 0;
@@ -81,21 +43,27 @@ XGridScrambler::DoScramble(unsigned short key_int)
     wxASSERT(m_grid.First() != NULL);
 
     if (! ok)
-        return 0;
+        return false;
+
+    if (key_int == 0)
+        key_int = MakeKey();
+
+    wxASSERT(1000 <= key_int && key_int <= 9999);
 
     // Read the key into an array of single digits
-    char key[4];
-    for (int i = 3; i >= 0; --i)
-    {
-        key[i] = key_int % 10;
-        key_int /= 10;
-    }
+    unsigned char key[4];
+    key[0] = int(key_int / 1000) % 10;
+    key[1] = int(key_int / 100)  % 10;
+    key[2] = int(key_int / 10)   % 10;
+    key[3] = int(key_int / 1)    % 10;
 
     wxString solution = GetSolutionDown();
 
-    unsigned short cksum = cksum_string(solution, 0);
+    unsigned short cksum = Checksummer::cksum_region(solution, 0);
+    if (cksum == 0)
+        return false;
 
-    int length = solution.length();
+    size_t length = solution.length();
 
     // Don't scramble really small puzzles
     if(length < 12)
@@ -105,7 +73,7 @@ XGridScrambler::DoScramble(unsigned short key_int)
     for (int i = 0; i < 4; ++i)
     {
         wxString scramble_part;
-        for (int j = 0; j < length; ++j)
+        for (size_t j = 0; j < length; ++j)
         {
             wxChar letter = solution[j] + key[j % 4];
 
@@ -138,14 +106,37 @@ XGridScrambler::DoScramble(unsigned short key_int)
     {
         if (square->IsWhite())
         {
-            square->solution = *it;
+            square->m_asciiSolution = *it;
             ++it;
         }
     }
     wxASSERT(it == solution.end());
+
     m_grid.m_flag |= XFLAG_SCRAMBLED;
-    return cksum;
+    m_grid.m_cksum = cksum;
+    m_grid.m_key = key_int;
+
+    return true;
 }
+
+
+unsigned short
+XGridScrambler::MakeKey()
+{
+    // If we already have a key, use that one
+    if (m_grid.m_key != 0)
+        return m_grid.m_key;
+
+    // Generate 4 random numbers for the key
+    unsigned short key;
+    key = rand() % 9 + 1;
+    key = key * 10 + rand() % 10;
+    key = key * 10 + rand() % 10;
+    key = key * 10 + rand() % 10;
+
+    return key;
+}
+
 
 
 
@@ -154,7 +145,7 @@ XGridScrambler::DoScramble(unsigned short key_int)
 
 // Shift the string by keynum characters (wraps around)
 wxString
-XGridScrambler::ShiftString(const wxString & str, unsigned short keynum)
+XGridScrambler::ShiftString(const wxString & str, unsigned char keynum)
 {
     wxASSERT(str.length() > 0);
 
@@ -194,51 +185,34 @@ XGridScrambler::ScrambleString(const wxString & str)
 
 
 
-//--------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Unscrambling functions
 //
-// These are almost _exactly_ the scrambling functions run backward
-//--------------------------------------------------------------------------------
+// These are almost exactly the scrambling functions run backward
+//------------------------------------------------------------------------------
 
 bool
-XGridScrambler::UnscrambleSolution(unsigned short key)
-{
-    wxASSERT(key != 0);
-
-    unsigned short cksum = DoUnscramble(key);
-    if (cksum == m_grid.m_cksum)
-    {
-        m_grid.m_cksum = 0;
-        m_grid.m_key = 0;
-        return true;
-    }
-    return false;
-}
-
-
-
-unsigned short
-XGridScrambler::DoUnscramble(unsigned short key_int)
+XGridScrambler::UnscrambleSolution(unsigned short key_int)
 {
     bool ok = m_grid.GetWidth() > 0 && m_grid.GetHeight() > 0;
     ok = ok && (m_grid.m_flag & XFLAG_NO_SOLUTION) == 0;
 
+    wxASSERT(1000 <= key_int && key_int <= 9999);
     wxASSERT(m_grid.First() != NULL);
 
     if (! ok)
-        return 0;
+        return false;
 
     // Read the key into an array of single digits
-    char key[4];
-    for (int i = 3; i >= 0; --i)
-    {
-        key[i] = key_int % 10;
-        key_int /= 10;
-    }
+    unsigned char key[4];
+    key[0] = int(key_int / 1000) % 10;
+    key[1] = int(key_int / 100)  % 10;
+    key[2] = int(key_int / 10)   % 10;
+    key[3] = int(key_int / 1)    % 10;
 
     wxString solution = GetSolutionDown();
 
-    int length = solution.length();
+    size_t length = solution.length();
 
     // Don't unscramble really small puzzles
     if(length < 12)
@@ -255,7 +229,7 @@ XGridScrambler::DoUnscramble(unsigned short key_int)
 
         wxString unscramble_part;
 
-        for (int j = 0; j < length; ++j)
+        for (size_t j = 0; j < length; ++j)
         {
             wxChar letter = solution[j] - key[j % 4];
 
@@ -273,9 +247,12 @@ XGridScrambler::DoUnscramble(unsigned short key_int)
         solution = unscramble_part;
     }
 
-    unsigned short cksum = cksum_string(solution, 0);
+    unsigned short cksum = Checksummer::cksum_region(solution, 0);
 
-    // Save the scrambled solution to the puzzle file
+    if (cksum != m_grid.m_cksum)
+        return false;
+
+    // Save the unscrambled solution to the grid
     wxString::iterator it = solution.begin();
     for (XSquare * square = m_grid.First();
          square != NULL;
@@ -283,13 +260,18 @@ XGridScrambler::DoUnscramble(unsigned short key_int)
     {
         if (square->IsWhite())
         {
-            square->solution = *it;
+            square->m_asciiSolution = *it;
             ++it;
         }
     }
     wxASSERT(it == solution.end());
+
+    // Reset the flags
     m_grid.m_flag &= ~XFLAG_SCRAMBLED;
-    return cksum;
+    m_grid.m_cksum = 0;
+    m_grid.m_key = 0;
+
+    return true;
 }
 
 
@@ -302,7 +284,7 @@ XGridScrambler::DoUnscramble(unsigned short key_int)
 
 // Shift the string by -keynum characters (wraps around)
 wxString
-XGridScrambler::UnshiftString(const wxString & str, unsigned short keynum)
+XGridScrambler::UnshiftString(const wxString & str, unsigned char keynum)
 {
     wxASSERT(str.length() > 0);
 
@@ -343,9 +325,9 @@ XGridScrambler::UnscrambleString(const wxString & str)
 
 
 
-//--------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // General functions
-//--------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 // Returns a character array with the solution to all white squares
 // Note that this is arranged by moving DOWN instead of the normal ACROSS
@@ -362,7 +344,7 @@ XGridScrambler::GetSolutionDown()
          square = square->Next(DIR_DOWN))
     {
         if (square->IsWhite())
-            ret.append(square->solution);
+            ret.append(static_cast<wxChar>(square->GetPlainSolution()));
     }
 
     return ret;

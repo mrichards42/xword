@@ -19,19 +19,19 @@
 #ifndef MY_APP_H
 #define MY_APP_H
 
-// For compilers that don't support precompilation, include "wx/wx.h"
-#include <wx/wxprec.h>
- 
+#include <wx/wxprec.h> 
 #ifndef WX_PRECOMP
-#    include <wx/wx.h>
+#    include <wx/app.h>
 #endif
 
 class MyFrame;
 
 class MyApp : public wxApp
 {
+    friend class MyFrame; // So we can set m_frame to NULL when it is deleted
 public:
     virtual bool OnInit();
+    virtual bool ReadCommandLine();
 
     // return code = number of unsuccessful conversions
     virtual int  OnRun() { wxApp::OnRun(); return m_retCode; }
@@ -41,8 +41,13 @@ public:
     void SetReturnCode(int code) { m_retCode = code; }
 
 private:
+    void OnActivate(wxActivateEvent & evt);
+
     MyFrame * m_frame;
     int m_retCode;
+    bool m_isTimerRunning;
+
+    DECLARE_EVENT_TABLE()
 };
 
 DECLARE_APP(MyApp)

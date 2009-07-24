@@ -30,8 +30,8 @@ public:
 
     // ScrambleSolution() will set m_key and m_cksum on the XGrid
     // If key != 0, use the provided key, otherwise create one
-    bool ScrambleSolution(unsigned short key = 0);
-    bool UnscrambleSolution(unsigned short key);
+    bool ScrambleSolution(unsigned short key_int = 0);
+    bool UnscrambleSolution(unsigned short key_int);
 
 private:
     XGrid & m_grid;
@@ -40,17 +40,13 @@ private:
 
     // Scrambling functions
     unsigned short MakeKey();
-    unsigned short DoScramble(unsigned short key_int);
 
-    static wxString ShiftString(const wxString & str, unsigned short keynum);
+    static wxString ShiftString(const wxString & str, unsigned char keynum);
     static wxString ScrambleString(const wxString & str);
 
     // Unscrambling functions
-    unsigned short DoUnscramble(unsigned short key_int);
-
-    static wxString UnshiftString   (const wxString & str, unsigned short keynum);
+    static wxString UnshiftString(const wxString & str, unsigned char keynum);
     static wxString UnscrambleString(const wxString & str);
-
 };
 
 

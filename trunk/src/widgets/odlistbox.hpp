@@ -38,6 +38,7 @@
 // NB: OnMeasureItem provides wxDC as a parameter (different from wxVListBox)
 //==============================================================================
 
+static const wxChar * wxOwnerDrawnListBoxNameStr = _T("OwnerDrawnListBox");
 
 // At some point we can use another parent class . . . not yet
 template<typename T = wxString, class _Parent = wxCachedVListBox>
@@ -56,10 +57,11 @@ public:
                         const wxPoint& pos = wxDefaultPosition,
                         const wxSize& size = wxDefaultSize,
                         int n = 0, const T choices[] = NULL,
-                        long style = 0)
+                        long style = 0,
+                        const wxString & name = wxOwnerDrawnListBoxNameStr)
     {
         Init();
-        Create(parent, id, pos, size, n, choices, style);
+        Create(parent, id, pos, size, n, choices, style, name);
     }
 
     wxOwnerDrawnListBox(wxWindow *parent,
@@ -67,19 +69,21 @@ public:
                         const wxPoint& pos,
                         const wxSize& size,
                         const std::vector<T> & choices,
-                        long style = 0)
+                        long style = 0,
+                        const wxString & name = wxOwnerDrawnListBoxNameStr)
     {
         Init();
-        Create(parent, id, pos, size, choices, style);
+        Create(parent, id, pos, size, choices, style, name);
     }
 
     bool Create(wxWindow *parent, wxWindowID id,
                 const wxPoint& pos = wxDefaultPosition,
                 const wxSize& size = wxDefaultSize,
                 int n = 0, const T choices[] = NULL,
-                long style = 0)
+                long style = 0,
+                const wxString & name = _T("OwnerDrawnListBox"))
     {
-        if (! _Parent::Create(parent, id, pos, size, style))
+        if (! _Parent::Create(parent, id, pos, size, style, name))
             return false;
         int i;
         for (i = 0; i < n; ++i)
@@ -92,9 +96,10 @@ public:
                 const wxPoint& pos,
                 const wxSize& size,
                 const std::vector<T> & choices,
-                long style = 0)
+                long style = 0,
+                const wxString & name = _T("OwnerDrawnListBox"))
     {
-        if (! _Parent::Create(parent, id, pos, size, style))
+        if (! _Parent::Create(parent, id, pos, size, style, name))
             return false;
         Append(choices);
         return true;
@@ -222,6 +227,9 @@ protected:
 
     // Text color
     wxColour m_selectionForeground;
+
+    DECLARE_ABSTRACT_CLASS(wxOwnerDrawnListBox)
+    DECLARE_NO_COPY_CLASS(wxOwnerDrawnListBox)
 };
 
 
@@ -242,6 +250,30 @@ wxOwnerDrawnListBox<T, _Parent>::OnDrawBackground(wxDC & dc,
 }
 
 
+
+
+
+
+
+// wxWidgets RTTI
+//---------------
+// This is the equivalent of IMPLEMENT_ABSTRACT_CLASS, except that the
+// implementation can't happen with the macro because this is a templated class
+template <typename T, class _Parent>
+wxClassInfo
+wxOwnerDrawnListBox<T, _Parent>
+    ::ms_classInfo( _T("wxOwnerDrawnListBox"),
+                    &_Parent::ms_classInfo,
+                    NULL,
+                    (int) sizeof(wxOwnerDrawnListBox<T, _Parent>),
+                    (wxObjectConstructorFn) NULL );
+
+template <typename T, class _Parent>
+wxClassInfo *
+wxOwnerDrawnListBox<T, _Parent>::GetClassInfo() const
+{
+    return &wxOwnerDrawnListBox<T, _Parent>::ms_classInfo;
+}
 
 
 

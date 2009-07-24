@@ -17,22 +17,19 @@
 
 
 // TODO:
-// - Most importantly, organize MyFrame.hpp
-//    and MyFrame.cpp (including comments)
 //   - Figure out what needs to go in the config
-
 
 #ifndef MY_FRAME_H
 #define MY_FRAME_H
 
-// For compilers that don't support precompilation, include "wx/wx.h"
+
 #include <wx/wxprec.h>
- 
 #ifndef WX_PRECOMP
-#    include <wx/wx.h>
+#    include <wx/frame.h>
 #endif
 
 #include <wx/aui/aui.h>
+
 
 // XWord library
 #include "puz/XPuzzle.hpp"
@@ -42,15 +39,14 @@ class wxPuzEvent;
 class ClueListBox;
 class SizedText;
 class CluePanel;
-class PerspectiveDialog;
+class LayoutDialog;
 
-#include "GridCtrl.hpp"
+#include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
+
 
 #include "utils/ToolManager.hpp"
 
-// Drag and drop
-class XWordFileDropTarget;
 
 // Config headers
 #include <wx/wfstream.h>    // for wxFileInputStream and wxFileOutputStream
@@ -60,186 +56,185 @@ class XWordFileDropTarget;
 #include <wx/stdpaths.h>
 
 
-// Frame menu and toolbar ids
-enum
+//#define USE_AUI_TOOLBAR
+
+
+//------------------------------------------------------------------------------
+// The XWord frame class
+//------------------------------------------------------------------------------
+
+class MyFrame : public wxFrame
 {
-    ID_OPEN = wxID_HIGHEST,
-    ID_SAVE,
-    ID_CLOSE,
-
-    ID_QUIT,
-
-    ID_ZOOM_IN,
-    ID_ZOOM_FIT,
-    ID_ZOOM_OUT,
-    ID_CHECK_LETTER,
-    ID_CHECK_WORD,
-    ID_CHECK_GRID,
-
-    ID_SCRAMBLE,
-    ID_UNSCRAMBLE,
-
-    ID_LAYOUT_PANES,
-    ID_LOAD_PERSPECTIVE,
-    ID_SAVE_PERSPECTIVE,
-
-    ID_SHOW_NOTES,
-    ID_SHOW_NOTES_NEW,
-
-    ID_TIMER,
-
-#ifdef __WXDEBUG__
-    ID_DUMP_STATUS
-#endif
-};
-
-class MyFrame
-    : public wxFrame
-{
-    friend class PerspectiveDialog;
 public:
     MyFrame();
     ~MyFrame();
 
-    bool LoadPuzzle(const wxString & filename,
-                    const wxString & ext = wxEmptyString);
+    // XWord puzzle loading / saving
+    //-----------
+    bool LoadPuzzle(const wxString & filename, const wxString & ext = _T(""));
+    bool SavePuzzle(const wxString & filename, const wxString & ext = _T(""));
+    bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
+    void CheckPuzzle();
+    void ShowPuzzle();  // Displays the actual puzzle
 
-    bool SavePuzzle(const wxString & filename,
-                    const wxString & ext = wxEmptyString);
+    // Window Management
+    //-----------
+    void ShowPane(const wxString & name, bool show = true);
+    void HidePane(const wxString & name) { return ShowPane(name, false); }
 
-    // Return true if no puzzle is opened after the function
-    bool ClosePuzzle();
+    void SaveLayout      (const wxString & name);
+    bool LoadLayout      (const wxString & name, bool update = false);
+    bool LoadLayoutString(const wxString & layout, bool update = false);
+    void UpdateLayout();
 
+
+    // Status bar
+    //-----------
     void SetStatus(const wxString & text) { m_status->SetStatus(text); }
 
 
-protected:
-    // General use functions
-    //------------------------
-
-    void SavePerspective      (const wxString & name);
-    bool LoadPerspective      (const wxString & name, bool update = false);
-    bool LoadPerspectiveString(const wxString & name, bool update = false);
-
-    void EnableTools(bool enable = true);
-
-    // Timer convenience functions
+    // Timer
+    //-----------
     void SetTime  (int time) { m_time = time; m_status->SetTime(time); }
+    void ResetTimer()     { SetTime(0); }
     void StartTimer(bool start = true)
-        { if (start != m_timer.IsRunning()) ToggleTimer(); }
-    void ResetTimer()  { SetTime(0); }
-    void StopTimer()   { StartTimer(false); }
-    void ToggleTimer() { wxCommandEvent evt; OnTimer(evt); }
+        { if (start != IsTimerRunning()) ToggleTimer(); }
+    void StopTimer()      { StartTimer(false); }
+    void ToggleTimer()    { wxCommandEvent evt; OnTimer(evt); }
     bool IsTimerRunning() { return m_timer.IsRunning(); }
 
 private:
-    // Member variables
-    //------------------------
-
-    // An XWord puzzle
-    XPuzzle m_puz;
-
-    // Location of the config file
-    wxString m_configFile;
-
     // Windows
-    // -------------------------
+    //--------
+    void CreateWindows();
 
-    // Grid
-    GridCtrl * m_grid;
+#ifdef USE_AUI_TOOLBAR
+    wxAuiToolBar * MakeAuiToolBar();
+#else
+    wxToolBar    * MakeToolBar();
+#endif
 
-    // Clues
-    CluePanel    * m_downPanel;
-    ClueListBox  * m_down;
+    wxMenuBar    * MakeMenuBar();
 
-    CluePanel    * m_acrossPanel;
-    ClueListBox  * m_across;
+    XGridCtrl *  m_gridCtrl;
 
-    SizedText  * m_title;
-    SizedText  * m_author;
-    SizedText  * m_copyright;
-    SizedText  * m_cluePrompt;
+    CluePanel *  m_down;
+    CluePanel *  m_across;
+
+    SizedText *  m_title;
+    SizedText *  m_author;
+    SizedText *  m_copyright;
+    SizedText *  m_cluePrompt;
     wxTextCtrl * m_notes;
 
+#ifdef USE_AUI_TOOLBAR
     wxAuiToolBar * m_toolbar;
+#else
+    wxToolBar * m_toolbar;
+#endif
+
     wxMenuBar * m_menubar;
 
     MyStatusBar * m_status;
 
 
-    // Window Manager
+    // Window Management
+    //------------------
+    void SetupWindowManager();
+    void ManageWindows();
+
     wxAuiManager m_mgr;
 
-    // Tool Manager
+
+    // Tool Management
+    //----------------
+    void SetupToolManager();
+    void ManageTools();
+    void EnableTools (bool enable = true);
+    void DisableTools() { EnableTools(false); }
+
     ToolManager m_toolMgr;
 
-    // Timer
-    wxTimer m_timer;
-    int m_time;
-    bool m_timerRunning;
 
-private:
-    // Frame setup functions
-    void CreateWindows();
-    void SetupManager();
-    void ManageWindows();
-    wxAuiToolBar * MakeAuiToolBar();
-    wxMenuBar    * MakeMenuBar();
+    // Timer
+    //------
+    wxTimer m_timer;
+    int  m_time;
+    bool m_isTimerRunning; // Used to start/stop timer on frame activate events.
+
+    // The XWord puzzle
+    //-----------------
+    XPuzzle m_puz;
+
 
     // Config
+    //-------
+    wxString GetConfigPath();
     void LoadConfig();
     void SaveConfig();
+    wxFileConfig * GetConfig();
 
-    // Frame Management
-    void ShowPane(const wxString & name, bool show = true);
-    void HidePane(const wxString & name) { return ShowPane(name, false); }
-    void UpdateLayout();
 
-    // Called from LoadPuzzle
-    void ShowPuzzle();
-    void CheckPuzzle();
-
-protected:
+private:
     // Event Handlers
-    //----------------------------------------------
+    //---------------
 
-    // Menus and toolbars
+    // Menu and toolbar events
+    // ------------------------
+
+    // General
     void OnOpenPuzzle (wxCommandEvent & WXUNUSED(evt));
     void OnSavePuzzle (wxCommandEvent & WXUNUSED(evt));
-    void OnClosePuzzle(wxCommandEvent & WXUNUSED(evt))
-        { ClosePuzzle(); ShowPuzzle(); }
+    void OnClosePuzzle(wxCommandEvent & WXUNUSED(evt))   { ClosePuzzle(true); }
     void OnQuit       (wxCommandEvent & WXUNUSED(evt))   { Close(); }
 
-    void OnZoomIn (wxCommandEvent & WXUNUSED(evt));
-    void OnZoomFit(wxCommandEvent & WXUNUSED(evt));
-    void OnZoomOut(wxCommandEvent & WXUNUSED(evt));
+    // XGridCtrl interaction
+    void OnZoomIn     (wxCommandEvent & WXUNUSED(evt));
+    void OnZoomFit    (wxCommandEvent & WXUNUSED(evt));
+    void OnZoomOut    (wxCommandEvent & WXUNUSED(evt));
 
-    void OnCheckGrid  (wxCommandEvent & evt)  { m_grid->CheckGrid(); }
-    void OnCheckWord  (wxCommandEvent & evt)  { m_grid->CheckWord(); }
-    void OnCheckLetter(wxCommandEvent & evt)  { m_grid->CheckLetter(); }
+    void OnCheckGrid  (wxCommandEvent & evt)  { m_gridCtrl->CheckGrid(); }
+    void OnCheckWord  (wxCommandEvent & evt)  { m_gridCtrl->CheckWord(); }
+    void OnCheckLetter(wxCommandEvent & evt)  { m_gridCtrl->CheckLetter(); }
 
-    void OnScramble(wxCommandEvent & WXUNUSED(evt));
-    void OnUnscramble(wxCommandEvent & WXUNUSED(evt));
+    // XWord puzzle stuff
+    void OnScramble   (wxCommandEvent & WXUNUSED(evt));
+    void OnUnscramble (wxCommandEvent & WXUNUSED(evt));
 
-    void OnLayout(wxCommandEvent & WXUNUSED(evt));
-    void OnLoadPerspective(wxCommandEvent & WXUNUSED(evt));
-    void OnSavePerspective(wxCommandEvent & WXUNUSED(evt));
-    void OnShowNotes      (wxCommandEvent & WXUNUSED(evt));
+    // Window management
+    void OnLayout     (wxCommandEvent & WXUNUSED(evt));
+    void OnLoadLayout (wxCommandEvent & WXUNUSED(evt));
+    void OnSaveLayout (wxCommandEvent & WXUNUSED(evt));
+    void OnShowNotes  (wxCommandEvent & WXUNUSED(evt));
 
-    void OnTimer          (wxCommandEvent & WXUNUSED(evt));
-    void OnTimerNotify    (wxTimerEvent   & WXUNUSED(evt));
+    // Timer
+    void OnTimer      (wxCommandEvent & WXUNUSED(evt));
+    void OnTimerNotify(wxTimerEvent   & WXUNUSED(evt));
 
-    // From the puzzle's controls
-    void OnGridFocus (wxPuzEvent & evt);
-    void OnGridLetter(wxPuzEvent & evt);
-    void OnClueFocus (wxPuzEvent & evt);
+    
+    // XGridCtrl and CluePanel events
+    //------------------------------
+    void OnGridFocus  (wxPuzEvent & evt);
+    void OnGridLetter (wxPuzEvent & evt);
+    void OnClueFocus  (wxPuzEvent & evt);
 
-    // Frame Events
-    void OnActivate(wxActivateEvent & evt);
-    void OnClose(wxCloseEvent & evt);
+
+    // Frame events
+    //-------------
+    void OnActivate   (wxActivateEvent & evt);
+    void OnClose      (wxCloseEvent & evt);
+
+
+private:
+    // Debugging
+    //----------
 
 #ifdef __WXDEBUG__
-    void OnDumpStatus(wxCommandEvent & WXUNUSED(evt));
+
+    void ShowDebugDialog(const wxString & title, const wxString & str);
+    void OnDumpLayout (wxCommandEvent & WXUNUSED(evt));
+    void OnDumpStatus (wxCommandEvent & WXUNUSED(evt));
+
 #endif
 
     DECLARE_EVENT_TABLE()
@@ -247,54 +242,85 @@ protected:
 
 
 
+//------------------------------------------------------------------------------
+// Inline Functions
+//------------------------------------------------------------------------------
+
+
+// Config
+//-------
+
+inline
+wxString
+MyFrame::GetConfigPath()
+{
+    wxString file = wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+    file << wxFileName::GetPathSeparator() << _T("config.ini");
+    return file;
+}
+
+
+inline
+wxFileConfig *
+MyFrame::GetConfig()
+{
+    wxFileConfig * config = dynamic_cast<wxFileConfig*>(wxFileConfig::Get());
+    wxASSERT_MSG(config != NULL, _T("Did you forget to set up a config?"));
+    return config;
+}
+
+
+
+// Window Management
+//------------------
+
 inline void
 MyFrame::UpdateLayout()
 {
     // Save the toolbar size so it isn't cut off
-    wxSize tbSize = m_toolbar->GetMinSize();
-    m_mgr.GetPane(m_toolbar).BestSize(tbSize);
+    //wxSize tbSize = m_toolbar->GetMinSize();
+    //m_mgr.GetPane(m_toolbar).BestSize(tbSize);
     m_mgr.Update();
 }
 
 
 inline void
-MyFrame::SavePerspective(const wxString & name)
+MyFrame::SaveLayout(const wxString & name)
 {
-    wxConfigBase * config = wxFileConfig::Get();
-    wxASSERT(config != NULL);
-    config->Write(wxString::Format(_T("Perspectives/%s"), name),
-                  m_mgr.SavePerspective());
+    GetConfig()->Write(wxString::Format(_T("/Layouts/%s"), name),
+                       m_mgr.SavePerspective());
 }
 
+
+
 inline bool
-MyFrame::LoadPerspectiveString(const wxString & perspective, bool update)
+MyFrame::LoadLayout(const wxString & name, bool update)
+{
+    wxString perspective;
+    if (! GetConfig()->Read(wxString::Format(_T("/Layouts/%s"), name), 
+                            &perspective) )
+        return false;
+
+    return LoadLayoutString(perspective, update);
+}
+
+
+inline bool
+MyFrame::LoadLayoutString(const wxString & layout, bool update)
 {
     // Save the toolbar size so it isn't cut off
     wxSize tbSize = m_toolbar->GetMinSize();
-    if (m_mgr.LoadPerspective(perspective, false))
-    {
-        m_mgr.GetPane(m_toolbar).BestSize(tbSize);
-        if (update)
-            m_mgr.Update();
-        return true;
-    }
-    return false;
-}
 
+    if (! m_mgr.LoadPerspective(layout, false))
+        return false;
 
-inline bool
-MyFrame::LoadPerspective(const wxString & name, bool update)
-{
-    wxConfigBase * config = wxFileConfig::Get();
-    wxASSERT(config != NULL);
-    wxString perspective;
-    if (config->Read(wxString::Format(_T("Perspectives/%s"), name),
-                     &perspective))
-    {
-        return LoadPerspectiveString(perspective, update);
-    }
+    // Restore toolbar size
+    m_mgr.GetPane(m_toolbar).BestSize(tbSize);
 
-    return false;
+    if (update)
+        m_mgr.Update();
+
+    return true;
 }
 
 
@@ -307,30 +333,5 @@ MyFrame::ShowPane(const wxString & name, bool show)
     info.Show(show);
     UpdateLayout();
 }
-
-
-
-inline void
-MyFrame::EnableTools(bool enable)
-{
-    m_toolMgr.Enable(ID_SAVE,         enable);
-    m_toolMgr.Enable(ID_CLOSE,        enable);
-
-    m_toolMgr.Enable(ID_ZOOM_IN,      enable);
-    m_toolMgr.Enable(ID_ZOOM_OUT,     enable);
-    m_toolMgr.Enable(ID_ZOOM_FIT,     enable);
-
-    m_toolMgr.Enable(ID_SCRAMBLE,     enable);
-    m_toolMgr.Enable(ID_UNSCRAMBLE,   enable);
-
-    m_toolMgr.Enable(ID_CHECK_LETTER, enable);
-    m_toolMgr.Enable(ID_CHECK_WORD,   enable);
-    m_toolMgr.Enable(ID_CHECK_GRID,   enable);
-
-    m_toolMgr.Enable(ID_SHOW_NOTES,   enable);
-
-    m_toolMgr.Enable(ID_TIMER,        enable);
-}
-
 
 #endif // MY_FRAME_H
