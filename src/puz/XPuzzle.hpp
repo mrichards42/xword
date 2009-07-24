@@ -22,14 +22,20 @@
 #include <wx/string.h>
 #include <vector>
 #include "XGrid.hpp"
-#include "PuzLoader.hpp"
+#include "../utils/ByteArray.hpp"
 
+// Friends
+class XPuzzleModule;
+class HandlerBase;
 
 class XPuzzle
 {
+    friend class XPuzzleModule;
+    friend class HandlerBase;
 public:
     explicit XPuzzle(const wxString & filename = wxEmptyString)
     {
+        m_version = 12;
         m_isOk = false;
         if (! filename.empty())
             Load(filename);
@@ -37,11 +43,13 @@ public:
 
     ~XPuzzle() {}
 
-    bool Load(const wxString & filename, const wxString & ext = wxEmptyString);
-    bool Save(const wxString & filename, const wxString & ext = wxEmptyString);
+    bool Load(const wxString & filename, wxString ext = wxEmptyString);
+    bool Save(const wxString & filename, wxString ext = wxEmptyString);
 
     void Clear();
-    bool IsOk() { return m_isOk; }
+    bool IsOk()        const { return m_isOk; }
+    bool IsScrambled() const { return m_grid.IsScrambled(); }
+    short GetVersion() const { return m_version; }
 
     wxString m_filename;
     bool m_modified;
@@ -66,24 +74,36 @@ public:
 
     XGrid m_grid;
 
-    // This is here so we don't have to include HandlerCommon.hpp
-    // There are issues with the timing of includes, etc.
-    typedef std::vector<unsigned char> ByteArray;
 
-    struct section
-    {
-        section(const wxString & a_name, const ByteArray & a_data)
-            : name(a_name), data(a_data)
-        {}
-        wxString name;
-        ByteArray data;
-    };
-
-    // Extra random sections . . . just save them and append to the file later
+    // Extra unknown sections for persistence between load and save
+    struct section;
     std::vector<section> m_extraSections;
+
+    static wxString GetLoadTypeString();
+    static wxString GetSaveTypeString();
+    static bool CanLoad(const wxString & ext);
+    static bool CanSave(const wxString & ext);
+
+    static void AddHandler(HandlerBase * handler);
 
 protected:
     bool m_isOk;
+    short m_version;
+
+private:
+    // Load / save stuff
+    bool Load(const wxString & filename, HandlerBase * handler);
+    bool Save(const wxString & filename, HandlerBase * handler);
+
+    static HandlerBase * PromptForSaveHandler(const wxString & message);
+    static HandlerBase * PromptForLoadHandler(const wxString & message);
+
+    static HandlerBase * GetHandler(const wxString & ext);
+
+    static void InitHandlers();
+    static void CleanUpHandlers();
+
+    static std::vector<HandlerBase *> sm_handlers;
 };
 
 
@@ -107,22 +127,15 @@ public:
 
 
 
-
-inline bool
-XPuzzle::Load(const wxString & filename, const wxString & ext)
+struct XPuzzle::section
 {
-    m_modified = false;
-    m_isOk = PuzLoader::Load(this, filename, ext);
-    return m_isOk;
-}
+    section(const wxString & a_name, const ByteArray & a_data)
+        : name(a_name), data(a_data)
+    {}
+    wxString name;
+    ByteArray data;
+};
 
-
-inline bool
-XPuzzle::Save(const wxString & filename, const wxString & ext)
-{
-    m_modified = false;
-    return PuzLoader::Save(this, filename, ext);
-}
 
 
 inline void

@@ -44,14 +44,28 @@ class SizedText
     : public wxControl
 {
 public:
-    explicit SizedText(wxWindow * parent,
-                       wxWindowID id,
-                       const wxString & label = wxEmptyString,
-                       const wxPoint & position = wxDefaultPosition,
-                       const wxSize & size = wxDefaultSize,
-                       long  style = 0);
+    SizedText() {}
 
-    ~SizedText() {}
+    SizedText(wxWindow * parent,
+              wxWindowID id,
+              const wxString & label = wxEmptyString,
+              const wxPoint & position = wxDefaultPosition,
+              const wxSize & size = wxDefaultSize,
+              long  style = wxBORDER_NONE,
+              const wxString & name = _T("SizedText"))
+    {
+        Create(parent, id, label, position, size, style, name);
+    }
+
+    virtual ~SizedText() {}
+
+    bool Create(wxWindow * parent,
+                wxWindowID id,
+                const wxString & label = wxEmptyString,
+                const wxPoint & position = wxDefaultPosition,
+                const wxSize & size = wxDefaultSize,
+                long  style = wxBORDER_NONE,
+                const wxString & name = _("SizedText"));
 
     void SetLabel(const wxString & label)
     {
@@ -73,12 +87,17 @@ public:
 
 protected:
     void ResizeLabel();
-    void OnSize(wxSizeEvent & evt)   { ResizeLabel(); evt.Skip(); }
+    void WrapLabel();
+    void TruncateLabel();
+
+    void OnSize(wxSizeEvent & evt) { ResizeLabel(); evt.Skip(); }
     void OnPaint(wxPaintEvent & WXUNUSED(evt));
 
     wxString m_fullLabel;
 
     DECLARE_EVENT_TABLE()
+    DECLARE_NO_COPY_CLASS(SizedText)
+    DECLARE_DYNAMIC_CLASS(SizedText)
 };
 
 

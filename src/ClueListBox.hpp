@@ -35,6 +35,7 @@
 #include "widgets/odlistbox.hpp"
 #include "puz/XPuzzle.hpp"
 
+extern const wxChar* ClueListBoxNameStr;
 
 class ClueListBox
     : public wxOwnerDrawnListBox<XPuzzle::Clue>
@@ -42,11 +43,15 @@ class ClueListBox
 public:
     typedef wxOwnerDrawnListBox parent_t;
 
-    explicit ClueListBox(wxWindow * parent, wxWindowID id = wxID_ANY)
+    ClueListBox() { Init(); }
+
+    ClueListBox(wxWindow * parent, wxWindowID id)
     {
-        SetMargins(5, 5);
+        Init();
         Create(parent, id);
     }
+
+    bool Create(wxWindow * parent, wxWindowID id);
 
     virtual ~ClueListBox() {}
 
@@ -58,28 +63,23 @@ public:
         Append(clues);
     }
 
-    void SetClueNumber(int number);
-
-    const wxString & GetClueText()   const
-        { return GetItem(GetSelection()).Text(); }
-    int    GetClueNumber() const
-        { return GetItem(GetSelection()).Number(); }
+    void SetClueNumber(unsigned int number);
 
     bool SetFont(const wxFont & font);
 
 protected:
+    void Init() { SetMargins(5, 5); }
+
     // Drawing functions
     void    OnDrawBackground(wxDC & dc, const wxRect & rect, size_t n) const;
     void    OnDrawItem      (wxDC & dc, const wxRect & rect, size_t n) const;
     wxCoord OnMeasureItem   (wxDC & dc, size_t n) const;
 
-    void OnSelect(wxCommandEvent & evt);
-
     // Cache to save us from wrapping every time
     mutable std::vector<wxString> m_cachedClues;
     mutable std::vector<int> m_numWidths;
 
-    int FindClue(int number) const;
+    int FindClue(unsigned int number) const;
 
     void CalculateNumberWidth();
     int  m_numWidth;
@@ -96,8 +96,11 @@ protected:
                           m_numWidths, -1,
                           parent_t)
 
-    DECLARE_EVENT_TABLE()
+    DECLARE_NO_COPY_CLASS(ClueListBox)
+    DECLARE_DYNAMIC_CLASS(ClueListBox)
 };
+
+
 
 
 inline bool

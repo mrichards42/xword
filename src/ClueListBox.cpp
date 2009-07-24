@@ -20,31 +20,20 @@
 //#include "PuzEvent.hpp"
 #include "utils/wrap.hpp"
 
+const wxChar* ClueListBoxNameStr = _T("ClueListBox");
 
-BEGIN_EVENT_TABLE(ClueListBox, wxOwnerDrawnListBox<XPuzzle::Clue>)
-    EVT_LISTBOX            (wxID_ANY, ClueListBox::OnSelect)
-END_EVENT_TABLE()
-
+IMPLEMENT_DYNAMIC_CLASS(ClueListBox, wxOwnerDrawnListBox<XPuzzle::Clue>)
 
 
-void
-ClueListBox::OnSelect(wxCommandEvent & evt)
+bool
+ClueListBox::Create(wxWindow * parent, wxWindowID id)
 {
-    /*
-    XPuzzle::Clue clue = m_clues.at(evt.GetSelection());
-    Update();
-
-    wxPuzEvent puzEvt(wxEVT_PUZ_CLUE_FOCUS, GetId());
-    puzEvt.SetClueNumber(m_direction, clue.Number());
-    puzEvt.SetDirection(m_direction);
-    puzEvt.SetClueText(clue.Text());
-    GetEventHandler()->ProcessEvent(puzEvt);
-    */
+    return parent_t::Create(parent, id);
 }
 
 
 void
-ClueListBox::SetClueNumber(int number)
+ClueListBox::SetClueNumber(unsigned int number)
 {
     int index = FindClue(number);
     if (index != -1) {
@@ -57,13 +46,13 @@ ClueListBox::SetClueNumber(int number)
 
 
 int
-ClueListBox::FindClue(int number) const
+ClueListBox::FindClue(unsigned int number) const
 {
-    if (GetItemCount() == 0)
-        return -1;
-    int num = 0;
-    container_t::const_iterator it;
-    for (it = m_items.begin(); it != m_items.end(); ++it) {
+    unsigned int num = 0;
+    for (container_t::const_iterator it = m_items.begin();
+         it != m_items.end();
+         ++it)
+    {
         if (it->Number() == number)
             return num;
         ++num;

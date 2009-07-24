@@ -30,7 +30,6 @@ public:
     wxPuzEvent(wxEventType commandType = wxEVT_NULL, int id = 0);
 
     // accessors
-    const wxPoint &  GetGridPosition() const    { return m_position; }
     int              GetAcrossClue()   const    { return m_acrossClue; }
     int              GetDownClue()     const    { return m_downClue; }
     const wxString & GetClueText()     const    { return m_clueText; }
@@ -38,7 +37,6 @@ public:
     int      GetClueNumber(bool dir)   const    { return dir == false ? m_acrossClue : m_downClue; } // DIR_ACROSS = false;
     int      GetClueNumber()           const    { return GetClueNumber(m_direction); }
 
-    void SetGridPosition (const wxPoint & pos)   { m_position   = pos; }
     void SetAcrossClue   (int num)               { m_acrossClue = num; }
     void SetDownClue     (int num)               { m_downClue   = num; }
     void SetClueText     (const wxString & text) { m_clueText   = text; }
@@ -50,7 +48,6 @@ public:
 
 
 private:
-    wxPoint m_position;
     int m_acrossClue;
     int m_downClue;
     wxString m_clueText;

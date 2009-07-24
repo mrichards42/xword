@@ -91,15 +91,18 @@ XGrid::SetSize(size_t width, size_t height)
     m_height = height;
     m_width  = width;
 
-    // Recalculate next and previous grid squares
-    //----------------------------------------------
+    // Recalculate XSquare members:
+    //   - Row and Col
+    //   - Next and Prev
+    //   - IsLast (row/col next/prev)
+    //-------------------------------------------------------------------
     for (size_t row = 0; row < GetHeight(); ++row)
     {
-        for (size_t col = 0; col < GetHeight(); ++col)
+        for (size_t col = 0; col < GetWidth(); ++col)
         {
             XSquare & square = At(col, row);
-            square.col = col;
-            square.row = row;
+            square.m_col = col;
+            square.m_row = row;
 
             // Two special cases: top left and bottom right corners
             if (row == 0 && col == 0)
@@ -171,115 +174,14 @@ XGrid::UnscrambleSolution(unsigned short key)
 }
 
 
-
-void
-XGrid::SetSolution(const char * solution)
-{
-    for (XSquare * square = First(); square != NULL; square = square->Next())
-        square->solution = *solution++;
-
-    SetupGrid();
-}
-
-void
-XGrid::SetGrid(const char * grid)
-{
-    for (XSquare * square = First(); square != NULL; square = square->Next())
-        square->text = *grid++;
-}
-
-void
-XGrid::SetGext(const unsigned char * gext)
-{
-    for (XSquare * square = First(); square != NULL; square = square->Next())
-        square->flag = *gext++;
-}
-
-
-void
-XGrid::ClearSolution()
-{
-    for (XSquare * square = First(); square != NULL; square = square->Next())
-        square->solution = '.';
-}
-
-
-void
-XGrid::ClearGrid()
-{
-    for (XSquare * square = First(); square != NULL; square = square->Next())
-        square->text = square->IsBlack() ? '.' : '-';
-}
-
-void
-XGrid::ClearGext()
-{
-    for (XSquare * square = First(); square != NULL; square = square->Next())
-        square->flag = XFLAG_CLEAR;
-}
-
-
-
-
-
-
-
-
-wxString
-XGrid::GetSolution() const
-{
-    wxString solution;
-
-    for (const XSquare * square = First();
-         square != NULL;
-         square = square->Next())
-    {
-        solution.Append(square->solution);
-    }
-
-    return solution;
-}
-
-wxString
-XGrid::GetGrid() const
-{
-    wxString grid;
-
-    for (const XSquare * square = First();
-         square != NULL;
-         square = square->Next())
-    {
-        grid.Append(square->text);
-    }
-
-    return grid;
-}
-
-
-wxString
-XGrid::GetGext() const
-{
-    wxString gext;
-
-    for (const XSquare * square = First();
-         square != NULL;
-         square = square->Next())
-    {
-        gext.Append(square->flag);
-    }
-
-    return gext;
-}
-
-
 #include <wx/stopwatch.h>
 #include <wx/log.h>
 
 
 // Setup the entire grid:
-//  (1) assigns clue numbers and flags to each square (0 and NO_CLUE if none)
-//  (2) create clue maps that hold the across and down clue numbers and their start and end squares
-//  (3) assigns the word start and end to each square
+//  (1) Assigns clue numbers and flags to each square (0 and NO_CLUE if none).
+//  (2) Assigns the word start and end to each square.
+//  (3) If the text is empty, fill it with blanks (or black)
 void
 XGrid::SetupGrid()
 {
@@ -287,36 +189,39 @@ XGrid::SetupGrid()
 
     wxStopWatch sw;
 
-    std::map<size_t, XSquare *> wordStart[2];
-    std::map<size_t, XSquare *> wordEnd[2];
-
-    wordStart[DIR_ACROSS][0] = NULL;
-    wordEnd  [DIR_ACROSS][0] = NULL;
-
-    wordStart[DIR_DOWN][0] = NULL;
-    wordEnd  [DIR_DOWN][0] = NULL;
-
     m_firstWhite = NULL;
     m_lastWhite  = NULL;
 
     size_t clueNumber = 1;
 
+    // Assign square clue numbers
+    //---------------------------
     for (XSquare * square = First(); square != NULL; square = square->Next())
     {
+        // Clear the word start and end
+        square->m_wordStart[DIR_ACROSS] = NULL;
+        square->m_wordStart[DIR_DOWN]   = NULL;
+        square->m_wordEnd  [DIR_ACROSS] = NULL;
+        square->m_wordEnd  [DIR_DOWN]   = NULL;
+
         if (square->IsBlack())
         {
-            square->clueFlag = NO_CLUE;
-            square->clue[DIR_ACROSS] = 0;
-            square->clue[DIR_DOWN]   = 0;
-            square->number           = 0;
+            // Make sure our square's text member knows that the square is
+            // black too.
+            square->m_text = _T(".");
+            square->m_clueFlag = NO_CLUE;
+            square->m_number   = 0;
         }
         else
         {
+            if (square->m_text.empty())
+                square->m_text = _T("-");
+
             // Clues are located in squares where a black square (or the edge)
             //   preceeds and where a white square follows.
 
             // Test across and down clues
-            for (int direction = 0; direction < 2; ++direction)
+            for (bool direction = false; ; direction = !direction)
             {
                 if (   square->IsLast(direction, FIND_PREV)
                     || square->Prev(direction)->IsBlack())
@@ -325,51 +230,35 @@ XGrid::SetupGrid()
                         && square->Next(direction)->IsWhite())
                     {
                         if (direction == DIR_ACROSS)
-                            square->clueFlag |= ACROSS_CLUE;
+                            square->m_clueFlag |= ACROSS_CLUE;
                         else
-                            square->clueFlag |= DOWN_CLUE;
-
-                        square->clue[direction] = clueNumber;
-                        wordStart[direction][clueNumber] = square;
+                            square->m_clueFlag |= DOWN_CLUE;
                     }
                 }
-                else if (square->Prev(direction)->IsWhite())
-                {
-                    // Fill in the clue number from the previous square
-                    square->clue[direction] =
-                        square->Prev(direction)->clue[direction];
-                }
-                else
-                    square->clue[direction] = 0;
-
-                // If the edge of the board or a black square is next,
-                // this is the last square in the word
-                if (    (   square->IsLast(direction, FIND_NEXT)
-                         || square->Next  (direction, FIND_NEXT)->IsBlack())
-                     && square->clue[direction] != 0)
-                {
-                    wordEnd[direction][square->clue[direction]] = square;
-                }
+                if (direction)
+                    break;
             }
 
             // Increment clue number
-            if (square->clueFlag != NO_CLUE)
-                square->number = clueNumber++;
+            if (square->m_clueFlag != NO_CLUE)
+                square->m_number = clueNumber++;
         }
     }
 
     // Set first white square
+    //-----------------------
     for (XSquare * square = First(); square != NULL; square = square->Next())
+    {
         if (square->IsWhite())
         {
             m_firstWhite = square;
             break;
         }
+    }
 
     // Set last white square
-    for (XSquare * square = Last();
-         square != NULL;
-         square = square->Next(DIR_ACROSS, FIND_PREV))
+    //-----------------------
+    for (XSquare * square = Last(); square != NULL; square = square->Prev())
     {
         if (square->IsWhite())
         {
@@ -378,42 +267,83 @@ XGrid::SetupGrid()
         }
     }
 
-    // Set word start/end
+    // Set word start and end
+    //-----------------------
     for (XSquare * square = First(); square != NULL; square = square->Next())
     {
-        square->m_wordStart[DIR_ACROSS] =
-            wordStart[DIR_ACROSS][square->clue[DIR_ACROSS]];
+        if (square->IsBlack())
+            continue;
 
-        square->m_wordEnd  [DIR_ACROSS] =
-            wordEnd  [DIR_ACROSS][square->clue[DIR_ACROSS]];
+        // Run both across and down
+        for (bool direction = false; ; direction = !direction)
+        {
+            if (square->HasClue(direction))
+            {
+                XSquare * sqIt;
 
-        square->m_wordStart[DIR_DOWN]   =
-            wordStart[DIR_DOWN]  [square->clue[DIR_DOWN]];
+                // Set word start
+                //---------------
 
-        square->m_wordEnd  [DIR_DOWN]   =
-            wordEnd  [DIR_DOWN]  [square->clue[DIR_DOWN]];
+                XSquare * start = square;
+                for (sqIt = start;
+                     sqIt != NULL;
+                     sqIt = sqIt->Next(direction))
+                {
+                    if (sqIt->IsBlack())
+                    {
+                        // If it's black, back up a square before stopping
+                        // so that the wordEnd calculation works.
+                        sqIt = sqIt->Prev(direction);
+                        break;
+                    }
+                    sqIt->m_wordStart[direction] = square;
+                    if (sqIt->IsLast(direction))
+                        break;
+                }
+
+
+                // Set word end
+                //-------------
+
+                // The end of this word should be where sqIt is now.
+                XSquare * end = sqIt;
+
+                for (sqIt = end;
+                     sqIt != NULL;
+                     sqIt = sqIt->Prev(direction))
+                {
+                    if (sqIt->IsBlack())
+                        break;
+                    sqIt->m_wordEnd[direction] = end;
+                    if (sqIt->IsFirst(direction))
+                        break;
+                }
+            }
+
+            if (direction)
+                break;
+        }
     }
 
     wxLogDebug(_T("Time to set up grid: %d"), sw.Time());
 }
 
+
 void
 XGrid::CountClues(size_t * across, size_t * down) const
 {
+    *across = 0;
+    *down = 0;
     // Count number of across and down clues
-    int acrossClues = 0;
-    int downClues = 0;
     for (const XSquare * square = First();
          square != NULL;
          square = square->Next())
     {
-        if ( (square->clueFlag & ACROSS_CLUE) != 0 )
-            ++acrossClues;
-        if ( (square->clueFlag & DOWN_CLUE) != 0 )
-            ++downClues;
+        if ( (square->m_clueFlag & ACROSS_CLUE) != 0 )
+            ++(*across);
+        if ( (square->m_clueFlag & DOWN_CLUE) != 0 )
+            ++(*down);
      }
-    *across = acrossClues;
-    *down = acrossClues;
 }
 
 
@@ -435,10 +365,13 @@ XGrid::CheckGrid(bool checkBlank)
 
 // return false if the squares are not in line
 bool
-SetIterateParams(XSquare * start, XSquare * end, bool * direction, bool * increment)
+SetIterateParams(XSquare * start,
+                 XSquare * end,
+                 bool * direction,
+                 bool * increment)
 {
-    int row_dif = end->row - start->row;
-    int col_dif = end->col - start->col;
+    int row_dif = end->GetRow() - start->GetRow();
+    int col_dif = end->GetCol() - start->GetCol();
 
     if (row_dif == 0) {
         if (col_dif == 0)
@@ -466,26 +399,19 @@ XGrid::CheckWord(XSquare * start, XSquare * end, bool checkBlank)
     if (SetIterateParams(start, end, &direction, &increment)) {
         end = end->Next(direction, increment);
         XSquare * square;
-        for (square = start; square != end; square = square->Next(direction, increment))
+        for (square = start;
+             square != end;
+             square = square->Next(direction, increment))
+        {
             if (! square->Check(checkBlank))
                 incorrect.push_back(square);
+        }
     }
 
     return incorrect;
 }
 
 
-
-// Find functions
-bool FIND_ACROSS_CLUE  (const XSquare * square)
-{
-    return (square->clueFlag & ACROSS_CLUE) != 0;
-}
-
-bool FIND_DOWN_CLUE    (const XSquare * square)
-{
-    return (square->clueFlag & DOWN_CLUE) != 0;
-}
 
 bool FIND_WHITE_SQUARE (const XSquare * square)
 {
@@ -520,13 +446,13 @@ bool FIND_CLUE_DIFFERENT    (int num1, int num2)
 // Functor for FIND_WORD
 //----------------------
 FIND_WORD::FIND_WORD(bool direction, const XSquare * square)
-    : m_direction(direction), m_number(square->clue[direction])
+    : m_direction(direction), m_wordStart(square->GetWordStart(direction))
 {}
 
 bool FIND_WORD::operator () (const XSquare * square)
 {
-    return square->clue[m_direction] != 0
-        && square->clue[m_direction] != m_number;
+    return square->GetWordStart(m_direction) != NULL
+        && square->GetWordStart(m_direction) != m_wordStart;
 }
 
 
@@ -534,14 +460,87 @@ bool FIND_WORD::operator () (const XSquare * square)
 //----------------------
 FIND_CLUE::FIND_CLUE(bool direction, const XSquare * square)
     : m_clueType(direction == DIR_ACROSS ? ACROSS_CLUE : DOWN_CLUE),
-      m_number(square->number)
+      m_number(square->GetNumber())
 {
-    wxASSERT(m_number != 0 && square->clueFlag & m_clueType);
+    wxASSERT(m_number != 0 && square->GetClueFlag() & m_clueType);
 }
 
 bool FIND_CLUE::operator () (const XSquare * square)
 {
-    return square->number != 0
-        && (square->clueFlag & m_clueType) != 0
-        && square->number != m_number;
+    return square->GetNumber() != 0
+        && (square->GetClueFlag() & m_clueType) != 0
+        && square->GetNumber() != m_number;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Get grid data
+//------------------------------------------------------------------------------
+
+ByteArray
+XGrid::GetGridSolution(const wxString & delim) const
+{
+    ByteArray data;
+    data.reserve(GetWidth() * GetHeight());
+
+    for (const XSquare * square = First();
+         square != NULL;
+         square = square->Next())
+    {
+        data.push_back(square->GetPlainSolution());
+        if (square->IsLast(DIR_ACROSS))
+            data.push_string(delim);
+    }
+    return data;
+}
+
+
+ByteArray
+XGrid::GetGridText(const wxString & delim) const
+{
+    ByteArray data;
+    data.reserve(GetWidth() * GetHeight());
+
+    for (const XSquare * square = First();
+         square != NULL;
+         square = square->Next())
+    {
+        // Send text as lower case if the square is in pencil
+        if (square->HasFlag(XFLAG_PENCIL))
+            data.push_back( tolower(square->GetPlainText()) );
+        else
+            data.push_back(square->GetPlainText());
+
+        if (square->IsLast(DIR_ACROSS))
+            data.push_string(delim);
+    }
+    return data;
+}
+
+
+ByteArray
+XGrid::GetGext(const wxString & delim) const
+{
+    ByteArray data;
+    data.reserve(GetWidth() * GetHeight());
+
+    for (const XSquare * square = First();
+         square != NULL;
+         square = square->Next())
+    {
+        data.push_back(square->m_flag);
+        if (square->IsLast(DIR_ACROSS))
+            data.push_string(delim);
+    }
+    return data;
 }

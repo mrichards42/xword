@@ -23,148 +23,165 @@ BEGIN_EVENT_TABLE(SizedText, wxStaticText)
     EVT_PAINT       (SizedText::OnPaint)
 END_EVENT_TABLE()
 
+IMPLEMENT_DYNAMIC_CLASS(SizedText, wxControl)
 
-SizedText::SizedText(wxWindow * parent,
-                     wxWindowID id,
-                     const wxString & label,
-                     const wxPoint & position,
-                     const wxSize & size,
-                     long style)
 
-    : wxControl(parent, id, position, size, style | wxBORDER_NONE)
+bool
+SizedText::Create(wxWindow * parent,
+                  wxWindowID id,
+                  const wxString & label,
+                  const wxPoint & position,
+                  const wxSize & size,
+                  long style,
+                  const wxString & name)
 {
+    if (! wxControl::Create(parent, id,
+                            position, size,
+                            style,
+                            wxDefaultValidator,
+                            name))
+        return false;
     SetLabel(label);
+    return true;
 }
 
 
 void
 SizedText::ResizeLabel()
 {
-    // This will break if the label is blank, so short cut that
-    // For some reason, this function actually *doesn't* break in debug builds, 
-    // but does break in release builds (it enters an infinite loop trying to
-    // increase the font size from -infinity)
     if (m_fullLabel.empty())
-    {
         wxControl::SetLabel(_T(""));
-        Refresh();
-        return;
-    }
-
-    // Truncates the label (i.e. "this is some really lo...")
-    if (IsTruncated())
-    {
-        int maxWidth;
-        GetClientSize(&maxWidth, NULL);
-
-        int lineWidth;
-        GetTextExtent(m_fullLabel, &lineWidth, NULL);
-        if (lineWidth <= maxWidth)
-        {
-            wxControl::SetLabel(m_fullLabel);
-        }
-        else
-        {
-            wxString label;
-            GetTextExtent(_T("..."), &lineWidth, NULL);
-
-            for (wxString::iterator it = m_fullLabel.begin();
-                 it != m_fullLabel.end();
-                 ++it)
-            {
-                int width;
-                GetTextExtent(*it, &width, NULL);
-                lineWidth += width;
-                if (lineWidth <= maxWidth)
-                    label.Append(*it);
-                else
-                    break;
-            }
-            label.Append(_T("..."));
-            wxControl::SetLabel(label);
-        }
-    }
-    // Wraps the label and resizes text to make the text as large as possible
+    else if (IsTruncated())
+        TruncateLabel();
     else
-    {
-        wxString label = m_fullLabel;
-
-        int maxWidth, maxHeight;
-        GetClientSize(&maxWidth, &maxHeight);
-        int textWidth, textHeight;
-        GetTextExtent(label, &textWidth, &textHeight);
-
-        // Guess first (from my Python xword program
-        double scaleX = double(maxWidth)  / textWidth;
-        double scaleY = double(maxHeight) / textHeight;
-
-        double clientRatio = double(maxHeight)  / maxWidth;
-        double textRatio   = double(textHeight) / textWidth;
-
-        int lines = wxRound(sqrt( clientRatio / textRatio ));
-        if (lines < 1)
-            lines = 1;
-
-        // Guess font size
-        wxFont font = GetFont();
-        int fontPt = font.GetPointSize() * scaleY / lines;
-        font.SetPointSize(fontPt);
-
-        // Shrink to fit (maxHeight / lines)
-        GetTextExtent(label, NULL, &textHeight, NULL, NULL, &font);
-        while (fontPt >= 3 && textHeight * lines > maxHeight)
-        {
-            font.SetPointSize(--fontPt);
-            GetTextExtent(label, NULL, &textHeight, NULL, NULL, &font);
-        }
-
-        // Wrap text
-        if (lines > 1)
-            label = ::WrapIntoLines(this, label, lines, &font);
-
-        // A dummy dc for measuring text
-        wxClientDC dc(this);
-
-        // Grow and shrink text to fit
-        //-----------------------------
-        dc.GetMultiLineTextExtent(label, &textWidth, &textHeight, NULL, &font);
-
-        // Increase font point if height _and_ width are too small
-        while (fontPt < 100
-               && (textHeight < maxHeight && textWidth < maxWidth))
-        {
-            font.SetPointSize(++fontPt);
-            dc.GetMultiLineTextExtent(label,
-                                      &textWidth,
-                                      &textHeight,
-                                      NULL,
-                                      &font);
-        }
-
-        // Decrease font point if height _or_ width are too large
-        while (fontPt >= 3
-               && (textHeight > maxHeight || textWidth > maxWidth))
-        {
-            font.SetPointSize(--fontPt);
-            dc.GetMultiLineTextExtent(label,
-                                      &textWidth,
-                                      &textHeight,
-                                      NULL,
-                                      &font);
-        }
-        wxControl::SetFont(font);
-        wxControl::SetLabel(label);
-    }
+        WrapLabel();
 
     // An advantage of deriving from wxControl instead of wxStaticText is that
     // there is no automatic repaint functionality.  We get to decide when that
     // happens, which means no extra refreshing.
     Refresh();
-
-    // Update if you want the refresh to happen right away (can cause lagging)
-    //Update();
 }
 
+
+
+
+void
+SizedText::WrapLabel()
+{
+    // We'll go into an infinite loop otherwise
+    wxASSERT(! m_fullLabel.empty());
+
+    wxString label = m_fullLabel;
+
+    int maxWidth, maxHeight;
+    GetClientSize(&maxWidth, &maxHeight);
+
+    int textWidth, textHeight;
+    GetTextExtent(label, &textWidth, &textHeight);
+
+    // Guess the number of lines we need
+    double scaleX = double(maxWidth)  / textWidth;
+    double scaleY = double(maxHeight) / textHeight;
+
+    double clientRatio = double(maxHeight)  / maxWidth;
+    double textRatio   = double(textHeight) / textWidth;
+
+    int lines = wxRound(sqrt( clientRatio / textRatio ));
+    if (lines < 1)
+        lines = 1;
+
+
+    // Guess that the font size will be the current font size divided by
+    // the number of lines of text we have.
+    wxFont font = GetFont();
+    int fontPt = font.GetPointSize() * scaleY / lines;
+    font.SetPointSize(fontPt);
+
+    // Shrink the font to fit maxHeight / lines
+    GetTextExtent(label, NULL, &textHeight, NULL, NULL, &font);
+    while (fontPt >= 3 && textHeight * lines > maxHeight)
+    {
+        font.SetPointSize(--fontPt);
+        GetTextExtent(label, NULL, &textHeight, NULL, NULL, &font);
+    }
+
+    // Do the wrapping
+    if (lines > 1)
+        label = ::WrapIntoLines(this, label, lines, &font);
+
+
+    // A dummy dc for measuring text
+    wxClientDC dc(this);
+
+    // Grow and shrink text to fit
+    //-----------------------------
+    dc.GetMultiLineTextExtent(label, &textWidth, &textHeight, NULL, &font);
+
+    // Increase font point if height _and_ width are too small
+    while (fontPt < 100
+           && (textHeight < maxHeight && textWidth < maxWidth))
+    {
+        font.SetPointSize(++fontPt);
+        dc.GetMultiLineTextExtent(label,
+                                  &textWidth,
+                                  &textHeight,
+                                  NULL,
+                                  &font);
+    }
+
+    // Decrease font point if height _or_ width are too large
+    while (fontPt >= 3
+           && (textHeight > maxHeight || textWidth > maxWidth))
+    {
+        font.SetPointSize(--fontPt);
+        dc.GetMultiLineTextExtent(label,
+                                  &textWidth,
+                                  &textHeight,
+                                  NULL,
+                                  &font);
+    }
+
+    wxControl::SetFont(font);
+    wxControl::SetLabel(label);
+}
+
+
+
+void
+SizedText::TruncateLabel()
+{
+    int maxWidth;
+    GetClientSize(&maxWidth, NULL);
+
+    int lineWidth;
+    GetTextExtent(m_fullLabel, &lineWidth, NULL);
+
+    if (lineWidth <= maxWidth)
+    {
+        wxControl::SetLabel(m_fullLabel);
+        return;
+    }
+
+    wxString label;
+    GetTextExtent(_T("..."), &lineWidth, NULL);
+
+    for (wxString::iterator it = m_fullLabel.begin();
+         it != m_fullLabel.end();
+         ++it)
+    {
+        int width;
+        GetTextExtent(*it, &width, NULL);
+        lineWidth += width;
+
+        if (lineWidth > maxWidth)
+            break;
+
+        label.Append(*it);
+    }
+    label.Append(_T("..."));
+
+    wxControl::SetLabel(label);
+}
 
 
 void

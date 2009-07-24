@@ -35,7 +35,7 @@ public:
     virtual bool OnDropFiles(wxCoord x, wxCoord y,
                              const wxArrayString & filenames)
     {
-        if (! m_frame->ClosePuzzle())
+        if ( ! m_frame->ClosePuzzle(true) ) // Prompt for save
             return false;
         m_frame->LoadPuzzle(filenames.Item(0));
         return true;

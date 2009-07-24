@@ -16,8 +16,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#ifndef PERSPECTIVE_DLG_H
-#define PERSPECTIVE_DLG_H
+#ifndef LAYOUT_DLG_H
+#define LAYOUT_DLG_H
 
 // For compilers that don't support precompilation, include "wx/wx.h"
 #include <wx/wxprec.h>
@@ -29,23 +29,32 @@
 #include "../MyFrame.hpp"
 
 
-// Note that this should only be used as a modal dialog because of
-// wxSingleChoiceDialog
-class PerspectiveDialog
+// Note that this should only be used as a modal dialog because
+// wxSingleChoiceDialog is modal
+
+
+class LayoutDialog
     : public wxSingleChoiceDialog
 {
 public:
-    PerspectiveDialog(MyFrame * frame,
-                      const wxString & message,
-                      const wxString & caption,
-                      const wxArrayString & choices)
+    LayoutDialog(MyFrame * frame,
+                 const wxString & message,
+                 const wxString & caption,
+                 const wxArrayString & choices)
         : wxSingleChoiceDialog(frame, message, caption, choices),
           m_frame(frame)
-    {}
-    ~PerspectiveDialog() {}
+    {
+        Connect( wxEVT_COMMAND_LISTBOX_SELECTED,
+                 wxCommandEventHandler(LayoutDialog::OnSelect) );
+    }
+
+    ~LayoutDialog() {}
 
 protected:
-    void OnSelect(wxCommandEvent & WXUNUSED(evt));
+    void OnSelect(wxCommandEvent & WXUNUSED(evt))
+    {
+        m_frame->LoadLayout(m_listbox->GetStringSelection(), true);
+    }
 
     // Keep a pointer to the frame so we can dynamically update it.
     MyFrame * m_frame;
@@ -53,15 +62,10 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-BEGIN_EVENT_TABLE(PerspectiveDialog, wxSingleChoiceDialog)
-    EVT_LISTBOX    (wxID_ANY, PerspectiveDialog::OnSelect)
+
+
+BEGIN_EVENT_TABLE(LayoutDialog, wxSingleChoiceDialog)
+    EVT_LISTBOX    (wxID_ANY, LayoutDialog::OnSelect)
 END_EVENT_TABLE()
 
-void
-PerspectiveDialog::OnSelect(wxCommandEvent & WXUNUSED(evt))
-{
-    wxLogDebug(_T("List box selection: '%s'"), m_listbox->GetStringSelection());
-    m_frame->LoadPerspective(m_listbox->GetStringSelection(), true);
-}
-
-#endif // PERSPECTIVE_DLG_H
+#endif // LAYOUT_DLG_H
