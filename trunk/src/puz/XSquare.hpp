@@ -64,8 +64,8 @@ enum GridDirection
 // Used with Check()
 enum CheckTest
 {
-    CHECK_BLANK,
-    NO_CHECK_BLANK
+    NO_CHECK_BLANK,
+    CHECK_BLANK
 };
 
 
@@ -83,6 +83,19 @@ friend class HandlerBase;
 friend class XSquareModule;
 
 public:
+
+    // There are several accessor functions (SetSolution, SetFlag, etc.) that
+    // seem like they should be private, but are public so that the XWord
+    // handlers can get access to them without having to be friends.  Previously
+    // these functions were non-existant, and HandlerBase was a friend of
+    // XSquare so that it could directly set the member variables.  As a result,
+    // HanderBase had functions such as SetGridSolution() that were supposed to
+    // work for all XWord handlers.  This was too limiting for individual
+    // handlers.
+    //
+    // Also, in the future there are plans to make XWord into a simple crossword
+    // constructing program, which would require these accessors to be public.
+    
     XSquare();
 
     // Location information
@@ -103,6 +116,12 @@ public:
     const wxString & GetText()     const { return m_text; }
     const wxString & GetSolution() const { return m_solution; }
 
+    void SetText    (const wxString & text);
+    void SetSolution(const wxString & solution, wxChar plain = '\0');
+    void SetPlainSolution(wxChar plain);
+
+    bool Check(bool checkBlank = NO_CHECK_BLANK) const;
+
     char GetPlainText()     const { return Ascii(m_text); }
     char GetPlainSolution() const { return m_asciiSolution; }
 
@@ -114,25 +133,25 @@ public:
     int GetTextSymbol()      const;
     int GetSolutionSymbol()  const;
 
-    void SetText(const wxString & text) { m_text = text; }
-
-    bool Check(bool checkBlank = NO_CHECK_BLANK) const;
-
 
     // Clue
     //-----
     short GetNumber() const { return m_number; }
-    short GetClueFlag() const { return m_clueFlag; }
     bool HasClue(bool direction) const
-        { return (m_clueFlag & (direction + 1)) != 0; }
+        { return GetWordStart(direction) == this; }
+    bool HasClue() const { return HasClue(DIR_ACROSS) || HasClue(DIR_DOWN); }
 
 
     // Flag (GEXT)
     //------------
-    bool HasFlag     (wxByte flag) const { return (m_flag & flag) != 0; }
-    void AddFlag     (wxByte flag)       { m_flag |=   flag; }
-    void RemoveFlag  (wxByte flag)       { m_flag &= ~ flag; }
-    void ReplaceFlag (wxByte flag1, wxByte flag2)
+    void   SetFlag     (wxByte flag)       { m_flag = flag; }
+    void   AddFlag     (wxByte flag)       { m_flag |=   flag; }
+    void   RemoveFlag  (wxByte flag)       { m_flag &= ~ flag; }
+
+    wxByte GetFlag     ()            const { return m_flag; }
+    bool   HasFlag     (wxByte flag) const { return (m_flag & flag) != 0; }
+
+    void   ReplaceFlag (wxByte flag1, wxByte flag2)
         { RemoveFlag(flag1); AddFlag(flag2); }
 
 
@@ -204,8 +223,14 @@ private:
     static void InitCharTable();
 
     // ASCII lookup functions
-    static char Ascii(wxChar chr);
+    static char Ascii(wxChar ch);
     static char Ascii(const wxString & str) { return Ascii(str.at(0)); }
+
+    // Debug stuff
+#ifdef __WXDEBUG__
+    static bool IsValidChar(wxChar ch);
+    static bool IsValidString(const wxString & str);
+#endif // __WXDEBUG__
 };
 
 
@@ -213,6 +238,67 @@ private:
 //------------------------------------------------------------------------------
 // Inline functions
 //------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+// Square text and solution
+//------------------------------------------------------------------------------
+
+inline
+void
+XSquare::SetText(const wxString & text)
+{
+    wxASSERT(IsValidString(text));
+    m_text = text.Upper();
+}
+
+
+inline
+void
+XSquare::SetSolution(const wxString & solution, wxChar plain)
+{
+    wxASSERT(IsValidString(solution));
+    m_solution = solution.Upper();
+    
+    if (plain != '\0')
+        SetPlainSolution(plain);
+    else
+        SetPlainSolution(Ascii(m_solution));
+}
+
+
+inline
+void
+XSquare::SetPlainSolution(wxChar solution)
+{
+    // Valid characters for the plain solution
+    wxASSERT(wxIsupper(solution) || solution == _T('.') || solution == _T('-'));
+    m_asciiSolution = solution;
+}
+
+
+inline
+bool
+XSquare::Check(bool checkBlank)  const
+{
+    wxASSERT(! m_text.empty() && ! m_solution.empty());
+    if (IsBlack())
+        return true;
+    if (IsBlank())
+        return ! checkBlank;
+
+    if (HasTextRebus())
+        return m_solution == m_text;
+    else
+        return GetPlainText() == GetPlainSolution();
+}
+
+
+
+
+// Information abotu text and solution
+//------------------------------------
 
 inline
 bool
@@ -271,36 +357,43 @@ XSquare::GetSolutionSymbol() const
 
 
 
-
-inline
-bool
-XSquare::Check(bool checkBlank)  const
-{
-    wxASSERT(! m_text.empty() && ! m_solution.empty());
-    if (IsBlack())
-        return true;
-    if (IsBlank())
-        return ! checkBlank;
-
-    if (HasTextRebus())
-        return m_solution == m_text;
-    else
-        return GetPlainText() == GetPlainSolution();
-}
-
-
-
-
 //------------------------------------------------------------------------------
 // Character table functions
 //------------------------------------------------------------------------------
 
 inline
 char
-XSquare::Ascii(wxChar chr)
+XSquare::Ascii(wxChar ch)
 {
-    wxASSERT(sm_charTable.find(chr) != sm_charTable.end());
-    return sm_charTable[chr];
+    wxASSERT(IsValidChar(ch));
+    return sm_charTable[ch];
 }
+
+
+
+
+#ifdef __WXDEBUG__
+
+inline
+bool
+XSquare::IsValidChar(wxChar ch)
+{
+    return sm_charTable.find(ch) != sm_charTable.end();
+}
+
+
+inline
+bool
+XSquare::IsValidString(const wxString & str)
+{
+    for (wxString::const_iterator it = str.begin(); it != str.end(); ++it)
+        if (! IsValidChar(*it))
+            return false;
+    return true;
+}
+
+#endif // __WXDEBUG__
+
+
 
 #endif // X_SQUARE_H

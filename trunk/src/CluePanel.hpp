@@ -74,9 +74,11 @@ public:
 
     void SetClueNumber(unsigned int number, bool focused)
     {
-        m_clueList->SetSelectionForeground( m_colors[focused][TEXT_COLOR] );
+        m_clueList->SetSelectionForeground(
+            m_colors[focused][TEXT_COLOR] );
 
-        m_clueList->SetSelectionForeground( m_colors[focused][TEXT_COLOR] );
+        m_clueList->SetSelectionBackground(
+            m_colors[focused][BACKGROUND_COLOR] );
 
         m_clueList->SetClueNumber(number);
     }

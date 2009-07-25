@@ -179,7 +179,7 @@ XGrid::UnscrambleSolution(unsigned short key)
 
 
 // Setup the entire grid:
-//  (1) Assigns clue numbers and flags to each square (0 and NO_CLUE if none).
+//  (1) Assigns clue numbers to each square (0 if no clue).
 //  (2) Assigns the word start and end to each square.
 //  (3) If the text is empty, fill it with blanks (or black)
 void
@@ -198,52 +198,101 @@ XGrid::SetupGrid()
     //---------------------------
     for (XSquare * square = First(); square != NULL; square = square->Next())
     {
-        // Clear the word start and end
-        square->m_wordStart[DIR_ACROSS] = NULL;
-        square->m_wordStart[DIR_DOWN]   = NULL;
-        square->m_wordEnd  [DIR_ACROSS] = NULL;
-        square->m_wordEnd  [DIR_DOWN]   = NULL;
-
         if (square->IsBlack())
         {
             // Make sure our square's text member knows that the square is
             // black too.
             square->m_text = _T(".");
-            square->m_clueFlag = NO_CLUE;
             square->m_number   = 0;
+
+            square->m_wordStart[DIR_ACROSS] = NULL;
+            square->m_wordStart[DIR_DOWN]   = NULL;
+            square->m_wordEnd  [DIR_ACROSS] = NULL;
+            square->m_wordEnd  [DIR_DOWN]   = NULL;
         }
         else
         {
             if (square->m_text.empty())
                 square->m_text = _T("-");
 
-            // Clues are located in squares where a black square (or the edge)
-            //   preceeds and where a white square follows.
-
-            // Test across and down clues
+            // Run everything in across and down directions
             for (bool direction = false; ; direction = !direction)
             {
-                if (   square->IsLast(direction, FIND_PREV)
-                    || square->Prev(direction)->IsBlack())
+                // Clues are located in squares where a black square (or the
+                // edge) preceeds and where a white square follows.
+
+                const bool is_first_white = \
+                                square->IsLast(direction, FIND_PREV) ||
+                                square->Prev(direction)->IsBlack();
+
+                const bool has_clue = is_first_white &&
+                            (! square->IsLast(direction, FIND_NEXT) &&
+                             square->Next(direction)->IsWhite() );
+
+                if (has_clue)
                 {
-                    if (   ! square->IsLast(direction, FIND_NEXT)
-                        && square->Next(direction)->IsWhite())
+                    square->m_number = clueNumber;
+
+                    // Bounce to the next black square and back, setting start
+                    // and end squares for all in between
+
+                    // Word start
+                    XSquare * start = square;
+                    for (;; square = square->Next(direction))
                     {
-                        if (direction == DIR_ACROSS)
-                            square->m_clueFlag |= ACROSS_CLUE;
-                        else
-                            square->m_clueFlag |= DOWN_CLUE;
+                        wxASSERT(square != NULL);
+                        if (square->IsBlack())
+                        {
+                            // Back up one square
+                            square = square->Prev(direction);
+                            break;
+                        }
+                        square->m_wordStart[direction] = start;
+                        if (square->IsLast(direction))
+                            break;
                     }
+                    wxASSERT(square != start);
+
+                    // Word end
+                    XSquare * end = square;
+                    for (;; square = square->Prev(direction))
+                    {
+                        wxASSERT(square != NULL);
+                        if (square->IsBlack())
+                        {
+                            // Go forward a square so that we end up with the
+                            // same square we started with
+                            square = square->Next(direction);
+                            break;
+                        }
+                        square->m_wordEnd[direction] = end;
+                        if (square->IsFirst(direction))
+                            break;
+                    }
+
+                    wxASSERT(square == start);
                 }
+
+                // If there is no clue number on this square but it is
+                // preceded by a black square or the edge of the board, this
+                // square is not part of a word in this direction.
+                else if (is_first_white)
+                {
+                    square->m_wordStart[direction] = NULL;
+                    square->m_wordEnd  [direction] = NULL;
+                }
+
+
                 if (direction)
                     break;
             }
 
             // Increment clue number
-            if (square->m_clueFlag != NO_CLUE)
-                square->m_number = clueNumber++;
+            if (square->m_number != 0)
+                ++clueNumber;
         }
     }
+
 
     // Set first white square
     //-----------------------
@@ -266,7 +315,7 @@ XGrid::SetupGrid()
             break;
         }
     }
-
+/*
     // Set word start and end
     //-----------------------
     for (XSquare * square = First(); square != NULL; square = square->Next())
@@ -275,6 +324,8 @@ XGrid::SetupGrid()
             continue;
 
         // Run both across and down
+        if (square->GetNumber() != 0)
+        {
         for (bool direction = false; ; direction = !direction)
         {
             if (square->HasClue(direction))
@@ -324,7 +375,7 @@ XGrid::SetupGrid()
                 break;
         }
     }
-
+*/
     wxLogDebug(_T("Time to set up grid: %d"), sw.Time());
 }
 
@@ -339,9 +390,9 @@ XGrid::CountClues(size_t * across, size_t * down) const
          square != NULL;
          square = square->Next())
     {
-        if ( (square->m_clueFlag & ACROSS_CLUE) != 0 )
+        if (square->HasClue(DIR_ACROSS))
             ++(*across);
-        if ( (square->m_clueFlag & DOWN_CLUE) != 0 )
+        if (square->HasClue(DIR_DOWN))
             ++(*down);
      }
 }
@@ -459,17 +510,17 @@ bool FIND_WORD::operator () (const XSquare * square)
 // Functor for FIND_CLUE
 //----------------------
 FIND_CLUE::FIND_CLUE(bool direction, const XSquare * square)
-    : m_clueType(direction == DIR_ACROSS ? ACROSS_CLUE : DOWN_CLUE),
+    : m_direction(direction),
       m_number(square->GetNumber())
 {
-    wxASSERT(m_number != 0 && square->GetClueFlag() & m_clueType);
+    wxASSERT(m_number != 0 && square->HasClue(m_direction));
 }
 
 bool FIND_CLUE::operator () (const XSquare * square)
 {
-    return square->GetNumber() != 0
-        && (square->GetClueFlag() & m_clueType) != 0
-        && square->GetNumber() != m_number;
+    return square->GetNumber() != 0 &&
+           square->HasClue(m_direction) &&
+           square->GetNumber() != m_number;
 }
 
 

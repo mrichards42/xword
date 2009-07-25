@@ -121,11 +121,7 @@ XGridCtrl::SetXGrid(XGrid * grid)
     {
         m_grid = grid;
 
-        std::vector<XSquare *> incorrect    = m_grid->CheckGrid();
-        std::vector<XSquare *> wrongOrBlank = m_grid->CheckGrid(true);
-
-        m_incorrectSquares = incorrect.size();
-        m_blankSquares     = wrongOrBlank.size() - incorrect.size();
+        RecheckGrid();
 
         m_direction     = DIR_ACROSS;
         m_focusedSquare = m_grid->FirstWhite();
@@ -137,6 +133,16 @@ XGridCtrl::SetXGrid(XGrid * grid)
 }
 
 
+void
+XGridCtrl::RecheckGrid()
+{
+    wxASSERT(m_grid != NULL);
+    std::vector<XSquare *> incorrect    = m_grid->CheckGrid();
+    std::vector<XSquare *> wrongOrBlank = m_grid->CheckGrid(true);
+
+    m_incorrectSquares = incorrect.size();
+    m_blankSquares     = wrongOrBlank.size() - incorrect.size();
+}
 
 //-------------------------------------------------------
 // Drawing functions
@@ -542,28 +548,16 @@ XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
 {
     // Adjust blank and incorrect counts each time a letter is changed
     // The logic is a little confusing at first, but it's correct
-    if (square.GetText() != text)
-    {
-        if (text == _T(""))
-        {
-            ++m_blankSquares;
-            if (square.GetText() != square.GetSolution())
-                --m_incorrectSquares;
-        }
-        else if (square.IsBlank())
-        {
-            --m_blankSquares;
-            if (text != square.GetSolution())
-                ++m_incorrectSquares;
-        }
-        else
-        {
-            if (square.GetText() != square.GetSolution())
-                --m_incorrectSquares;
-            if (text != square.GetSolution())
-                ++m_incorrectSquares;
-        }
-    }
+    const int correctBefore = square.Check();
+    const int blankBefore   = square.IsBlank();
+
+    square.SetText(text);
+
+    const int correctAfter = square.Check();
+    const int blankAfter   = square.IsBlank();
+
+    m_blankSquares     += blankAfter   - blankBefore;
+    m_incorrectSquares -= correctAfter - correctBefore;
 
     square.SetText(text);
 
@@ -722,9 +716,12 @@ XGridCtrl::Scale(double factor)
 void
 XGridCtrl::CheckGrid(int options)
 {
-    std::vector<XSquare *> incorrect = m_grid->CheckGrid();
+    wxASSERT(m_grid != NULL && ! m_grid->IsScrambled());
 
-    if (incorrect.empty() && (options & MESSAGE_BOX))
+    std::vector<XSquare *> incorrect = \
+        m_grid->CheckGrid( (options & CHECK_ALL) != 0 );
+
+    if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
         wxMessageBox(_T("No Incorrect Letters!"), _T("Message"));
         return;
@@ -737,7 +734,7 @@ XGridCtrl::CheckGrid(int options)
     {
         XSquare * square = *it;
 
-        if (options & REVEAL_ANSWER)
+        if ( (options & REVEAL_ANSWER) != 0)
         {
             square->SetText(square->GetSolution());
             square->RemoveFlag(XFLAG_BLACK | XFLAG_X);
@@ -756,11 +753,13 @@ XGridCtrl::CheckGrid(int options)
 void
 XGridCtrl::CheckWord(int options)
 {
+    wxASSERT(m_grid != NULL && ! m_grid->IsScrambled());
+
     std::vector<XSquare *> incorrect =
         m_grid->CheckWord( m_focusedSquare->GetWordStart(m_direction),
                            m_focusedSquare->GetWordEnd  (m_direction) );
 
-    if (incorrect.empty() && (options & MESSAGE_BOX))
+    if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
         wxMessageBox(_T("No Incorrect Letters!"), _T("Message"));
         return;
@@ -773,7 +772,7 @@ XGridCtrl::CheckWord(int options)
     {
         XSquare * square = *it;
 
-        if (options & REVEAL_ANSWER)
+        if ( (options & REVEAL_ANSWER) != 0)
         {
             square->SetText(square->GetSolution());
             square->RemoveFlag(XFLAG_BLACK | XFLAG_X);
@@ -793,6 +792,8 @@ XGridCtrl::CheckWord(int options)
 void
 XGridCtrl::CheckLetter(int options)
 {
+    wxASSERT(m_grid != NULL && ! m_grid->IsScrambled());
+
     XSquare & square = *GetFocusedSquare();
 
     if (! m_grid->CheckSquare(square))
@@ -810,7 +811,7 @@ XGridCtrl::CheckLetter(int options)
         }
         RefreshSquare(*m_focusedSquare);
     }
-    else if ( (options & MESSAGE_BOX) != 0)
+    else if ( (options & NO_MESSAGE_BOX) == 0)
         wxMessageBox(_T("No Incorrect Letters!"), _T("Message"));
 }
 

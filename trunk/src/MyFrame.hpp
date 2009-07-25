@@ -150,8 +150,20 @@ private:
     //----------------
     void SetupToolManager();
     void ManageTools();
+
     void EnableTools (bool enable = true);
     void DisableTools() { EnableTools(false); }
+
+    // Incremental enabling/disabling . . .
+    void EnableSave(bool enable = true);
+    void EnableClose(bool enable = true);
+    void EnableGridSize(bool enable = true);
+    void EnableScramble(bool enable = true);
+    void EnableUnscramble(bool enable = true);
+    void EnableCheck (bool enable = true);
+    void EnableReveal(bool enable = true);
+    void EnableNotes(bool enable = true);
+    void EnableTimer(bool enable = true);
 
     ToolManager m_toolMgr;
 
@@ -193,9 +205,18 @@ private:
     void OnZoomFit    (wxCommandEvent & WXUNUSED(evt));
     void OnZoomOut    (wxCommandEvent & WXUNUSED(evt));
 
-    void OnCheckGrid  (wxCommandEvent & evt)  { m_gridCtrl->CheckGrid(); }
-    void OnCheckWord  (wxCommandEvent & evt)  { m_gridCtrl->CheckWord(); }
-    void OnCheckLetter(wxCommandEvent & evt)  { m_gridCtrl->CheckLetter(); }
+    void OnCheckGrid  (wxCommandEvent & evt) { m_gridCtrl->CheckGrid(); }
+    void OnCheckWord  (wxCommandEvent & evt) { m_gridCtrl->CheckWord(); }
+    void OnCheckLetter(wxCommandEvent & evt) { m_gridCtrl->CheckLetter(); }
+
+    void OnRevealGrid   (wxCommandEvent & evt)
+        { m_gridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL); }
+    void OnRevealIncorrect(wxCommandEvent & evt)
+        { m_gridCtrl->CheckGrid(REVEAL_ANSWER); }
+    void OnRevealWord  (wxCommandEvent & evt)
+        { m_gridCtrl->CheckWord(REVEAL_ANSWER); }
+    void OnRevealLetter(wxCommandEvent & evt)
+        { m_gridCtrl->CheckLetter(REVEAL_ANSWER); }
 
     // XWord puzzle stuff
     void OnScramble   (wxCommandEvent & WXUNUSED(evt));

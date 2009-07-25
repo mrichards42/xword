@@ -104,11 +104,15 @@ XGridScrambler::ScrambleSolution(unsigned short key_int)
          square != NULL;
          square = square->Next(DIR_DOWN))
     {
-        if (square->IsWhite())
-        {
-            square->m_asciiSolution = *it;
-            ++it;
-        }
+        if (square->IsBlack())
+            continue;
+
+        // Make sure we preserve any rebus in the solution
+        if (! square->HasSolutionRebus())
+            square->SetSolution(*it);
+        else
+            square->SetPlainSolution(*it);
+        ++it;
     }
     wxASSERT(it == solution.end());
 
@@ -258,11 +262,15 @@ XGridScrambler::UnscrambleSolution(unsigned short key_int)
          square != NULL;
          square = square->Next(DIR_DOWN))
     {
-        if (square->IsWhite())
-        {
-            square->m_asciiSolution = *it;
-            ++it;
-        }
+        if (square->IsBlack())
+            continue;
+
+        // Preserve any rebus in the solution
+        if (! square->HasSolutionRebus())
+            square->SetSolution(*it);
+        else
+            square->SetPlainSolution(*it);
+        ++it;
     }
     wxASSERT(it == solution.end());
 

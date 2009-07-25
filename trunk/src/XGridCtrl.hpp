@@ -45,7 +45,8 @@ enum
     MESSAGE_BOX      = 0x00,
     NO_REVEAL_ANSWER = 0x00,
     REVEAL_ANSWER    = 0x01,
-    NO_MESSAGE_BOX   = 0x02
+    NO_MESSAGE_BOX   = 0x02,
+    CHECK_ALL        = 0x04    // Inclue blanks
 };
 
 // THIS IS NOT TRUE CURRENTLYs
@@ -100,6 +101,8 @@ public:
     void SetXGrid(XGrid * grid);
           XGrid * GetXGrid()       { return m_grid; }
     const XGrid * GetXGrid() const { return m_grid; }
+
+    void RecheckGrid();
 
     // Will trigger an event
     XSquare * SetSquareFocus(XSquare * square, bool direction);

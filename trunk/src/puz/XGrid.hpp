@@ -121,11 +121,13 @@ public:
     // Flags
     bool IsScrambled() const { return (m_flag & XFLAG_SCRAMBLED) != 0; }
     bool HasSolution() const { return (m_flag & XFLAG_NO_SOLUTION) == 0; }
+    unsigned short GetFlag() const { return m_flag; }
 
     // Type
     bool IsDiagramless() const { return m_type == XTYPE_DIAGRAMLESS; }
+    unsigned short GetType() const { return m_type; }
 
-    // Scramblind
+    // Scrambling
     bool ScrambleSolution  (unsigned short key = 0);
     bool UnscrambleSolution(unsigned short key);
 
@@ -275,7 +277,7 @@ struct FIND_CLUE
     FIND_CLUE(bool direction, const XSquare * square);
     bool operator() (const XSquare * square);
 private:
-    int m_clueType;
+    bool m_direction;
     unsigned int m_number;
 };
 
