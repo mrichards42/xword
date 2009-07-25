@@ -56,9 +56,15 @@ enum
     ID_ZOOM_IN,
     ID_ZOOM_FIT,
     ID_ZOOM_OUT,
+
     ID_CHECK_LETTER,
     ID_CHECK_WORD,
     ID_CHECK_GRID,
+    ID_REVEAL_LETTER,
+    ID_REVEAL_WORD,
+    ID_REVEAL_INCORRECT,
+    ID_REVEAL_GRID,
+
 
     ID_SCRAMBLE,
     ID_UNSCRAMBLE,
@@ -91,9 +97,14 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_ZOOM_IN,           MyFrame::OnZoomIn)
     EVT_MENU           (ID_ZOOM_FIT,          MyFrame::OnZoomFit)
     EVT_MENU           (ID_ZOOM_OUT,          MyFrame::OnZoomOut)
+
     EVT_MENU           (ID_CHECK_GRID,        MyFrame::OnCheckGrid)
     EVT_MENU           (ID_CHECK_WORD,        MyFrame::OnCheckWord)
     EVT_MENU           (ID_CHECK_LETTER,      MyFrame::OnCheckLetter)
+    EVT_MENU           (ID_REVEAL_GRID,       MyFrame::OnRevealGrid)
+    EVT_MENU           (ID_REVEAL_INCORRECT,  MyFrame::OnRevealIncorrect)
+    EVT_MENU           (ID_REVEAL_WORD,       MyFrame::OnRevealWord)
+    EVT_MENU           (ID_REVEAL_LETTER,     MyFrame::OnRevealLetter)
 
     EVT_MENU           (ID_SCRAMBLE,          MyFrame::OnScramble)
     EVT_MENU           (ID_UNSCRAMBLE,        MyFrame::OnUnscramble)
@@ -137,9 +148,13 @@ static const ToolDesc toolDesc[] =
     { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble...") },
     { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("Unscramble...") },
 
-    { ID_CHECK_LETTER, wxITEM_NORMAL, _T("Check Letter"), _T("check_letter") },
-    { ID_CHECK_WORD,   wxITEM_NORMAL, _T("Check Word"),   _T("check_word") },
-    { ID_CHECK_GRID,   wxITEM_NORMAL, _T("Check All"),    _T("check_grid") },
+    { ID_CHECK_LETTER,  wxITEM_NORMAL, _T("Check Letter"), _T("check_letter") },
+    { ID_CHECK_WORD,    wxITEM_NORMAL, _T("Check Word"),   _T("check_word") },
+    { ID_CHECK_GRID,    wxITEM_NORMAL, _T("Check All"),    _T("check_grid") },
+    { ID_REVEAL_LETTER, wxITEM_NORMAL, _T("Reveal Letter") },
+    { ID_REVEAL_WORD,   wxITEM_NORMAL, _T("Reveal Word") },
+    { ID_REVEAL_INCORRECT, wxITEM_NORMAL, _T("Reveal Incorrect letters") },
+    { ID_REVEAL_GRID,   wxITEM_NORMAL, _T("Reveal Grid") },
 
     { ID_LAYOUT_PANES,      wxITEM_CHECK,  _T("Layout"), _T("layout"), _T("") },
     { ID_LOAD_LAYOUT,  wxITEM_NORMAL, _T("Load Layout") },
@@ -186,7 +201,7 @@ MyFrame::MyFrame()
 
     LoadConfig();
 
-    //LoadLayout(_T("Default"));
+    LoadLayout(_T("Default"));
     UpdateLayout();
 
     SetIcon(wxICON(aa_main_icon));
@@ -318,17 +333,11 @@ MyFrame::ShowPuzzle()
         EnableTools(true);
 
 
-        if (m_puz.m_grid.IsScrambled())
-        {
-            m_toolMgr.Disable(ID_SCRAMBLE);
-            m_toolMgr.Enable (ID_UNSCRAMBLE);
-        }
-        else
-        {
-            m_toolMgr.Enable (ID_SCRAMBLE);
-            m_toolMgr.Disable(ID_UNSCRAMBLE);
-        }
-
+        const bool scrambled = m_puz.IsScrambled();
+        EnableScramble(! scrambled);
+        EnableUnscramble(scrambled);
+        EnableCheck(! scrambled);
+        EnableReveal(! scrambled);
 
         m_gridCtrl->SetFocusedClue(1, DIR_ACROSS);
 
@@ -350,24 +359,29 @@ MyFrame::CheckPuzzle()
 {
     if (m_gridCtrl->GetBlankCount() == 0)
     {
-        if (m_gridCtrl->GetIncorrectCount() == 0)
+        if (m_puz.IsScrambled())
         {
             StopTimer();
-            m_status->SetAlert(_T("The puzzle is filled correctly!"),
-                              *wxWHITE, *wxGREEN);
+            m_status->SetAlert(
+                _T("The puzzle is completely filled, ")
+                _T("but the solution is scrambled"),
+                *wxWHITE, wxColor(0, 255, 255));
         }
         else
         {
-            if (m_puz.IsScrambled())
-                m_status->SetAlert(
-                    _T("The puzzle is completely filled,")
-                    _T("but the solution is scrambled"),
-                    *wxWHITE, wxColor(0, 255, 255));
+            if (m_gridCtrl->GetIncorrectCount() == 0)
+            {
+                StopTimer();
+                m_status->SetAlert(_T("The puzzle is filled correctly!"),
+                                  *wxWHITE, *wxGREEN);
+            }
             else
+            {
                 m_status->SetAlert(
                     _T("The puzzle is completely filled,")
                     _T("but some letters are incorrect"),
                     *wxWHITE, *wxRED);
+            }
         }
     }
     else
@@ -400,9 +414,9 @@ MyFrame::CreateWindows()
 
 #ifdef USE_AUI_TOOLBAR
     m_toolbar = MakeAuiToolBar();
-#else
+#else // ! USE_AUI_TOOLBAR
     m_toolbar = MakeToolBar();
-#endif
+#endif // USE_AUI_TOOLBAR / !
 
     m_menubar = MakeMenuBar();
     SetMenuBar(m_menubar);
@@ -427,7 +441,7 @@ MyFrame::MakeAuiToolBar()
 
     tb->GetArtProvider()->SetTextOrientation(wxAUI_TBTOOL_TEXT_BOTTOM);
 
-#else
+#else // ! USE_AUI_TOOLBAR
 wxToolBar *
 MyFrame::MakeToolBar()
 {
@@ -439,7 +453,7 @@ MyFrame::MakeToolBar()
     tb->SetToolBitmapSize( wxSize(m_toolMgr.GetIconSize_ToolBar(),
                                   m_toolMgr.GetIconSize_ToolBar()) );
 
-#endif
+#endif // USE_AUI_TOOLBAR / !
 
     m_toolMgr.Add(tb, ID_OPEN);
     m_toolMgr.Add(tb, ID_SAVE);
@@ -460,7 +474,9 @@ MyFrame::MakeToolBar()
 #ifdef USE_AUI_TOOLBAR
     // Overflow button
     tb->SetOverflowVisible(true);
-#endif
+#else // ! USE_AUI_TOOLBAR
+    SetToolBar(tb);
+#endif // USE_AUI_TOOLBAR / !
 
     tb->Realize();
     return tb;
@@ -498,6 +514,12 @@ MyFrame::MakeMenuBar()
             m_toolMgr.Add(subMenu, ID_CHECK_WORD);
             m_toolMgr.Add(subMenu, ID_CHECK_GRID);
         menu->AppendSubMenu(subMenu, _T("Check"));
+        subMenu = new wxMenu();
+            m_toolMgr.Add(subMenu, ID_REVEAL_LETTER);
+            m_toolMgr.Add(subMenu, ID_REVEAL_WORD);
+            m_toolMgr.Add(subMenu, ID_REVEAL_INCORRECT);
+            m_toolMgr.Add(subMenu, ID_REVEAL_GRID);
+        menu->AppendSubMenu(subMenu, _T("Reveal"));
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_SCRAMBLE);
         m_toolMgr.Add(menu, ID_UNSCRAMBLE);
@@ -559,6 +581,7 @@ MyFrame::ManageWindows()
                   .Caption(_T("Grid"))
                   .Name(_T("Grid")) );
 
+#ifdef USE_AUI_TOOLBAR
     // It would be better to use MinSize, instead of Fixed, but it doesn't work
     // quite right, and we would have to update the MinSize every time the 
     // toolbar was resized . . .
@@ -570,6 +593,7 @@ MyFrame::ManageWindows()
                   .Layer(5)
                   .Caption(_T("Tools"))
                   .Name(_T("Tools")));
+#endif // USE_AUI_TOOLBAR
 
     m_mgr.AddPane(m_across,
                   wxAuiPaneInfo()
@@ -652,22 +676,80 @@ MyFrame::ManageTools()
 void
 MyFrame::EnableTools(bool enable)
 {
-    m_toolMgr.Enable(ID_SAVE,         enable);
-    m_toolMgr.Enable(ID_CLOSE,        enable);
+    EnableSave(enable);
+    EnableClose(enable);
+    EnableGridSize(enable);
+    EnableScramble(enable);
+    EnableUnscramble(enable);
+    EnableCheck(enable);
+    EnableReveal(enable);
+    EnableNotes(enable);
+    EnableTimer(enable);
+}
 
+void
+MyFrame::EnableSave(bool enable)
+{
+    m_toolMgr.Enable(ID_SAVE,         enable);
+}
+
+void
+MyFrame::EnableClose(bool enable)
+{
+    m_toolMgr.Enable(ID_CLOSE,        enable);
+}
+
+void
+MyFrame::EnableGridSize(bool enable)
+{
     m_toolMgr.Enable(ID_ZOOM_IN,      enable);
     m_toolMgr.Enable(ID_ZOOM_OUT,     enable);
     m_toolMgr.Enable(ID_ZOOM_FIT,     enable);
+}
 
+void
+MyFrame::EnableScramble(bool enable)
+{
     m_toolMgr.Enable(ID_SCRAMBLE,     enable);
-    m_toolMgr.Enable(ID_UNSCRAMBLE,   enable);
+}
 
+void
+MyFrame::EnableUnscramble(bool enable)
+{
+    m_toolMgr.Enable(ID_UNSCRAMBLE,     enable);
+}
+
+void
+MyFrame::EnableCheck(bool enable)
+{
     m_toolMgr.Enable(ID_CHECK_LETTER, enable);
     m_toolMgr.Enable(ID_CHECK_WORD,   enable);
     m_toolMgr.Enable(ID_CHECK_GRID,   enable);
+    m_menubar->Enable(m_menubar->FindMenuItem(_T("Solution"), _T("Check")),
+                      enable);
 
+}
+
+void
+MyFrame::EnableReveal(bool enable)
+{
+    m_toolMgr.Enable(ID_REVEAL_LETTER,    enable);
+    m_toolMgr.Enable(ID_REVEAL_WORD,      enable);
+    m_toolMgr.Enable(ID_REVEAL_INCORRECT, enable);
+    m_toolMgr.Enable(ID_REVEAL_GRID,      enable);
+    m_menubar->Enable(m_menubar->FindMenuItem(_T("Solution"),_T("Reveal")),
+                      enable);
+}
+
+void
+MyFrame::EnableNotes(bool enable)
+{
     m_toolMgr.Enable(ID_SHOW_NOTES,   enable);
+}
 
+void
+MyFrame::EnableTimer(bool enable)
+{
     m_toolMgr.Enable(ID_TIMER,        enable);
 }
 
@@ -860,6 +942,7 @@ MyFrame::OnZoomOut(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 {
+    wxASSERT(m_gridCtrl->GetXGrid() != NULL);
     int key = wxGetNumberFromUser(
                     _T("Enter a four-digit key"),
                     _T("Key (0 to generate automatically):"),
@@ -879,8 +962,14 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
                                       m_gridCtrl->GetXGrid()->GetKey()),
                      _T("XWord Message"));
 
-        m_toolMgr.Disable(ID_SCRAMBLE);
-        m_toolMgr.Enable(ID_UNSCRAMBLE);
+        m_gridCtrl->RecheckGrid();
+        CheckPuzzle();
+
+        EnableScramble(false);
+        EnableUnscramble(true);
+
+        EnableCheck(false);
+        EnableReveal(false);
     }
     else // This should never be the case
     {
@@ -894,24 +983,36 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 {
-    int key = wxGetNumberFromUser(
+    wxASSERT(m_gridCtrl->GetXGrid() != NULL);
+
+    int key = m_gridCtrl->GetXGrid()->GetKey();
+
+    if (key == 0)
+    {
+        key = wxGetNumberFromUser(
                     _T("Enter the four-digit key"),
                     _T("Key:"),
                     _T("Unscrambling solution"),
                     0,
                     1000,
                     9999);
-
-    if (key < 1000)
-        return;
+        if (key < 1000)
+            return;
+    }
 
     if (m_gridCtrl->GetXGrid()->UnscrambleSolution(key))
     {
         wxMessageBox(_T("Solution unscrambled!"),
                      _T("XWord Message"));
 
-        m_toolMgr.Enable(ID_SCRAMBLE);
-        m_toolMgr.Disable(ID_UNSCRAMBLE);
+        m_gridCtrl->RecheckGrid();
+        CheckPuzzle();
+
+        EnableScramble(true);
+        EnableUnscramble(false);
+
+        EnableCheck(true);
+        EnableReveal(true);
     }
     else
     {

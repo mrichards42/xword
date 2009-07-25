@@ -92,7 +92,6 @@ public:
         wxASSERT(puz != NULL);
         m_puz = puz;
         m_outStream = &stream;
-        SetVersion(1, 3); // Always use version 1.3 to save
         DoSave();
         m_outStream = NULL;
         m_puz = NULL;
@@ -133,37 +132,12 @@ protected:
 
     // XGrid functions
     //----------------
-
-    // It's kind of a pain, but all functions that access private/protected
-    // data in XPuzzle, XGrid, or XSquare have to be defined here instead
-    // of in their specific handlers, becuase only this class is a friend.
-    // Consequently, these functions should be as generic as possible.
-
-    void SetGridSolution(const ByteArray & data);
-    void SetGridText    (const ByteArray & data);
-
-    void SetGridChecksum(unsigned short cksum)
-        { m_puz->m_grid.m_cksum = cksum; }
-    void SetGridType(unsigned short type) { m_puz->m_grid.m_type = type; }
-    void SetGridFlag(unsigned short flag) { m_puz->m_grid.m_flag = flag; }
-
-    unsigned short GetGridChecksum() const { return m_puz->m_grid.m_cksum; }
-    unsigned short GetGridType()     const { return m_puz->m_grid.m_type; }
-    unsigned short GetGridFlag()     const { return m_puz->m_grid.m_flag; }
-
-    // Misc
-    void SetVersion(unsigned short major, unsigned short minor);
-    wxString GetVersionString() const;
+    void SetGridFlag (unsigned short flag)  { m_puz->m_grid.m_flag  = flag; }
+    void SetGridType (unsigned short type)  { m_puz->m_grid.m_type  = type; }
+    void SetGridCksum(unsigned short cksum) { m_puz->m_grid.m_cksum = cksum; }
 
     void SetupGrid() { m_puz->m_grid.SetupGrid(); }
     void SetupClues();
-
-    // Sections
-    void SetGext(const ByteArray & data);
-    void SetTime(unsigned int time) { m_puz->m_time = time; }
-    void SetTextRebus(const std::vector<wxString> & data);
-    void SetSolutionRebus(const std::map<unsigned char, wxString> & table,
-                          const ByteArray & grid);
 };
 
 

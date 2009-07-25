@@ -136,9 +136,9 @@ TxtHandler::DoLoad()
              square != NULL;
              square = square->Next())
         {
-            if ( (square->GetClueFlag() & ACROSS_CLUE) != 0)
+            if (square->HasClue(DIR_ACROSS))
                 m_puz->m_clues.push_back(*across_it++);
-            if ( (square->GetClueFlag() & DOWN_CLUE) != 0)
+            if (square->HasClue(DIR_DOWN))
                 m_puz->m_clues.push_back(*down_it++);
         }
 
@@ -176,7 +176,10 @@ TxtHandler::LoadVersion1Grid()
 {
     CheckSection(_T("<GRID>"));
 
+    // Read the solution into a string
     wxString solution;
+    solution.reserve(m_puz->m_grid.GetWidth() * m_puz->m_grid.GetHeight());
+
     for (size_t i = 0; i < m_puz->m_grid.GetHeight(); ++i)
     {
         wxString line = ReadLine();
@@ -185,7 +188,20 @@ TxtHandler::LoadVersion1Grid()
 
         solution.append(line);
     }
-    SetGridSolution(solution);
+
+    wxASSERT(solution.length() ==
+                m_puz->m_grid.GetWidth() * m_puz->m_grid.GetHeight());
+
+    // Set the grid's solution
+    wxString::const_iterator it = solution.begin();
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        square->SetSolution(*it++);
+    }
+
+    wxASSERT(it == solution.end());
 }
 
 
@@ -193,20 +209,29 @@ TxtHandler::LoadVersion1Grid()
 void
 TxtHandler::LoadVersion2Grid()
 {
-    // Read the grid the same way as before (but with different allowedChars)
     CheckSection(_T("<GRID>"));
 
+    // Read the grid the same way as in V1 (with different allowedChars)
     wxString solution;
+    solution.reserve(m_puz->m_grid.GetWidth() * m_puz->m_grid.GetHeight());
+
     for (size_t i = 0; i < m_puz->m_grid.GetHeight(); ++i)
     {
         wxString line = ReadLine();
 
-        CheckGridLine(line, allowedCharsV2, m_puz->m_grid.GetWidth());
+        CheckGridLine(line, allowedCharsV1, m_puz->m_grid.GetWidth());
 
         solution.append(line);
     }
 
+    wxASSERT(solution.length() ==
+                m_puz->m_grid.GetWidth() * m_puz->m_grid.GetHeight());
 
+
+    typedef std::map<unsigned char, std::pair<wxString, wxChar> > rebusTable_t;
+    rebusTable_t rebusTable;
+
+    wxArrayString flags;
     // Read the <REBUS> section (optional)
     //------------------------------------
     if ( TestLine(_T("<REBUS>")) )
@@ -223,30 +248,7 @@ TxtHandler::LoadVersion2Grid()
             // We'll be a little more lenient here, and split the line by ';'
             // so that more flags can be used in the future if needed.
 
-            wxArrayString flags =
-                wxStringTokenize(line, _T("; "), wxTOKEN_STRTOK );
-
-            for (wxArrayString::iterator it = flags.begin();
-                 it != flags.end();
-                 ++it)
-            {
-                // MARK: circle all lowercase letters
-                if (*it == _T("MARK"))
-                {
-                    ByteArray gext;
-                    for (wxString::iterator str_it = solution.begin();
-                         str_it != solution.end();
-                         ++str_it)
-                    {
-                        if (wxIslower(*str_it))
-                            gext.push_back(XFLAG_CIRCLE);
-                        else
-                            gext.push_back(XFLAG_CLEAR);
-                    }
-                    if (gext.has_data())
-                        SetGext(gext);
-                }
-            }
+            flags = wxStringTokenize(line, _T("; "), wxTOKEN_STRTOK );
         }
         else if (line.find(_T(":")) == wxString::npos)
             throw PuzLoadError(_T("No entries in <REBUS> section."));
@@ -256,9 +258,6 @@ TxtHandler::LoadVersion2Grid()
 
         // Read rebus markers
         //-------------------
-        std::map<unsigned char, wxString> table;
-        std::map<unsigned char, wxChar> asciiTable;
-
         for (;;)
         {
             line = ReadLine();
@@ -276,36 +275,58 @@ TxtHandler::LoadVersion2Grid()
 
             const unsigned char index =
                 static_cast<unsigned char>( marker.Item(0).at(0) );
+            const wxString & long_solution = marker.Item(1);
+            const wxChar &   short_solution = marker.Item(2).at(0);
 
-            table.insert(      std::make_pair(index, marker.Item(1)) );
-            asciiTable.insert( std::make_pair(index, marker.Item(2).at(0)) );
+            rebusTable[index] = std::make_pair(long_solution, short_solution);
         }
-
-        // Replace entries in the solution grid with the markers
-        //------------------------------------------------------
-        ByteArray grid;
-        for (wxString::iterator it = solution.begin();
-             it != solution.end();
-             ++it)
-        {
-            // Look for the letter in the rebus table
-            std::map<unsigned char, wxString>::iterator table_it;
-            table_it = table.find(*it);
-
-            // This square has a rebus
-            if (table_it != table.end())
-            {
-                grid.push_back(table_it->first);
-                *it = asciiTable[table_it->first];
-            }
-            else
-                grid.push_back(0);
-        }
-        SetGridSolution(solution);
-        SetSolutionRebus(table, grid);
     }
-    else // No rebus section
-        SetGridSolution(solution);
+
+    // Process flags
+    //--------------
+
+    // MARK: circle all lowercase letters
+    const bool use_mark = flags.Index(_T("MARK")) != wxNOT_FOUND;
+
+    if (use_mark)
+    {
+        wxString::iterator str_it = solution.begin();
+        for (XSquare * square = m_puz->m_grid.First();
+             square != NULL;
+             square = square->Next())
+        {
+            // We need to preserve the original case because lower case letters
+            // are valid rebus indexes
+            if (wxIslower(*str_it))
+                square->SetFlag(XFLAG_CIRCLE);
+            ++str_it;
+        }
+        wxASSERT(str_it = solution.end());
+    }
+
+    // Set the grid's solution (including rebus)
+    //------------------------------------------
+    wxString::const_iterator str_it = solution.begin();
+
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        // Look for the letter in the rebus table
+        rebusTable_t::const_iterator table_it;
+        table_it = rebusTable.find(*str_it);
+
+        if (table_it != rebusTable.end())
+        {
+            square->SetSolution(table_it->second.first,   // Long solution
+                                table_it->second.second); // Short solution
+        }
+        else // No rebus
+            square->SetSolution(*str_it);
+
+        ++str_it;
+    }
+    wxASSERT(str_it == solution.end());
 }
 
 

@@ -87,7 +87,7 @@ XSquare::InitCharTable()
         // Upper case
         sm_charTable[static_cast<wxChar>(ch)] = ch;
         // Lower case
-        sm_charTable[static_cast<wxChar>(tolower(ch))] = ch;
+        sm_charTable[static_cast<wxChar>(wxTolower(ch))] = ch;
     }
 
     // Other possible values

@@ -66,17 +66,28 @@ PuzHandler::DoLoad()
 
     m_puz->m_grid.SetSize(h.width, h.height);
 
-    SetGridChecksum(h.c_grid);
+    SetGridCksum(h.c_grid);
     SetGridType(h.puz_type);
     SetGridFlag(h.puz_flag);
 
+    // Read in the solution and text
     ByteArray solution(h.width * h.height);
     Read(&solution[0], h.width * h.height);
-    SetGridSolution(solution);
 
     ByteArray gridText(h.width * h.height);
     Read(&gridText[0], h.width * h.height);
-    SetGridText(gridText);
+
+    // Set the grid's solution and text
+    ByteArray::iterator sol_it  = solution.begin();
+    ByteArray::iterator text_it = gridText.begin();
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        square->SetSolution(static_cast<wxChar>(*sol_it++));
+        square->SetText    (static_cast<wxChar>(*text_it++));
+    }
+    wxASSERT(sol_it == solution.end() && text_it == gridText.end());
 
     m_puz->m_title       = ReadString();
     m_puz->m_author      = ReadString();
@@ -136,6 +147,10 @@ PuzHandler::DoLoad()
 void
 PuzHandler::DoSave()
 {
+    // NB: Make sure to use c strings (without _T() macro) when writing
+    // the file so that they show up correctly in unicode build.  If _T() is
+    // used under unicode build, it will add extra nuls between letters.
+
     // Get checksums
     unsigned short c_cib;
     unsigned short c_primary;
@@ -153,10 +168,10 @@ PuzHandler::DoSave()
     Write(&c_cib, 2);
     Write(&c_masked[0], 8);
 
-    Write( GetVersionString() + _T('\0') );
+    Write("1.3\0", 4);
 
     Write("\0\0", 2);
-    unsigned short temp = GetGridChecksum();
+    unsigned short temp = m_puz->m_grid.GetCksum();
     Write(&temp, 2);
     Write("\0\0", 2);
     Write("\0\0", 2);
@@ -173,15 +188,24 @@ PuzHandler::DoSave()
     Write(&height, 1);
 
     Write(&nClues, 2);
-    temp = GetGridType();
+    temp = m_puz->m_grid.GetType();
     Write(&temp, 2);
-    temp = GetGridFlag();
+    temp = m_puz->m_grid.GetFlag();
     Write(&temp, 2);
 
 
     // Write the puzzle's contents
-    Write( m_puz->m_grid.GetGridSolution() );
-    Write( m_puz->m_grid.GetGridText() );
+    ByteArray grid;
+    ByteArray solution;
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        grid.push_back(square->GetPlainText());
+        solution.push_back(square->GetPlainSolution());
+    }
+    Write(solution);
+    Write(grid);
     Write(m_puz->m_title     + _T('\0'));
     Write(m_puz->m_author    + _T('\0'));
     Write(m_puz->m_copyright + _T('\0'));
@@ -245,7 +269,7 @@ PuzHandler::LoadSections()
 
     data = sections[_T("GEXT")];
     if (data.has_data())
-        SetGext(data);
+        SetGEXT(data);
     sections.erase(_T("GEXT"));
 
     data = sections[_T("LTIM")];
@@ -283,6 +307,22 @@ PuzHandler::LoadSections()
 
 
 
+// GEXT (grid-extra?)
+//-------------------
+void
+PuzHandler::SetGEXT(const ByteArray & data)
+{
+    ByteArray::const_iterator it = data.begin();
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        square->SetFlag(*it++);
+    }
+    wxASSERT(it == data.end());
+}
+
+
 // LTIM (lit-time?)
 //-----------------
 void
@@ -298,7 +338,7 @@ PuzHandler::SetLTIM(const ByteArray & data)
     long time;
     if (! str.Left(index).ToLong(&time))
         throw PuzLoadError(_T("Incorrect time value"));
-    SetTime(time);
+    m_puz->m_time = time;
 }
 
 
@@ -307,21 +347,37 @@ PuzHandler::SetLTIM(const ByteArray & data)
 void
 PuzHandler::SetRUSR(const ByteArray & data)
 {
-    std::vector<wxString> strs;
+    // RUSR is a series of strings (each nul-terminated) that represent any user
+    // grid rebus entries.  If the rebus is a symbol, it is enclosed in '[' ']'.
+
     ByteArray::const_iterator it = data.begin();
-    for (ByteArray::const_iterator it = data.begin();
-         it != data.end();
-         ++it)
+
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
     {
         wxString str;
-        if (*it != '\0')
-            while (*it != '\0')
-                str.append(static_cast<wxChar>(*it++));
-        strs.push_back(str);
+        while (*it != '\0')
+            str.append(static_cast<wxChar>(*it++));
+        ++it;
+
+        if (str.empty())
+            continue;
+
+        // Make sure symbols are entered correctly
+        if (str.at(0) == _T('['))
+        {
+            if (str.at(3) != _T(']'))
+                throw PuzLoadError(_T("Missing ']' in RUSR section"));
+
+            wxChar num = str.at(1);
+            if (num > 255)
+                throw PuzLoadError(_T("Invalid entry in RUSR section"));
+        }
+
+        square->SetText(str);
     }
-    wxASSERT(strs.size()
-        == m_puz->m_grid.GetWidth() * m_puz->m_grid.GetHeight());
-    SetTextRebus(strs);
+    wxASSERT(it == data.end());
 }
 
 
@@ -330,18 +386,16 @@ PuzHandler::SetRUSR(const ByteArray & data)
 void
 PuzHandler::SetSolutionRebus(const ByteArray & table, const ByteArray & grid)
 {
-    // An important note here:
-    // In the grid rebus section, the index is actually 1 greater than the real
-    // number.
-    // Note sure why.
+    // NB: In the grid rebus section (GRBS), the index is 1 greater than the
+    // index in the rebus table section (RTBL).
 
     wxASSERT(grid.size()
              == m_puz->m_grid.GetWidth() * m_puz->m_grid.GetHeight());
 
 
-    // Create the rebus table
-    // Format: ' ' index ':' string ';'
-    //   - Index can be multiple characters
+    // Read the rebus table (RTBL)
+    // Format: index ':' string ';'
+    //   - Index is a number, padded to two digits with a space if needed.
     std::map<unsigned char, wxString> rebusTable;
 
     ByteArray::const_iterator table_it = table.begin();
@@ -350,8 +404,6 @@ PuzHandler::SetSolutionRebus(const ByteArray & table, const ByteArray & grid)
     {
         wxString key;
         wxString value;
-
-        ++table_it;         // Throw away ' '
 
         // Read the index
         while (*table_it != ':')
@@ -382,7 +434,30 @@ PuzHandler::SetSolutionRebus(const ByteArray & table, const ByteArray & grid)
         rebusTable[static_cast<unsigned char>(index)] = value;
     }
 
-    HandlerBase::SetSolutionRebus(rebusTable, grid);
+
+    // Set the grid rebus solution
+    ByteArray::const_iterator rebus_it = grid.begin();
+
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (*rebus_it > 0)
+        {
+            std::map<unsigned char, wxString>::const_iterator it;
+            it = rebusTable.find(*rebus_it);
+            if (it == rebusTable.end())
+                throw PuzLoadError(_T("Invalid value in GRBS section"));
+
+            // Make sure we're not overwriting the plain solution for 
+            // unscrambling
+            if (m_puz->m_grid.IsScrambled())
+                square->SetSolution(it->second, square->GetPlainSolution());
+            else
+                square->SetSolution(it->second);
+        }
+        ++rebus_it;
+    }
 }
 
 
@@ -429,7 +504,15 @@ PuzHandler::WriteSection(const wxString & name, const ByteArray & data)
 void
 PuzHandler::WriteGEXT()
 {
-    ByteArray data = m_puz->m_grid.GetGext();
+    ByteArray data;
+    data.reserve(m_puz->m_grid.GetWidth() * m_puz->m_grid.GetHeight());
+
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        data.push_back(square->GetFlag());
+    }
     if (data.has_data())
         WriteSection(_T("GEXT"), data);
 }
@@ -485,8 +568,6 @@ PuzHandler::WriteSolutionRebus()
     wxByte index = 1;
 
 
-    std::map<wxString, wxByte>::iterator table_it;
-
     // Assemble the grid rebus string
     for (XSquare * square = m_puz->m_grid.First();
          square != NULL;
@@ -495,29 +576,29 @@ PuzHandler::WriteSolutionRebus()
         if (! square->HasSolutionRebus())
         {
             rebus.push_back(0);
+            continue;
         }
-        else
+
+        std::map<wxString, wxByte>::iterator table_it;
+        table_it = tableMap.find(square->GetSolution());
+
+        if (table_it != tableMap.end())
         {
-            table_it = tableMap.find(square->GetSolution());
-            if (table_it == tableMap.end()) // This is a new entry
-            {
-                // The grid-rebus section adds 1 for every index
-                tableMap[square->GetSolution()] = index + 1;
-                rebus.push_back(index + 1);
+            rebus.push_back(table_it->second);
+        }
+        else // We need to add this entry to the map
+        {
+            // The grid-rebus section adds 1 for every index
+            tableMap[square->GetSolution()] = index + 1;
+            rebus.push_back(index + 1);
 
-                // Add to the rebusTable (uses the actual index)
-                table.push_back(' ');
-                table.push_string(wxString::Format(_T("%d"), index));
-                table.push_back(':');
-                table.push_string(square->GetSolution());
-                table.push_back(';');
+            // Add to the rebusTable (uses the actual index)
+            table.push_string(wxString::Format(_T("%2d"), index));
+            table.push_back(':');
+            table.push_string(square->GetSolution());
+            table.push_back(';');
 
-                ++index;
-            }
-            else // This string is already in the map
-            {
-                rebus.push_back(table_it->second);
-            }
+            ++index;
         }
     }
 

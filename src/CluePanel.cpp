@@ -114,8 +114,8 @@ CluePanel::OnClueSelect(wxCommandEvent & evt)
     m_clueList->SetSelectionForeground(
         m_colors[FOCUSED_CLUE][TEXT_COLOR] );
 
-    m_clueList->SetSelectionForeground(
-        m_colors[FOCUSED_CLUE][TEXT_COLOR] );
+    m_clueList->SetSelectionBackground(
+        m_colors[FOCUSED_CLUE][BACKGROUND_COLOR] );
 
 
     wxPuzEvent puzEvt   (wxEVT_PUZ_CLUE_FOCUS, GetId());

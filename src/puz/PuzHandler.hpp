@@ -32,23 +32,27 @@ protected:
     bool CanLoad() const { return true; }
     bool CanSave() const { return true; }
 
-    // Extra sections
-    //---------------
+    // Read extra sections
+    //--------------------
     void LoadSections();
 
+    void SetGEXT(const ByteArray & data);
     void SetLTIM(const ByteArray & data);
     void SetRUSR(const ByteArray & data);
     void SetSolutionRebus(const ByteArray & table, const ByteArray & grid);
 
+    void AddSection(const wxString & name, const ByteArray & data)
+        { m_puz->m_extraSections.push_back(XPuzzle::section(name, data)); }
+
+
+    // Write extra sections
+    //---------------------
     void WriteSections();
 
     void WriteGEXT();
     void WriteLTIM();
     void WriteRUSR();
     void WriteSolutionRebus();
-
-    void AddSection(const wxString & name, const ByteArray & data)
-        { m_puz->m_extraSections.push_back(XPuzzle::section(name, data)); }
 
     void WriteSection(const wxString & name, const ByteArray & data);
     void WriteSection(const XPuzzle::section & section)
