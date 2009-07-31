@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib advapi32.lib comctl32.lib wxbase28d.lib wxmsw28d_core.lib wxmsw28d_aui.lib wsock32.lib winmm.lib"
+				AdditionalDependencies="rpcrt4.lib advapi32.lib comctl32.lib wxbase28d.lib wxmsw28d_core.lib wxpngd.lib wxzlibd.lib wxmsw28d_aui.lib wsock32.lib winmm.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
@@ -120,7 +120,8 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				WarningLevel="3"
+				ForceConformanceInForLoopScope="false"
+				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -134,7 +135,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib advapi32.lib wxbase28ud.lib comctl32.lib wxmsw28ud_aui.lib wxmsw28ud_core.lib wsock32.lib winmm.lib"
+				AdditionalDependencies="rpcrt4.lib advapi32.lib wxbase28ud.lib comctl32.lib wxmsw28ud_aui.lib wxpngd.lib wxzlibd.lib wxmsw28ud_core.lib wsock32.lib winmm.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
@@ -205,7 +206,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib advapi32.lib comctl32.lib wxmsw28_aui.lib wxmsw28_core.lib wsock32.lib winmm.lib wxbase28.lib"
+				AdditionalDependencies="rpcrt4.lib advapi32.lib comctl32.lib wxmsw28_aui.lib wxmsw28_core.lib wxpng.lib wxzlib.lib wsock32.lib winmm.lib wxbase28.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="false"
@@ -277,7 +278,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib advapi32.lib wxmsw28u_aui.lib wxmsw28u_core.lib comctl32.lib wxbase28u.lib wsock32.lib winmm.lib"
+				AdditionalDependencies="rpcrt4.lib advapi32.lib wxmsw28u_aui.lib wxmsw28u_core.lib wxpng.lib wxzlib.lib comctl32.lib wxbase28u.lib wsock32.lib winmm.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="false"

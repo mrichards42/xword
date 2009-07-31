@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -26,4 +26,4 @@ class wxFont;
 wxString Wrap          (const wxWindow * window, const wxString & str, int maxWidth, const wxFont * font = NULL);
 wxString WrapIntoLines (const wxWindow * window, const wxString & str, int lines,    const wxFont * font = NULL);
 
-#endif MY_WRAP_H
+#endif // MY_WRAP_H

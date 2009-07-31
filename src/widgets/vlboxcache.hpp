@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -71,29 +71,16 @@ public:
 protected:
     void Init() { InvalidateCache(); }
 
-    // Mutiple overloads of OnGetLineHeight and OnMeasureItem
-    //   Adds support for using wxDC as one of the parameters
-    // ------------------------------------------------------
     virtual wxCoord OnGetLineHeight(size_t line) const
     {
         if (! IsCached(line))
-            return OnMeasureItem(wxMemoryDC(), line) + 2*GetMargins().y;
-        return m_heights.at(line);
-    }
-
-    // An overload to use during OnPaint
-    virtual wxCoord OnGetLineHeight(size_t line, wxDC & dc) const
-    {
-        if (! IsCached(line))
-            return OnMeasureItem(dc, line) + 2*GetMargins().y;
+            return OnMeasureItem(line) + 2*GetMargins().y;
         return m_heights.at(line);
     }
 
 
-    // Note that this is a different overload from wxVListBox.
-    // wxVListBox does not use a wxDC for OnMeasureItem
-    virtual wxCoord OnMeasureItem(wxDC & dc, size_t n) const
-        { return dc.GetCharHeight(); }
+    virtual wxCoord OnMeasureItem(size_t n) const
+        { return GetCharHeight(); }
 
     // Caching Stuff
     mutable std::vector<int> m_heights;

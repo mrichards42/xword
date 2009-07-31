@@ -1,0 +1,65 @@
+
+XWord - A cross platform crossword solving program
+==================================================
+
+https://sourceforge.net/projects/wx-xword/
+
+XWord is a cross-platform crossword puzzle program designed to be highly
+configurable.  It reads and writes the Across Lite .puz file format, and reads
+the Across Lite plain text format (version 1 or 2).
+
+Supported features:
+    - Solving of all American style and cryptic crosswords (not diagramless yet).
+    - A timer.
+    - Checking and revealing letters.
+    - Scrambling and unscrambling puzzle solutions.
+    - Viewing and editing puzzle notes.
+    - Zooming the grid in and out.
+    - Displaying puzzles with rebus information (multiple letters numbers or
+        symbols per square).  XWord cannot currently be used to solve rebus
+        puzzles, though support for solving rebus puzzles will come in the
+        near future.
+    - Rearranging the window layout (try checking the "Layout" option in the
+        Layout menu)
+
+
+Configuration is currently minimal, but that will change soon.
+
+
+
+XWord can also be used to batch convert .txt formatted puzzles into .puz files
+on the command line.  Usage is as follows:
+
+    -c --convert
+
+        Runs XWord in batch convert mode.  XWord will convert files and exit
+        (no gui).  Other switches do nothing unless -c is specified.
+        With no other switches, convert .txt files and place converted .puz
+        files in the same directory.
+
+    -o  --output-files
+
+        If converting files, specify each output file after each input file:
+            xword -c -o in_file_1 out_file_1 in_file_2 out_file_2
+
+    -w  --overwrite
+
+        If output files exist, overwrite them instead of creating a new file.
+        If this switch is not specified and the output file exists, XWord will
+        add a number to the output file name.
+
+    -d  --directory=<output directory>
+
+        Place converted files in this directory.  Output files can be specified
+        as relative paths, in which case files will be made relative to this
+        directory.
+
+NB: Batch converting is still experimental.  Essentially the program will
+    convert all files and then suppress the GUI (forcing the application to end
+    with an error).  No information is output to the screen informing the user
+    about the converting process.
+
+
+
+
+

@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ XPuzzle::Load(const wxString & filename, wxString ext)
 
     if (! fn.FileExists())
     {
-        wxLogError(_T("File \"%s\" does not exist"), fn.GetFullPath());
+        wxLogError(_T("File \"%s\" does not exist"), fn.GetFullPath().c_str());
         return false;
     }
 
@@ -72,10 +72,10 @@ XPuzzle::Load(const wxString & filename, HandlerBase * handler)
 
     try
     {
-        wxLogDebug(_T("Loading puzzle: %s"), m_filename);
+        wxLogDebug(_T("Loading puzzle: %s"), m_filename.c_str());
         wxFileInputStream stream(m_filename);
         if (! stream.IsOk())
-            throw PuzLoadError(_T("Cannot open file %s"), m_filename);
+            throw PuzLoadError(_T("Cannot open file %s"), m_filename.c_str());
         handler->Load(this, stream);
         m_isOk = true;
     }
@@ -91,7 +91,7 @@ XPuzzle::Load(const wxString & filename, HandlerBase * handler)
 
             handler = PromptForLoadHandler(
                 wxString::Format(_T("Loading file as %s failed."),
-                                 handler->GetDescription()) );
+                                 handler->GetDescription().c_str()) );
             if (handler != NULL)
                 return Load(filename, handler);
         }
@@ -146,10 +146,10 @@ XPuzzle::Save(const wxString & filename, HandlerBase * handler)
 
     try
     {
-        wxLogDebug(_T("Saving puzzle: %s"), m_filename);
+        wxLogDebug(_T("Saving puzzle: %s"), m_filename.c_str());
         wxFileOutputStream stream(m_filename);
         if (! stream.IsOk())
-            throw PuzLoadError(_T("Cannot open file %s"), m_filename);
+            throw PuzLoadError(_T("Cannot open file %s"), m_filename.c_str());
         handler->Save(this, stream);
         return true;
     }
@@ -165,7 +165,7 @@ XPuzzle::Save(const wxString & filename, HandlerBase * handler)
 
             handler = PromptForSaveHandler(
                 wxString::Format(_T("Saving file as %s failed."),
-                                 handler->GetDescription()) );
+                                 handler->GetDescription().c_str()) );
             if (handler != NULL)
                 return Load(filename, handler);
         }
@@ -247,16 +247,16 @@ XPuzzle::GetLoadTypeString()
             continue;
 
         typeStr << wxString::Format(_T("%s (*.%s)|*.%s|"),
-                                    handler->GetDescription(),
-                                    handler->GetExtension(),
-                                    handler->GetExtension());
+                                    handler->GetDescription().c_str(),
+                                    handler->GetExtension().c_str(),
+                                    handler->GetExtension().c_str());
 
-        allTypes << wxString::Format(_T("*.%s;"), handler->GetExtension());
+        allTypes << wxString::Format(_T("*.%s;"), handler->GetExtension().c_str());
     }
 
     typeStr << wxString::Format(_T("Supported types (%s)|%s"),
-                                allTypes,
-                                allTypes);
+                                allTypes.c_str(),
+                                allTypes.c_str());
     typeStr.RemoveLast();
     return typeStr;
 }
@@ -278,16 +278,10 @@ XPuzzle::GetSaveTypeString()
             continue;
 
         typeStr << wxString::Format(_T("%s (*.%s)|*.%s|"),
-                                    handler->GetDescription(),
-                                    handler->GetExtension(),
-                                    handler->GetExtension());
-
-        //allTypes << wxString::Format(_T("*.%s;"), handler->GetExtension());
+                                    handler->GetDescription().c_str(),
+                                    handler->GetExtension().c_str(),
+                                    handler->GetExtension().c_str());
     }
-
-    //typeStr << wxString::Format(_T("Supported types (%s)|%s"),
-    //                            allTypes,
-    //                            allTypes);
     typeStr.RemoveLast();
     return typeStr;
 }

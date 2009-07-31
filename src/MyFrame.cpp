@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -33,19 +33,22 @@
 
 #include <wx/numdlg.h>
 
-//#include "widgets/MyAuiToolBar.hpp" // Change behavior of drop down menu
 
 #include "utils/DragAndDrop.hpp" // File drag and drop
 
 #include "utils/SizerPrinter.hpp"
 
 
+#if !defined(__WXMSW__) && !defined(__WXPM__)
+    #include "../images/xword.xpm"
+#endif
+
 
 //------------------------------------------------------------------------------
 // Menu and Toolbar IDs
 //------------------------------------------------------------------------------
 
-enum
+enum toolIds
 {
     ID_OPEN = wxID_HIGHEST,
     ID_SAVE,
@@ -189,6 +192,8 @@ MyFrame::MyFrame()
       m_isTimerRunning(false)
 {
     wxLogDebug(_T("Creating Frame"));
+    wxImage::AddHandler(new wxPNGHandler());
+
     SetDropTarget(new XWordFileDropTarget(this));
 
     SetupToolManager();
@@ -204,7 +209,7 @@ MyFrame::MyFrame()
     LoadLayout(_T("Default"));
     UpdateLayout();
 
-    SetIcon(wxICON(aa_main_icon));
+    SetIcon(wxICON(xword));
 
     ShowPuzzle();
 }
@@ -237,7 +242,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
 
     if (success)
         SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
-                                   m_puz.m_filename,
+                                   m_puz.m_filename.c_str(),
                                    sw.Time()));
     else
         SetStatus(_T("No file loaded"));
@@ -257,7 +262,7 @@ MyFrame::SavePuzzle(const wxString & filename, const wxString & ext)
     m_toolMgr.GetTool(ID_SAVE)->SetLabel(_T("&Save As\tCtrl+S"));
 
     SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
-                               m_puz.m_filename,
+                               m_puz.m_filename.c_str(),
                                sw.Time()));
 
     return success;
@@ -315,7 +320,7 @@ MyFrame::ShowPuzzle()
     m_notes    ->ChangeValue(m_puz.m_notes);
 
     StopTimer();
-    SetTime(m_puz.m_time);    
+    SetTime(m_puz.m_time);
 
     // Reset save/save as flag
     m_toolMgr.GetTool(ID_SAVE)->SetLabel(_T("&Save As\tCtrl+S"));
@@ -418,6 +423,7 @@ MyFrame::CreateWindows()
     m_toolbar = MakeToolBar();
 #endif // USE_AUI_TOOLBAR / !
 
+
     m_menubar = MakeMenuBar();
     SetMenuBar(m_menubar);
 
@@ -432,10 +438,10 @@ MyFrame::CreateWindows()
 
 
 #ifdef USE_AUI_TOOLBAR
-wxAuiToolBar * 
+wxAuiToolBar *
 MyFrame::MakeAuiToolBar()
 {
-    wxAuiToolBar * tb = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, 
+    wxAuiToolBar * tb = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition,
                                          wxDefaultSize,
                                          wxAUI_TB_HORZ_TEXT);
 
@@ -483,7 +489,7 @@ MyFrame::MakeToolBar()
 }
 
 
-wxMenuBar * 
+wxMenuBar *
 MyFrame::MakeMenuBar()
 {
     wxMenuBar * mb = new wxMenuBar();
@@ -583,7 +589,7 @@ MyFrame::ManageWindows()
 
 #ifdef USE_AUI_TOOLBAR
     // It would be better to use MinSize, instead of Fixed, but it doesn't work
-    // quite right, and we would have to update the MinSize every time the 
+    // quite right, and we would have to update the MinSize every time the
     // toolbar was resized . . .
     m_mgr.AddPane(m_toolbar,
                   wxAuiPaneInfo()
@@ -763,7 +769,7 @@ void
 MyFrame::LoadConfig()
 {
     wxString configPath = GetConfigPath();
-    wxLogDebug(_T("Config file: %s"), configPath);
+    wxLogDebug(_T("Config file: %s"), configPath.c_str());
 
     // Create a blank file it it doesn't exist
     if (! wxFileName::FileExists(configPath))
@@ -1048,7 +1054,7 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
     wxArrayString arrayStr;
 
     // Enumerate all layouts
-    
+
     // Eummy enumeration variables
     wxString str;
     long dummy;
@@ -1232,7 +1238,7 @@ void
 MyFrame::ShowDebugDialog(const wxString & title, const wxString & str)
 {
     wxDialog dlg(this, wxID_ANY,
-                 wxString::Format(_T("Debug: %s"), title),
+                 wxString::Format(_T("Debug: %s"), title.c_str()),
                  wxDefaultPosition, wxDefaultSize,
                  wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
 
