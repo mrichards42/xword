@@ -63,3 +63,43 @@ NB: Batch converting is still experimental.  Essentially the program will
 
 
 
+Building XWord
+==============
+
+XWord uses the wxWidgets cross-platform toolkit (version 2.8.10 as of this
+writing).  The distributed builds are statically linked and use unicode.  If you
+want to build a non-unicode version of XWord, you will get a couple of errors,
+because of a few unicode-specific functions and parameters.  These should be
+easy to fix.
+
+http://www.wxwidgets.org
+
+
+
+Currently there is a small amount of code that uses boost (specifically, the
+BOOST_FOREACH macro).  Hopefully this will change soon, since it's silly to
+require boost for the eight or so lines of code that use the macro.
+
+http://www.boost.org/
+
+
+Visual C++ and Code::Blocks project files are supplied in the source
+distribution.  The Code::Blocks file is intended to work only on Linux (i.e. it
+uses the wx-config program).
+
+
+Windows-specific building instructions
+======================================
+
+The VC project file is set up to link to the MSVC runtime library *statically*
+(so that XWord can be run on Windows without needing to download any dlls).
+You will either need to build the wxWidgets libraries so that they also link to
+the MSVC runtimes statically, or change the setting
+(Properties >> C/C++ >> Code Generation >> Runtime Library).
+
+XWord requires the following libraries in addition to the wxWidgets Base and
+Core libraries:
+
+wxAUI
+wxpng
+wxzlib
