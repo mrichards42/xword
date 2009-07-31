@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -232,7 +232,7 @@ private:
     void OnTimer      (wxCommandEvent & WXUNUSED(evt));
     void OnTimerNotify(wxTimerEvent   & WXUNUSED(evt));
 
-    
+
     // XGridCtrl and CluePanel events
     //------------------------------
     void OnGridFocus  (wxPuzEvent & evt);
@@ -275,7 +275,7 @@ inline
 wxString
 MyFrame::GetConfigPath()
 {
-    wxString file = wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+    wxString file = wxPathOnly(wxString(wxTheApp->argv[0]));
     file << wxFileName::GetPathSeparator() << _T("config.ini");
     return file;
 }
@@ -308,7 +308,7 @@ MyFrame::UpdateLayout()
 inline void
 MyFrame::SaveLayout(const wxString & name)
 {
-    GetConfig()->Write(wxString::Format(_T("/Layouts/%s"), name),
+    GetConfig()->Write(wxString::Format(_T("/Layouts/%s"), name.c_str()),
                        m_mgr.SavePerspective());
 }
 
@@ -318,7 +318,7 @@ inline bool
 MyFrame::LoadLayout(const wxString & name, bool update)
 {
     wxString perspective;
-    if (! GetConfig()->Read(wxString::Format(_T("/Layouts/%s"), name), 
+    if (! GetConfig()->Read(wxString::Format(_T("/Layouts/%s"), name.c_str()),
                             &perspective) )
         return false;
 
@@ -330,13 +330,13 @@ inline bool
 MyFrame::LoadLayoutString(const wxString & layout, bool update)
 {
     // Save the toolbar size so it isn't cut off
-    wxSize tbSize = m_toolbar->GetMinSize();
+    //wxSize tbSize = m_toolbar->GetMinSize();
 
     if (! m_mgr.LoadPerspective(layout, false))
         return false;
 
     // Restore toolbar size
-    m_mgr.GetPane(m_toolbar).BestSize(tbSize);
+    //m_mgr.GetPane(m_toolbar).BestSize(tbSize);
 
     if (update)
         m_mgr.Update();

@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -415,7 +415,7 @@ XGridCtrl::ChangeSquareFocus(XSquare * square, bool direction)
     {
         // Only draw old squares if there was a focused word to begin with
         if (oldFocused != NULL)
-            for (square = oldStart; 
+            for (square = oldStart;
                  square != NULL;
                  square = square->Next(oldDirection))
             {
@@ -486,7 +486,7 @@ XGridCtrl::ChangeFocusedClue(int cluenum, bool direction)
 
     if (HasStyle(BLANK_ON_NEW_WORD))
         SetIfExists(square,
-                    FindSquare(square->GetWordStart(direction), 
+                    FindSquare(square->GetWordStart(direction),
                                FIND_BLANK_SQUARE,
                                direction) );
 
@@ -880,22 +880,22 @@ XGridCtrl::OnKeyDown(wxKeyEvent & evt)
         OnArrow(DIR_ACROSS, FIND_PREV, mod);
     else if (key == WXK_RIGHT || key == WXK_NUMPAD_RIGHT)    /* Right     */
         OnArrow(DIR_ACROSS, FIND_NEXT, mod);
-    else if (key == WXK_UP    || key == WXK_NUMPAD_UP)       /* Up        */   
+    else if (key == WXK_UP    || key == WXK_NUMPAD_UP)       /* Up        */
         OnArrow(DIR_DOWN,   FIND_PREV, mod);
-    else if (key == WXK_DOWN  || key == WXK_NUMPAD_DOWN)     /* Down      */   
+    else if (key == WXK_DOWN  || key == WXK_NUMPAD_DOWN)     /* Down      */
         OnArrow(DIR_DOWN,   FIND_NEXT, mod);
     else if (key == WXK_HOME  || key == WXK_NUMPAD_HOME)     /* Home      */
         OnHome(mod);
-    else if (key == WXK_END   || key == WXK_NUMPAD_END)      /* End       */   
+    else if (key == WXK_END   || key == WXK_NUMPAD_END)      /* End       */
         OnEnd(mod);
     else if (key == WXK_TAB   || key == WXK_NUMPAD_TAB       /* Tab       */
-          || key == WXK_RETURN || key == WXK_NUMPAD_ENTER)   /* Enter     */   
+          || key == WXK_RETURN || key == WXK_NUMPAD_ENTER)   /* Enter     */
         OnTab(mod);
-    else if (65 <= key && key <= 90 || key == WXK_SPACE)     /* Letter    */   
+    else if (65 <= key && key <= 90 || key == WXK_SPACE)     /* Letter    */
         OnLetter(evt.GetUnicodeKey(), mod);
     else if (key == WXK_BACK)                                /* Backspace */
         OnBackspace(mod);
-    else if (key == WXK_DELETE || key == WXK_NUMPAD_DELETE)  /* Delete    */   
+    else if (key == WXK_DELETE || key == WXK_NUMPAD_DELETE)  /* Delete    */
         OnDelete(mod);
 }
 
@@ -917,7 +917,7 @@ XGridCtrl::OnLetter(wxChar key, int mod)
     // Not allowed to overwrite revealed letters
     if (! square.HasFlag(XFLAG_RED))
     {
-        if (key == WXK_SPACE)
+        if (static_cast<int>(key) == WXK_SPACE)
             SetSquareText(square, _T("-"));
         else
             SetSquareText(square, key);
@@ -965,7 +965,7 @@ XGridCtrl::OnArrow(bool arrowDirection, bool increment, int mod)
         {
             newSquare =
                 FindNextSquare(m_focusedSquare,
-                               FIND_WORD(arrowDirection, m_focusedSquare), 
+                               FIND_WORD(arrowDirection, m_focusedSquare),
                                arrowDirection,
                                increment,
                                SKIP_BLACK_SQUARES,
@@ -1121,7 +1121,7 @@ XGridCtrl::OnTab(int mod)
             newDir = !newDir;
             newSquare =
                 FindNextSquare(m_grid->LastWhite(),
-                               FIND_CLUE(newDir, m_grid->FirstWhite()), 
+                               FIND_CLUE(newDir, m_grid->FirstWhite()),
                                DIR_ACROSS,
                                FIND_PREV,
                                SKIP_BLACK_SQUARES,
@@ -1146,7 +1146,7 @@ XGridCtrl::OnTab(int mod)
     }
     newSquare = newSquare->GetWordStart(newDir);
 
-    const bool isNewWord = 
+    const bool isNewWord =
         newSquare->GetWordStart(newDir)
             != m_focusedSquare->GetWordStart(m_direction);
 

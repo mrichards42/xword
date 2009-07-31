@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -47,6 +47,7 @@ class WXDLLEXPORT wxOwnerDrawnListBox
       public wxItemContainer_T<T>
 {
 public:
+    typedef typename std::vector<T> container_t;
     // Constructors
     // --------------
 
@@ -86,8 +87,9 @@ public:
         if (! _Parent::Create(parent, id, pos, size, style, name))
             return false;
         int i;
+        // Can't directly access base class members because they are templated
         for (i = 0; i < n; ++i)
-            m_items.push_back(choices[i]);
+            this->m_items.push_back(choices[i]);
         UpdateCount();
         return true;
     }
@@ -112,34 +114,34 @@ public:
     // -----------------------------------
 
     virtual void SetItem(unsigned int n, const T & item)
-        { m_items.at(n) = item; RefreshLine(n); }
+        { this->m_items.at(n) = item; this->RefreshLine(n); }
 
     void SetSelection(int n)   { _Parent::SetSelection(n); }
     int  GetSelection() const  { return _Parent::GetSelection(); }
 
     virtual void Clear()
     {
-        m_items.clear();
+        this->m_items.clear();
         UpdateCount();
     }
 
     virtual void Delete(unsigned int n)
     {
-        m_heights.erase (m_heights.begin()  + n);
-        m_bmpCache.erase(m_bmpCache.begin() + n);
-        m_items.erase   (m_items.begin()    + n);
+        this->m_heights.erase (this->m_heights.begin()  + n);
+        this->m_bmpCache.erase(this->m_bmpCache.begin() + n);
+        this->m_items.erase   (this->m_items.begin()    + n);
         UpdateCount();
     }
 
 
     // Optimized append
-    void Append(const std::vector<T> & items)
+    void Append(const container_t & items)
     {
-        for(std::vector<T>::const_iterator it = items.begin();
+        for(typename container_t::const_iterator it = items.begin();
             it != items.end();
             ++it)
         {
-            m_items.push_back(*it);
+            this->m_items.push_back(*it);
         }
         UpdateCount();
     }
@@ -154,34 +156,34 @@ public:
 protected:
     void Init()
     {
-        SetSelectionForeground(
+        this->SetSelectionForeground(
             wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
 
-        SetSelectionBackground(
+        this->SetSelectionBackground(
             wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
     }
 
     void UpdateCount()
     {
-        SetItemCount(m_items.size());
+        SetItemCount(this->m_items.size());
         OnUpdateCount();
         if (!this->IsFrozen())
-            RefreshAll();
+            this->RefreshAll();
     }
 
     virtual int DoAppend(const T & item)
     {
-        m_items.push_back(item);
+        this->m_items.push_back(item);
         UpdateCount();
-        return GetCount() - 1;
+        return this->GetCount() - 1;
     }
 
     virtual int DoInsert(const T & item, unsigned int pos)
     {
         OnInsert(pos);
-        m_heights.insert(m_heights.begin() + pos, -1);
-        m_bmpCache.insert(m_bmpCache.begin() + pos, wxNullBitmap);
-        m_items.insert(m_items.begin() + pos, item);
+        this->m_heights.insert(this->m_heights.begin() + pos, -1);
+        this->m_bmpCache.insert(this->m_bmpCache.begin() + pos, wxNullBitmap);
+        this->m_items.insert(this->m_items.begin() + pos, item);
         UpdateCount();
         return pos;
     }
@@ -209,11 +211,8 @@ protected:
     virtual void SetItemCount(size_t count) { _Parent::SetItemCount(count); }
     virtual void SetLineCount(size_t count) { _Parent::SetLineCount(count); }
 
-    // Note that this is a different overload (with a DC, which is helpful)
     virtual wxCoord OnMeasureItem(size_t n) const
-        { return OnMeasureItem(wxMemoryDC(), n); }
-    virtual wxCoord OnMeasureItem(wxDC & dc, size_t n) const
-        { return dc.GetCharHeight(); }
+        { return this->GetCharHeight(); }
 
     // We can't know how to draw unless the type is wxString
     virtual void OnDrawItem(wxDC & dc,
@@ -241,9 +240,9 @@ wxOwnerDrawnListBox<T, _Parent>::OnDrawBackground(wxDC & dc,
                                                   const wxRect & rect,
                                                   size_t n) const
 {
-    if (IsSelected(n)) {
-        dc.SetBrush(wxBrush(GetSelectionBackground()));
-        dc.SetPen  (wxPen  (GetSelectionBackground()));
+    if (this->IsSelected(n)) {
+        dc.SetBrush(wxBrush(this->GetSelectionBackground()));
+        dc.SetPen  (wxPen  (this->GetSelectionBackground()));
         dc.DrawRectangle(rect);
     }
     // else the background is already filled in

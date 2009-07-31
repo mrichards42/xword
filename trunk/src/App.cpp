@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -32,6 +32,39 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
     EVT_ACTIVATE_APP(MyApp::OnActivate)
 END_EVENT_TABLE()
 
+// Command line table
+const wxCmdLineEntryDesc cmdLineDesc[] =
+{
+    { wxCMD_LINE_SWITCH,
+      _T("c"), _T("convert"),
+      _T("convert multiple files without a gui") },
+
+    { wxCMD_LINE_SWITCH,
+      _T("o"), _T("output-files"),
+      _T("specify output file after each input file") },
+
+    { wxCMD_LINE_SWITCH,
+      _T("w"), _T("overwrite"),
+      _T("overwrite existing files") },
+
+    { wxCMD_LINE_OPTION,
+      _T("d"), _T("directory"),
+      _T("parent directory for output of converted files") },
+
+    { wxCMD_LINE_OPTION,
+      _T("l"), _T("log"),
+      _T("log file for conversion") },
+
+    { wxCMD_LINE_PARAM,
+      NULL, NULL,
+      _T("crossword puzzle"),
+      wxCMD_LINE_VAL_STRING,
+      wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
+
+    { wxCMD_LINE_NONE }
+};
+
+
 bool
 MyApp::OnInit()
 {
@@ -52,38 +85,6 @@ MyApp::OnInit()
 bool
 MyApp::ReadCommandLine()
 {
-    // Command line table
-    const wxCmdLineEntryDesc cmdLineDesc[] =
-    {
-        { wxCMD_LINE_SWITCH,
-          _T("c"), _T("convert"),
-          _T("convert multiple files without a gui") },
-
-        { wxCMD_LINE_SWITCH,
-          _T("o"), _T("output-files"),
-          _T("specify output file after each input file") },
-
-        { wxCMD_LINE_SWITCH,
-          _T("w"), _T("overwrite"),
-          _T("overwrite existing files") },
-
-        { wxCMD_LINE_OPTION,
-          _T("d"), _T("directory"),
-          _T("parent directory for output of converted files") },
-
-        { wxCMD_LINE_OPTION,
-          _T("l"), _T("log"),
-          _T("log file for conversion") },
-
-        { wxCMD_LINE_PARAM, 
-          NULL, NULL,
-          _T("crossword puzzle"),
-          wxCMD_LINE_VAL_STRING,
-          wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
-
-        { wxCMD_LINE_NONE }
-    };
-
     wxCmdLineParser cmd(argc, argv);
     cmd.SetDesc(cmdLineDesc);
     cmd.Parse(false); // don't show usage
@@ -154,8 +155,8 @@ MyApp::ReadCommandLine()
 
 
             wxLogDebug(_T("Converting %s to %s"),
-                         in_file.GetFullPath(),
-                         out_file.GetFullPath());
+                         in_file.GetFullPath().c_str(),
+                         out_file.GetFullPath().c_str());
 
             // Make sure we have a directory
             out_file.Mkdir(0777, wxPATH_MKDIR_FULL);
@@ -178,6 +179,14 @@ MyApp::ReadCommandLine()
     //--------------------------
 
     m_frame = new MyFrame();
+
+    // Log to a window
+#if defined(__WXDEBUG__ ) && ! defined(__VISUALC__)
+    wxLogWindow *w = new wxLogWindow(m_frame, _T("Logger"));
+    w->Show();
+#endif
+
+
     // XWord puzzle to open
     if (param_count > 0)
         m_frame->LoadPuzzle( cmd.GetParam(0) );

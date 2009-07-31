@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -19,6 +19,7 @@
 #include "ClueListBox.hpp"
 //#include "PuzEvent.hpp"
 #include "utils/wrap.hpp"
+#include <wx/tokenzr.h>
 
 const wxChar* ClueListBoxNameStr = _T("ClueListBox");
 
@@ -99,9 +100,7 @@ ClueListBox::OnDrawItem(wxDC & dc, const wxRect & rect, size_t n) const
 
     dc.DrawLabel(wxString::Format(_T("%d."), clue.Number()), numRect, wxALIGN_RIGHT|wxALIGN_TOP);
 
-    // If our clue is not yet cached, cache it
-    if (m_cachedClues.at(n).empty())
-        m_cachedClues.at(n) = ::Wrap(this, clue.Text(), textRect.width);
+    wxASSERT(! m_cachedClues.at(n).empty());
 
     dc.DrawLabel(m_cachedClues.at(n), textRect);
 
@@ -111,19 +110,35 @@ ClueListBox::OnDrawItem(wxDC & dc, const wxRect & rect, size_t n) const
 
 
 wxCoord
-ClueListBox::OnMeasureItem(wxDC & dc, size_t n) const
+ClueListBox::OnMeasureItem(size_t n) const
 {
     XPuzzle::Clue clue = GetItem(n);
 
     // Cache the wrapped clue's text if it isn't already
-    int height = 0;
-    if (m_cachedClues.at(n).empty()) {
+    if (m_cachedClues.at(n).empty())
+    {
         int maxWidth;
         GetClientSize(&maxWidth, NULL);
-        m_cachedClues.at(n) = Wrap(this, clue.Text(), maxWidth - m_numWidth - GetMargins().x);
+        m_cachedClues.at(n) = Wrap(this, clue.Text(),
+                                   maxWidth - m_numWidth - GetMargins().x);
     }
-    dc.GetMultiLineTextExtent(m_cachedClues.at(n), NULL, &height, NULL, &GetFont());
+    else
+    {
+        wxLogDebug(_T("Cached: \"%s\""), m_cachedClues.at(n).c_str());
+    }
 
+    int height = 0;
+    const wxArrayString lines = wxStringTokenize(m_cachedClues.at(n), _T("\n"));
+    for (wxArrayString::const_iterator it = lines.begin();
+         it != lines.end();
+         ++it)
+    {
+        int lineHeight;
+        GetTextExtent(*it, NULL, &lineHeight);
+        height += lineHeight;
+    }
+
+    wxLogDebug(_T("Item measured (%s): %d (lines: %d)"), clue.Text().c_str(), height, lines.GetCount());
     return height;
 }
 

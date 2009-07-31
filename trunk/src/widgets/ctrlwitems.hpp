@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ class WXDLLEXPORT wxItemContainerImmutable_T
 {
 public:
     typedef T item_t;
-    typedef std::vector<T> container_t;
+    typedef typename std::vector<T> container_t;
 
     wxItemContainerImmutable_T() { }
     virtual ~wxItemContainerImmutable_T() { }
@@ -131,6 +131,7 @@ class WXDLLEXPORT wxItemContainer_T
     : public wxItemContainerImmutable_T<T>
 {
 public:
+    typedef typename std::vector<T> container_t;
     wxItemContainer_T() { }
     virtual ~wxItemContainer_T() { }
 
@@ -140,9 +141,9 @@ public:
     int Append(const T & item) { return DoAppend(item); }
 
     // append several items at once to the control (virtual for optimmizations)
-    virtual void Append(const std::vector<T> & items)
+    virtual void Append(const container_t & items)
     {
-        std::vector<T>::const_iterator it;
+        typename container_t::const_iterator it;
         for (it = items.begin(); it != items.end(); ++it)
             Append(*it);
     }

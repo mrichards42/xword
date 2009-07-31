@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@
 #define TOOL_INFO_H
 
 #include <wx/wxprec.h>
- 
+
 #ifndef WX_PRECOMP
 #    include <wx/wx.h>
 #endif
@@ -160,4 +160,4 @@ private:
 
 };
 
-#endif TOOL_INFO_H
+#endif // TOOL_INFO_H

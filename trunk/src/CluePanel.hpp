@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ class CluePanel
     : public wxPanel
 {
 public:
-    CluePanel::CluePanel() { Init(); }
+    CluePanel() { Init(); }
 
     CluePanel(wxWindow * parent,
               wxWindowID id,

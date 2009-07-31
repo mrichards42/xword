@@ -22,27 +22,7 @@
 // a name starting with "a"
 aa_main_icon ICON "images/xword.ico"
 
-
-// toolbar icons
-open ICON "images/open.ico"
-save ICON "images/save.ico"
-
-zoom_in  ICON "images/zoom_in.ico"
-zoom_out ICON "images/zoom_out.ico"
-zoom_fit ICON "images/zoom_fit.ico"
-
-check_letter ICON "images/check_letter.ico"
-check_word   ICON "images/check_word.ico"
-check_grid   ICON "images/check_grid.ico"
-
-layout ICON "images/layout.ico"
-notes  ICON "images/notes.ico"
-notes_new  ICON "images/notes_new.ico"
-
-timer ICON "images/timer.ico"
-
-// For some reason it wants to look at the last icon for the program as well as the first
-zz_main_icon ICON "images/xword.ico"
+xword ICON "images/xword.ico"
 
 // set this to 1 if you don't want to use manifest resource (manifest resource
 // is needed to enable visual styles on Windows XP - see docs/msw/winxp.txt

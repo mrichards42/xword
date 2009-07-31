@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -48,7 +48,7 @@ private:
 
     // Throw an exception if the next line does not equal name.
     void CheckSection(const wxString & name);
-    
+
     // Return value indicates if the next line equals test.
     // If it does, the function eats the line.
     // Otherwise, it does not eat the line.
@@ -97,7 +97,7 @@ void
 TxtHandler::CheckSection(const wxString & name)
 {
     if (ReadLine() != name)
-        throw PuzLoadError(_T("Missing %s header"), name);
+        throw PuzLoadError(_T("Missing %s header"), name.c_str());
 }
 
 inline

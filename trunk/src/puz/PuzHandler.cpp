@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -255,11 +255,11 @@ PuzHandler::LoadSections()
 
         if (ck_section != Checksummer::cksum_region(data, 0))
             throw PuzLoadError(_T("Checksum does not match for %s region"),
-                               title);
+                               title.to_string().c_str());
 
         if (m_inStream->GetC() != '\0')
             throw PuzLoadError(_T("Missiong nul-terminator for %s region"),
-                               title);
+                               title.to_string().c_str());
 
         sections[title.to_string()] = data;
     }
@@ -449,7 +449,7 @@ PuzHandler::SetSolutionRebus(const ByteArray & table, const ByteArray & grid)
             if (it == rebusTable.end())
                 throw PuzLoadError(_T("Invalid value in GRBS section"));
 
-            // Make sure we're not overwriting the plain solution for 
+            // Make sure we're not overwriting the plain solution for
             // unscrambling
             if (m_puz->m_grid.IsScrambled())
                 square->SetSolution(it->second, square->GetPlainSolution());
@@ -561,7 +561,7 @@ PuzHandler::WriteSolutionRebus()
 
     // Using a starting index like this works, but it's not quite accurate
     // I think Across lite loads the rebus-table into memory and uses it
-    // like a symbol table, so that the index for a given string is 
+    // like a symbol table, so that the index for a given string is
     // preserved across saves.
     // I doubt that feature is essential, and it's a lot easier to just
     // remake the table starting from 1 when we need it.

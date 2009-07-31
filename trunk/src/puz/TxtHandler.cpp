@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ static const wxString allowedCharsV1 = _T("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
                                        _T("abcdefghijklmnopqrstuvwxyz")
                                        _T(".:");
 
-static const wxString allowedCharsV2 = allowedCharsV1 + 
+static const wxString allowedCharsV2 = allowedCharsV1 +
                                        _T("0123456789")
                                        _T("@#$%&+?");
 
@@ -76,7 +76,7 @@ TxtHandler::DoLoad()
         m_puz->m_copyright = ReadLine();
         // Prepend a (c) to the copyright string
         if (! m_puz->m_copyright.empty())
-            m_puz->m_copyright.Prepend(_T("© "));
+            m_puz->m_copyright.Prepend(_T("0xa9 "));
 
         CheckSection(_T("<SIZE>"));
         { // Enter scope

@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
 
 
 // TODO (long term):
-//   - Add an edit mode . . . 
+//   - Add an edit mode . . .
 //        Dynamically add and remove clues as the grid is edited
 //        Make the clue text into editable wxTextCtrls
 
@@ -27,7 +27,7 @@
 
 // For compilers that don't support precompilation, include "wx/wx.h"
 #include <wx/wxprec.h>
- 
+
 #ifndef WX_PRECOMP
 #    include <wx/wx.h>
 #endif
@@ -41,7 +41,7 @@ class ClueListBox
     : public wxOwnerDrawnListBox<XPuzzle::Clue>
 {
 public:
-    typedef wxOwnerDrawnListBox parent_t;
+    typedef wxOwnerDrawnListBox<XPuzzle::Clue> parent_t;
 
     ClueListBox() { Init(); }
 
@@ -73,7 +73,7 @@ protected:
     // Drawing functions
     void    OnDrawBackground(wxDC & dc, const wxRect & rect, size_t n) const;
     void    OnDrawItem      (wxDC & dc, const wxRect & rect, size_t n) const;
-    wxCoord OnMeasureItem   (wxDC & dc, size_t n) const;
+    wxCoord OnMeasureItem   (size_t n) const;
 
     // Cache to save us from wrapping every time
     mutable std::vector<wxString> m_cachedClues;

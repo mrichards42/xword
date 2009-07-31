@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -17,6 +17,7 @@
 
 
 #include "ToolInfo.hpp"
+#include <wx/filename.h>
 
 
 ToolInfo::ToolInfo(int id,
@@ -62,10 +63,20 @@ ToolInfo::ToolInfo(int id,
 wxIcon
 ToolInfo::GetIcon(int width, int height, bool checked) const
 {
-    const wxString & icon = (checked ? m_icoName1 : m_icoName2);
+    wxString icon = (checked ? m_icoName1 : m_icoName2);
+
     if (icon.empty())
-        return wxIcon(0,0, -1);
-    return wxIcon(icon, wxBITMAP_TYPE_ICO_RESOURCE, width, height);
+        return wxNullIcon;
+
+    icon += wxString::Format(_T("_%d.png"), width);
+
+    wxFileName iconPath(icon);
+    iconPath.MakeAbsolute( wxPathOnly(wxTheApp->argv[0]) );
+    iconPath.AppendDir(_T("images"));
+
+    return wxIcon(iconPath.GetFullPath(), wxBITMAP_TYPE_PNG);
+
+    //return wxIcon(icon, wxBITMAP_TYPE_ICO_RESOURCE, width, height);
 }
 
 
@@ -73,10 +84,11 @@ ToolInfo::GetIcon(int width, int height, bool checked) const
 wxBitmap
 ToolInfo::GetBitmap(int width, int height, bool checked) const
  {
-     const wxString & icon = (checked ? m_icoName1 : m_icoName2);
-     if (icon.empty())
-         return wxNullBitmap;
-     return wxBitmap(wxIcon(icon, wxBITMAP_TYPE_ICO_RESOURCE, width, height));
+     const wxIcon icon = GetIcon(width, height, checked);
+     if (! icon.IsOk())
+        return wxNullBitmap;
+
+     return wxBitmap(icon);
 }
 
 
@@ -135,7 +147,7 @@ ToolInfo::Enable(bool enabled)
 }
 
 
-ToolInfo & 
+ToolInfo &
 ToolInfo::SetLabel(const wxString & label)
 {
     m_label = label;
@@ -164,7 +176,7 @@ ToolInfo::SetLabel(const wxString & label)
 }
 
 
-ToolInfo & 
+ToolInfo &
 ToolInfo::SetIconName(const wxString & icoName, bool checked)
 {
     if (checked)
@@ -198,8 +210,12 @@ ToolInfo::SetIconName(const wxString & icoName, bool checked)
         {
             const int width  = item->GetBitmap().GetWidth();
             const int height = item->GetBitmap().GetHeight();
+#ifdef __WXMSW__
             item->SetBitmaps( GetBitmap(width, height, true),
                               GetBitmap(width, height, false) );
+#else // ! __WXMSW__
+            item->SetBitmap( GetBitmap(width, height, true) );
+#endif // __WXMSW__ / !
         }
     }
 
@@ -250,6 +266,7 @@ ToolInfo::Add(wxToolBar * tb, int width, int height)
                                            m_kind,
                                            GetLabelText(),
                                            wxEmptyString);
+
 /*
     wxToolBarToolBase * tool = tb->AddTool(m_id,
                                            GetLabelText(),
@@ -321,7 +338,7 @@ ToolInfo::Insert(wxToolBar * tb, size_t pos, int width, int height)
     wxToolBarToolBase * tool = tb->InsertTool(pos,
                                               m_id,
                                               GetLabelText(),
-                                              GetBitmap(width, height), 
+                                              GetBitmap(width, height),
                                               GetBitmap(width, height, false),
                                               m_kind,
                                               m_helpStr);

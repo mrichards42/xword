@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -85,7 +85,7 @@ wxCachedVListBox::OnPaint(wxPaintEvent& WXUNUSED(event))
     const size_t lineMax = GetVisibleEnd();
     for ( size_t line = GetFirstVisibleLine(); line < lineMax; line++ )
     {
-        const wxCoord hLine = OnGetLineHeight(line, dc);
+        const wxCoord hLine = OnGetLineHeight(line);
 
         rectLine.height = hLine;
 
@@ -131,6 +131,7 @@ wxCachedVListBox::OnPaint(wxPaintEvent& WXUNUSED(event))
                                   rectLine.x, rectLine.y,
                                   false); // not transparent
 
+                    wxLogDebug(_T("Height of new line (%d): %d"), line, hLine);
                     m_heights.at(line) = hLine;
                 }
                 // wxMemoryDC create failed
