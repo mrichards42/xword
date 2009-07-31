@@ -1,0 +1,105 @@
+
+XWord - A cross platform crossword solving program
+==================================================
+
+https://sourceforge.net/projects/wx-xword/
+
+XWord is a cross-platform crossword puzzle program designed to be highly
+configurable.  It reads and writes the Across Lite .puz file format, and reads
+the Across Lite plain text format (version 1 or 2).
+
+Supported features:
+    - Solving of all American style and cryptic crosswords (not diagramless yet).
+    - A timer.
+    - Checking and revealing letters.
+    - Scrambling and unscrambling puzzle solutions.
+    - Viewing and editing puzzle notes.
+    - Zooming the grid in and out.
+    - Displaying puzzles with rebus information (multiple letters numbers or
+        symbols per square).  XWord cannot currently be used to solve rebus
+        puzzles, though support for solving rebus puzzles will come in the
+        near future.
+    - Rearranging the window layout (try checking the "Layout" option in the
+        Layout menu)
+
+
+Configuration is currently minimal, but that will change soon.
+
+
+
+XWord can also be used to batch convert .txt formatted puzzles into .puz files
+on the command line.  Usage is as follows:
+
+    -c --convert
+
+        Runs XWord in batch convert mode.  XWord will convert files and exit
+        (no gui).  Other switches do nothing unless -c is specified.
+        With no other switches, convert .txt files and place converted .puz
+        files in the same directory.
+
+    -o  --output-files
+
+        If converting files, specify each output file after each input file:
+            xword -c -o in_file_1 out_file_1 in_file_2 out_file_2
+
+    -w  --overwrite
+
+        If output files exist, overwrite them instead of creating a new file.
+        If this switch is not specified and the output file exists, XWord will
+        add a number to the output file name.
+
+    -d  --directory=<output directory>
+
+        Place converted files in this directory.  Output files can be specified
+        as relative paths, in which case files will be made relative to this
+        directory.
+
+NB: Batch converting is still experimental.  Essentially the program will
+    convert all files and then suppress the GUI (forcing the application to end
+    with an error).  No information is output to the screen informing the user
+    about the converting process.
+
+
+
+
+
+Building XWord
+==============
+
+XWord uses the wxWidgets cross-platform toolkit (version 2.8.10 as of this
+writing).  The distributed builds are statically linked and use unicode.  If you
+want to build a non-unicode version of XWord, you will get a couple of errors,
+because of a few unicode-specific functions and parameters.  These should be
+easy to fix.
+
+http://www.wxwidgets.org
+
+
+
+Currently there is a small amount of code that uses boost (specifically, the
+BOOST_FOREACH macro).  Hopefully this will change soon, since it's silly to
+require boost for the eight or so lines of code that use the macro.
+
+http://www.boost.org/
+
+
+Visual C++ and Code::Blocks project files are supplied in the source
+distribution.  The Code::Blocks file is intended to work only on Linux (i.e. it
+uses the wx-config program).
+
+
+Windows-specific building instructions
+======================================
+
+The VC project file is set up to link to the MSVC runtime library *statically*
+(so that XWord can be run on Windows without needing to download any dlls).
+You will either need to build the wxWidgets libraries so that they also link to
+the MSVC runtimes statically, or change the setting
+(Properties >> C/C++ >> Code Generation >> Runtime Library).
+
+XWord requires the following libraries in addition to the wxWidgets Base and
+Core libraries:
+
+wxAUI
+wxpng
+wxzlib
