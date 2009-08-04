@@ -427,6 +427,14 @@
 				<File
 					RelativePath=".\src\utils\ToolInfo.cpp"
 					>
+					<FileConfiguration
+						Name="Unicode Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							GeneratePreprocessedFile="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\utils\ToolManager.cpp"

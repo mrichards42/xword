@@ -122,10 +122,6 @@ ClueListBox::OnMeasureItem(size_t n) const
         m_cachedClues.at(n) = Wrap(this, clue.Text(),
                                    maxWidth - m_numWidth - GetMargins().x);
     }
-    else
-    {
-        wxLogDebug(_T("Cached: \"%s\""), m_cachedClues.at(n).c_str());
-    }
 
     int height = 0;
     const wxArrayString lines = wxStringTokenize(m_cachedClues.at(n), _T("\n"));
@@ -138,7 +134,6 @@ ClueListBox::OnMeasureItem(size_t n) const
         height += lineHeight;
     }
 
-    wxLogDebug(_T("Item measured (%s): %d (lines: %d)"), clue.Text().c_str(), height, lines.GetCount());
     return height;
 }
 
@@ -149,18 +144,21 @@ ClueListBox::CalculateNumberWidth()
     // Calculate the max width, filling in missing values
     int max_width = 0;
     container_t::iterator item_it = m_items.begin();
-    std::vector<int>::iterator it;
-    for (it = m_numWidths.begin(); it != m_numWidths.end(); ++it) {
+    std::vector<int>::iterator it, end;
+    for (it = m_numWidths.begin(), end = m_numWidths.end(); it != end; ++it)
+    {
+        int & width = *it;
         // If there is no width for this item, calculate it
-        if ((*it) == -1)
-            GetTextExtent(wxString::Format(_T("%d."), item_it->Number()), &*it, NULL, NULL, NULL);
-        if (*it > max_width)
-            max_width = *it;
+        if (width == -1)
+            GetTextExtent(wxString::Format(_T("%d."), item_it->Number()), &width, NULL, NULL, NULL);
+        if (width > max_width)
+            max_width = width;
         ++item_it;
     }
 
     // Test to see if the cache needs to be invalidated
-    if (max_width != m_numWidth) {
+    if (max_width != m_numWidth)
+    {
         m_numWidth = max_width;
         InvalidateCache();
     }

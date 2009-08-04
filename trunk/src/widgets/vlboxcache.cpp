@@ -131,7 +131,6 @@ wxCachedVListBox::OnPaint(wxPaintEvent& WXUNUSED(event))
                                   rectLine.x, rectLine.y,
                                   false); // not transparent
 
-                    wxLogDebug(_T("Height of new line (%d): %d"), line, hLine);
                     m_heights.at(line) = hLine;
                 }
                 // wxMemoryDC create failed

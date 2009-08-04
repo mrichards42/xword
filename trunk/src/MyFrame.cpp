@@ -52,6 +52,7 @@ enum toolIds
 {
     ID_OPEN = wxID_HIGHEST,
     ID_SAVE,
+    ID_SAVE_AS,
     ID_CLOSE,
 
     ID_QUIT,
@@ -77,7 +78,6 @@ enum toolIds
     ID_SAVE_LAYOUT,
 
     ID_SHOW_NOTES,
-    ID_SHOW_NOTES_NEW,
 
     ID_TIMER,
 
@@ -94,6 +94,7 @@ enum toolIds
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_OPEN,              MyFrame::OnOpenPuzzle)
     EVT_MENU           (ID_SAVE,              MyFrame::OnSavePuzzle)
+    EVT_MENU           (ID_SAVE_AS,           MyFrame::OnSavePuzzleAs)
     EVT_MENU           (ID_CLOSE,             MyFrame::OnClosePuzzle)
     EVT_MENU           (ID_QUIT,              MyFrame::OnQuit)
 
@@ -141,6 +142,7 @@ static const ToolDesc toolDesc[] =
 {
     { ID_OPEN,  wxITEM_NORMAL, _T("&Open\tCtrl+O"), _T("open") },
     { ID_SAVE,  wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
+    { ID_SAVE_AS,  wxITEM_NORMAL, _T("&Save AS..."), _T("save") },
     { ID_CLOSE, wxITEM_NORMAL, _T("&Close\tCtrl+W") },
     { ID_QUIT,  wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
 
@@ -191,6 +193,10 @@ MyFrame::MyFrame()
       m_timer(this),
       m_isTimerRunning(false)
 {
+    // Set the initial timer amount
+    m_timer.Start(1000);
+    m_timer.Stop();
+
     wxLogDebug(_T("Creating Frame"));
     wxImage::AddHandler(new wxPNGHandler());
 
@@ -221,6 +227,7 @@ MyFrame::~MyFrame()
     wxGetApp().m_frame = NULL;
 
     // Cleanup
+    m_toolMgr.UnInit();
     m_mgr.UnInit();
     wxLogDebug(_T("Frame has been destroyed"));
 }
@@ -252,14 +259,29 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
 
 
 bool
-MyFrame::SavePuzzle(const wxString & filename, const wxString & ext)
+MyFrame::SavePuzzle(wxString filename, const wxString & ext)
 {
+    m_puz.m_notes = m_notes->GetValue();
+    m_puz.m_time = m_time;
+
+    if (filename.empty())
+        filename = wxFileSelector(
+                        _T("Save Puzzle As"),
+                        wxEmptyString, wxEmptyString, _T("puz"),
+                        XPuzzle::GetSaveTypeString()
+                            + _T("|All Files (*.*)|*.*"),
+                        wxFD_SAVE | wxFD_OVERWRITE_PROMPT
+                   );
+
+    if (filename.empty())
+        return false;
+
     wxStopWatch sw;
 
     const bool success = m_puz.Save(filename, ext);
 
     // Reset save/save as flag
-    m_toolMgr.GetTool(ID_SAVE)->SetLabel(_T("&Save As\tCtrl+S"));
+    EnableSaveAs();
 
     SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
                                m_puz.m_filename.c_str(),
@@ -323,14 +345,14 @@ MyFrame::ShowPuzzle()
     SetTime(m_puz.m_time);
 
     // Reset save/save as flag
-    m_toolMgr.GetTool(ID_SAVE)->SetLabel(_T("&Save As\tCtrl+S"));
+    EnableSaveAs();
 
 
     // Set the notes bitmap depending on whether there are notes or not
     if (m_puz.m_notes.empty())
-        m_toolMgr.GetTool(ID_SHOW_NOTES)->SetIconName(_T("notes"));
+        m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
     else
-        m_toolMgr.GetTool(ID_SHOW_NOTES)->SetIconName(_T("notes_new"));
+        m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes_new"));
 
     if (m_puz.IsOk())
     {
@@ -339,8 +361,8 @@ MyFrame::ShowPuzzle()
 
 
         const bool scrambled = m_puz.IsScrambled();
-        EnableScramble(! scrambled);
-        EnableUnscramble(scrambled);
+        m_toolMgr.Enable(ID_SCRAMBLE,   ! scrambled);
+        m_toolMgr.Enable(ID_UNSCRAMBLE, scrambled);
         EnableCheck(! scrambled);
         EnableReveal(! scrambled);
 
@@ -498,6 +520,7 @@ MyFrame::MakeMenuBar()
     wxMenu * menu = new wxMenu();
         m_toolMgr.Add(menu, ID_OPEN);
         m_toolMgr.Add(menu, ID_SAVE);
+        m_toolMgr.Add(menu, ID_SAVE_AS);
         m_toolMgr.Add(menu, ID_CLOSE);
         m_toolMgr.Add(menu, ID_QUIT);
         menu->AppendSeparator();
@@ -669,6 +692,9 @@ MyFrame::SetupToolManager()
     m_toolMgr.SetIconSize_AuiToolBar(24);
     m_toolMgr.SetIconSize_ToolBar(24);
     m_toolMgr.SetIconSize_Menu(16);
+    m_toolMgr.SetIconLocation( wxPathOnly(wxTheApp->argv[0]) +
+                               wxFileName::GetPathSeparator() +
+                               _T("images") );
 }
 
 
@@ -676,33 +702,59 @@ void
 MyFrame::ManageTools()
 {
     m_toolMgr.SetDesc(toolDesc);
+    m_toolMgr.SetManagedWindow(this);
 }
 
 
 void
 MyFrame::EnableTools(bool enable)
 {
-    EnableSave(enable);
-    EnableClose(enable);
     EnableGridSize(enable);
-    EnableScramble(enable);
-    EnableUnscramble(enable);
     EnableCheck(enable);
     EnableReveal(enable);
-    EnableNotes(enable);
-    EnableTimer(enable);
+
+    m_toolMgr.Enable(ID_UNSCRAMBLE, enable);
+    m_toolMgr.Enable(ID_SCRAMBLE,   enable);
+
+    m_toolMgr.Enable(ID_SAVE,    enable);
+    m_toolMgr.Enable(ID_SAVE_AS, enable);
+
+    // Tools that are only enabled or disabled when a puzzle
+    // is shown or closed.  These don't have any special logic.
+    m_toolMgr.Enable(ID_CLOSE, enable);
+    m_toolMgr.Enable(ID_SHOW_NOTES, enable);
+    m_toolMgr.Enable(ID_TIMER, enable);
 }
+
 
 void
 MyFrame::EnableSave(bool enable)
 {
     m_toolMgr.Enable(ID_SAVE,         enable);
-}
 
-void
-MyFrame::EnableClose(bool enable)
-{
-    m_toolMgr.Enable(ID_CLOSE,        enable);
+    // Swap the toolbar icons
+    if (enable)
+    {
+        const int pos = m_toolbar->GetToolPos(ID_SAVE_AS);
+        if (pos != wxNOT_FOUND)
+        {
+            m_toolMgr.Delete(m_toolbar, ID_SAVE_AS);
+            m_toolMgr.Insert(m_toolbar, ID_SAVE, pos);
+        }
+        wxASSERT(  m_toolMgr.IsAttached(ID_SAVE, m_toolbar) &&
+                 ! m_toolMgr.IsAttached(ID_SAVE_AS, m_toolbar) );
+    }
+    else // disable save (enable save as)
+    {
+        const int pos = m_toolbar->GetToolPos(ID_SAVE);
+        if (pos != wxNOT_FOUND)
+        {
+            m_toolMgr.Delete(m_toolbar, ID_SAVE);
+            m_toolMgr.Insert(m_toolbar, ID_SAVE_AS, pos);
+        }
+        wxASSERT(! m_toolMgr.IsAttached(ID_SAVE, m_toolbar) &&
+                   m_toolMgr.IsAttached(ID_SAVE_AS, m_toolbar) );
+    }
 }
 
 void
@@ -713,17 +765,6 @@ MyFrame::EnableGridSize(bool enable)
     m_toolMgr.Enable(ID_ZOOM_FIT,     enable);
 }
 
-void
-MyFrame::EnableScramble(bool enable)
-{
-    m_toolMgr.Enable(ID_SCRAMBLE,     enable);
-}
-
-void
-MyFrame::EnableUnscramble(bool enable)
-{
-    m_toolMgr.Enable(ID_UNSCRAMBLE,     enable);
-}
 
 void
 MyFrame::EnableCheck(bool enable)
@@ -747,17 +788,6 @@ MyFrame::EnableReveal(bool enable)
                       enable);
 }
 
-void
-MyFrame::EnableNotes(bool enable)
-{
-    m_toolMgr.Enable(ID_SHOW_NOTES,   enable);
-}
-
-void
-MyFrame::EnableTimer(bool enable)
-{
-    m_toolMgr.Enable(ID_TIMER,        enable);
-}
 
 
 
@@ -888,44 +918,24 @@ MyFrame::OnOpenPuzzle(wxCommandEvent & WXUNUSED(evt))
 }
 
 
+void
+MyFrame::OnSavePuzzleAs(wxCommandEvent & WXUNUSED(evt))
+{
+    SavePuzzle(wxEmptyString);
+}
 
 
 void
 MyFrame::OnSavePuzzle(wxCommandEvent & WXUNUSED(evt))
 {
-    m_puz.m_notes = m_notes->GetValue();
-    m_puz.m_time = m_time;
-    m_puz.m_complete = (m_gridCtrl->GetIncorrectCount() + m_gridCtrl->GetBlankCount() == 0);
-
-    wxString filename;
-    if (! m_puz.m_modified)
-        filename = wxFileSelector(
-                        _T("Save Puzzle As"),
-                        wxEmptyString, wxEmptyString, _T("puz"),
-                        XPuzzle::GetSaveTypeString()
-                            + _T("|All Files (*.*)|*.*"),
-                        wxFD_SAVE | wxFD_OVERWRITE_PROMPT
-                   );
-    else
-        filename = m_puz.m_filename;
-
-    if (! filename.empty())
-        SavePuzzle(filename);
+    SavePuzzle(m_puz.m_filename);
 }
 
 
 void
-MyFrame::OnZoomFit(wxCommandEvent & WXUNUSED(evt))
+MyFrame::OnZoomFit(wxCommandEvent & evt)
 {
-    bool fit = m_toolMgr.Toggle(ID_ZOOM_FIT);
-
-    // Don't enable/disagle Zoom buttons
-    /*
-    m_toolMgr.Enable(ID_ZOOM_OUT, !fit);
-    m_toolMgr.Enable(ID_ZOOM_IN,  !fit);
-    */
-
-    m_gridCtrl->FitGrid(fit);
+    m_gridCtrl->FitGrid(evt.IsChecked());
 }
 
 
@@ -971,8 +981,8 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
         m_gridCtrl->RecheckGrid();
         CheckPuzzle();
 
-        EnableScramble(false);
-        EnableUnscramble(true);
+        m_toolMgr.Enable(ID_SCRAMBLE, false);
+        m_toolMgr.Enable(ID_UNSCRAMBLE, true);
 
         EnableCheck(false);
         EnableReveal(false);
@@ -1014,8 +1024,8 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
         m_gridCtrl->RecheckGrid();
         CheckPuzzle();
 
-        EnableScramble(true);
-        EnableUnscramble(false);
+        m_toolMgr.Enable(ID_SCRAMBLE,   true);
+        m_toolMgr.Enable(ID_UNSCRAMBLE, false);
 
         EnableCheck(true);
         EnableReveal(true);
@@ -1029,9 +1039,9 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 
 
 void
-MyFrame::OnLayout(wxCommandEvent & WXUNUSED(evt))
+MyFrame::OnLayout(wxCommandEvent & evt)
 {
-    bool allowMove = m_toolMgr.Toggle(ID_LAYOUT_PANES);
+    const bool allowMove = evt.IsChecked();
 
     wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
 
@@ -1104,23 +1114,18 @@ MyFrame::OnSaveLayout(wxCommandEvent & WXUNUSED(evt))
 
 
 void
-MyFrame::OnShowNotes(wxCommandEvent & WXUNUSED(evt))
+MyFrame::OnShowNotes(wxCommandEvent & evt)
 {
-    bool show = m_toolMgr.Toggle(ID_SHOW_NOTES);
-    ShowPane(_T("Notes"), show);
+    ShowPane(_T("Notes"), evt.IsChecked());
 }
 
 
 
 void
-MyFrame::OnTimer(wxCommandEvent & WXUNUSED(evt))
+MyFrame::OnTimer(wxCommandEvent & evt)
 {
-    bool running = m_toolMgr.Toggle(ID_TIMER);
-
-    if (running)
-        m_timer.Start(1000);
-    else
-        m_timer.Stop();
+    wxASSERT(evt.IsChecked() != IsTimerRunning());
+    ToggleTimer();
 }
 
 
@@ -1180,7 +1185,7 @@ MyFrame::OnGridLetter(wxPuzEvent & evt)
     if (! m_puz.m_modified)
     {
         m_puz.m_modified = true;
-        m_toolMgr.GetTool(ID_SAVE)->SetLabel(_T("&Save\tCtrl+S"));
+        EnableSave();
     }
     CheckPuzzle();
 }
@@ -1203,6 +1208,12 @@ MyFrame::OnActivate(wxActivateEvent & evt)
             // This isn't the best solution, but seems to work despite all the
             // SetFocus() failed messages
             m_gridCtrl->SetFocus();
+
+            // When we restore (from the task bar) the frame, the App doesn't
+            // receive an activate event, so this is needed. . . . It shouldn't
+            // need to be here.
+            if (wxGetApp().m_isTimerRunning)
+                StartTimer();
         }
     }
 

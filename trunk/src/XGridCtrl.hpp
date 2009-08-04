@@ -49,20 +49,42 @@ enum
     CHECK_ALL        = 0x04    // Inclue blanks
 };
 
-// THIS IS NOT TRUE CURRENTLYs
-//---------------------------------------------------------------------------
-// Note that this class will steal keyboard focus in OnPaint and
-//   SetFocus (this overloaded function sets the grid's "focus" --
-//   that is, the square that is highlighted)
-// Calling wxScrolledWindow::OnFocus from OnPaint is neccesary to overcome a
-//   bug in wx/window.h: the WinAPI SetFocus function fails when
-//   the frame is minimized and then restored, such that clicking
-//   on the frame will not reset the focus
-// This focus-stealing behavior is fine in this instance, because
-//   the grid window should be the only thing in the application that
-//   needs keyboard input.  Just watch out before doing this in other
-//   places
-//---------------------------------------------------------------------------
+
+// Styles
+enum GridStyle
+{
+    PAUSE_ON_SWITCH     = 0x0001,
+    BLANK_ON_NEW_WORD   = 0x0002,
+    MOVE_AFTER_LETTER   = 0x0004,
+    MOVE_TO_NEXT_BLANK  = 0x0008,
+    BLANK_ON_DIRECTION  = 0x0010,
+    CONTEXT_MENU        = 0x0020,
+    MOVE_ON_RIGHT_CLICK = 0x0040,
+    CHECK_WHILE_TYPING  = 0x0080,
+
+    DEFAULT_GRID_STYLE = PAUSE_ON_SWITCH
+                       | MOVE_AFTER_LETTER
+                       | BLANK_ON_NEW_WORD,
+
+    GRID_STYLE_MASK = PAUSE_ON_SWITCH
+                    | BLANK_ON_NEW_WORD
+                    | MOVE_AFTER_LETTER
+                    | MOVE_TO_NEXT_BLANK
+                    | BLANK_ON_DIRECTION
+                    | CONTEXT_MENU
+                    | MOVE_ON_RIGHT_CLICK
+                    | CHECK_WHILE_TYPING
+};
+
+
+// Colors
+enum SquareColor
+{
+    WHITE_SQUARE  = 0,
+    LETTER_SQUARE = 1,
+    WORD_SQUARE   = 2
+};
+
 
 extern const wxChar * XGridCtrlNameStr;
 
@@ -183,6 +205,9 @@ public:
     void SetBorderSize(size_t size) { m_borderSize = size; Scale(); Refresh(); }
     int  GetBorderSize() const      { return m_borderSize; }
 
+    int GetNumberHeight() const { return m_boxSize * m_numScale; }
+    int GetTextHeight()   const { return m_boxSize * m_textScale; }
+
     // Style
     void SetGridStyle(int style)
         { SetWindowStyle( GetWindowStyle() & ~ GRID_STYLE_MASK | style ); }
@@ -246,7 +271,7 @@ protected:
     // Scaling functions and members
     void OnSize(wxSizeEvent & evt);
     void Scale(double factor = 1.0);
-    void ScaleFont(wxFont * font, double desiredHeight);
+    void ScaleFont(wxFont * font, int desiredHeight);
 
     wxRect m_rect;              // Overall grid size
     int m_borderSize;           // Border between squares
@@ -256,6 +281,8 @@ protected:
 
     wxFont m_numberFont;
     wxFont m_letterFont;
+    float m_numScale;
+    float m_textScale;
 
     // Pointer to puzzle data
     XGrid * m_grid;
@@ -275,6 +302,9 @@ protected:
     // Square colors
     wxColor m_colors[3];
 
+    // Rebus
+    bool m_wantsRebus;
+
 private:
     // Events
     void OnClueFocus  (wxPuzEvent & evt);
@@ -282,6 +312,8 @@ private:
     void OnLeftDown   (wxMouseEvent & evt);
     void OnRightDown  (wxMouseEvent & evt);
     void OnKeyDown    (wxKeyEvent & evt);
+    void OnChar       (wxKeyEvent & evt);
+
     void OnLetter     (wxChar key, int mod);
     void OnArrow      (bool arrowDirection, bool increment, int mod);
     void OnTab        (int mod);
@@ -289,6 +321,7 @@ private:
     void OnEnd        (int mod);
     void OnBackspace  (int mod);
     void OnDelete     (int mod);
+    void OnInsert     (int mod);
 
     DECLARE_EVENT_TABLE()
     DECLARE_NO_COPY_CLASS(XGridCtrl)
@@ -331,14 +364,14 @@ inline void
 XGridCtrl::SetNumberFont(const wxFont & font)
 {
     m_numberFont = font;
-    ScaleFont(&m_numberFont, m_boxSize * NUMBER_SCALE);
+    ScaleFont(&m_numberFont, GetNumberHeight());
 }
 
 inline void
 XGridCtrl::SetLetterFont(const wxFont & font)
 {
     m_letterFont = font;
-    ScaleFont(&m_letterFont, m_boxSize * LETTER_SCALE);
+    ScaleFont(&m_letterFont, GetTextHeight());
 }
 
 

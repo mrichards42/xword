@@ -35,7 +35,9 @@ class XPuzzle
 public:
     explicit XPuzzle(const wxString & filename = wxEmptyString)
     {
-        m_version = 12;
+        m_modified = false;
+        m_time = 0;
+        m_version = 13;
         m_isOk = false;
         if (! filename.empty())
             Load(filename);
@@ -55,7 +57,6 @@ public:
     bool m_modified;
 
     int m_time;
-    bool m_complete;
 
     class Clue;
     typedef std::vector<Clue> ClueList;
@@ -151,7 +152,6 @@ XPuzzle::Clear()
     m_copyright.clear();
     m_notes.clear();
     m_time = 0;
-    m_complete = false;
     m_extraSections.clear();
 }
 

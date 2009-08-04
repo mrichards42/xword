@@ -91,7 +91,7 @@ public:
 
 
 private:
-    void Init() { m_heading = NULL; m_clueList = NULL; }
+    void Init() { m_heading = NULL; m_clueList = NULL; m_direction = DIR_ACROSS; }
 
     wxStaticText * m_heading;
     ClueListBox * m_clueList;

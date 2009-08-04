@@ -246,8 +246,12 @@ PuzHandler::LoadSections()
         Read(&title[0], 4);
 
         unsigned short length;
-        unsigned short ck_section;
         Read(&length, 2);
+        if (length == 0)
+            throw PuzLoadError(_T("Length of %s region is 0"),
+                               title.to_string().c_str());
+
+        unsigned short ck_section;
         Read(&ck_section, 2);
 
         ByteArray data(length);
