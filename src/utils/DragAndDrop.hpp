@@ -32,7 +32,7 @@ public:
         : m_frame(frame)
     {}
 
-    virtual bool OnDropFiles(wxCoord x, wxCoord y,
+    virtual bool OnDropFiles(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
                              const wxArrayString & filenames)
     {
         if ( ! m_frame->ClosePuzzle(true) ) // Prompt for save

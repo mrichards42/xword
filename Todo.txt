@@ -25,14 +25,12 @@ Create a suite of test puzzles for a variety of cases:
         - Missing nul-terminators (many places for this)
 
 
-Reorganize load/save
+Configuration
+
+Rebus (almost done)
 
 Printing
 
-Load NOTEPAD section from text files
-
 Finish Status bar
-
-Work on Tool Manager and AuiToolbar (especially adding or removing buttons -- drag and drop support?)
 
 Save tool and menu layout in config file (separate XML file?)

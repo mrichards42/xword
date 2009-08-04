@@ -68,7 +68,7 @@ public:
     bool SetFont(const wxFont & font);
 
 protected:
-    void Init() { SetMargins(5, 5); }
+    void Init() { SetMargins(5, 5); m_numWidth = -1; }
 
     // Drawing functions
     void    OnDrawBackground(wxDC & dc, const wxRect & rect, size_t n) const;

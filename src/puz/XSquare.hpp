@@ -133,6 +133,8 @@ public:
     int GetTextSymbol()      const;
     int GetSolutionSymbol()  const;
 
+    static bool IsValidChar(wxChar ch);
+    static bool IsValidString(const wxString & str);
 
     // Clue
     //-----
@@ -225,12 +227,6 @@ private:
     // ASCII lookup functions
     static char Ascii(wxChar ch);
     static char Ascii(const wxString & str) { return Ascii(str.at(0)); }
-
-    // Debug stuff
-#ifdef __WXDEBUG__
-    static bool IsValidChar(wxChar ch);
-    static bool IsValidString(const wxString & str);
-#endif // __WXDEBUG__
 };
 
 
@@ -371,9 +367,6 @@ XSquare::Ascii(wxChar ch)
 
 
 
-
-#ifdef __WXDEBUG__
-
 inline
 bool
 XSquare::IsValidChar(wxChar ch)
@@ -391,8 +384,6 @@ XSquare::IsValidString(const wxString & str)
             return false;
     return true;
 }
-
-#endif // __WXDEBUG__
 
 
 

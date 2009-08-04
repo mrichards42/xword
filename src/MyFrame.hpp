@@ -72,7 +72,7 @@ public:
     // XWord puzzle loading / saving
     //-----------
     bool LoadPuzzle(const wxString & filename, const wxString & ext = _T(""));
-    bool SavePuzzle(const wxString & filename, const wxString & ext = _T(""));
+    bool SavePuzzle(      wxString   filename, const wxString & ext = _T(""));
     bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
     void CheckPuzzle();
     void ShowPuzzle();  // Displays the actual puzzle
@@ -95,13 +95,13 @@ public:
 
     // Timer
     //-----------
+    bool IsTimerRunning() { return m_timer.IsRunning(); }
     void SetTime  (int time) { m_time = time; m_status->SetTime(time); }
     void ResetTimer()     { SetTime(0); }
-    void StartTimer(bool start = true)
-        { if (start != IsTimerRunning()) ToggleTimer(); }
-    void StopTimer()      { StartTimer(false); }
-    void ToggleTimer()    { wxCommandEvent evt; OnTimer(evt); }
-    bool IsTimerRunning() { return m_timer.IsRunning(); }
+    void StartTimer()     { if (! IsTimerRunning()) m_timer.Start(); }
+    void StopTimer()      { if (IsTimerRunning()) m_timer.Stop(); }
+    void ToggleTimer()
+        { if (IsTimerRunning()) m_timer.Stop(); else m_timer.Start(); }
 
 private:
     // Windows
@@ -156,14 +156,14 @@ private:
 
     // Incremental enabling/disabling . . .
     void EnableSave(bool enable = true);
-    void EnableClose(bool enable = true);
+    void EnableSaveAs(bool enable = true) { EnableSave(! enable); }
     void EnableGridSize(bool enable = true);
     void EnableScramble(bool enable = true);
     void EnableUnscramble(bool enable = true);
     void EnableCheck (bool enable = true);
     void EnableReveal(bool enable = true);
-    void EnableNotes(bool enable = true);
-    void EnableTimer(bool enable = true);
+
+    void SetHasNotes(bool show = true);
 
     ToolManager m_toolMgr;
 
@@ -195,19 +195,20 @@ private:
     // ------------------------
 
     // General
-    void OnOpenPuzzle (wxCommandEvent & WXUNUSED(evt));
-    void OnSavePuzzle (wxCommandEvent & WXUNUSED(evt));
-    void OnClosePuzzle(wxCommandEvent & WXUNUSED(evt))   { ClosePuzzle(true); }
-    void OnQuit       (wxCommandEvent & WXUNUSED(evt))   { Close(); }
+    void OnOpenPuzzle  (wxCommandEvent & WXUNUSED(evt));
+    void OnSavePuzzle  (wxCommandEvent & WXUNUSED(evt));
+    void OnSavePuzzleAs(wxCommandEvent & WXUNUSED(evt));
+    void OnClosePuzzle (wxCommandEvent & WXUNUSED(evt))   { ClosePuzzle(true); }
+    void OnQuit        (wxCommandEvent & WXUNUSED(evt))   { Close(); }
 
     // XGridCtrl interaction
-    void OnZoomIn     (wxCommandEvent & WXUNUSED(evt));
-    void OnZoomFit    (wxCommandEvent & WXUNUSED(evt));
-    void OnZoomOut    (wxCommandEvent & WXUNUSED(evt));
+    void OnZoomIn      (wxCommandEvent & WXUNUSED(evt));
+    void OnZoomFit     (wxCommandEvent & WXUNUSED(evt));
+    void OnZoomOut     (wxCommandEvent & WXUNUSED(evt));
 
-    void OnCheckGrid  (wxCommandEvent & evt) { m_gridCtrl->CheckGrid(); }
-    void OnCheckWord  (wxCommandEvent & evt) { m_gridCtrl->CheckWord(); }
-    void OnCheckLetter(wxCommandEvent & evt) { m_gridCtrl->CheckLetter(); }
+    void OnCheckGrid   (wxCommandEvent & evt) { m_gridCtrl->CheckGrid(); }
+    void OnCheckWord   (wxCommandEvent & evt) { m_gridCtrl->CheckWord(); }
+    void OnCheckLetter (wxCommandEvent & evt) { m_gridCtrl->CheckLetter(); }
 
     void OnRevealGrid   (wxCommandEvent & evt)
         { m_gridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL); }

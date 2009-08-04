@@ -21,57 +21,23 @@
 
 #include "ToolInfo.hpp"
 #include <list>
-#include <wx/string.h>
-#include <wx/defs.h> // for wxItemKind
 
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#    include <wx/string.h>
+#    include <wx/event.h>
+#    include <wx/defs.h> // for wxItemKind
+#endif
 
 
 // Define some macros to make calling ToolInfo functions from ToolManager
 // cleaner.
-// Templates are used so that GetTool() can be called with any type allowed.
 
 #define TOOL_PROXY(ret, name, const_or_not)              \
-    template <typename T>                                \
-    ret name(T getter) const_or_not                      \
-        { return GetTool(getter)->name(); }
+    ret name(int id) const_or_not { return GetTool(id)->name(); }
 
-#define TOOL_PROXY_1(ret, name, type1, var1, def1, const_or_not)       \
-    template <typename T>                                              \
-    ret name(T getter, type1 var1 def1) const_or_not                   \
-        { return GetTool(getter)->name(var1); }
-
-#define TOOL_PROXY_2(ret, name, type1, var1, def1,                     \
-                                type2, var2, def2,                     \
-                                const_or_not)                          \
-    template <typename T>                                              \
-    ret name(T getter, type1 var1 def1,                                \
-                       type2 var2 def2) const_or_not                   \
-        { return GetTool(getter)->name(var1, var2); }
-
-#define TOOL_PROXY_3(ret, name, type1, var1, def1,                     \
-                                type2, var2, def2,                     \
-                                type3, var3, def3,                     \
-                                const_or_not)                          \
-    template <typename T>                                              \
-    ret name(T getter, type1 var1 def1,                                \
-                       type2 var2 def2,                                \
-                       type3 var3 def3) const_or_not                   \
-        { return GetTool(getter)->name(var1, var2, var3); }
-
-
-#define TOOL_PROXY_VOID(name, const_or_not)              \
-    template <typename T>                                \
-    void name(T getter) const_or_not                     \
-        { GetTool(getter)->name(); }
-
-#define TOOL_PROXY_VOID_1(name, type1, var1, def1, const_or_not)       \
-    template <typename T>                                              \
-    void name(T getter, type1 var1 def1) const_or_not                   \
-        { GetTool(getter)->name(var1); }
-
-#define NOT_CONST
-#define NO_DEFAULT
-
+#define TOOL_PROXY1(ret, name, type1, var1, const_or_not)              \
+    ret name(int id, type1 var1) const_or_not { return GetTool(id)->name(var1); }
 
 // Used with an array of tools for an initialized list to mark the end
 const int TOOL_NONE = wxID_NONE;
@@ -82,29 +48,28 @@ struct ToolDesc
     int id;
     wxItemKind kind;
     const wxString label;
-    const wxString icoName1;
-    const wxString icoName2;
+    const wxString iconName;
     const wxString helpStr;
 };
 
-class ToolManager
+class ToolManager : public wxEvtHandler
 {
 public:
     ToolManager();
     ~ToolManager();
 
+    // Takes over logic for checking/unchecking items
+    // These two functions follow the wxAuiManager model.
+    void SetManagedWindow(wxWindow * window);
+    void UnInit();
+
+    void OnToolSelected(wxCommandEvent & evt);
+
     // Adding tools to the manager
     //----------------------------
     void AddTool(int id,
                  const wxString & label,
-                 const wxString & icoName1,
-                 const wxString & icoName2,
-                 const wxString & helpString = wxEmptyString,
-                 wxItemKind kind = wxITEM_NORMAL);
-
-    void AddTool(int id,
-                 const wxString & label,
-                 const wxString & icoName1,
+                 const wxString & iconName,
                  const wxString & helpString = wxEmptyString,
                  wxItemKind kind = wxITEM_NORMAL);
 
@@ -118,17 +83,10 @@ public:
     // Return NULL if there is no tool
     const ToolInfo * GetTool (int id) const;
           ToolInfo * GetTool (int id);
-    const ToolInfo * GetTool (const wxString & label) const;
-          ToolInfo * GetTool (const wxString & label);
-
-    typedef std::list<ToolInfo> toolList_t;
-    const toolList_t & GetToolList() const { return m_toolList; }
-          toolList_t & GetToolList()       { return m_toolList; }
 
 
-
-    // IconSize functions
-    //----------------------
+    // Icon functions
+    //---------------
     void SetIconSize_Menu       (int iconSize) { m_menuIconSize = iconSize; }
     void SetIconSize_ToolBar    (int iconSize) { m_tbIconSize = iconSize; }
     void SetIconSize_AuiToolBar (int iconSize) { m_auiIconSize = iconSize; }
@@ -137,108 +95,97 @@ public:
     int  GetIconSize_ToolBar    () const       { return m_tbIconSize; }
     int  GetIconSize_AuiToolBar () const       { return m_auiIconSize; }
 
+    void SetIconLocation(const wxString & path) { m_iconLocation = path; }
+    const wxString & GetIconLocation() const    { return m_iconLocation; }
 
+    wxIcon   GetIcon  (int id, int size) const { return GetIcon  (GetTool(id), size); }
+    wxBitmap GetBitmap(int id, int size) const { return GetBitmap(GetTool(id), size); }
 
-    // Eveything after here is used as a proxy for ToolInfo functions
-    //---------------------------------------------------------------
+    wxIcon   GetIcon  (const ToolInfo * tool, int size) const;
+    wxBitmap GetBitmap(const ToolInfo * tool, int size) const;
 
 
     // Add to menus / toolbars
     //------------------------
-    template <typename T>
-    wxMenuItem *
-    Add(wxMenu * menu, T getter, int width = -1, int height = -1);
-
-    template <typename T>
-    wxToolBarToolBase *
-    Add(wxToolBar * tb, T getter, int width = -1, int height = -1);
-
-    template <typename T>
-    void
-    Add(wxAuiToolBar * tb, T getter, int width = -1, int height = -1);
-
+    wxMenuItem *        Add(wxMenu * menu,     int id, int iconSize = -1);
+    wxToolBarToolBase * Add(wxToolBar * tb,    int id, int iconSize = -1);
+    void                Add(wxAuiToolBar * tb, int id, int iconSize = -1);
 
 
     // Insert into menus / toolbars
     //-----------------------------
-    template <typename T>
     wxMenuItem *
-    Insert(wxMenu * menu, T getter, size_t pos, int width = -1, int height = -1);
+    Insert(wxMenu * menu, int id, size_t pos, int iconSize = -1);
 
-    template <typename T>
     wxToolBarToolBase *
-    Insert(wxToolBar * tb, T getter, size_t pos, int width = -1, int height = -1);
+    Insert(wxToolBar * tb, int id, size_t pos, int iconSize = -1);
 
     // wxAuitoolBar doesn't have an Insert method . . .
 
 
 
     // Remove from menus / toolbars
-    //------------------------
-    TOOL_PROXY_1(wxMenuItem *,        Remove, wxMenu *,    menu,
-                 NO_DEFAULT, NOT_CONST);
-    TOOL_PROXY_1(wxToolBarToolBase *, Remove, wxToolBar *, tb,
-                 NO_DEFAULT, NOT_CONST);
-
+    //-----------------------------
+    wxMenuItem *        Remove(wxMenu * menu, int id);
+    wxToolBarToolBase * Remove(wxToolBar * tb, int menu);
     // wxAuitoolBar doesn't have a Remvoe method . . .
 
 
     // Delete from menus / toolbars
     //-----------------------------
-    TOOL_PROXY_VOID_1 (Delete, wxMenu *,       menu, NO_DEFAULT, NOT_CONST);
-    TOOL_PROXY_1(bool, Delete, wxToolBar *,    tb,   NO_DEFAULT, NOT_CONST);
-    TOOL_PROXY_1(bool, Delete, wxAuiToolBar *, tb,   NO_DEFAULT, NOT_CONST);
+    void Delete(wxMenu * menu,     int id);
+    bool Delete(wxToolBar * tb,    int id);
+    bool Delete(wxAuiToolBar * tb, int id);
 
 
-    TOOL_PROXY_1(bool, IsAttached, wxMenu *,       menu, NO_DEFAULT, const);
-    TOOL_PROXY_1(bool, IsAttached, wxToolBar *,    tb,   NO_DEFAULT, const);
-    TOOL_PROXY_1(bool, IsAttached, wxAuiToolBar *, tb,   NO_DEFAULT, const);
+    // Information
+    //------------
+    TOOL_PROXY1(bool, IsAttached, wxMenu* ,       menu, const)
+    TOOL_PROXY1(bool, IsAttached, wxToolBar* ,    menu, const)
+    TOOL_PROXY1(bool, IsAttached, wxAuiToolBar* , menu, const)
 
-    TOOL_PROXY  (int,                GetId,          const);
-    TOOL_PROXY  (const wxString &,   GetLabel,       const);
-    TOOL_PROXY  (wxString,           GetLabelText,   const);
-    TOOL_PROXY  (const wxString &,   GetHelpString,  const);
-    TOOL_PROXY  (wxItemKind,         GetKind,        const);
-    TOOL_PROXY_1(const wxString &,   GetIconName, bool, checked, = true, const);
-    TOOL_PROXY_1(bool,               HasBitmap,   bool, checked, = true, const);
+    TOOL_PROXY(const wxString &, GetLabel,      const)
+    TOOL_PROXY(      wxString,   GetLabelText,  const)
+    TOOL_PROXY(const wxString &, GetHelpString, const)
+    TOOL_PROXY(wxItemKind,       GetKind,       const)
+    TOOL_PROXY(const wxString &, GetIconName,   const)
+    TOOL_PROXY(bool,             HasIcon,       const)
 
-    TOOL_PROXY_3(wxIcon,   GetIcon,   int,  width,   NO_DEFAULT,
-                                      int,  height,  NO_DEFAULT,
-                                      bool, checked, = true,
-                                      const);
-
-    TOOL_PROXY_3(wxBitmap, GetBitmap, int,  width,   NO_DEFAULT,
-                                      int,  height,  NO_DEFAULT,
-                                      bool, checked, = true,
-                                      const);
+    void SetLabel   (int id, const wxString & label);
+    void SetIconName(int id, const wxString & iconName);
 
     // Tool States
     //------------
 
-    // Checking
-    TOOL_PROXY_1(ToolInfo &,  Check, bool, check, = true, NOT_CONST);
-    TOOL_PROXY  (bool,        Toggle,    NOT_CONST);
-    TOOL_PROXY  (bool,        IsChecked, const);
+    // Check
+    void Check    (int id, bool check = true) { Check(GetTool(id), check); }
+    bool Toggle   (int id)                    { return Toggle(GetTool(id)); }
+    bool IsChecked(int id) const { return GetTool(id)->IsChecked(); }
+
+    void Check (ToolInfo * tool, bool check = true);
+    bool Toggle(ToolInfo * tool)
+        { Check(tool, ! tool->IsChecked()); return tool->IsChecked(); }
 
     // Enabling
-    TOOL_PROXY_1(ToolInfo &,  Enable, bool, enable, = true, NOT_CONST);
-    TOOL_PROXY  (ToolInfo &,  Disable,   NOT_CONST);
-    TOOL_PROXY  (bool,        IsEnabled, const);
+    void Enable   (int id, bool enable = true) { Enable(GetTool(id), enable); }
+    void Disable  (int id)                     { Enable(id, false); }
+    bool IsEnabled(int id) const { return GetTool(id)->IsChecked(); }
 
+    void Enable (ToolInfo * tool, bool enable = true);
+    void Disable(ToolInfo * tool) { Enable(tool, false); }
 
 
 private:
-    toolList_t m_toolList;
-
-    toolList_t::const_iterator Find (int id) const;
-    toolList_t::iterator       Find (int id);
-    toolList_t::const_iterator Find (const wxString & label) const;
-    toolList_t::iterator       Find (const wxString & label);
+    std::list<ToolInfo> m_toolList;
 
     int m_menuIconSize;
     int m_tbIconSize;
     int m_auiIconSize;
+    wxString m_iconLocation;
+    wxWindow * m_managedWindow;
 };
+
+
 
 //------------------------------------------------------------------------------
 // Inline functions
@@ -249,23 +196,10 @@ private:
 //-------------
 
 inline void
-ToolManager::AddTool(int id, const wxString & label, const wxString & icoName1,
-                     const wxString & icoName2, const wxString & helpString, wxItemKind kind)
-{
-    m_toolList.push_back( ToolInfo(id,
-                                   label,
-                                   icoName1,
-                                   icoName2,
-                                   helpString,
-                                   kind) );
-}
-
-
-inline void
-ToolManager::AddTool(int id, const wxString & label, const wxString & icoName1,
+ToolManager::AddTool(int id, const wxString & label, const wxString & iconName,
                      const wxString & helpString, wxItemKind kind)
 {
-    m_toolList.push_back(ToolInfo(id, label, icoName1, helpString, kind));
+    m_toolList.push_back(ToolInfo(id, label, iconName, helpString, kind));
 }
 
 
@@ -277,11 +211,15 @@ inline
 const ToolInfo *
 ToolManager::GetTool(int id) const
 {
-    toolList_t::const_iterator it;
-    it = Find(id);
-    if (it == m_toolList.end())
-        return NULL;
-    return &(*it);
+    std::list<ToolInfo>::const_iterator it, end;
+    for (it = m_toolList.begin(), end = m_toolList.end();
+         it != end;
+         ++it)
+    {
+        if (it->GetId() == id)
+            return &(*it);
+    }
+    return NULL;
 }
 
 
@@ -289,99 +227,15 @@ inline
 ToolInfo *
 ToolManager::GetTool(int id)
 {
-    toolList_t::iterator it;
-    it = Find(id);
-    if (it == m_toolList.end())
-        return NULL;
-    return &(*it);
-}
-
-
-inline
-const ToolInfo *
-ToolManager::GetTool(const wxString & label) const
-{
-    toolList_t::const_iterator it;
-    it = Find(label);
-    if (it == m_toolList.end())
-        return NULL;
-    return &(*it);
-}
-
-
-inline
-ToolInfo *
-ToolManager::GetTool(const wxString & label)
-{
-    toolList_t::iterator it;
-    it = Find(label);
-    if (it == m_toolList.end())
-        return NULL;
-    return &(*it);
-}
-
-
-
-
-// Add to menu / toolbar
-//----------------------
-
-template <typename T>
-wxMenuItem *
-ToolManager::Add(wxMenu * menu, T getter, int width, int height)
-{
-    if (width  == -1)   width  = GetIconSize_Menu();
-    if (height == -1)   height = GetIconSize_Menu();
-
-    return GetTool(getter)->Add(menu, width, height);
-}
-
-
-template <typename T>
-wxToolBarToolBase *
-ToolManager::Add(wxToolBar * tb, T getter, int width, int height)
-{
-    if (width  == -1)   width  = GetIconSize_ToolBar();
-    if (height == -1)   height = GetIconSize_ToolBar();
-
-    return GetTool(getter)->Add(tb, width, height);
-}
-
-
-template <typename T>
-void
-ToolManager::Add(wxAuiToolBar * tb, T getter, int width, int height)
-{
-    if (width  == -1)   width  = GetIconSize_AuiToolBar();
-    if (height == -1)   height = GetIconSize_AuiToolBar();
-
-    GetTool(getter)->Add(tb, width, height);
-}
-
-
-
-
-// Insert into menu / toolbar
-//----------------------
-template <typename T>
-wxMenuItem *
-ToolManager::Insert(wxMenu * menu, T getter, size_t pos, int width, int height)
-{
-    if (width  == -1)   width  = GetIconSize_Menu();
-    if (height == -1)   height = GetIconSize_Menu();
-
-    return GetTool(getter)->Insert(menu, pos, width, height);
-}
-
-
-template <typename T>
-wxToolBarToolBase *
-ToolManager::Insert(wxToolBar * tb, T getter, size_t pos, int width, int height)
-{
-    if (width  == -1)   width  = GetIconSize_ToolBar();
-    if (height == -1)   height = GetIconSize_ToolBar();
-
-    return GetTool(getter)->Insert(tb, pos, width, height);
+    std::list<ToolInfo>::iterator it, end;
+    for (it = m_toolList.begin(), end = m_toolList.end();
+         it != end;
+         ++it)
+    {
+        if (it->GetId() == id)
+            return &(*it);
+    }
+    return NULL;
 }
 
 
@@ -389,12 +243,6 @@ ToolManager::Insert(wxToolBar * tb, T getter, size_t pos, int width, int height)
 
 #undef TOOL_PROXY
 #undef TOOL_PROXY_1
-#undef TOOL_PROXY_2
-#undef TOOL_PROXY_3
-#undef TOOL_PROXY_VOID
-#undef TOOL_PROXY_VOID_1
-#undef NO_DEFAULT
-#undef NOT_CONST
 
 
 

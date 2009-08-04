@@ -79,7 +79,7 @@ protected:
     }
 
 
-    virtual wxCoord OnMeasureItem(size_t n) const
+    virtual wxCoord OnMeasureItem(size_t WXUNUSED(n)) const
         { return GetCharHeight(); }
 
     // Caching Stuff

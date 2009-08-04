@@ -190,7 +190,7 @@ protected:
 
     // Needed for caching items, because DoInsert is messy with a template
     // parameter
-    virtual void OnInsert(size_t pos) { }
+    virtual void OnInsert(size_t WXUNUSED(pos)) { }
 
     virtual void InvalidateCache()
     {
@@ -211,7 +211,7 @@ protected:
     virtual void SetItemCount(size_t count) { _Parent::SetItemCount(count); }
     virtual void SetLineCount(size_t count) { _Parent::SetLineCount(count); }
 
-    virtual wxCoord OnMeasureItem(size_t n) const
+    virtual wxCoord OnMeasureItem(size_t WXUNUSED(n)) const
         { return this->GetCharHeight(); }
 
     // We can't know how to draw unless the type is wxString
