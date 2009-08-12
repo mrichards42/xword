@@ -25,6 +25,8 @@
 
 // Windows
 #include "dialogs/Layout.hpp"
+#include "dialogs/Properties.hpp"
+
 #include "widgets/SizedText.hpp"
 #include "ClueListBox.hpp"
 #include "CluePanel.hpp"
@@ -81,6 +83,8 @@ enum toolIds
 
     ID_TIMER,
 
+    ID_OPTIONS,
+
 #ifdef __WXDEBUG__
 
     ID_DUMP_STATUS,
@@ -121,12 +125,15 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_TIMER,             MyFrame::OnTimer)
     EVT_TIMER          (wxID_ANY,             MyFrame::OnTimerNotify)
 
+    EVT_MENU           (ID_OPTIONS,           MyFrame::OnOptions)
+
     EVT_PUZ_GRID_FOCUS (                      MyFrame::OnGridFocus)
     EVT_PUZ_CLUE_FOCUS (                      MyFrame::OnClueFocus)
     EVT_PUZ_LETTER     (                      MyFrame::OnGridLetter)
 
     EVT_ACTIVATE       (                      MyFrame::OnActivate)
     EVT_CLOSE          (                      MyFrame::OnClose)
+
 
 #ifdef __WXDEBUG__
 
@@ -144,6 +151,7 @@ static const ToolDesc toolDesc[] =
     { ID_SAVE,  wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
     { ID_SAVE_AS,  wxITEM_NORMAL, _T("&Save AS..."), _T("save") },
     { ID_CLOSE, wxITEM_NORMAL, _T("&Close\tCtrl+W") },
+    { ID_OPTIONS, wxITEM_NORMAL, _T("Options...") },
     { ID_QUIT,  wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
 
     { ID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in")  },
@@ -191,7 +199,8 @@ static const ToolDesc toolDesc[] =
 MyFrame::MyFrame()
     : wxFrame(NULL, -1, _T("XWord"), wxDefaultPosition, wxSize(700,700)),
       m_timer(this),
-      m_isTimerRunning(false)
+      m_isTimerRunning(false),
+      m_propertiesDialog(NULL)
 {
     // Set the initial timer amount
     m_timer.Start(1000);
@@ -202,7 +211,7 @@ MyFrame::MyFrame()
 
     SetDropTarget(new XWordFileDropTarget(this));
 
-    SetupToolManager();
+    SetupToolManager();  // This will check for image files
     ManageTools();
 
     CreateWindows();
@@ -248,9 +257,12 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
     ShowPuzzle();
 
     if (success)
+    {
         SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
                                    m_puz.m_filename.c_str(),
                                    sw.Time()));
+        m_gridCtrl->SetFocus();
+    }
     else
         SetStatus(_T("No file loaded"));
 
@@ -439,12 +451,14 @@ MyFrame::CreateWindows()
                                   wxDefaultSize,
                                   wxTE_MULTILINE);
 
+    if (m_toolMgr.GetIconLocation() != wxEmptyString)
 #ifdef USE_AUI_TOOLBAR
-    m_toolbar = MakeAuiToolBar();
+        m_toolbar = MakeAuiToolBar();
 #else // ! USE_AUI_TOOLBAR
-    m_toolbar = MakeToolBar();
+        m_toolbar = MakeToolBar();
 #endif // USE_AUI_TOOLBAR / !
-
+    else
+        m_toolbar = NULL;
 
     m_menubar = MakeMenuBar();
     SetMenuBar(m_menubar);
@@ -522,6 +536,7 @@ MyFrame::MakeMenuBar()
         m_toolMgr.Add(menu, ID_SAVE);
         m_toolMgr.Add(menu, ID_SAVE_AS);
         m_toolMgr.Add(menu, ID_CLOSE);
+        m_toolMgr.Add(menu, ID_OPTIONS);
         m_toolMgr.Add(menu, ID_QUIT);
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_ZOOM_IN);
@@ -614,14 +629,15 @@ MyFrame::ManageWindows()
     // It would be better to use MinSize, instead of Fixed, but it doesn't work
     // quite right, and we would have to update the MinSize every time the
     // toolbar was resized . . .
-    m_mgr.AddPane(m_toolbar,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
-                  .Top()
-                  .Fixed()
-                  .Layer(5)
-                  .Caption(_T("Tools"))
-                  .Name(_T("Tools")));
+    if (m_toolbar != NULL)
+        m_mgr.AddPane(m_toolbar,
+                      wxAuiPaneInfo()
+                      .CaptionVisible(false)
+                      .Top()
+                      .Fixed()
+                      .Layer(5)
+                      .Caption(_T("Tools"))
+                      .Name(_T("Tools")));
 #endif // USE_AUI_TOOLBAR
 
     m_mgr.AddPane(m_across,
@@ -686,15 +702,52 @@ MyFrame::ManageWindows()
 // Tool management
 //------------------------------------------------------------------------------
 
+wxString
+GetImagesPath()
+{
+    // Look in several locations for the images file (order is preserved)
+    // We can't use wxPathList to search for a directory (only a file), but we
+    // can use it to make sure that directories aren't added twice.  Since it
+    // inherits from wxArrayString, we can just iterate over the elements
+    // directory to search for the directory.
+    wxPathList directories;
+    directories.Add(wxPathOnly(wxString(wxTheApp->argv[0])));
+    directories.Add(wxStandardPaths::Get().GetUserDataDir());
+    directories.Add(wxStandardPaths::Get().GetLocalDataDir());
+    directories.Add(wxStandardPaths::Get().GetDataDir());
+    directories.Add(wxStandardPaths::Get().GetResourcesDir());
+
+    for (wxArrayString::const_iterator it = directories.begin();
+                 it != directories.end();
+                 ++it)
+    {
+        wxFileName dir; dir.AssignDir(*it);
+        dir.AppendDir(_T("images"));
+        if (dir.DirExists())
+            return dir.GetFullPath();
+    }
+
+    // If there is no images directory, alert the user
+    wxString message = _T("Could not find images folder.  Folders searched:\n");
+    for (wxArrayString::const_iterator it = directories.begin();
+         it != directories.end();
+         ++it)
+    {
+        message.append(*it + _T("\n"));
+    }
+    wxLogError(message);
+
+    return wxEmptyString;
+}
+
+
 void
 MyFrame::SetupToolManager()
 {
     m_toolMgr.SetIconSize_AuiToolBar(24);
     m_toolMgr.SetIconSize_ToolBar(24);
     m_toolMgr.SetIconSize_Menu(16);
-    m_toolMgr.SetIconLocation( wxPathOnly(wxTheApp->argv[0]) +
-                               wxFileName::GetPathSeparator() +
-                               _T("images") );
+    m_toolMgr.SetIconLocation( GetImagesPath() );
 }
 
 
@@ -731,6 +784,9 @@ void
 MyFrame::EnableSave(bool enable)
 {
     m_toolMgr.Enable(ID_SAVE,         enable);
+
+    if (m_toolbar == NULL)
+        return;
 
     // Swap the toolbar icons
     if (enable)
@@ -798,76 +854,91 @@ MyFrame::EnableReveal(bool enable)
 void
 MyFrame::LoadConfig()
 {
-    wxString configPath = GetConfigPath();
-    wxLogDebug(_T("Config file: %s"), configPath.c_str());
-
-    // Create a blank file it it doesn't exist
-    if (! wxFileName::FileExists(configPath))
-        wxFile(configPath, wxFile::write);
-
-    // Setup wxFileConfig
-    wxFileInputStream file(configPath);
-    wxFileConfig::Set( new wxFileConfig(file) );
-
-    wxFileConfig * config = GetConfig();
-
-    // Load settings
-    //--------------
-    config->SetPath(_T("/Window"));
-    long x, y, w, h;
-    bool maximized;
-    bool hasData = true;
-    hasData = hasData && config->Read(_T("width"),     &w);
-    hasData = hasData && config->Read(_T("height"),    &h);
-    hasData = hasData && config->Read(_T("top"),       &y);
-    hasData = hasData && config->Read(_T("left"),      &x);
-    hasData = hasData && config->Read(_T("maximized"), &maximized);
-    if (! hasData)
+    ConfigManager & config = wxGetApp().GetConfigManager();
+    // Window size and position
+    //-------------------------
+    config.SetPath(_T("/Window"));
+    if (config.ReadBool(_T("maximized")))
     {
-        x = 20;
-        y = 20;
-        w = 500;
-        h = 500;
-        maximized = false;
-    }
-
-    config->SetPath(_T("/Grid"));
-    bool fit_grid;
-    int  grid_style;
-    hasData = true;
-    hasData = hasData && config->Read(_T("fit"),   &fit_grid);
-    hasData = hasData && config->Read(_T("style"), &grid_style);
-    if (! hasData)
-    {
-        fit_grid = true;
-        grid_style = DEFAULT_GRID_STYLE;
-    }
-
-
-    // Apply the settings
-    // -------------------
-    if (maximized)
         Maximize();
+    }
     else
-        SetSize(x, y, w, h);
+    {
+        SetSize( config.ReadLong(_T("top")),
+                 config.ReadLong(_T("left")),
+                 config.ReadLong(_T("width")),
+                 config.ReadLong(_T("height")) );
+    }
 
-    m_gridCtrl->SetGridStyle(grid_style);
-    if (fit_grid)
+
+    // Grid
+    //-----
+    config.SetPath(_T("/Grid"));
+
+    if (config.ReadBool(_T("fit")))
+    {
         m_toolMgr.Check(ID_ZOOM_FIT);
+        m_gridCtrl->FitGrid();
+    }
+    m_gridCtrl->SetGridStyle(config.ReadLong(_T("style")) );
 
-    config->SetPath(_T("/"));
+    m_gridCtrl->SetFont(config.ReadFont(_T("font")) );
+
+    m_gridCtrl->SetFocusedLetterColor(
+        config.ReadColor(_T("focusedLetterColor")) );
+    m_gridCtrl->SetFocusedWordColor(
+        config.ReadColor(_T("focusedWordColor")) );
+    m_gridCtrl->SetWhiteSquareColor(
+        config.ReadColor(_T("whiteSquareColor")) );
+    m_gridCtrl->SetBlackSquareColor(
+        config.ReadColor(_T("blackSquareColor"))) ;
+    m_gridCtrl->SetPenColor(
+        config.ReadColor(_T("penColor")) );
+    m_gridCtrl->SetPencilColor(
+        config.ReadColor(_T("pencilColor")) );
+    m_gridCtrl->SetNumberScale(
+        config.ReadLong(_T("numberScale")) / 100. );
+    m_gridCtrl->SetLetterScale(
+        config.ReadLong(_T("letterScale")) / 100. );
+
+    // Clue Boxes
+    //-----------
+    config.SetPath(_T("/Clue"));
+
+    for (CluePanel * panel = m_across; ; panel = m_down)
+    {
+        panel->SetHeadingForeground(
+            config.ReadColor(_T("headingForegroundColor")) );
+        panel->SetHeadingBackground(
+            config.ReadColor(_T("headingBackgroundColor")) );
+        panel->SetForegroundColour(
+            config.ReadColor(_T("listForegroundColor")) );
+        panel->SetBackgroundColour(
+            config.ReadColor(_T("listBackgroundColor")) );
+        panel->SetColor(CluePanel::FOCUSED, CluePanel::TEXT,
+            config.ReadColor(_T("selectedForegroundColor")) );
+        panel->SetColor(CluePanel::FOCUSED, CluePanel::BACKGROUND,
+            config.ReadColor(_T("selectedBackgroundColor")) );
+        panel->SetColor(CluePanel::CROSSING, CluePanel::TEXT,
+            config.ReadColor(_T("crossingForegroundColor")) );
+        panel->SetColor(CluePanel::CROSSING, CluePanel::BACKGROUND,
+            config.ReadColor(_T("crossingBackgroundColor")) );
+
+        if (panel == m_down)
+            break;
+    }
+
+    config.SetPath(_T("/"));
 }
 
 
 void
 MyFrame::SaveConfig()
 {
-    SaveLayout(_T("Default"));
-
-    // Save window settings
-    wxFileConfig * config = GetConfig();
-
-    config->SetPath(_T("/Window"));
+    ConfigManager & config = wxGetApp().GetConfigManager();
+    // Window settings
+    //----------------
+    config.SetPath(_T("/Window"));
 
     // Only save window position if it is not maximized
     if (! IsMaximized())
@@ -875,26 +946,61 @@ MyFrame::SaveConfig()
         int x, y, w, h;
         GetSize(&w, &h);
         GetPosition(&x, &y);
+
+        // Make sure the sizes are within acceptable bounds
         if (w < 200) w = 500;
         if (h < 200) h = 500;
         if (x < 0 || x >= wxSystemSettings::GetMetric(wxSYS_SCREEN_X)) x = 20;
         if (y < 0 || y >= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)) y = 20;
-        config->Write(_T("width"),     w);
-        config->Write(_T("height"),    h);
-        config->Write(_T("top"),       y);
-        config->Write(_T("left"),      x);
+        config.WriteLong(_T("width"),     w);
+        config.WriteLong(_T("height"),    h);
+        config.WriteLong(_T("top"),       y);
+        config.WriteLong(_T("left"),      x);
     }
-    config->Write(_T("maximized"), IsMaximized());
+    config.WriteBool(_T("maximized"), IsMaximized());
 
-    config->SetPath(_T("/Grid"));
-    config->Write(_T("style"), m_gridCtrl->GetGridStyle());
-    config->Write(_T("fit"),   m_toolMgr.IsChecked(ID_ZOOM_FIT));
 
-    // Save config file
-    wxFileOutputStream file(GetConfigPath());
-    config->Save( file );
+    // Grid Settings
+    //--------------
+    config.SetPath(_T("/Grid"));
+
+    config.WriteLong(_T("style"), m_gridCtrl->GetGridStyle());
+    config.WriteBool(_T("fit"),   m_toolMgr.IsChecked(ID_ZOOM_FIT));
+    config.WriteFont(_T("font"),  m_gridCtrl->GetFont());
+    config.WriteColor(_T("focusedLetterColor"), m_gridCtrl->GetFocusedLetterColor());
+    config.WriteColor(_T("focusedWordColor"),   m_gridCtrl->GetFocusedWordColor());
+    config.WriteColor(_T("whiteSquareColor"),   m_gridCtrl->GetWhiteSquareColor());
+    config.WriteColor(_T("blackSquareColor"),   m_gridCtrl->GetBlackSquareColor());
+    config.WriteColor(_T("penColor"),           m_gridCtrl->GetPenColor());
+    config.WriteColor(_T("pencilColor"),        m_gridCtrl->GetPencilColor());
+    config.WriteLong(_T("numberScale"),         m_gridCtrl->GetNumberScale() * 100);
+    config.WriteLong(_T("letterScale"),         m_gridCtrl->GetLetterScale() * 100);
+
+
+    // Clue Panel
+    //-----------
+    config.SetPath(_T("/Clue"));
+    config.WriteColor(_T("headingForegroundColor"),
+        m_across->GetHeadingForeground() );
+    config.WriteColor(_T("headingBackgroundColor"),
+        m_across->GetHeadingBackground() );
+    config.WriteColor(_T("listForegroundColor"),
+        m_across->GetForegroundColour() );
+    config.WriteColor(_T("listBackgroundColor"),
+        m_across->GetBackgroundColour() );
+    config.WriteColor(_T("selectedForegroundColor"),
+        m_across->GetColor(CluePanel::FOCUSED, CluePanel::TEXT) );
+    config.WriteColor(_T("selectedBackgroundColor"),
+        m_across->GetColor(CluePanel::FOCUSED, CluePanel::BACKGROUND) );
+    config.WriteColor(_T("crossingForegroundColor"),
+        m_across->GetColor(CluePanel::CROSSING, CluePanel::TEXT) );
+    config.WriteColor(_T("crossingBackgroundColor"),
+        m_across->GetColor(CluePanel::CROSSING, CluePanel::BACKGROUND) );
+
+
+    // Layout
+    SaveLayout(_T("Default"));
 }
-
 
 //------------------------------------------------------------------------------
 // Menu and toolbar events
@@ -1061,7 +1167,11 @@ void
 MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
 {
     wxFileConfig * config = GetConfig();
-    wxArrayString arrayStr;
+    wxArrayString nameArray;
+    wxArrayString layoutArray;
+
+    nameArray.push_back(_T("(Current)"));
+    layoutArray.push_back(m_mgr.SavePerspective());
 
     // Enumerate all layouts
 
@@ -1073,14 +1183,25 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
     bool bCont = config->GetFirstEntry(str, dummy);
     while (bCont)
     {
-        arrayStr.Add(str);
+        nameArray.push_back(str);
+        layoutArray.push_back(config->Read(str, wxEmptyString));
+        wxLogDebug(_T("Layout %s = %s"), nameArray.back().c_str(), layoutArray.back().c_str());
+
+        // Make sure this isn't an empty entry
+        if (layoutArray.back() == wxEmptyString)
+        {
+            nameArray.pop_back();
+            layoutArray.pop_back();
+        }
+
         bCont = config->GetNextEntry(str, dummy);
     }
     config->SetPath(_T("/"));
 
+    wxASSERT(nameArray.size() == layoutArray.size());
 
     // Show the dialog
-    if (arrayStr.empty())
+    if (nameArray.size() == 1)
     {
         wxMessageBox(_T("No layouts found"),
                      _T("XWord Error"),
@@ -1089,14 +1210,15 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
     }
     else
     {
-        wxString oldLayout = m_mgr.SavePerspective();
         LayoutDialog dlg(this,
                          _T("Choose a layout"),
                          _T("Load Layout"),
-                         arrayStr);
+                         nameArray,
+                         layoutArray);
 
+        // If the dialog is canceled, load the previous layout
         if (dlg.ShowModal() != wxID_OK)
-            LoadLayoutString(oldLayout, true);
+            LoadLayoutString(layoutArray.front(), true);
     }
 }
 
@@ -1136,6 +1258,31 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
 }
 
 
+void
+MyFrame::OnOptions(wxCommandEvent & evt)
+{
+    SaveConfig();
+    if (m_propertiesDialog == NULL)
+    {
+        m_propertiesDialog = new PropertiesDialog(this);
+        m_propertiesDialog->Connect(wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED,
+                                    wxCommandEventHandler(MyFrame::OnPropertiesDialogCancel),
+                                    NULL, this);
+    }
+    m_propertiesDialog->Show();
+}
+
+
+void
+MyFrame::OnPropertiesDialogCancel(wxCommandEvent & evt)
+{
+    // Reload the config from the previously saved config
+    LoadConfig();
+    Refresh();
+
+    evt.Skip();
+}
+
 
 //------------------------------------------------------------------------------
 // XGridCtrl and CluePanel events
@@ -1146,15 +1293,18 @@ MyFrame::OnGridFocus(wxPuzEvent & evt)
 {
     // Update everything
 
-    m_across->SetClueNumber(evt.GetAcrossClue(),
-                            evt.GetDirection() == DIR_ACROSS);
-
-    m_down  ->SetClueNumber(evt.GetDownClue(),
-                            evt.GetDirection() == DIR_DOWN);
-
-    m_cluePrompt->SetLabel (evt.GetDirection() == DIR_ACROSS
-                          ? m_across->GetClueText()
-                          : m_down  ->GetClueText());
+    if (evt.GetDirection() == DIR_ACROSS)
+    {
+        m_across->SetClueNumber(evt.GetAcrossClue(), CluePanel::FOCUSED);
+        m_down  ->SetClueNumber(evt.GetDownClue(), CluePanel::CROSSING);
+        m_cluePrompt->SetLabel(m_across->GetClueText());
+    }
+    else
+    {
+        m_across->SetClueNumber(evt.GetAcrossClue(), CluePanel::CROSSING);
+        m_down  ->SetClueNumber(evt.GetDownClue(), CluePanel::FOCUSED);
+        m_cluePrompt->SetLabel(m_down->GetClueText());
+    }
 
     // We shouldn't need this if we're fast enough
     // m_cluePrompt->Update();
@@ -1168,13 +1318,16 @@ MyFrame::OnClueFocus(wxPuzEvent & evt)
 
     m_cluePrompt->SetLabel(evt.GetClueText());
 
-    int crossingClue = m_gridCtrl->GetFocusedSquare()
-        ->GetWordStart(! evt.GetDirection())->GetNumber();
+    const XSquare * crossingStart = m_gridCtrl->GetFocusedSquare()
+                                        ->GetWordStart(! evt.GetDirection());
+    const int crossingClue = (crossingStart == NULL ?
+                               0 :
+                               crossingStart->GetNumber());
 
     if (evt.GetDirection() == DIR_ACROSS)
-        m_down->  SetClueNumber(crossingClue, CROSSING_CLUE);
+        m_down->  SetClueNumber(crossingClue, CluePanel::CROSSING);
     else
-        m_across->SetClueNumber(crossingClue, CROSSING_CLUE);
+        m_across->SetClueNumber(crossingClue, CluePanel::CROSSING);
 }
 
 

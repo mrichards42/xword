@@ -301,7 +301,7 @@ TxtHandler::LoadVersion2Grid()
                 square->SetFlag(XFLAG_CIRCLE);
             ++str_it;
         }
-        wxASSERT(str_it = solution.end());
+        wxASSERT(str_it == solution.end());
     }
 
     // Set the grid's solution (including rebus)

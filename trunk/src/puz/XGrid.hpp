@@ -214,8 +214,9 @@ XGrid::FindNextSquare(XSquare * start,
                       bool skipBlack,
                       bool wrapLines)
 {
-    if (start == NULL)
+    if (start == NULL || (! wrapLines && start->IsLast(direction, increment)) )
         return NULL;
+
     return FindSquare(start->Next(direction, increment),
                       findFunc,
                       direction,
@@ -241,14 +242,14 @@ XGrid::FindSquare(XSquare * start,
          square != NULL;
          square = square->Next(direction, increment))
     {
-        if (   (! skipBlack && square->IsBlack())
-            || (! wrapLines && square->IsLast(direction, ! increment)) )
-        {
+        if (! skipBlack && square->IsBlack())
             break;
-        }
 
         if (findFunc(square))
             return square;
+
+        if (! wrapLines && square->IsLast(direction, increment))
+            break;
     }
 
     return NULL;

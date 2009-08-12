@@ -84,8 +84,17 @@ PuzHandler::DoLoad()
          square != NULL;
          square = square->Next())
     {
-        square->SetSolution(static_cast<wxChar>(*sol_it++));
-        square->SetText    (static_cast<wxChar>(*text_it++));
+        square->SetSolution(static_cast<wxChar>(*sol_it));
+        if (*text_it == _T('-'))
+            square->SetText(_T(""));
+        else
+        {
+            square->SetText    (static_cast<wxChar>(*text_it));
+            if (wxIslower(*text_it))
+                square->AddFlag(XFLAG_PENCIL);
+        }
+        ++text_it;
+        ++sol_it;
     }
     wxASSERT(sol_it == solution.end() && text_it == gridText.end());
 

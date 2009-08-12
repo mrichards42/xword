@@ -36,8 +36,6 @@
 #include "puz/XGrid.hpp"
 #include "defs.hpp"
 
-class wxPuzEvent;
-
 
 // For checking grid squares
 enum
@@ -77,20 +75,29 @@ enum GridStyle
 };
 
 
-// Colors
-enum SquareColor
-{
-    WHITE_SQUARE  = 0,
-    LETTER_SQUARE = 1,
-    WORD_SQUARE   = 2
-};
-
 
 extern const wxChar * XGridCtrlNameStr;
+
+class XGridRebusHandler;
 
 class XGridCtrl
     : public wxScrolledWindow
 {
+    friend class XGridRebusHandler;
+public: // Enums
+    // Colors
+    enum Color
+    {
+        WHITE = 0,
+        BLACK,
+        LETTER,
+        WORD,
+
+        PEN,
+        PENCIL,
+        COLOR_COUNT
+    };
+
 public:
     XGridCtrl() { Init(); }
 
@@ -123,6 +130,7 @@ public:
     void SetXGrid(XGrid * grid);
           XGrid * GetXGrid()       { return m_grid; }
     const XGrid * GetXGrid() const { return m_grid; }
+    bool IsEmpty() const { return m_grid == NULL || m_grid->IsEmpty(); }
 
     void RecheckGrid();
 
@@ -150,7 +158,22 @@ public:
     void RefreshSquare(XSquare & square)
         { wxClientDC dc(this); DoPrepareDC(dc); RefreshSquare(dc, square); }
 
-    void SetSquareText(XSquare & square, const wxString & text = _T('-'));
+    void RefreshSquare() { wxASSERT(m_focusedSquare != NULL); RefreshSquare(*m_focusedSquare); }
+
+    void RefreshWord()
+    {
+        wxClientDC dc(this);
+        DoPrepareDC(dc);
+        wxASSERT(m_focusedStart != NULL && m_focusedEnd != NULL);
+        for (XSquare * square = m_focusedStart;
+             square != m_focusedEnd->Next(m_direction);
+             square = square->Next(m_direction))
+        {
+            DrawSquare(dc, *square);
+        }
+    }
+
+    void SetSquareText(XSquare & square, const wxString & text = _T(""));
 
     XSquare * GetFocusedSquare() { return m_focusedSquare; }
 
@@ -164,15 +187,25 @@ public:
     void SetNumberFont(const wxFont & font);
 
     // Colors
-    void SetColors(const wxColor & square,
-                   const wxColor & focus,
-                   const wxColor & word);
-    void SetSquareColor(const wxColor & color)
-        { m_colors[WHITE_SQUARE]  = color; }
-    void SetFocusColor(const wxColor & color)
-        { m_colors[LETTER_SQUARE] = color; }
-    void SetWordColor(const wxColor & color)  
-        { m_colors[WORD_SQUARE]   = color; }
+    void SetFocusedLetterColor(const wxColor & color)
+        { m_colors[LETTER]  = color; if (! IsEmpty()) RefreshSquare();}
+    void SetFocusedWordColor(const wxColor & color)
+        { m_colors[WORD] = color; if (! IsEmpty()) RefreshWord(); }
+    void SetWhiteSquareColor(const wxColor & color)  
+        { m_colors[WHITE]   = color; if (! IsEmpty()) Refresh();}
+    void SetBlackSquareColor(const wxColor & color)  
+        { m_colors[BLACK]   = color; if (! IsEmpty()) Refresh();}
+    void SetPenColor(const wxColor & color)
+        { m_colors[PEN]  = color; if (! IsEmpty()) Refresh(); }
+    void SetPencilColor(const wxColor & color)
+        { m_colors[PENCIL] = color; if (! IsEmpty()) Refresh(); }
+
+    const wxColor & GetFocusedLetterColor() const { return m_colors[LETTER]; }
+    const wxColor & GetFocusedWordColor()   const { return m_colors[WORD]; }
+    const wxColor & GetWhiteSquareColor()   const { return m_colors[WHITE]; }
+    const wxColor & GetBlackSquareColor()   const { return m_colors[BLACK]; }
+    const wxColor & GetPenColor()           const { return m_colors[PEN]; }
+    const wxColor & GetPencilColor()        const { return m_colors[PENCIL]; }
 
     // Sizes
     wxSize GetBestSize() const;
@@ -201,12 +234,17 @@ public:
     void ZoomOut(double factor = 1.1) { ZoomIn(1/factor); }
 
     // Square/border size
-    int  GetSquareSize()            { return m_boxSize + m_borderSize; }
-    void SetBorderSize(size_t size) { m_borderSize = size; Scale(); Refresh(); }
-    int  GetBorderSize() const      { return m_borderSize; }
+    int   GetSquareSize()             { return m_boxSize + m_borderSize; }
+    void  SetBorderSize(size_t size)  { m_borderSize = size; Scale(); Refresh(); }
+    int   GetBorderSize()  const      { return m_borderSize; }
 
-    int GetNumberHeight() const { return m_boxSize * m_numScale; }
-    int GetTextHeight()   const { return m_boxSize * m_textScale; }
+    void  SetNumberScale(float scale) { m_numberScale = scale; }
+    void  SetLetterScale(float scale) { m_letterScale = scale; }
+    float GetNumberScale() const      { return m_numberScale; }
+    float GetLetterScale() const      { return m_letterScale; }
+
+    int GetNumberHeight() const   { return m_boxSize * m_numberScale; }
+    int GetLetterHeight() const   { return m_boxSize * m_letterScale; }
 
     // Style
     void SetGridStyle(int style)
@@ -271,7 +309,7 @@ protected:
     // Scaling functions and members
     void OnSize(wxSizeEvent & evt);
     void Scale(double factor = 1.0);
-    void ScaleFont(wxFont * font, int desiredHeight);
+    void ScaleFont(wxFont * font, int width, int height);
 
     wxRect m_rect;              // Overall grid size
     int m_borderSize;           // Border between squares
@@ -280,9 +318,9 @@ protected:
     bool m_fit;                 // Fit the grid to the window?
 
     wxFont m_numberFont;
-    wxFont m_letterFont;
-    float m_numScale;
-    float m_textScale;
+    wxFont m_letterFont[8];  // Cache fonts for all rebus lengths
+    float m_numberScale;
+    float m_letterScale;
 
     // Pointer to puzzle data
     XGrid * m_grid;
@@ -300,28 +338,30 @@ protected:
     int m_incorrectSquares;
 
     // Square colors
-    wxColor m_colors[3];
+    wxColor m_colors[COLOR_COUNT];
 
     // Rebus
     bool m_wantsRebus;
 
 private:
     // Events
-    void OnClueFocus  (wxPuzEvent & evt);
+    void ConnectEvents();
+    void DisconnectEvents();
 
-    void OnLeftDown   (wxMouseEvent & evt);
-    void OnRightDown  (wxMouseEvent & evt);
-    void OnKeyDown    (wxKeyEvent & evt);
-    void OnChar       (wxKeyEvent & evt);
+    void OnLeftDown    (wxMouseEvent & evt);
+    void OnRightDown   (wxMouseEvent & evt);
+    void OnKeyDown     (wxKeyEvent & evt);
+    void OnChar        (wxKeyEvent & evt);
 
-    void OnLetter     (wxChar key, int mod);
-    void OnArrow      (bool arrowDirection, bool increment, int mod);
-    void OnTab        (int mod);
-    void OnHome       (int mod);
-    void OnEnd        (int mod);
-    void OnBackspace  (int mod);
-    void OnDelete     (int mod);
-    void OnInsert     (int mod);
+    void OnLetter      (wxChar key, int mod);
+    void MoveAfterLetter();
+    void OnArrow       (bool arrowDirection, bool increment, int mod);
+    void OnTab         (int mod);
+    void OnHome        (int mod);
+    void OnEnd         (int mod);
+    void OnBackspace   (int mod);
+    void OnDelete      (int mod);
+    void OnInsert      (int mod);
 
     DECLARE_EVENT_TABLE()
     DECLARE_NO_COPY_CLASS(XGridCtrl)
@@ -338,25 +378,13 @@ private:
 // Inline functions
 //---------------------------------------------------------------------
 
-// Colors
-inline void
-XGridCtrl::SetColors(const wxColor & square,
-                    const wxColor & focus,
-                    const wxColor & word)
-{
-    SetSquareColor(square);
-    SetFocusColor(focus);
-    SetWordColor(word);
-}
-
-
-
 // Fonts
 inline bool
 XGridCtrl::SetFont(const wxFont & font)
 {
     SetNumberFont(font);
     SetLetterFont(font);
+    Refresh();
     return wxScrolledWindow::SetFont(font);
 }
 
@@ -364,14 +392,31 @@ inline void
 XGridCtrl::SetNumberFont(const wxFont & font)
 {
     m_numberFont = font;
-    ScaleFont(&m_numberFont, GetNumberHeight());
+    ScaleFont(&m_numberFont, -1, GetNumberHeight());
 }
 
 inline void
 XGridCtrl::SetLetterFont(const wxFont & font)
 {
-    m_letterFont = font;
-    ScaleFont(&m_letterFont, GetTextHeight());
+    // 1 letter
+    m_letterFont[0] = font;
+    ScaleFont(&m_letterFont[0], -1, GetLetterHeight());
+
+    // 2-3 letters
+    m_letterFont[1] = m_letterFont[0];
+    ScaleFont(&m_letterFont[1], GetSquareSize() / 4, GetLetterHeight());
+    m_letterFont[2] = m_letterFont[1];
+
+    // 4-5 letters
+    m_letterFont[3] = m_letterFont[2];
+    ScaleFont(&m_letterFont[3], GetSquareSize() / 6, GetLetterHeight());
+    m_letterFont[4] = m_letterFont[3];
+
+    // 6+ (6-8) letters
+    m_letterFont[5] = m_letterFont[4];
+    ScaleFont(&m_letterFont[5], GetSquareSize() / 8, GetLetterHeight());
+    m_letterFont[6] = m_letterFont[5];
+    m_letterFont[7] = m_letterFont[6];
 }
 
 

@@ -92,7 +92,7 @@ XSquare::InitCharTable()
 
     // Other possible values
     sm_charTable[_T('.')] = '.';
-    sm_charTable[_T('-')] = '-';
+    sm_charTable[_T('')]  = '-';
 }
 
 

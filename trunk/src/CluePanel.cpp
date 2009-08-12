@@ -49,49 +49,40 @@ CluePanel::Create(wxWindow* parent,
                                  wxID_ANY,
                                  heading,
                                  wxDefaultPosition,
-                                 wxSize(100,40),
-                                 wxST_NO_AUTORESIZE);
+                                 wxDefaultSize,
+                                 wxST_NO_AUTORESIZE | wxBORDER_DOUBLE);
 
     m_clueList = new ClueListBox(this, wxID_ANY);
 
     // Setup fonts and colors
-    wxFont clueHeadingFont(15,
-                           wxFONTFAMILY_SWISS,
-                           wxFONTSTYLE_NORMAL,
-                           wxFONTWEIGHT_NORMAL);
-
-    wxFont clueListFont(12,
-                        wxFONTFAMILY_SWISS,
-                        wxFONTSTYLE_NORMAL,
-                        wxFONTWEIGHT_NORMAL);
+    wxFont clueHeadingFont = *wxSWISS_FONT;
+    clueHeadingFont.SetPointSize(14);
 
     // Default colors and fonts
-    m_heading->SetForegroundColour(*wxWHITE);
-    m_heading->SetBackgroundColour(*wxBLUE);
     m_heading->SetFont(clueHeadingFont);
 
-    m_clueList->SetFont(clueListFont);
+    m_clueList->SetFont(*wxSWISS_FONT);
 
 
     // Colors
-    m_colors[FOCUSED_CLUE][TEXT_COLOR] =
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
+    SetColor(FOCUSED, TEXT, 
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
 
-    m_colors[FOCUSED_CLUE][BACKGROUND_COLOR] = 
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+    SetColor(FOCUSED, BACKGROUND, 
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
 
-    m_colors[CROSSING_CLUE][TEXT_COLOR] =
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+    SetColor(CROSSING, TEXT,
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
 
-    m_colors[CROSSING_CLUE][BACKGROUND_COLOR] = 
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
+    SetColor(CROSSING, BACKGROUND,
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
 
 
     m_clueList->SetSelectionForeground(
-        m_colors[FOCUSED_CLUE][TEXT_COLOR] );
+        GetColor(FOCUSED, TEXT) );
 
     m_clueList->SetSelectionBackground(
-        m_colors[FOCUSED_CLUE][BACKGROUND_COLOR] );
+        GetColor(FOCUSED, BACKGROUND) );
 
     // Layout
     wxSizer * sizer = new wxBoxSizer(wxVERTICAL);
@@ -112,10 +103,10 @@ CluePanel::OnClueSelect(wxCommandEvent & evt)
     const XPuzzle::Clue & clue = m_clueList->GetItem(evt.GetSelection());
 
     m_clueList->SetSelectionForeground(
-        m_colors[FOCUSED_CLUE][TEXT_COLOR] );
+        GetColor(FOCUSED, TEXT) );
 
     m_clueList->SetSelectionBackground(
-        m_colors[FOCUSED_CLUE][BACKGROUND_COLOR] );
+        GetColor(FOCUSED, BACKGROUND) );
 
 
     wxPuzEvent puzEvt   (wxEVT_PUZ_CLUE_FOCUS, GetId());

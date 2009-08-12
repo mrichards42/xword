@@ -108,7 +108,7 @@ public:
     //--------------------
     bool IsWhite()      const { return ! IsBlack(); }
     bool IsBlack()      const { return m_solution == _T("."); }
-    bool IsBlank()      const { return m_text == _T("-"); }
+    bool IsBlank()      const { return m_text.empty(); }
 
 
     // Text
@@ -269,7 +269,7 @@ void
 XSquare::SetPlainSolution(wxChar solution)
 {
     // Valid characters for the plain solution
-    wxASSERT(wxIsupper(solution) || solution == _T('.') || solution == _T('-'));
+    wxASSERT(wxIsupper(solution) || solution == _T('.'));
     m_asciiSolution = solution;
 }
 
@@ -278,7 +278,7 @@ inline
 bool
 XSquare::Check(bool checkBlank)  const
 {
-    wxASSERT(! m_text.empty() && ! m_solution.empty());
+    wxASSERT(! m_solution.empty());
     if (IsBlack())
         return true;
     if (IsBlank())
@@ -300,7 +300,6 @@ inline
 bool
 XSquare::HasTextRebus() const
 {
-    wxASSERT(! m_text.empty());
     return ! m_text.IsSameAs( static_cast<wxChar>(GetPlainText()) );
 }
 

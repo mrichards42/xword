@@ -212,8 +212,9 @@ XGrid::SetupGrid()
         }
         else
         {
-            if (square->m_text.empty())
-                square->m_text = _T("-");
+            wxASSERT(square->m_text != _T("-"));
+            if (square->m_text == _T("-"))
+                square->m_text = _T("");
 
             // Run everything in across and down directions
             for (bool direction = false; ; direction = !direction)

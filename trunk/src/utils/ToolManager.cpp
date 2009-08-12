@@ -305,9 +305,19 @@ ToolManager::Add(wxToolBar * tb, int id, int iconSize)
 
     ToolInfo * tool = GetTool(id);
 
+    const wxBitmap toolBmp = GetBitmap(tool, iconSize);
+    // We can't add a tool to a toolbar without a bitmap
+    if (! toolBmp.IsOk())
+    {
+        wxLogError(_T("Image missing for tool \"%s\".  ")
+                   _T("Tool will not be available on the toolbar"),
+                   tool->GetLabelText().c_str());
+        return NULL;
+    }
+
     wxToolBarToolBase * item = tb->AddTool(tool->GetId(),
                                            tool->GetLabelText(),
-                                           GetBitmap(tool, iconSize),
+                                           toolBmp,
                                            wxNullBitmap,
                                            tool->GetKind(),
                                            tool->GetLabelText(),
@@ -333,9 +343,19 @@ ToolManager::Add(wxAuiToolBar * tb, int id, int iconSize)
 
     ToolInfo * tool = GetTool(id);
 
+    const wxBitmap toolBmp = GetBitmap(tool, iconSize);
+    // We can't add a tool to a toolbar without a bitmap
+    if (! toolBmp.IsOk())
+    {
+        wxLogError(_T("Image missing for tool \"%s\".  ")
+                   _T("Tool will not be available on the toolbar"),
+                   tool->GetLabelText().c_str());
+        return;
+    }
+
     tb->AddTool(tool->GetId(),
                 tool->GetLabelText(),
-                GetBitmap(tool, iconSize),
+                toolBmp,
                 tool->GetHelpString(),
                 tool->GetKind());
 
@@ -397,10 +417,20 @@ ToolManager::Insert(wxToolBar * tb, int id, size_t pos, int iconSize)
 
     ToolInfo * tool = GetTool(id);
 
+    const wxBitmap toolBmp = GetBitmap(tool, iconSize);
+    // We can't add a tool to a toolbar without a bitmap
+    if (! toolBmp.IsOk())
+    {
+        wxLogError(_T("Image missing for tool \"%s\".  ")
+                   _T("Tool will not be available on the toolbar"),
+                   tool->GetLabelText().c_str());
+        return NULL;
+    }
+
     wxToolBarToolBase * item = tb->InsertTool(pos,
                                               tool->GetId(),
                                               tool->GetLabelText(),
-                                              GetBitmap(tool, iconSize),
+                                              toolBmp,
                                               wxNullBitmap,
                                               tool->GetKind(),
                                               tool->GetHelpString());

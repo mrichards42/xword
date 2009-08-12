@@ -26,6 +26,8 @@
 
 class MyFrame;
 
+#include "utils/ConfigManager.hpp"
+
 class MyApp : public wxApp
 {
     friend class MyFrame; // So we can set m_frame to NULL when it is deleted
@@ -34,16 +36,24 @@ public:
     virtual bool ReadCommandLine();
 
     // return code = number of unsuccessful conversions
-    virtual int  OnRun() { wxApp::OnRun(); return m_retCode; }
+    virtual int OnRun() { wxApp::OnRun(); return m_retCode; }
+
+    virtual int OnExit();
 
     // Get and set global data from the whole app
     int  GetReturnCode()  const  { return m_retCode; }
     void SetReturnCode(int code) { m_retCode = code; }
 
+    ConfigManager & GetConfigManager() { return m_config; }
+    wxString GetConfigPath();
+
 private:
     void OnActivate(wxActivateEvent & evt);
 
+    void SetupConfig();
+
     MyFrame * m_frame;
+    ConfigManager m_config;
     int m_retCode;
     bool m_isTimerRunning;
 
