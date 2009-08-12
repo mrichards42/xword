@@ -29,7 +29,13 @@ IMPLEMENT_DYNAMIC_CLASS(ClueListBox, wxOwnerDrawnListBox<XPuzzle::Clue>)
 bool
 ClueListBox::Create(wxWindow * parent, wxWindowID id)
 {
-    return parent_t::Create(parent, id);
+    if (! parent_t::Create(parent, id))
+        return false;
+
+    // Connect the single event here so we don't need the event macros
+    Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(ClueListBox::OnLeftDown));
+
+    return true;
 }
 
 
@@ -37,8 +43,10 @@ void
 ClueListBox::SetClueNumber(unsigned int number)
 {
     int index = FindClue(number);
-    if (index != -1) {
-        SetSelection(index);
+    wxASSERT(index != wxNOT_FOUND || number == 0);
+    SetSelection(index);
+    if (index != wxNOT_FOUND)
+    {
         RefreshLine(index);
         //Update(); // We shouldn't really need this
     }
@@ -58,13 +66,13 @@ ClueListBox::FindClue(unsigned int number) const
             return num;
         ++num;
     }
-    return -1;
+    return wxNOT_FOUND;
 }
 
 
-//----------------------------------------------------
+//------------------------------------------------------------------------------
 // Drawing functions
-//----------------------------------------------------
+//------------------------------------------------------------------------------
 
 void
 ClueListBox::OnDrawBackground(wxDC & dc, const wxRect & rect, size_t n) const
@@ -162,4 +170,23 @@ ClueListBox::CalculateNumberWidth()
         m_numWidth = max_width;
         InvalidateCache();
     }
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Selection handling
+//------------------------------------------------------------------------------
+
+// This is here in order to hijack wxVListBox's selection model.  Trick the 
+// wxVListBox into thinking that there is no selection so that an event
+// is fired every time an item is clicked.  This allows the color change to
+// work correctly -- otherwise if the crossing clue were clicked, no event
+// would be fired, since the selection didn't change.
+void
+ClueListBox::OnLeftDown(wxMouseEvent & evt)
+{
+    DoSetCurrent(wxNOT_FOUND);
+    evt.Skip();
 }

@@ -40,13 +40,13 @@ class ClueListBox;
 class SizedText;
 class CluePanel;
 class LayoutDialog;
+class PropertiesDialog;
 
 #include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
 
 
 #include "utils/ToolManager.hpp"
-
 
 // Config headers
 #include <wx/wfstream.h>    // for wxFileInputStream and wxFileOutputStream
@@ -65,6 +65,7 @@ class LayoutDialog;
 
 class MyFrame : public wxFrame
 {
+    friend class PropertiesDialog;
 public:
     MyFrame();
     ~MyFrame();
@@ -181,10 +182,12 @@ private:
 
     // Config
     //-------
-    wxString GetConfigPath();
     void LoadConfig();
     void SaveConfig();
+
     wxFileConfig * GetConfig();
+
+    PropertiesDialog * m_propertiesDialog;
 
 
 private:
@@ -233,6 +236,10 @@ private:
     void OnTimer      (wxCommandEvent & WXUNUSED(evt));
     void OnTimerNotify(wxTimerEvent   & WXUNUSED(evt));
 
+    // Config
+    void OnOptions    (wxCommandEvent & WXUNUSED(evt));
+    void OnPropertiesDialogCancel(wxCommandEvent & evt);
+
 
     // XGridCtrl and CluePanel events
     //------------------------------
@@ -271,16 +278,6 @@ private:
 
 // Config
 //-------
-
-inline
-wxString
-MyFrame::GetConfigPath()
-{
-    wxString file = wxPathOnly(wxString(wxTheApp->argv[0]));
-    file << wxFileName::GetPathSeparator() << _T("config.ini");
-    return file;
-}
-
 
 inline
 wxFileConfig *

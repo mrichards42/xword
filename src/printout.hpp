@@ -1,4 +1,4 @@
-// This file is part of XWord
+// This file is part of XWord    
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -15,15 +15,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include <wx/print.h>
 
-#ifndef MY_WRAP_H
-#define MY_WRAP_H
+class MyPrintout : public wxPrintout
+{
+public:
+    bool HasPage(int pageNum) { return pageNum == 1; }
 
-#include <wx/string.h>
-class wxWindow;
-class wxFont;
+    void GetPageInfo(int *minPage, int *maxPage, int *pageFrom, int *pageTo)
+        { *minPage = 1; *maxPage = 1; *pageFrom = 1; *pageTo = 1; }
 
-wxString Wrap          (const wxWindow * window, const wxString & str, int maxWidth, const wxFont * font = NULL);
-wxString WrapIntoLines (const wxWindow * window, const wxString & str, int lines,    const wxFont * font = NULL);
-
-#endif // MY_WRAP_H
+    void OnPrintPage(int pageNum);
+};

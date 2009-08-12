@@ -40,24 +40,27 @@ public:
     LayoutDialog(MyFrame * frame,
                  const wxString & message,
                  const wxString & caption,
-                 const wxArrayString & choices)
+                 const wxArrayString & choices,
+                 const wxArrayString & layouts)
         : wxSingleChoiceDialog(frame, message, caption, choices),
-          m_frame(frame)
+          m_frame(frame),
+          m_layouts(layouts)
     {
-        Connect( wxEVT_COMMAND_LISTBOX_SELECTED,
-                 wxCommandEventHandler(LayoutDialog::OnSelect) );
+        wxASSERT(choices.size() == layouts.size());
     }
 
     ~LayoutDialog() {}
 
 protected:
-    void OnSelect(wxCommandEvent & WXUNUSED(evt))
+    void OnSelect(wxCommandEvent & evt)
     {
-        m_frame->LoadLayout(m_listbox->GetStringSelection(), true);
+        m_frame->LoadLayoutString(m_layouts[evt.GetSelection()], true);
     }
 
     // Keep a pointer to the frame so we can dynamically update it.
     MyFrame * m_frame;
+
+    wxArrayString m_layouts;
 
     DECLARE_EVENT_TABLE()
 };

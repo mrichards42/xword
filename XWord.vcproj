@@ -401,6 +401,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\utils\ConfigManager.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\utils\DragAndDrop.hpp"
 					>
 				</File>
@@ -493,13 +497,29 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\src\dialogs\PerspectiveDlg.hpp"
+					RelativePath=".\src\dialogs\Layout.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\dialogs\Properties.hpp"
 					>
 				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				>
+			</Filter>
+			<Filter
+				Name="formbuilder"
+				>
+				<File
+					RelativePath=".\src\dialogs\formbuilder\Properties.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\dialogs\formbuilder\Properties.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

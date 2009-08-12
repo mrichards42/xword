@@ -66,6 +66,10 @@ public:
     void SetClueNumber(unsigned int number);
 
     bool SetFont(const wxFont & font);
+    bool SetBackgroundColour(const wxColour & color);
+    bool SetForegroundColour(const wxColour & color);
+    void SetSelectionBackground(const wxColour & color);
+    void SetSelectionForeground(const wxColour & color);
 
 protected:
     void Init() { SetMargins(5, 5); m_numWidth = -1; }
@@ -92,6 +96,10 @@ protected:
         parent_t::OnUpdateCount();
     }
 
+    // Reset the current selection on left clicks so that an select event is
+    // always fired.
+    void OnLeftDown(wxMouseEvent & evt);
+
     DECLARE_CACHED_ITEM_2(m_cachedClues, wxEmptyString,
                           m_numWidths, -1,
                           parent_t)
@@ -101,15 +109,51 @@ protected:
 };
 
 
-
-
 inline bool
 ClueListBox::SetFont(const wxFont & font)
 {
-    bool ret = parent_t::SetFont(font);
+    const bool ret = parent_t::SetFont(font);
     InvalidateCache();
+    Refresh();
     return ret;
 }
+
+inline bool
+ClueListBox::SetBackgroundColour(const wxColour & color)
+{
+    InvalidateCache();
+    const bool ret = parent_t::SetBackgroundColour(color);
+    Refresh();
+    return ret;
+}
+
+inline bool
+ClueListBox::SetForegroundColour(const wxColour & color)
+{
+    InvalidateCache();
+    const bool ret = parent_t::SetForegroundColour(color);
+    Refresh();
+    return ret;
+}
+
+inline void
+ClueListBox::SetSelectionBackground(const wxColour & color)
+{
+    parent_t::SetSelectionBackground(color);
+    const int selection = GetSelection();
+    if (selection != wxNOT_FOUND)
+        RefreshLine(selection);
+}
+
+inline void
+ClueListBox::SetSelectionForeground(const wxColour & color)
+{
+    parent_t::SetSelectionForeground(color);
+    const int selection = GetSelection();
+    if (selection != wxNOT_FOUND)
+        RefreshLine(selection);
+}
+
 
 
 #endif // CLUE_LIST_BOX_H

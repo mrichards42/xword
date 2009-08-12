@@ -24,7 +24,6 @@
 
 #include <cstdlib> // srand()
 #include <ctime>   // time()
-#include <iostream> // In case we need to direct output to std::cout
 
 IMPLEMENT_APP(MyApp)
 
@@ -78,7 +77,22 @@ MyApp::OnInit()
     // Seed random number generator (for grid scrambling)
     srand( time(NULL) );
 
+    SetupConfig();
+
     return ReadCommandLine();
+}
+
+
+int
+MyApp::OnExit()
+{    
+    // Save config file
+    wxFileOutputStream file(GetConfigPath());
+    wxFileConfig * config = dynamic_cast<wxFileConfig*>(wxFileConfig::Get());
+    wxASSERT(config != NULL);
+    config->Save( file );
+
+    return wxApp::OnExit();
 }
 
 
@@ -194,6 +208,97 @@ MyApp::ReadCommandLine()
 
     return true;
 }
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Config
+//------------------------------------------------------------------------------
+
+wxString
+MyApp::GetConfigPath()
+{
+    // Look in several locations for the config file (order is preserved)
+    wxPathList paths;
+
+    paths.EnsureFileAccessible(wxString(wxTheApp->argv[0]));
+    paths.Add(wxStandardPaths::Get().GetUserConfigDir());
+    paths.Add(wxStandardPaths::Get().GetUserDataDir());
+    paths.Add(wxStandardPaths::Get().GetDataDir());
+
+    wxString filename = paths.FindAbsoluteValidPath(_T("config.ini"));
+
+    // If there is no config file, put it in the same directory as the executable
+    if (filename.empty())
+        filename = wxPathOnly(wxTheApp->argv[0]) +
+                   wxFileName::GetPathSeparator() +
+                   _T("config.ini");
+
+    return filename;
+}
+
+
+
+void
+MyApp::SetupConfig()
+{
+    const wxString configPath = GetConfigPath();
+    wxLogDebug(_T("Config file: %s"), configPath.c_str());
+
+    // Create a blank file it it doesn't exist
+    if (! wxFileName::FileExists(configPath))
+        wxFile(configPath, wxFile::write);
+
+    // Setup wxFileConfig
+    wxFileInputStream file(configPath);
+    wxFileConfig::Set( new wxFileConfig(file) );
+
+    m_config.SetConfig(wxFileConfig::Get());
+
+    // Window size/position defaults
+    m_config.SetPath(_T("/Window"));
+    m_config.AddLong(_T("top"),       20);
+    m_config.AddLong(_T("left"),      20);
+    m_config.AddLong(_T("width"),     500);
+    m_config.AddLong(_T("height"),    500);
+    m_config.AddBool(_T("maximized"), false);
+
+    // Grid style, fonts, and colors
+    m_config.SetPath(_T("/Grid"));
+    m_config.AddBool(_T("fit"),       false);
+    m_config.AddLong(_T("style"),     DEFAULT_GRID_STYLE);
+    m_config.AddFont(_T("font"),      *wxSWISS_FONT);
+    m_config.AddColor(_T("focusedLetterColor"),     *wxGREEN);
+    m_config.AddColor(_T("focusedWordColor"),       *wxLIGHT_GREY);
+    m_config.AddColor(_T("whiteSquareColor"),       *wxWHITE);
+    m_config.AddColor(_T("blackSquareColor"),       *wxBLACK);
+    m_config.AddColor(_T("penColor"),               *wxBLACK);
+    m_config.AddColor(_T("pencilColor"),            wxColor(200,200,200));
+    m_config.AddLong(_T("numberScale"),             42);
+    m_config.AddLong(_T("letterScale"),             75);
+
+    // Clue box
+    //---------
+    m_config.SetPath(_T("/Clue"));
+    m_config.AddFont(_T("font"),      *wxSWISS_FONT);
+    m_config.AddColor(_T("headingForegroundColor"),
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
+    m_config.AddColor(_T("headingBackgroundColor"),
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
+    m_config.AddColor(_T("listForegroundColor"),        *wxBLACK);
+    m_config.AddColor(_T("listBackgroundColor"),        *wxWHITE);
+    m_config.AddColor(_T("selectedForegroundColor"),
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
+    m_config.AddColor(_T("selectedBackgroundColor"),
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
+    m_config.AddColor(_T("crossingForegroundColor"),
+        m_config.GetDefaultColor(_T("selectedBackgroundColor")));
+    m_config.AddColor(_T("crossingBackgroundColor"),
+        m_config.GetDefaultColor(_T("selectedForegroundColor")));
+}
+
 
 
 // Handle timer starting and stopping logic
