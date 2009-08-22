@@ -123,22 +123,30 @@ protected:
         { SetClueListColor(evt, &CluePanel::SetForegroundColour); }
 
 	virtual void OnSelectedClueBackgroundColor( wxColourPickerEvent& evt )
-        { SetClueListColor(evt, &CluePanel::SetSelectedBackgroundColour); }
+        { SetClueListColor(evt, &CluePanel::SetSelectionBackground); }
 
 	virtual void OnSelectedClueTextColor( wxColourPickerEvent& evt )
-        { SetClueListColor(evt, &CluePanel::SetSelectedForegroundColour); }
+        { SetClueListColor(evt, &CluePanel::SetSelectionForeground); }
 
 	virtual void OnCrossingClueBackgroundColor( wxColourPickerEvent& evt )
-        { SetClueListColor(evt, &CluePanel::SetCrossingBackgroundColour); }
+        { SetClueListColor(evt, &CluePanel::SetCrossingBackground); }
 
 	virtual void OnCrossingClueTextColor( wxColourPickerEvent& evt )
-        { SetClueListColor(evt, &CluePanel::SetCrossingForegroundColour); }
+        { SetClueListColor(evt, &CluePanel::SetCrossingForeground); }
 
+	virtual void OnClueHeadingTextColor( wxColourPickerEvent& evt )
+        { SetClueListColor(evt, &CluePanel::SetHeadingForeground); }
+
+	virtual void OnClueHeadingBackgroundColor( wxColourPickerEvent& evt )
+        { SetClueListColor(evt, &CluePanel::SetHeadingBackground); }
 
     // Fonts
     //------
 	virtual void OnGridFont( wxFontPickerEvent& evt )
         { m_frame->m_gridCtrl->SetFont(evt.GetFont()); evt.Skip(); }
+
+	virtual void OnCluePromptFont( wxFontPickerEvent& evt )
+        { m_frame->m_cluePrompt->SetFont(evt.GetFont()); evt.Skip(); }
 
 	virtual void OnClueFont( wxFontPickerEvent& evt )
     {
@@ -147,8 +155,12 @@ protected:
         evt.Skip();
     }
 
-	virtual void OnCluePromptFont( wxFontPickerEvent& evt )
-        { m_frame->m_cluePrompt->SetFont(evt.GetFont()); evt.Skip(); }
+	virtual void OnClueHeadingFont( wxFontPickerEvent& evt )
+    {
+        m_frame->m_across->SetHeadingFont(evt.GetFont());
+        m_frame->m_down->SetHeadingFont(evt.GetFont());
+        evt.Skip();
+    }
 };
 
 
@@ -187,11 +199,12 @@ PropertiesDialog::LoadCurrentState()
 
     m_clueBackground        ->SetColour(m_frame->m_across->GetBackgroundColour());
     m_clueText              ->SetColour(m_frame->m_across->GetForegroundColour());
-    m_selectedClueBackground->SetColour(m_frame->m_across->GetSelectedBackgroundColour());
-    m_selectedClueText      ->SetColour(m_frame->m_across->GetSelectedForegroundColour());
-    m_crossingClueBackground->SetColour(m_frame->m_across->GetCrossingBackgroundColour());
-    m_crossingClueText      ->SetColour(m_frame->m_across->GetCrossingForegroundColour());
-
+    m_selectedClueBackground->SetColour(m_frame->m_across->GetSelectionBackground());
+    m_selectedClueText      ->SetColour(m_frame->m_across->GetSelectionForeground());
+    m_crossingClueBackground->SetColour(m_frame->m_across->GetCrossingBackground());
+    m_crossingClueText      ->SetColour(m_frame->m_across->GetCrossingForeground());
+    m_clueHeadingBackground  ->SetColour(m_frame->m_across->GetHeadingBackground());
+    m_clueHeadingText       ->SetColour(m_frame->m_across->GetHeadingForeground());
 
     // Fonts
     m_gridFont      ->SetSelectedFont(m_frame->m_gridCtrl->GetFont());

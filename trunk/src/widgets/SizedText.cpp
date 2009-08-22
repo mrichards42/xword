@@ -41,6 +41,8 @@ SizedText::Create(wxWindow * parent,
                             wxDefaultValidator,
                             name))
         return false;
+
+//    SetAlign(style & wxALIGN_MASK);
     SetLabel(label);
     return true;
 }

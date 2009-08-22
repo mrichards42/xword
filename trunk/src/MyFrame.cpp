@@ -16,7 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "MyFrame.hpp"
-#include <boost/foreach.hpp>
+#include "paths.hpp"
 
 #include "App.hpp" // To notify that frame has been destroyed
 
@@ -149,14 +149,14 @@ static const ToolDesc toolDesc[] =
 {
     { ID_OPEN,  wxITEM_NORMAL, _T("&Open\tCtrl+O"), _T("open") },
     { ID_SAVE,  wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
-    { ID_SAVE_AS,  wxITEM_NORMAL, _T("&Save AS..."), _T("save") },
+    { ID_SAVE_AS,  wxITEM_NORMAL, _T("&Save As..."), _T("save") },
     { ID_CLOSE, wxITEM_NORMAL, _T("&Close\tCtrl+W") },
-    { ID_OPTIONS, wxITEM_NORMAL, _T("Options...") },
     { ID_QUIT,  wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
 
     { ID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in")  },
     { ID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom Fit"), _T("zoom_fit") },
     { ID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out") },
+    { ID_OPTIONS, wxITEM_NORMAL, _T("Options...") },
 
     { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble...") },
     { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("Unscramble...") },
@@ -169,7 +169,7 @@ static const ToolDesc toolDesc[] =
     { ID_REVEAL_INCORRECT, wxITEM_NORMAL, _T("Reveal Incorrect letters") },
     { ID_REVEAL_GRID,   wxITEM_NORMAL, _T("Reveal Grid") },
 
-    { ID_LAYOUT_PANES,      wxITEM_CHECK,  _T("Layout"), _T("layout"), _T("") },
+    { ID_LAYOUT_PANES,      wxITEM_CHECK,  _T("Edit Layout"), _T("layout"), _T("") },
     { ID_LOAD_LAYOUT,  wxITEM_NORMAL, _T("Load Layout") },
     { ID_SAVE_LAYOUT,  wxITEM_NORMAL, _T("Save Layout"), },
 
@@ -339,13 +339,18 @@ MyFrame::ShowPuzzle()
     // If there is no puzzle, display a blank frame
     if (! m_puz.IsOk())
     {
+        SetTitle(_T("XWord"));
         m_puz.Clear();
         m_gridCtrl->SetXGrid(NULL);
     }
     else
+    {
+        SetTitle(m_puz.m_title + _T(" - XWord"));
         m_gridCtrl->SetXGrid     (&m_puz.m_grid);
+    }
+    // Everything else is fine to set with or without a loaded puzzle
 
-    // Everything else is OK
+
     m_across   ->SetClueList(m_puz.m_across);
     m_down     ->SetClueList(m_puz.m_down);
     m_title    ->SetLabel   (m_puz.m_title);
@@ -445,6 +450,8 @@ MyFrame::CreateWindows()
     m_author     = new SizedText (this, wxID_ANY);
     m_copyright  = new SizedText (this, wxID_ANY);
     m_cluePrompt = new SizedText (this, wxID_ANY);
+    m_cluePrompt->SetAlign(wxALIGN_CENTER);
+
     m_notes      = new wxTextCtrl(this, wxID_ANY,
                                   wxEmptyString,
                                   wxDefaultPosition,
@@ -538,18 +545,21 @@ MyFrame::MakeMenuBar()
         m_toolMgr.Add(menu, ID_CLOSE);
         m_toolMgr.Add(menu, ID_OPTIONS);
         m_toolMgr.Add(menu, ID_QUIT);
-        menu->AppendSeparator();
-        m_toolMgr.Add(menu, ID_ZOOM_IN);
-        m_toolMgr.Add(menu, ID_ZOOM_FIT);
-        m_toolMgr.Add(menu, ID_ZOOM_OUT);
     mb->Append(menu, _T("&File"));
 
     menu = new wxMenu();
+        m_toolMgr.Add(menu, ID_ZOOM_IN);
+        m_toolMgr.Add(menu, ID_ZOOM_FIT);
+        m_toolMgr.Add(menu, ID_ZOOM_OUT);
+        menu->AppendSeparator();
+        m_toolMgr.Add(menu, ID_SHOW_NOTES);
+        menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_LAYOUT_PANES);
         m_toolMgr.Add(menu, ID_LOAD_LAYOUT);
         m_toolMgr.Add(menu, ID_SAVE_LAYOUT);
-        m_toolMgr.Add(menu, ID_SHOW_NOTES);
-    mb->Append(menu, _T("&Layout"));
+        menu->AppendSeparator();
+        m_toolMgr.Add(menu, ID_OPTIONS);
+    mb->Append(menu, _T("&View"));
 
     // Solution Menu
     menu = new wxMenu();
@@ -702,52 +712,13 @@ MyFrame::ManageWindows()
 // Tool management
 //------------------------------------------------------------------------------
 
-wxString
-GetImagesPath()
-{
-    // Look in several locations for the images file (order is preserved)
-    // We can't use wxPathList to search for a directory (only a file), but we
-    // can use it to make sure that directories aren't added twice.  Since it
-    // inherits from wxArrayString, we can just iterate over the elements
-    // directory to search for the directory.
-    wxPathList directories;
-    directories.Add(wxPathOnly(wxString(wxTheApp->argv[0])));
-    directories.Add(wxStandardPaths::Get().GetUserDataDir());
-    directories.Add(wxStandardPaths::Get().GetLocalDataDir());
-    directories.Add(wxStandardPaths::Get().GetDataDir());
-    directories.Add(wxStandardPaths::Get().GetResourcesDir());
-
-    for (wxArrayString::const_iterator it = directories.begin();
-                 it != directories.end();
-                 ++it)
-    {
-        wxFileName dir; dir.AssignDir(*it);
-        dir.AppendDir(_T("images"));
-        if (dir.DirExists())
-            return dir.GetFullPath();
-    }
-
-    // If there is no images directory, alert the user
-    wxString message = _T("Could not find images folder.  Folders searched:\n");
-    for (wxArrayString::const_iterator it = directories.begin();
-         it != directories.end();
-         ++it)
-    {
-        message.append(*it + _T("\n"));
-    }
-    wxLogError(message);
-
-    return wxEmptyString;
-}
-
-
 void
 MyFrame::SetupToolManager()
 {
     m_toolMgr.SetIconSize_AuiToolBar(24);
     m_toolMgr.SetIconSize_ToolBar(24);
     m_toolMgr.SetIconSize_Menu(16);
-    m_toolMgr.SetIconLocation( GetImagesPath() );
+    m_toolMgr.SetIconLocation( GetImagesDirectory() );
 }
 
 
@@ -864,8 +835,8 @@ MyFrame::LoadConfig()
     }
     else
     {
-        SetSize( config.ReadLong(_T("top")),
-                 config.ReadLong(_T("left")),
+        SetSize( config.ReadLong(_T("left")),
+                 config.ReadLong(_T("top")),
                  config.ReadLong(_T("width")),
                  config.ReadLong(_T("height")) );
     }
@@ -883,6 +854,8 @@ MyFrame::LoadConfig()
     m_gridCtrl->SetGridStyle(config.ReadLong(_T("style")) );
 
     m_gridCtrl->SetFont(config.ReadFont(_T("font")) );
+
+    m_gridCtrl->SetBorderSize(config.ReadLong(_T("lineThickness")));
 
     m_gridCtrl->SetFocusedLetterColor(
         config.ReadColor(_T("focusedLetterColor")) );
@@ -907,26 +880,38 @@ MyFrame::LoadConfig()
 
     for (CluePanel * panel = m_across; ; panel = m_down)
     {
-        panel->SetHeadingForeground(
-            config.ReadColor(_T("headingForegroundColor")) );
-        panel->SetHeadingBackground(
-            config.ReadColor(_T("headingBackgroundColor")) );
+        panel->SetFont(config.ReadFont(_T("font")));
+        panel->SetMargins(config.ReadPoint(_T("spacing")));
+
         panel->SetForegroundColour(
             config.ReadColor(_T("listForegroundColor")) );
         panel->SetBackgroundColour(
             config.ReadColor(_T("listBackgroundColor")) );
-        panel->SetColor(CluePanel::FOCUSED, CluePanel::TEXT,
+        panel->SetSelectionForeground(
             config.ReadColor(_T("selectedForegroundColor")) );
-        panel->SetColor(CluePanel::FOCUSED, CluePanel::BACKGROUND,
+        panel->SetSelectionBackground(
             config.ReadColor(_T("selectedBackgroundColor")) );
-        panel->SetColor(CluePanel::CROSSING, CluePanel::TEXT,
+        panel->SetCrossingForeground(
             config.ReadColor(_T("crossingForegroundColor")) );
-        panel->SetColor(CluePanel::CROSSING, CluePanel::BACKGROUND,
+        panel->SetCrossingBackground(
             config.ReadColor(_T("crossingBackgroundColor")) );
+
+        panel->SetHeadingFont(config.ReadFont(_T("headingFont")));
+        panel->SetHeadingForeground(
+            config.ReadColor(_T("headingForegroundColor")) );
+        panel->SetHeadingBackground(
+            config.ReadColor(_T("headingBackgroundColor")) );
 
         if (panel == m_down)
             break;
     }
+
+    // Clue Prompt
+    //------------
+    config.SetPath(_T("/Clue Prompt"));
+    m_cluePrompt->SetFont(config.ReadFont(_T("font")));
+    m_cluePrompt->SetBackgroundColour(config.ReadColor(_T("backgroundColor")));
+    m_cluePrompt->SetForegroundColour(config.ReadColor(_T("foregroundColor")));
 
     config.SetPath(_T("/"));
 }
@@ -967,6 +952,8 @@ MyFrame::SaveConfig()
     config.WriteLong(_T("style"), m_gridCtrl->GetGridStyle());
     config.WriteBool(_T("fit"),   m_toolMgr.IsChecked(ID_ZOOM_FIT));
     config.WriteFont(_T("font"),  m_gridCtrl->GetFont());
+    config.WriteLong(_T("lineThickness"), m_gridCtrl->GetBorderSize());
+
     config.WriteColor(_T("focusedLetterColor"), m_gridCtrl->GetFocusedLetterColor());
     config.WriteColor(_T("focusedWordColor"),   m_gridCtrl->GetFocusedWordColor());
     config.WriteColor(_T("whiteSquareColor"),   m_gridCtrl->GetWhiteSquareColor());
@@ -980,23 +967,42 @@ MyFrame::SaveConfig()
     // Clue Panel
     //-----------
     config.SetPath(_T("/Clue"));
-    config.WriteColor(_T("headingForegroundColor"),
-        m_across->GetHeadingForeground() );
-    config.WriteColor(_T("headingBackgroundColor"),
-        m_across->GetHeadingBackground() );
+
+    config.WriteFont(_T("font"), m_across->GetFont());
+    config.WritePoint(_T("spacing"), m_across->GetMargins());
+
     config.WriteColor(_T("listForegroundColor"),
         m_across->GetForegroundColour() );
     config.WriteColor(_T("listBackgroundColor"),
         m_across->GetBackgroundColour() );
-    config.WriteColor(_T("selectedForegroundColor"),
-        m_across->GetColor(CluePanel::FOCUSED, CluePanel::TEXT) );
-    config.WriteColor(_T("selectedBackgroundColor"),
-        m_across->GetColor(CluePanel::FOCUSED, CluePanel::BACKGROUND) );
-    config.WriteColor(_T("crossingForegroundColor"),
-        m_across->GetColor(CluePanel::CROSSING, CluePanel::TEXT) );
-    config.WriteColor(_T("crossingBackgroundColor"),
-        m_across->GetColor(CluePanel::CROSSING, CluePanel::BACKGROUND) );
 
+    config.WriteColor(_T("selectedForegroundColor"),
+        m_across->GetSelectionForeground() );
+    config.WriteColor(_T("selectedBackgroundColor"),
+        m_across->GetSelectionBackground() );
+
+    config.WriteColor(_T("crossingForegroundColor"),
+        m_across->GetCrossingForeground() );
+    config.WriteColor(_T("crossingBackgroundColor"),
+        m_across->GetCrossingBackground() );
+
+    config.WriteFont(_T("headingFont"), m_across->GetHeadingFont());
+    config.WriteColor(_T("headingForegroundColor"),
+        m_across->GetHeadingForeground() );
+    config.WriteColor(_T("headingBackgroundColor"),
+        m_across->GetHeadingBackground() );
+
+    // Clue Prompt
+    //------------
+    config.SetPath(_T("/Clue Prompt"));
+
+    config.WriteFont(_T("font"), m_cluePrompt->GetFont());
+
+    config.WriteColor(_T("foregroundColour"),
+                      m_cluePrompt->GetForegroundColour());
+
+    config.WriteColor(_T("backgroundColour"),
+                      m_cluePrompt->GetBackgroundColour());
 
     // Layout
     SaveLayout(_T("Default"));
@@ -1259,7 +1265,7 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
 
 
 void
-MyFrame::OnOptions(wxCommandEvent & evt)
+MyFrame::OnOptions(wxCommandEvent & WXUNUSED(evt))
 {
     SaveConfig();
     if (m_propertiesDialog == NULL)
@@ -1332,7 +1338,7 @@ MyFrame::OnClueFocus(wxPuzEvent & evt)
 
 
 void
-MyFrame::OnGridLetter(wxPuzEvent & evt)
+MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
 {
     // Change the save/save as button
     if (! m_puz.m_modified)

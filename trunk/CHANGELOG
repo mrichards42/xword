@@ -1,0 +1,33 @@
+
+
+
+
+
+Version 0.2 (date)
+    * Rebus puzzles can now be solved!
+    * Puzzle information sections (clue prompt, author, title, and copyright)
+      are now centered instead of left- and top-aligned.  This will be
+      configurable in the future.
+    * Puzzle title is displayed in the title bar.
+
+    File Locations
+    * XWord will now search a set of directories for its files rather than
+      expecting all the files to be in the executable directory.  Directories
+      searched depend both on the OS used and the directory that XWord is run
+      from.
+    * Portable mode: if a file named "config.ini" is found in the executable's
+      directory (linux or windows), XWord will write all config settings to
+      that file and will not touch any other folders.
+
+    Config
+    * Added configuration settings!
+    * Created a very basic options dialog with wxFormBuilder
+    * Config file is named "config.ini" on windows and ".xword" on linux
+
+    Windows-specific
+    * Removed icons from menus, as menu icon rendering is not implemented well
+      in wxWidgets under Vista
+
+
+Version 0.1 (07/31/2009)
+    * Initial release

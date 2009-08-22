@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
 
 #include "printout.hpp"
 
-void GetLogicalPageSize(wxDC * dc, printData, int * maxX, int * maxY)
+void GetLogicalPageSize(wxDC * dc, wxPageSetupDialogData printData, int * maxX, int * maxY)
 {
     const wxSize dcSize = dc->GetSize();
     const wxPoint topLeft = printData.GetMarginTopLeft();
@@ -26,9 +26,9 @@ void GetLogicalPageSize(wxDC * dc, printData, int * maxX, int * maxY)
     const double dpmX = static_cast<double>(-dc->DeviceToLogicalX(0)) / topLeft.x;
     const double dpmY = static_cast<double>(-dc->DeviceToLogicalX(0)) / topLeft.y;
 
-    const int logicalWidth = dc->DeviceToLogicalX(dcSize.GetWidth()) - 
+    const int logicalWidth = dc->DeviceToLogicalX(dcSize.GetWidth()) -
                              dc->DeviceToLogicalX(0);
-    const int logicalHeight = dc->DeviceToLogicalY(dcSize.GetHeight()) - 
+    const int logicalHeight = dc->DeviceToLogicalY(dcSize.GetHeight()) -
                               dc->DeviceToLogicalY(0);
 
     *maxX = logicalWidth -  dpmX * (topLeft.x + bottomRight.x);

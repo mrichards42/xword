@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -25,5 +25,5 @@ public:
     void GetPageInfo(int *minPage, int *maxPage, int *pageFrom, int *pageTo)
         { *minPage = 1; *maxPage = 1; *pageFrom = 1; *pageTo = 1; }
 
-    void OnPrintPage(int pageNum);
+    bool OnPrintPage(int pageNum);
 };

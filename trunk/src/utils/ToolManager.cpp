@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -119,8 +119,8 @@ ToolManager::GetIcon(const ToolInfo * tool, int iconSize) const
     if (! tool->HasIcon())
         return wxNullIcon;
 
-    const wxString icon = 
-        wxString::Format(_T("%s_%d.png"), tool->GetIconName(), iconSize);
+    const wxString icon =
+        wxString::Format(_T("%s_%d.png"), tool->GetIconName().c_str(), iconSize);
 
     wxFileName iconPath(icon);
     iconPath.MakeAbsolute(m_iconLocation);

@@ -31,14 +31,13 @@
 
 #include "../utils/wrap.hpp"
 
-
-// SizedText styles
-enum
+// Enums
+//------
+enum SizedTextWrapMode
 {
     ST_WRAP     = 0x00,
     ST_TRUNCATE = 0x01
 };
-
 
 class SizedText
     : public wxControl
@@ -51,7 +50,7 @@ public:
               const wxString & label = wxEmptyString,
               const wxPoint & position = wxDefaultPosition,
               const wxSize & size = wxDefaultSize,
-              long  style = wxBORDER_NONE,
+              long style = wxBORDER_NONE | wxALIGN_CENTER | ST_WRAP,
               const wxString & name = _T("SizedText"))
     {
         Create(parent, id, label, position, size, style, name);
@@ -64,7 +63,7 @@ public:
                 const wxString & label = wxEmptyString,
                 const wxPoint & position = wxDefaultPosition,
                 const wxSize & size = wxDefaultSize,
-                long  style = wxBORDER_NONE,
+                long style = wxBORDER_NONE | wxALIGN_CENTER | ST_WRAP,
                 const wxString & name = _("SizedText"));
 
     void SetLabel(const wxString & label)
@@ -84,6 +83,18 @@ public:
 
     bool IsTruncated() const { return HasFlag(ST_TRUNCATE); }
     bool IsWrapped()   const { return ! IsTruncated(); }
+
+    void SetWrapMode(SizedTextWrapMode mode)
+    {
+        SetWindowStyle(GetWindowStyle() & ~ (ST_WRAP | ST_TRUNCATE) | mode);
+        Refresh();
+    }
+
+    void SetAlign(long align)
+    {
+        SetWindowStyle(GetWindowStyle() & ~ (wxALIGN_MASK) | align);
+        Refresh();
+    }
 
 protected:
     void ResizeLabel();

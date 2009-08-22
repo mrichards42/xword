@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -95,7 +95,7 @@ public:
     //
     // Also, in the future there are plans to make XWord into a simple crossword
     // constructing program, which would require these accessors to be public.
-    
+
     XSquare();
 
     // Location information
@@ -226,7 +226,10 @@ private:
 
     // ASCII lookup functions
     static char Ascii(wxChar ch);
-    static char Ascii(const wxString & str) { return Ascii(str.at(0)); }
+    static char Ascii(const wxString & str)
+    {
+        return str.empty() ? '-' : Ascii(str.at(0));
+    }
 };
 
 
@@ -256,7 +259,7 @@ XSquare::SetSolution(const wxString & solution, wxChar plain)
 {
     wxASSERT(IsValidString(solution));
     m_solution = solution.Upper();
-    
+
     if (plain != '\0')
         SetPlainSolution(plain);
     else

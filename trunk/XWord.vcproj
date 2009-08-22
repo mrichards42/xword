@@ -311,86 +311,6 @@
 	</References>
 	<Files>
 		<Filter
-			Name="puz"
-			>
-			<Filter
-				Name="Header Files"
-				>
-				<File
-					RelativePath=".\src\puz\Checksummer.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\HandlerBase.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\PuzCk.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\PuzHandler.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\Scrambler.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\TxtHandler.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\XGrid.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\XPuzzle.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\XSquare.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				>
-				<File
-					RelativePath=".\src\puz\Checksummer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\HandlerBase.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\PuzHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\Scrambler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\TxtHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\XGrid.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\XPuzzle.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\XSquare.cpp"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
 			Name="utils"
 			>
 			<Filter
@@ -494,18 +414,6 @@
 			Name="dialogs"
 			>
 			<Filter
-				Name="Header Files"
-				>
-				<File
-					RelativePath=".\src\dialogs\Layout.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\Properties.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="Source Files"
 				>
 			</Filter>
@@ -521,9 +429,21 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\dialogs\Layout.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\dialogs\Properties.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
-			Name="Header Files"
+			Name=".Header Files"
 			>
 			<File
 				RelativePath=".\src\App.hpp"
@@ -554,6 +474,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\paths.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\PuzEvent.hpp"
 				>
 			</File>
@@ -563,7 +487,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Source Files"
+			Name=".Source Files"
 			>
 			<File
 				RelativePath=".\src\App.cpp"
@@ -590,6 +514,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\paths.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\PuzEvent.cpp"
 				>
 			</File>
@@ -597,6 +525,86 @@
 				RelativePath=".\src\XGridCtrl.cpp"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="puz"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\puz\Checksummer.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\HandlerBase.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\PuzCk.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\PuzHandler.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\Scrambler.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\TxtHandler.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\XGrid.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\XPuzzle.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\XSquare.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\puz\Checksummer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\HandlerBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\PuzHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\Scrambler.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\TxtHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\XGrid.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\XPuzzle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\puz\XSquare.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\src\resource.rc"
