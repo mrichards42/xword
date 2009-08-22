@@ -141,6 +141,7 @@ public:
 
     void SetDirection(bool direction) { SetSquareFocus(NULL, direction); }
     void SetDirection()               { SetDirection( ! m_direction); }
+    bool GetDirection() const { return m_direction; }
 
     void SetFocusedClue   (int cluenum, bool direction)
         { ChangeFocusedClue(cluenum, direction); SetSquareFocus(); }
@@ -238,10 +239,10 @@ public:
     void  SetBorderSize(size_t size)  { m_borderSize = size; Scale(); Refresh(); }
     int   GetBorderSize()  const      { return m_borderSize; }
 
-    void  SetNumberScale(float scale) { m_numberScale = scale; }
-    void  SetLetterScale(float scale) { m_letterScale = scale; }
-    float GetNumberScale() const      { return m_numberScale; }
-    float GetLetterScale() const      { return m_letterScale; }
+    void  SetNumberScale(double scale) { m_numberScale = scale; }
+    void  SetLetterScale(double scale) { m_letterScale = scale; }
+    double GetNumberScale() const      { return m_numberScale; }
+    double GetLetterScale() const      { return m_letterScale; }
 
     int GetNumberHeight() const   { return m_boxSize * m_numberScale; }
     int GetLetterHeight() const   { return m_boxSize * m_letterScale; }
@@ -319,8 +320,8 @@ protected:
 
     wxFont m_numberFont;
     wxFont m_letterFont[8];  // Cache fonts for all rebus lengths
-    float m_numberScale;
-    float m_letterScale;
+    double m_numberScale;
+    double m_letterScale;
 
     // Pointer to puzzle data
     XGrid * m_grid;

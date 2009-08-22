@@ -121,6 +121,8 @@ private:
 
     CluePanel *  m_down;
     CluePanel *  m_across;
+    CluePanel * GetCrossingClues();
+    CluePanel * GetFocusedClues();
 
     SizedText *  m_title;
     SizedText *  m_author;
@@ -209,17 +211,20 @@ private:
     void OnZoomFit     (wxCommandEvent & WXUNUSED(evt));
     void OnZoomOut     (wxCommandEvent & WXUNUSED(evt));
 
-    void OnCheckGrid   (wxCommandEvent & evt) { m_gridCtrl->CheckGrid(); }
-    void OnCheckWord   (wxCommandEvent & evt) { m_gridCtrl->CheckWord(); }
-    void OnCheckLetter (wxCommandEvent & evt) { m_gridCtrl->CheckLetter(); }
+    void OnCheckGrid   (wxCommandEvent & WXUNUSED(evt))
+        { m_gridCtrl->CheckGrid(); }
+    void OnCheckWord   (wxCommandEvent & WXUNUSED(evt))
+        { m_gridCtrl->CheckWord(); }
+    void OnCheckLetter (wxCommandEvent & WXUNUSED(evt))
+        { m_gridCtrl->CheckLetter(); }
 
-    void OnRevealGrid   (wxCommandEvent & evt)
+    void OnRevealGrid   (wxCommandEvent & WXUNUSED(evt))
         { m_gridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL); }
-    void OnRevealIncorrect(wxCommandEvent & evt)
+    void OnRevealIncorrect(wxCommandEvent & WXUNUSED(evt))
         { m_gridCtrl->CheckGrid(REVEAL_ANSWER); }
-    void OnRevealWord  (wxCommandEvent & evt)
+    void OnRevealWord  (wxCommandEvent & WXUNUSED(evt))
         { m_gridCtrl->CheckWord(REVEAL_ANSWER); }
-    void OnRevealLetter(wxCommandEvent & evt)
+    void OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
         { m_gridCtrl->CheckLetter(REVEAL_ANSWER); }
 
     // XWord puzzle stuff
@@ -274,6 +279,24 @@ private:
 //------------------------------------------------------------------------------
 // Inline Functions
 //------------------------------------------------------------------------------
+
+inline
+CluePanel *
+MyFrame::GetFocusedClues()
+{
+    return (m_gridCtrl->GetDirection() == DIR_ACROSS ?
+             m_across :
+             m_down);
+}
+
+inline
+CluePanel *
+MyFrame::GetCrossingClues()
+{
+    return (m_gridCtrl->GetDirection() == DIR_DOWN ?
+             m_across :
+             m_down);
+}
 
 
 // Config

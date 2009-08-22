@@ -34,6 +34,24 @@ class CluePanel
     : public wxPanel
 {
 public:
+    // Enums
+    //------
+
+    // Color type
+    enum textColor
+    {
+        TEXT,
+        BACKGROUND
+    };
+
+    // Focused direction
+    enum focusDirection
+    {
+        CROSSING,
+        FOCUSED
+    };
+
+public:
     CluePanel() { Init(); }
 
     CluePanel(wxWindow * parent,
@@ -64,70 +82,6 @@ public:
 
     bool GetDirection() const { return m_direction; }
 
-    // Colors
-    //-------
-    enum textColor
-    {
-        TEXT,
-        BACKGROUND
-    };
-
-    // Focused direction
-    enum focusDirection
-    {
-        CROSSING,
-        FOCUSED
-    };
-
-    // List colors
-    void SetColor(focusDirection focus, textColor type, const wxColor & color)
-        { m_colors[focus][type] = color; }
-    const wxColor & GetColor(focusDirection focus, textColor type) const
-        { return m_colors[focus][type]; }
-
-    void SetSelectedForegroundColour(const wxColor & color)
-        { SetColor(FOCUSED, TEXT, color); }
-    void SetSelectedBackgroundColour(const wxColor & color)
-        { SetColor(FOCUSED, BACKGROUND, color); }
-    void SetCrossingForegroundColour(const wxColor & color)
-        { SetColor(CROSSING, TEXT, color); }
-    void SetCrossingBackgroundColour(const wxColor & color)
-        { SetColor(CROSSING, BACKGROUND, color); }
-
-    const wxColour & GetSelectedForegroundColour() const
-        { return GetColor(FOCUSED, TEXT); }
-    const wxColour & GetSelectedBackgroundColour() const
-        { return GetColor(FOCUSED, BACKGROUND); }
-    const wxColour & GetCrossingForegroundColour() const
-        { return GetColor(CROSSING, TEXT); }
-    const wxColour & GetCrossingBackgroundColour() const
-        { return GetColor(CROSSING, BACKGROUND); }
-
-    bool SetForegroundColour(const wxColor & color)
-        { return m_clueList->SetForegroundColour(color); }
-    wxColour GetForegroundColour() const
-        { return m_clueList->GetForegroundColour(); }
-    bool SetBackgroundColour(const wxColor & color)
-        { return m_clueList->SetBackgroundColour(color); }
-    wxColour GetBackgroundColour() const
-        { return m_clueList->GetBackgroundColour(); }
-
-    // Heading colors
-    bool SetHeadingForeground(const wxColor & color)
-        { return m_heading->SetForegroundColour(color); }
-    wxColour GetHeadingForeground() const
-        { return m_heading->GetForegroundColour(); }
-    bool SetHeadingBackground(const wxColor & color)
-        { return m_heading->SetBackgroundColour(color); }
-    wxColour GetHeadingBackground() const
-        { return m_heading->GetBackgroundColour(); }
-
-
-    // Clue list font
-    bool SetFont(const wxFont & font)
-        { return m_clueList->SetFont(font); }
-    wxFont GetFont() const
-        { return m_clueList->GetFont(); }
 
     // Access to the ClueListBox
     //--------------------------
@@ -136,12 +90,13 @@ public:
 
     void SetClueNumber(unsigned int number, focusDirection focus)
     {
-        m_clueList->SetSelectionForeground(
-            GetColor(focus, TEXT) );
+        if (m_focusDirection != focus)
+        {
+            m_clueList->SetSelectionForeground(m_colors[focus][TEXT]);
+            m_clueList->SetSelectionBackground(m_colors[focus][BACKGROUND]);
+        }
 
-        m_clueList->SetSelectionBackground(
-            GetColor(focus, BACKGROUND) );
-
+        m_focusDirection = focus;
         m_clueList->SetClueNumber(number);
     }
 
@@ -151,6 +106,97 @@ public:
     unsigned int    GetClueNumber()  const
         { return m_clueList->GetItem(m_clueList->GetSelection()).Number(); }
 
+    // List colors
+    //------------
+
+    // This works well from the outside, but is a mess internally.
+    // It would be nice to just have access to m_clueList directly so that we
+    // don't need all these extra functions to access it, but without these
+    // functions it's difficult to manage the color swapping.  It's definitely
+    // possible to implement, but this setup already exists and I don't feel
+    // like taking the time to mess with it.
+
+    void SetSelectionForeground(const wxColor & color)
+    {
+        m_colors[FOCUSED][TEXT] = color;
+        if (m_focusDirection == FOCUSED)
+            m_clueList->SetSelectionForeground(color) ;
+    }
+
+    void SetSelectionBackground(const wxColor & color)
+    {
+        m_colors[FOCUSED][BACKGROUND] = color;
+        if (m_focusDirection == FOCUSED)
+            m_clueList->SetSelectionBackground(color) ;
+    }
+
+    void SetCrossingForeground(const wxColor & color)
+    {
+        m_colors[CROSSING][TEXT] = color;
+        if (m_focusDirection == CROSSING)
+            m_clueList->SetSelectionForeground(color) ;
+    }
+
+    void SetCrossingBackground(const wxColor & color)
+    {
+        m_colors[CROSSING][BACKGROUND] = color;
+        if (m_focusDirection == CROSSING)
+            m_clueList->SetSelectionBackground(color) ;
+    }
+
+    const wxColour & GetSelectionForeground() const
+        { return m_colors[FOCUSED][TEXT]; }
+    const wxColour & GetSelectionBackground() const
+        { return m_colors[FOCUSED][BACKGROUND]; }
+    const wxColour & GetCrossingForeground() const
+        { return m_colors[CROSSING][TEXT]; }
+    const wxColour & GetCrossingBackground() const
+        { return m_colors[CROSSING][BACKGROUND]; }
+
+    bool SetForegroundColour(const wxColor & color)
+        { return m_clueList->SetForegroundColour(color); }
+    bool SetBackgroundColour(const wxColor & color)
+        { return m_clueList->SetBackgroundColour(color); }
+
+    wxColour GetForegroundColour() const
+        { return m_clueList->GetForegroundColour(); }
+    wxColour GetBackgroundColour() const
+        { return m_clueList->GetBackgroundColour(); }
+
+
+    // Clue list font
+    //---------------
+    bool SetFont(const wxFont & font)
+        { return m_clueList->SetFont(font); }
+    wxFont GetFont() const
+        { return m_clueList->GetFont(); }
+
+
+    // Clue list margins
+    //------------------
+    void SetMargins(const wxPoint & margins) 
+        { m_clueList->SetMargins(margins); }
+    wxPoint GetMargins() const
+        { return m_clueList->GetMargins(); }
+
+
+    // Clue list heading
+    //------------------
+    bool SetHeadingFont(const wxFont & font)
+        { return m_heading->SetFont(font); }
+    wxFont GetHeadingFont() const
+        { return m_heading->GetFont(); }
+
+    bool SetHeadingForeground(const wxColor & color)
+        { return m_heading->SetForegroundColour(color);}
+    bool SetHeadingBackground(const wxColor & color)
+        { return m_heading->SetBackgroundColour(color); }
+
+    wxColour GetHeadingForeground() const
+        { return m_heading->GetForegroundColour(); }
+    wxColour GetHeadingBackground() const
+        { return m_heading->GetBackgroundColour(); }
+
 
 private:
     void Init() { m_heading = NULL; m_clueList = NULL; m_direction = DIR_ACROSS; }
@@ -158,6 +204,7 @@ private:
     wxStaticText * m_heading;
     ClueListBox * m_clueList;
     bool m_direction;
+    focusDirection m_focusDirection;
 
     // [ Focused / unfocused ][ text / background ]
     wxColor m_colors[2][2];
@@ -166,7 +213,7 @@ private:
     // If it is, display the clue box next to the heading
     void OnSize(wxSizeEvent & evt);
 
-    void OnClueSelect(wxCommandEvent & evt);
+    void OnClueSelect(wxCommandEvent & WXUNUSED(evt));
 
     DECLARE_EVENT_TABLE()
     DECLARE_NO_COPY_CLASS(CluePanel)

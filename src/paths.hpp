@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -15,7 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#ifndef MY_PATHS_H
+#define MY_PATHS_H
 
-#include "MyConfig.hpp"
+#include <wx/string.h>
 
-MyConfig g_config;
+// Locations where the application expects to find its files
+wxString GetConfigFile();
+wxString GetImagesDirectory();
+
+#endif // MY_PATHS_H

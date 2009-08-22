@@ -43,6 +43,7 @@ CluePanel::Create(wxWindow* parent,
         return false;
 
     m_direction = direction;
+    m_focusDirection = CROSSING;
 
     // Create windows
     m_heading = new wxStaticText(this,
@@ -54,35 +55,23 @@ CluePanel::Create(wxWindow* parent,
 
     m_clueList = new ClueListBox(this, wxID_ANY);
 
-    // Setup fonts and colors
-    wxFont clueHeadingFont = *wxSWISS_FONT;
-    clueHeadingFont.SetPointSize(14);
+    // Default fonts
+    m_heading->SetFont( wxFont(13, wxFONTFAMILY_SWISS,
+                                   wxFONTSTYLE_NORMAL,
+                                   wxFONTWEIGHT_NORMAL) );
 
-    // Default colors and fonts
-    m_heading->SetFont(clueHeadingFont);
-
-    m_clueList->SetFont(*wxSWISS_FONT);
-
-
-    // Colors
-    SetColor(FOCUSED, TEXT, 
+    // Default Colors
+    SetSelectionForeground(
         wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
 
-    SetColor(FOCUSED, BACKGROUND, 
+    SetSelectionBackground(
         wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
 
-    SetColor(CROSSING, TEXT,
+    SetCrossingForeground(
         wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
 
-    SetColor(CROSSING, BACKGROUND,
+    SetCrossingBackground(
         wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
-
-
-    m_clueList->SetSelectionForeground(
-        GetColor(FOCUSED, TEXT) );
-
-    m_clueList->SetSelectionBackground(
-        GetColor(FOCUSED, BACKGROUND) );
 
     // Layout
     wxSizer * sizer = new wxBoxSizer(wxVERTICAL);
@@ -98,21 +87,19 @@ CluePanel::Create(wxWindow* parent,
 
 
 void
-CluePanel::OnClueSelect(wxCommandEvent & evt)
+CluePanel::OnClueSelect(wxCommandEvent & WXUNUSED(evt))
 {
-    const XPuzzle::Clue & clue = m_clueList->GetItem(evt.GetSelection());
-
-    m_clueList->SetSelectionForeground(
-        GetColor(FOCUSED, TEXT) );
-
-    m_clueList->SetSelectionBackground(
-        GetColor(FOCUSED, BACKGROUND) );
-
+    if (m_focusDirection == CROSSING)
+    {
+        m_clueList->SetSelectionForeground(m_colors[FOCUSED][TEXT]);
+        m_clueList->SetSelectionBackground(m_colors[FOCUSED][BACKGROUND]);
+        m_focusDirection = FOCUSED;
+    }
 
     wxPuzEvent puzEvt   (wxEVT_PUZ_CLUE_FOCUS, GetId());
-    puzEvt.SetClueNumber(GetDirection(), clue.Number());
+    puzEvt.SetClueNumber(GetDirection(), GetClueNumber());
     puzEvt.SetDirection (GetDirection());
-    puzEvt.SetClueText  (clue.Text());
+    puzEvt.SetClueText  (GetClueText());
 
     ::wxPostEvent(GetEventHandler(), puzEvt);
 }

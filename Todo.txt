@@ -25,12 +25,12 @@ Create a suite of test puzzles for a variety of cases:
         - Missing nul-terminators (many places for this)
 
 
-Configuration
-
-Rebus (almost done)
+Graphical front-end for the rest of the config options
 
 Printing
 
 Finish Status bar
 
 Save tool and menu layout in config file (separate XML file?)
+
+Downloading puzzles

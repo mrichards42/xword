@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -92,7 +92,6 @@ XSquare::InitCharTable()
 
     // Other possible values
     sm_charTable[_T('.')] = '.';
-    sm_charTable[_T('')]  = '-';
 }
 
 

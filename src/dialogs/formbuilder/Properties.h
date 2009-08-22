@@ -56,9 +56,12 @@ class wxFB_PropertiesDialog : public wxDialog
 		wxColourPickerCtrl* m_selectedClueText;
 		wxColourPickerCtrl* m_crossingClueBackground;
 		wxColourPickerCtrl* m_crossingClueText;
+		wxColourPickerCtrl* m_clueHeadingBackground;
+		wxColourPickerCtrl* m_clueHeadingText;
 		wxFontPickerCtrl* m_gridFont;
-		wxFontPickerCtrl* m_clueFont;
 		wxFontPickerCtrl* m_cluePromptFont;
+		wxFontPickerCtrl* m_clueFont;
+		wxFontPickerCtrl* m_clueHeadingFont;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnAfterLetter( wxCommandEvent& event ){ event.Skip(); }
@@ -79,9 +82,12 @@ class wxFB_PropertiesDialog : public wxDialog
 		virtual void OnSelectedClueTextColor( wxColourPickerEvent& event ){ event.Skip(); }
 		virtual void OnCrossingClueBackgroundColor( wxColourPickerEvent& event ){ event.Skip(); }
 		virtual void OnCrossingClueTextColor( wxColourPickerEvent& event ){ event.Skip(); }
+		virtual void OnClueHeadingBackgroundColor( wxColourPickerEvent& event ){ event.Skip(); }
+		virtual void OnClueHeadingTextColor( wxColourPickerEvent& event ){ event.Skip(); }
 		virtual void OnGridFont( wxFontPickerEvent& event ){ event.Skip(); }
-		virtual void OnClueFont( wxFontPickerEvent& event ){ event.Skip(); }
 		virtual void OnCluePromptFont( wxFontPickerEvent& event ){ event.Skip(); }
+		virtual void OnClueFont( wxFontPickerEvent& event ){ event.Skip(); }
+		virtual void OnClueHeadingFont( wxFontPickerEvent& event ){ event.Skip(); }
 		
 	
 	public:

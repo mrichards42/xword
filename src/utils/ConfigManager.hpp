@@ -18,10 +18,11 @@
 #ifndef CONFIG_MGR_H
 #define CONFIG_MGR_H
 
+#include <wx/tokenzr.h>
+#include <wx/font.h>
+#include <wx/colour.h>
 #include <wx/config.h>
 #include <map>
-
-
 
 // A class for representing default values.  Note that everything is
 // accessed and set by const reference so that macros can be used
@@ -40,13 +41,13 @@ public:
     virtual void SetData(const long & WXUNUSED(data))
         { wxFAIL_MSG(_T("Not Implemented")); }
 
-    virtual const wxString & GetString() const
+    virtual wxString GetString() const
         { wxFAIL_MSG(_T("Not Implemented")); return wxEmptyString; }
-    virtual const bool & GetBool() const
+    virtual bool GetBool() const
         { wxFAIL_MSG(_T("Not Implemented")); return false; }
-    virtual const double & GetDouble() const
+    virtual double GetDouble() const
         { wxFAIL_MSG(_T("Not Implemented")); return 0; }
-    virtual const long & GetLong() const
+    virtual long GetLong() const
         { wxFAIL_MSG(_T("Not Implemented")); return 0; }
 };
 
@@ -71,7 +72,7 @@ public:
         Config ## type_name(const type & data) { SetData(data); }              \
                                                                                \
         virtual void SetData(const type & data) { m_data = data; }             \
-        virtual const type & Get ## type_name() const { return m_data; }       \
+        virtual type Get ## type_name() const { return m_data; }       \
                                                                                \
     protected:                                                                 \
         type m_data;                                                           \
@@ -134,7 +135,14 @@ public:
     /* Read function */                                                        \
     type Read ## type_name(const wxString & path)                              \
     {                                                                          \
-        return conv_type ## To ## type_name( Read ## conv_type(path) );        \
+        try                                                                    \
+        {                                                                      \
+            return conv_type ## To ## type_name( Read ## conv_type(path) );    \
+        }                                                                      \
+        catch (ConversionError)                                                \
+        {                                                                      \
+            return GetDefault ## type_name(path);                              \
+        }                                                                      \
     }                                                                          \
                                                                                \
     /* Write function */                                                       \
@@ -145,6 +153,7 @@ public:
     }                                                                          \
                                                                                \
     /* GetDefault function */                                                  \
+    /* If a ConversionError is thrown here we've done something wrong */       \
     type GetDefault ## type_name(const wxString & path) const                  \
     {                                                                          \
         return conv_type ## To ## type_name( GetDefault ## conv_type(path) );  \
@@ -184,6 +193,14 @@ public:
     // Extra data types
     //-----------------
 
+    // Throw this when a conversion fails
+    // NB: Only throw during a "supported type to X" (e.g. StringToFont) conversion,
+    // not the other way around
+    class ConversionError {};
+
+    // GCC doesn't like the implementation of these static functions to be in
+    // the class declaration.
+
     // wxFont
     static wxString FontToString(const wxFont & font)
         { return font.GetNativeFontInfoUserDesc(); }
@@ -206,6 +223,27 @@ public:
 
     CFG_CONVERTED_TYPE(wxColour, Color, String);
 
+
+    // wxPoint
+    static wxString PointToString(const wxPoint & pt)
+        { return wxString::Format(_T("%d, %d"), pt.x, pt.y); }
+
+    static wxPoint StringToPoint(const wxString & str)
+    {
+        wxArrayString tokens = wxStringTokenize(str, _T(", "), wxTOKEN_STRTOK);
+        long x, y;
+        if (tokens.size() != 2 ||
+            ! (tokens[0].ToLong(&x) && tokens[1].ToLong(&y)) )
+        {
+            throw ConversionError();
+        }
+
+        return wxPoint(x, y);
+    }
+
+    CFG_CONVERTED_TYPE(wxPoint, Point, String);
+
+
 private:
     wxConfigBase * m_config;
     wxString m_path;
@@ -218,8 +256,6 @@ private:
 
     std::map<wxString, ConfigDefault*> m_items;
 };
-
-
 
 #undef CFG_TYPE
 #undef CFG_CONVERTED_TYPE

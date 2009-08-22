@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -33,10 +33,15 @@ MyStatusBar::MyStatusBar(wxWindow * parent,
 {
     int widths[] = {-2, -1, 200};
     SetFieldsCount(3, widths);
-    m_alert = new SizedText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER | ST_TRUNCATE);
-    m_alert->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyStatusBar::OnAlertClick));
+    m_alert = new SizedText(this, wxID_ANY);
+    m_alert->SetAlign(wxALIGN_CENTER);
+    m_alert->SetWrapMode(ST_TRUNCATE);
     m_alert->SetFont(GetFont());
     m_alert->SetToolTip(_T(""));
+
+    m_alert->Connect(wxEVT_LEFT_DCLICK,
+                 wxMouseEventHandler(MyStatusBar::OnAlertClick),
+                 NULL, this);
 }
 
 void
@@ -77,6 +82,6 @@ MyStatusBar::WrapAlert(int width)
         width = rect.width;
     }
 
-    wxString wrapped = Wrap(m_alert, m_alert->GetToolTip()->GetTip(), width, &GetFont());
+    wxString wrapped = Wrap(m_alert, m_alert->GetToolTip()->GetTip(), width, NULL);
     m_alert->SetLabel(wrapped.BeforeFirst(_T('\n')));
 }

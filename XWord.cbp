@@ -83,6 +83,9 @@
 		<Unit filename="src/XGridCtrl.hpp" />
 		<Unit filename="src/defs.hpp" />
 		<Unit filename="src/dialogs/Layout.hpp" />
+		<Unit filename="src/dialogs/Properties.hpp" />
+		<Unit filename="src/dialogs/formbuilder/Properties.cpp" />
+		<Unit filename="src/dialogs/formbuilder/Properties.h" />
 		<Unit filename="src/puz/Checksummer.cpp" />
 		<Unit filename="src/puz/Checksummer.hpp" />
 		<Unit filename="src/puz/HandlerBase.cpp" />
@@ -102,6 +105,7 @@
 		<Unit filename="src/puz/XSquare.hpp" />
 		<Unit filename="src/utils/ByteArray.cpp" />
 		<Unit filename="src/utils/ByteArray.hpp" />
+		<Unit filename="src/utils/ConfigManager.hpp" />
 		<Unit filename="src/utils/DragAndDrop.hpp" />
 		<Unit filename="src/utils/SizerPrinter.hpp" />
 		<Unit filename="src/utils/ToolInfo.cpp" />

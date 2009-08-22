@@ -19,6 +19,7 @@
 #include "App.hpp"
 #include <wx/cmdline.h>
 #include "MyFrame.hpp"
+#include "paths.hpp"
 
 #include <wx/log.h>
 
@@ -87,10 +88,15 @@ int
 MyApp::OnExit()
 {    
     // Save config file
-    wxFileOutputStream file(GetConfigPath());
+    wxFileName configFile(GetConfigFile());
+    if (! configFile.DirExists())
+        configFile.Mkdir(0777, wxPATH_MKDIR_FULL);
+
     wxFileConfig * config = dynamic_cast<wxFileConfig*>(wxFileConfig::Get());
     wxASSERT(config != NULL);
-    config->Save( file );
+
+    wxFileOutputStream fileStream(configFile.GetFullPath());
+    config->Save(fileStream);
 
     return wxApp::OnExit();
 }
@@ -217,44 +223,31 @@ MyApp::ReadCommandLine()
 // Config
 //------------------------------------------------------------------------------
 
-wxString
-MyApp::GetConfigPath()
-{
-    // Look in several locations for the config file (order is preserved)
-    wxPathList paths;
-
-    paths.EnsureFileAccessible(wxString(wxTheApp->argv[0]));
-    paths.Add(wxStandardPaths::Get().GetUserConfigDir());
-    paths.Add(wxStandardPaths::Get().GetUserDataDir());
-    paths.Add(wxStandardPaths::Get().GetDataDir());
-
-    wxString filename = paths.FindAbsoluteValidPath(_T("config.ini"));
-
-    // If there is no config file, put it in the same directory as the executable
-    if (filename.empty())
-        filename = wxPathOnly(wxTheApp->argv[0]) +
-                   wxFileName::GetPathSeparator() +
-                   _T("config.ini");
-
-    return filename;
-}
-
-
-
 void
 MyApp::SetupConfig()
 {
-    const wxString configPath = GetConfigPath();
-    wxLogDebug(_T("Config file: %s"), configPath.c_str());
+    wxFileName configFile(GetConfigFile());
+    wxLogDebug(_T("Config file: %s"), configFile.GetFullPath().c_str());
 
+    /*
     // Create a blank file it it doesn't exist
-    if (! wxFileName::FileExists(configPath))
-        wxFile(configPath, wxFile::write);
+    if (! configFile.FileExists())
+        wxFile(configFile.GetFullPath(), wxFile::write);
+    */
 
     // Setup wxFileConfig
-    wxFileInputStream file(configPath);
-    wxFileConfig::Set( new wxFileConfig(file) );
+    if (configFile.FileExists())
+    {
+        wxFileInputStream fileStream(configFile.GetFullPath());
+        wxFileConfig::Set( new wxFileConfig(fileStream) );
+    }
+    else
+    {
+        wxFileConfig::Set( new wxFileConfig() );
+    }
 
+    // Setup our config manager
+    //-------------------------
     m_config.SetConfig(wxFileConfig::Get());
 
     // Window size/position defaults
@@ -270,6 +263,7 @@ MyApp::SetupConfig()
     m_config.AddBool(_T("fit"),       false);
     m_config.AddLong(_T("style"),     DEFAULT_GRID_STYLE);
     m_config.AddFont(_T("font"),      *wxSWISS_FONT);
+    m_config.AddLong(_T("lineThickness"), 1);
     m_config.AddColor(_T("focusedLetterColor"),     *wxGREEN);
     m_config.AddColor(_T("focusedWordColor"),       *wxLIGHT_GREY);
     m_config.AddColor(_T("whiteSquareColor"),       *wxWHITE);
@@ -280,13 +274,10 @@ MyApp::SetupConfig()
     m_config.AddLong(_T("letterScale"),             75);
 
     // Clue box
-    //---------
     m_config.SetPath(_T("/Clue"));
     m_config.AddFont(_T("font"),      *wxSWISS_FONT);
-    m_config.AddColor(_T("headingForegroundColor"),
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
-    m_config.AddColor(_T("headingBackgroundColor"),
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
+    m_config.AddPoint(_T("spacing"),    wxPoint(5, 5));
+
     m_config.AddColor(_T("listForegroundColor"),        *wxBLACK);
     m_config.AddColor(_T("listBackgroundColor"),        *wxWHITE);
     m_config.AddColor(_T("selectedForegroundColor"),
@@ -297,6 +288,24 @@ MyApp::SetupConfig()
         m_config.GetDefaultColor(_T("selectedBackgroundColor")));
     m_config.AddColor(_T("crossingBackgroundColor"),
         m_config.GetDefaultColor(_T("selectedForegroundColor")));
+
+    wxFont clueHeadingFont = *wxSWISS_FONT;
+    clueHeadingFont.SetPointSize(14);
+
+    m_config.AddFont(_T("headingFont"),
+            wxFont(13, wxFONTFAMILY_SWISS,
+                   wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+    m_config.AddColor(_T("headingForegroundColor"),
+        wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT ) );
+    m_config.AddColor(_T("headingBackgroundColor"),
+        wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE ) );
+
+
+    // Clue prompt
+    m_config.SetPath(_T("/Clue Prompt"));
+    m_config.AddFont(_T("font"),      *wxSWISS_FONT);
+    m_config.AddColor(_T("foregroundColor"), *wxBLACK);
+    m_config.AddColor(_T("backgroundColor"), *wxWHITE);
 }
 
 

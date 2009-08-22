@@ -32,7 +32,7 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	wxString m_afterLetterChoices[] = { wxT("Do not move"), wxT("Move to next square"), wxT("Move to next blank") };
 	int m_afterLetterNChoices = sizeof( m_afterLetterChoices ) / sizeof( wxString );
 	m_afterLetter = new wxRadioBox( solvePanel, wxID_ANY, wxT("After entering a letter"), wxDefaultPosition, wxDefaultSize, m_afterLetterNChoices, m_afterLetterChoices, 1, wxRA_SPECIFY_COLS );
-	m_afterLetter->SetSelection( 1 );
+	m_afterLetter->SetSelection( 0 );
 	sbSizer3->Add( m_afterLetter, 0, wxALL|wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer5;
@@ -43,7 +43,6 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	sbSizer5->Add( m_blankOnDirection, 0, wxALL, 5 );
 	
 	m_blankOnNewWord = new wxCheckBox( solvePanel, wxID_ANY, wxT("After moving to a new word"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_blankOnNewWord->SetValue(true);
 	
 	sbSizer5->Add( m_blankOnNewWord, 0, wxALL, 5 );
 	
@@ -52,7 +51,7 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	wxString m_pauseOnSwitchChoices[] = { wxT("Move cursor"), wxT("Keep cursor on current square") };
 	int m_pauseOnSwitchNChoices = sizeof( m_pauseOnSwitchChoices ) / sizeof( wxString );
 	m_pauseOnSwitch = new wxRadioBox( solvePanel, wxID_ANY, wxT("When switching with arrow keys"), wxDefaultPosition, wxDefaultSize, m_pauseOnSwitchNChoices, m_pauseOnSwitchChoices, 1, wxRA_SPECIFY_COLS );
-	m_pauseOnSwitch->SetSelection( 1 );
+	m_pauseOnSwitch->SetSelection( 0 );
 	sbSizer3->Add( m_pauseOnSwitch, 0, wxALL|wxEXPAND, 5 );
 	
 	bSizer4->Add( sbSizer3, 0, wxALL|wxEXPAND, 5 );
@@ -85,7 +84,7 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	solvePanel->SetSizer( bSizer3 );
 	solvePanel->Layout();
 	bSizer3->Fit( solvePanel );
-	notebook->AddPage( solvePanel, wxT("Solving"), false );
+	notebook->AddPage( solvePanel, wxT("Solving"), true );
 	wxPanel* colorPanel;
 	colorPanel = new wxPanel( notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer35;
@@ -268,6 +267,32 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	
 	sbSizer6->Add( bSizer61351, 0, wxEXPAND, 5 );
 	
+	wxBoxSizer* bSizer613513;
+	bSizer613513 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_clueHeadingBackground = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	bSizer613513->Add( m_clueHeadingBackground, 0, 0, 5 );
+	
+	wxStaticText* m_staticText13513;
+	m_staticText13513 = new wxStaticText( colorPanel, wxID_ANY, wxT("Heading background"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText13513->Wrap( -1 );
+	bSizer613513->Add( m_staticText13513, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	
+	sbSizer6->Add( bSizer613513, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer6135131;
+	bSizer6135131 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_clueHeadingText = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	bSizer6135131->Add( m_clueHeadingText, 0, 0, 5 );
+	
+	wxStaticText* m_staticText135131;
+	m_staticText135131 = new wxStaticText( colorPanel, wxID_ANY, wxT("Heading text"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText135131->Wrap( -1 );
+	bSizer6135131->Add( m_staticText135131, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	
+	sbSizer6->Add( bSizer6135131, 0, wxEXPAND, 5 );
+	
 	bSizer37->Add( sbSizer6, 0, wxALL|wxEXPAND, 5 );
 	
 	bSizer35->Add( bSizer37, 1, wxEXPAND, 5 );
@@ -275,7 +300,7 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	colorPanel->SetSizer( bSizer35 );
 	colorPanel->Layout();
 	bSizer35->Fit( colorPanel );
-	notebook->AddPage( colorPanel, wxT("Colors"), true );
+	notebook->AddPage( colorPanel, wxT("Colors"), false );
 	wxPanel* fontPanel;
 	fontPanel = new wxPanel( notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer30;
@@ -292,11 +317,25 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	bSizer614->Add( m_gridFont, 0, wxALL, 5 );
 	
 	wxStaticText* m_staticText14;
-	m_staticText14 = new wxStaticText( fontPanel, wxID_ANY, wxT("Grid"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText14 = new wxStaticText( fontPanel, wxID_ANY, wxT("Grid (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
 	bSizer614->Add( m_staticText14, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	bSizer20->Add( bSizer614, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer6142;
+	bSizer6142 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_cluePromptFont = new wxFontPickerCtrl( fontPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
+	m_cluePromptFont->SetMaxPointSize( 100 ); 
+	bSizer6142->Add( m_cluePromptFont, 0, wxALL, 5 );
+	
+	wxStaticText* m_staticText142;
+	m_staticText142 = new wxStaticText( fontPanel, wxID_ANY, wxT("Clue prompt (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText142->Wrap( -1 );
+	bSizer6142->Add( m_staticText142, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	
+	bSizer20->Add( bSizer6142, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer6141;
 	bSizer6141 = new wxBoxSizer( wxHORIZONTAL );
@@ -312,19 +351,19 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	
 	bSizer20->Add( bSizer6141, 0, wxEXPAND, 5 );
 	
-	wxBoxSizer* bSizer6142;
-	bSizer6142 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizer61411;
+	bSizer61411 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_cluePromptFont = new wxFontPickerCtrl( fontPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_cluePromptFont->SetMaxPointSize( 100 ); 
-	bSizer6142->Add( m_cluePromptFont, 0, wxALL, 5 );
+	m_clueHeadingFont = new wxFontPickerCtrl( fontPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
+	m_clueHeadingFont->SetMaxPointSize( 100 ); 
+	bSizer61411->Add( m_clueHeadingFont, 0, wxALL, 5 );
 	
-	wxStaticText* m_staticText142;
-	m_staticText142 = new wxStaticText( fontPanel, wxID_ANY, wxT("Clue prompt"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText142->Wrap( -1 );
-	bSizer6142->Add( m_staticText142, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	wxStaticText* m_staticText1411;
+	m_staticText1411 = new wxStaticText( fontPanel, wxID_ANY, wxT("Clue list heading"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1411->Wrap( -1 );
+	bSizer61411->Add( m_staticText1411, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
-	bSizer20->Add( bSizer6142, 0, wxEXPAND, 5 );
+	bSizer20->Add( bSizer61411, 0, wxEXPAND, 5 );
 	
 	bSizer30->Add( bSizer20, 1, wxALL|wxEXPAND, 5 );
 	
@@ -369,9 +408,12 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	m_selectedClueText->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnSelectedClueTextColor ), NULL, this );
 	m_crossingClueBackground->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnCrossingClueBackgroundColor ), NULL, this );
 	m_crossingClueText->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnCrossingClueTextColor ), NULL, this );
+	m_clueHeadingBackground->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnClueHeadingBackgroundColor ), NULL, this );
+	m_clueHeadingText->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnClueHeadingTextColor ), NULL, this );
 	m_gridFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnGridFont ), NULL, this );
-	m_clueFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnClueFont ), NULL, this );
 	m_cluePromptFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnCluePromptFont ), NULL, this );
+	m_clueFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnClueFont ), NULL, this );
+	m_clueHeadingFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnClueHeadingFont ), NULL, this );
 }
 
 wxFB_PropertiesDialog::~wxFB_PropertiesDialog()
@@ -395,7 +437,10 @@ wxFB_PropertiesDialog::~wxFB_PropertiesDialog()
 	m_selectedClueText->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnSelectedClueTextColor ), NULL, this );
 	m_crossingClueBackground->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnCrossingClueBackgroundColor ), NULL, this );
 	m_crossingClueText->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnCrossingClueTextColor ), NULL, this );
+	m_clueHeadingBackground->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnClueHeadingBackgroundColor ), NULL, this );
+	m_clueHeadingText->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PropertiesDialog::OnClueHeadingTextColor ), NULL, this );
 	m_gridFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnGridFont ), NULL, this );
-	m_clueFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnClueFont ), NULL, this );
 	m_cluePromptFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnCluePromptFont ), NULL, this );
+	m_clueFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnClueFont ), NULL, this );
+	m_clueHeadingFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PropertiesDialog::OnClueHeadingFont ), NULL, this );
 }

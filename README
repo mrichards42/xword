@@ -10,22 +10,72 @@ the Across Lite plain text format (version 1 or 2).
 
 Supported features:
     - Solving of all American style and cryptic crosswords (not diagramless yet).
+    - Solving rebus puzzles (new!)
     - A timer.
     - Checking and revealing letters.
     - Scrambling and unscrambling puzzle solutions.
     - Viewing and editing puzzle notes.
     - Zooming the grid in and out.
-    - Displaying puzzles with rebus information (multiple letters numbers or
-        symbols per square).  XWord cannot currently be used to solve rebus
-        puzzles, though support for solving rebus puzzles will come in the
-        near future.
     - Rearranging the window layout (try checking the "Layout" option in the
         Layout menu)
+    - Color, font, and solving behavior configuration.
 
 
-Configuration is currently minimal, but that will change soon.
+Rebus
+=====
+
+XWord can now be used to solve rebus puzzles.
+
+Key               Function
+-------------------------------------
+Insert            Begin entering multiple letters and/or numbers into a square.
+Insert or Enter   End entering multiple letters.
+Delete            Remove letters from the beginning of the word.
+Backspace         Remove letters from the end of the word.
+Ctrl + Delete     Remove all letters.
+Ctrl + Backspace  Remove all letters.
 
 
+
+Configuration
+=============
+
+Configuration settings can be accessed from the File menu (under "Options").
+Users can configure grid movement/solving options, colors, and fonts.  Most of
+XWord's configuration can be accessed this way.  However, there are a few
+configuration settings that are not yet implemented in the GUI (and require a
+program restart to take effect):
+
+
+    - Clue list spacing.
+        Accessed under [Clue] heading of config file (spacing)
+
+        X and y spacing applied to the clue list text, and between the clue
+        number and the clue text.
+        This is slightly buggy, as setting an X padding to zero causes some of
+        the clue numbers to get cut off.
+
+
+    - Grid text and number font scale
+        Accessed under [Grid] heading of config file (numberScale and letterScale)
+
+        These set the percentage of a square that the number and letter take up,
+        respectively.  The height of all letters in a font is not always
+        reported accurately, so these settings allow the user to fine-tune font
+        sizes in the grid.  Usually the two settings combined will add up to
+        more than 100%, because most fonts report their height to be slightly
+        larger than the space the characters actually take up.
+
+    - Grid line thickness
+        Accessed under [Grid] heading of config file (lineThickness)
+
+        Sets the thickness of lines between squares in the grid (in pixels)
+
+
+
+
+Batch conversion
+================
 
 XWord can also be used to batch convert .txt formatted puzzles into .puz files
 on the command line.  Usage is as follows:
@@ -75,12 +125,8 @@ easy to fix.
 http://www.wxwidgets.org
 
 
+*** Boost is no longer required to build XWord
 
-Currently there is a small amount of code that uses boost (specifically, the
-BOOST_FOREACH macro).  Hopefully this will change soon, since it's silly to
-require boost for the eight or so lines of code that use the macro.
-
-http://www.boost.org/
 
 
 Visual C++ and Code::Blocks project files are supplied in the source
