@@ -33,10 +33,14 @@ public:
     bool ScrambleSolution(unsigned short key_int = 0);
     bool UnscrambleSolution(unsigned short key_int);
 
+    // Check a scrambled grid to see if it is correct
+    static bool CheckUserGrid(XGrid & grid);
+
 private:
     XGrid & m_grid;
 
     wxString GetSolutionDown();
+    wxString GetUserGridDown();
 
     // Scrambling functions
     unsigned short MakeKey();

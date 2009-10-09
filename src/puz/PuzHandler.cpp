@@ -141,7 +141,13 @@ PuzHandler::DoLoad()
     cksum.SetGridText(gridText);
 
     if (! cksum.TestChecksums(h.c_cib, h.c_primary, h.c_masked))
-        throw PuzLoadError(_T("Checksums do not match"));
+    {
+        // We're going to test both 1.3 and 1.2 as versions because some files
+        // with notepads don't have the correct version . . .
+        cksum.SetVersion( (version == 13 ? 12 : 13) );
+        if (! cksum.TestChecksums(h.c_cib, h.c_primary, h.c_masked))
+            throw PuzLoadError(_T("Checksums do not match"));
+    }
 
     SetupGrid();
     SetupClues();
