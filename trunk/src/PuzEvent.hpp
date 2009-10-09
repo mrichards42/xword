@@ -19,7 +19,6 @@
 #ifndef PUZ_EVENT_H
 #define PUZ_EVENT_H
 
-#include "defs.hpp"
 #include <wx/event.h>
 #include <wx/gdicmn.h>  // wxPoint
 
