@@ -34,7 +34,6 @@
 #endif
 
 #include "puz/XGrid.hpp"
-#include "defs.hpp"
 
 
 // For checking grid squares

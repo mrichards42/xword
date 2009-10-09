@@ -100,4 +100,3 @@ wxString GetImagesDirectory()
 
     return wxEmptyString;
 }
-
