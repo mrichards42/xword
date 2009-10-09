@@ -1,5 +1,8 @@
 Version 0.2 (10/09/2009)
     * Rebus puzzles can now be solved!
+    * Scrambled puzzles are checked once the puzzle is completely filled.
+    * "Corrupted" .puz files with the wrong version string are automatically
+      tested with other version strings.
     * Puzzle information sections (clue prompt, author, title, and copyright)
       are now centered instead of left- and top-aligned.  This will be
       configurable in the future.

@@ -357,3 +357,34 @@ XGridScrambler::GetSolutionDown()
 
     return ret;
 }
+
+
+// Same as GetSolutionDown, but for the user grid
+wxString
+XGridScrambler::GetUserGridDown()
+{
+    wxASSERT(m_grid.GetWidth() > 0 && m_grid.GetHeight() > 0);
+
+    wxString ret;
+
+    for (XSquare * square = m_grid.First();
+         square != NULL;
+         square = square->Next(DIR_DOWN))
+    {
+        if (square->IsWhite())
+            ret.append(static_cast<wxChar>(square->GetPlainText()));
+    }
+
+    return ret;
+}
+
+
+
+bool
+XGridScrambler::CheckUserGrid(XGrid & grid)
+{
+    XGridScrambler scrambler(grid);
+    unsigned short cksum =
+            Checksummer::cksum_region(scrambler.GetUserGridDown(), 0);
+    return cksum == grid.GetCksum();
+}

@@ -22,6 +22,7 @@
 
 // Puz library
 #include "PuzEvent.hpp"
+#include "puz/Scrambler.hpp"
 
 // Windows
 #include "dialogs/Layout.hpp"
@@ -403,29 +404,18 @@ MyFrame::CheckPuzzle()
 {
     if (m_gridCtrl->GetBlankCount() == 0)
     {
-        if (m_puz.IsScrambled())
+        if (m_gridCtrl->IsCorrect())
         {
             StopTimer();
-            m_status->SetAlert(
-                _T("The puzzle is completely filled, ")
-                _T("but the solution is scrambled"),
-                *wxWHITE, wxColor(0, 255, 255));
+            m_status->SetAlert(_T("The puzzle is filled correctly!"),
+                              *wxWHITE, *wxGREEN);
         }
         else
         {
-            if (m_gridCtrl->GetIncorrectCount() == 0)
-            {
-                StopTimer();
-                m_status->SetAlert(_T("The puzzle is filled correctly!"),
-                                  *wxWHITE, *wxGREEN);
-            }
-            else
-            {
-                m_status->SetAlert(
-                    _T("The puzzle is completely filled,")
-                    _T("but some letters are incorrect"),
-                    *wxWHITE, *wxRED);
-            }
+            m_status->SetAlert(
+                _T("The puzzle is completely filled,")
+                _T("but some letters are incorrect"),
+                *wxWHITE, *wxRED);
         }
     }
     else

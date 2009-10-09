@@ -173,6 +173,12 @@ XGrid::UnscrambleSolution(unsigned short key)
     return scrambler.UnscrambleSolution(key);
 }
 
+bool
+XGrid::CheckScrambledGrid()
+{
+    return XGridScrambler::CheckUserGrid(*this);
+}
+
 
 #include <wx/stopwatch.h>
 #include <wx/log.h>

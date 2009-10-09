@@ -258,6 +258,7 @@ public:
 
     int GetBlankCount()     const { return m_blankSquares; }
     int GetIncorrectCount() const { return m_incorrectSquares; }
+    bool IsCorrect();
 
 
     XSquare * GetClueNumber     (int num);

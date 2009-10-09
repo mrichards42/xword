@@ -218,6 +218,17 @@ XGridCtrl::RecheckGrid()
     m_blankSquares     = wrongOrBlank.size() - incorrect.size();
 }
 
+bool
+XGridCtrl::IsCorrect()
+{
+    // We *can* test scrambled puzzles!  Not sure why I didn't think of
+    // this before.  (Inspired by Alex Boisvert:
+    // http://alexboisvert.com/software.html#check)
+    return m_blankSquares == 0 &&
+        (m_incorrectSquares == 0 ||
+            (m_grid->IsScrambled() && m_grid->CheckScrambledGrid()));
+}
+
 //-------------------------------------------------------
 // Drawing functions
 //-------------------------------------------------------
