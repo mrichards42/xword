@@ -458,10 +458,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\defs.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\MyConfig.hpp"
 				>
 			</File>
@@ -499,10 +495,6 @@
 			</File>
 			<File
 				RelativePath=".\src\CluePanel.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MyConfig.cpp"
 				>
 			</File>
 			<File

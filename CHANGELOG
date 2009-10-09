@@ -1,9 +1,4 @@
-
-
-
-
-
-Version 0.2 (date)
+Version 0.2 (10/09/2009)
     * Rebus puzzles can now be solved!
     * Puzzle information sections (clue prompt, author, title, and copyright)
       are now centered instead of left- and top-aligned.  This will be
