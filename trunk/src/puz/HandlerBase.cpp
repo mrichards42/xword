@@ -46,5 +46,3 @@ HandlerBase::SetupClues()
     }
     wxASSERT(clue_it == m_puz->m_clues.end());
 }
-
-
