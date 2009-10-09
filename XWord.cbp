@@ -65,62 +65,226 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Unit filename="src/App.cpp" />
-		<Unit filename="src/App.hpp" />
-		<Unit filename="src/ClueListBox.cpp" />
-		<Unit filename="src/ClueListBox.hpp" />
-		<Unit filename="src/CluePanel.cpp" />
-		<Unit filename="src/CluePanel.hpp" />
-		<Unit filename="src/MyConfig.cpp" />
-		<Unit filename="src/MyConfig.hpp" />
-		<Unit filename="src/MyFrame.cpp" />
-		<Unit filename="src/MyFrame.hpp" />
-		<Unit filename="src/MyStatusBar.cpp" />
-		<Unit filename="src/MyStatusBar.hpp" />
-		<Unit filename="src/PuzEvent.cpp" />
-		<Unit filename="src/PuzEvent.hpp" />
-		<Unit filename="src/XGridCtrl.cpp" />
-		<Unit filename="src/XGridCtrl.hpp" />
-		<Unit filename="src/defs.hpp" />
-		<Unit filename="src/dialogs/Layout.hpp" />
-		<Unit filename="src/dialogs/Properties.hpp" />
-		<Unit filename="src/dialogs/formbuilder/Properties.cpp" />
-		<Unit filename="src/dialogs/formbuilder/Properties.h" />
-		<Unit filename="src/puz/Checksummer.cpp" />
-		<Unit filename="src/puz/Checksummer.hpp" />
-		<Unit filename="src/puz/HandlerBase.cpp" />
-		<Unit filename="src/puz/HandlerBase.hpp" />
-		<Unit filename="src/puz/PuzCk.hpp" />
-		<Unit filename="src/puz/PuzHandler.cpp" />
-		<Unit filename="src/puz/PuzHandler.hpp" />
-		<Unit filename="src/puz/Scrambler.cpp" />
-		<Unit filename="src/puz/Scrambler.hpp" />
-		<Unit filename="src/puz/TxtHandler.cpp" />
-		<Unit filename="src/puz/TxtHandler.hpp" />
-		<Unit filename="src/puz/XGrid.cpp" />
-		<Unit filename="src/puz/XGrid.hpp" />
-		<Unit filename="src/puz/XPuzzle.cpp" />
-		<Unit filename="src/puz/XPuzzle.hpp" />
-		<Unit filename="src/puz/XSquare.cpp" />
-		<Unit filename="src/puz/XSquare.hpp" />
-		<Unit filename="src/utils/ByteArray.cpp" />
-		<Unit filename="src/utils/ByteArray.hpp" />
-		<Unit filename="src/utils/ConfigManager.hpp" />
-		<Unit filename="src/utils/DragAndDrop.hpp" />
-		<Unit filename="src/utils/SizerPrinter.hpp" />
-		<Unit filename="src/utils/ToolInfo.cpp" />
-		<Unit filename="src/utils/ToolInfo.hpp" />
-		<Unit filename="src/utils/ToolManager.cpp" />
-		<Unit filename="src/utils/ToolManager.hpp" />
-		<Unit filename="src/utils/wrap.cpp" />
-		<Unit filename="src/utils/wrap.hpp" />
-		<Unit filename="src/widgets/SizedText.cpp" />
-		<Unit filename="src/widgets/SizedText.hpp" />
-		<Unit filename="src/widgets/ctrlwitems.hpp" />
-		<Unit filename="src/widgets/mlistbox.hpp" />
-		<Unit filename="src/widgets/odlistbox.hpp" />
-		<Unit filename="src/widgets/vlboxcache.cpp" />
-		<Unit filename="src/widgets/vlboxcache.hpp" />
+		<Unit filename="src/App.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/App.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/ClueListBox.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/ClueListBox.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/CluePanel.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/CluePanel.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/MyFrame.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/MyFrame.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/MyStatusBar.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/MyStatusBar.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/PuzEvent.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/PuzEvent.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/XGridCtrl.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/XGridCtrl.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/dialogs/Layout.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/dialogs/Properties.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/dialogs/formbuilder/Properties.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/dialogs/formbuilder/Properties.h">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/paths.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/paths.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/Checksummer.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/Checksummer.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/HandlerBase.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/HandlerBase.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/PuzCk.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/PuzHandler.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/PuzHandler.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/Scrambler.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/Scrambler.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/TxtHandler.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/TxtHandler.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/XGrid.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/XGrid.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/XPuzzle.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/XPuzzle.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/XSquare.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/puz/XSquare.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/ByteArray.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/ByteArray.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/ConfigManager.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/DragAndDrop.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/SizerPrinter.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/ToolInfo.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/ToolInfo.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/ToolManager.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/ToolManager.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/wrap.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/utils/wrap.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/widgets/SizedText.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/widgets/SizedText.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/widgets/ctrlwitems.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/widgets/mlistbox.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/widgets/odlistbox.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/widgets/vlboxcache.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/widgets/vlboxcache.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />
