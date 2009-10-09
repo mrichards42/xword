@@ -296,7 +296,7 @@ XSquare::Check(bool checkBlank)  const
 
 
 
-// Information abotu text and solution
+// Information about text and solution
 //------------------------------------
 
 inline
@@ -311,7 +311,6 @@ inline
 bool
 XSquare::HasSolutionRebus() const
 {
-    wxASSERT(! m_solution.empty());
     return ! m_solution.IsSameAs( static_cast<wxChar>(GetPlainSolution()) );
 }
 
@@ -320,7 +319,6 @@ inline
 bool
 XSquare::HasTextSymbol() const
 {
-    wxASSERT(! m_text.empty());
     return m_text.length() == 3
         && m_text.at(0) == _T('[') && m_text.at(2) == _T(']');
 }
