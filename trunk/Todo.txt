@@ -25,7 +25,7 @@ Create a suite of test puzzles for a variety of cases:
         - Missing nul-terminators (many places for this)
 
 
-Graphical front-end for the rest of the config options
+Graphical front-end for the rest of the config options (only a few)
 
 Printing
 

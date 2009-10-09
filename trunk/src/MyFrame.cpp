@@ -557,8 +557,6 @@ MyFrame::MakeMenuBar()
         m_toolMgr.Add(menu, ID_LAYOUT_PANES);
         m_toolMgr.Add(menu, ID_LOAD_LAYOUT);
         m_toolMgr.Add(menu, ID_SAVE_LAYOUT);
-        menu->AppendSeparator();
-        m_toolMgr.Add(menu, ID_OPTIONS);
     mb->Append(menu, _T("&View"));
 
     // Solution Menu
