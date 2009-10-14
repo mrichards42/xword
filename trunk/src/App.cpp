@@ -317,17 +317,12 @@ MyApp::OnActivate(wxActivateEvent & evt)
     // MyFrame will NULL this pointer when it is destroyed
     if (m_frame != NULL)
     {
-        if (evt.GetActive())
-        {
-            wxLogDebug(_T("App Activate"));
-            if (! m_frame->IsIconized() && m_isTimerRunning)
-                m_frame->StartTimer();
-        }
-        else
+        // The frame will handle starting the timer
+        if (! evt.GetActive())
         {
             wxLogDebug(_T("App Deactivate"));
-            m_isTimerRunning = m_frame->IsTimerRunning();
-            m_frame->StopTimer();
+            wxLogDebug(_T("Stopping timer."));
+            m_frame->OnAppDeactivate();
         }
     }
 

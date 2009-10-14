@@ -124,6 +124,8 @@ public:
 
     ~XGridCtrl();
 
+    void SetPaused(bool pause = true) { m_isPaused = pause; Refresh(); }
+
     void SetFocus() { SetFocusIgnoringChildren(); }
 
     void SetXGrid(XGrid * grid);
@@ -291,6 +293,7 @@ protected:
 
     // Drawing functions
     void OnPaint(wxPaintEvent & evt);
+    void DrawPauseMessage(wxDC & dc);
     void DrawGrid(wxDC & dc, const wxRegion & updateRegion = wxRegion());
 
     void DrawSquare(wxDC & dc, const XSquare & square, const wxColour & color);
@@ -317,6 +320,7 @@ protected:
     int m_boxSize;              // width/heigth of a square
     int m_lastBoxSize;          // The last non-fitted box size
     bool m_fit;                 // Fit the grid to the window?
+    bool m_isPaused;            // Trigger a "Paused" message?
 
     wxFont m_numberFont;
     wxFont m_letterFont[8];  // Cache fonts for all rebus lengths

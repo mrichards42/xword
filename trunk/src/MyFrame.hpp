@@ -104,6 +104,9 @@ public:
     void ToggleTimer()
         { if (IsTimerRunning()) m_timer.Stop(); else m_timer.Start(); }
 
+    void OnAppDeactivate();
+    void OnAppActivate();
+
 private:
     // Windows
     //--------
@@ -236,6 +239,7 @@ private:
     void OnLoadLayout (wxCommandEvent & WXUNUSED(evt));
     void OnSaveLayout (wxCommandEvent & WXUNUSED(evt));
     void OnShowNotes  (wxCommandEvent & WXUNUSED(evt));
+    void OnAuiPaneClose(wxAuiManagerEvent & evt);
 
     // Timer
     void OnTimer      (wxCommandEvent & WXUNUSED(evt));
@@ -344,25 +348,6 @@ MyFrame::LoadLayout(const wxString & name, bool update)
         return false;
 
     return LoadLayoutString(perspective, update);
-}
-
-
-inline bool
-MyFrame::LoadLayoutString(const wxString & layout, bool update)
-{
-    // Save the toolbar size so it isn't cut off
-    //wxSize tbSize = m_toolbar->GetMinSize();
-
-    if (! m_mgr.LoadPerspective(layout, false))
-        return false;
-
-    // Restore toolbar size
-    //m_mgr.GetPane(m_toolbar).BestSize(tbSize);
-
-    if (update)
-        m_mgr.Update();
-
-    return true;
 }
 
 
