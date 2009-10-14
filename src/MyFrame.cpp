@@ -134,7 +134,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
     EVT_ACTIVATE       (                      MyFrame::OnActivate)
     EVT_CLOSE          (                      MyFrame::OnClose)
-
+    EVT_AUI_PANE_CLOSE (                      MyFrame::OnAuiPaneClose)
 
 #ifdef __WXDEBUG__
 
@@ -696,6 +696,28 @@ MyFrame::ManageWindows()
 }
 
 
+bool
+MyFrame::LoadLayoutString(const wxString & layout, bool update)
+{
+    // Save the toolbar size so it isn't cut off
+    //wxSize tbSize = m_toolbar->GetMinSize();
+
+    if (! m_mgr.LoadPerspective(layout, false))
+        return false;
+
+    // Restore toolbar size
+    //m_mgr.GetPane(m_toolbar).BestSize(tbSize);
+
+    if (update)
+        m_mgr.Update();
+
+    m_toolMgr.Check(ID_SHOW_NOTES, m_mgr.GetPane(_T("Notes")).IsShown());
+
+    return true;
+}
+
+
+
 //------------------------------------------------------------------------------
 // Tool management
 //------------------------------------------------------------------------------
@@ -770,6 +792,8 @@ MyFrame::EnableSave(bool enable)
         wxASSERT(! m_toolMgr.IsAttached(ID_SAVE, m_toolbar) &&
                    m_toolMgr.IsAttached(ID_SAVE_AS, m_toolbar) );
     }
+    // Have to call Realize() since we have inserted a tool.
+    m_toolbar->Realize();
 }
 
 void
@@ -1151,7 +1175,7 @@ MyFrame::OnLayout(wxCommandEvent & evt)
         wxAuiPaneInfo & info = panes.Item(i);
         info.Floatable(allowMove).Dockable(allowMove);
         info.CaptionVisible(allowMove);
-        info.CloseButton(allowMove);
+        //info.CloseButton(allowMove);
     }
     m_mgr.Update();
 }
@@ -1235,6 +1259,13 @@ MyFrame::OnShowNotes(wxCommandEvent & evt)
     ShowPane(_T("Notes"), evt.IsChecked());
 }
 
+
+void
+MyFrame::OnAuiPaneClose(wxAuiManagerEvent & evt)
+{
+    if (evt.GetPane()->name == _T("Notes"))
+        m_toolMgr.Check(ID_SHOW_NOTES, false);
+}
 
 
 void
@@ -1343,12 +1374,14 @@ MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
 // Frame events
 //------------------------------------------------------------------------------
 
+// Here's the weird way this needs to happen:
+// The wxApp stops the timer
+// The wxFrame starts the timer
 void
 MyFrame::OnActivate(wxActivateEvent & evt)
 {
     if (evt.GetActive())
     {
-        wxLogDebug(_T("Frame Activate"));
         if (! IsIconized())
         {
             // Keep focus on the XGridCtrl
@@ -1356,15 +1389,34 @@ MyFrame::OnActivate(wxActivateEvent & evt)
             // SetFocus() failed messages
             m_gridCtrl->SetFocus();
 
-            // When we restore (from the task bar) the frame, the App doesn't
-            // receive an activate event, so this is needed. . . . It shouldn't
-            // need to be here.
-            if (wxGetApp().m_isTimerRunning)
-                StartTimer();
+            OnAppActivate();
         }
     }
 
     evt.Skip();
+}
+
+
+void
+MyFrame::OnAppActivate()
+{
+    if (m_toolMgr.IsChecked(ID_TIMER))
+    {
+        wxLogDebug(_T("Starting timer."));
+        StartTimer();
+        m_gridCtrl->SetPaused(false);
+    }
+}
+
+
+void
+MyFrame::OnAppDeactivate()
+{
+    if (m_toolMgr.IsChecked(ID_TIMER))
+    {
+        StopTimer();
+        m_gridCtrl->SetPaused(true);
+    }
 }
 
 

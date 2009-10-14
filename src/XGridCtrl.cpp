@@ -113,6 +113,7 @@ void XGridCtrl::Init()
 
     m_direction = DIR_ACROSS;
 
+    m_isPaused = false;
     m_fit = true;
     m_boxSize = 20;
     m_borderSize = 1;
@@ -241,11 +242,20 @@ XGridCtrl::OnPaint(wxPaintEvent & WXUNUSED(evt))
     DoPrepareDC(dc);
     dc.SetBackground(wxBrush(GetBackgroundColour()));
     dc.Clear();
-    DrawGrid(dc, GetUpdateRegion());
+    if (! m_isPaused)
+        DrawGrid(dc, GetUpdateRegion());
+    else
+        DrawPauseMessage(dc);
 
     //wxScrolledWindow::SetFocus();
 }
 
+
+void
+XGridCtrl::DrawPauseMessage(wxDC & dc)
+{
+    dc.DrawLabel(_T("(Paused)"), wxRect(wxPoint(0,0), dc.GetSize()), wxALIGN_CENTER);
+}
 
 
 void
