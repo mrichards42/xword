@@ -1,3 +1,10 @@
+Version 0.2.1 (bug fix) (10/14/2009)
+    * Fixed timer starting/stopping issues when activating and deactivating
+      XWord.
+    * Notepad window can be closed.
+    * The grid is replaced with a "(Paused)" message if the timer is running
+      when XWord is deactivated.
+
 Version 0.2 (10/09/2009)
     * Rebus puzzles can now be solved!
     * Scrambled puzzles are checked once the puzzle is completely filled.
