@@ -1,4 +1,4 @@
-#include "formbuilder/Properties.h"
+#include "wxFB_Dialogs.h"
 #include "../MyFrame.hpp"
 #include "../CluePanel.hpp"
 #include "../XGridCtrl.hpp"
@@ -55,11 +55,11 @@ protected:
         if (selection == 0)
             style = RemoveFlag(style, MOVE_AFTER_LETTER | MOVE_TO_NEXT_BLANK);
         else if (selection == 1)
-            style = AddFlag( style, MOVE_AFTER_LETTER | MOVE_TO_NEXT_BLANK );
+            style = AddFlag( RemoveFlag(style, MOVE_TO_NEXT_BLANK), MOVE_AFTER_LETTER);
         else
         {
             wxASSERT(selection == 2);
-            style = AddFlag( RemoveFlag(style, MOVE_TO_NEXT_BLANK), MOVE_AFTER_LETTER);
+            style = AddFlag( RemoveFlag(style, MOVE_AFTER_LETTER), MOVE_TO_NEXT_BLANK);
         }
         m_frame->m_gridCtrl->SetGridStyle(style);
         evt.Skip();
