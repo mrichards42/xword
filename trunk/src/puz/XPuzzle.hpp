@@ -50,6 +50,7 @@ public:
 
     void Clear();
     bool IsOk()        const { return m_isOk; }
+    void SetOk(bool doit=true) { m_isOk = doit; }
     bool IsScrambled() const { return m_grid.IsScrambled(); }
     short GetVersion() const { return m_version; }
 

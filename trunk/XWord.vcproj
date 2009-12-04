@@ -325,10 +325,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\utils\DragAndDrop.hpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\utils\ToolInfo.hpp"
 					>
 				</File>
@@ -416,16 +412,12 @@
 			<Filter
 				Name="Source Files"
 				>
-			</Filter>
-			<Filter
-				Name="formbuilder"
-				>
 				<File
-					RelativePath=".\src\dialogs\formbuilder\Properties.cpp"
+					RelativePath=".\src\dialogs\Convert.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\dialogs\formbuilder\Properties.h"
+					RelativePath=".\src\dialogs\wxFB_Dialogs.cpp"
 					>
 				</File>
 			</Filter>
@@ -433,11 +425,19 @@
 				Name="Header Files"
 				>
 				<File
+					RelativePath=".\src\dialogs\Convert.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\dialogs\Layout.hpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\dialogs\Properties.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\dialogs\wxFB_Dialogs.h"
 					>
 				</File>
 			</Filter>

@@ -32,7 +32,7 @@ PuzHandler::DoLoad()
     Read(&h.c_primary, 2);
     Read(h.formatstr, 12);
     if (strcmp(h.formatstr, "ACROSS&DOWN") != 0)
-        throw PuzLoadError(_T("This is not a valid Across puzzle file."));
+        throw PuzTypeError(_T("This is not a valid Across puzzle file."));
 
     Read(&h.c_cib, 2);
     Read(h.c_masked, 8);
@@ -40,10 +40,10 @@ PuzHandler::DoLoad()
     Read(h.version, 4);
 
     if (h.version[0] != '1')
-        throw PuzLoadError(_T("This puzzle uses a later version that this ")
+        throw PuzHeaderError(_T("This puzzle uses a later version that this ")
                            _T("version of XWord can't read."));
     if (h.version[2] < '1' || h.version[2] > '9')
-         throw PuzLoadError(_T("Bad puzzle version"));
+         throw PuzHeaderError(_T("Bad puzzle version"));
 
     // We're using the assumption that both are valid numbers, as checked above
     // ASCII '1' is 0x31
@@ -98,6 +98,8 @@ PuzHandler::DoLoad()
     }
     wxASSERT(sol_it == solution.end() && text_it == gridText.end());
 
+    SetupGrid();
+
     m_puz->m_title       = ReadString();
     m_puz->m_author      = ReadString();
     m_puz->m_copyright   = ReadString();
@@ -105,33 +107,33 @@ PuzHandler::DoLoad()
     for (size_t i = 0; i < h.num_clues; ++i)
         m_puz->m_clues.push_back(ReadString());
 
+    SetupClues();
+
     m_puz->m_notes = ReadString();
 
-    // Find extra sections (i.e. GEXT, LTIM, etc)
+    // At this point we've read in all the essential puzzle information.
+    // Even if loading the sections fails miserably, or if the checksums
+    // aren't correct, we can still display a puzzle.
+    // Any functions we call from here on out are welcome to throw
+    // exceptions, and our caller is welcome to catch those exceptions
+    // and still try to display the puzzle.
+
+    wxString sectionError;
+    bool checksumsOk;
+
+    // Try to load the extra sections (i.e. GEXT, LTIM, etc).
     try
     {
         LoadSections();
+        sectionError = wxEmptyString;
     }
-    // This is a reference to an event, so we can set error.isProcessed
-    catch (PuzLoadError & error)
+    catch (PuzDataError & error)
     {
-        if (error.isProcessed)
-            throw;
-
-        error.isProcessed = true;
-
-        int ret = wxMessageBox(error.message
-                      + _T("\n\n")
-                        _T("Puzzle grid and clues are intact ")
-                        _T("but other parts may be corrupted.")
-                        _T("\n\n")
-                        _T("Continue?"),
-                        wxMessageBoxCaptionStr,
-                        wxYES_NO | wxICON_EXCLAMATION);
-
-        if (ret == wxNO)
-            throw;
+        sectionError = error.what();
     }
+
+
+    // Test the checksums
 
     Checksummer cksum(*m_puz, version);
 
@@ -140,17 +142,22 @@ PuzHandler::DoLoad()
     cksum.SetSolution(solution);
     cksum.SetGridText(gridText);
 
-    if (! cksum.TestChecksums(h.c_cib, h.c_primary, h.c_masked))
+    checksumsOk = cksum.TestChecksums(h.c_cib, h.c_primary, h.c_masked);
+    if (! checksumsOk)
     {
         // We're going to test both 1.3 and 1.2 as versions because some files
         // with notepads don't have the correct version . . .
         cksum.SetVersion( (version == 13 ? 12 : 13) );
-        if (! cksum.TestChecksums(h.c_cib, h.c_primary, h.c_masked))
-            throw PuzLoadError(_T("Checksums do not match"));
+        checksumsOk = cksum.TestChecksums(h.c_cib, h.c_primary, h.c_masked);
     }
 
-    SetupGrid();
-    SetupClues();
+    // Throw errors if there are any
+    if (! checksumsOk)
+        throw PuzChecksumError(_T("File checksums don't match."));
+    if (! sectionError.empty())
+        throw PuzSectionError(sectionError);
+
+    m_puz->SetOk(checksumsOk && sectionError.empty());
 }
 
 
@@ -263,8 +270,8 @@ PuzHandler::LoadSections()
         unsigned short length;
         Read(&length, 2);
         if (length == 0)
-            throw PuzLoadError(_T("Length of %s region is 0"),
-                               title.to_string().c_str());
+            throw PuzSectionError(_T("Length of %s region is 0"),
+                                  title.to_string().c_str());
 
         unsigned short ck_section;
         Read(&ck_section, 2);
@@ -273,12 +280,12 @@ PuzHandler::LoadSections()
         Read(&data[0], length);
 
         if (ck_section != Checksummer::cksum_region(data, 0))
-            throw PuzLoadError(_T("Checksum does not match for %s region"),
-                               title.to_string().c_str());
+            throw PuzSectionError(_T("Checksum does not match for %s region"),
+                                  title.to_string().c_str());
 
         if (m_inStream->GetC() != '\0')
-            throw PuzLoadError(_T("Missiong nul-terminator for %s region"),
-                               title.to_string().c_str());
+            throw PuzSectionError(_T("Missiong nul-terminator for %s region"),
+                                  title.to_string().c_str());
 
         sections[title.to_string()] = data;
     }
@@ -352,11 +359,11 @@ PuzHandler::SetLTIM(const ByteArray & data)
     // Split the string at the ','
     size_t index = str.find(_T(","));
     if (index == wxString::npos || index == 0)
-        throw PuzLoadError(_T("Missing ',' in LTIM section"));
+        throw PuzSectionError(_T("Missing ',' in LTIM section"));
 
     long time;
     if (! str.Left(index).ToLong(&time))
-        throw PuzLoadError(_T("Incorrect time value"));
+        throw PuzSectionError(_T("Incorrect time value"));
     m_puz->m_time = time;
 }
 
@@ -387,11 +394,11 @@ PuzHandler::SetRUSR(const ByteArray & data)
         if (str.at(0) == _T('['))
         {
             if (str.at(3) != _T(']'))
-                throw PuzLoadError(_T("Missing ']' in RUSR section"));
+                throw PuzSectionError(_T("Missing ']' in RUSR section"));
 
             wxChar num = str.at(1);
             if (num > 255)
-                throw PuzLoadError(_T("Invalid entry in RUSR section"));
+                throw PuzSectionError(_T("Invalid entry in RUSR section"));
         }
 
         square->SetText(str);
@@ -433,7 +440,7 @@ PuzHandler::SetSolutionRebus(const ByteArray & table, const ByteArray & grid)
 
         long index;
         if (! key.ToLong(&index))
-            throw PuzLoadError(_T("Invalid rebus table key"));
+            throw PuzSectionError(_T("Invalid rebus table key"));
 
         // The index value in the rebus-table section is 1 less than the
         // index in the grid-rebus, so we need add 1 here.
@@ -466,7 +473,7 @@ PuzHandler::SetSolutionRebus(const ByteArray & table, const ByteArray & grid)
             std::map<unsigned char, wxString>::const_iterator it;
             it = rebusTable.find(*rebus_it);
             if (it == rebusTable.end())
-                throw PuzLoadError(_T("Invalid value in GRBS section"));
+                throw PuzSectionError(_T("Invalid value in GRBS section"));
 
             // Make sure we're not overwriting the plain solution for
             // unscrambling

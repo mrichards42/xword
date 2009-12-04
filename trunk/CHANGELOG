@@ -1,3 +1,21 @@
+Version 0.3 (??/??/???)
+    * A dialog supporting batch conversion of puzzle files (from .txt to .puz
+      and vice-versa) has been added under the tools menu.  If the
+      -convert [-c] command line option is given when XWord is invoked, only
+      the conversion dialog appears.  Closing the dialog ends the program.
+      Files to convert can still be given as command line parameters, and other
+      options (-directory [-d], -output-files [-o], -overwrite [-w]) work as
+      expected. If XWord is invoked with -c, conversion begins immediately.
+    * A correctly filled grid with revealed letters is noted as solved instead
+      of displaying the message
+        "The puzzle is completely filled, but some letters are incorrect."
+    * If a puzzle file is corrupt and not entirely unrecoverable, an option is
+      given to load the puzzle anyway.
+
+    Options dialog
+    * "Move to next square" and "Move to next blank" under the "After entering
+      a letter" option now work as expeted.
+
 Version 0.2.1 (bug fix) (10/14/2009)
     * Fixed timer starting/stopping issues when activating and deactivating
       XWord.

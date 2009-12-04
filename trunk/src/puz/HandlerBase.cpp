@@ -25,6 +25,8 @@
 void
 HandlerBase::SetupClues()
 {
+    // If the clues don't setup correctly, it means there is a mismatch between
+    // the grid and the clues.  We can't load the puzzle.
     std::vector<wxString>::iterator clue_it = m_puz->m_clues.begin();
     for (XSquare * square = m_puz->m_grid.First();
          square != NULL;
@@ -32,17 +34,19 @@ HandlerBase::SetupClues()
     {
         if (square->HasClue(DIR_ACROSS))
         {
-            wxASSERT(clue_it != m_puz->m_clues.end());
+            if (clue_it == m_puz->m_clues.end())
+                throw FatalPuzError(_T("Clues and grid don't match."));
             m_puz->m_across.push_back( XPuzzle::Clue(square->m_number,
                                                    *clue_it++) );
         }
 
         if (square->HasClue(DIR_DOWN))
         {
+            if (clue_it == m_puz->m_clues.end())
+                throw FatalPuzError(_T("Clues and grid don't match."));
             wxASSERT(clue_it != m_puz->m_clues.end());
             m_puz->m_down.push_back( XPuzzle::Clue(square->m_number,
                                                  *clue_it++) );
         }
     }
-    wxASSERT(clue_it == m_puz->m_clues.end());
 }

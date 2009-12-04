@@ -388,3 +388,16 @@ XGridScrambler::CheckUserGrid(XGrid & grid)
             Checksummer::cksum_region(scrambler.GetUserGridDown(), 0);
     return cksum == grid.GetCksum();
 }
+
+
+
+unsigned short
+XGridScrambler::BruteForceUnscramble()
+{
+    for (unsigned short i = 1000; i <= 9999; ++i)
+    {
+        if (UnscrambleSolution(i))
+            return i;
+    }
+    return 0;
+}

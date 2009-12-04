@@ -20,20 +20,33 @@
 
 #include "HandlerBase.hpp"
 #include <wx/txtstrm.h>
-#include <stack>
+#include <stack> // For holding extra lines.
+
+// Rebus stuff
+#include <set>
+#include <map>
+// ( ( long_entry, short_entry), circle? )
+typedef std::pair< std::pair<wxString, char>, bool > RebusPair;
+typedef std::set<RebusPair> RebusSet;
+typedef std::map<RebusPair, char> RebusMap;
 
 class TxtHandler : public HandlerBase
 {
 protected:
     void DoLoad();
+    void DoSave();
 
     void LoadVersion1Grid();
     void LoadVersion2Grid();
 
+    void WriteVersion1Grid();
+    void GetRebusEntries(RebusSet & rebusEntries);
+    void WriteVersion2Grid(const RebusSet & rebusEntries);
+
     wxString GetExtension()   const { return _T("txt"); }
     wxString GetDescription() const { return _T("Plain text format"); }
     bool CanLoad() const { return true; }
-    bool CanSave() const { return false; }
+    bool CanSave() const { return true; }
 
 private:
     wxTextInputStream * m_inText;
@@ -97,7 +110,7 @@ void
 TxtHandler::CheckSection(const wxString & name)
 {
     if (ReadLine() != name)
-        throw PuzLoadError(_T("Missing %s header"), name.c_str());
+        throw PuzTypeError(_T("Missing %s header"), name.c_str());
 }
 
 inline

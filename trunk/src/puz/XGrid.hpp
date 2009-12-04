@@ -130,6 +130,7 @@ public:
     // Scrambling
     bool ScrambleSolution  (unsigned short key = 0);
     bool UnscrambleSolution(unsigned short key);
+    unsigned short BruteForceUnscramble();
     bool CheckScrambledGrid();
 
     unsigned short  GetKey()   const { return m_key; }

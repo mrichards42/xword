@@ -1,3 +1,24 @@
+// This file is part of XWord    
+// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+#ifndef CONVERT_DLG_H
+#define CONVERT_DLG_H
+
 #include "wxFB_Dialogs.h"
 #include "../puz/XPuzzle.hpp"
 #include <wx/filename.h>
@@ -10,250 +31,64 @@ public:
                   const wxArrayString & input = wxArrayString(),
                   const wxArrayString & output = wxArrayString(),
                   const wxString & output_directory = wxEmptyString,
-                  const wxString & logfile = wxEmptyString)
-        : wxFB_ConvertDialog(parent, wxID_ANY)
-    {
-        // Setup the files list
-        m_list->InsertColumn(0, _T("Input"));
-        m_list->InsertColumn(1, _T("Output"));
-        m_list->InsertColumn(2, _T("Status"));
+                  const wxString & logfile = wxEmptyString,
+                  bool overwrite = false,
+                  bool strict_errors = false);
 
-        wxASSERT(input.size() == output.size() || output.IsEmpty());
+    // Files list
+    bool AddFile(const wxString & input,
+                 const wxString & output = wxEmptyString);
+    void RemoveFile(long index);
+    void AutoSizeColumns(int index = -1);
 
-        // Set the output directory options
-        const bool hasOutputDir = ! output_directory.IsEmpty();
-        m_outputDirectory->Enable(hasOutputDir);
-        m_outputDirectory->SetPath(output_directory);
-        m_specifyDirectory->SetValue(hasOutputDir);
+    void StartConversion();
+    void StopConversion();
+    int ConvertFile(long index, bool ignore_errors = true);
+    int HandleExceptions(long index, bool ignore_errors = true);
 
-        // Set the log file options
-        const bool hasLogfile = ! logfile.IsEmpty();
-        m_logfile->Enable(hasLogfile);
-        m_logfile->SetPath(logfile);
-        m_useLog->SetValue(hasOutputDir);
-
-        // Input / Output files
-        const bool hasOutput = ! output.IsEmpty();
-        for (int i = 0; i < input.size(); ++i)
-        {
-            if (hasOutput)
-                AddFile(input[i], output[i]);
-            else
-                AddFile(input[i]);
-        }
-
-        // Only show the options if we haven't been given any.
-        ShowOptions(! (hasOutputDir || hasLogfile || ! input.IsEmpty()));
-    }
-
-protected:
-    bool m_isRunning;
-    // [index] = ( (input, output), status )
-    std::list< std::pair< std::pair<wxString, wxString>, int > > m_items;
-
-    // Show / hide the options pane
-    //-----------------------------
-
-    void ShowOptions(bool show = true)
-    {
-        if (show == m_mainSizer->IsShown(m_optionsSizer))
-            return;
-
-        if (show)
-        {
-            m_optionsButton->SetLabel(_T("Options <<<"));
-            m_mainSizer->Show(m_optionsSizer, true);
-        }
-        else
-        {
-            m_optionsButton->SetLabel(_T("Options >>>"));
-            m_mainSizer->Show(m_optionsSizer, false);
-        }
-        Freeze();
-        m_mainSizer->Layout();
-        Fit();
-        Thaw();
-    }
-
+    // Options
+    void ShowOptions(bool show = true);
     void HideOptions() { ShowOptions(false); }
-
     void ToggleOptions()
     {
         ShowOptions(! m_mainSizer->IsShown(m_optionsSizer));
     }
 
-    // ListCtrl Adding / editing
-    //--------------------------
-    wxString GetOutputFile(const wxString & input)
-    {
-        wxFileName in(input);
-        wxFileName out;
-        if (m_specifyDirectory->GetValue())
-        {
-            out.AssignDir(m_outputDirectory->GetPath());
-            out.SetName(in.GetName());
-        }
-        else
-        {
-            wxASSERT(m_useInput->GetValue());
-            out = in;
-        }
+protected:
+    bool m_isRunning;
 
-        // Set the extension to the "opposite" of the input file.
-        if (in.GetExt().Lower() == _T("puz"))
-            out.SetExt(_T("txt"));
-        else
-            out.SetExt(_T("puz"));
-        return out.GetFullPath();
-    }
+    // One item per line in the list.  Value indicates whether or not we
+    // still need to process that item.
+    // See enum ConversionStatus in Convert.cpp (internal use only anyways).
+    std::vector<int> m_conversionStatus;
+    long m_conversionIndex;
+    
+    wxString GetOutputFile(const wxString & input);
+    wxString RenameFile(wxFileName filename);
+    bool     ShouldRename(const wxFileName & filename);
+    wxString GetItemText(long index, int col);
 
-    bool AddFile(const wxString & input,
-                 const wxString & output = wxEmptyString)
-    {
-        long index = m_list->InsertItem(m_list->GetItemCount(), input);
-        if (index == wxNOT_FOUND)
-            return false;
-        if (! output.IsEmpty())
-            m_list->SetItem(index, 1, output);
-        else
-            m_list->SetItem(index, 1, GetOutputFile(input));
-
-        m_items.push_back(
-            std::make_pair(std::make_pair(input, output), index)
-        )
-
-        return true;
-    }
-
-    void RemoveFile(int index)
-    {
-        m_list->DeleteItem(index);
-        m_items.remove(index);
-    }
-
-    void MakeQueue()
-    {
-        m_queue.clear();
-        wxListItem item;
-        int index = -1;
-        for (;;)
-        {
-            index = m_list->GetNextItem(index);
-            if (index == wxNOT_FOUND)
-                break;
-            item.SetId(index);
-            item.SetColumn(2); // The "Status" column
-            m_list->GetItem(item);
-            if (item.GetText() != _T("Done"))
-            {
-                wxASSERT(item.GetText() == wxEmptyString);
-                
-                item.SetColumn(0);
-                m_list->GetItem(item);
-                const wxString input = item.GetText();
-
-                item.SetColumn(1);
-                m_list->GetItem(item);
-                const wxString output = item.GetText();
-
-                m_queue.push_back( std::make_pair(input, output) );
-            }
-        }
-    }
-
-    bool ConvertNextFile()
-    {
-        std::pair<wxString, wxString> file_pair = m_queue.front();
-        m_queue.pop_front();
-
-        wxFileName in(file_pair.first);
-        wxFileName out(file_pair.second);
-        // Make sure we have a directory
-        out.Mkdir(0777, wxPATH_MKDIR_FULL);
-
-        XPuzzle puz;
-        // If we don't understand this extension, treat it as a text file.
-        if (XPuzzle::CanLoad(in.GetExt()))
-            puz.Load(in.GetFullPath());
-        else
-            puz.Load(in.GetFullPath(), _T("txt"));
-
-        if (! puz.IsOk() || ! puz.Save(out.GetFullPath()))
-        {
-
-        }
-    }
+    // This is just for symmetry with GetItemText().
+    void SetItemText(long index, int col, const wxString & text)
+        { m_list->SetItem(index, col, text); }
 
     // Event Handlers
     //---------------
 
     // Options events
     //---------------
-    virtual void OnShowOptions(wxCommandEvent & WXUNUSED(evt))
-    {
-        ToggleOptions();
-    }
-
-	virtual void OnSpecifyDirectory(wxCommandEvent & evt)
-    {
-        m_outputDirectory->Enable(evt.IsChecked());
-    }
-
-	virtual void OnUseLog(wxCommandEvent & evt)
-    {
-        m_logfile->Enable(evt.IsChecked());
-    }
-
+    virtual void OnShowOptions(wxCommandEvent & WXUNUSED(evt));
+	virtual void OnSpecifyDirectory(wxCommandEvent & evt);
+	virtual void OnUseLog(wxCommandEvent & evt);
 
     // Files list events
     //------------------
-	virtual void OnAdd(wxCommandEvent & WXUNUSED(evt))
-    {
-        wxFileDialog dlg(this,
-                         _T("Choose input file(s)"),
-                         wxEmptyString,
-                         wxEmptyString,
-                         XPuzzle::GetLoadTypeString(),
-                         wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
-        if (dlg.ShowModal() == wxID_OK)
-        {
-            wxArrayString files;
-            dlg.GetPaths(files);
-            for (wxArrayString::iterator it = files.begin();
-                 it != files.end();
-                 ++it)
-            {
-                AddFile(*it);
-            }
-        }
-    }
-
-	virtual void OnRemove(wxCommandEvent & WXUNUSED(evt))
-    {
-        int index = -1;
-        for (;;)
-        {
-            index = m_list->GetNextItem(index, wxLIST_NEXT_ALL,
-                                               wxLIST_STATE_SELECTED);
-            if (index == wxNOT_FOUND)
-                break;
-
-            RemoveFile(index);
-        }
-    }
-
-    virtual void OnRunButton(wxCommandEvent & WXUNUSED(evt))
-    {
-        m_isRunning = ! m_isRunning;
-        if (m_isrunning)
-        {
-            m_runButton->SetLabel(_T("Stop"));
-            MakeQueue();
-            ConvertNextFile();
-        }
-        else
-        {
-            m_runButton->SetLabel(_T("Start"));
-        }
-    }
+	virtual void OnAdd(wxCommandEvent & WXUNUSED(evt));
+	virtual void OnRemove(wxCommandEvent & WXUNUSED(evt));
+    virtual void OnRunButton(wxCommandEvent & WXUNUSED(evt));
+    // This is where the conversion takes place.
+    virtual void OnIdle(wxIdleEvent & evt);
 };
+
+
+#endif // CONVERT_DLG_H
