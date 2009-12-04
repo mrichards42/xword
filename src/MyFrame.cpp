@@ -23,10 +23,13 @@
 // Puz library
 #include "PuzEvent.hpp"
 #include "puz/Scrambler.hpp"
+#include "puz/HandlerBase.hpp" // Puz exceptions
+#include "puz/XPuzzle.hpp"
 
 // Windows
 #include "dialogs/Layout.hpp"
 #include "dialogs/Properties.hpp"
+#include "dialogs/Convert.hpp"
 
 #include "widgets/SizedText.hpp"
 #include "ClueListBox.hpp"
@@ -35,9 +38,6 @@
 #include "MyStatusBar.hpp"
 
 #include <wx/numdlg.h>
-
-
-#include "utils/DragAndDrop.hpp" // File drag and drop
 
 #include "utils/SizerPrinter.hpp"
 
@@ -83,13 +83,15 @@ enum toolIds
     ID_SHOW_NOTES,
 
     ID_TIMER,
+    ID_CONVERT,
 
     ID_OPTIONS,
 
 #ifdef __WXDEBUG__
 
     ID_DUMP_STATUS,
-    ID_DUMP_LAYOUT
+    ID_DUMP_LAYOUT,
+    ID_FORCE_UNSCRAMBLE
 
 #endif
 };
@@ -124,6 +126,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_SHOW_NOTES,        MyFrame::OnShowNotes)
 
     EVT_MENU           (ID_TIMER,             MyFrame::OnTimer)
+    EVT_MENU           (ID_CONVERT,           MyFrame::OnConvert)
     EVT_TIMER          (wxID_ANY,             MyFrame::OnTimerNotify)
 
     EVT_MENU           (ID_OPTIONS,           MyFrame::OnOptions)
@@ -140,6 +143,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
     EVT_MENU           (ID_DUMP_LAYOUT,       MyFrame::OnDumpLayout)
     EVT_MENU           (ID_DUMP_STATUS,       MyFrame::OnDumpStatus)
+    EVT_MENU           (ID_FORCE_UNSCRAMBLE,  MyFrame::OnBruteForceUnscramble)
 
 #endif
 
@@ -177,6 +181,7 @@ static const ToolDesc toolDesc[] =
     { ID_SHOW_NOTES,        wxITEM_CHECK,  _T("Notes"), _T("notes") },
 
     { ID_TIMER, wxITEM_CHECK, _T("Timer"), _T("timer") },
+    { ID_CONVERT, wxITEM_NORMAL, _T("Convert files") },
 
 //    { ID_CUSTOMIZE,         _T("Customize . . ."),     _T("") },
 
@@ -184,6 +189,7 @@ static const ToolDesc toolDesc[] =
 
     { ID_DUMP_LAYOUT,   wxITEM_NORMAL, _T("Dump layout") },
     { ID_DUMP_STATUS,   wxITEM_NORMAL, _T("Dump status") },
+    { ID_FORCE_UNSCRAMBLE, wxITEM_NORMAL, _T("Brute force unscramble") },
 
 #endif
 
@@ -191,6 +197,34 @@ static const ToolDesc toolDesc[] =
 };
 
 
+
+
+
+
+    
+#include <wx/dnd.h>
+
+// Drop target for the main frame
+//-------------------------------
+class XWordFileDropTarget : public wxFileDropTarget
+{
+public:
+    XWordFileDropTarget(MyFrame * frame)
+        : m_frame(frame)
+    {}
+
+    virtual bool OnDropFiles(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
+                             const wxArrayString & filenames)
+    {
+        if ( ! m_frame->ClosePuzzle(true) ) // Prompt for save
+            return false;
+        m_frame->LoadPuzzle(filenames.Item(0));
+        return true;
+    }
+
+private:
+    MyFrame * m_frame;
+};
 
 
 //------------------------------------------------------------------------------
@@ -253,11 +287,46 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
 {
     wxStopWatch sw;
 
-    const bool success = m_puz.Load(filename, ext);
+    try
+    {
+        m_puz.Load(filename, ext);
+    }
+    catch (PuzTypeError & error)
+    {
+        // Do something more useful here.
+        m_puz.SetOk(false);
+        wxMessageBox(error.what(),
+                     _T("Error loading puzzle"),
+                     wxOK | wxICON_ERROR);
+    }
+    catch (PuzChecksumError &)
+    {
+        const int ret = 
+            wxMessageBox(
+                _T("This puzzle seems to be corrupt.\nLoad it anyway?"),
+                _T("Error loading puzzle"),
+                wxYES_NO  | wxICON_ERROR);
+        m_puz.SetOk(ret == wxYES);
+    }
+    catch (PuzSectionError &)
+    {
+        const int ret =
+            wxMessageBox(
+               _T("Some parts of this puzzle are corrupt, but the basic puzzle information is intact.\nLoad it anyway?"),
+               _T("Error loading puzzle"),
+               wxYES_NO  | wxICON_ERROR);
+        m_puz.SetOk(ret == wxYES);
+    }
+    catch (...)
+    {
+        // We can't recover from any other exception.
+        m_puz.SetOk(false);
+        HandlePuzException(_T("loading"));
+    }
 
     ShowPuzzle();
 
-    if (success)
+    if (m_puz.IsOk())
     {
         SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
                                    m_puz.m_filename.c_str(),
@@ -267,7 +336,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
     else
         SetStatus(_T("No file loaded"));
 
-    return success;
+    return m_puz.IsOk();
 }
 
 
@@ -291,16 +360,53 @@ MyFrame::SavePuzzle(wxString filename, const wxString & ext)
 
     wxStopWatch sw;
 
-    const bool success = m_puz.Save(filename, ext);
+    try
+    {
+        m_puz.Save(filename, ext);
 
-    // Reset save/save as flag
-    EnableSaveAs();
+        // Reset save/save as flag
+        EnableSaveAs();
 
-    SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
-                               m_puz.m_filename.c_str(),
-                               sw.Time()));
+        SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
+                                   m_puz.m_filename.c_str(),
+                                   sw.Time()));
+        return true;
+    }
+    catch (...)
+    {
+        HandlePuzException(_T("saving"));
+        return false;
+    }
+}
 
-    return success;
+// Catch everything that wasn't already caught.
+void
+MyFrame::HandlePuzException(const wxString & type)
+{
+    const wxString mbTitle =
+        wxString::Format(_T("Error %s puzzle"), type.c_str());
+    try
+    {
+        throw;
+    }
+    catch (BasePuzError & error)
+    {
+        wxMessageBox(error.what(),
+                     mbTitle,
+                     wxOK | wxICON_ERROR);
+    }
+    catch (std::exception & error)
+    {
+        wxMessageBox(wxString(error.what(), wxConvISO8859_1),
+                     mbTitle,
+                     wxOK | wxICON_ERROR);
+    }
+    catch (...)
+    {
+        wxMessageBox(_T("Unknown error."),
+                     mbTitle,
+                     wxOK | wxICON_ERROR);
+    }
 }
 
 
@@ -413,8 +519,8 @@ MyFrame::CheckPuzzle()
         else
         {
             m_status->SetAlert(
-                _T("The puzzle is completely filled,")
-                _T("but some letters are incorrect"),
+                _T("The puzzle is completely filled, ")
+                _T("but some letters are incorrect."),
                 *wxWHITE, *wxRED);
         }
     }
@@ -570,6 +676,7 @@ MyFrame::MakeMenuBar()
     // Tools Menu
     menu = new wxMenu();
         m_toolMgr.Add(menu, ID_TIMER);
+        m_toolMgr.Add(menu, ID_CONVERT);
     mb->Append(menu, _T("&Tools"));
 
 #ifdef __WXDEBUG__
@@ -578,6 +685,7 @@ MyFrame::MakeMenuBar()
     menu = new wxMenu();
         m_toolMgr.Add(menu, ID_DUMP_STATUS);
         m_toolMgr.Add(menu, ID_DUMP_LAYOUT);
+        m_toolMgr.Add(menu, ID_FORCE_UNSCRAMBLE);
     mb->Append(menu, _T("&Debug"));
 
 #endif
@@ -1284,6 +1392,13 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
 
 
 void
+MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
+{
+    ConvertDialog(this).ShowModal();
+}
+
+
+void
 MyFrame::OnOptions(wxCommandEvent & WXUNUSED(evt))
 {
     SaveConfig();
@@ -1622,4 +1737,111 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
 
     ShowDebugDialog(_T("Current puzzle status"), str);
 }
+
+
+class UnscrambleDialog : public wxDialog
+{
+public:
+    UnscrambleDialog(wxWindow * parent)
+        : wxDialog(parent, wxID_ANY, _T("Unscrambling"), wxDefaultPosition)
+    {
+        m_elapsedTime = 0;
+
+        wxSizer * sizer = new wxFlexGridSizer(0,2,5,5);
+        m_text = new wxStaticText(this, wxID_ANY, _T("0000"));
+        sizer->Add(new wxStaticText(this, wxID_ANY, _T("Trying key:  ")));
+        sizer->Add(m_text);
+
+        m_time = new wxStaticText(this, wxID_ANY, _T("00:00"));
+        sizer->Add(new wxStaticText(this, wxID_ANY, _T("Time (seconds):  ")));
+        sizer->Add(m_time);
+
+        wxBoxSizer * outersizer = new wxBoxSizer(wxVERTICAL);
+        outersizer->Add(sizer, 0, wxALL, 10);
+        SetSizerAndFit(outersizer);
+
+        Connect(wxEVT_TIMER, wxTimerEventHandler(UnscrambleDialog::OnTimer));
+        m_timer = new wxTimer(this);
+        m_timer->Start(1000);
+    }
+
+    void SetKey(unsigned short key)
+    {
+        m_text->SetLabel(wxString::Format(_T("%d"), key));
+    }
+
+private:
+    wxStaticText * m_text;
+    wxStaticText * m_time;
+    int m_elapsedTime;
+    wxTimer * m_timer;
+
+    void OnTimer(wxTimerEvent & WXUNUSED(evt))
+    {
+        ++m_elapsedTime;
+        int minutes = m_elapsedTime / 60;
+        int seconds = m_elapsedTime - minutes * 60;
+        m_time->SetLabel(wxString::Format(_T("%02d:%02d"), minutes, seconds));
+    }
+};
+
+void
+MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
+{
+    if (! m_puz.IsScrambled())
+    {
+        wxMessageBox(_T("Puzzle is not scrambled"),
+                     _T("XWord Debug"),
+                     wxOK);
+        return;
+    }
+
+    // This seems to take about ~11 seconds per 1000 keys.
+    // That would mean a total of ~1:40 worst-case to try all the keys.
+    // The dialog slows it down a bit, especially with the calls to wxApp::Yeild().
+    // These benchmarks were taken with the computer on reduced cpu power too.
+
+    UnscrambleDialog * dlg = new UnscrambleDialog(this);
+    dlg->Show();
+    wxStopWatch sw;
+    XGridScrambler scrambler(m_puz.m_grid);
+    unsigned short key = 0;
+    for (unsigned short i = 1000; i <= 9999; ++i)
+    {
+        wxTheApp->Yield();
+        dlg->SetKey(i);
+        if (scrambler.UnscrambleSolution(i))
+        {
+            key = i;
+            break;
+        }
+    }
+    dlg->Destroy();
+
+    if (key == 0)
+    {
+        wxMessageBox(wxString::Format(
+                        _T("Unscrambling failed!\n")
+                        _T("Elapsed time: %f seconds"), sw.Time() / 1000.),
+                     _T("XWord Debug"),
+                     wxOK);
+    }
+    else
+    {
+        wxMessageBox(wxString::Format(
+                        _T("Unscrambling succeeded!\n")
+                        _T("Key: %d\n")
+                        _T("Elapsed time: %f seconds"), key, sw.Time() / 1000.),
+                     _T("XWord Debug"),
+                     wxOK);
+
+        // Let the rest of the frame know that we did it.
+        m_toolMgr.Enable(ID_SCRAMBLE,   true);
+        m_toolMgr.Enable(ID_UNSCRAMBLE, false);
+
+        EnableCheck(true);
+        EnableReveal(true);
+    }
+}
+
 #endif // __WXDEBUG__

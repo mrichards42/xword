@@ -196,6 +196,9 @@ private:
 
 
 private:
+    // Load / save exception handling.
+    void HandlePuzException(const wxString & type);
+
     // Event Handlers
     //---------------
 
@@ -245,6 +248,9 @@ private:
     void OnTimer      (wxCommandEvent & WXUNUSED(evt));
     void OnTimerNotify(wxTimerEvent   & WXUNUSED(evt));
 
+    // File conversion
+    void OnConvert    (wxCommandEvent & WXUNUSED(evt));
+
     // Config
     void OnOptions    (wxCommandEvent & WXUNUSED(evt));
     void OnPropertiesDialogCancel(wxCommandEvent & evt);
@@ -272,6 +278,7 @@ private:
     void ShowDebugDialog(const wxString & title, const wxString & str);
     void OnDumpLayout (wxCommandEvent & WXUNUSED(evt));
     void OnDumpStatus (wxCommandEvent & WXUNUSED(evt));
+    void OnBruteForceUnscramble (wxCommandEvent & WXUNUSED(evt));
 
 #endif
 

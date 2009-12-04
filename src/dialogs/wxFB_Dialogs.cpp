@@ -453,7 +453,7 @@ wxFB_ConvertDialog::wxFB_ConvertDialog( wxWindow* parent, wxWindowID id, const w
 	wxStaticBoxSizer* sbSizer2;
 	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Files") ), wxVERTICAL );
 	
-	m_list = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxSize( 400,200 ), wxLC_REPORT|wxLC_SINGLE_SEL );
+	m_list = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxSize( 400,150 ), wxLC_REPORT );
 	sbSizer2->Add( m_list, 1, wxALL|wxEXPAND, 5 );
 	
 	bSizer1->Add( sbSizer2, 1, wxALL|wxEXPAND, 5 );
@@ -494,11 +494,22 @@ wxFB_ConvertDialog::wxFB_ConvertDialog( wxWindow* parent, wxWindowID id, const w
 	
 	m_optionsSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Options") ), wxVERTICAL );
 	
+	wxBoxSizer* bSizer351;
+	bSizer351 = new wxBoxSizer( wxHORIZONTAL );
+	
 	wxString m_overwriteChoices[] = { wxT("Rename"), wxT("Overwrite") };
 	int m_overwriteNChoices = sizeof( m_overwriteChoices ) / sizeof( wxString );
 	m_overwrite = new wxRadioBox( this, wxID_ANY, wxT("Name Collisions"), wxDefaultPosition, wxDefaultSize, m_overwriteNChoices, m_overwriteChoices, 1, wxRA_SPECIFY_ROWS );
 	m_overwrite->SetSelection( 0 );
-	m_optionsSizer->Add( m_overwrite, 0, wxALL|wxEXPAND, 5 );
+	bSizer351->Add( m_overwrite, 0, wxALL|wxEXPAND, 5 );
+	
+	wxString m_errorHandlingChoices[] = { wxT("Ignore if possible"), wxT("Always fail") };
+	int m_errorHandlingNChoices = sizeof( m_errorHandlingChoices ) / sizeof( wxString );
+	m_errorHandling = new wxRadioBox( this, wxID_ANY, wxT("Error Handling"), wxDefaultPosition, wxDefaultSize, m_errorHandlingNChoices, m_errorHandlingChoices, 1, wxRA_SPECIFY_ROWS );
+	m_errorHandling->SetSelection( 1 );
+	bSizer351->Add( m_errorHandling, 0, wxALL|wxEXPAND, 5 );
+	
+	m_optionsSizer->Add( bSizer351, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer4;
 	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Output Directory") ), wxVERTICAL );

@@ -173,6 +173,13 @@ XGrid::UnscrambleSolution(unsigned short key)
     return scrambler.UnscrambleSolution(key);
 }
 
+unsigned short
+XGrid::BruteForceUnscramble()
+{
+    XGridScrambler scrambler(*this);
+    return scrambler.BruteForceUnscramble();
+}
+
 bool
 XGrid::CheckScrambledGrid()
 {
@@ -187,7 +194,7 @@ XGrid::CheckScrambledGrid()
 // Setup the entire grid:
 //  (1) Assigns clue numbers to each square (0 if no clue).
 //  (2) Assigns the word start and end to each square.
-//  (3) If the text is empty, fill it with blanks (or black)
+//  (3) If the text is empty, fill it with blanks (or "." for black squares)
 void
 XGrid::SetupGrid()
 {
@@ -200,14 +207,14 @@ XGrid::SetupGrid()
 
     size_t clueNumber = 1;
 
-    // Assign square clue numbers
-    //---------------------------
+    // Assign square clue numbers, word start, and word end
+    //-----------------------------------------------------
     for (XSquare * square = First(); square != NULL; square = square->Next())
     {
         if (square->IsBlack())
         {
             // Make sure our square's text member knows that the square is
-            // black too.
+            // black too (not just the solution).
             square->m_text = _T(".");
             square->m_number   = 0;
 
@@ -218,7 +225,9 @@ XGrid::SetupGrid()
         }
         else
         {
-            wxASSERT(square->m_text != _T("-"));
+            // 12-3-09: I'm not sure why this assert is here.
+            //wxASSERT(square->m_text != _T("-"));
+
             if (square->m_text == _T("-"))
                 square->m_text = _T("");
 
@@ -241,7 +250,7 @@ XGrid::SetupGrid()
                     square->m_number = clueNumber;
 
                     // Bounce to the next black square and back, setting start
-                    // and end squares for all in between
+                    // and end squares for all in between.
 
                     // Word start
                     XSquare * start = square;
@@ -250,7 +259,8 @@ XGrid::SetupGrid()
                         wxASSERT(square != NULL);
                         if (square->IsBlack())
                         {
-                            // Back up one square
+                            // Back up one square so we end up with the
+                            // last white square in this word.
                             square = square->Prev(direction);
                             break;
                         }
@@ -282,21 +292,24 @@ XGrid::SetupGrid()
 
                 // If there is no clue number on this square but it is
                 // preceded by a black square or the edge of the board, this
-                // square is not part of a word in this direction.
+                // square is not part of a word in this direction (i.e. it
+                // is an unchecked square).
                 else if (is_first_white)
                 {
                     square->m_wordStart[direction] = NULL;
                     square->m_wordEnd  [direction] = NULL;
                 }
 
-
+                // End the loop once we've finished both across and down
                 if (direction)
                     break;
             }
 
-            // Increment clue number
+            // Increment clue number if this square recieved a clue number.
             if (square->m_number != 0)
                 ++clueNumber;
+
+            // Off to the next square!
         }
     }
 
@@ -322,67 +335,7 @@ XGrid::SetupGrid()
             break;
         }
     }
-/*
-    // Set word start and end
-    //-----------------------
-    for (XSquare * square = First(); square != NULL; square = square->Next())
-    {
-        if (square->IsBlack())
-            continue;
 
-        // Run both across and down
-        if (square->GetNumber() != 0)
-        {
-        for (bool direction = false; ; direction = !direction)
-        {
-            if (square->HasClue(direction))
-            {
-                XSquare * sqIt;
-
-                // Set word start
-                //---------------
-
-                XSquare * start = square;
-                for (sqIt = start;
-                     sqIt != NULL;
-                     sqIt = sqIt->Next(direction))
-                {
-                    if (sqIt->IsBlack())
-                    {
-                        // If it's black, back up a square before stopping
-                        // so that the wordEnd calculation works.
-                        sqIt = sqIt->Prev(direction);
-                        break;
-                    }
-                    sqIt->m_wordStart[direction] = square;
-                    if (sqIt->IsLast(direction))
-                        break;
-                }
-
-
-                // Set word end
-                //-------------
-
-                // The end of this word should be where sqIt is now.
-                XSquare * end = sqIt;
-
-                for (sqIt = end;
-                     sqIt != NULL;
-                     sqIt = sqIt->Prev(direction))
-                {
-                    if (sqIt->IsBlack())
-                        break;
-                    sqIt->m_wordEnd[direction] = end;
-                    if (sqIt->IsFirst(direction))
-                        break;
-                }
-            }
-
-            if (direction)
-                break;
-        }
-    }
-*/
     wxLogDebug(_T("Time to set up grid: %d"), sw.Time());
 }
 

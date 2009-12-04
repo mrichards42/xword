@@ -909,7 +909,7 @@ XGridCtrl::CheckGrid(int options)
 
         if ( (options & REVEAL_ANSWER) != 0)
         {
-            square->SetText(square->GetSolution());
+            SetSquareText(*square, square->GetSolution());
             square->RemoveFlag(XFLAG_BLACK | XFLAG_X);
             square->AddFlag(XFLAG_RED);
         }
@@ -947,7 +947,7 @@ XGridCtrl::CheckWord(int options)
 
         if ( (options & REVEAL_ANSWER) != 0)
         {
-            square->SetText(square->GetSolution());
+            SetSquareText(*square, square->GetSolution());
             square->RemoveFlag(XFLAG_BLACK | XFLAG_X);
             square->AddFlag(XFLAG_RED);
         }
@@ -973,7 +973,7 @@ XGridCtrl::CheckLetter(int options)
     {
         if ( (options & REVEAL_ANSWER) != 0)
         {
-            square.SetText(square.GetSolution());
+            SetSquareText(square, square.GetSolution());
             square.RemoveFlag(XFLAG_BLACK | XFLAG_X);
             square.AddFlag(XFLAG_RED);
         }
@@ -1029,7 +1029,7 @@ XGridCtrl::OnLeftDown(wxMouseEvent & evt)
     if (square != NULL && square->IsWhite())
         SetSquareFocus(square, m_direction);
 
-    // MAKE SURE THIS SKIPS OR WE DON'T GET KEYBOARD FOCUS
+    // Make sure to skip this event or we don't get keyboard focus!
     evt.Skip();
 }
 
@@ -1038,6 +1038,7 @@ XGridCtrl::OnRightDown(wxMouseEvent & evt)
 {
     wxASSERT(! IsEmpty());
 
+    // CONTEXT_MENU style is not yet implemented.
     if (HasStyle(CONTEXT_MENU))
         return;
 
@@ -1050,7 +1051,7 @@ XGridCtrl::OnRightDown(wxMouseEvent & evt)
     if (square != NULL && square->IsWhite())
         SetSquareFocus(square, !m_direction);
 
-    // Kill the event
+    // Kill the event.
 }
 
 
@@ -1251,7 +1252,7 @@ XGridCtrl::OnBackspace(int WXUNUSED(mod))
     if (square.HasFlag(XFLAG_X))
         square.ReplaceFlag(XFLAG_X, XFLAG_BLACK);
 
-    // Not allowed to overwrite reveal letters
+    // Not allowed to overwrite revealed letters
     if (! square.HasFlag(XFLAG_RED))
             SetSquareText(square, _T(""));
 
@@ -1273,7 +1274,7 @@ XGridCtrl::OnDelete(int WXUNUSED(mod))
     if (square.HasFlag(XFLAG_X))
         square.ReplaceFlag(XFLAG_X, XFLAG_BLACK);
 
-    // Not allowed to overwrite reveal letters
+    // Not allowed to overwrite revealed letters
     if (! square.HasFlag(XFLAG_RED))
         SetSquareText(square, _T(""));
 
@@ -1286,7 +1287,7 @@ void
 XGridCtrl::OnHome(int mod)
 {
     wxASSERT(! IsEmpty());
-    // Shift key is used in Across Lite
+    // Shift key is used in Across Lite instead of the usual ctrl / command
     if (mod == wxMOD_CMD || mod == wxMOD_SHIFT)
     {
         XSquare * newSquare = m_grid->FirstWhite();
@@ -1313,7 +1314,7 @@ void
 XGridCtrl::OnEnd(int mod)
 {
     wxASSERT(! IsEmpty());
-    // Shift key is used in Across Lite
+    // Shift key is used in Across Lite instead of the usual ctrl / command
     if (mod == wxMOD_CMD || mod == wxMOD_SHIFT)
         SetSquareFocus(m_grid->LastWhite(), m_direction);
     else
@@ -1332,14 +1333,16 @@ XGridCtrl::OnInsert(int WXUNUSED(mod))
 
         RefreshSquare();
 
-        // This will handle events from now until it is destroyed.
-        // It will destroy itself when it is done.
+        // XGridRebusHandler will capture keyboard until it is destroyed.
+        // When XGridRebusHandler recieves a key event that indicates that
+        // the user is done entering a rebus square, it will destroy itself.
         new XGridRebusHandler(*this);
     }
     else
     {
         m_wantsRebus = false;
-        // Force checking the square since this had been prevented previously
+        // Force checking the square since checking has been prevented by
+        // XGridRebusHandler.
         SetSquareText(*m_focusedSquare, m_focusedSquare->GetText());
 
         if (! m_focusedSquare->IsBlank())
@@ -1495,6 +1498,7 @@ END_EVENT_TABLE()
 void
 XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
 {
+    // Skip this event by default so that we recieve EVT_CHAR events.
     evt.Skip();
     wxLogDebug(_T("KeyDown at XGridRebusHandler"));
 
@@ -1506,6 +1510,7 @@ XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
     {
         evt.Skip(false);
         EndEventHandling();
+        // Notify the XGridCtrl that we are done capturing events.
         m_grid.OnInsert(wxMOD_NONE);
         delete this;
     }

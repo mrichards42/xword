@@ -116,6 +116,7 @@ class wxFB_ConvertDialog : public wxDialog
 		wxButton* m_runButton;
 		wxStaticBoxSizer* m_optionsSizer;
 		wxRadioBox* m_overwrite;
+		wxRadioBox* m_errorHandling;
 		wxRadioButton* m_useInput;
 		wxRadioButton* m_specifyDirectory;
 		wxDirPickerCtrl* m_outputDirectory;

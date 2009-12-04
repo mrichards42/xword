@@ -70,24 +70,27 @@ XPuzzle::Load(const wxString & filename, HandlerBase * handler)
     Clear();
     m_filename = fn.GetFullPath();
 
+    wxFileInputStream stream(m_filename);
+    if (! stream.IsOk())
+        throw PuzFileError(_T("Cannot open file %s"), m_filename.c_str());
+    handler->Load(this, stream);
+    m_isOk = true;
+    return true;
+
     try
     {
         wxLogDebug(_T("Loading puzzle: %s"), m_filename.c_str());
         wxFileInputStream stream(m_filename);
         if (! stream.IsOk())
-            throw PuzLoadError(_T("Cannot open file %s"), m_filename.c_str());
+            throw PuzFileError(_T("Cannot open file %s"), m_filename.c_str());
         handler->Load(this, stream);
         m_isOk = true;
     }
-    catch (PuzLoadError & error)
+    catch (PuzTypeError & error)
     {
         if (! error.isProcessed)
         {
             error.isProcessed = true;
-
-            wxMessageBox(error.message,
-                        wxMessageBoxCaptionStr,
-                        wxOK | wxICON_ERROR);
 
             handler = PromptForLoadHandler(
                 wxString::Format(_T("Loading file as %s failed."),
@@ -95,6 +98,12 @@ XPuzzle::Load(const wxString & filename, HandlerBase * handler)
             if (handler != NULL)
                 return Load(filename, handler);
         }
+    }
+    catch (FatalPuzError & error)
+    {
+        wxMessageBox(error.what(),
+                     wxMessageBoxCaptionStr,
+                     wxOK | wxICON_ERROR);
     }
     catch (std::exception * error)
     {
@@ -141,48 +150,24 @@ XPuzzle::Save(const wxString & filename, HandlerBase * handler)
 
     wxASSERT(handler->CanLoad());
 
-
-    m_filename = fn.GetFullPath();
-
+    wxLogDebug(_T("Saving puzzle: %s"), m_filename.c_str());
     try
     {
-        wxLogDebug(_T("Saving puzzle: %s"), m_filename.c_str());
-        wxFileOutputStream stream(m_filename);
+        wxFileOutputStream stream(fn.GetFullPath());
         if (! stream.IsOk())
-            throw PuzLoadError(_T("Cannot open file %s"), m_filename.c_str());
+            throw PuzFileError(_T("Cannot open file %s"), m_filename.c_str());
         handler->Save(this, stream);
+        m_filename = fn.GetFullPath();
         return true;
-    }
-    catch (PuzLoadError & error)
-    {
-        if (! error.isProcessed)
-        {
-            error.isProcessed = true;
-
-            wxMessageBox(error.message,
-                        wxMessageBoxCaptionStr,
-                        wxOK | wxICON_ERROR);
-
-            handler = PromptForSaveHandler(
-                wxString::Format(_T("Saving file as %s failed."),
-                                 handler->GetDescription().c_str()) );
-            if (handler != NULL)
-                return Load(filename, handler);
-        }
-    }
-    catch (std::exception error)
-    {
-        wxMessageBox(wxString(error.what(), wxConvISO8859_1),
-                     wxMessageBoxCaptionStr,
-                     wxOK | wxICON_ERROR);
     }
     catch (...)
     {
-        wxMessageBox(_T("Unknown error while saving file"),
-                     wxMessageBoxCaptionStr,
-                     wxOK | wxICON_ERROR);
+        // An exception thrown while saving means that the resulting
+        // file is unusable, so just delete it here.
+        wxRemoveFile(fn.GetFullPath());
+        throw;
     }
-    return false;
+
 }
 
 

@@ -20,6 +20,7 @@
 #include <wx/cmdline.h>
 #include "MyFrame.hpp"
 #include "paths.hpp"
+#include "dialogs/Convert.hpp"
 
 #include <wx/log.h>
 
@@ -37,7 +38,7 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
 {
     { wxCMD_LINE_SWITCH,
       _T("c"), _T("convert"),
-      _T("convert multiple files without a gui") },
+      _T("convert files") },
 
     { wxCMD_LINE_SWITCH,
       _T("o"), _T("output-files"),
@@ -118,81 +119,49 @@ MyApp::ReadCommandLine()
         // Gather other options
         const bool output_files = cmd.Found(_T("o"));
         const bool overwrite_files = cmd.Found(_T("w"));
-        wxString directory;
-        const bool use_directory = cmd.Found(_T("d"), &directory);
-        wxString log_file;
-        const bool use_log_file = cmd.Found(_T("l"), &log_file);
+        wxString defaultDir;
+        const bool use_directory = cmd.Found(_T("d"), &defaultDir);
+        wxString logfile;
+        const bool use_log_file = cmd.Found(_T("l"), &logfile);
 
 
-        size_t nFailed = 0;
-        size_t i;
-        for (i = 0; i < param_count; ++i)
+        wxArrayString input_list;
+        wxArrayString output_list;
+        for (size_t i = 0; i < param_count; ++i)
         {
-            // Make sure we have an output file if requested.
+            // If output files are specified, we need to make
+            // sure there is at least one more parameter.
             if (output_files && i + 1 >= param_count)
-            {
-                ++nFailed;
                 break;
-            }
 
-            // Find the input and output files
+            // Get the input and output files
             wxFileName in_file(cmd.GetParam(i));
             in_file.MakeAbsolute();
+            input_list.push_back(in_file.GetFullPath());
 
-            wxFileName out_file;
             if (output_files)
             {
                 ++i;
-                out_file.Assign(cmd.GetParam(i));
+                wxFileName out_file(cmd.GetParam(i));
+                if (use_directory)
+                    out_file.MakeAbsolute(defaultDir);
+                else
+                    out_file.MakeAbsolute(in_file.GetPath());
+                output_list.push_back(out_file.GetFullPath());
             }
-            else
-            {
-                out_file.Assign(in_file.GetName());
-            }
-
-            if (use_directory)
-                out_file.MakeAbsolute(directory);
-            else
-                out_file.MakeAbsolute(in_file.GetPath());
-
-            out_file.SetExt(_T("puz"));
-            if (! overwrite_files && out_file.FileExists())
-            {
-                wxString orig_name = out_file.GetName();
-                int i = 1;
-                while (out_file.FileExists() && i < 100)
-                {
-                    out_file.SetName(orig_name +
-                                     wxString::Format(_T("%03d"), i));
-                    ++i;
-                }
-                if (i == 100)
-                {
-                    ++nFailed;
-                    continue;
-                }
-            }
-
-
-            wxLogDebug(_T("Converting %s to %s"),
-                         in_file.GetFullPath().c_str(),
-                         out_file.GetFullPath().c_str());
-
-            // Make sure we have a directory
-            out_file.Mkdir(0777, wxPATH_MKDIR_FULL);
-
-            XPuzzle puz;
-            if (XPuzzle::CanLoad(in_file.GetExt()))
-                puz.Load(in_file.GetFullPath());
-            else
-                puz.Load(in_file.GetFullPath(), _T("txt"));
-
-            if (! puz.IsOk() || ! puz.Save(out_file.GetFullPath()))
-                ++nFailed;
         }
-        wxLogDebug(_T("Failed: %d"), nFailed);
-        SetReturnCode(nFailed);
-        return false; // Don't start the app
+
+        // Show a conversion dialog, then end the application.
+        ConvertDialog * dlg = new ConvertDialog(NULL,
+                                                input_list,
+                                                output_list,
+                                                defaultDir,
+                                                logfile,
+                                                overwrite_files);
+        dlg->ShowModal();
+        // Destroy is necessary to end the application.
+        dlg->Destroy();
+        return true;
     }
 
     // End of non-GUI parameters

@@ -29,6 +29,10 @@ static const wxString allowedCharsV2 = allowedCharsV1 +
                                        _T("@#$%&+?");
 
 
+// Across lite claims that it will accept any of the characters in the grid
+// as a valid rebus key, but it only takes numbers and lower case letters.
+static const wxString allowedCharsRebus = _T("1234567890")
+                                          _T("abcdefghijklmnopqrstuvwxyz");
 // Checks
 void CheckRebusMarker(const wxArrayString & marker);
 
@@ -61,7 +65,7 @@ TxtHandler::DoLoad()
         else if (versionStr == _T("<ACROSS PUZZLE V2>"))
             version = 2;
         else
-            throw PuzLoadError(
+            throw PuzHeaderError(
                 _T("Missing <ACROSS PUZZLE> or <ACROSS PUZZLE V2> header.") );
 
 
@@ -76,18 +80,18 @@ TxtHandler::DoLoad()
         m_puz->m_copyright = ReadLine();
         // Prepend a (c) to the copyright string
         if (! m_puz->m_copyright.empty())
-            m_puz->m_copyright.Prepend(_T("0xa9 "));
+            m_puz->m_copyright.Prepend(_T("\xa9 "));
 
         CheckSection(_T("<SIZE>"));
         { // Enter scope
             wxString size = ReadLine();
             size_t x_index = size.find(_T("x"));
             if (x_index == wxString::npos)
-                throw PuzLoadError(_T("Missing 'x' in size specification"));
+                throw PuzDataError(_T("Missing 'x' in size specification"));
             long width, height;
             if (! (size.Mid(0, x_index).ToLong(&width)
                    && size.Mid(x_index+1).ToLong(&height)) )
-                throw PuzLoadError(_T("Improper size specification."));
+                throw PuzDataError(_T("Improper size specification."));
 
             m_puz->m_grid.SetSize(width, height);
         } // Exit scope
@@ -117,7 +121,7 @@ TxtHandler::DoLoad()
             across.push_back(ReadLine());
             if (across.back() == _T("<DOWN>")
                 || across.back().empty())
-                throw PuzLoadError(_T("Missing some across clues"));
+                throw PuzDataError(_T("Missing some across clues"));
         }
 
         CheckSection(_T("<DOWN>"));
@@ -125,7 +129,7 @@ TxtHandler::DoLoad()
         {
             down.push_back(ReadLine());
             if (down.back().empty())
-                throw PuzLoadError(_T("Missing some down clues"));
+                throw PuzDataError(_T("Missing some down clues"));
         }
 
         // Read across and down into m_clues
@@ -160,9 +164,9 @@ TxtHandler::DoLoad()
             }
         }
         else if (! header.empty())
-            throw PuzLoadError(_T("Unrecognized line(s) at end of file."));
+            throw PuzDataError(_T("Unrecognized line(s) at end of file."));
     }
-    catch (PuzLoadError & error)
+    catch (BasePuzError & error)
     {
         // Add line information to the exception
         error.message.append(wxString::Format(_T("\nAt line: %d"), m_line));
@@ -251,7 +255,7 @@ TxtHandler::LoadVersion2Grid()
             flags = wxStringTokenize(line, _T("; "), wxTOKEN_STRTOK );
         }
         else if (line.find(_T(":")) == wxString::npos)
-            throw PuzLoadError(_T("No entries in <REBUS> section."));
+            throw PuzDataError(_T("No entries in <REBUS> section."));
         else // This is a marker line
             UngetLine(line);
 
@@ -341,15 +345,15 @@ CheckGridLine(const wxString & line,
               size_t width)
 {
     if (line.length() < width)
-        throw PuzLoadError(_T("Missing letters in grid."));
+        throw PuzDataError(_T("Missing letters in grid."));
 
     if (line.length() > width)
-        throw PuzLoadError(_T("Extra letters in grid."));
+        throw PuzDataError(_T("Extra letters in grid."));
 
     // Make sure all the characters are allowed to be in the grid
     size_t index = line.find_first_not_of(allowedCharsV2);
     if (index != wxString::npos)
-        throw PuzLoadError(_T("Invalid character in grid: \"%c\"."),
+        throw PuzDataError(_T("Invalid character in grid: \"%c\"."),
                            line.at(index));
 }
 
@@ -359,16 +363,243 @@ void
 CheckRebusMarker(const wxArrayString & marker)
 {
     if (marker.size() < 3)
-        throw PuzLoadError(_T("Missing marker entries in <REBUS>."));
+        throw PuzDataError(_T("Missing marker entries in <REBUS>."));
     if (marker.size() > 3)
-        throw PuzLoadError(_T("Extra marker entries in <REBUS>."));
+        throw PuzDataError(_T("Extra marker entries in <REBUS>."));
 
     if (marker.Item(0).length() > 1)
-        throw PuzLoadError(_T("<REBUS> marker can only be one character."));
+        throw PuzDataError(_T("<REBUS> marker can only be one character."));
 
     if (allowedCharsV2.find(marker.Item(0)) == wxString::npos)
-        throw PuzLoadError(_T("Invalid marker character in <REBUS>."));
+        throw PuzDataError(_T("Invalid marker character in <REBUS>."));
 
     if (! wxIsupper(marker.Item(2).at(0)))
-        throw PuzLoadError(_T("<REBUS> short solution must be upper case."));
+        throw PuzDataError(_T("<REBUS> short solution must be upper case."));
+}
+
+
+
+
+
+
+//------------------------------------------------------------------------------
+// DoSave implementation
+//------------------------------------------------------------------------------
+
+void
+TxtHandler::DoSave()
+{
+    // No way we can save a scrambled puzzle to a txt file.
+    if (m_puz->IsScrambled())
+        throw FatalPuzError(_T("Puzzle is scrambled"));
+
+    // Make the rebus table.  Then we can figure out which text version to
+    // save the puzzle as.
+    RebusSet rebusEntries;
+    GetRebusEntries(rebusEntries);
+    const bool use_version_2 = ! rebusEntries.empty();
+
+    if (use_version_2)
+        Write("<ACROSS PUZZLE V2>\n");
+    else
+        Write("<ACROSS PUZZLE>\n");
+
+    Write("<TITLE>\n");
+    Write(m_puz->m_title + _T("\n"));
+
+    Write("<AUTHOR>\n");
+    Write(m_puz->m_author + _T("\n"));
+
+    Write("<COPYRIGHT>\n");
+    // Strip the (c) symbol
+    if (m_puz->m_copyright.StartsWith(_T("\xa9 ")))
+        Write(m_puz->m_copyright.substr(2) + _T("\n"));
+    else
+        Write(m_puz->m_copyright + _T("\n"));
+
+    Write("<SIZE>\n");
+    Write(wxString::Format(_T("%dx%d"),
+                           m_puz->m_grid.GetWidth(),
+                           m_puz->m_grid.GetHeight()) + _T("\n"));
+
+    Write("<GRID>\n");
+    if (! use_version_2)
+        WriteVersion1Grid();
+    else
+        WriteVersion2Grid(rebusEntries);
+
+    Write("<ACROSS>\n");
+    for (XPuzzle::ClueList::iterator it = m_puz->m_across.begin();
+         it != m_puz->m_across.end();
+         ++it)
+    {
+        Write(it->Text() + _T("\n"));
+    }
+
+    Write("<DOWN>\n");
+    for (XPuzzle::ClueList::iterator it = m_puz->m_down.begin();
+         it != m_puz->m_down.end();
+         ++it)
+    {
+        Write(it->Text() + _T("\n"));
+    }
+
+    if (! m_puz->m_notes.empty())
+    {
+        Write("<NOTEPAD>\n");
+        Write(m_puz->m_notes + _T("\n"));
+    }
+}
+
+
+void
+TxtHandler::WriteVersion1Grid()
+{
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        Write(square->GetPlainSolution());
+        if (square->IsLast(DIR_ACROSS))
+            Write("\n");
+    }
+}
+
+void
+TxtHandler::WriteVersion2Grid(const RebusSet & rebusEntries)
+{
+    // Figure out what characters we can use for the rebus table.
+    bool hasMark = false;
+    wxString available_rebus = allowedCharsRebus;
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (square->HasFlag(XFLAG_CIRCLE))
+        {
+            hasMark = true;
+            if (! square->HasSolutionRebus())
+                available_rebus.Replace(
+                    wxString(
+                        static_cast<wxChar>(
+                            wxTolower(square->GetPlainSolution()))),
+                    _T(""));
+        }
+    }
+
+    // Make the rebus table
+    //---------------------
+
+    RebusMap rebusTable;
+
+    // We can only make the table if there are enough letters left for all
+    // the rebus entries.
+    if (rebusEntries.size() <= available_rebus.length())
+    {
+        // Start from the end (the lower-case letters).  This iterator will be
+        // used for all rebus entries that also need a circle.
+        wxString::reverse_iterator letter_it = available_rebus.rbegin();
+        // Start from the beginning (the numbers letters).  This iterator will
+        // be used for all rebus entries do not need a circle.
+        wxString::iterator number_it = available_rebus.begin();
+
+        for (RebusSet::const_iterator it = rebusEntries.begin();
+             it != rebusEntries.end();
+             ++it)
+        {
+            // If this assert fails, we've run out of characters in
+            // available_rebus.  We've already checked to make sure we wouldn't
+            // run out of characters, so this is just a sanity check.
+            wxASSERT(*number_it != *letter_it);
+
+            // Do we need a circle?
+            if (hasMark && it->second == true)
+            {
+                // If we need to use lower-case letters to indicate circles and
+                // we've run out of them, give up on the circles and press on
+                // with the rebus.
+                if (hasMark && ! wxIsalpha(*number_it))
+                    hasMark = false;
+
+                rebusTable[*it] = *letter_it;
+                ++letter_it;
+            }
+            else // No circle
+            {
+                // If we need to use lower-case letters to indicate circles and
+                // we've run out of numbers for the non-circled rebus squares,
+                // give up on the circles and press on with the rebus.
+                if (hasMark && ! wxIsdigit(*number_it))
+                    hasMark = false;
+
+                rebusTable[*it] = *number_it;
+                ++number_it;
+            }
+        }
+    }
+
+    // Write the grid
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (square->HasSolutionRebus())
+        {
+            RebusPair entry( std::make_pair(square->GetSolution(),
+                                            square->GetPlainSolution()),
+                             square->HasFlag(XFLAG_CIRCLE) );
+            const char key = rebusTable[entry];
+            Write(key);
+        }
+        else
+        {
+            if (hasMark && square->HasFlag(XFLAG_CIRCLE))
+                Write(wxTolower(square->GetPlainSolution()));
+            else
+                Write(square->GetPlainSolution());
+        }
+        if (square->IsLast(DIR_ACROSS))
+            Write("\n");
+    }
+
+    // Write the rebus section
+    if (hasMark || ! rebusTable.empty())
+    {
+        Write("<REBUS>\n");
+        if (hasMark)
+            Write("MARK;\n");
+        for (RebusMap::iterator it = rebusTable.begin();
+             it != rebusTable.end();
+             ++it)
+        {
+            const RebusPair & entry = it->first;
+            Write(it->second);
+            Write(":");
+            Write(entry.first.first);
+            Write(":");
+            Write(entry.first.second);
+            Write("\n");
+        }
+    }
+    // Done!
+}
+
+
+
+void
+TxtHandler::GetRebusEntries(RebusSet & rebusEntries)
+{
+    for (XSquare * square = m_puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (! square->HasSolutionRebus())
+            continue;
+
+        RebusPair entry( std::make_pair(square->GetSolution(),
+                                        square->GetPlainSolution()),
+                         square->HasFlag(XFLAG_CIRCLE) );
+
+        rebusEntries.insert(entry);
+    }
 }

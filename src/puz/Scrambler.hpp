@@ -33,6 +33,10 @@ public:
     bool ScrambleSolution(unsigned short key_int = 0);
     bool UnscrambleSolution(unsigned short key_int);
 
+    // Try all keys from 1000 - 9999.
+    // Return the key if it works, otherwise return 0.
+    unsigned short BruteForceUnscramble();
+
     // Check a scrambled grid to see if it is correct
     static bool CheckUserGrid(XGrid & grid);
 

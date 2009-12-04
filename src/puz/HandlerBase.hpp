@@ -25,11 +25,18 @@
 #include <wx/stream.h>
 
 
-// A load/save exception
-class PuzLoadError
+//------------------------------------------------------------------------------
+// Exceptions
+//------------------------------------------------------------------------------
+class BasePuzError
 {
 public:
-    PuzLoadError(const wxChar *format, ...)
+    BasePuzError()
+        : isProcessed(false),
+          message(wxEmptyString)
+    {}
+
+    BasePuzError(const wxChar *format, ...)
         : isProcessed(false)
     {
         va_list argptr;
@@ -42,8 +49,46 @@ public:
 
     wxString message;
     bool isProcessed;
+
+    // For compatibility with std::exception
+    const wxString & what() { return message; }
 };
 
+#define _MAKE_EXCEPTION_CLASS(ClassName, BaseClass)                            \
+class ClassName : public BaseClass                                             \
+{                                                                              \
+public:                                                                        \
+    ClassName()                                                                \
+        : BaseClass()                                                          \
+    {}                                                                         \
+                                                                               \
+    ClassName(const wxChar *format, ...)                                       \
+        : BaseClass()                                                          \
+    {                                                                          \
+        va_list argptr;                                                        \
+        va_start(argptr, format);                                              \
+                                                                               \
+        message.PrintfV(format, argptr);                                       \
+                                                                               \
+        va_end(argptr);                                                        \
+    }                                                                          \
+};
+
+
+// Any of these can be thrown before the whole puzzle is read
+// to indicate that the puzzle can't be read at all.
+_MAKE_EXCEPTION_CLASS(FatalPuzError,  BasePuzError)
+_MAKE_EXCEPTION_CLASS(PuzFileError,   FatalPuzError)
+_MAKE_EXCEPTION_CLASS(PuzTypeError,   FatalPuzError)
+_MAKE_EXCEPTION_CLASS(PuzHeaderError, FatalPuzError)
+
+// These can be thrown after the main sections of the puzzle are
+// read to indicate that the puzzle might be readable.
+_MAKE_EXCEPTION_CLASS(PuzDataError,     BasePuzError)
+_MAKE_EXCEPTION_CLASS(PuzSectionError,  PuzDataError)
+_MAKE_EXCEPTION_CLASS(PuzChecksumError, PuzDataError)
+
+#undef _MAKE_EXCEPTION_CLASS
 
 //==============================================================================
 // The base class for all XWord file handlers
@@ -92,7 +137,16 @@ public:
         wxASSERT(puz != NULL);
         m_puz = puz;
         m_outStream = &stream;
-        DoSave();
+        try
+        {
+            DoSave();
+        }
+        catch (...)
+        {
+            m_outStream = NULL;
+            m_puz = NULL;
+            throw;
+        }
         m_outStream = NULL;
         m_puz = NULL;
     }
@@ -119,6 +173,8 @@ protected:
     // Write functions
     //-------------------------------------
     void Write(const void * buffer, size_t count);
+    void Write(const char ch) { Write(&ch, 1); }
+    void Write(const char * str) { Write(str, strlen(str)); }
     void Write(const ByteArray & bytes) { Write(&bytes[0], bytes.size()); }
 
     // Internal use
@@ -191,11 +247,11 @@ HandlerBase::CheckError(wxStreamBase & stream)
         return;
 
     if      (error == wxSTREAM_EOF)
-        throw PuzLoadError(_T("Unexpected end of file"));
+        throw PuzFileError(_T("Unexpected end of file"));
     else if (error == wxSTREAM_READ_ERROR)
-        throw PuzLoadError(_T("Read error"));
+        throw PuzFileError(_T("Read error"));
     else if (error == wxSTREAM_WRITE_ERROR)
-        throw PuzLoadError(_T("Write error"));
+        throw PuzFileError(_T("Write error"));
 }
 
 #endif // HANDLER_BASE_H
