@@ -201,7 +201,7 @@ static const ToolDesc toolDesc[] =
 
 
 
-    
+
 #include <wx/dnd.h>
 
 // Drop target for the main frame
@@ -301,7 +301,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
     }
     catch (PuzChecksumError &)
     {
-        const int ret = 
+        const int ret =
             wxMessageBox(
                 _T("This puzzle seems to be corrupt.\nLoad it anyway?"),
                 _T("Error loading puzzle"),
@@ -1762,13 +1762,15 @@ public:
 
         Connect(wxEVT_TIMER, wxTimerEventHandler(UnscrambleDialog::OnTimer));
         m_timer = new wxTimer(this);
-        m_timer->Start(1000);
     }
 
     void SetKey(unsigned short key)
     {
         m_text->SetLabel(wxString::Format(_T("%d"), key));
     }
+
+    void StartTimer() { m_timer->Start(1000); }
+    void StopTimer()  { m_timer->Stop(); }
 
 private:
     wxStaticText * m_text;
@@ -1796,19 +1798,15 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
         return;
     }
 
-    // This seems to take about ~11 seconds per 1000 keys.
-    // That would mean a total of ~1:40 worst-case to try all the keys.
-    // The dialog slows it down a bit, especially with the calls to wxApp::Yeild().
-    // These benchmarks were taken with the computer on reduced cpu power too.
-
     UnscrambleDialog * dlg = new UnscrambleDialog(this);
     dlg->Show();
-    wxStopWatch sw;
     XGridScrambler scrambler(m_puz.m_grid);
     unsigned short key = 0;
+    wxStopWatch sw;
+    dlg->StartTimer();
     for (unsigned short i = 1000; i <= 9999; ++i)
     {
-        wxTheApp->Yield();
+        wxTheApp->Yield(); // Don't block the GUI.
         dlg->SetKey(i);
         if (scrambler.UnscrambleSolution(i))
         {
@@ -1816,6 +1814,10 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
             break;
         }
     }
+    // If we don't stop the timer, it might try to send another event, which would
+    // cause a seg fault once the dialog has been destroyed.  (At least, under
+    // wxGTK).
+    dlg->StopTimer();
     dlg->Destroy();
 
     if (key == 0)

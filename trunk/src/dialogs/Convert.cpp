@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -134,9 +134,9 @@ ConvertDialog::AddFile(const wxString & input, const wxString & output)
     m_conversionStatus.push_back(false);
 
     wxLogDebug(_T("Added: %s, %s, %s"),
-                GetItemText(index, 0),
-                GetItemText(index, 1),
-                GetItemText(index, 2));
+                GetItemText(index, 0).c_str(),
+                GetItemText(index, 1).c_str(),
+                GetItemText(index, 2).c_str());
     AutoSizeColumns();
     return true;
 }
