@@ -121,6 +121,14 @@
 			<Option target="Unicode Release" />
 			<Option target="Unicode Debug" />
 		</Unit>
+		<Unit filename="src/dialogs/Convert.cpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
+		<Unit filename="src/dialogs/Convert.hpp">
+			<Option target="Unicode Release" />
+			<Option target="Unicode Debug" />
+		</Unit>
 		<Unit filename="src/dialogs/Layout.hpp">
 			<Option target="Unicode Release" />
 			<Option target="Unicode Debug" />
@@ -129,11 +137,11 @@
 			<Option target="Unicode Release" />
 			<Option target="Unicode Debug" />
 		</Unit>
-		<Unit filename="src/dialogs/formbuilder/Properties.cpp">
+		<Unit filename="src/dialogs/wxFB_Dialogs.cpp">
 			<Option target="Unicode Release" />
 			<Option target="Unicode Debug" />
 		</Unit>
-		<Unit filename="src/dialogs/formbuilder/Properties.h">
+		<Unit filename="src/dialogs/wxFB_Dialogs.h">
 			<Option target="Unicode Release" />
 			<Option target="Unicode Debug" />
 		</Unit>
@@ -222,10 +230,6 @@
 			<Option target="Unicode Debug" />
 		</Unit>
 		<Unit filename="src/utils/ConfigManager.hpp">
-			<Option target="Unicode Release" />
-			<Option target="Unicode Debug" />
-		</Unit>
-		<Unit filename="src/utils/DragAndDrop.hpp">
 			<Option target="Unicode Release" />
 			<Option target="Unicode Debug" />
 		</Unit>
