@@ -141,7 +141,7 @@
                             <property name="bitmap"></property>
                             <property name="label">Solving</property>
                             <property name="select">1</property>
-                            <object class="wxPanel" expanded="1">
+                            <object class="wxPanel" expanded="0">
                                 <property name="bg"></property>
                                 <property name="context_help"></property>
                                 <property name="enabled">1</property>
@@ -672,7 +672,7 @@
                                         <property name="border">5</property>
                                         <property name="flag">wxEXPAND</property>
                                         <property name="proportion">1</property>
-                                        <object class="wxBoxSizer" expanded="0">
+                                        <object class="wxBoxSizer" expanded="1">
                                             <property name="minimum_size"></property>
                                             <property name="name">bSizer33</property>
                                             <property name="orient">wxVERTICAL</property>
@@ -685,15 +685,15 @@
                                                     <property name="id">wxID_ANY</property>
                                                     <property name="label">Grid</property>
                                                     <property name="minimum_size"></property>
-                                                    <property name="name">sbSizer51</property>
+                                                    <property name="name">sbSizer36</property>
                                                     <property name="orient">wxVERTICAL</property>
-                                                    <property name="permission">none</property>
+                                                    <property name="permission">protected</property>
                                                     <event name="OnUpdateUI"></event>
                                                     <object class="sizeritem" expanded="1">
                                                         <property name="border">5</property>
                                                         <property name="flag">wxEXPAND</property>
                                                         <property name="proportion">0</property>
-                                                        <object class="wxBoxSizer" expanded="1">
+                                                        <object class="wxBoxSizer" expanded="0">
                                                             <property name="minimum_size"></property>
                                                             <property name="name">bSizer61</property>
                                                             <property name="orient">wxHORIZONTAL</property>
@@ -1072,7 +1072,7 @@
                                                                     <property name="enabled">1</property>
                                                                     <property name="fg"></property>
                                                                     <property name="font"></property>
-                                                                    <property name="hidden">0</property>
+                                                                    <property name="hidden">1</property>
                                                                     <property name="id">wxID_ANY</property>
                                                                     <property name="maximum_size"></property>
                                                                     <property name="minimum_size"></property>
@@ -1126,7 +1126,7 @@
                                                                     <property name="enabled">1</property>
                                                                     <property name="fg"></property>
                                                                     <property name="font"></property>
-                                                                    <property name="hidden">0</property>
+                                                                    <property name="hidden">1</property>
                                                                     <property name="id">wxID_ANY</property>
                                                                     <property name="label">Pencil</property>
                                                                     <property name="maximum_size"></property>
@@ -1437,7 +1437,7 @@
                                         <property name="border">5</property>
                                         <property name="flag">wxEXPAND</property>
                                         <property name="proportion">1</property>
-                                        <object class="wxBoxSizer" expanded="1">
+                                        <object class="wxBoxSizer" expanded="0">
                                             <property name="minimum_size"></property>
                                             <property name="name">bSizer37</property>
                                             <property name="orient">wxVERTICAL</property>
@@ -1446,7 +1446,7 @@
                                                 <property name="border">5</property>
                                                 <property name="flag">wxALL|wxEXPAND</property>
                                                 <property name="proportion">0</property>
-                                                <object class="wxStaticBoxSizer" expanded="1">
+                                                <object class="wxStaticBoxSizer" expanded="0">
                                                     <property name="id">wxID_ANY</property>
                                                     <property name="label">Clue List</property>
                                                     <property name="minimum_size"></property>
@@ -3082,7 +3082,7 @@
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxBoxSizer" expanded="0">
+                    <object class="wxBoxSizer" expanded="1">
                         <property name="minimum_size"></property>
                         <property name="name">bSizer1</property>
                         <property name="orient">wxVERTICAL</property>
@@ -3134,7 +3134,7 @@
                                         <event name="OnKeyUp"></event>
                                         <event name="OnKillFocus"></event>
                                         <event name="OnLeaveWindow"></event>
-                                        <event name="OnLeftDClick"></event>
+                                        <event name="OnLeftDClick">OnDoubleClick</event>
                                         <event name="OnLeftDown"></event>
                                         <event name="OnLeftUp"></event>
                                         <event name="OnListBeginDrag"></event>
@@ -3150,7 +3150,7 @@
                                         <event name="OnListDeleteItem"></event>
                                         <event name="OnListEndLabelEdit"></event>
                                         <event name="OnListInsertItem"></event>
-                                        <event name="OnListItemActivated">OnListItemDoubleClick</event>
+                                        <event name="OnListItemActivated"></event>
                                         <event name="OnListItemDeselected"></event>
                                         <event name="OnListItemFocused"></event>
                                         <event name="OnListItemMiddleClick"></event>
@@ -3448,7 +3448,7 @@
                     <property name="border">5</property>
                     <property name="flag">wxALL|wxEXPAND</property>
                     <property name="proportion">0</property>
-                    <object class="wxStaticBoxSizer" expanded="1">
+                    <object class="wxStaticBoxSizer" expanded="0">
                         <property name="id">wxID_ANY</property>
                         <property name="label">Options</property>
                         <property name="minimum_size"></property>
@@ -3460,7 +3460,7 @@
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size"></property>
                                 <property name="name">bSizer351</property>
                                 <property name="orient">wxHORIZONTAL</property>
@@ -3587,7 +3587,7 @@
                             <property name="border">5</property>
                             <property name="flag">wxALL|wxEXPAND</property>
                             <property name="proportion">0</property>
-                            <object class="wxStaticBoxSizer" expanded="1">
+                            <object class="wxStaticBoxSizer" expanded="0">
                                 <property name="id">wxID_ANY</property>
                                 <property name="label">Output Directory</property>
                                 <property name="minimum_size"></property>
@@ -3780,7 +3780,7 @@
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND|wxALL</property>
                             <property name="proportion">0</property>
-                            <object class="wxStaticBoxSizer" expanded="1">
+                            <object class="wxStaticBoxSizer" expanded="0">
                                 <property name="id">wxID_ANY</property>
                                 <property name="label">Log</property>
                                 <property name="minimum_size"></property>

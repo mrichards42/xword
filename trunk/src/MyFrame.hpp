@@ -229,9 +229,9 @@ private:
     void OnRevealIncorrect(wxCommandEvent & WXUNUSED(evt))
         { m_gridCtrl->CheckGrid(REVEAL_ANSWER); }
     void OnRevealWord  (wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckWord(REVEAL_ANSWER); }
+        { m_gridCtrl->CheckWord(REVEAL_ANSWER | CHECK_ALL); }
     void OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckLetter(REVEAL_ANSWER); }
+        { m_gridCtrl->CheckLetter(REVEAL_ANSWER | CHECK_ALL); }
 
     // XWord puzzle stuff
     void OnScramble   (wxCommandEvent & WXUNUSED(evt));

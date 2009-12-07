@@ -1118,10 +1118,10 @@ MyFrame::SaveConfig()
 
     config.WriteFont(_T("font"), m_cluePrompt->GetFont());
 
-    config.WriteColor(_T("foregroundColour"),
+    config.WriteColor(_T("foregroundColor"),
                       m_cluePrompt->GetForegroundColour());
 
-    config.WriteColor(_T("backgroundColour"),
+    config.WriteColor(_T("backgroundColor"),
                       m_cluePrompt->GetBackgroundColour());
 
     // Layout
@@ -1248,12 +1248,11 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
             return;
     }
 
-    if (m_gridCtrl->GetXGrid()->UnscrambleSolution(key))
+    if (m_gridCtrl->UnscrambleSolution(key))
     {
         wxMessageBox(_T("Solution unscrambled!"),
                      _T("XWord Message"));
 
-        m_gridCtrl->RecheckGrid();
         CheckPuzzle();
 
         m_toolMgr.Enable(ID_SCRAMBLE,   true);

@@ -1,5 +1,41 @@
 Todo:
 
+Fix the notepad window.  The user should always be able to open and close it.
+
+Add a pencil solving option.  Perhaps don't check penciled in squares.
+
+Options dialog:
+    Add a number / letter scale option to the font size panel.
+    Add a clue number color and font option (currently they're set to whatever
+    the pen is set to).
+
+Convert dialog:
+    Perhaps add an option to scramble when outputting a .puz file.
+
+    Add an output format column.
+
+Attempt to load a puzzle with each handler until one succeeds or all fail.
+
+Set a minimum zoom.
+
+Set a realistic minimum clue number font size.
+
+Stripping the (c) symbol when saving as text format doesn't work under Ubuntu.
+
+Consider anti-aliased drawing for the grid (wxGCDC).
+
+Sometimes the clue prompt doesn't pick the best wrap (i.e. it picks a wrapping
+    that uses a smaller font size than it could).
+
+(12/4/09) I got a failed ASSERT (IsValidString) while loading a puz file
+    (nyt090304).
+    This is because of a rebus entry "IN/OUT"  It doesn't like the slash.
+    Perhaps we could use a slash as a way to split different across/down
+    entries.
+
+Add diagramless solving.  Allow black squares to be focused, and use the
+    spacebar to toggle black / white squares.
+
 Create a suite of test puzzles for a variety of cases:
     Normal
         - Versions 1.2 and 1.3
@@ -24,8 +60,6 @@ Create a suite of test puzzles for a variety of cases:
         - Poorly formed sections
         - Missing nul-terminators (many places for this)
 
-
-Graphical front-end for the rest of the config options (only a few)
 
 Printing
 
