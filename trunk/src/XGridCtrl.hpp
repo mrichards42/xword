@@ -92,7 +92,7 @@ public: // Enums
     };
 
 public:
-    XGridCtrl() : m_drawer(*this) { Init(); }
+    XGridCtrl() : m_drawer(this) { Init(); }
 
     explicit XGridCtrl(wxWindow * parent,
                       wxWindowID id = -1,
@@ -102,7 +102,7 @@ public:
                       long style = DEFAULT_GRID_STYLE
                                  | wxVSCROLL | wxHSCROLL,
                       const wxString & name = XGridCtrlNameStr)
-        : m_drawer(*this)
+        : m_drawer(this)
     {
         Init();
         Create(parent, id, pos, size, grid, style, name);
@@ -229,12 +229,7 @@ public:
     {
         Freeze();
         m_fit = fit;
-        if (fit)
-            m_drawer.SetAlign(wxALIGN_CENTER);
-        else
-            m_drawer.SetAlign(wxALIGN_LEFT | wxALIGN_TOP);
         Scale();
-        MakeVisible(*m_focusedSquare);
         Thaw();
         Refresh();
     }
@@ -243,9 +238,7 @@ public:
     {
         Freeze();
         m_fit = false;
-        m_drawer.SetAlign(wxALIGN_LEFT | wxALIGN_TOP);
         Scale(factor);
-        MakeVisible(*m_focusedSquare);
         Refresh();
         Thaw();
     }
@@ -318,7 +311,7 @@ protected:
     void ScaleFont(wxFont * font, int width, int height);
 
 
-    XGridDrawer<wxWindow> m_drawer;
+    XGridDrawer m_drawer;
     int m_lastBoxSize;          // The last non-fitted box size
     bool m_fit;                 // Fit the grid to the window?
     bool m_isPaused;            // Trigger a "Paused" message?
