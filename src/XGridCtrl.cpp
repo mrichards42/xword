@@ -609,19 +609,34 @@ XGridCtrl::Scale(double factor)
         return;
 
     // Recalculate box size
-    if (! m_fit)
+    if (m_fit)
     {
-        // This should only occur when FitGrid(false) is called
+        m_drawer.SetMaxSize(GetClientSize());
+        m_drawer.SetAlign(wxALIGN_CENTER);
+    }
+    else
+    {
+        // factor should only equal 1 when the user has decided to "un-fit"
+        // the grid without explicitly zooming in or out.  In this case, set the
+        // zoom factor to whatever the last zoom factor was.
         if (factor == 1.0 && m_lastBoxSize != UNDEFINED_BOX_SIZE)
             m_drawer.SetBoxSize(m_lastBoxSize);
+        // Otherwise, change the zoom by the specified factor.
         else
             m_drawer.SetBoxSize(m_drawer.GetBoxSize() * factor);
 
         m_lastBoxSize = m_drawer.GetBoxSize();
-    }
-    else // fit == true
-    {
-        m_drawer.SetMaxSize(GetClientSize());
+
+        // Change the alignment.
+        // If a given dimension fits in the window, it should be centered.
+        // Otherwise, it will be aligned to the top / left.
+        const wxSize clientSize = GetClientSize();
+        long align = wxALIGN_LEFT | wxALIGN_TOP;
+        if (m_drawer.GetWidth() < clientSize.GetWidth())
+            align |= wxALIGN_CENTER_HORIZONTAL;
+        if (m_drawer.GetHeight() < clientSize.GetHeight())
+            align |= wxALIGN_CENTER_VERTICAL;
+        m_drawer.SetAlign(align);
     }
 
     // Virtual size does not include the bottom and right grid border.
