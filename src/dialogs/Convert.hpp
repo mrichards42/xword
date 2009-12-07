@@ -39,7 +39,10 @@ public:
     bool AddFile(const wxString & input,
                  const wxString & output = wxEmptyString);
     void RemoveFile(long index);
-    void AutoSizeColumns(int index = -1);
+    void AutoSizeColumn(int index);
+    void AutoSizeColumns();
+    // Find the list item at this point
+    void HitTest(const wxPoint & pos, long * index, int * col);
 
     void StartConversion();
     void StopConversion();
@@ -86,6 +89,7 @@ protected:
 	virtual void OnAdd(wxCommandEvent & WXUNUSED(evt));
 	virtual void OnRemove(wxCommandEvent & WXUNUSED(evt));
     virtual void OnRunButton(wxCommandEvent & WXUNUSED(evt));
+    virtual void OnDoubleClick(wxMouseEvent & evt);
     // This is where the conversion takes place.
     virtual void OnIdle(wxIdleEvent & evt);
 };

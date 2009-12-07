@@ -11,10 +11,19 @@ Version 0.3 (??/??/???)
         "The puzzle is completely filled, but some letters are incorrect."
     * If a puzzle file is corrupt and not entirely unrecoverable, an option is
       given to load the puzzle anyway.
+    * "Reveal letter" and "Reveal word" now reveal squares if they are blank
+      or incorrect (previously they only revealed incorrect squares).
 
     Options dialog
     * "Move to next square" and "Move to next blank" under the "After entering
-      a letter" option now work as expeted.
+      a letter" option now work as expected.
+    * "Check while typing" does not attempt to check squares if the puzzle is
+      scrambled.  If this option is selected when the puzzle is unscrambled,
+      the puzzle is immediately checked for incorrect letters.
+    * All settings now update immediately when then are changed (so you can
+      preview the changes in the main window).
+    * The default "crossing clue background color" is now white.
+    * Removed the pencil color setting until a pencil is implemented.
 
 Version 0.2.1 (bug fix) (10/14/2009)
     * Fixed timer starting/stopping issues when activating and deactivating

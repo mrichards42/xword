@@ -21,7 +21,7 @@
 #include <list>
 #include <algorithm>
 #include "PuzEvent.hpp"
-
+#include "XGridDrawer.hpp"
 
 // This class will take over the XGridCtrl's event processing
 // when needed.  It must be created on the heap, and it will
@@ -76,9 +76,6 @@ END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(XGridCtrl, wxScrolledWindow)
 
-const int MAX_POINT_SIZE = 150;
-const int MIN_POINT_SIZE = 2;
-
 const int UNDEFINED_BOX_SIZE = -1;
 
 // Helper functions for all of the "lookup" functions that return NULL
@@ -115,18 +112,8 @@ void XGridCtrl::Init()
 
     m_isPaused = false;
     m_fit = true;
-    m_boxSize = 20;
-    m_borderSize = 1;
-    m_lastBoxSize = UNDEFINED_BOX_SIZE;
 
-    // This is a good default scale.
-    // Allowing the square number to take up 5/12 of the square and the text
-    // to take up 9/12 (=3/4) should introduce some overlap, but the character
-    // height of a font seems to be larger than the actual text size (e.g.
-    // GetCharHeight may report a height of 28 px when the letter itself only
-    // takes up 24 px).
-    m_numberScale = 42 / 100.;
-    m_letterScale = 75 / 100.;
+    m_lastBoxSize = UNDEFINED_BOX_SIZE;
 
     m_incorrectSquares = 0;
     m_blankSquares = 0;
@@ -203,7 +190,7 @@ XGridCtrl::SetXGrid(XGrid * grid)
 
         ConnectEvents();
     }
-
+    m_drawer.SetGrid(grid);
     Scale();
 }
 
@@ -217,6 +204,24 @@ XGridCtrl::RecheckGrid()
 
     m_incorrectSquares = incorrect.size();
     m_blankSquares     = wrongOrBlank.size() - incorrect.size();
+}
+
+bool
+XGridCtrl::UnscrambleSolution(unsigned short key)
+{
+    const bool success = m_grid->UnscrambleSolution(key);
+
+    // We need to update the internal incorrect / blank square counts.
+    if (success)
+    {
+        RecheckGrid();
+        // If we should have been checking while typing, go ahead and
+        // check the whole grid now that it is possible.
+        if (HasStyle(CHECK_WHILE_TYPING))
+            CheckGrid(NO_REVEAL_ANSWER | NO_MESSAGE_BOX);
+    }
+
+    return success;
 }
 
 bool
@@ -273,7 +278,7 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
         wxASSERT(_scrollX == GetSquareSize() && _scrollY == GetSquareSize());
 #endif
 
-    if (m_rect.IsEmpty() || m_boxSize == 0)
+    if (m_drawer.GetBoxSize() == 0)
     {
         wxLogDebug(_T("Size is too small"));
         //return;
@@ -283,7 +288,7 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
     dc.SetBrush(wxBrush(GetBlackSquareColor()));
     dc.SetPen  (wxPen(GetBlackSquareColor()));
 
-    dc.DrawRectangle(m_rect);
+    dc.DrawRectangle(m_drawer.GetRect());
 
     XSquare * square;
 
@@ -302,7 +307,7 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
             return;
 
         // Adjust update rect based on position of grid rect
-        rect.Offset(- m_rect.GetLeft(), - m_rect.GetTop());
+        rect.Offset(- m_drawer.GetLeft(), - m_drawer.GetTop());
 
         // Adjust udpate rect based on scroll position
         int scrollX, scrollY;
@@ -349,143 +354,12 @@ XGridCtrl::DrawSquare(wxDC & dc, const XSquare & square, const wxColour & color)
     if (square.IsBlack())
         return;
 
-    // The order of drawing is important to make sure that we don't draw over
-    // the more important parts of a square:
-    // 1. The background
-    // 2. An incorrect / revealed indicator (the little triangle in the corner)
-    // 3. A circle
-    // 4. The number (with an opaque background so it draws over the circle)
-    // 5. The text
-    // 6. An X over everything if necessary
-
-    // If the user has pressed <insert> we are in rebus mode.  The focused square
-    // will be outlined in the selected color (and have a white background).
-    // Certain features will not be drawn in this case:
-    //    - The number
-    //    - The incorrect/revealed indicator
-    //    - The X (if applicable).
-
-
     const bool drawOutline = m_wantsRebus && IsFocusedLetter(square);
-    // Use this color for the background.  If we are looking for a rebus
-    // entry, and this is the focused square, make the background white
-    // and draw a border around the square.
+
     const wxColor bgcolor =
         (drawOutline ? GetWhiteSquareColor() : color);
 
-    wxPoint pt = TopLeft(square);
-    int x = pt.x;
-    int y = pt.y;
-
-    // Draw the square background
-    if (drawOutline)
-    {
-        int outlineSize = m_boxSize / 15;
-        if (outlineSize < 1)
-            outlineSize = 1;
-
-        wxPen outlinePen(color, outlineSize * 2);
-        outlinePen.SetJoin(wxJOIN_MITER);
-
-        dc.SetPen(outlinePen);
-        dc.SetBrush(wxBrush(bgcolor));
-        dc.DrawRectangle(x + outlineSize, y + outlineSize,
-                         m_boxSize - outlineSize * 2 + 1, m_boxSize - outlineSize * 2 + 1);
-
-    }
-    else
-    {
-        dc.SetBrush(wxBrush(bgcolor));
-        dc.SetPen  (wxPen(bgcolor));
-
-        dc.DrawRectangle(x, y, m_boxSize, m_boxSize);
-    }
-
-    // Draw square's flag if any (top right)
-    if (square.HasFlag(XFLAG_RED | XFLAG_BLACK) && ! drawOutline)
-    {
-        if (square.HasFlag(XFLAG_RED))
-        {
-            dc.SetBrush(*wxRED_BRUSH);
-            dc.SetPen(*wxRED_PEN);
-        }
-        else
-        {
-            dc.SetBrush(*wxBLACK_BRUSH);
-            dc.SetPen(*wxBLACK_PEN);
-        }
-        wxPoint pts[3];
-        pts[0] = wxPoint(x + 2./3.*m_boxSize, y);
-        pts[1] = wxPoint(x + m_boxSize - 1, y);
-        pts[2] = wxPoint(x + m_boxSize - 1, y + 1./3.*m_boxSize);
-        dc.DrawPolygon(3, pts);
-    }
-
-
-    if (square.HasFlag(XFLAG_CIRCLE))
-    {
-        dc.SetBrush(*wxTRANSPARENT_BRUSH);
-        dc.SetPen(wxPen(*wxBLACK, 1));
-        dc.DrawCircle(x + m_boxSize/2, y + m_boxSize/2, m_boxSize/2);
-    }
-
-    dc.SetTextForeground(GetPenColor());
-
-    // Draw square's number if applicable (top left).
-    if (square.GetNumber() != 0 && ! drawOutline)
-    {
-        // Set a solid text background so it will draw over any circles.
-        dc.SetTextBackground(bgcolor);
-        dc.SetBackgroundMode(wxSOLID);
-
-        dc.SetFont(m_numberFont);
-        dc.DrawText(wxString::Format(_T("%d"), square.GetNumber()), x+1, y);
-        dc.SetBackgroundMode(wxTRANSPARENT);
-    }
-
-    // Draw square's text (bottom and center to avoid conflicts with numbers)
-    if (! square.IsBlank())
-    {
-        wxString text = square.GetText();
-
-        if (text.length() > 4)
-        {
-            const int len = (text.length() + 1) / 2;
-            text.insert(len, _T("\n"));
-
-            dc.SetFont(m_letterFont[3]);
-        }
-        else
-            dc.SetFont(m_letterFont[text.length() - 1]);
-
-        if (square.HasFlag(XFLAG_PENCIL))
-            dc.SetTextForeground(GetPencilColor());
-        else
-            dc.SetTextForeground(GetPenColor());
-
-        if (text.length() == 1)
-        {
-            int width, height;
-            dc.GetTextExtent(text, &width, &height);
-            dc.DrawText(text,
-                        x + (m_boxSize - width)/2,
-                        y + (m_boxSize - height));
-        }
-        else
-        {
-            dc.DrawLabel(text, wxRect(x, y + m_boxSize - GetLetterHeight(),
-                                      m_boxSize, GetLetterHeight()), wxALIGN_CENTER);
-        }
-    }
-
-    // Draw an X across the square
-    if (square.HasFlag(XFLAG_X) && ! drawOutline)
-    {
-        dc.SetPen(wxPen(*wxRED, 2));
-        // Funky math here because of the way that DCs draw lines
-        dc.DrawLine(x + 1, y + 1, x + m_boxSize - 2, y + m_boxSize - 2);
-        dc.DrawLine(x + m_boxSize - 2, y + 1, x + 1, y + m_boxSize - 2);
-    }
+    m_drawer.DrawSquare(dc, square, bgcolor, GetPenColor(), drawOutline);
 }
 
 
@@ -703,7 +577,7 @@ XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
     m_blankSquares     += blankAfter   - blankBefore;
     m_incorrectSquares -= correctAfter - correctBefore;
 
-    if (HasStyle(CHECK_WHILE_TYPING))
+    if (HasStyle(CHECK_WHILE_TYPING) && ! m_grid->IsScrambled())
         CheckLetter(NO_REVEAL_ANSWER | NO_MESSAGE_BOX);
 
     wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
@@ -717,75 +591,6 @@ XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
 //-------------------------------------------------------
 // Scaling
 //-------------------------------------------------------
-double DoScale(int width, int height, int maxWidth, int maxHeight)
-{
-    if      (maxWidth == -1)
-        return static_cast<double>(maxHeight) / static_cast<double>(height);
-    else if (maxHeight == -1)
-        return static_cast<double>(maxWidth) / static_cast<double>(width);
-
-    return std::min( static_cast<double>(maxWidth)  / static_cast<double>(width),
-                     static_cast<double>(maxHeight) / static_cast<double>(height) );
-}
-
-void
-XGridCtrl::ScaleFont(wxFont * font, int maxWidth, int maxHeight)
-{
-    // Don't test numbers and symbols because they're probably not as wide.
-    const wxString text = _T("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-
-    // Adjust width to fit the test string
-    if (maxWidth != -1)
-        maxWidth *= text.length();
-
-    int h, w;
-    GetTextExtent(text, &w, &h, NULL, NULL, font);
-
-    // First "guess" should speed things up
-    font->SetPointSize(font->GetPointSize() * DoScale(w, h, maxWidth, maxHeight));
-
-    // Make the font larger if needed.
-    GetTextExtent(text, &w, &h, NULL, NULL, font);
-    while ( (maxHeight == -1 ? true : h < maxHeight) &&
-            (maxWidth  == -1 ? true : w < maxWidth) &&
-            font->GetPointSize() < MAX_POINT_SIZE )
-    {
-        font->SetPointSize(font->GetPointSize()+1);
-        GetTextExtent(text, &w, &h, NULL, NULL, font);
-    }
-
-    // Make the font smaller if needed.
-    while ( (maxHeight == -1 ? true : h > maxHeight) &&
-            (maxWidth  == -1 ? true : w > maxWidth) &&
-            font->GetPointSize() > MIN_POINT_SIZE )
-    {
-        font->SetPointSize(font->GetPointSize()-1);
-        GetTextExtent(text, &w, &h, NULL, NULL, font);
-    }
-
-    // This happens if desiredHeight is very small or zero
-    if (font->GetPointSize() < MIN_POINT_SIZE)
-        font->SetPointSize(MIN_POINT_SIZE);
-}
-
-
-
-wxSize
-XGridCtrl::GetBestSize() const
-{
-    if (! m_grid || m_grid->IsEmpty())
-        return wxDefaultSize;
-
-    return wxSize( m_grid->GetWidth()
-                   * (m_boxSize + m_borderSize)
-                   + m_borderSize,
-
-                   m_grid->GetHeight()
-                   * (m_boxSize + m_borderSize)
-                   + m_borderSize );
-}
-
-
 void
 XGridCtrl::OnSize(wxSizeEvent & WXUNUSED(evt))
 {
@@ -801,83 +606,31 @@ void
 XGridCtrl::Scale(double factor)
 {
     if (IsEmpty())
-    {
-        m_rect.SetWidth(0);
-        m_rect.SetHeight(0);
         return;
-    }
-
-    int max_width, max_height;
-    GetClientSize(&max_width, &max_height);
 
     // Recalculate box size
     if (! m_fit)
     {
         // This should only occur when FitGrid(false) is called
         if (factor == 1.0 && m_lastBoxSize != UNDEFINED_BOX_SIZE)
-            m_boxSize = m_lastBoxSize;
+            m_drawer.SetBoxSize(m_lastBoxSize);
         else
-            m_boxSize *= factor;
+            m_drawer.SetBoxSize(m_drawer.GetBoxSize() * factor);
 
-        m_lastBoxSize = m_boxSize;
+        m_lastBoxSize = m_drawer.GetBoxSize();
     }
     else // fit == true
     {
-        // If the window is too small to fit the grid, catch it here
-        if (max_width  < (m_grid->GetWidth()  + 1)  * m_borderSize
-         || max_height < (m_grid->GetHeight() + 1) * m_borderSize)
-        {
-            m_boxSize = 0;
-        }
-        else
-        {
-            const size_t width =
-                (max_width  - (m_grid->GetWidth() + 1)  * m_borderSize)
-                / m_grid->GetWidth();
-
-            const size_t height =
-                (max_height - (m_grid->GetHeight() + 1) * m_borderSize)
-                / m_grid->GetHeight();
-
-            m_boxSize = std::min(width, height);
-        }
+        m_drawer.SetMaxSize(GetClientSize());
     }
-
-    // Set grid rect size based on m_boxSize
-    m_rect.SetWidth ( m_grid->GetWidth()
-                      * (m_boxSize + m_borderSize)
-                      + m_borderSize );
-
-    m_rect.SetHeight( m_grid->GetHeight()
-                      * (m_boxSize + m_borderSize)
-                      + m_borderSize );
-
-    wxASSERT(! m_fit
-             || m_boxSize == 0
-             || (m_rect.width <= max_width && m_rect.height <= max_height) );
-
-    // Set left side of grid
-    if (m_fit || m_rect.width <= max_width)
-        m_rect.SetX( (max_width  - m_rect.width)  / 2 );
-    else
-        m_rect.SetX(0);
-
-    // Set top of grid
-    if (m_fit || m_rect.height <= max_height)
-        m_rect.SetY( (max_height - m_rect.height) / 2 );
-    else
-        m_rect.SetY(0);
-
-    // Scale fonts
-    SetNumberFont(m_numberFont);
-    SetLetterFont(m_letterFont[0]);
 
     // Virtual size does not include the bottom and right grid border.
     // If it did include the border, there would often be an extra scroll unit
     // because the scroll unit is equal to one square plus _one_ border, not
     // both borders.
-    SetVirtualSize(m_rect.width  - m_borderSize, m_rect.height - m_borderSize);
-    SetScrollRate(GetSquareSize(), GetSquareSize());
+    SetVirtualSize(m_drawer.GetWidth()  - m_drawer.GetBorderSize(),
+                   m_drawer.GetHeight() - m_drawer.GetBorderSize());
+    SetScrollRate(m_drawer.GetSquareSize(), m_drawer.GetSquareSize());
 }
 
 
@@ -891,8 +644,9 @@ XGridCtrl::CheckGrid(int options)
 {
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
+    const bool checkBlank = (options & CHECK_ALL) != 0;
     std::vector<XSquare *> incorrect = \
-        m_grid->CheckGrid( (options & CHECK_ALL) != 0 );
+        m_grid->CheckGrid(checkBlank);
 
     if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
@@ -928,9 +682,11 @@ XGridCtrl::CheckWord(int options)
 {
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
+    const bool checkBlank = (options & CHECK_ALL) != 0;
     std::vector<XSquare *> incorrect =
         m_grid->CheckWord( m_focusedSquare->GetWordStart(m_direction),
-                           m_focusedSquare->GetWordEnd  (m_direction) );
+                           m_focusedSquare->GetWordEnd  (m_direction),
+                           checkBlank);
 
     if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
@@ -969,7 +725,8 @@ XGridCtrl::CheckLetter(int options)
 
     XSquare & square = *GetFocusedSquare();
 
-    if (! m_grid->CheckSquare(square))
+    const bool checkBlank = (options & CHECK_ALL) != 0;
+    if (! m_grid->CheckSquare(square, checkBlank))
     {
         if ( (options & REVEAL_ANSWER) != 0)
         {
@@ -1428,10 +1185,10 @@ XSquare *
 XGridCtrl::HitTest(int x, int y)
 {
     CalcUnscrolledPosition(x, y, &x, &y);
-    x -= (m_rect.x + m_borderSize);
-    y -= (m_rect.y + m_borderSize);
-    int col = floor(static_cast<double>(x) / (m_boxSize+m_borderSize));
-    int row = floor(static_cast<double>(y) / (m_boxSize+m_borderSize));
+    x -= (m_drawer.GetLeft() + m_drawer.GetBorderSize());
+    y -= (m_drawer.GetTop() + m_drawer.GetBorderSize());
+    int col = floor(static_cast<double>(x) / (m_drawer.GetSquareSize()));
+    int row = floor(static_cast<double>(y) / (m_drawer.GetSquareSize()));
 
     if (   0 <= col && col < m_grid->GetWidth()
         && 0 <= row && row < m_grid->GetHeight())

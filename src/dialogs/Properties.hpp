@@ -130,10 +130,18 @@ protected:
 
     // Clue Prompt
 	virtual void OnPromptBackgroundColor( wxColourPickerEvent& evt )
-        { m_frame->m_cluePrompt->SetBackgroundColour(evt.GetColour()); evt.Skip(); }
+    {
+        m_frame->m_cluePrompt->SetBackgroundColour(evt.GetColour());
+        m_frame->m_cluePrompt->Refresh();
+        evt.Skip();
+    }
 
 	virtual void OnPromptTextColor( wxColourPickerEvent& evt )
-        { m_frame->m_cluePrompt->SetForegroundColour(evt.GetColour()); evt.Skip(); }
+    {
+        m_frame->m_cluePrompt->SetForegroundColour(evt.GetColour());
+        m_frame->m_cluePrompt->Refresh();
+        evt.Skip();
+    }
 
 
     // Clues

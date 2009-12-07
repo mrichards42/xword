@@ -47,6 +47,7 @@ class wxFB_PropertiesDialog : public wxDialog
 		wxRadioBox* m_pauseOnSwitch;
 		wxCheckBox* m_moveOnRightClick;
 		wxCheckBox* m_checkWhileTyping;
+		wxStaticBoxSizer* sbSizer36;
 		wxColourPickerCtrl* m_selectedLetterColor;
 		wxColourPickerCtrl* m_selectedWordColor;
 		wxColourPickerCtrl* m_penColor;
@@ -124,7 +125,7 @@ class wxFB_ConvertDialog : public wxDialog
 		wxFilePickerCtrl* m_logfile;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnListItemDoubleClick( wxListEvent& event ) { event.Skip(); }
+		virtual void OnDoubleClick( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnShowOptions( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemove( wxCommandEvent& event ) { event.Skip(); }

@@ -112,9 +112,10 @@ public:
     // This works well from the outside, but is a mess internally.
     // It would be nice to just have access to m_clueList directly so that we
     // don't need all these extra functions to access it, but without these
-    // functions it's difficult to manage the color swapping.  It's definitely
-    // possible to implement, but this setup already exists and I don't feel
-    // like taking the time to mess with it.
+    // functions it's difficult to manage the color swapping when the user
+    // changes from an across clue to a down clue.  It's definitely possible
+    // to implement, but this setup already exists and I don't feel like
+    // taking the time to mess with it.
 
     void SetSelectionForeground(const wxColor & color)
     {
@@ -188,9 +189,17 @@ public:
         { return m_heading->GetFont(); }
 
     bool SetHeadingForeground(const wxColor & color)
-        { return m_heading->SetForegroundColour(color);}
+    {
+        const bool ret = m_heading->SetForegroundColour(color);
+        m_heading->Refresh();
+        return ret;
+    }
     bool SetHeadingBackground(const wxColor & color)
-        { return m_heading->SetBackgroundColour(color); }
+    {
+        const bool ret = m_heading->SetBackgroundColour(color);
+        m_heading->Refresh();
+        return ret;
+    }
 
     wxColour GetHeadingForeground() const
         { return m_heading->GetForegroundColour(); }

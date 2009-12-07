@@ -16,13 +16,6 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-// TODO:
-//   - Fix moving around the grid (TAB key especially)
-//   - Eventually get to entering characters other than A-Z
-//        This might require changing how the puz headers store data
-//   - Clean up the file
-
-
 #ifndef MY_GRID_H
 #define MY_GRID_H
 
@@ -34,6 +27,7 @@
 #endif
 
 #include "puz/XGrid.hpp"
+#include "XGridDrawer.hpp"
 
 
 // For checking grid squares
@@ -98,7 +92,7 @@ public: // Enums
     };
 
 public:
-    XGridCtrl() { Init(); }
+    XGridCtrl() : m_drawer(*this) { Init(); }
 
     explicit XGridCtrl(wxWindow * parent,
                       wxWindowID id = -1,
@@ -108,6 +102,7 @@ public:
                       long style = DEFAULT_GRID_STYLE
                                  | wxVSCROLL | wxHSCROLL,
                       const wxString & name = XGridCtrlNameStr)
+        : m_drawer(*this)
     {
         Init();
         Create(parent, id, pos, size, grid, style, name);
@@ -134,6 +129,7 @@ public:
     bool IsEmpty() const { return m_grid == NULL || m_grid->IsEmpty(); }
 
     void RecheckGrid();
+    bool UnscrambleSolution(unsigned short key);
 
     // Will trigger an event
     XSquare * SetSquareFocus(XSquare * square, bool direction);
@@ -209,14 +205,34 @@ public:
     const wxColor & GetPenColor()           const { return m_colors[PEN]; }
     const wxColor & GetPencilColor()        const { return m_colors[PENCIL]; }
 
-    // Sizes
-    wxSize GetBestSize() const;
+    // Sizing / Drawing
+    int    GetWidth()        const { return m_drawer.GetWidth(); }
+    int    GetHeight()       const { return m_drawer.GetHeight(); }
+    int    GetTop()          const { return m_drawer.GetTop(); }
+    int    GetLeft()         const { return m_drawer.GetLeft(); }
+    wxSize GetBestSize()     const { return m_drawer.GetBestSize(); }
+    int    GetBoxSize()      const { return m_drawer.GetBoxSize(); }
+    int    GetBorderSize()   const { return m_drawer.GetBorderSize(); }
+    int    GetSquareSize()   const { return m_drawer.GetSquareSize(); }
+    double GetLetterScale()  const { return m_drawer.GetLetterScale(); }
+    double GetNumberScale()  const { return m_drawer.GetNumberScale(); }
+    int    GetNumberHeight() const { return m_drawer.GetNumberHeight(); }
+    int    GetLetterHeight() const { return m_drawer.GetLetterHeight(); }
+
+    void SetBoxSize(int size)         { m_drawer.SetBoxSize(size); }
+    void SetBorderSize(int size)      { m_drawer.SetBorderSize(size); }
+    void SetLetterScale(double scale) { m_drawer.SetLetterScale(scale); }
+    void SetNumberScale(double scale) { m_drawer.SetNumberScale(scale); }
 
     // Zooming
     void FitGrid(bool fit = true)
     {
         Freeze();
         m_fit = fit;
+        if (fit)
+            m_drawer.SetAlign(wxALIGN_CENTER);
+        else
+            m_drawer.SetAlign(wxALIGN_LEFT | wxALIGN_TOP);
         Scale();
         MakeVisible(*m_focusedSquare);
         Thaw();
@@ -227,6 +243,7 @@ public:
     {
         Freeze();
         m_fit = false;
+        m_drawer.SetAlign(wxALIGN_LEFT | wxALIGN_TOP);
         Scale(factor);
         MakeVisible(*m_focusedSquare);
         Refresh();
@@ -234,19 +251,6 @@ public:
     }
 
     void ZoomOut(double factor = 1.1) { ZoomIn(1/factor); }
-
-    // Square/border size
-    int   GetSquareSize()             { return m_boxSize + m_borderSize; }
-    void  SetBorderSize(size_t size)  { m_borderSize = size; Scale(); Refresh(); }
-    int   GetBorderSize()  const      { return m_borderSize; }
-
-    void  SetNumberScale(double scale) { m_numberScale = scale; }
-    void  SetLetterScale(double scale) { m_letterScale = scale; }
-    double GetNumberScale() const      { return m_numberScale; }
-    double GetLetterScale() const      { return m_letterScale; }
-
-    int GetNumberHeight() const   { return m_boxSize * m_numberScale; }
-    int GetLetterHeight() const   { return m_boxSize * m_letterScale; }
 
     // Style
     void SetGridStyle(int style)
@@ -285,8 +289,6 @@ public:
     bool IsFocusedWord  (const XSquare & square);
 
     XSquare * HitTest(int x, int y);
-    wxPoint TopLeft(const XSquare & square);
-    wxPoint BottomRight(const XSquare & square);
 
 protected:
     void Init();
@@ -315,17 +317,11 @@ protected:
     void Scale(double factor = 1.0);
     void ScaleFont(wxFont * font, int width, int height);
 
-    wxRect m_rect;              // Overall grid size
-    int m_borderSize;           // Border between squares
-    int m_boxSize;              // width/heigth of a square
+
+    XGridDrawer<wxWindow> m_drawer;
     int m_lastBoxSize;          // The last non-fitted box size
     bool m_fit;                 // Fit the grid to the window?
     bool m_isPaused;            // Trigger a "Paused" message?
-
-    wxFont m_numberFont;
-    wxFont m_letterFont[8];  // Cache fonts for all rebus lengths
-    double m_numberScale;
-    double m_letterScale;
 
     // Pointer to puzzle data
     XGrid * m_grid;
@@ -396,32 +392,13 @@ XGridCtrl::SetFont(const wxFont & font)
 inline void
 XGridCtrl::SetNumberFont(const wxFont & font)
 {
-    m_numberFont = font;
-    ScaleFont(&m_numberFont, -1, GetNumberHeight());
+    m_drawer.SetNumberFont(font);
 }
 
 inline void
 XGridCtrl::SetLetterFont(const wxFont & font)
 {
-    // 1 letter
-    m_letterFont[0] = font;
-    ScaleFont(&m_letterFont[0], -1, GetLetterHeight());
-
-    // 2-3 letters
-    m_letterFont[1] = m_letterFont[0];
-    ScaleFont(&m_letterFont[1], GetSquareSize() / 4, GetLetterHeight());
-    m_letterFont[2] = m_letterFont[1];
-
-    // 4-5 letters
-    m_letterFont[3] = m_letterFont[2];
-    ScaleFont(&m_letterFont[3], GetSquareSize() / 6, GetLetterHeight());
-    m_letterFont[4] = m_letterFont[3];
-
-    // 6+ (6-8) letters
-    m_letterFont[5] = m_letterFont[4];
-    ScaleFont(&m_letterFont[5], GetSquareSize() / 8, GetLetterHeight());
-    m_letterFont[6] = m_letterFont[5];
-    m_letterFont[7] = m_letterFont[6];
+    m_drawer.SetLetterFont(font);
 }
 
 
@@ -429,26 +406,6 @@ inline bool
 XGridCtrl::IsFocusedLetter(const XSquare & Square)
 {
     return m_focusedSquare == &Square;
-}
-
-
-
-
-inline wxPoint
-XGridCtrl::TopLeft(const XSquare & square)
-{
-    return wxPoint(m_rect.x + m_borderSize + square.GetCol() * GetSquareSize(),
-                   m_rect.y + m_borderSize + square.GetRow() * GetSquareSize());
-}
-
-
-inline wxPoint
-XGridCtrl::BottomRight(const XSquare & square)
-{
-    wxPoint pt = TopLeft(square);
-    pt.x += GetSquareSize();
-    pt.y += GetSquareSize();
-    return pt;
 }
 
 

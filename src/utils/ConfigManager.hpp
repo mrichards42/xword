@@ -63,6 +63,10 @@ public:
 //     bool Write    (const wxString & path, const TYPE & value);
 //     bool WriteTYPE(const wxString & path, const TYPE & value);
 //     void GetDefaultTYPE(const wxString & path) const;
+//
+// The WriteTYPE function should attempt to ASSERT that the path exists.
+// This makes sure that we are consistent with config item names throughout.
+//
 
 #define CFG_TYPE(type, type_name)                                              \
     /* The ConfigXXXX class */                                                 \
@@ -72,7 +76,7 @@ public:
         Config ## type_name(const type & data) { SetData(data); }              \
                                                                                \
         virtual void SetData(const type & data) { m_data = data; }             \
-        virtual type Get ## type_name() const { return m_data; }       \
+        virtual type Get ## type_name() const { return m_data; }               \
                                                                                \
     protected:                                                                 \
         type m_data;                                                           \
@@ -85,7 +89,7 @@ public:
     }                                                                          \
     void Add ## type_name(const wxString & path, const type & default_value)   \
     {                                                                          \
-        m_items[GetPathOf(path)] = new Config ## type_name(default_value);     \
+        m_items[AbsPath(path)] = new Config ## type_name(default_value);       \
     }                                                                          \
                                                                                \
     /* Read function */                                                        \
@@ -93,7 +97,7 @@ public:
     {                                                                          \
         wxASSERT(m_config != NULL);                                            \
         type ret;                                                              \
-        if (m_config->Read(GetPathOf(path), &ret))                             \
+        if (m_config->Read(AbsPath(path), &ret))                               \
             return ret;                                                        \
         return GetDefault ## type_name(path);                                  \
     }                                                                          \
@@ -106,14 +110,15 @@ public:
     bool Write ## type_name(const wxString & path, const type & value)         \
     {                                                                          \
         wxASSERT(m_config != NULL);                                            \
-        return m_config->Write(GetPathOf(path), value);                        \
+        wxASSERT(HasEntry(path));                                              \
+        return m_config->Write(AbsPath(path), value);                          \
     }                                                                          \
                                                                                \
     /* GetDefault function */                                                  \
     type GetDefault ## type_name(const wxString & path) const                  \
     {                                                                          \
-        wxASSERT(m_items.find(GetPathOf(path)) != m_items.end());              \
-        return m_items.find(GetPathOf(path))->second->Get ## type_name();      \
+        wxASSERT(HasEntry(path));                                              \
+        return m_items.find(AbsPath(path))->second->Get ## type_name();        \
     }
 
 // Macro for types that aren't natively representable by a wxConfig.
@@ -181,8 +186,10 @@ public:
 
     void SetConfig(wxConfigBase * config) { m_config = config; }
 
-    void SetPath(const wxString & path) { m_path = GetPathOf(path); }
+    void SetPath(const wxString & path) { m_path = AbsPath(path); }
     const wxString & GetPath() const { return m_path; }
+    bool HasEntry(const wxString & path) const
+        { return m_items.find(AbsPath(path)) != m_items.end(); }
 
     // AddXXX, ReadXXX, WriteXXX, and GetDefaultXXX functions
     CFG_TYPE(wxString,   String)
@@ -247,7 +254,7 @@ public:
 private:
     wxConfigBase * m_config;
     wxString m_path;
-    wxString GetPathOf(const wxString & name) const
+    wxString AbsPath(const wxString & name) const
     {
         if (name.StartsWith(_T("/")))
             return name;

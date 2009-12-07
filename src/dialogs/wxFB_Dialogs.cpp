@@ -89,8 +89,7 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	wxBoxSizer* bSizer33;
 	bSizer33 = new wxBoxSizer( wxVERTICAL );
 	
-	wxStaticBoxSizer* sbSizer51;
-	sbSizer51 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Grid") ), wxVERTICAL );
+	sbSizer36 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Grid") ), wxVERTICAL );
 	
 	wxBoxSizer* bSizer61;
 	bSizer61 = new wxBoxSizer( wxHORIZONTAL );
@@ -103,7 +102,7 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	m_staticText1->Wrap( -1 );
 	bSizer61->Add( m_staticText1, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
-	sbSizer51->Add( bSizer61, 0, wxEXPAND, 5 );
+	sbSizer36->Add( bSizer61, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer611;
 	bSizer611 = new wxBoxSizer( wxHORIZONTAL );
@@ -116,7 +115,7 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	m_staticText11->Wrap( -1 );
 	bSizer611->Add( m_staticText11, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
-	sbSizer51->Add( bSizer611, 0, wxEXPAND, 5 );
+	sbSizer36->Add( bSizer611, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer612;
 	bSizer612 = new wxBoxSizer( wxHORIZONTAL );
@@ -129,22 +128,26 @@ wxFB_PropertiesDialog::wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id, c
 	m_staticText12->Wrap( -1 );
 	bSizer612->Add( m_staticText12, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
-	sbSizer51->Add( bSizer612, 0, wxEXPAND, 5 );
+	sbSizer36->Add( bSizer612, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer613;
 	bSizer613 = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_pencilColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	m_pencilColor->Hide();
+	
 	bSizer613->Add( m_pencilColor, 0, 0, 5 );
 	
 	wxStaticText* m_staticText13;
 	m_staticText13 = new wxStaticText( colorPanel, wxID_ANY, wxT("Pencil"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText13->Wrap( -1 );
+	m_staticText13->Hide();
+	
 	bSizer613->Add( m_staticText13, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
-	sbSizer51->Add( bSizer613, 0, wxEXPAND, 5 );
+	sbSizer36->Add( bSizer613, 0, wxEXPAND, 5 );
 	
-	bSizer33->Add( sbSizer51, 0, wxALL|wxEXPAND, 5 );
+	bSizer33->Add( sbSizer36, 0, wxALL|wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer7;
 	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Clue Prompt") ), wxVERTICAL );
@@ -553,7 +556,7 @@ wxFB_ConvertDialog::wxFB_ConvertDialog( wxWindow* parent, wxWindowID id, const w
 	m_mainSizer->Fit( this );
 	
 	// Connect Events
-	m_list->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( wxFB_ConvertDialog::OnListItemDoubleClick ), NULL, this );
+	m_list->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( wxFB_ConvertDialog::OnDoubleClick ), NULL, this );
 	m_optionsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnShowOptions ), NULL, this );
 	m_add->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnAdd ), NULL, this );
 	m_remove->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnRemove ), NULL, this );
@@ -565,7 +568,7 @@ wxFB_ConvertDialog::wxFB_ConvertDialog( wxWindow* parent, wxWindowID id, const w
 wxFB_ConvertDialog::~wxFB_ConvertDialog()
 {
 	// Disconnect Events
-	m_list->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( wxFB_ConvertDialog::OnListItemDoubleClick ), NULL, this );
+	m_list->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( wxFB_ConvertDialog::OnDoubleClick ), NULL, this );
 	m_optionsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnShowOptions ), NULL, this );
 	m_add->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnAdd ), NULL, this );
 	m_remove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnRemove ), NULL, this );

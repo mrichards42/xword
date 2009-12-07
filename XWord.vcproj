@@ -481,6 +481,10 @@
 				RelativePath=".\src\XGridCtrl.hpp"
 				>
 			</File>
+			<File
+				RelativePath=".\src\XGridDrawer.hpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name=".Source Files"

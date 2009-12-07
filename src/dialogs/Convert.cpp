@@ -20,7 +20,6 @@
 #include <wx/log.h>
 #include "../puz/HandlerBase.hpp" // Loading / saving exceptions
 
-
 enum ConversionStatus
 {
     QUEUED,     // Never attempted
@@ -30,6 +29,9 @@ enum ConversionStatus
     SUCCESS = DONE
 };
 
+// For some entirely unknown reason, I can't compile this if the wxApp include
+// Is placed before enum ConversionStatus.
+#include <wx/app.h> // for wxTheApp->Yield();
 
 
 // Drop target for the conversion dialog
@@ -88,17 +90,16 @@ ConvertDialog::ConvertDialog(wxWindow * parent,
     const bool hasOutput = ! output.IsEmpty();
     for (size_t i = 0; i < input.size(); ++i)
     {
+        wxTheApp->Yield();
         if (hasOutput)
             AddFile(input[i], output[i]);
         else
             AddFile(input[i]);
     }
-
-    // Fit the list ctrl to the size of its contents
     if (! input.empty())
     {
-        m_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
-        m_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
+        AutoSizeColumn(0);
+        AutoSizeColumn(1);
     }
 
     SetMinSize(wxSize(GetSize().GetWidth(), -1));
@@ -137,7 +138,7 @@ ConvertDialog::AddFile(const wxString & input, const wxString & output)
                 GetItemText(index, 0).c_str(),
                 GetItemText(index, 1).c_str(),
                 GetItemText(index, 2).c_str());
-    AutoSizeColumns();
+
     return true;
 }
 
@@ -151,6 +152,30 @@ ConvertDialog::RemoveFile(long index)
     // Keep the current conversion index up to date.
     if (index <= m_conversionIndex)
         --m_conversionIndex;
+}
+
+
+
+void
+ConvertDialog::HitTest(const wxPoint & pos, long * index, int * col)
+{
+    *index = wxNOT_FOUND;
+    *col = wxNOT_FOUND;
+    // We can get the column using wxListCtrl::HitTest only in Windows, so we'll just
+    // figure out a different way to get the column.
+    int flags;
+    *index = m_list->HitTest(pos, flags, NULL);
+    if (*index == wxNOT_FOUND)
+        return;
+
+    int width = 0;
+    for (*col = 0; *col < m_list->GetColumnCount(); ++*col)
+    {
+        width += m_list->GetColumnWidth(*col);
+        if (pos.x < width)
+            return;
+    }
+    *col = wxNOT_FOUND;
 }
 
 
@@ -239,13 +264,16 @@ ConvertDialog::ConvertFile(long index, bool ignore_errors)
 
 
 void
-ConvertDialog::AutoSizeColumns(int index)
+ConvertDialog::AutoSizeColumn(int index)
 {
-    if (index == -1)
-        for (int i = 0; i < m_list->GetColumnCount(); ++i)
-            m_list->SetColumnWidth(i, wxLIST_AUTOSIZE);
-    else
-        m_list->SetColumnWidth(index, wxLIST_AUTOSIZE);
+    m_list->SetColumnWidth(index, wxLIST_AUTOSIZE);
+}
+
+void
+ConvertDialog::AutoSizeColumns()
+{
+    for (int i = 0; i < m_list->GetColumnCount(); ++i)
+        m_list->SetColumnWidth(i, wxLIST_AUTOSIZE);
 }
 
 // Note that the StartConversion and StopConversion functions don't actually
@@ -337,7 +365,6 @@ ConvertDialog::GetItemText(long index, int col)
     item.SetColumn(col);
     item.SetMask(wxLIST_MASK_TEXT);
     m_list->GetItem(item);
-    wxLogDebug(_T("Item: %d, %d = %d, %s"), index, col, item.GetMask(), item.GetText().c_str());
     return item.GetText();
 }
 
@@ -386,7 +413,7 @@ void
 ConvertDialog::OnAdd(wxCommandEvent & WXUNUSED(evt))
 {
     wxFileDialog dlg(this,
-                     _T("Choose input file(s)"),
+                     _T("Select input file(s)"),
                      wxEmptyString,
                      wxEmptyString,
                      XPuzzle::GetLoadTypeString(),
@@ -402,6 +429,8 @@ ConvertDialog::OnAdd(wxCommandEvent & WXUNUSED(evt))
             AddFile(*it);
         }
     }
+    AutoSizeColumn(0);
+    AutoSizeColumn(1);
 }
 
 void
@@ -419,6 +448,45 @@ ConvertDialog::OnRemove(wxCommandEvent & WXUNUSED(evt))
         RemoveFile(index);
     }
 }
+
+void
+ConvertDialog::OnDoubleClick(wxMouseEvent & evt)
+{
+    long index;
+    int col;
+    HitTest(evt.GetPosition(), &index, &col);
+    if (index == wxNOT_FOUND || col == wxNOT_FOUND)
+        return;
+
+    wxFileName filename(GetItemText(index, col));
+    wxString result;
+    if (col == 0)
+    {
+        result = 
+            wxFileSelector(_T("Select the input file"),
+                           filename.GetPath(),
+                           filename.GetFullName(),
+                           filename.GetExt(),
+                           XPuzzle::GetLoadTypeString(),
+                           wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    }
+    else if (col == 1)
+    {
+        result =
+            wxFileSelector(_T("Select the output file"),
+                           filename.GetPath(),
+                           filename.GetFullName(),
+                           filename.GetExt(),
+                           XPuzzle::GetSaveTypeString(),
+                           wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    }
+    if (result.IsEmpty())
+        return;
+    SetItemText(index, col, result);
+    AutoSizeColumn(col);
+}
+
+
 
 void
 ConvertDialog::OnRunButton(wxCommandEvent & WXUNUSED(evt))
@@ -467,7 +535,7 @@ ConvertDialog::OnIdle(wxIdleEvent & evt)
     // Do the conversion
     wxLogDebug(_T("Converting line number: %d"), m_conversionIndex);
     m_conversionStatus.at(m_conversionIndex) = ConvertFile(m_conversionIndex);
-    AutoSizeColumns(2);
+    AutoSizeColumn(2);
     ++m_conversionIndex;
     evt.RequestMore(true);
 }
@@ -505,8 +573,11 @@ ConvertDialogDropTarget::OnDropFiles(wxCoord WXUNUSED(x),
          it != filenames.end();
          ++ it)
     {
+        wxTheApp->Yield();
         m_dlg->AddFile(*it);
     }
+    m_dlg->AutoSizeColumn(0);
+    m_dlg->AutoSizeColumn(1);
     return true;
 }
 

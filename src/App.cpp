@@ -122,7 +122,7 @@ MyApp::ReadCommandLine()
         wxString defaultDir;
         const bool use_directory = cmd.Found(_T("d"), &defaultDir);
         wxString logfile;
-        const bool use_log_file = cmd.Found(_T("l"), &logfile);
+        cmd.Found(_T("l"), &logfile);
 
 
         wxArrayString input_list;
@@ -255,8 +255,11 @@ MyApp::SetupConfig()
         wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
     m_config.AddColor(_T("crossingForegroundColor"),
         m_config.GetDefaultColor(_T("selectedBackgroundColor")));
-    m_config.AddColor(_T("crossingBackgroundColor"),
-        m_config.GetDefaultColor(_T("selectedForegroundColor")));
+    // Using the selected foreground color here can make the list look
+    // really ugly.  If, for example, the default selected text color
+    // is black, this would make the crossing clue's background color
+    // to default to black, which draws too much attention to that clue.
+    m_config.AddColor(_T("crossingBackgroundColor"),    *wxWHITE);
 
     wxFont clueHeadingFont = *wxSWISS_FONT;
     clueHeadingFont.SetPointSize(14);
