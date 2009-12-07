@@ -40,7 +40,7 @@ class XSquare;
 class XGridDrawer
 {
 public:
-    XGridDrawer::XGridDrawer(XGrid * grid = NULL,
+    XGridDrawer(XGrid * grid = NULL,
                              const wxFont & font = *wxSWISS_FONT);
     XGridDrawer(wxDC * dc,
                 XGrid * grid = NULL,
