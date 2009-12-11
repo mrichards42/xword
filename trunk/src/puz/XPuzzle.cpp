@@ -76,48 +76,6 @@ XPuzzle::Load(const wxString & filename, HandlerBase * handler)
     handler->Load(this, stream);
     m_isOk = true;
     return true;
-
-    try
-    {
-        wxLogDebug(_T("Loading puzzle: %s"), m_filename.c_str());
-        wxFileInputStream stream(m_filename);
-        if (! stream.IsOk())
-            throw PuzFileError(_T("Cannot open file %s"), m_filename.c_str());
-        handler->Load(this, stream);
-        m_isOk = true;
-    }
-    catch (PuzTypeError & error)
-    {
-        if (! error.isProcessed)
-        {
-            error.isProcessed = true;
-
-            handler = PromptForLoadHandler(
-                wxString::Format(_T("Loading file as %s failed."),
-                                 handler->GetDescription().c_str()) );
-            if (handler != NULL)
-                return Load(filename, handler);
-        }
-    }
-    catch (FatalPuzError & error)
-    {
-        wxMessageBox(error.what(),
-                     wxMessageBoxCaptionStr,
-                     wxOK | wxICON_ERROR);
-    }
-    catch (std::exception * error)
-    {
-        wxMessageBox(wxString(error->what(), wxConvISO8859_1),
-                     wxMessageBoxCaptionStr,
-                     wxOK | wxICON_ERROR);
-    }
-    catch (...)
-    {
-        wxMessageBox(_T("Unknown error while loading file"),
-                     wxMessageBoxCaptionStr,
-                     wxOK | wxICON_ERROR);
-    }
-    return m_isOk;
 }
 
 

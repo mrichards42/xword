@@ -256,7 +256,9 @@ MyApp::SetupConfig()
 
     // Clue box
     m_config.SetPath(_T("/Clue"));
-    m_config.AddFont(_T("font"),      *wxSWISS_FONT);
+    m_config.AddFont(_T("font"),
+                     wxFont(12, wxFONTFAMILY_SWISS,
+                            wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
     m_config.AddPoint(_T("spacing"),    wxPoint(5, 5));
 
     m_config.AddColor(_T("listForegroundColor"),        *wxBLACK);
@@ -273,11 +275,8 @@ MyApp::SetupConfig()
     // to default to black, which draws too much attention to that clue.
     m_config.AddColor(_T("crossingBackgroundColor"),    *wxWHITE);
 
-    wxFont clueHeadingFont = *wxSWISS_FONT;
-    clueHeadingFont.SetPointSize(14);
-
     m_config.AddFont(_T("headingFont"),
-            wxFont(13, wxFONTFAMILY_SWISS,
+            wxFont(14, wxFONTFAMILY_SWISS,
                    wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
     m_config.AddColor(_T("headingForegroundColor"),
         wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT ) );
@@ -297,6 +296,13 @@ MyApp::SetupConfig()
     m_config.SetPath(_T("/Printing"));
     m_config.AddLong(_T("blackSquareBrightness"), 0);
     m_config.AddLong(_T("gridAlignment"), wxALIGN_TOP | wxALIGN_RIGHT);
+    m_config.AddLong(_T("paperID"), wxPAPER_LETTER);
+    m_config.AddLong(_T("orientation"), wxPORTRAIT);
+    m_config.SetPath(_T("/Printing/Margins"));
+    m_config.AddLong(_T("left"), 15);
+    m_config.AddLong(_T("right"), 15);
+    m_config.AddLong(_T("top"), 15);
+    m_config.AddLong(_T("bottom"), 15);
     m_config.SetPath(_T("/Printing/Fonts"));
     m_config.AddBool(_T("useCustomFonts"), false);
     m_config.AddFont(_T("gridLetterFont"), *wxSWISS_FONT);
@@ -333,13 +339,5 @@ void
 MyApp::SetupPrinting()
 {
     g_printData = new wxPrintData;
-    g_printData->SetPaperId(wxPAPER_LETTER);
-
     g_pageSetupData = new wxPageSetupDialogData;
-
-    // Copy over initial paper size from print record.
-    g_pageSetupData->SetPaperId(g_printData->GetPaperId());
-    // Set some initial page margins in mm.
-    g_pageSetupData->SetMarginTopLeft(wxPoint(15, 15));
-    g_pageSetupData->SetMarginBottomRight(wxPoint(15, 15));
 }

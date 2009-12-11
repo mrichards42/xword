@@ -22,6 +22,7 @@
 // and stopping.
 #include "App.hpp"
 #include <wx/print.h>
+#include <wx/printdlg.h>
 #include "printout.hpp"
 
 // Puz library
@@ -47,6 +48,8 @@
 #include <wx/numdlg.h>
 
 #include "utils/SizerPrinter.hpp"
+
+#include <algorithm>
 
 
 #if !defined(__WXMSW__) && !defined(__WXPM__)
@@ -94,7 +97,10 @@ enum toolIds
     ID_SWAP_DIRECTION,
 
     ID_PREFERENCES,
+
     ID_PRINT_PREVIEW,
+    ID_PAGE_SETUP,
+    ID_PRINT,
 
 #ifdef __WXDEBUG__
 
@@ -113,6 +119,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_SAVE_AS,           MyFrame::OnSavePuzzleAs)
     EVT_MENU           (ID_CLOSE,             MyFrame::OnClosePuzzle)
     EVT_MENU           (ID_PRINT_PREVIEW,     MyFrame::OnPrintPreview)
+    EVT_MENU           (ID_PAGE_SETUP,        MyFrame::OnPageSetup)
+    EVT_MENU           (ID_PRINT,             MyFrame::OnPrint)
     EVT_MENU           (ID_QUIT,              MyFrame::OnQuit)
 
     EVT_MENU           (ID_ZOOM_IN,           MyFrame::OnZoomIn)
@@ -167,7 +175,9 @@ static const ToolDesc toolDesc[] =
     { ID_SAVE,  wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
     { ID_SAVE_AS,  wxITEM_NORMAL, _T("&Save As..."), _T("save") },
     { ID_CLOSE, wxITEM_NORMAL, _T("&Close\tCtrl+W") },
-    { ID_PRINT_PREVIEW,  wxITEM_NORMAL, _T("Print Preview...") },
+    { ID_PAGE_SETUP,    wxITEM_NORMAL, _T("Page Setup...") },
+    { ID_PRINT_PREVIEW, wxITEM_NORMAL, _T("Print Preview") },
+    { ID_PRINT,         wxITEM_NORMAL, _T("Print...") },
     { ID_QUIT,  wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
 
     { ID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in")  },
@@ -269,7 +279,7 @@ MyFrame::MyFrame()
 
     LoadConfig();
 
-    LoadLayout(_T("Default"));
+    LoadLayout(_T("(Previous)"));
     UpdateLayout();
 
     SetIcon(wxICON(xword));
@@ -304,7 +314,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
     {
         m_puz.Load(filename, ext);
     }
-    catch (PuzTypeError & error)
+    catch (FatalPuzError & error)
     {
         // Do something more useful here.
         m_puz.SetOk(false);
@@ -321,7 +331,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
                 wxYES_NO  | wxICON_ERROR);
         m_puz.SetOk(ret == wxYES);
     }
-    catch (PuzSectionError &)
+    catch (BasePuzError &)
     {
         const int ret =
             wxMessageBox(
@@ -358,6 +368,7 @@ MyFrame::SavePuzzle(wxString filename, const wxString & ext)
 {
     m_puz.m_notes = m_notes->GetValue();
     m_puz.m_time = m_time;
+    m_puz.m_isTimerRunning = IsTimerRunning();
 
     if (filename.empty())
         filename = wxFileSelector(
@@ -478,9 +489,6 @@ MyFrame::ShowPuzzle()
     m_copyright->SetLabel   (m_puz.m_copyright);
     m_notes    ->ChangeValue(m_puz.m_notes);
 
-    StopTimer();
-    SetTime(m_puz.m_time);
-
     // Reset save/save as flag
     EnableSaveAs();
 
@@ -514,6 +522,12 @@ MyFrame::ShowPuzzle()
         m_cluePrompt->Clear();
     }
 
+    StopTimer();
+    SetTime(m_puz.m_time);
+    if (m_puz.m_isTimerRunning)
+        StartTimer();
+
+    m_gridCtrl->SetPaused(false);
     m_gridCtrl->Refresh();
 }
 
@@ -652,8 +666,13 @@ MyFrame::MakeMenuBar()
         m_toolMgr.Add(menu, ID_SAVE);
         m_toolMgr.Add(menu, ID_SAVE_AS);
         m_toolMgr.Add(menu, ID_CLOSE);
+        menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_PREFERENCES);
+        menu->AppendSeparator();
+        m_toolMgr.Add(menu, ID_PAGE_SETUP);
         m_toolMgr.Add(menu, ID_PRINT_PREVIEW);
+        m_toolMgr.Add(menu, ID_PRINT);
+        menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_QUIT);
     mb->Append(menu, _T("&File"));
 
@@ -764,6 +783,7 @@ MyFrame::ManageWindows()
     m_mgr.AddPane(m_across,
                   wxAuiPaneInfo()
                   .CaptionVisible(false)
+                  .BestSize(300,-1)
                   .Layer(4)
                   .Left()
                   .Caption(_T("Across"))
@@ -772,6 +792,7 @@ MyFrame::ManageWindows()
     m_mgr.AddPane(m_down,
                   wxAuiPaneInfo()
                   .CaptionVisible(false)
+                  .BestSize(300,-1)
                   .Layer(4)
                   .Left()
                   .Caption(_T("Down"))
@@ -804,6 +825,7 @@ MyFrame::ManageWindows()
     m_mgr.AddPane(m_cluePrompt,
                   wxAuiPaneInfo()
                   .CaptionVisible(false)
+                  .BestSize(-1, 75)
                   .Layer(2)
                   .Top()
                   .Caption(_T("Clue"))
@@ -814,8 +836,11 @@ MyFrame::ManageWindows()
                   .CaptionVisible(false)
                   .Float()
                   .Hide()
+                  .CloseButton(true)
                   .Caption(_T("Notes"))
                   .Name(_T("Notes")));
+
+    SaveLayout(_T("XWord Default"));
 }
 
 
@@ -831,10 +856,15 @@ MyFrame::LoadLayoutString(const wxString & layout, bool update)
     // Restore toolbar size
     //m_mgr.GetPane(m_toolbar).BestSize(tbSize);
 
+    m_toolMgr.Check(ID_SHOW_NOTES, m_mgr.GetPane(_T("Notes")).IsShown());
+
+    // Make sure that the user can always close the notes panel.
+    wxAuiPaneInfo & notes = m_mgr.GetPane(_T("Notes"));
+    notes.CloseButton(true);
+
+
     if (update)
         m_mgr.Update();
-
-    m_toolMgr.Check(ID_SHOW_NOTES, m_mgr.GetPane(_T("Notes")).IsShown());
 
     return true;
 }
@@ -879,7 +909,6 @@ MyFrame::EnableTools(bool enable)
     // Tools that are only enabled or disabled when a puzzle
     // is shown or closed.  These don't have any special logic.
     m_toolMgr.Enable(ID_CLOSE, enable);
-    m_toolMgr.Enable(ID_SHOW_NOTES, enable);
     m_toolMgr.Enable(ID_TIMER, enable);
     m_toolMgr.Enable(ID_PRINT_PREVIEW, enable);
     m_toolMgr.Enable(ID_SWAP_DIRECTION, enable);
@@ -1052,6 +1081,19 @@ MyFrame::LoadConfig()
     m_cluePrompt->SetForegroundColour(config.ReadColor(_T("foregroundColor")));
     m_cluePrompt->SetDisplayFormat(config.ReadString(_T("displayFormat")));
 
+    // Printing
+    //---------
+    config.SetPath(_T("/Printing"));
+    g_printData->SetPaperId(static_cast<wxPaperSize>(config.ReadLong(_T("paperID"))));
+    g_printData->SetOrientation(config.ReadLong(_T("orientation")));
+    g_pageSetupData->SetPaperId(g_printData->GetPaperId());
+
+    config.SetPath(_T("/Printing/Margins"));
+    g_pageSetupData->SetMarginTopLeft(wxPoint(config.ReadLong(_T("left")),
+                                              config.ReadLong(_T("top"))));
+    g_pageSetupData->SetMarginBottomRight(wxPoint(config.ReadLong(_T("right")),
+                                                  config.ReadLong(_T("bottom"))));
+
     config.SetPath(_T("/"));
 }
 
@@ -1147,7 +1189,18 @@ MyFrame::SaveConfig()
     config.WriteString(_T("displayFormat"), m_cluePrompt->GetDisplayFormat());
 
     // Layout
-    SaveLayout(_T("Default"));
+    SaveLayout(_T("(Previous)"));
+
+    // Printing
+    //---------
+    config.SetPath(_T("/Printing"));
+    config.WriteLong(_T("paperID"), g_pageSetupData->GetPaperId());
+    config.WriteLong(_T("orientation"), g_printData->GetOrientation());
+    config.SetPath(_T("/Printing/Margins"));
+    config.WriteLong(_T("left"), g_pageSetupData->GetMarginTopLeft().x);
+    config.WriteLong(_T("right"), g_pageSetupData->GetMarginBottomRight().x);
+    config.WriteLong(_T("top"), g_pageSetupData->GetMarginTopLeft().y);
+    config.WriteLong(_T("bottom"), g_pageSetupData->GetMarginBottomRight().y);
 }
 
 //------------------------------------------------------------------------------
@@ -1304,8 +1357,15 @@ MyFrame::OnLayout(wxCommandEvent & evt)
         wxAuiPaneInfo & info = panes.Item(i);
         info.Floatable(allowMove).Dockable(allowMove);
         info.CaptionVisible(allowMove);
+        // We need to provide a means to reopen closed windows before we allow
+        // closing.
         //info.CloseButton(allowMove);
     }
+
+    // Ensure the notes panel keeps its default settings
+    wxAuiPaneInfo & notes = m_mgr.GetPane(_T("Notes"));
+    notes.CloseButton(true);
+
     m_mgr.Update();
 }
 
@@ -1392,10 +1452,24 @@ MyFrame::OnShowNotes(wxCommandEvent & evt)
 void
 MyFrame::OnAuiPaneClose(wxAuiManagerEvent & evt)
 {
+    // Keep track of the state of our panels
     if (evt.GetPane()->name == _T("Notes"))
         m_toolMgr.Check(ID_SHOW_NOTES, false);
 }
 
+void
+MyFrame::StartTimer()
+{
+    m_timer.Start();
+    m_toolMgr.Check(ID_TIMER);
+}
+
+void
+MyFrame::StopTimer()
+{
+    m_timer.Stop();
+    m_toolMgr.Check(ID_TIMER, false);
+}
 
 void
 MyFrame::OnTimer(wxCommandEvent & evt)
@@ -1419,9 +1493,32 @@ MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
 }
 
 
+// Helper functor for OnSwapDirection
+struct find_clue_number
+{
+    find_clue_number(int num)
+        : m_num(num)
+    {}
+
+    bool operator() (const XPuzzle::Clue & clue)
+    {
+        return clue.Number() == m_num;
+    }
+
+    int m_num;
+};
+
+
 void
 MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
 {
+    // Save important puzzle state information.
+    int focusedRow = m_gridCtrl->GetFocusedSquare()->GetRow();
+    int focusedCol = m_gridCtrl->GetFocusedSquare()->GetCol();
+    bool focusedDir = m_gridCtrl->GetDirection();
+    int oldTime = m_time;
+    bool wasTimerRunning = IsTimerRunning();
+
     // Swap the clues
     //---------------
     XPuzzle::ClueList oldAcross = m_puz.m_across;
@@ -1431,31 +1528,42 @@ MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
     m_puz.m_down.clear();
     m_puz.m_clues.clear();
 
-    XPuzzle::ClueList::iterator across_it = oldAcross.begin();
-    XPuzzle::ClueList::iterator down_it   = oldDown.begin();
-
+    // Iterate through the grid (downward), and look for all clue squares.
+    // These will all still be clue squares when the grid is swapped.
+    // The clues will sorted correctly.
+    // Fill in the new clue numbers as we go.
+    int clueNumber = 1;
     for (XSquare * square = m_puz.m_grid.First();
          square != NULL;
-         square = square->Next())
+         square = square->Next(DIR_DOWN))
     {
-        if (square->HasClue(DIR_ACROSS))
-        {
-            m_puz.m_across.push_back(XPuzzle::Clue(square->GetNumber(),
-                                                   down_it->Text()));
-            m_puz.m_clues.push_back(down_it->Text());
-            ++down_it;
-        }
+        // Down clues will become across clues
         if (square->HasClue(DIR_DOWN))
         {
-            m_puz.m_down.push_back(XPuzzle::Clue(square->GetNumber(),
-                                                 across_it->Text()));
-            m_puz.m_clues.push_back(across_it->Text());
-            ++across_it;
+            XPuzzle::ClueList::iterator clue_it = 
+                std::find_if(oldDown.begin(), oldDown.end(),
+                             find_clue_number(square->GetNumber()));
+            wxASSERT(clue_it != oldDown.end());
+            m_puz.m_across.push_back(*clue_it);
+            m_puz.m_across.back().m_num = clueNumber;
+            m_puz.m_clues.push_back(clue_it->Text());
         }
+        // Across clues will become down clues
+        if (square->HasClue(DIR_ACROSS))
+        {
+            XPuzzle::ClueList::iterator clue_it = 
+                std::find_if(oldAcross.begin(), oldAcross.end(),
+                             find_clue_number(square->GetNumber()));
+            wxASSERT(clue_it != oldAcross.end());
+            m_puz.m_down.push_back(*clue_it);
+            m_puz.m_down.back().m_num = clueNumber;
+            m_puz.m_clues.push_back(clue_it->Text());
+        }
+        if (square->HasClue())
+            ++clueNumber;
     }
-
-    wxASSERT(across_it == oldAcross.end());
-    wxASSERT(down_it   == oldDown.end());
+    wxASSERT(oldAcross.size() == m_puz.m_down.size());
+    wxASSERT(oldDown.size()   == m_puz.m_across.size());
 
 
     // Swap the grid
@@ -1477,8 +1585,17 @@ MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
     m_puz.m_grid.SetupIteration();
     m_puz.m_grid.SetupGrid();
 
-    // Done!
+
+    // Show the new puzzle
     ShowPuzzle();
+
+    // Restore the puzzle state
+    m_gridCtrl->SetSquareFocus(&m_gridCtrl->At(focusedRow, focusedCol), ! focusedDir);
+    SetTime(oldTime);
+    if (wasTimerRunning)
+        StartTimer();
+    else
+        StopTimer();
 }
 
 
@@ -1509,6 +1626,24 @@ MyFrame::OnPreferencesDialogCancel(wxCommandEvent & evt)
 }
 
 
+//------------------------------------------------------------------------------
+// Printing events
+//------------------------------------------------------------------------------
+// Most of this is only slightly adapted from the wxWidgets printing sample.
+
+void
+MyFrame::OnPageSetup(wxCommandEvent & WXUNUSED(evt))
+{
+    // For some reason the paperID doesn't persist between page setup sessions . . .
+    g_pageSetupData->SetPrintData(*g_printData);
+
+    wxPageSetupDialog pageSetupDialog(this, g_pageSetupData);
+    pageSetupDialog.ShowModal();
+
+    *g_pageSetupData = pageSetupDialog.GetPageSetupDialogData();
+    *g_printData = g_pageSetupData->GetPrintData();
+}
+
 void
 MyFrame::OnPrintPreview(wxCommandEvent & WXUNUSED(evt))
 {
@@ -1531,6 +1666,26 @@ MyFrame::OnPrintPreview(wxCommandEvent & WXUNUSED(evt))
     frame->Show();
 }
 
+void
+MyFrame::OnPrint(wxCommandEvent & WXUNUSED(evt))
+{
+    wxPrintDialogData printDialogData(*g_printData);
+
+    wxPrinter printer(& printDialogData);
+    MyPrintout printout(this, &m_puz, 1);
+    if (!printer.Print(this, &printout, true /*prompt*/))
+    {
+        if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+            wxMessageBox(_T("There was a problem printing.\n")
+                         _T("Perhaps your current printer is not set correctly?"),
+                         _T("Printing"),
+                         wxOK);
+    }
+    else
+    {
+        *g_printData = printer.GetPrintDialogData().GetPrintData();
+    }
+}
 
 
 //------------------------------------------------------------------------------
@@ -1630,7 +1785,7 @@ MyFrame::OnAppActivate()
     if (m_toolMgr.IsChecked(ID_TIMER))
     {
         wxLogDebug(_T("Starting timer."));
-        StartTimer();
+        m_timer.Start();
         m_gridCtrl->SetPaused(false);
     }
 }
@@ -1641,7 +1796,7 @@ MyFrame::OnAppDeactivate()
 {
     if (m_toolMgr.IsChecked(ID_TIMER))
     {
-        StopTimer();
+        m_timer.Stop();
         m_gridCtrl->SetPaused(true);
     }
 }
@@ -1654,6 +1809,7 @@ MyFrame::OnClose(wxCloseEvent & evt)
     if (ClosePuzzle() || ! evt.CanVeto())
     {
         SaveConfig();
+        Hide();
         Destroy();
         return;
     }

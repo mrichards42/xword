@@ -276,6 +276,23 @@ PreferencesDialog::OnCluePromptFormat(wxCommandEvent & evt)
 }
 
 
+void
+PreferencesDialog::OnLetterScale(wxSpinEvent & evt)
+{
+    m_frame->m_gridCtrl->SetLetterScale(evt.GetPosition() / 100.);
+    m_frame->m_gridCtrl->Refresh();
+    evt.Skip();
+}
+
+void
+PreferencesDialog::OnNumberScale(wxSpinEvent & evt)
+{
+    m_frame->m_gridCtrl->SetNumberScale(evt.GetPosition() / 100.);
+    m_frame->m_gridCtrl->Refresh();
+    evt.Skip();
+}
+
+
 //------------------------------------------------------------------------------
 // Printing
 //------------------------------------------------------------------------------
@@ -355,6 +372,8 @@ PreferencesDialog::LoadConfig()
 
     // Misc
     m_cluePromptFormat->ChangeValue(m_frame->m_cluePrompt->GetDisplayFormat());
+    m_letterScale->SetValue(m_frame->m_gridCtrl->GetLetterScale() * 100);
+    m_numberScale->SetValue(m_frame->m_gridCtrl->GetNumberScale() * 100);
 
     // Printing
     ConfigManager & config = wxGetApp().GetConfigManager();

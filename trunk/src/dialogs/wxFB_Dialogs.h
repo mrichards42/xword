@@ -25,6 +25,7 @@
 #include <wx/stattext.h>
 #include <wx/fontpicker.h>
 #include <wx/textctrl.h>
+#include <wx/spinctrl.h>
 #include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/button.h>
@@ -46,6 +47,7 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxButton* m_buttonsCancel;
 	
 	protected:
+		wxNotebook* m_notebook;
 		wxRadioBox* m_afterLetter;
 		wxCheckBox* m_blankOnDirection;
 		wxCheckBox* m_blankOnNewWord;
@@ -83,6 +85,11 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxStaticText* m_staticText35;
 		wxStaticText* m_staticText38;
 		wxStaticText* m_staticText39;
+		wxStaticText* m_staticText330;
+		wxSpinCtrl* m_letterScale;
+		wxStaticText* m_staticText331;
+		wxSpinCtrl* m_numberScale;
+		wxStaticText* m_staticText341;
 		wxPanel* printPanel;
 		wxCheckBox* m_printCustomFonts;
 		wxFontPickerCtrl* m_printGridLetterFont;
@@ -122,6 +129,8 @@ class wxFB_PreferencesDialog : public wxDialog
 		virtual void OnClueFont( wxFontPickerEvent& event ) { event.Skip(); }
 		virtual void OnClueHeadingFont( wxFontPickerEvent& event ) { event.Skip(); }
 		virtual void OnCluePromptFormat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLetterScale( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnNumberScale( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnPrintCustomFonts( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPrintBlackSquareBrightness( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }

@@ -22,6 +22,7 @@
 #include "MyFrame.hpp"
 #include "CluePanel.hpp"
 #include "XGridCtrl.hpp"
+#include <wx/busyinfo.h>
 
 // Constants
 // The actual grid size will be GRID_SIZE - GRID_PADDING
@@ -30,8 +31,11 @@ const double GRID_PADDING = 0.005;
 const int NUMBER_PADDING = 1;
 const int COLUMN_PADDING = 0;
 const int LINE_PADDING = 0;
-const int MIN_POINT_SIZE = 8;
 const int CLUE_HEADING_PADDING = 5;
+// Absolute minimum
+const int MIN_POINT_SIZE = 6;
+// Minimum before a new grid size is tried
+const int MIN_GOOD_POINT_SIZE = 8;
 
 wxString FormatNumber(int num)
 {
@@ -87,6 +91,9 @@ MyPrintout::ReadConfig()
         m_drawer.SetLetterFont(m_frame->m_gridCtrl->GetLetterFont());
         m_clueFont = m_frame->m_across->GetFont();
     }
+    m_drawer.SetNumberScale(config.ReadLong(_T("/Grid/numberScale")) / 100.);
+    m_drawer.SetLetterScale(config.ReadLong(_T("/Grid/letterScale")) / 100.);
+
     SetupFonts();
 
     // Grid config
@@ -168,32 +175,62 @@ MyPrintout::OnPreparePrinting()
 void
 MyPrintout::LayoutPages()
 {
+    // Disable windows while laying out the page
+    wxWindowDisabler disableAll;
+    wxBusyInfo wait(_T("Please wait. Laying out page..."));
+
     // Suppress drawing
     m_isDrawing = false;
 
-    // Measure the grid
-    LayoutGrid();
-    m_gridScale = 3./4.;
+    // Make the borders bigger if we're actually printing, because the DPI of the printer
+    // is way higher.
+    if (IsPreview())
+        m_drawer.SetBorderSize(1);
+    else
+        m_drawer.SetBorderSize(3);
 
-    // Measure the text.  If the text doesn't fit, catch the exception that should
-    // be thrown, and try a smaller font size.
+    // Try successive column scales (1/x) after the font gets too small.
+    // Grid scale will be the entire page less the column scale.
+    // e.g. column scale of 4 = 1/4; the grid will take up 3/4 of the page
+    double colScales[] = { 4, 5, 6, 3 };
+    int i = 0;
+    const int startingFontSize = m_clueFont.GetPointSize();
+
+    // Measure the grid and text.  If the text doesn't fit, catch the exception that should
+    // be thrown, and try a smaller font size or a different grid size.
     for (;;)
     {
         try
         {
+            // Measure the grid
+            m_gridScale = 1 - (1. / colScales[i]);
+            LayoutGrid(m_gridScale);
             DrawText();
             break;
         }
         catch (FontSizeError&)
         {
-            if (m_clueFont.GetPointSize() <= MIN_POINT_SIZE)
+            wxTheApp->Yield();
+            // If we're at the smallest good looking font size, try the next grid size.
+            if (m_clueFont.GetPointSize() == MIN_GOOD_POINT_SIZE && i < 2)
             {
-                wxLogDebug(_T("Hit Min font size"));
+                wxLogDebug(_T("Hit min *good* font size"));
+                wxLogDebug(_T("Trying again with a different grid size"));
+                ++i; // Next grid size in the list
+                m_clueFont.SetPointSize(startingFontSize);
+                SetupFonts();
+            }
+            else if (m_clueFont.GetPointSize() <= MIN_POINT_SIZE)
+            {
+                wxLogDebug(_T("Ran out of size options!"));
                 return;
             }
-            m_clueFont.SetPointSize(m_clueFont.GetPointSize() - 1);
-            wxLogDebug(_T("Trying again with font size: %d"), m_clueFont.GetPointSize());
-            SetupFonts();
+            else
+            {
+                wxLogDebug(_T("Trying again with font size: %d"), m_clueFont.GetPointSize());
+                m_clueFont.SetPointSize(m_clueFont.GetPointSize() - 1);
+                SetupFonts();
+            }
         }
     }
     wxLogDebug(_T("Done with layout"));

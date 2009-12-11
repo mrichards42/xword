@@ -100,6 +100,8 @@ protected:
     // Misc
     //-----
 	virtual void OnCluePromptFormat(wxCommandEvent & evt);
+    virtual void OnLetterScale(wxSpinEvent & evt);
+    virtual void OnNumberScale(wxSpinEvent & evt);
 
     // Printing
     //---------

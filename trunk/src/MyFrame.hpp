@@ -103,10 +103,10 @@ public:
     bool IsTimerRunning() { return m_timer.IsRunning(); }
     void SetTime  (int time) { m_time = time; m_status->SetTime(time); }
     void ResetTimer()     { SetTime(0); }
-    void StartTimer()     { if (! IsTimerRunning()) m_timer.Start(); }
-    void StopTimer()      { if (IsTimerRunning()) m_timer.Stop(); }
+    void StartTimer();
+    void StopTimer();
     void ToggleTimer()
-        { if (IsTimerRunning()) m_timer.Stop(); else m_timer.Start(); }
+        { if (IsTimerRunning()) StopTimer(); else StartTimer(); }
 
     void OnAppDeactivate();
     void OnAppActivate();
@@ -263,7 +263,9 @@ private:
     void OnPreferencesDialogCancel(wxCommandEvent & evt);
 
     // Printing
+    void OnPageSetup(wxCommandEvent & WXUNUSED(evt));
     void OnPrintPreview(wxCommandEvent & WXUNUSED(evt));
+    void OnPrint(wxCommandEvent & WXUNUSED(evt));
 
     // XGridCtrl and CluePanel events
     //------------------------------

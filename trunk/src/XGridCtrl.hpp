@@ -343,6 +343,7 @@ private:
     // Events
     void ConnectEvents();
     void DisconnectEvents();
+    bool m_areEventsConnected;
 
     void OnLeftDown    (wxMouseEvent & evt);
     void OnRightDown   (wxMouseEvent & evt);

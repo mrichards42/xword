@@ -75,10 +75,10 @@ public:                                                                        \
 };
 
 
+
 // Any of these can be thrown before the whole puzzle is read
 // to indicate that the puzzle can't be read at all.
 _MAKE_EXCEPTION_CLASS(FatalPuzError,  BasePuzError)
-_MAKE_EXCEPTION_CLASS(PuzFileError,   FatalPuzError)
 _MAKE_EXCEPTION_CLASS(PuzTypeError,   FatalPuzError)
 _MAKE_EXCEPTION_CLASS(PuzHeaderError, FatalPuzError)
 
@@ -87,6 +87,10 @@ _MAKE_EXCEPTION_CLASS(PuzHeaderError, FatalPuzError)
 _MAKE_EXCEPTION_CLASS(PuzDataError,     BasePuzError)
 _MAKE_EXCEPTION_CLASS(PuzSectionError,  PuzDataError)
 _MAKE_EXCEPTION_CLASS(PuzChecksumError, PuzDataError)
+
+// Puzzle file errors can be fatal or not.
+_MAKE_EXCEPTION_CLASS(PuzFileError,      BasePuzError)
+_MAKE_EXCEPTION_CLASS(FatalPuzFileError, FatalPuzError)
 
 #undef _MAKE_EXCEPTION_CLASS
 
@@ -127,6 +131,7 @@ public:
         wxASSERT(puz != NULL);
         m_puz = puz;
         m_inStream = &stream;
+        m_readErrorsFatal = true;
         DoLoad();
         m_inStream = NULL;
         m_puz = NULL;
@@ -168,6 +173,10 @@ protected:
     //-------------------------------------
     void Read(void * buffer, size_t count);
     wxString ReadString();
+    void ThrowFileError(const wxString & message);
+    bool m_readErrorsFatal;
+    void SetReadErrorsFatal(bool fatal=true) { m_readErrorsFatal = fatal; }
+    bool AreReadErrorsFatal() const { return m_readErrorsFatal; }
 
 
     // Write functions
@@ -184,7 +193,6 @@ protected:
     XPuzzle * m_puz;
     wxInputStream  * m_inStream;
     wxOutputStream * m_outStream;
-
 
     // XGrid functions
     //----------------
@@ -247,11 +255,21 @@ HandlerBase::CheckError(wxStreamBase & stream)
         return;
 
     if      (error == wxSTREAM_EOF)
-        throw PuzFileError(_T("Unexpected end of file"));
+        ThrowFileError(_T("Unexpected end of file"));
     else if (error == wxSTREAM_READ_ERROR)
-        throw PuzFileError(_T("Read error"));
+        ThrowFileError(_T("Read error"));
     else if (error == wxSTREAM_WRITE_ERROR)
-        throw PuzFileError(_T("Write error"));
+        ThrowFileError(_T("Write error"));
+}
+
+inline
+void
+HandlerBase::ThrowFileError(const wxString & message)
+{
+    if (AreReadErrorsFatal())
+        throw FatalPuzFileError(message);
+    else
+        throw PuzFileError(message);
 }
 
 #endif // HANDLER_BASE_H
