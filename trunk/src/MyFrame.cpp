@@ -900,17 +900,16 @@ MyFrame::EnableTools(bool enable)
     EnableCheck(enable);
     EnableReveal(enable);
 
-    m_toolMgr.Enable(ID_UNSCRAMBLE, enable);
-    m_toolMgr.Enable(ID_SCRAMBLE,   enable);
-
-    m_toolMgr.Enable(ID_SAVE,    enable);
-    m_toolMgr.Enable(ID_SAVE_AS, enable);
-
     // Tools that are only enabled or disabled when a puzzle
     // is shown or closed.  These don't have any special logic.
+    m_toolMgr.Enable(ID_UNSCRAMBLE, enable);
+    m_toolMgr.Enable(ID_SCRAMBLE,   enable);
+    m_toolMgr.Enable(ID_SAVE,    enable);
+    m_toolMgr.Enable(ID_SAVE_AS, enable);
     m_toolMgr.Enable(ID_CLOSE, enable);
     m_toolMgr.Enable(ID_TIMER, enable);
     m_toolMgr.Enable(ID_PRINT_PREVIEW, enable);
+    m_toolMgr.Enable(ID_PRINT, enable);
     m_toolMgr.Enable(ID_SWAP_DIRECTION, enable);
 }
 
