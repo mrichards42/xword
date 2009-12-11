@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 #ifndef MY_APP_H
 #define MY_APP_H
 
-#include <wx/wxprec.h> 
+#include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #    include <wx/app.h>
 #endif
@@ -27,6 +27,8 @@
 #include "utils/ConfigManager.hpp"
 
 class MyFrame;
+class wxPrintData;
+class wxPageSetupDialogData;
 
 // Global printing variables
 extern wxPrintData * g_printData;
@@ -67,5 +69,5 @@ private:
 };
 
 DECLARE_APP(MyApp)
- 
+
 #endif // MY_APP_H
