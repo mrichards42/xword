@@ -59,7 +59,7 @@ PreferencesDialog::OnAfterLetter(wxCommandEvent & evt)
     else
     {
         wxASSERT(selection == 2);
-        style = AddFlag( RemoveFlag(style, MOVE_AFTER_LETTER), MOVE_TO_NEXT_BLANK);
+        style = AddFlag(style, MOVE_AFTER_LETTER | MOVE_TO_NEXT_BLANK);
     }
     m_frame->m_gridCtrl->SetGridStyle(style);
     evt.Skip();
