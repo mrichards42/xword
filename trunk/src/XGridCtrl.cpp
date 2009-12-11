@@ -354,12 +354,27 @@ XGridCtrl::DrawSquare(wxDC & dc, const XSquare & square, const wxColour & color)
     if (square.IsBlack())
         return;
 
+    // If the user has pressed <insert> we are in rebus mode.  The focused square
+    // will be outlined in the selected color (and have a white background).
+    // Certain features will not be drawn in this case:
+    //    - The number
+    //    - The incorrect/revealed indicator
+    //    - The X.
     const bool drawOutline = m_wantsRebus && IsFocusedLetter(square);
+    if (drawOutline)
+    {
+        m_drawer.AddFlag(XGridDrawer::DRAW_OUTLINE);
+        m_drawer.RemoveFlag(XGridDrawer::DRAW_FLAG | XGridDrawer::DRAW_NUMBER);
+    }
 
-    const wxColor bgcolor =
-        (drawOutline ? GetWhiteSquareColor() : color);
+    m_drawer.DrawSquare(dc, square, color, GetPenColor());
 
-    m_drawer.DrawSquare(dc, square, bgcolor, GetPenColor(), drawOutline);
+    // Reset the drawing mode
+    if (drawOutline)
+    {
+        m_drawer.RemoveFlag(XGridDrawer::DRAW_OUTLINE);
+        m_drawer.AddFlag(XGridDrawer::DRAW_FLAG | XGridDrawer::DRAW_NUMBER);
+    }
 }
 
 

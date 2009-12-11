@@ -37,10 +37,13 @@ class wxPuzEvent;
 
 // Windows
 class ClueListBox;
+class CluePrompt;
 class SizedText;
 class CluePanel;
 class LayoutDialog;
-class PropertiesDialog;
+class PreferencesDialog;
+
+class MyPrintout;
 
 #include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
@@ -65,7 +68,8 @@ class PropertiesDialog;
 
 class MyFrame : public wxFrame
 {
-    friend class PropertiesDialog;
+    friend class PreferencesDialog;
+    friend class MyPrintout;
 public:
     MyFrame();
     ~MyFrame();
@@ -130,7 +134,7 @@ private:
     SizedText *  m_title;
     SizedText *  m_author;
     SizedText *  m_copyright;
-    SizedText *  m_cluePrompt;
+    CluePrompt *  m_cluePrompt;
     wxTextCtrl * m_notes;
 
 #ifdef USE_AUI_TOOLBAR
@@ -192,7 +196,7 @@ private:
 
     wxFileConfig * GetConfig();
 
-    PropertiesDialog * m_propertiesDialog;
+    PreferencesDialog * m_preferencesDialog;
 
 
 private:
@@ -251,10 +255,15 @@ private:
     // File conversion
     void OnConvert    (wxCommandEvent & WXUNUSED(evt));
 
-    // Config
-    void OnOptions    (wxCommandEvent & WXUNUSED(evt));
-    void OnPropertiesDialogCancel(wxCommandEvent & evt);
+    // Just for fun
+    void OnSwapDirection(wxCommandEvent & WXUNUSED(evt));
 
+    // Config
+    void OnPreferences(wxCommandEvent & WXUNUSED(evt));
+    void OnPreferencesDialogCancel(wxCommandEvent & evt);
+
+    // Printing
+    void OnPrintPreview(wxCommandEvent & WXUNUSED(evt));
 
     // XGridCtrl and CluePanel events
     //------------------------------

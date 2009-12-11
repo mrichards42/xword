@@ -24,7 +24,7 @@
 // Diagram of our organization of the grid (as in a python list)
 // This is organized into a vector, m_grid.
 // Access is obtained internally as m_grid[row][col], but externally as
-//   m_grid.at(row, col), i.e. m_grid.at(x, y)
+//   m_grid.at(col, row), i.e. m_grid.at(x, y)
 // This organization is important to remember for all functions, but 
 //   especially for SetSize(width, height), which must first change the
 //   height (cols), then loop through each line (rows) and resize each one
@@ -91,7 +91,13 @@ XGrid::SetSize(size_t width, size_t height)
     m_height = height;
     m_width  = width;
 
-    // Recalculate XSquare members:
+    SetupIteration();
+}
+
+void
+XGrid::SetupIteration()
+{
+    // Fill in XSquare members:
     //   - Row and Col
     //   - Next and Prev
     //   - IsLast (row/col next/prev)
@@ -201,6 +207,8 @@ XGrid::SetupGrid()
     wxASSERT(GetWidth() > 0 && GetHeight() > 0);
 
     wxStopWatch sw;
+
+    SetupIteration();
 
     m_firstWhite = NULL;
     m_lastWhite  = NULL;

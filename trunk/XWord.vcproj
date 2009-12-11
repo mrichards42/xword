@@ -360,10 +360,6 @@
 					RelativePath=".\src\utils\ToolManager.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\src\utils\wrap.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -417,6 +413,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\dialogs\Preferences.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\dialogs\wxFB_Dialogs.cpp"
 					>
 				</File>
@@ -433,7 +433,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\dialogs\Properties.hpp"
+					RelativePath=".\src\dialogs\Preferences.hpp"
 					>
 				</File>
 				<File
@@ -458,7 +458,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\MyConfig.hpp"
+				RelativePath=".\src\CluePrompt.hpp"
 				>
 			</File>
 			<File
@@ -471,6 +471,10 @@
 			</File>
 			<File
 				RelativePath=".\src\paths.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\printout.hpp"
 				>
 			</File>
 			<File
@@ -502,6 +506,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\CluePrompt.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\MyFrame.cpp"
 				>
 			</File>
@@ -514,11 +522,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\printout.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\PuzEvent.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\XGridCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\XGridDrawer.cpp"
 				>
 			</File>
 		</Filter>
