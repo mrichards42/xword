@@ -1,4 +1,7 @@
-Version 0.3 (??/??/???)
+Version 0.3.1 (12/11/2009)
+    * Fixed "Move to next blank" bug (really, this time I mean it)
+
+Version 0.3 (12/11/2009)
     New Features
     * If a puzzle file is corrupt and not entirely unrecoverable, an option is
       given to load the puzzle anyway.
