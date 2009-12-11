@@ -16,10 +16,9 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	wxBoxSizer* sizer;
 	sizer = new wxBoxSizer( wxVERTICAL );
 	
-	wxNotebook* notebook;
-	notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	wxPanel* solvePanel;
-	solvePanel = new wxPanel( notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	solvePanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -80,9 +79,9 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	solvePanel->SetSizer( bSizer3 );
 	solvePanel->Layout();
 	bSizer3->Fit( solvePanel );
-	notebook->AddPage( solvePanel, wxT("Solving"), true );
+	m_notebook->AddPage( solvePanel, wxT("Solving"), true );
 	wxPanel* colorPanel;
-	colorPanel = new wxPanel( notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	colorPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer35;
 	bSizer35 = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -286,9 +285,9 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	colorPanel->SetSizer( bSizer35 );
 	colorPanel->Layout();
 	bSizer35->Fit( colorPanel );
-	notebook->AddPage( colorPanel, wxT("Colors"), false );
+	m_notebook->AddPage( colorPanel, wxT("Colors"), false );
 	wxPanel* fontPanel;
-	fontPanel = new wxPanel( notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	fontPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer30;
 	bSizer30 = new wxBoxSizer( wxVERTICAL );
 	
@@ -347,8 +346,8 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	fontPanel->SetSizer( bSizer30 );
 	fontPanel->Layout();
 	bSizer30->Fit( fontPanel );
-	notebook->AddPage( fontPanel, wxT("Fonts"), false );
-	miscPanel = new wxPanel( notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_notebook->AddPage( fontPanel, wxT("Fonts"), false );
+	miscPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer42;
 	bSizer42 = new wxBoxSizer( wxVERTICAL );
 	
@@ -418,11 +417,43 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	
 	bSizer42->Add( sbSizer13, 0, wxEXPAND|wxALL, 10 );
 	
+	wxStaticBoxSizer* sbSizer191;
+	sbSizer191 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("Grid font tweaking") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer11;
+	fgSizer11 = new wxFlexGridSizer( 2, 2, 3, 8 );
+	fgSizer11->SetFlexibleDirection( wxBOTH );
+	fgSizer11->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText330 = new wxStaticText( miscPanel, wxID_ANY, wxT("Percent of square for text:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText330->Wrap( -1 );
+	fgSizer11->Add( m_staticText330, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_letterScale = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 5, 95, 42 );
+	fgSizer11->Add( m_letterScale, 0, 0, 5 );
+	
+	m_staticText331 = new wxStaticText( miscPanel, wxID_ANY, wxT("Percent of square for clue number:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText331->Wrap( -1 );
+	fgSizer11->Add( m_staticText331, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_numberScale = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 5, 95, 75 );
+	fgSizer11->Add( m_numberScale, 0, 0, 5 );
+	
+	sbSizer191->Add( fgSizer11, 1, wxEXPAND|wxALL, 5 );
+	
+	m_staticText341 = new wxStaticText( miscPanel, wxID_ANY, wxT("Note: these numbers do not have to add up to 100%"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText341->Wrap( -1 );
+	m_staticText341->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 90, false, wxEmptyString ) );
+	
+	sbSizer191->Add( m_staticText341, 0, wxALL, 5 );
+	
+	bSizer42->Add( sbSizer191, 0, wxEXPAND|wxALL, 10 );
+	
 	miscPanel->SetSizer( bSizer42 );
 	miscPanel->Layout();
 	bSizer42->Fit( miscPanel );
-	notebook->AddPage( miscPanel, wxT("Misc"), false );
-	printPanel = new wxPanel( notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_notebook->AddPage( miscPanel, wxT("Misc"), false );
+	printPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer56;
 	bSizer56 = new wxBoxSizer( wxVERTICAL );
 	
@@ -513,9 +544,9 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	printPanel->SetSizer( bSizer56 );
 	printPanel->Layout();
 	bSizer56->Fit( printPanel );
-	notebook->AddPage( printPanel, wxT("Printing"), false );
+	m_notebook->AddPage( printPanel, wxT("Printing"), false );
 	
-	sizer->Add( notebook, 1, wxEXPAND | wxALL, 5 );
+	sizer->Add( m_notebook, 1, wxEXPAND | wxALL, 5 );
 	
 	m_buttons = new wxStdDialogButtonSizer();
 	m_buttonsOK = new wxButton( this, wxID_OK );
@@ -558,6 +589,8 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_clueFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnClueFont ), NULL, this );
 	m_clueHeadingFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnClueHeadingFont ), NULL, this );
 	m_cluePromptFormat->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCluePromptFormat ), NULL, this );
+	m_letterScale->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLetterScale ), NULL, this );
+	m_numberScale->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnNumberScale ), NULL, this );
 	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
 	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
 	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
@@ -602,6 +635,8 @@ wxFB_PreferencesDialog::~wxFB_PreferencesDialog()
 	m_clueFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnClueFont ), NULL, this );
 	m_clueHeadingFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnClueHeadingFont ), NULL, this );
 	m_cluePromptFormat->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCluePromptFormat ), NULL, this );
+	m_letterScale->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLetterScale ), NULL, this );
+	m_numberScale->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnNumberScale ), NULL, this );
 	m_printCustomFonts->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
 	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
 	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );

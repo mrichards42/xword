@@ -37,6 +37,7 @@ public:
     {
         m_modified = false;
         m_time = 0;
+        m_isTimerRunning = false;
         m_version = 13;
         m_isOk = false;
         if (! filename.empty())
@@ -58,6 +59,7 @@ public:
     bool m_modified;
 
     int m_time;
+    bool m_isTimerRunning;
 
     class Clue;
     typedef std::vector<Clue> ClueList;
@@ -153,6 +155,7 @@ XPuzzle::Clear()
     m_copyright.clear();
     m_notes.clear();
     m_time = 0;
+    m_isTimerRunning = false;
     m_extraSections.clear();
 }
 

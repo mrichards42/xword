@@ -11,7 +11,11 @@ Version 0.3 (??/??/???)
       expected. If XWord is invoked with -c, conversion begins immediately.
     * Added a clue prompt format preference.
     * Added separate preferences for grid clue number and text fonts.
+    * Added an option to tweak the proprtion of text size to clue number size
+      in the grid.
     * Rudimentary printing.
+    * Added "Swap across and down" under the tools menu for a new perspective
+      on your crossword puzzle!
 
     Bug Fixes
     * A correctly filled grid with revealed letters is noted as solved instead
@@ -27,6 +31,9 @@ Version 0.3 (??/??/???)
     * All preferences now update immediately when then are changed (so you can
       preview the changes in the main window).
     * Removed the pencil color setting until a pencil is implemented.
+    * Notepad window can *always* be opened or closed.
+    * Loading and saving the LTIM section of puz files is aware of whether
+      or not the timer is running.
 
     Misc
     * Changed the name of the "Options" dialog to "Preferences".

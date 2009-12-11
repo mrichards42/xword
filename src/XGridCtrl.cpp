@@ -120,6 +120,8 @@ void XGridCtrl::Init()
 
     m_wantsRebus = false;
 
+    m_areEventsConnected = false;
+
     // m_rect is already equal to wxRect(0,0,0,0) from its constructor
 }
 
@@ -788,20 +790,29 @@ XGridCtrl::CheckLetter(int options)
 void
 XGridCtrl::ConnectEvents()
 {
-    Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
-    Connect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
-    Connect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
-    Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+    // Prevent double-connecting events
+    if (! m_areEventsConnected)
+    {
+        Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
+        Connect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
+        Connect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
+        Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+    }
+    m_areEventsConnected = true;
 }
 
 
 void
 XGridCtrl::DisconnectEvents()
 {
-    Disconnect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
-    Disconnect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
-    Disconnect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
-    Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+    if (m_areEventsConnected)
+    {
+        Disconnect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
+        Disconnect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
+        Disconnect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
+        Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+    }
+    m_areEventsConnected = false;
 }
 
 

@@ -9,17 +9,22 @@ configurable.  It reads and writes the Across Lite .puz file format, and reads
 the Across Lite plain text format (version 1 or 2).
 
 Supported features:
-    - Solving of all American style and cryptic crosswords (not diagramless yet).
-    - Solving rebus puzzles (new!)
+    - Solving of all American style and cryptic crosswords (except diagramless).
+    - Solving rebus puzzles.
     - A timer.
     - Checking and revealing letters.
     - Scrambling and unscrambling puzzle solutions.
     - Viewing and editing puzzle notes.
     - Zooming the grid in and out.
-    - Rearranging the window layout (try checking the "Layout" option in the
-        Layout menu)
+    - Rearranging the window layout.
     - Color, font, and solving behavior configuration.
-
+    - Batch conversion to and from .puz and .txt formats.
+    - Recovery of corrupted Across Lite .puz files.  If a .puz file is
+      corrupt in any way, XWord will alert the user and attempt to display
+      as much of the puzzle as possible (usually the entire puzzle is
+      recoverable).
+    - Printing (not yet polished, and somewhat buggy: e.g. the page setup
+      dialog doesn't always display the correct paper size)
 
 Rebus
 =====
@@ -40,7 +45,7 @@ Ctrl + Backspace  Remove all letters.
 Configuration
 =============
 
-Configuration settings can be accessed from the File menu (under "Options").
+Configuration settings can be accessed from the File menu (under "Preferences").
 Users can configure grid movement/solving options, colors, and fonts.  Most of
 XWord's configuration can be accessed this way.  However, there are a few
 configuration settings that are not yet implemented in the GUI (and require a
@@ -55,22 +60,14 @@ program restart to take effect):
         This is slightly buggy, as setting an X padding to zero causes some of
         the clue numbers to get cut off.
 
-
-    - Grid text and number font scale
-        Accessed under [Grid] heading of config file (numberScale and letterScale)
-
-        These set the percentage of a square that the number and letter take up,
-        respectively.  The height of all letters in a font is not always
-        reported accurately, so these settings allow the user to fine-tune font
-        sizes in the grid.  Usually the two settings combined will add up to
-        more than 100%, because most fonts report their height to be slightly
-        larger than the space the characters actually take up.
-
     - Grid line thickness
         Accessed under [Grid] heading of config file (lineThickness)
 
         Sets the thickness of lines between squares in the grid (in pixels)
 
+    - Printing support
+        Printing is not ready for a real release, but it can be enabled anyway
+        by adding "enablePrinting=1" under the [Printing] heading.
 
 
 
@@ -78,14 +75,17 @@ Batch conversion
 ================
 
 XWord can also be used to batch convert .txt formatted puzzles into .puz files
-on the command line.  Usage is as follows:
+(and vice-versa).  The convert dialog is located in the Tools menu.  Conversion
+can also be invoked at the command line (conversion still occurs using the
+gui).
 
     -c --convert
 
-        Runs XWord in batch convert mode.  XWord will convert files and exit
-        (no gui).  Other switches do nothing unless -c is specified.
-        With no other switches, convert .txt files and place converted .puz
-        files in the same directory.
+        Runs XWord in batch convert mode.  XWord will convert files using the
+        convert dialog.  When the user closes the dialog, XWord wil exit.
+        Other switches do nothing unless -c is specified.
+        With no other switches, convert files and place the output files in
+        the same directory.
 
     -o  --output-files
 
@@ -94,21 +94,15 @@ on the command line.  Usage is as follows:
 
     -w  --overwrite
 
-        If output files exist, overwrite them instead of creating a new file.
-        If this switch is not specified and the output file exists, XWord will
-        add a number to the output file name.
+        If output files exist, overwrite them instead of giving the output
+        a different file name.  If this switch is not specified and the output
+        file exists, XWord will add a number to the output file name.
 
     -d  --directory=<output directory>
 
         Place converted files in this directory.  Output files can be specified
         as relative paths, in which case files will be made relative to this
         directory.
-
-NB: Batch converting is still experimental.  Essentially the program will
-    convert all files and then suppress the GUI (forcing the application to end
-    with an error).  No information is output to the screen informing the user
-    about the converting process.
-
 
 
 
@@ -125,13 +119,17 @@ easy to fix.
 http://www.wxwidgets.org
 
 
-*** Boost is no longer required to build XWord
-
-
-
 Visual C++ and Code::Blocks project files are supplied in the source
 distribution.  The Code::Blocks file is intended to work only on Linux (i.e. it
 uses the wx-config program).
+
+
+XWord requires the following libraries in addition to the wxWidgets Base and
+Core libraries:
+
+wxAUI
+wxpng
+wxzlib
 
 
 Windows-specific building instructions
@@ -143,9 +141,3 @@ You will either need to build the wxWidgets libraries so that they also link to
 the MSVC runtimes statically, or change the setting
 (Properties >> C/C++ >> Code Generation >> Runtime Library).
 
-XWord requires the following libraries in addition to the wxWidgets Base and
-Core libraries:
-
-wxAUI
-wxpng
-wxzlib

@@ -56,8 +56,8 @@ XGridDrawer::Init()
     // height of a font seems to be larger than the actual text size (e.g.
     // GetCharHeight may report a height of 28 px when the letter itself only
     // takes up 24 px).
-    m_numberScale = 42 / 100.;
-    m_letterScale = 75 / 100.;
+    m_numberScale = 5 / 12.;
+    m_letterScale = 9 / 12.;
 
     SetNumberFont(*wxSWISS_FONT);
     SetLetterFont(*wxSWISS_FONT);
@@ -466,21 +466,10 @@ XGridDrawer::DrawSquare(wxDC & dc,
         else
             dc.SetFont(m_letterFont[text.length() - 1]);
 
-        if (text.length() == 1)
-        {
-            int width, height;
-            dc.GetTextExtent(text, &width, &height);
-            dc.DrawText(text,
-                        x + (m_boxSize - width)/2,
-                        y + (m_boxSize - height));
-        }
-        else
-        {
-            dc.DrawLabel(text,
-                         wxRect(x, y + m_boxSize - GetLetterHeight(),
-                                m_boxSize, GetLetterHeight()),
-                         wxALIGN_CENTER);
-        }
+        dc.DrawLabel(text,
+                     wxRect(x, y + m_boxSize - GetLetterHeight(),
+                            m_boxSize, GetLetterHeight()),
+                     wxALIGN_CENTER);
     }
 
     // Draw an X across the square

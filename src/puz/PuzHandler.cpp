@@ -117,6 +117,7 @@ PuzHandler::DoLoad()
     // Any functions we call from here on out are welcome to throw
     // exceptions, and our caller is welcome to catch those exceptions
     // and still try to display the puzzle.
+    SetReadErrorsFatal(false);
 
     wxString sectionError;
     bool checksumsOk;
@@ -364,6 +365,12 @@ PuzHandler::SetLTIM(const ByteArray & data)
     long time;
     if (! str.Left(index).ToLong(&time))
         throw PuzSectionError(_T("Incorrect time value"));
+
+    long isTimerRunning;
+    if (! str.Mid(index+1).ToLong(&isTimerRunning))
+        throw PuzSectionError(_T("Incorrect time value"));
+
+    m_puz->m_isTimerRunning = (isTimerRunning == 0);
     m_puz->m_time = time;
 }
 
@@ -551,7 +558,9 @@ PuzHandler::WriteLTIM()
 {
     if (m_puz->m_time != 0)
         WriteSection(_T("LTIM"),
-                     wxString::Format(_T("%d,%d"), m_puz->m_time, 0) );
+                     wxString::Format(_T("%d,%d"),
+                                      m_puz->m_time,
+                                      m_puz->m_isTimerRunning ? 0 : 1) );
 }
 
 
