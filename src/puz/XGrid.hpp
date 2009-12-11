@@ -29,6 +29,7 @@
 class XGridScrambler;
 class HandlerBase;
 class Checksummer;
+class MyFrame;
 
 enum XGridFlag
 {
@@ -61,13 +62,17 @@ class XGrid
     friend class XGridScrambler;
     friend class HandlerBase;
     friend class Checksummer;
+    friend class MyFrame;
 public:
     explicit XGrid(size_t width = 0, size_t height = 0);
     ~XGrid();
 
     // Setup
     //------
-    void SetupGrid(); // Called to setup numbers, etc.
+    // Fills in XSquare Next / Prev, etc.  Called automatically from SetSize.
+    void SetupIteration();
+    // Setup numbers, etc.  This must be called after the solution is filled.
+    void SetupGrid();
 
     // Size
     //-----

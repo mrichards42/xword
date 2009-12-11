@@ -40,18 +40,12 @@ class XSquare;
 class XGridDrawer
 {
 public:
-    XGridDrawer(XGrid * grid = NULL,
-                             const wxFont & font = *wxSWISS_FONT);
-    XGridDrawer(wxDC * dc,
-                XGrid * grid = NULL,
-                const wxFont & font = *wxSWISS_FONT);
-    XGridDrawer(wxWindow * window,
-                XGrid * grid = NULL,
-                const wxFont & font = *wxSWISS_FONT);
+    XGridDrawer(XGrid * grid = NULL);
+    XGridDrawer(wxDC * dc, XGrid * grid = NULL);
+    XGridDrawer(wxWindow * window, XGrid * grid = NULL);
 
-    void SetDC(wxDC * dc) { m_dc = dc; m_status = HAS_DC; }
-    void SetWindow(wxWindow * win) { m_window = win; m_status = HAS_WINDOW; }
-
+    void SetDC(wxDC * dc);
+    void SetWindow(wxWindow * window);
     bool HasMeasurer() const { return m_status != INVALID_MEASURER; }
     bool HasDC()       const { return m_status == HAS_DC; }
     bool HasWindow()   const { return m_status == HAS_WINDOW; }
@@ -92,6 +86,47 @@ public:
     void SetLetterFont(const wxFont & font);
     void SetNumberFont(const wxFont & font);
 
+    // Colors
+    //-------
+    const wxColour & GetWhiteSquareColor() const { return m_whiteSquareColor; }
+    const wxColour & GetBlackSquareColor() const { return m_blackSquareColor; }
+    const wxColour & GetPenColor()         const { return m_penColor; }
+
+    void SetWhiteSquareColor(const wxColour & color)
+        { m_whiteSquareColor = color; }
+    void SetBlackSquareColor(const wxColour & color)
+        { m_blackSquareColor = color; }
+    void SetPenColor(const wxColour & color) { m_penColor = color; }
+
+
+    // Selective Drawing
+    //------------------
+    enum
+    {
+        DRAW_USER_TEXT  = 0x01,
+        DRAW_SOLUTION   = 0x02,
+        DRAW_NUMBER     = 0x04,
+        DRAW_FLAG       = 0x08,
+        DRAW_X          = 0x10,
+        DRAW_CIRCLE     = 0x20,
+        DRAW_OUTLINE    = 0x40,
+
+        DRAW_ALL = DRAW_USER_TEXT
+                 | DRAW_NUMBER
+                 | DRAW_FLAG
+                 | DRAW_X
+                 | DRAW_CIRCLE,
+
+        // Text Mask
+        DRAW_TEXT = DRAW_USER_TEXT
+                  | DRAW_SOLUTION
+    };
+    int  GetFlags  ()         const { return m_drawOptions; }
+    bool HasFlag   (int flag) const { return (m_drawOptions & flag) != 0; }
+    void AddFlag   (int flag)       { m_drawOptions |= flag; }
+    void RemoveFlag(int flag)       { m_drawOptions &= ~ flag; }
+    void SetFlags  (int flags)      { m_drawOptions = flags; }
+
     // XGrid
     //------
     XGrid * GetGrid() { return m_grid; }
@@ -99,13 +134,15 @@ public:
     void SetGrid(XGrid * grid) { m_grid = grid; UpdateGridSize(); }
 
     void DrawSquare(wxDC & dc, const XSquare & square,
-                    const wxColour & bgColor = *wxWHITE,
-                    const wxColour & textColor = *wxBLACK,
-                    bool  drawOutline = false);
+                    const wxColour & bgColor,
+                    const wxColour & textColor);
+
+    void DrawSquare(wxDC & dc, const XSquare & square);
+
     void DrawGrid(wxDC & dc);
 
 private:
-    void Init(const wxFont & font = *wxSWISS_FONT);
+    void Init();
 
     // The two different measuring windows
     union {
@@ -127,6 +164,7 @@ private:
                        wxFont* font = NULL) const;
 
     XGrid * m_grid;
+    // Size
     long m_align;
     int m_boxSize;
     int m_borderSize;
@@ -136,15 +174,25 @@ private:
     int m_maxWidth;
     int m_maxHeight;
 
+    void UpdateGridSize();
+
+    // Fonts
     wxFont m_numberFont;
     wxFont m_letterFont[8];  // Cache fonts for all rebus lengths
 
-    void UpdateGridSize();
     void ScaleFont(wxFont * font, int maxWidth, int maxHeight);
     void ScaleFonts() { ScaleNumberFont(); ScaleLetterFont(); }
     void ScaleNumberFont() { ScaleFont(&m_numberFont, -1, GetNumberHeight()); }
     void ScaleLetterFont();
     static double GetScale(int width, int height, int maxWidth, int maxHeight);
+
+    // Colors
+    wxColour m_whiteSquareColor;
+    wxColour m_blackSquareColor;
+    wxColour m_penColor;
+
+    // Selective Drawing
+    int m_drawOptions;
 };
 
 #endif // MY_GRID_DRAWER_H

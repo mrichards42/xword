@@ -183,6 +183,8 @@ public:
     bool SetFont(const wxFont & font);
     void SetLetterFont(const wxFont & font);
     void SetNumberFont(const wxFont & font);
+    const wxFont & GetLetterFont() const { return m_drawer.GetLetterFont(); }
+    const wxFont & GetNumberFont() const { return m_drawer.GetNumberFont(); }
 
     // Colors
     void SetFocusedLetterColor(const wxColor & color)

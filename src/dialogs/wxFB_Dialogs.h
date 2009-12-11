@@ -24,6 +24,8 @@
 #include <wx/clrpicker.h>
 #include <wx/stattext.h>
 #include <wx/fontpicker.h>
+#include <wx/textctrl.h>
+#include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -34,11 +36,14 @@
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxFB_PropertiesDialog
+/// Class wxFB_PreferencesDialog
 ///////////////////////////////////////////////////////////////////////////////
-class wxFB_PropertiesDialog : public wxDialog 
+class wxFB_PreferencesDialog : public wxDialog 
 {
 	private:
+		wxStdDialogButtonSizer* m_buttons;
+		wxButton* m_buttonsOK;
+		wxButton* m_buttonsCancel;
 	
 	protected:
 		wxRadioBox* m_afterLetter;
@@ -52,22 +57,45 @@ class wxFB_PropertiesDialog : public wxDialog
 		wxColourPickerCtrl* m_selectedWordColor;
 		wxColourPickerCtrl* m_penColor;
 		wxColourPickerCtrl* m_pencilColor;
-		wxColourPickerCtrl* m_cluePromptBackground;
 		wxColourPickerCtrl* m_cluePromptText;
-		wxColourPickerCtrl* m_clueBackground;
+		wxColourPickerCtrl* m_cluePromptBackground;
 		wxColourPickerCtrl* m_clueText;
-		wxColourPickerCtrl* m_selectedClueBackground;
+		wxColourPickerCtrl* m_clueBackground;
 		wxColourPickerCtrl* m_selectedClueText;
-		wxColourPickerCtrl* m_crossingClueBackground;
+		wxColourPickerCtrl* m_selectedClueBackground;
 		wxColourPickerCtrl* m_crossingClueText;
-		wxColourPickerCtrl* m_clueHeadingBackground;
+		wxColourPickerCtrl* m_crossingClueBackground;
 		wxColourPickerCtrl* m_clueHeadingText;
-		wxFontPickerCtrl* m_gridFont;
+		wxColourPickerCtrl* m_clueHeadingBackground;
+		wxFontPickerCtrl* m_gridLetterFont;
+		wxFontPickerCtrl* m_gridNumberFont;
 		wxFontPickerCtrl* m_cluePromptFont;
 		wxFontPickerCtrl* m_clueFont;
 		wxFontPickerCtrl* m_clueHeadingFont;
+		wxPanel* miscPanel;
+		wxStaticText* m_staticText23;
+		wxTextCtrl* m_cluePromptFormat;
+		wxStaticText* m_staticText32;
+		wxStaticText* m_staticText33;
+		wxStaticText* m_staticText36;
+		wxStaticText* m_staticText37;
+		wxStaticText* m_staticText34;
+		wxStaticText* m_staticText35;
+		wxStaticText* m_staticText38;
+		wxStaticText* m_staticText39;
+		wxPanel* printPanel;
+		wxCheckBox* m_printCustomFonts;
+		wxFontPickerCtrl* m_printGridLetterFont;
+		wxFontPickerCtrl* m_printGridNumberFont;
+		wxFontPickerCtrl* m_printClueFont;
+		wxRadioBox* m_printGridAlignment;
+		wxSlider* m_printBlackSquareBrightness;
+		wxPanel* m_panel8;
+		wxPanel* m_printBlackSquarePreview;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnInit( wxInitDialogEvent& event ) { event.Skip(); }
 		virtual void OnAfterLetter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBlankOnDirection( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBlankOnNewWord( wxCommandEvent& event ) { event.Skip(); }
@@ -78,26 +106,31 @@ class wxFB_PropertiesDialog : public wxDialog
 		virtual void OnSelectedWordColor( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnPenColor( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnPencilColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnPromptBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnPromptTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
+		virtual void OnPromptBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnClueTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnSelectedClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
+		virtual void OnClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnSelectedClueTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnCrossingClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
+		virtual void OnSelectedClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnCrossingClueTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnClueHeadingBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
+		virtual void OnCrossingClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnClueHeadingTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnGridFont( wxFontPickerEvent& event ) { event.Skip(); }
+		virtual void OnClueHeadingBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
+		virtual void OnGridLetterFont( wxFontPickerEvent& event ) { event.Skip(); }
+		virtual void OnGridNumberFont( wxFontPickerEvent& event ) { event.Skip(); }
 		virtual void OnCluePromptFont( wxFontPickerEvent& event ) { event.Skip(); }
 		virtual void OnClueFont( wxFontPickerEvent& event ) { event.Skip(); }
 		virtual void OnClueHeadingFont( wxFontPickerEvent& event ) { event.Skip(); }
+		virtual void OnCluePromptFormat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPrintCustomFonts( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPrintBlackSquareBrightness( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		wxFB_PropertiesDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Options"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
-		~wxFB_PropertiesDialog();
+		wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~wxFB_PreferencesDialog();
 	
 };
 

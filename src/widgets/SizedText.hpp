@@ -111,6 +111,4 @@ protected:
     DECLARE_DYNAMIC_CLASS(SizedText)
 };
 
-
-
 #endif // MY_SIZED_TEXT_CTRL_H

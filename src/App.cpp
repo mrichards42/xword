@@ -27,6 +27,12 @@
 #include <cstdlib> // srand()
 #include <ctime>   // time()
 
+
+// Initialize the global printing variables
+wxPrintData * g_printData = (wxPrintData*)NULL;
+wxPageSetupDialogData * g_pageSetupData = (wxPageSetupDialogData*)NULL;
+
+
 IMPLEMENT_APP(MyApp)
 
 BEGIN_EVENT_TABLE(MyApp, wxApp)
@@ -80,6 +86,7 @@ MyApp::OnInit()
     srand( time(NULL) );
 
     SetupConfig();
+    SetupPrinting();
 
     return ReadCommandLine();
 }
@@ -87,7 +94,7 @@ MyApp::OnInit()
 
 int
 MyApp::OnExit()
-{    
+{
     // Save config file
     wxFileName configFile(GetConfigFile());
     if (! configFile.DirExists())
@@ -98,6 +105,10 @@ MyApp::OnExit()
 
     wxFileOutputStream fileStream(configFile.GetFullPath());
     config->Save(fileStream);
+
+    // Clean up printing stuff.
+    delete g_printData;
+    delete g_pageSetupData;
 
     return wxApp::OnExit();
 }
@@ -231,7 +242,8 @@ MyApp::SetupConfig()
     m_config.SetPath(_T("/Grid"));
     m_config.AddBool(_T("fit"),       false);
     m_config.AddLong(_T("style"),     DEFAULT_GRID_STYLE);
-    m_config.AddFont(_T("font"),      *wxSWISS_FONT);
+    m_config.AddFont(_T("letterFont"),      *wxSWISS_FONT);
+    m_config.AddFont(_T("numberFont"),      *wxSWISS_FONT);
     m_config.AddLong(_T("lineThickness"), 1);
     m_config.AddColor(_T("focusedLetterColor"),     *wxGREEN);
     m_config.AddColor(_T("focusedWordColor"),       *wxLIGHT_GREY);
@@ -278,6 +290,18 @@ MyApp::SetupConfig()
     m_config.AddFont(_T("font"),      *wxSWISS_FONT);
     m_config.AddColor(_T("foregroundColor"), *wxBLACK);
     m_config.AddColor(_T("backgroundColor"), *wxWHITE);
+    m_config.AddString(_T("displayFormat"), _T("%N. %T"));
+
+
+    // Printing
+    m_config.SetPath(_T("/Printing"));
+    m_config.AddLong(_T("blackSquareBrightness"), 0);
+    m_config.AddLong(_T("gridAlignment"), wxALIGN_TOP | wxALIGN_RIGHT);
+    m_config.SetPath(_T("/Printing/Fonts"));
+    m_config.AddBool(_T("useCustomFonts"), false);
+    m_config.AddFont(_T("gridLetterFont"), *wxSWISS_FONT);
+    m_config.AddFont(_T("gridNumberFont"), *wxSWISS_FONT);
+    m_config.AddFont(_T("clueFont"),       *wxSWISS_FONT);
 }
 
 
@@ -299,4 +323,23 @@ MyApp::OnActivate(wxActivateEvent & evt)
     }
 
     evt.Skip();
+}
+
+//------------------------------------------------------------------------------
+// Printing
+//------------------------------------------------------------------------------
+
+void
+MyApp::SetupPrinting()
+{
+    g_printData = new wxPrintData;
+    g_printData->SetPaperId(wxPAPER_LETTER);
+
+    g_pageSetupData = new wxPageSetupDialogData;
+
+    // Copy over initial paper size from print record.
+    g_pageSetupData->SetPaperId(g_printData->GetPaperId());
+    // Set some initial page margins in mm.
+    g_pageSetupData->SetMarginTopLeft(wxPoint(15, 15));
+    g_pageSetupData->SetMarginBottomRight(wxPoint(15, 15));
 }

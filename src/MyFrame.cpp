@@ -18,7 +18,11 @@
 #include "MyFrame.hpp"
 #include "paths.hpp"
 
-#include "App.hpp" // To notify that frame has been destroyed
+// For the global printing pointers and application activation / timer starting
+// and stopping.
+#include "App.hpp"
+#include <wx/print.h>
+#include "printout.hpp"
 
 // Puz library
 #include "PuzEvent.hpp"
@@ -26,17 +30,20 @@
 #include "puz/HandlerBase.hpp" // Puz exceptions
 #include "puz/XPuzzle.hpp"
 
-// Windows
+// Dialogs
 #include "dialogs/Layout.hpp"
-#include "dialogs/Properties.hpp"
+#include "dialogs/Preferences.hpp"
 #include "dialogs/Convert.hpp"
 
+// Windows
 #include "widgets/SizedText.hpp"
 #include "ClueListBox.hpp"
 #include "CluePanel.hpp"
+#include "CluePrompt.hpp"
 #include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
 
+// For the scrambling dialogs
 #include <wx/numdlg.h>
 
 #include "utils/SizerPrinter.hpp"
@@ -84,8 +91,10 @@ enum toolIds
 
     ID_TIMER,
     ID_CONVERT,
+    ID_SWAP_DIRECTION,
 
-    ID_OPTIONS,
+    ID_PREFERENCES,
+    ID_PRINT_PREVIEW,
 
 #ifdef __WXDEBUG__
 
@@ -103,6 +112,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_SAVE,              MyFrame::OnSavePuzzle)
     EVT_MENU           (ID_SAVE_AS,           MyFrame::OnSavePuzzleAs)
     EVT_MENU           (ID_CLOSE,             MyFrame::OnClosePuzzle)
+    EVT_MENU           (ID_PRINT_PREVIEW,     MyFrame::OnPrintPreview)
     EVT_MENU           (ID_QUIT,              MyFrame::OnQuit)
 
     EVT_MENU           (ID_ZOOM_IN,           MyFrame::OnZoomIn)
@@ -127,9 +137,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
     EVT_MENU           (ID_TIMER,             MyFrame::OnTimer)
     EVT_MENU           (ID_CONVERT,           MyFrame::OnConvert)
+    EVT_MENU           (ID_SWAP_DIRECTION,    MyFrame::OnSwapDirection)
     EVT_TIMER          (wxID_ANY,             MyFrame::OnTimerNotify)
 
-    EVT_MENU           (ID_OPTIONS,           MyFrame::OnOptions)
+    EVT_MENU           (ID_PREFERENCES,       MyFrame::OnPreferences)
 
     EVT_PUZ_GRID_FOCUS (                      MyFrame::OnGridFocus)
     EVT_PUZ_CLUE_FOCUS (                      MyFrame::OnClueFocus)
@@ -156,12 +167,13 @@ static const ToolDesc toolDesc[] =
     { ID_SAVE,  wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
     { ID_SAVE_AS,  wxITEM_NORMAL, _T("&Save As..."), _T("save") },
     { ID_CLOSE, wxITEM_NORMAL, _T("&Close\tCtrl+W") },
+    { ID_PRINT_PREVIEW,  wxITEM_NORMAL, _T("Print Preview...") },
     { ID_QUIT,  wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
 
     { ID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in")  },
     { ID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom Fit"), _T("zoom_fit") },
     { ID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out") },
-    { ID_OPTIONS, wxITEM_NORMAL, _T("Options...") },
+    { ID_PREFERENCES, wxITEM_NORMAL, _T("Preferences...") },
 
     { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble...") },
     { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("Unscramble...") },
@@ -182,6 +194,7 @@ static const ToolDesc toolDesc[] =
 
     { ID_TIMER, wxITEM_CHECK, _T("Timer"), _T("timer") },
     { ID_CONVERT, wxITEM_NORMAL, _T("Convert files") },
+    { ID_SWAP_DIRECTION, wxITEM_NORMAL, _T("Swap across and down") },
 
 //    { ID_CUSTOMIZE,         _T("Customize . . ."),     _T("") },
 
@@ -235,7 +248,7 @@ MyFrame::MyFrame()
     : wxFrame(NULL, -1, _T("XWord"), wxDefaultPosition, wxSize(700,700)),
       m_timer(this),
       m_isTimerRunning(false),
-      m_propertiesDialog(NULL)
+      m_preferencesDialog(NULL)
 {
     // Set the initial timer amount
     m_timer.Start(1000);
@@ -498,7 +511,7 @@ MyFrame::ShowPuzzle()
     else
     {
         EnableTools(false);
-        m_cluePrompt->SetLabel(wxEmptyString);
+        m_cluePrompt->Clear();
     }
 
     m_gridCtrl->Refresh();
@@ -545,7 +558,7 @@ MyFrame::CreateWindows()
     m_title      = new SizedText (this, wxID_ANY);
     m_author     = new SizedText (this, wxID_ANY);
     m_copyright  = new SizedText (this, wxID_ANY);
-    m_cluePrompt = new SizedText (this, wxID_ANY);
+    m_cluePrompt = new CluePrompt (this, wxID_ANY);
     m_cluePrompt->SetAlign(wxALIGN_CENTER);
 
     m_notes      = new wxTextCtrl(this, wxID_ANY,
@@ -639,7 +652,8 @@ MyFrame::MakeMenuBar()
         m_toolMgr.Add(menu, ID_SAVE);
         m_toolMgr.Add(menu, ID_SAVE_AS);
         m_toolMgr.Add(menu, ID_CLOSE);
-        m_toolMgr.Add(menu, ID_OPTIONS);
+        m_toolMgr.Add(menu, ID_PREFERENCES);
+        m_toolMgr.Add(menu, ID_PRINT_PREVIEW);
         m_toolMgr.Add(menu, ID_QUIT);
     mb->Append(menu, _T("&File"));
 
@@ -677,6 +691,7 @@ MyFrame::MakeMenuBar()
     menu = new wxMenu();
         m_toolMgr.Add(menu, ID_TIMER);
         m_toolMgr.Add(menu, ID_CONVERT);
+        m_toolMgr.Add(menu, ID_SWAP_DIRECTION);
     mb->Append(menu, _T("&Tools"));
 
 #ifdef __WXDEBUG__
@@ -866,6 +881,8 @@ MyFrame::EnableTools(bool enable)
     m_toolMgr.Enable(ID_CLOSE, enable);
     m_toolMgr.Enable(ID_SHOW_NOTES, enable);
     m_toolMgr.Enable(ID_TIMER, enable);
+    m_toolMgr.Enable(ID_PRINT_PREVIEW, enable);
+    m_toolMgr.Enable(ID_SWAP_DIRECTION, enable);
 }
 
 
@@ -973,7 +990,8 @@ MyFrame::LoadConfig()
     }
     m_gridCtrl->SetGridStyle(config.ReadLong(_T("style")) );
 
-    m_gridCtrl->SetFont(config.ReadFont(_T("font")) );
+    m_gridCtrl->SetLetterFont(config.ReadFont(_T("letterFont")) );
+    m_gridCtrl->SetNumberFont(config.ReadFont(_T("numberFont")) );
 
     m_gridCtrl->SetBorderSize(config.ReadLong(_T("lineThickness")));
 
@@ -1032,6 +1050,7 @@ MyFrame::LoadConfig()
     m_cluePrompt->SetFont(config.ReadFont(_T("font")));
     m_cluePrompt->SetBackgroundColour(config.ReadColor(_T("backgroundColor")));
     m_cluePrompt->SetForegroundColour(config.ReadColor(_T("foregroundColor")));
+    m_cluePrompt->SetDisplayFormat(config.ReadString(_T("displayFormat")));
 
     config.SetPath(_T("/"));
 }
@@ -1071,7 +1090,8 @@ MyFrame::SaveConfig()
 
     config.WriteLong(_T("style"), m_gridCtrl->GetGridStyle());
     config.WriteBool(_T("fit"),   m_toolMgr.IsChecked(ID_ZOOM_FIT));
-    config.WriteFont(_T("font"),  m_gridCtrl->GetFont());
+    config.WriteFont(_T("letterFont"),  m_gridCtrl->GetLetterFont());
+    config.WriteFont(_T("numberFont"),  m_gridCtrl->GetNumberFont());
     config.WriteLong(_T("lineThickness"), m_gridCtrl->GetBorderSize());
 
     config.WriteColor(_T("focusedLetterColor"), m_gridCtrl->GetFocusedLetterColor());
@@ -1123,6 +1143,8 @@ MyFrame::SaveConfig()
 
     config.WriteColor(_T("backgroundColor"),
                       m_cluePrompt->GetBackgroundColour());
+
+    config.WriteString(_T("displayFormat"), m_cluePrompt->GetDisplayFormat());
 
     // Layout
     SaveLayout(_T("Default"));
@@ -1398,22 +1420,86 @@ MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
 
 
 void
-MyFrame::OnOptions(wxCommandEvent & WXUNUSED(evt))
+MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
 {
-    SaveConfig();
-    if (m_propertiesDialog == NULL)
+    // Swap the clues
+    //---------------
+    XPuzzle::ClueList oldAcross = m_puz.m_across;
+    XPuzzle::ClueList oldDown   = m_puz.m_down;
+
+    m_puz.m_across.clear();
+    m_puz.m_down.clear();
+    m_puz.m_clues.clear();
+
+    XPuzzle::ClueList::iterator across_it = oldAcross.begin();
+    XPuzzle::ClueList::iterator down_it   = oldDown.begin();
+
+    for (XSquare * square = m_puz.m_grid.First();
+         square != NULL;
+         square = square->Next())
     {
-        m_propertiesDialog = new PropertiesDialog(this);
-        m_propertiesDialog->Connect(wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED,
-                                    wxCommandEventHandler(MyFrame::OnPropertiesDialogCancel),
-                                    NULL, this);
+        if (square->HasClue(DIR_ACROSS))
+        {
+            m_puz.m_across.push_back(XPuzzle::Clue(square->GetNumber(),
+                                                   down_it->Text()));
+            m_puz.m_clues.push_back(down_it->Text());
+            ++down_it;
+        }
+        if (square->HasClue(DIR_DOWN))
+        {
+            m_puz.m_down.push_back(XPuzzle::Clue(square->GetNumber(),
+                                                 across_it->Text()));
+            m_puz.m_clues.push_back(across_it->Text());
+            ++across_it;
+        }
     }
-    m_propertiesDialog->Show();
+
+    wxASSERT(across_it == oldAcross.end());
+    wxASSERT(down_it   == oldDown.end());
+
+
+    // Swap the grid
+    //--------------
+
+    // Make a copy of the grid vector
+    XGrid::Grid_t gridCopy = m_puz.m_grid.m_grid;
+
+    // Resize the old grid
+    m_puz.m_grid.SetSize(gridCopy.size(), gridCopy.at(0).size());
+
+    // Fill in the new squares
+    for (int row = 0; row < gridCopy.size(); ++row)
+        for (int col = 0; col < gridCopy.at(row).size(); ++col)
+            // Swap the square
+            m_puz.m_grid.m_grid.at(row).at(col) = gridCopy.at(col).at(row);
+
+    // Re-setup the grid.
+    m_puz.m_grid.SetupIteration();
+    m_puz.m_grid.SetupGrid();
+
+    // Done!
+    ShowPuzzle();
 }
 
 
 void
-MyFrame::OnPropertiesDialogCancel(wxCommandEvent & evt)
+MyFrame::OnPreferences(wxCommandEvent & WXUNUSED(evt))
+{
+    SaveConfig();
+    if (m_preferencesDialog == NULL)
+    {
+        m_preferencesDialog = new PreferencesDialog(this);
+        m_preferencesDialog->Connect(
+            wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED,
+            wxCommandEventHandler(MyFrame::OnPreferencesDialogCancel),
+            NULL, this);
+    }
+    m_preferencesDialog->Show();
+}
+
+
+void
+MyFrame::OnPreferencesDialogCancel(wxCommandEvent & evt)
 {
     // Reload the config from the previously saved config
     LoadConfig();
@@ -1421,6 +1507,30 @@ MyFrame::OnPropertiesDialogCancel(wxCommandEvent & evt)
 
     evt.Skip();
 }
+
+
+void
+MyFrame::OnPrintPreview(wxCommandEvent & WXUNUSED(evt))
+{
+    // Pass two printout objects: for preview, and possible printing.
+    wxPrintDialogData printDialogData(*g_printData);
+    wxPrintPreview * preview = new wxPrintPreview(new MyPrintout(this, &m_puz, 1),
+                                                  new MyPrintout(this, &m_puz, 1),
+                                                  &printDialogData);
+    if (! preview->Ok())
+    {
+        delete preview;
+        wxMessageBox(_T("There was a problem previewing.\nPerhaps your current printer is not set correctly?"), _T("Previewing"), wxOK);
+        return;
+    }
+
+    wxPreviewFrame *frame = new wxPreviewFrame(preview, this,
+                                               _T("Demo Print Preview"));
+    frame->Centre();
+    frame->Initialize();
+    frame->Show();
+}
+
 
 
 //------------------------------------------------------------------------------
@@ -1436,13 +1546,15 @@ MyFrame::OnGridFocus(wxPuzEvent & evt)
     {
         m_across->SetClueNumber(evt.GetAcrossClue(), CluePanel::FOCUSED);
         m_down  ->SetClueNumber(evt.GetDownClue(), CluePanel::CROSSING);
-        m_cluePrompt->SetLabel(m_across->GetClueText());
+        m_cluePrompt->SetClue(evt.GetAcrossClue(), DIR_ACROSS,
+                              m_across->GetClueText());
     }
     else
     {
         m_across->SetClueNumber(evt.GetAcrossClue(), CluePanel::CROSSING);
         m_down  ->SetClueNumber(evt.GetDownClue(), CluePanel::FOCUSED);
-        m_cluePrompt->SetLabel(m_down->GetClueText());
+        m_cluePrompt->SetClue(evt.GetDownClue(), DIR_DOWN,
+                              m_down->GetClueText());
     }
 
     // We shouldn't need this if we're fast enough
@@ -1455,7 +1567,8 @@ MyFrame::OnClueFocus(wxPuzEvent & evt)
 {
     m_gridCtrl->ChangeFocusedClue(evt.GetClueNumber(), evt.GetDirection());
 
-    m_cluePrompt->SetLabel(evt.GetClueText());
+    m_cluePrompt->SetClue(evt.GetClueNumber(), evt.GetDirection(),
+                          evt.GetClueText());
 
     const XSquare * crossingStart = m_gridCtrl->GetFocusedSquare()
                                         ->GetWordStart(! evt.GetDirection());

@@ -22,30 +22,30 @@
 const int MAX_POINT_SIZE = 150;
 const int MIN_POINT_SIZE = 2;
 
-XGridDrawer::XGridDrawer(XGrid * grid, const wxFont & font)
+XGridDrawer::XGridDrawer(XGrid * grid)
     : m_grid(grid),
       m_dc(NULL),
       m_status(INVALID_MEASURER)
 {
-    Init(font);
+    Init();
 }
 
-XGridDrawer::XGridDrawer(wxDC * dc, XGrid * grid, const wxFont & font)
+XGridDrawer::XGridDrawer(wxDC * dc, XGrid * grid)
     : m_grid(grid)
 {
     SetDC(dc);
-    Init(font);
+    Init();
 }
 
-XGridDrawer::XGridDrawer(wxWindow * window, XGrid * grid, const wxFont & font)
+XGridDrawer::XGridDrawer(wxWindow * window, XGrid * grid)
     : m_grid(grid)
 {
     SetWindow(window);
-    Init(font);
+    Init();
 }
 
 void
-XGridDrawer::Init(const wxFont & font)
+XGridDrawer::Init()
 {
     m_boxSize = 20;
     m_borderSize = 1;
@@ -59,16 +59,41 @@ XGridDrawer::Init(const wxFont & font)
     m_numberScale = 42 / 100.;
     m_letterScale = 75 / 100.;
 
-    m_numberFont = font;
-    m_letterFont[0] = font;
-    SetNumberFont(font);
-    SetLetterFont(font);
+    SetNumberFont(*wxSWISS_FONT);
+    SetLetterFont(*wxSWISS_FONT);
+
+    SetWhiteSquareColor(*wxWHITE);
+    SetBlackSquareColor(*wxBLACK);
+    SetPenColor(*wxBLACK);
+
+    m_drawOptions = DRAW_ALL;
+
     UpdateGridSize();
 }
 
 //-----------------------------------------------------------------------------
 // Measuring
 //-----------------------------------------------------------------------------
+void
+XGridDrawer::SetDC(wxDC * dc)
+{
+    m_dc = dc;
+    if (dc != NULL)
+        m_status = HAS_DC;
+    else
+        m_status = INVALID_MEASURER;
+}
+
+void
+XGridDrawer::SetWindow(wxWindow * window)
+{
+    m_window = window;
+    if (window != NULL)
+        m_status = HAS_WINDOW;
+    else
+        m_status = INVALID_MEASURER;
+}
+
 void
 XGridDrawer::GetTextExtent(const wxString & string, int* w, int* h,
                            int* descent, int* externalLeading,
@@ -202,6 +227,10 @@ XGridDrawer::GetScale(int width, int height, int maxWidth, int maxHeight)
 void
 XGridDrawer::ScaleFont(wxFont * font, int maxWidth, int maxHeight)
 {
+    // Can't do anything without a measurer
+    if (! HasMeasurer())
+        return;
+
     // Don't test numbers and symbols because they're probably not as wide.
     const wxString text = _T("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -301,7 +330,8 @@ void
 XGridDrawer::SetNumberFont(const wxFont & font)
 {
     m_numberFont = font;
-    ScaleNumberFont();
+    if (HasMeasurer())
+        ScaleNumberFont();
 }
 
 
@@ -309,13 +339,20 @@ XGridDrawer::SetNumberFont(const wxFont & font)
 //-----------------------------------------------------------------------------
 // Drawing
 //-----------------------------------------------------------------------------
+void
+XGridDrawer::DrawSquare(wxDC & dc, const XSquare & square)
+{
+    if (square.IsWhite())
+        DrawSquare(dc, square, GetWhiteSquareColor(), GetPenColor());
+    else
+        DrawSquare(dc, square, GetBlackSquareColor(), GetPenColor());
+}
 
 void
 XGridDrawer::DrawSquare(wxDC & dc,
                            const XSquare & square,
                            const wxColour & bgColor,
-                           const wxColour & textColor,
-                           bool  drawOutline)
+                           const wxColour & textColor)
 {
     // The order of drawing is important to make sure that we don't draw over
     // the more important parts of a square:
@@ -324,45 +361,44 @@ XGridDrawer::DrawSquare(wxDC & dc,
     // 3. A circle
     // 4. The number (with an opaque background so it draws over the circle)
     // 5. The text
-    // 6. An X over everything if necessary
+    // 6. An X over everything
 
-    // If the user has pressed <insert> we are in rebus mode.  The focused square
-    // will be outlined in the selected color (and have a white background).
-    // Certain features will not be drawn in this case:
-    //    - The number
-    //    - The incorrect/revealed indicator
-    //    - The X (if applicable).
-
+    // If we are supposed to draw the outline, we'll draw the square with
+    // the default square background, and then draw the outline using the
+    // bgColor.
 
     const int x = m_rect.x + m_borderSize + square.GetCol() * GetSquareSize();
     const int y = m_rect.y + m_borderSize + square.GetRow() * GetSquareSize();
 
-    // Draw the square background
-    if (drawOutline)
+    // Draw the outline with a white background
+    if (HasFlag(DRAW_OUTLINE))
     {
         const int outlineSize = std::max(m_boxSize / 15, 1);
 
         wxPen outlinePen(bgColor, outlineSize * 2);
         outlinePen.SetJoin(wxJOIN_MITER);
 
+        if (square.IsWhite())
+            dc.SetBrush(wxBrush(GetWhiteSquareColor()));
+        else
+            dc.SetBrush(wxBrush(GetBlackSquareColor()));
+
         dc.SetPen(outlinePen);
-        dc.SetBrush(wxBrush(bgColor));
         dc.DrawRectangle(x + outlineSize,
                          y + outlineSize,
                          m_boxSize - outlineSize * 2 + 1,
                          m_boxSize - outlineSize * 2 + 1);
 
     }
-    else
+    else // Just draw the background
     {
         dc.SetBrush(wxBrush(bgColor));
         dc.SetPen  (wxPen(bgColor));
-
         dc.DrawRectangle(x, y, m_boxSize, m_boxSize);
     }
 
-    // Draw square's flag if any (top right)
-    if (square.HasFlag(XFLAG_RED | XFLAG_BLACK) && ! drawOutline)
+    // Draw square's flag (top right)
+    if (HasFlag(DRAW_FLAG) && square.HasFlag(XFLAG_RED | XFLAG_BLACK))
     {
         if (square.HasFlag(XFLAG_RED))
         {
@@ -382,7 +418,7 @@ XGridDrawer::DrawSquare(wxDC & dc,
     }
 
 
-    if (square.HasFlag(XFLAG_CIRCLE))
+    if (HasFlag(DRAW_CIRCLE) && square.HasFlag(XFLAG_CIRCLE))
     {
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.SetPen(wxPen(*wxBLACK, 1));
@@ -391,11 +427,16 @@ XGridDrawer::DrawSquare(wxDC & dc,
 
     dc.SetTextForeground(textColor);
 
-    // Draw square's number if applicable (top left).
-    if (square.GetNumber() != 0 && ! drawOutline)
+    // Draw square's number (top left).
+    if (HasFlag(DRAW_NUMBER) && square.GetNumber() != 0)
     {
         // Set a solid text background so it will draw over any circles.
-        dc.SetTextBackground(bgColor);
+        if (! HasFlag(DRAW_OUTLINE))
+            dc.SetTextBackground(bgColor);
+        else if (square.IsWhite())
+            dc.SetTextBackground(GetWhiteSquareColor());
+        else
+            dc.SetTextBackground(GetBlackSquareColor());
         dc.SetBackgroundMode(wxSOLID);
 
         dc.SetFont(m_numberFont);
@@ -404,9 +445,16 @@ XGridDrawer::DrawSquare(wxDC & dc,
     }
 
     // Draw square's text (bottom and center to avoid conflicts with numbers)
-    if (! square.IsBlank())
+    if (HasFlag(DRAW_TEXT) && ! square.IsBlank())
     {
-        wxString text = square.GetText();
+        wxString text;
+        if (HasFlag(DRAW_USER_TEXT))
+            text = square.GetText();
+        else
+        {
+            wxASSERT(HasFlag(DRAW_SOLUTION));
+            text = square.GetSolution();
+        }
 
         if (text.length() > 4)
         {
@@ -436,7 +484,7 @@ XGridDrawer::DrawSquare(wxDC & dc,
     }
 
     // Draw an X across the square
-    if (square.HasFlag(XFLAG_X) && ! drawOutline)
+    if (HasFlag(DRAW_X) && square.HasFlag(XFLAG_X))
     {
         dc.SetPen(wxPen(*wxRED, 2));
         // Funky math here because of the way that DCs draw lines
@@ -457,8 +505,8 @@ XGridDrawer::DrawGrid(wxDC & dc)
     }
 
     // Draw black as crossword background
-    dc.SetBrush(*wxBLACK_BRUSH);
-    dc.SetPen  (*wxBLACK_PEN);
+    dc.SetBrush(wxBrush(*wxBLACK));
+    dc.SetPen  (wxPen(*wxBLACK));
 
     dc.DrawRectangle(m_rect);
 
@@ -466,7 +514,6 @@ XGridDrawer::DrawGrid(wxDC & dc)
          square != NULL;
          square = square->Next())
     {
-        if (square->IsWhite())
             DrawSquare(dc, *square);
     }
 }

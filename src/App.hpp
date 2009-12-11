@@ -24,9 +24,14 @@
 #    include <wx/app.h>
 #endif
 
+#include "utils/ConfigManager.hpp"
+
 class MyFrame;
 
-#include "utils/ConfigManager.hpp"
+// Global printing variables
+extern wxPrintData * g_printData;
+extern wxPageSetupDialogData* g_pageSetupData;
+
 
 class MyApp : public wxApp
 {
@@ -51,6 +56,7 @@ private:
     void OnActivate(wxActivateEvent & evt);
 
     void SetupConfig();
+    void SetupPrinting();
 
     MyFrame * m_frame;
     ConfigManager m_config;
