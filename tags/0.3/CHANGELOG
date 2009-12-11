@@ -1,0 +1,79 @@
+Version 0.3 (??/??/???)
+    New Features
+    * If a puzzle file is corrupt and not entirely unrecoverable, an option is
+      given to load the puzzle anyway.
+    * A dialog supporting batch conversion of puzzle files (from .txt to .puz
+      and vice-versa) has been added under the tools menu.  If the
+      -convert [-c] command line option is given when XWord is invoked, only
+      the conversion dialog appears.  Closing the dialog ends the program.
+      Files to convert can still be given as command line parameters, and other
+      options (-directory [-d], -output-files [-o], -overwrite [-w]) work as
+      expected. If XWord is invoked with -c, conversion begins immediately.
+    * Added a clue prompt format preference.
+    * Added separate preferences for grid clue number and text fonts.
+    * Added an option to tweak the proprtion of text size to clue number size
+      in the grid.
+    * Rudimentary printing.
+    * Added "Swap across and down" under the tools menu for a new perspective
+      on your crossword puzzle!
+
+    Bug Fixes
+    * A correctly filled grid with revealed letters is noted as solved instead
+      of displaying the message
+        "The puzzle is completely filled, but some letters are incorrect."
+    * "Reveal letter" and "Reveal word" now reveal squares if they are blank
+      or incorrect (previously they only revealed incorrect squares).
+    * The "Check while typing" option does not attempt to check squares if the
+      puzzle is scrambled.  If this option is selected when the puzzle is
+      unscrambled, the puzzle is immediately checked for incorrect letters.
+    * "Move to next square" and "Move to next blank" preferences under the
+      "After entering a letter" section now work as expected.
+    * All preferences now update immediately when then are changed (so you can
+      preview the changes in the main window).
+    * Removed the pencil color setting until a pencil is implemented.
+    * Notepad window can *always* be opened or closed.
+    * Loading and saving the LTIM section of puz files is aware of whether
+      or not the timer is running.
+
+    Misc
+    * Changed the name of the "Options" dialog to "Preferences".
+    * The default "crossing clue background color" is now white.
+
+Version 0.2.1 (bug fix) (10/14/2009)
+    * Fixed timer starting/stopping issues when activating and deactivating
+      XWord.
+    * Notepad window can be closed.
+    * The grid is replaced with a "(Paused)" message if the timer is running
+      when XWord is deactivated.
+
+Version 0.2 (10/09/2009)
+    * Rebus puzzles can now be solved!
+    * Scrambled puzzles are checked once the puzzle is completely filled.
+    * "Corrupted" .puz files with the wrong version string are automatically
+      tested with other version strings.
+    * Puzzle information sections (clue prompt, author, title, and copyright)
+      are now centered instead of left- and top-aligned.  This will be
+      configurable in the future.
+    * Puzzle title is displayed in the title bar.
+
+    File Locations
+    * XWord will now search a set of directories for its files rather than
+      expecting all the files to be in the executable directory.  Directories
+      searched depend both on the OS used and the directory that XWord is run
+      from.
+    * Portable mode: if a file named "config.ini" is found in the executable's
+      directory (linux or windows), XWord will write all config settings to
+      that file and will not touch any other folders.
+
+    Config
+    * Added configuration settings!
+    * Created a very basic options dialog with wxFormBuilder
+    * Config file is named "config.ini" on windows and ".xword" on linux
+
+    Windows-specific
+    * Removed icons from menus, as menu icon rendering is not implemented well
+      in wxWidgets under Vista
+
+
+Version 0.1 (07/31/2009)
+    * Initial release

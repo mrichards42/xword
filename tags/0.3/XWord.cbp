@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="XWord" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Unicode Release">
+				<Option output="xword" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Unicode Release" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-W" />
+					<Add option="`wx-config --version=2.8 --unicode=yes --debug=no --static=yes --cppflags`" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="`wx-config --version=2.8 --unicode=yes --debug=no --static=yes --libs`" />
+				</Linker>
+			</Target>
+			<Target title="Unicode Debug">
+				<Option output="xword" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Unicode Debug" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="`wx-config --version=2.8 --unicode=yes --debug=yes --static=yes --cppflags`" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --version=2.8 --unicode=yes --debug=yes --static=yes --libs`" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="src/App.cpp" />
+		<Unit filename="src/App.hpp" />
+		<Unit filename="src/ClueListBox.cpp" />
+		<Unit filename="src/ClueListBox.hpp" />
+		<Unit filename="src/CluePanel.cpp" />
+		<Unit filename="src/CluePanel.hpp" />
+		<Unit filename="src/CluePrompt.cpp" />
+		<Unit filename="src/CluePrompt.hpp" />
+		<Unit filename="src/MyFrame.cpp" />
+		<Unit filename="src/MyFrame.hpp" />
+		<Unit filename="src/MyStatusBar.cpp" />
+		<Unit filename="src/MyStatusBar.hpp" />
+		<Unit filename="src/PuzEvent.cpp" />
+		<Unit filename="src/PuzEvent.hpp" />
+		<Unit filename="src/XGridCtrl.cpp" />
+		<Unit filename="src/XGridCtrl.hpp" />
+		<Unit filename="src/XGridDrawer.cpp" />
+		<Unit filename="src/XGridDrawer.hpp" />
+		<Unit filename="src/dialogs/Convert.cpp" />
+		<Unit filename="src/dialogs/Convert.hpp" />
+		<Unit filename="src/dialogs/Layout.hpp" />
+		<Unit filename="src/dialogs/Preferences.cpp" />
+		<Unit filename="src/dialogs/Preferences.hpp" />
+		<Unit filename="src/dialogs/wxFB_Dialogs.cpp" />
+		<Unit filename="src/dialogs/wxFB_Dialogs.h" />
+		<Unit filename="src/paths.cpp" />
+		<Unit filename="src/paths.hpp" />
+		<Unit filename="src/printout.cpp" />
+		<Unit filename="src/printout.hpp" />
+		<Unit filename="src/puz/Checksummer.cpp" />
+		<Unit filename="src/puz/Checksummer.hpp" />
+		<Unit filename="src/puz/HandlerBase.cpp" />
+		<Unit filename="src/puz/HandlerBase.hpp" />
+		<Unit filename="src/puz/PuzCk.hpp" />
+		<Unit filename="src/puz/PuzHandler.cpp" />
+		<Unit filename="src/puz/PuzHandler.hpp" />
+		<Unit filename="src/puz/Scrambler.cpp" />
+		<Unit filename="src/puz/Scrambler.hpp" />
+		<Unit filename="src/puz/TxtHandler.cpp" />
+		<Unit filename="src/puz/TxtHandler.hpp" />
+		<Unit filename="src/puz/XGrid.cpp" />
+		<Unit filename="src/puz/XGrid.hpp" />
+		<Unit filename="src/puz/XPuzzle.cpp" />
+		<Unit filename="src/puz/XPuzzle.hpp" />
+		<Unit filename="src/puz/XSquare.cpp" />
+		<Unit filename="src/puz/XSquare.hpp" />
+		<Unit filename="src/utils/ByteArray.cpp" />
+		<Unit filename="src/utils/ByteArray.hpp" />
+		<Unit filename="src/utils/ConfigManager.hpp" />
+		<Unit filename="src/utils/SizerPrinter.hpp" />
+		<Unit filename="src/utils/ToolInfo.cpp" />
+		<Unit filename="src/utils/ToolInfo.hpp" />
+		<Unit filename="src/utils/ToolManager.cpp" />
+		<Unit filename="src/utils/ToolManager.hpp" />
+		<Unit filename="src/utils/wrap.hpp" />
+		<Unit filename="src/widgets/SizedText.cpp" />
+		<Unit filename="src/widgets/SizedText.hpp" />
+		<Unit filename="src/widgets/ctrlwitems.hpp" />
+		<Unit filename="src/widgets/mlistbox.hpp" />
+		<Unit filename="src/widgets/odlistbox.hpp" />
+		<Unit filename="src/widgets/vlboxcache.cpp" />
+		<Unit filename="src/widgets/vlboxcache.hpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
