@@ -22,6 +22,7 @@
 #include <algorithm>
 #include "PuzEvent.hpp"
 #include "XGridDrawer.hpp"
+#include "messages.hpp"
 
 // This class will take over the XGridCtrl's event processing
 // when needed.  It must be created on the heap, and it will

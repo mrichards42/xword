@@ -20,6 +20,7 @@
 #include "utils/wrap.hpp"
 #include <wx/tooltip.h>
 #include "widgets/SizedText.hpp"
+#include "messages.hpp"
 
 BEGIN_EVENT_TABLE(MyStatusBar, wxStatusBar)
     EVT_SIZE(MyStatusBar::OnSize)
@@ -70,7 +71,7 @@ MyStatusBar::OnAlertClick(wxMouseEvent & evt)
 {
     wxWindow * alert = wxDynamicCast(evt.GetEventObject(), wxWindow);
     if (alert)
-        XWordMessage( MSG_STATUS_ALERT, alert->GetToolTip()->GetTip().c_str() );
+        XWordMessage(alert->GetToolTip()->GetTip());
 }
 
 void

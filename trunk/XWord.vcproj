@@ -319,6 +319,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\messages.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\MyFrame.hpp"
 				>
 			</File>
@@ -364,6 +368,10 @@
 			</File>
 			<File
 				RelativePath=".\src\CluePrompt.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\messages.cpp"
 				>
 			</File>
 			<File
