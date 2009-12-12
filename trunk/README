@@ -141,3 +141,10 @@ You will either need to build the wxWidgets libraries so that they also link to
 the MSVC runtimes statically, or change the setting
 (Properties >> C/C++ >> Code Generation >> Runtime Library).
 
+The VC project file assumes that you have an environmental variable $(WXWIN)
+that points to the wxWidgets folder (with compiled Unicode and Unicode Debug
+libraries).  It also assumes that the user has added "$(WXWIN)\include" to the
+VC include directories list, and "$(WXWIN)\lib\vc_lib" to the library
+directories list (Both are found under Tools >> Options >> Projects and
+Solutions >> VC++ Directories).  You should be able to add those two
+directories to the project if you'd rather not add them as global VC settings.
