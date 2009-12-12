@@ -21,6 +21,7 @@
 #include "MyFrame.hpp"
 #include "paths.hpp"
 #include "dialogs/Convert.hpp"
+#include <wx/wfstream.h> // wxFileInputStream / wxFileOutputStream for config
 
 #include <wx/log.h>
 

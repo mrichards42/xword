@@ -42,14 +42,13 @@
 // Used with an array of tools for an initialized list to mark the end
 const int TOOL_NONE = wxID_NONE;
 
-// Any strings not specified will be wxEmptyString
 struct ToolDesc
 {
     int id;
     wxItemKind kind;
-    const wxString label;
-    const wxString iconName;
-    const wxString helpStr;
+    const  wxChar * label;
+    const  wxChar * iconName;
+    const  wxChar * helpStr;
 };
 
 class ToolManager : public wxEvtHandler

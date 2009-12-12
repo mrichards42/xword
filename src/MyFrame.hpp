@@ -15,10 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-// TODO:
-//   - Figure out what needs to go in the config
-
 #ifndef MY_FRAME_H
 #define MY_FRAME_H
 
@@ -51,12 +47,7 @@ class MyPrintout;
 
 #include "utils/ToolManager.hpp"
 
-// Config headers
-#include <wx/wfstream.h>    // for wxFileInputStream and wxFileOutputStream
-#include <wx/fileconf.h>
-#include <wx/filedlg.h>
-#include <wx/filename.h>
-#include <wx/stdpaths.h>
+#include <wx/fileconf.h> // Used to get the layouts directly from wxConfig
 
 
 //#define USE_AUI_TOOLBAR
@@ -201,7 +192,7 @@ private:
 
 private:
     // Load / save exception handling.
-    void HandlePuzException(const wxString & type);
+    void HandlePuzException();
 
     // Event Handlers
     //---------------

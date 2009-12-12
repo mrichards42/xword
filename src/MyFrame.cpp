@@ -17,6 +17,7 @@
 
 #include "MyFrame.hpp"
 #include "paths.hpp"
+#include "messages.hpp"
 
 // For the global printing pointers and application activation / timer starting
 // and stopping.
@@ -318,23 +319,21 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
     {
         // Do something more useful here.
         m_puz.SetOk(false);
-        wxMessageBox(error.what(),
-                     _T("Error loading puzzle"),
-                     wxOK | wxICON_ERROR);
+        XWordMessage(MSG_PUZ_ERROR, error.what().c_str());
     }
     catch (PuzChecksumError &)
     {
-        m_puz.SetOk( XWordPrompt(MSG_CORRUPT_PUZ) );
+        m_puz.SetOk(XWordPrompt(MSG_CORRUPT_PUZ));
     }
     catch (BasePuzError &)
     {
-        m_puz.SetOk( XWordPrompt(MSG_CORRUPT_SECTION) );
+        m_puz.SetOk(XWordPrompt(MSG_CORRUPT_SECTION));
     }
     catch (...)
     {
         // We can't recover from any other exception.
         m_puz.SetOk(false);
-        HandlePuzException(_T("loading"));
+        HandlePuzException();
     }
 
     ShowPuzzle();
@@ -388,32 +387,30 @@ MyFrame::SavePuzzle(wxString filename, const wxString & ext)
     }
     catch (...)
     {
-        HandlePuzException(_T("saving"));
+        HandlePuzException();
         return false;
     }
 }
 
 // Catch everything that wasn't already caught.
 void
-MyFrame::HandlePuzException(const wxString & type)
+MyFrame::HandlePuzException()
 {
-    const wxString mbTitle =
-        wxString::Format(_T("Error %s puzzle"), type.c_str());
     try
     {
         throw;
     }
     catch (BasePuzError & error)
     {
-        XWordMessage( MSG_PUZ_ERROR, error.what().c_str() );
+        XWordMessage(MSG_PUZ_ERROR, error.what().c_str());
     }
     catch (std::exception & error)
     {
-        XWordMessage( MSG_STD_EXCEPTION, error.what() )
+        XWordMessage(MSG_STD_EXCEPTION, error.what());
     }
     catch (...)
     {
-        XWordMessage( MSG_UNKNOWN_ERROR );
+        XWordMessage(MSG_UNKNOWN_ERROR);
     }
 }
 
@@ -427,7 +424,7 @@ MyFrame::ClosePuzzle(bool prompt)
 
     if (prompt && m_puz.m_modified)
     {
-        int ret = XWordMessage( MSG_SAVE_PUZ );
+        int ret = XWordMessage(MSG_SAVE_PUZ);
 
         if (ret == wxCANCEL)
             return false;
@@ -1260,9 +1257,7 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 
     if (m_gridCtrl->GetXGrid()->ScrambleSolution(key))
     {
-        wxMessageBox(wxString::Format(_T("Solution scrambled.  Key is %d"),
-                                      m_gridCtrl->GetXGrid()->GetKey()),
-                     _T("XWord Message"));
+        XWordMessage(MSG_SCRAMBLE, m_gridCtrl->GetXGrid()->GetKey());
 
         m_gridCtrl->RecheckGrid();
         CheckPuzzle();
@@ -1304,7 +1299,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 
     if (m_gridCtrl->UnscrambleSolution(key))
     {
-        XWordMessage( MSG_UNSCRAMBLE );
+        XWordMessage(MSG_UNSCRAMBLE);
 
         CheckPuzzle();
 
@@ -1316,7 +1311,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
     }
     else
     {
-        XWordMessage( MSG_WRONG_KEY );
+        XWordMessage(MSG_WRONG_KEY);
     }
 }
 
@@ -1360,7 +1355,7 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
 
     // Enumerate all layouts
 
-    // Eummy enumeration variables
+    // Dummy enumeration variables
     wxString str;
     long dummy;
 
@@ -1384,29 +1379,20 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
     config->SetPath(_T("/"));
 
     wxASSERT(nameArray.size() == layoutArray.size());
+    wxASSERT(nameArray.size() > 1);
 
     // Show the dialog
-    if (nameArray.size() == 1)
-    {
-        // This should never happen, because we set "XWord Default" as a layout
-        // as soon as the program starts
-        wxMessageBox(_T("No layouts found"),
-                     _T("XWord Error"),
-                     wxICON_EXCLAMATION | wxOK);
-        return;
-    }
-    else
-    {
-        LayoutDialog dlg(this,
-                         _T("Choose a layout"),
-                         _T("Load Layout"),
-                         nameArray,
-                         layoutArray);
 
-        // If the dialog is canceled, load the previous layout
-        if (dlg.ShowModal() != wxID_OK)
-            LoadLayoutString(layoutArray.front(), true);
-    }
+    LayoutDialog dlg(this,
+                     _T("Choose a layout"),
+                     _T("Load Layout"),
+                     nameArray,
+                     layoutArray);
+
+    // If the dialog is canceled, load the previous layout
+    if (dlg.ShowModal() != wxID_OK)
+        LoadLayoutString(layoutArray.front(), true);
+
 }
 
 
