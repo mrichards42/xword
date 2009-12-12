@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Unicode Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\build\debug"
+			IntermediateDirectory="$(SolutionDir)\build\debug"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(WXWIN)\lib\vc_lib\mswud"
+				AdditionalIncludeDirectories="&quot;$(WXWIN)\lib\vc_lib\mswud&quot;"
 				PreprocessorDefinitions="_UNICODE;_DEBUG;__WXDEBUG__;__WXMSW__;WIN32;_WINDOWS"
 				IgnoreStandardIncludePath="false"
 				GeneratePreprocessedFile="0"
@@ -50,7 +50,7 @@
 				RuntimeLibrary="1"
 				ForceConformanceInForLoopScope="false"
 				WarningLevel="4"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -93,8 +93,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\build\release"
+			IntermediateDirectory="$(SolutionDir)\build\release"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -117,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				FavorSizeOrSpeed="0"
-				AdditionalIncludeDirectories="$(WXWIN)\lib\vc_lib\mswu"
+				AdditionalIncludeDirectories="&quot;$(WXWIN)\lib\vc_lib\mswu&quot;"
 				PreprocessorDefinitions="WIN32;_UNICODE;__WXMSW__;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="0"
