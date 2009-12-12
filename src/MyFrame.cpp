@@ -324,21 +324,11 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
     }
     catch (PuzChecksumError &)
     {
-        const int ret =
-            wxMessageBox(
-                _T("This puzzle seems to be corrupt.\nLoad it anyway?"),
-                _T("Error loading puzzle"),
-                wxYES_NO  | wxICON_ERROR);
-        m_puz.SetOk(ret == wxYES);
+        m_puz.SetOk( XWordPrompt(MSG_CORRUPT_PUZ) );
     }
     catch (BasePuzError &)
     {
-        const int ret =
-            wxMessageBox(
-               _T("Some parts of this puzzle are corrupt, but the basic puzzle information is intact.\nLoad it anyway?"),
-               _T("Error loading puzzle"),
-               wxYES_NO  | wxICON_ERROR);
-        m_puz.SetOk(ret == wxYES);
+        m_puz.SetOk( XWordPrompt(MSG_CORRUPT_SECTION) );
     }
     catch (...)
     {
@@ -415,21 +405,15 @@ MyFrame::HandlePuzException(const wxString & type)
     }
     catch (BasePuzError & error)
     {
-        wxMessageBox(error.what(),
-                     mbTitle,
-                     wxOK | wxICON_ERROR);
+        XWordMessage( MSG_PUZ_ERROR, error.what().c_str() );
     }
     catch (std::exception & error)
     {
-        wxMessageBox(wxString(error.what(), wxConvISO8859_1),
-                     mbTitle,
-                     wxOK | wxICON_ERROR);
+        XWordMessage( MSG_STD_EXCEPTION, error.what() )
     }
     catch (...)
     {
-        wxMessageBox(_T("Unknown error."),
-                     mbTitle,
-                     wxOK | wxICON_ERROR);
+        XWordMessage( MSG_UNKNOWN_ERROR );
     }
 }
 
@@ -443,11 +427,7 @@ MyFrame::ClosePuzzle(bool prompt)
 
     if (prompt && m_puz.m_modified)
     {
-        int ret = wxMessageBox(
-                  _T("Current Puzzle not saved.  Save before closing?"),
-                  _T("XWord Message"),
-                  wxYES_NO | wxCANCEL | wxICON_QUESTION
-              );
+        int ret = XWordMessage( MSG_SAVE_PUZ );
 
         if (ret == wxCANCEL)
             return false;
@@ -1324,8 +1304,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 
     if (m_gridCtrl->UnscrambleSolution(key))
     {
-        wxMessageBox(_T("Solution unscrambled!"),
-                     _T("XWord Message"));
+        XWordMessage( MSG_UNSCRAMBLE );
 
         CheckPuzzle();
 
@@ -1337,7 +1316,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
     }
     else
     {
-        wxMessageBox(_T("Wrong Key!"));
+        XWordMessage( MSG_WRONG_KEY );
     }
 }
 
@@ -1409,6 +1388,8 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
     // Show the dialog
     if (nameArray.size() == 1)
     {
+        // This should never happen, because we set "XWord Default" as a layout
+        // as soon as the program starts
         wxMessageBox(_T("No layouts found"),
                      _T("XWord Error"),
                      wxICON_EXCLAMATION | wxOK);

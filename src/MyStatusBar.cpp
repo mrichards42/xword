@@ -70,7 +70,7 @@ MyStatusBar::OnAlertClick(wxMouseEvent & evt)
 {
     wxWindow * alert = wxDynamicCast(evt.GetEventObject(), wxWindow);
     if (alert)
-        wxMessageBox(alert->GetToolTip()->GetTip());
+        XWordMessage( MSG_STATUS_ALERT, alert->GetToolTip()->GetTip().c_str() );
 }
 
 void

@@ -38,10 +38,10 @@ xword ICON "images/xword.ico"
 #endif
 
 #if defined(_WIN32_WCE)
-    #include "wx/msw/wince/wince.rc"
+    #include <wx/msw/wince/wince.rc>
 #endif
 
-#include "wx/msw/rcdefs.h"
+#include <wx/msw/rcdefs.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //

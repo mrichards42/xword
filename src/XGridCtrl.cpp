@@ -682,7 +682,7 @@ XGridCtrl::CheckGrid(int options)
 
     if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
-        wxMessageBox(_T("No Incorrect Letters!"), _T("Message"));
+        XWordMessage( MSG_NO_INCORRECT );
         return;
     }
 
@@ -722,7 +722,7 @@ XGridCtrl::CheckWord(int options)
 
     if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
-        wxMessageBox(_T("No Incorrect Letters!"), _T("Message"));
+        XWordMessage( MSG_NO_INCORRECT );
         return;
     }
 
@@ -774,7 +774,7 @@ XGridCtrl::CheckLetter(int options)
         RefreshSquare(*m_focusedSquare);
     }
     else if ( (options & NO_MESSAGE_BOX) == 0)
-        wxMessageBox(_T("No Incorrect Letters!"), _T("Message"));
+        XWordMessage( MSG_NO_INCORRECT );
 }
 
 
@@ -932,7 +932,11 @@ XGridCtrl::OnLetter(wxChar key, int mod)
             SetSquareText(square, key);
     }
 
-    MoveAfterLetter();
+    // Space bar always moves forward one square
+    if (static_cast<int>(key) == WXK_SPACE)
+        SetSquareFocus(FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE, m_direction));
+    else
+        MoveAfterLetter();
 }
 
 
@@ -949,13 +953,25 @@ XGridCtrl::MoveAfterLetter()
                                       FIND_BLANK_SQUARE,
                                       m_direction,
                                       FIND_NEXT);
+            // Last blank in the word: jump to the first blank if it exists
+            if (newSquare == NULL)
+            {
+                newSquare = FindSquare(m_focusedSquare->GetWordStart(m_direction),
+                                       FIND_BLANK_SQUARE,
+                                       m_direction,
+                                       FIND_NEXT);
+            }
         }
-        else
+        // Either the user wants "move to next letter", or there are no more blanks in the
+        // word.  Move to the next letter if it exists
+        if (newSquare == NULL)
         {
             newSquare = FindNextSquare(m_focusedSquare,
                                        FIND_WHITE_SQUARE,
                                        m_direction,
                                        FIND_NEXT);
+            // if newSquare == NULL (possibly again), it's the last square in the word,
+            // and the focus won't change.
         }
     }
 
