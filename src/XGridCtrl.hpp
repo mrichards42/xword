@@ -92,7 +92,7 @@ public: // Enums
     };
 
 public:
-    XGridCtrl() : m_drawer(this) { Init(); }
+    XGridCtrl() { Init(); }
 
     explicit XGridCtrl(wxWindow * parent,
                       wxWindowID id = -1,
@@ -102,7 +102,6 @@ public:
                       long style = DEFAULT_GRID_STYLE
                                  | wxVSCROLL | wxHSCROLL,
                       const wxString & name = XGridCtrlNameStr)
-        : m_drawer(this)
     {
         Init();
         Create(parent, id, pos, size, grid, style, name);

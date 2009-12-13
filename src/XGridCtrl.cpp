@@ -140,6 +140,10 @@ XGridCtrl::Create(wxWindow * parent,
     if (! wxScrolledWindow::Create(parent, id, pos, size, style, name))
         return false;
 
+	// Have to do this here, or wxMac will break
+	// (XGridDrawer would use GetTextExtent on a not yet created window)
+	m_drawer.SetWindow(this);
+
     SetXGrid(grid);
 
     SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
