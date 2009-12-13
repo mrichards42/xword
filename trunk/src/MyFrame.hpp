@@ -207,32 +207,25 @@ private:
     void OnClosePuzzle (wxCommandEvent & WXUNUSED(evt))   { ClosePuzzle(true); }
     void OnQuit        (wxCommandEvent & WXUNUSED(evt))   { Close(); }
 
-    // XGridCtrl interaction
+    // Zoom
     void OnZoomIn      (wxCommandEvent & WXUNUSED(evt));
     void OnZoomFit     (wxCommandEvent & WXUNUSED(evt));
     void OnZoomOut     (wxCommandEvent & WXUNUSED(evt));
 
-    void OnCheckGrid   (wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckGrid(); }
-    void OnCheckWord   (wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckWord(); }
-    void OnCheckLetter (wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckLetter(); }
+    // Check / Reveal
+    void OnCheckGrid      (wxCommandEvent & WXUNUSED(evt));
+    void OnCheckWord      (wxCommandEvent & WXUNUSED(evt));
+    void OnCheckLetter    (wxCommandEvent & WXUNUSED(evt));
+    void OnRevealGrid     (wxCommandEvent & WXUNUSED(evt));
+    void OnRevealIncorrect(wxCommandEvent & WXUNUSED(evt));
+    void OnRevealWord     (wxCommandEvent & WXUNUSED(evt));
+    void OnRevealLetter   (wxCommandEvent & WXUNUSED(evt));
 
-    void OnRevealGrid   (wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL); }
-    void OnRevealIncorrect(wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckGrid(REVEAL_ANSWER); }
-    void OnRevealWord  (wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckWord(REVEAL_ANSWER | CHECK_ALL); }
-    void OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
-        { m_gridCtrl->CheckLetter(REVEAL_ANSWER | CHECK_ALL); }
-
-    // XWord puzzle stuff
+    // Scrambling
     void OnScramble   (wxCommandEvent & WXUNUSED(evt));
     void OnUnscramble (wxCommandEvent & WXUNUSED(evt));
 
-    // Window management
+    // Window layout
     void OnLayout     (wxCommandEvent & WXUNUSED(evt));
     void OnLoadLayout (wxCommandEvent & WXUNUSED(evt));
     void OnSaveLayout (wxCommandEvent & WXUNUSED(evt));
@@ -249,7 +242,7 @@ private:
     // Just for fun
     void OnSwapDirection(wxCommandEvent & WXUNUSED(evt));
 
-    // Config
+    // Preferences
     void OnPreferences(wxCommandEvent & WXUNUSED(evt));
     void OnPreferencesDialogCancel(wxCommandEvent & evt);
 

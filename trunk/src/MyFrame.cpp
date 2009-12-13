@@ -1183,6 +1183,9 @@ MyFrame::SaveConfig()
 // Menu and toolbar events
 //------------------------------------------------------------------------------
 
+
+// Open / Save
+//------------
 void
 MyFrame::OnOpenPuzzle(wxCommandEvent & WXUNUSED(evt))
 {
@@ -1215,6 +1218,8 @@ MyFrame::OnSavePuzzle(wxCommandEvent & WXUNUSED(evt))
 }
 
 
+// Zoom
+//---------------
 void
 MyFrame::OnZoomFit(wxCommandEvent & evt)
 {
@@ -1238,6 +1243,54 @@ MyFrame::OnZoomOut(wxCommandEvent & WXUNUSED(evt))
 }
 
 
+// Check / Reveal
+//---------------
+void
+MyFrame::OnCheckGrid(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckGrid();
+}
+
+void
+MyFrame::OnCheckWord(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckWord();
+}
+
+void
+MyFrame::OnCheckLetter(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckLetter();
+}
+
+void
+MyFrame::OnRevealGrid(wxCommandEvent & WXUNUSED(evt))
+{
+    if (XWordPrompt(MSG_REVEAL_ALL))
+        m_gridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL);
+}
+
+void
+MyFrame::OnRevealIncorrect(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckGrid(REVEAL_ANSWER);
+}
+
+void
+MyFrame::OnRevealWord(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckWord(REVEAL_ANSWER | CHECK_ALL);
+}
+
+void
+MyFrame::OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckLetter(REVEAL_ANSWER | CHECK_ALL);
+}
+
+
+// Scramble / Unscramble
+//----------------------
 void
 MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 {
@@ -1317,6 +1370,8 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 
 
 
+// Window Layout
+//--------------
 void
 MyFrame::OnLayout(wxCommandEvent & evt)
 {
@@ -1423,6 +1478,8 @@ MyFrame::OnAuiPaneClose(wxAuiManagerEvent & evt)
         m_toolMgr.Check(ID_SHOW_NOTES, false);
 }
 
+// Timer
+//------
 void
 MyFrame::StartTimer()
 {
@@ -1458,6 +1515,10 @@ MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
     ConvertDialog(this).ShowModal();
 }
 
+
+
+// Swap across / down
+//-------------------
 
 // Helper functor for OnSwapDirection
 struct find_clue_number
@@ -1565,6 +1626,8 @@ MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
 }
 
 
+// Preferences
+//------------
 void
 MyFrame::OnPreferences(wxCommandEvent & WXUNUSED(evt))
 {
