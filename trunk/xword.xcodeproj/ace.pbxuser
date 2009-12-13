@@ -1,0 +1,221 @@
+// !$*UTF8*$!
+{
+	20286C28FDCF999611CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeExecutable = 50C09C8F10D4553E00A5C180 /* xword */;
+		activeTarget = 8D0C4E890486CD37000505A6 /* xword */;
+		addToTargets = (
+			8D0C4E890486CD37000505A6 /* xword */,
+		);
+		breakpointsGroup = 50C09CA510D4584D00A5C180 /* XCBreakpointsBucket */;
+		codeSenseManager = 50C09C9C10D4554200A5C180 /* Code sense */;
+		executables = (
+			50C09C8F10D4553E00A5C180 /* xword */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXErrorsWarningsDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXErrorsWarningsDataSource_LocationID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					300,
+					200,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXErrorsWarningsDataSource_TypeID,
+					PBXErrorsWarningsDataSource_MessageID,
+					PBXErrorsWarningsDataSource_LocationID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					22,
+					300,
+					131,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXExecutablesDataSource_ActiveFlagID,
+					PBXExecutablesDataSource_NameID,
+					PBXExecutablesDataSource_CommentsID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					395,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					200,
+					215,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 282356481;
+			PBXWorkspaceStateSaveDate = 282356481;
+		};
+		sourceControlManager = 50C09C9B10D4554200A5C180 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	50C09C8F10D4553E00A5C180 /* xword */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = xword;
+		savedGlobals = {
+		};
+		sourceDirectories = (
+		);
+		variableFormatDictionary = {
+		};
+	};
+	50C09C9B10D4554200A5C180 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+		scmType = "";
+	};
+	50C09C9C10D4554200A5C180 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	50C09CA510D4584D00A5C180 /* XCBreakpointsBucket */ = {
+		isa = XCBreakpointsBucket;
+		name = "Project Breakpoints";
+		objects = (
+		);
+	};
+	50C09E7F10D45C8600A5C180 /* App.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 4830}}";
+			sepNavSelRange = "{5035, 0}";
+			sepNavVisRect = "{{0, 1165}, {853, 232}}";
+		};
+	};
+	50C09E8310D45C8600A5C180 /* CluePanel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {960, 1722}}";
+			sepNavSelRange = "{1507, 0}";
+			sepNavVisRect = "{{0, 474}, {960, 467}}";
+		};
+	};
+	50C09E8410D45C8600A5C180 /* CluePanel.hpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1271, 3388}}";
+			sepNavSelRange = "{5579, 3}";
+			sepNavVisRect = "{{0, 2201}, {1271, 375}}";
+			sepNavWindowFrame = "{{340, 499}, {1700, 822}}";
+		};
+	};
+	50C09E9210D45C8600A5C180 /* MyFrame.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {960, 29176}}";
+			sepNavSelRange = "{17339, 0}";
+			sepNavVisRect = "{{0, 8748}, {960, 467}}";
+		};
+	};
+	50C09EB610D45C8700A5C180 /* ToolManager.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {960, 7434}}";
+			sepNavSelRange = "{7178, 0}";
+			sepNavVisRect = "{{0, 1706}, {960, 467}}";
+		};
+	};
+	50C09EBD10D45C8700A5C180 /* SizedText.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1271, 2814}}";
+			sepNavSelRange = "{2349, 51}";
+			sepNavVisRect = "{{0, 996}, {1271, 375}}";
+		};
+	};
+	50C09EC110D45C8700A5C180 /* XGridCtrl.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1661, 19348}}";
+			sepNavSelRange = "{3931, 0}";
+			sepNavVisRect = "{{0, 1652}, {1661, 693}}";
+			sepNavWindowFrame = "{{768, 593}, {1700, 822}}";
+		};
+	};
+	50C09EC210D45C8700A5C180 /* XGridCtrl.hpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 6188}}";
+			sepNavSelRange = "{2794, 0}";
+			sepNavVisRect = "{{0, 1347}, {853, 232}}";
+			sepNavWindowFrame = "{{294, 541}, {1700, 822}}";
+		};
+	};
+	50C09EC310D45C8700A5C180 /* XGridDrawer.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 7126}}";
+			sepNavSelRange = "{1268, 0}";
+			sepNavVisRect = "{{0, 4553}, {853, 232}}";
+		};
+	};
+	50C09EC410D45C8700A5C180 /* XGridDrawer.hpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 2786}}";
+			sepNavSelRange = "{6374, 0}";
+			sepNavVisRect = "{{0, 2467}, {853, 232}}";
+			sepNavWindowFrame = "{{317, 520}, {1700, 822}}";
+		};
+	};
+	8D0C4E890486CD37000505A6 /* xword */ = {
+		activeExec = 0;
+		executables = (
+			50C09C8F10D4553E00A5C180 /* xword */,
+		);
+	};
+}
