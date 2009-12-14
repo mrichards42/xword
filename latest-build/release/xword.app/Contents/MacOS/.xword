@@ -1,0 +1,48 @@
+[Layouts]
+XWord\ Default=layout2|name=Grid;caption=Grid;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=0;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Across;caption=Across;state=2098172;dir=4;layer=4;row=0;pos=0;prop=100000;bestw=300;besth=-1;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Down;caption=Down;state=2098172;dir=4;layer=4;row=0;pos=0;prop=100000;bestw=300;besth=-1;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Title;caption=Title;state=2098172;dir=1;layer=3;row=0;pos=0;prop=100000;bestw=0;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Author;caption=Author;state=2098172;dir=1;layer=3;row=0;pos=0;prop=100000;bestw=0;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Copyright;caption=Copyright;state=2098172;dir=1;layer=3;row=0;pos=0;prop=100000;bestw=0;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Clue;caption=Clue;state=2098172;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=-1;besth=75;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Notes;caption=Notes;state=2098175;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=96;besth=82;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|
+\(Previous\)=layout2|name=Grid;caption=Grid;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=0;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Across;caption=Across;state=2098172;dir=4;layer=4;row=0;pos=1;prop=100000;bestw=300;besth=-1;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Down;caption=Down;state=2098172;dir=4;layer=4;row=0;pos=0;prop=100000;bestw=300;besth=-1;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Title;caption=Title;state=2098172;dir=1;layer=3;row=0;pos=2;prop=100000;bestw=0;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Author;caption=Author;state=2098172;dir=1;layer=3;row=0;pos=1;prop=100000;bestw=0;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Copyright;caption=Copyright;state=2098172;dir=1;layer=3;row=0;pos=0;prop=100000;bestw=0;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Clue;caption=Clue;state=2098172;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=-1;besth=75;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Notes;caption=Notes;state=2098175;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=96;besth=82;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=96;floath=66|dock_size(5,0,0)=10|dock_size(4,4,0)=150|dock_size(1,3,0)=10|dock_size(1,2,0)=77|
+[Window]
+width=682
+height=479
+top=118
+left=677
+maximized=0
+[Grid]
+style=7
+fit=0
+letterFont=lucida grande 12
+numberFont=lucida grande 7
+lineThickness=1
+focusedLetterColor=green
+focusedWordColor=light grey
+whiteSquareColor=white
+blackSquareColor=black
+penColor=black
+pencilColor=rgb(200, 200, 200)
+numberScale=42
+letterScale=75
+[Clue]
+font=lucida grande 12
+spacing=5, 5
+listForegroundColor=black
+listBackgroundColor=white
+selectedForegroundColor=black
+selectedBackgroundColor=rgb(181, 213, 255)
+crossingForegroundColor=rgb(181, 213, 255)
+crossingBackgroundColor=white
+headingFont=lucida grande 14
+headingForegroundColor=black
+headingBackgroundColor=rgb(221, 221, 221)
+[Clue\ Prompt]
+font=lucida grande
+foregroundColor=black
+backgroundColor=white
+displayFormat=%N. %T
+[Printing]
+paperID=1
+orientation=1
+[Printing/Margins]
+left=15
+right=15
+top=15
+bottom=15
