@@ -64,16 +64,17 @@
 
 enum toolIds
 {
-    ID_OPEN = wxID_HIGHEST,
-    ID_SAVE,
-    ID_SAVE_AS,
-    ID_CLOSE,
+	ID_DUMMY_FIRST = wxID_HIGHEST,
+    //wxID_OPEN,
+    //wxID_SAVE,
+    //wxID_SAVEAS,
+    //wxID_CLOSE,
 
-    ID_QUIT,
+    //wxID_EXIT,
 
-    ID_ZOOM_IN,
-    ID_ZOOM_FIT,
-    ID_ZOOM_OUT,
+    //wxID_ZOOM_IN,
+    //wxID_ZOOM_FIT,
+    //wxID_ZOOM_OUT,
 
     ID_CHECK_LETTER,
     ID_CHECK_WORD,
@@ -97,11 +98,11 @@ enum toolIds
     ID_CONVERT,
     ID_SWAP_DIRECTION,
 
-    ID_PREFERENCES,
+    //wxID_PREFERENCES,
 
-    ID_PRINT_PREVIEW,
+    //wxID_PREVIEW,
     ID_PAGE_SETUP,
-    ID_PRINT,
+    //wxID_PRINT,
 
 #ifdef __WXDEBUG__
 
@@ -115,18 +116,18 @@ enum toolIds
 
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
-    EVT_MENU           (ID_OPEN,              MyFrame::OnOpenPuzzle)
-    EVT_MENU           (ID_SAVE,              MyFrame::OnSavePuzzle)
-    EVT_MENU           (ID_SAVE_AS,           MyFrame::OnSavePuzzleAs)
-    EVT_MENU           (ID_CLOSE,             MyFrame::OnClosePuzzle)
-    EVT_MENU           (ID_PRINT_PREVIEW,     MyFrame::OnPrintPreview)
+    EVT_MENU           (wxID_OPEN,            MyFrame::OnOpenPuzzle)
+    EVT_MENU           (wxID_SAVE,            MyFrame::OnSavePuzzle)
+    EVT_MENU           (wxID_SAVEAS,          MyFrame::OnSavePuzzleAs)
+    EVT_MENU           (wxID_CLOSE,           MyFrame::OnClosePuzzle)
+    EVT_MENU           (wxID_PREVIEW,         MyFrame::OnPrintPreview)
     EVT_MENU           (ID_PAGE_SETUP,        MyFrame::OnPageSetup)
-    EVT_MENU           (ID_PRINT,             MyFrame::OnPrint)
-    EVT_MENU           (ID_QUIT,              MyFrame::OnQuit)
+    EVT_MENU           (wxID_PRINT,           MyFrame::OnPrint)
+    EVT_MENU           (wxID_EXIT,            MyFrame::OnQuit)
 
-    EVT_MENU           (ID_ZOOM_IN,           MyFrame::OnZoomIn)
-    EVT_MENU           (ID_ZOOM_FIT,          MyFrame::OnZoomFit)
-    EVT_MENU           (ID_ZOOM_OUT,          MyFrame::OnZoomOut)
+    EVT_MENU           (wxID_ZOOM_IN,         MyFrame::OnZoomIn)
+    EVT_MENU           (wxID_ZOOM_FIT,        MyFrame::OnZoomFit)
+    EVT_MENU           (wxID_ZOOM_OUT,        MyFrame::OnZoomOut)
 
     EVT_MENU           (ID_CHECK_GRID,        MyFrame::OnCheckGrid)
     EVT_MENU           (ID_CHECK_WORD,        MyFrame::OnCheckWord)
@@ -149,7 +150,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU           (ID_SWAP_DIRECTION,    MyFrame::OnSwapDirection)
     EVT_TIMER          (wxID_ANY,             MyFrame::OnTimerNotify)
 
-    EVT_MENU           (ID_PREFERENCES,       MyFrame::OnPreferences)
+    EVT_MENU           (wxID_PREFERENCES,     MyFrame::OnPreferences)
 
     EVT_PUZ_GRID_FOCUS (                      MyFrame::OnGridFocus)
     EVT_PUZ_CLUE_FOCUS (                      MyFrame::OnClueFocus)
@@ -172,39 +173,39 @@ END_EVENT_TABLE()
 
 static const ToolDesc toolDesc[] =
 {
-    { ID_OPEN,  wxITEM_NORMAL, _T("&Open\tCtrl+O"), _T("open") },
-    { ID_SAVE,  wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
-    { ID_SAVE_AS,  wxITEM_NORMAL, _T("&Save As..."), _T("save") },
-    { ID_CLOSE, wxITEM_NORMAL, _T("&Close\tCtrl+W") },
+    { wxID_OPEN,        wxITEM_NORMAL, _T("&Open\tCtrl+O"), _T("open") },
+    { wxID_SAVE,        wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
+    { wxID_SAVEAS,      wxITEM_NORMAL, _T("&Save As..."),   _T("save") },
+    { wxID_CLOSE,       wxITEM_NORMAL, _T("&Close\tCtrl+W") },
+    { wxID_PREFERENCES, wxITEM_NORMAL, _T("Preferences...") },
     { ID_PAGE_SETUP,    wxITEM_NORMAL, _T("Page Setup...") },
-    { ID_PRINT_PREVIEW, wxITEM_NORMAL, _T("Print Preview") },
-    { ID_PRINT,         wxITEM_NORMAL, _T("Print...") },
-    { ID_QUIT,  wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
+    { wxID_PREVIEW,     wxITEM_NORMAL, _T("Print Preview") },
+    { wxID_PRINT,       wxITEM_NORMAL, _T("Print...") },
+    { wxID_EXIT,        wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
 
-    { ID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in")  },
-    { ID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom Fit"), _T("zoom_fit") },
-    { ID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out") },
-    { ID_PREFERENCES, wxITEM_NORMAL, _T("Preferences...") },
+    { wxID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in")  },
+    { wxID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom Fit"), _T("zoom_fit") },
+    { wxID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out") },
 
     { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble...") },
     { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("Unscramble...") },
 
-    { ID_CHECK_LETTER,  wxITEM_NORMAL, _T("Check Letter"), _T("check_letter") },
-    { ID_CHECK_WORD,    wxITEM_NORMAL, _T("Check Word"),   _T("check_word") },
-    { ID_CHECK_GRID,    wxITEM_NORMAL, _T("Check All"),    _T("check_grid") },
-    { ID_REVEAL_LETTER, wxITEM_NORMAL, _T("Reveal Letter") },
-    { ID_REVEAL_WORD,   wxITEM_NORMAL, _T("Reveal Word") },
+    { ID_CHECK_LETTER,     wxITEM_NORMAL, _T("Check Letter"), _T("check_letter") },
+    { ID_CHECK_WORD,       wxITEM_NORMAL, _T("Check Word"),   _T("check_word") },
+    { ID_CHECK_GRID,       wxITEM_NORMAL, _T("Check All"),    _T("check_grid") },
+    { ID_REVEAL_LETTER,    wxITEM_NORMAL, _T("Reveal Letter") },
+    { ID_REVEAL_WORD,      wxITEM_NORMAL, _T("Reveal Word") },
     { ID_REVEAL_INCORRECT, wxITEM_NORMAL, _T("Reveal Incorrect letters") },
-    { ID_REVEAL_GRID,   wxITEM_NORMAL, _T("Reveal Grid") },
+    { ID_REVEAL_GRID,      wxITEM_NORMAL, _T("Reveal Grid") },
 
-    { ID_LAYOUT_PANES,      wxITEM_CHECK,  _T("Edit Layout"), _T("layout"), _T("") },
+    { ID_LAYOUT_PANES, wxITEM_CHECK,  _T("Edit Layout"), _T("layout"), _T("") },
     { ID_LOAD_LAYOUT,  wxITEM_NORMAL, _T("Load Layout") },
     { ID_SAVE_LAYOUT,  wxITEM_NORMAL, _T("Save Layout"), },
 
-    { ID_SHOW_NOTES,        wxITEM_CHECK,  _T("Notes"), _T("notes") },
+    { ID_SHOW_NOTES,   wxITEM_CHECK,  _T("Notes"), _T("notes") },
 
-    { ID_TIMER, wxITEM_CHECK, _T("Timer"), _T("timer") },
-    { ID_CONVERT, wxITEM_NORMAL, _T("Convert files") },
+    { ID_TIMER,          wxITEM_CHECK, _T("Timer"), _T("timer") },
+    { ID_CONVERT,        wxITEM_NORMAL, _T("Convert files") },
     { ID_SWAP_DIRECTION, wxITEM_NORMAL, _T("Swap across and down") },
 
 //    { ID_CUSTOMIZE,         _T("Customize . . ."),     _T("") },
@@ -559,15 +560,20 @@ MyFrame::CreateWindows()
                                   wxTE_MULTILINE);
 
     if (m_toolMgr.GetIconLocation() != wxEmptyString)
+	{
 #ifdef USE_AUI_TOOLBAR
-        m_toolbar = MakeAuiToolBar();
+        m_toolbar = CreateAuiToolBar();
 #else // ! USE_AUI_TOOLBAR
-        m_toolbar = MakeToolBar();
+        m_toolbar = CreateToolBar();
+		SetToolBar(m_toolbar);
 #endif // USE_AUI_TOOLBAR / !
+	}
     else
+	{
         m_toolbar = NULL;
+	}
 
-    m_menubar = MakeMenuBar();
+    m_menubar = CreateMenuBar();
     SetMenuBar(m_menubar);
 
     m_status = new MyStatusBar(this);
@@ -582,7 +588,7 @@ MyFrame::CreateWindows()
 
 #ifdef USE_AUI_TOOLBAR
 wxAuiToolBar *
-MyFrame::MakeAuiToolBar()
+MyFrame::CreateAuiToolBar()
 {
     wxAuiToolBar * tb = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition,
                                          wxDefaultSize,
@@ -592,7 +598,7 @@ MyFrame::MakeAuiToolBar()
 
 #else // ! USE_AUI_TOOLBAR
 wxToolBar *
-MyFrame::MakeToolBar()
+MyFrame::CreateToolBar()
 {
     wxToolBar * tb = new wxToolBar(this, wxID_ANY,
                                    wxDefaultPosition,
@@ -604,12 +610,12 @@ MyFrame::MakeToolBar()
 
 #endif // USE_AUI_TOOLBAR / !
 
-    m_toolMgr.Add(tb, ID_OPEN);
-    m_toolMgr.Add(tb, ID_SAVE);
+    m_toolMgr.Add(tb, wxID_OPEN);
+    m_toolMgr.Add(tb, wxID_SAVE);
     tb->AddSeparator();
-    m_toolMgr.Add(tb, ID_ZOOM_IN);
-    m_toolMgr.Add(tb, ID_ZOOM_FIT);
-    m_toolMgr.Add(tb, ID_ZOOM_OUT);
+    m_toolMgr.Add(tb, wxID_ZOOM_IN);
+    m_toolMgr.Add(tb, wxID_ZOOM_FIT);
+    m_toolMgr.Add(tb, wxID_ZOOM_OUT);
     tb->AddSeparator();
     m_toolMgr.Add(tb, ID_CHECK_LETTER);
     m_toolMgr.Add(tb, ID_CHECK_WORD);
@@ -633,30 +639,30 @@ MyFrame::MakeToolBar()
 
 
 wxMenuBar *
-MyFrame::MakeMenuBar()
+MyFrame::CreateMenuBar()
 {
     wxMenuBar * mb = new wxMenuBar();
 
     // File Menu
     wxMenu * menu = new wxMenu();
-        m_toolMgr.Add(menu, ID_OPEN);
-        m_toolMgr.Add(menu, ID_SAVE);
-        m_toolMgr.Add(menu, ID_SAVE_AS);
-        m_toolMgr.Add(menu, ID_CLOSE);
+        m_toolMgr.Add(menu, wxID_OPEN);
+        m_toolMgr.Add(menu, wxID_SAVE);
+        m_toolMgr.Add(menu, wxID_SAVEAS);
+        m_toolMgr.Add(menu, wxID_CLOSE);
         menu->AppendSeparator();
-        m_toolMgr.Add(menu, ID_PREFERENCES);
+        m_toolMgr.Add(menu, wxID_PREFERENCES);
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_PAGE_SETUP);
-        m_toolMgr.Add(menu, ID_PRINT_PREVIEW);
-        m_toolMgr.Add(menu, ID_PRINT);
+        m_toolMgr.Add(menu, wxID_PREVIEW);
+        m_toolMgr.Add(menu, wxID_PRINT);
         menu->AppendSeparator();
-        m_toolMgr.Add(menu, ID_QUIT);
+        m_toolMgr.Add(menu, wxID_EXIT);
     mb->Append(menu, _T("&File"));
 
     menu = new wxMenu();
-        m_toolMgr.Add(menu, ID_ZOOM_IN);
-        m_toolMgr.Add(menu, ID_ZOOM_FIT);
-        m_toolMgr.Add(menu, ID_ZOOM_OUT);
+        m_toolMgr.Add(menu, wxID_ZOOM_IN);
+        m_toolMgr.Add(menu, wxID_ZOOM_FIT);
+        m_toolMgr.Add(menu, wxID_ZOOM_OUT);
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_SHOW_NOTES);
         menu->AppendSeparator();
@@ -881,12 +887,12 @@ MyFrame::EnableTools(bool enable)
     // is shown or closed.  These don't have any special logic.
     m_toolMgr.Enable(ID_UNSCRAMBLE, enable);
     m_toolMgr.Enable(ID_SCRAMBLE,   enable);
-    m_toolMgr.Enable(ID_SAVE,    enable);
-    m_toolMgr.Enable(ID_SAVE_AS, enable);
-    m_toolMgr.Enable(ID_CLOSE, enable);
+    m_toolMgr.Enable(wxID_SAVE,    enable);
+    m_toolMgr.Enable(wxID_SAVEAS, enable);
+    m_toolMgr.Enable(wxID_CLOSE, enable);
     m_toolMgr.Enable(ID_TIMER, enable);
-    m_toolMgr.Enable(ID_PRINT_PREVIEW, enable);
-    m_toolMgr.Enable(ID_PRINT, enable);
+    m_toolMgr.Enable(wxID_PREVIEW, enable);
+    m_toolMgr.Enable(wxID_PRINT, enable);
     m_toolMgr.Enable(ID_SWAP_DIRECTION, enable);
 }
 
@@ -894,7 +900,7 @@ MyFrame::EnableTools(bool enable)
 void
 MyFrame::EnableSave(bool enable)
 {
-    m_toolMgr.Enable(ID_SAVE,         enable);
+    m_toolMgr.Enable(wxID_SAVE,         enable);
 
     if (m_toolbar == NULL)
         return;
@@ -902,25 +908,25 @@ MyFrame::EnableSave(bool enable)
     // Swap the toolbar icons
     if (enable)
     {
-        const int pos = m_toolbar->GetToolPos(ID_SAVE_AS);
+        const int pos = m_toolbar->GetToolPos(wxID_SAVEAS);
         if (pos != wxNOT_FOUND)
         {
-            m_toolMgr.Delete(m_toolbar, ID_SAVE_AS);
-            m_toolMgr.Insert(m_toolbar, ID_SAVE, pos);
+            m_toolMgr.Delete(m_toolbar, wxID_SAVEAS);
+            m_toolMgr.Insert(m_toolbar, wxID_SAVE, pos);
         }
-        wxASSERT(  m_toolMgr.IsAttached(ID_SAVE, m_toolbar) &&
-                 ! m_toolMgr.IsAttached(ID_SAVE_AS, m_toolbar) );
+        wxASSERT(  m_toolMgr.IsAttached(wxID_SAVE, m_toolbar) &&
+                 ! m_toolMgr.IsAttached(wxID_SAVEAS, m_toolbar) );
     }
     else // disable save (enable save as)
     {
-        const int pos = m_toolbar->GetToolPos(ID_SAVE);
+        const int pos = m_toolbar->GetToolPos(wxID_SAVE);
         if (pos != wxNOT_FOUND)
         {
-            m_toolMgr.Delete(m_toolbar, ID_SAVE);
-            m_toolMgr.Insert(m_toolbar, ID_SAVE_AS, pos);
+            m_toolMgr.Delete(m_toolbar, wxID_SAVE);
+            m_toolMgr.Insert(m_toolbar, wxID_SAVEAS, pos);
         }
-        wxASSERT(! m_toolMgr.IsAttached(ID_SAVE, m_toolbar) &&
-                   m_toolMgr.IsAttached(ID_SAVE_AS, m_toolbar) );
+        wxASSERT(! m_toolMgr.IsAttached(wxID_SAVE, m_toolbar) &&
+                   m_toolMgr.IsAttached(wxID_SAVEAS, m_toolbar) );
     }
     // Have to call Realize() since we have inserted a tool.
     m_toolbar->Realize();
@@ -929,9 +935,9 @@ MyFrame::EnableSave(bool enable)
 void
 MyFrame::EnableGridSize(bool enable)
 {
-    m_toolMgr.Enable(ID_ZOOM_IN,      enable);
-    m_toolMgr.Enable(ID_ZOOM_OUT,     enable);
-    m_toolMgr.Enable(ID_ZOOM_FIT,     enable);
+    m_toolMgr.Enable(wxID_ZOOM_IN,      enable);
+    m_toolMgr.Enable(wxID_ZOOM_OUT,     enable);
+    m_toolMgr.Enable(wxID_ZOOM_FIT,     enable);
 }
 
 
@@ -990,7 +996,7 @@ MyFrame::LoadConfig()
 
     if (config.ReadBool(_T("fit")))
     {
-        m_toolMgr.Check(ID_ZOOM_FIT);
+        m_toolMgr.Check(wxID_ZOOM_FIT);
         m_gridCtrl->FitGrid();
     }
     m_gridCtrl->SetGridStyle(config.ReadLong(_T("style")) );
@@ -1107,7 +1113,7 @@ MyFrame::SaveConfig()
     config.SetPath(_T("/Grid"));
 
     config.WriteLong(_T("style"), m_gridCtrl->GetGridStyle());
-    config.WriteBool(_T("fit"),   m_toolMgr.IsChecked(ID_ZOOM_FIT));
+    config.WriteBool(_T("fit"),   m_toolMgr.IsChecked(wxID_ZOOM_FIT));
     config.WriteFont(_T("letterFont"),  m_gridCtrl->GetLetterFont());
     config.WriteFont(_T("numberFont"),  m_gridCtrl->GetNumberFont());
     config.WriteLong(_T("lineThickness"), m_gridCtrl->GetBorderSize());
@@ -1230,7 +1236,7 @@ MyFrame::OnZoomFit(wxCommandEvent & evt)
 void
 MyFrame::OnZoomIn(wxCommandEvent & WXUNUSED(evt))
 {
-    m_toolMgr.Check(ID_ZOOM_FIT, false);
+    m_toolMgr.Check(wxID_ZOOM_FIT, false);
     m_gridCtrl->ZoomIn();
 }
 
@@ -1238,7 +1244,7 @@ MyFrame::OnZoomIn(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnZoomOut(wxCommandEvent & WXUNUSED(evt))
 {
-    m_toolMgr.Check(ID_ZOOM_FIT, false);
+    m_toolMgr.Check(wxID_ZOOM_FIT, false);
     m_gridCtrl->ZoomOut();
 }
 

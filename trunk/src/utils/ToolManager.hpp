@@ -97,10 +97,11 @@ public:
     void SetIconLocation(const wxString & path) { m_iconLocation = path; }
     const wxString & GetIconLocation() const    { return m_iconLocation; }
 
-    wxIcon   GetIcon  (int id, int size) const { return GetIcon  (GetTool(id), size); }
+	// Use a wxImage instead of a wxIcon so that the toolbar icons look OK on a Mac.
+    wxImage  GetImage (int id, int size) const { return GetImage (GetTool(id), size); }
     wxBitmap GetBitmap(int id, int size) const { return GetBitmap(GetTool(id), size); }
 
-    wxIcon   GetIcon  (const ToolInfo * tool, int size) const;
+    wxImage  GetImage (const ToolInfo * tool, int size) const;
     wxBitmap GetBitmap(const ToolInfo * tool, int size) const;
 
 

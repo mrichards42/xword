@@ -113,11 +113,11 @@ ToolManager::SetDesc(const ToolDesc tools [])
 
 
 
-wxIcon
-ToolManager::GetIcon(const ToolInfo * tool, int iconSize) const
+wxImage
+ToolManager::GetImage(const ToolInfo * tool, int iconSize) const
 {
     if (! tool->HasIcon())
-        return wxNullIcon;
+        return wxNullImage;
 
     const wxString icon =
         wxString::Format(_T("%s_%d.png"), tool->GetIconName().c_str(), iconSize);
@@ -125,7 +125,7 @@ ToolManager::GetIcon(const ToolInfo * tool, int iconSize) const
     wxFileName iconPath(icon);
     iconPath.MakeAbsolute(m_iconLocation);
 
-    return wxIcon(iconPath.GetFullPath(), wxBITMAP_TYPE_PNG);
+    return wxImage(iconPath.GetFullPath(), wxBITMAP_TYPE_PNG);
 }
 
 
@@ -136,9 +136,9 @@ ToolManager::GetBitmap(const ToolInfo * tool, int iconSize) const
      if (! tool->HasIcon())
          return wxNullBitmap;
 
-     wxASSERT(GetIcon(tool, iconSize).IsOk());
+     wxASSERT(GetImage(tool, iconSize).IsOk());
 
-     return wxBitmap(GetIcon(tool, iconSize));
+	return wxBitmap(GetImage(tool, iconSize));
 }
 
 
