@@ -46,7 +46,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					395,
+					803,
 					20,
 					48,
 					43,
@@ -69,7 +69,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
 					200,
-					215,
+					623,
 					20,
 					48,
 					43,
@@ -85,8 +85,14 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 282356481;
-			PBXWorkspaceStateSaveDate = 282356481;
+			PBXPerProjectTemplateStateSaveDate = 282516630;
+			PBXWorkspaceStateSaveDate = 282516630;
+		};
+		perUserProjectItems = {
+			50DB828310D6DC9C00C67EF3 /* PBXBookmark */ = 50DB828310D6DC9C00C67EF3 /* PBXBookmark */;
+			50DB82AF10D6DE0B00C67EF3 /* PBXTextBookmark */ = 50DB82AF10D6DE0B00C67EF3 /* PBXTextBookmark */;
+			50DB82CD10D6E1AD00C67EF3 /* PBXTextBookmark */ = 50DB82CD10D6E1AD00C67EF3 /* PBXTextBookmark */;
+			50DB82CE10D6E1AD00C67EF3 /* PBXTextBookmark */ = 50DB82CE10D6E1AD00C67EF3 /* PBXTextBookmark */;
 		};
 		sourceControlManager = 50C09C9B10D4554200A5C180 /* Source Control */;
 		userBuildSettings = {
@@ -162,16 +168,50 @@
 	};
 	50C09E9210D45C8600A5C180 /* MyFrame.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {960, 29176}}";
-			sepNavSelRange = "{17339, 0}";
-			sepNavVisRect = "{{0, 8748}, {960, 467}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1661, 30142}}";
+			sepNavSelRange = "{16275, 0}";
+			sepNavVisRect = "{{0, 7991}, {1661, 693}}";
+			sepNavWindowFrame = "{{64, 751}, {1700, 822}}";
+		};
+	};
+	50C09E9310D45C8600A5C180 /* MyFrame.hpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1661, 5124}}";
+			sepNavSelRange = "{2933, 0}";
+			sepNavVisRect = "{{0, 1229}, {1661, 693}}";
+			sepNavWindowFrame = "{{64, 751}, {1700, 822}}";
+		};
+	};
+	50C09EB410D45C8700A5C180 /* ToolInfo.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1661, 693}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {1661, 693}}";
+			sepNavWindowFrame = "{{110, 709}, {1700, 822}}";
+		};
+	};
+	50C09EB510D45C8700A5C180 /* ToolInfo.hpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1661, 1260}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 567}, {1661, 693}}";
+			sepNavWindowFrame = "{{133, 688}, {1700, 822}}";
 		};
 	};
 	50C09EB610D45C8700A5C180 /* ToolManager.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {960, 7434}}";
-			sepNavSelRange = "{7178, 0}";
-			sepNavVisRect = "{{0, 1706}, {960, 467}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1661, 7434}}";
+			sepNavSelRange = "{3225, 0}";
+			sepNavVisRect = "{{0, 1454}, {1661, 693}}";
+			sepNavWindowFrame = "{{368, 432}, {1700, 822}}";
+		};
+	};
+	50C09EB710D45C8700A5C180 /* ToolManager.hpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1661, 3486}}";
+			sepNavSelRange = "{3400, 0}";
+			sepNavVisRect = "{{0, 1047}, {1661, 693}}";
+			sepNavWindowFrame = "{{179, 646}, {1700, 822}}";
 		};
 	};
 	50C09EBD10D45C8700A5C180 /* SizedText.cpp */ = {
@@ -211,6 +251,40 @@
 			sepNavVisRect = "{{0, 2467}, {853, 232}}";
 			sepNavWindowFrame = "{{317, 520}, {1700, 822}}";
 		};
+	};
+	50DB828310D6DC9C00C67EF3 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = 50C09E9310D45C8600A5C180 /* MyFrame.hpp */;
+	};
+	50DB82AF10D6DE0B00C67EF3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 50C09E9210D45C8600A5C180 /* MyFrame.cpp */;
+		name = "MyFrame.cpp: 251";
+		rLen = 0;
+		rLoc = 8086;
+		rType = 0;
+		vrLen = 1530;
+		vrLoc = 0;
+	};
+	50DB82CD10D6E1AD00C67EF3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 50C09E9210D45C8600A5C180 /* MyFrame.cpp */;
+		name = "MyFrame.cpp: CreateToolBar";
+		rLen = 0;
+		rLoc = 16275;
+		rType = 0;
+		vrLen = 1445;
+		vrLoc = 15555;
+	};
+	50DB82CE10D6E1AD00C67EF3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 50C09E9310D45C8600A5C180 /* MyFrame.hpp */;
+		name = "MyFrame.hpp: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1306;
+		vrLoc = 0;
 	};
 	8D0C4E890486CD37000505A6 /* xword */ = {
 		activeExec = 0;

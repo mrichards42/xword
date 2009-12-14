@@ -108,12 +108,12 @@ private:
     void CreateWindows();
 
 #ifdef USE_AUI_TOOLBAR
-    wxAuiToolBar * MakeAuiToolBar();
+    wxAuiToolBar * CreateAuiToolBar();
 #else
-    wxToolBar    * MakeToolBar();
+    wxToolBar    * CreateToolBar();
 #endif
 
-    wxMenuBar    * MakeMenuBar();
+    wxMenuBar    * CreateMenuBar();
 
     XGridCtrl *  m_gridCtrl;
 
