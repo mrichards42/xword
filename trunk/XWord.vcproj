@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib advapi32.lib wxbase28ud.lib comctl32.lib wxmsw28ud_aui.lib wxpngd.lib wxzlibd.lib wxmsw28ud_core.lib wsock32.lib winmm.lib"
+				AdditionalDependencies="wxbase28ud.lib wxmsw28ud_core.lib wxmsw28ud_adv.lib wxmsw28ud_aui.lib wxpngd.lib wxzlibd.lib rpcrt4.lib advapi32.lib comctl32.lib wsock32.lib winmm.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
@@ -135,7 +135,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib advapi32.lib wxmsw28u_aui.lib wxmsw28u_core.lib wxpng.lib wxzlib.lib comctl32.lib wxbase28u.lib wsock32.lib winmm.lib"
+				AdditionalDependencies="wxbase28u.lib wxmsw28u_core.lib wxmsw28u_adv.lib wxmsw28u_aui.lib wxpngd.lib wxzlibd.lib rpcrt4.lib advapi32.lib comctl32.lib wsock32.lib winmm.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="false"

@@ -36,6 +36,9 @@
 #include "dialogs/Layout.hpp"
 #include "dialogs/Preferences.hpp"
 #include "dialogs/Convert.hpp"
+#include "dialogs/wxFB_Dialogs.h"
+#include <wx/aboutdlg.h>
+
 
 // Windows
 #include "widgets/SizedText.hpp"
@@ -104,6 +107,9 @@ enum toolIds
     ID_PAGE_SETUP,
     //wxID_PRINT,
 
+    //wxID_ABOUT,
+    ID_LICENSE,
+
 #ifdef __WXDEBUG__
 
     ID_DUMP_STATUS,
@@ -116,41 +122,8 @@ enum toolIds
 
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
-    EVT_MENU           (wxID_OPEN,            MyFrame::OnOpenPuzzle)
-    EVT_MENU           (wxID_SAVE,            MyFrame::OnSavePuzzle)
-    EVT_MENU           (wxID_SAVEAS,          MyFrame::OnSavePuzzleAs)
-    EVT_MENU           (wxID_CLOSE,           MyFrame::OnClosePuzzle)
-    EVT_MENU           (wxID_PREVIEW,         MyFrame::OnPrintPreview)
-    EVT_MENU           (ID_PAGE_SETUP,        MyFrame::OnPageSetup)
-    EVT_MENU           (wxID_PRINT,           MyFrame::OnPrint)
-    EVT_MENU           (wxID_EXIT,            MyFrame::OnQuit)
-
-    EVT_MENU           (wxID_ZOOM_IN,         MyFrame::OnZoomIn)
-    EVT_MENU           (wxID_ZOOM_FIT,        MyFrame::OnZoomFit)
-    EVT_MENU           (wxID_ZOOM_OUT,        MyFrame::OnZoomOut)
-
-    EVT_MENU           (ID_CHECK_GRID,        MyFrame::OnCheckGrid)
-    EVT_MENU           (ID_CHECK_WORD,        MyFrame::OnCheckWord)
-    EVT_MENU           (ID_CHECK_LETTER,      MyFrame::OnCheckLetter)
-    EVT_MENU           (ID_REVEAL_GRID,       MyFrame::OnRevealGrid)
-    EVT_MENU           (ID_REVEAL_INCORRECT,  MyFrame::OnRevealIncorrect)
-    EVT_MENU           (ID_REVEAL_WORD,       MyFrame::OnRevealWord)
-    EVT_MENU           (ID_REVEAL_LETTER,     MyFrame::OnRevealLetter)
-
-    EVT_MENU           (ID_SCRAMBLE,          MyFrame::OnScramble)
-    EVT_MENU           (ID_UNSCRAMBLE,        MyFrame::OnUnscramble)
-
-    EVT_MENU           (ID_LAYOUT_PANES,      MyFrame::OnLayout)
-    EVT_MENU           (ID_LOAD_LAYOUT,       MyFrame::OnLoadLayout)
-    EVT_MENU           (ID_SAVE_LAYOUT,       MyFrame::OnSaveLayout)
-    EVT_MENU           (ID_SHOW_NOTES,        MyFrame::OnShowNotes)
-
-    EVT_MENU           (ID_TIMER,             MyFrame::OnTimer)
-    EVT_MENU           (ID_CONVERT,           MyFrame::OnConvert)
-    EVT_MENU           (ID_SWAP_DIRECTION,    MyFrame::OnSwapDirection)
     EVT_TIMER          (wxID_ANY,             MyFrame::OnTimerNotify)
 
-    EVT_MENU           (wxID_PREFERENCES,     MyFrame::OnPreferences)
 
     EVT_PUZ_GRID_FOCUS (                      MyFrame::OnGridFocus)
     EVT_PUZ_CLUE_FOCUS (                      MyFrame::OnClueFocus)
@@ -160,67 +133,136 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_CLOSE          (                      MyFrame::OnClose)
     EVT_AUI_PANE_CLOSE (                      MyFrame::OnAuiPaneClose)
 
-#ifdef __WXDEBUG__
-
-    EVT_MENU           (ID_DUMP_LAYOUT,       MyFrame::OnDumpLayout)
-    EVT_MENU           (ID_DUMP_STATUS,       MyFrame::OnDumpStatus)
-    EVT_MENU           (ID_FORCE_UNSCRAMBLE,  MyFrame::OnBruteForceUnscramble)
-
-#endif
-
 END_EVENT_TABLE()
 
+// This function is here instead of with the rest of the MyFrame implementation
+// because it seems to fit better with the other tables (tool id enum, event table).
+// The table needs to be in a function because it references protected functions (all of the
+// event handlers).
 
-static const ToolDesc toolDesc[] =
+// wxCommandEventHandler is long and pollutes the tool table
+#define _handler wxCommandEventHandler
+
+void
+MyFrame::ManageTools()
 {
-    { wxID_OPEN,        wxITEM_NORMAL, _T("&Open\tCtrl+O"), _T("open") },
-    { wxID_SAVE,        wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save") },
-    { wxID_SAVEAS,      wxITEM_NORMAL, _T("&Save As..."),   _T("save") },
-    { wxID_CLOSE,       wxITEM_NORMAL, _T("&Close\tCtrl+W") },
-    { wxID_PREFERENCES, wxITEM_NORMAL, _T("Preferences...") },
-    { ID_PAGE_SETUP,    wxITEM_NORMAL, _T("Page Setup...") },
-    { wxID_PREVIEW,     wxITEM_NORMAL, _T("Print Preview") },
-    { wxID_PRINT,       wxITEM_NORMAL, _T("Print...") },
-    { wxID_EXIT,        wxITEM_NORMAL, _T("&Quit\tCtrl+Q") },
+    const ToolDesc tools [] =
+    {
+        { wxID_OPEN,       wxITEM_NORMAL, _T("&Open\tCtrl+O"), _T("open"), NULL,
+                     _handler(MyFrame::OnOpenPuzzle) },
 
-    { wxID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in")  },
-    { wxID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom Fit"), _T("zoom_fit") },
-    { wxID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out") },
+        { wxID_SAVE,        wxITEM_NORMAL, _T("&Save\tCtrl+S"), _T("save"), NULL,
+                     _handler(MyFrame::OnSavePuzzle) },
 
-    { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble...") },
-    { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("Unscramble...") },
+        { wxID_SAVEAS,      wxITEM_NORMAL, _T("&Save As..."),   _T("save"), NULL,
+                     _handler(MyFrame::OnSavePuzzleAs) },
 
-    { ID_CHECK_LETTER,     wxITEM_NORMAL, _T("Check Letter"), _T("check_letter") },
-    { ID_CHECK_WORD,       wxITEM_NORMAL, _T("Check Word"),   _T("check_word") },
-    { ID_CHECK_GRID,       wxITEM_NORMAL, _T("Check All"),    _T("check_grid") },
-    { ID_REVEAL_LETTER,    wxITEM_NORMAL, _T("Reveal Letter") },
-    { ID_REVEAL_WORD,      wxITEM_NORMAL, _T("Reveal Word") },
-    { ID_REVEAL_INCORRECT, wxITEM_NORMAL, _T("Reveal Incorrect letters") },
-    { ID_REVEAL_GRID,      wxITEM_NORMAL, _T("Reveal Grid") },
+        { wxID_CLOSE,       wxITEM_NORMAL, _T("&Close\tCtrl+W"), NULL, NULL,
+                     _handler(MyFrame::OnClosePuzzle) },
 
-    { ID_LAYOUT_PANES, wxITEM_CHECK,  _T("Edit Layout"), _T("layout"), _T("") },
-    { ID_LOAD_LAYOUT,  wxITEM_NORMAL, _T("Load Layout") },
-    { ID_SAVE_LAYOUT,  wxITEM_NORMAL, _T("Save Layout"), },
+        { wxID_PREFERENCES, wxITEM_NORMAL, _T("Preferences..."), NULL, NULL,
+                     _handler(MyFrame::OnPreferences) },
 
-    { ID_SHOW_NOTES,   wxITEM_CHECK,  _T("Notes"), _T("notes") },
+        { ID_PAGE_SETUP,    wxITEM_NORMAL, _T("Page Setup..."), NULL, NULL,
+                     _handler(MyFrame::OnPageSetup) },
 
-    { ID_TIMER,          wxITEM_CHECK, _T("Timer"), _T("timer") },
-    { ID_CONVERT,        wxITEM_NORMAL, _T("Convert files") },
-    { ID_SWAP_DIRECTION, wxITEM_NORMAL, _T("Swap across and down") },
+        { wxID_PREVIEW,     wxITEM_NORMAL, _T("Print Preview"), NULL, NULL,
+                     _handler(MyFrame::OnPrintPreview) },
 
-//    { ID_CUSTOMIZE,         _T("Customize . . ."),     _T("") },
+        { wxID_PRINT,       wxITEM_NORMAL, _T("Print..."), NULL, NULL,
+                     _handler(MyFrame::OnPrint) },
+
+        { wxID_EXIT,        wxITEM_NORMAL, _T("&Quit\tCtrl+Q"), NULL, NULL,
+                     _handler(MyFrame::OnQuit) },
+
+
+        { wxID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in"), NULL,
+                    _handler(MyFrame::OnZoomIn) },
+
+        { wxID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom Fit"), _T("zoom_fit"), NULL,
+                    _handler(MyFrame::OnZoomFit) },
+
+        { wxID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out"), NULL,
+                    _handler(MyFrame::OnQuit) },
+
+
+        { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble..."), NULL, NULL,
+                    _handler(MyFrame::OnScramble) },
+
+        { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("Unscramble..."), NULL, NULL,
+                    _handler(MyFrame::OnUnscramble) },
+
+        { ID_CHECK_LETTER,     wxITEM_NORMAL, _T("Check Letter"), _T("check_letter"), NULL,
+                    _handler(MyFrame::OnCheckLetter) },
+
+        { ID_CHECK_WORD,       wxITEM_NORMAL, _T("Check Word"),   _T("check_word"), NULL,
+                    _handler(MyFrame::OnCheckWord) },
+
+        { ID_CHECK_GRID,       wxITEM_NORMAL, _T("Check All"),    _T("check_grid"), NULL,
+                   _handler(MyFrame::OnCheckGrid) },
+
+        { ID_REVEAL_LETTER,    wxITEM_NORMAL, _T("Reveal Letter"), NULL, NULL,
+                   _handler(MyFrame::OnRevealLetter) },
+
+        { ID_REVEAL_WORD,      wxITEM_NORMAL, _T("Reveal Word"), NULL, NULL,
+                   _handler(MyFrame::OnRevealWord) },
+
+        { ID_REVEAL_INCORRECT, wxITEM_NORMAL, _T("Reveal Incorrect letters"), NULL, NULL,
+                   _handler(MyFrame::OnRevealIncorrect) },
+
+        { ID_REVEAL_GRID,      wxITEM_NORMAL, _T("Reveal Solution"), NULL, NULL,
+                   _handler(MyFrame::OnRevealGrid) },
+
+
+        { ID_LAYOUT_PANES, wxITEM_CHECK,  _T("Edit Layout"), _T("layout"), NULL,
+                   _handler(MyFrame::OnLayout) },
+
+        { ID_LOAD_LAYOUT,  wxITEM_NORMAL, _T("Load Layout"), NULL, NULL,
+                   _handler(MyFrame::OnLoadLayout) },
+
+        { ID_SAVE_LAYOUT,  wxITEM_NORMAL, _T("Save Layout"), NULL, NULL,
+                   _handler(MyFrame::OnSaveLayout) },
+
+        { ID_SHOW_NOTES,   wxITEM_CHECK,  _T("Notes"), _T("notes"), NULL,
+                   _handler(MyFrame::OnShowNotes) },
+
+
+        { ID_TIMER,          wxITEM_CHECK, _T("Timer"), _T("timer"), NULL,
+                   _handler(MyFrame::OnTimer) },
+
+        { ID_CONVERT,        wxITEM_NORMAL, _T("Convert files"), NULL, NULL,
+                   _handler(MyFrame::OnConvert) },
+
+        { ID_SWAP_DIRECTION, wxITEM_NORMAL, _T("Swap across and down"), NULL, NULL,
+                   _handler(MyFrame::OnSwapDirection) },
+
+
+        { wxID_ABOUT, wxITEM_NORMAL, _T("&About XWord..."), NULL, NULL,
+                   _handler(MyFrame::OnAbout) },
+
+        { ID_LICENSE, wxITEM_NORMAL, _T("&License..."), NULL, NULL,
+                   _handler(MyFrame::OnLicense) },
 
 #ifdef __WXDEBUG__
+        { ID_DUMP_STATUS,   wxITEM_NORMAL, _T("Dump status"), NULL, NULL,
+                   _handler(MyFrame::OnDumpStatus) },
 
-    { ID_DUMP_LAYOUT,   wxITEM_NORMAL, _T("Dump layout") },
-    { ID_DUMP_STATUS,   wxITEM_NORMAL, _T("Dump status") },
-    { ID_FORCE_UNSCRAMBLE, wxITEM_NORMAL, _T("Brute force unscramble") },
+        { ID_DUMP_LAYOUT,   wxITEM_NORMAL, _T("Dump layout"), NULL, NULL,
+                   _handler(MyFrame::OnDumpLayout) },
 
+        { ID_FORCE_UNSCRAMBLE, wxITEM_NORMAL, _T("Brute force unscramble"), NULL, NULL,
+                   _handler(MyFrame::OnBruteForceUnscramble) },
 #endif
 
-    { TOOL_NONE }
-};
+        { TOOL_NONE }
+    };
 
+    m_toolMgr.SetDesc(tools);
+    m_toolMgr.SetManagedWindow(this);
+    m_toolMgr.ConnectEvents();
+}
+
+#undef _handler
 
 
 
@@ -296,6 +338,7 @@ MyFrame::~MyFrame()
     wxGetApp().m_frame = NULL;
 
     // Cleanup
+    m_toolMgr.DisconnectEvents();
     m_toolMgr.UnInit();
     m_mgr.UnInit();
     wxLogDebug(_T("Frame has been destroyed"));
@@ -696,6 +739,12 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, ID_SWAP_DIRECTION);
     mb->Append(menu, _T("&Tools"));
 
+    // Help Menu
+    menu = new wxMenu();
+        m_toolMgr.Add(menu, wxID_ABOUT);
+        m_toolMgr.Add(menu, ID_LICENSE);
+    mb->Append(menu, _T("&Help"));
+
 #ifdef __WXDEBUG__
 
     // Debug menu
@@ -867,13 +916,6 @@ MyFrame::SetupToolManager()
     m_toolMgr.SetIconLocation( GetImagesDirectory() );
 }
 
-
-void
-MyFrame::ManageTools()
-{
-    m_toolMgr.SetDesc(toolDesc);
-    m_toolMgr.SetManagedWindow(this);
-}
 
 
 void
@@ -1660,6 +1702,51 @@ MyFrame::OnPreferencesDialogCancel(wxCommandEvent & evt)
     evt.Skip();
 }
 
+
+
+// About
+//------------
+void
+MyFrame::OnAbout(wxCommandEvent & WXUNUSED(evt))
+{
+    wxAboutDialogInfo info;
+    info.SetName(_T("XWord"));
+
+    info.SetVersion(XWORD_VERSION_STRING _T(" (") __TDATE__ _T(")"));
+
+    info.SetCopyright(_T("(C) 2009 Mike Richards <mrichards42@gmx.com>"));
+
+    info.SetDescription(_T("http://sourceforge.net/projects/wx-xword/"));
+    wxAboutBox(info);
+}
+
+void
+MyFrame::OnLicense(wxCommandEvent & WXUNUSED(evt))
+{
+    const wxString licenseText(
+        _T("XWord ") XWORD_VERSION_STRING _T("\n")
+        _T("Copyright (C) 2009 Mike Richards <mrichards42@gmx.com>\n")
+        _T("\n")
+        _T("This program is free software; you can redistribute it and/or ")
+        _T("modify it under the terms of the GNU General Public License ")
+        _T("as published by the Free Software Foundation; either ")
+        _T("version 3 of the License, or (at your option) any later version.\n")
+        _T("\n")
+        _T("This program is distributed in the hope that it will be useful, ")
+        _T("but WITHOUT ANY WARRANTY; without even the implied warranty of ")
+        _T("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the ")
+        _T("GNU General Public License for more details.\n")
+        _T("\n")
+        _T("You should have received a copy of the GNU General Public License ")
+        _T("along with this program; if not, write to the Free Software ")
+        _T("Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n")
+    );
+
+    LicenseDialog dlg(this);
+    dlg.m_textCtrl->SetValue(licenseText);
+    dlg.CenterOnParent();
+    dlg.ShowModal();
+}
 
 //------------------------------------------------------------------------------
 // Printing events

@@ -34,6 +34,8 @@ class wxPageSetupDialogData;
 extern wxPrintData * g_printData;
 extern wxPageSetupDialogData* g_pageSetupData;
 
+// Global misc
+#define XWORD_VERSION_STRING _T("0.3.1 development snapshot")
 
 class MyApp : public wxApp
 {

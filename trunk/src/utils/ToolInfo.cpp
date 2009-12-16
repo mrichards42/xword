@@ -21,10 +21,12 @@
 
 ToolInfo::ToolInfo(int id,
                    const wxString & label,
+                   wxObjectEventFunction function,
                    const wxString & iconName,
                    const wxString & helpStr,
                    wxItemKind kind)
     : m_label(label),
+      m_function(function),
       m_iconName(iconName),
       m_helpStr(helpStr),
       m_kind(kind),
