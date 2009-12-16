@@ -49,6 +49,7 @@ struct ToolDesc
     const  wxChar * label;
     const  wxChar * iconName;
     const  wxChar * helpStr;
+    wxObjectEventFunction function;
 };
 
 class ToolManager : public wxEvtHandler
@@ -57,10 +58,19 @@ public:
     ToolManager();
     ~ToolManager();
 
-    // Takes over logic for checking/unchecking items
+    // Take over logic for checking/unchecking items.
     // These two functions follow the wxAuiManager model.
     void SetManagedWindow(wxWindow * window);
     void UnInit();
+
+    // Connect / discoonect events
+    //----------------------------
+    void ConnectEvents();
+    void DisconnectEvents();
+    void Connect(int id)    { Connect(GetTool(id)); }
+    bool Disconnect(int id) { return Disconnect(GetTool(id)); }
+    void Connect(const ToolInfo * tool);
+    bool Disconnect(const ToolInfo * tool);
 
     void OnToolSelected(wxCommandEvent & evt);
 
@@ -68,7 +78,8 @@ public:
     //----------------------------
     void AddTool(int id,
                  const wxString & label,
-                 const wxString & iconName,
+                 wxObjectEventFunction function,
+                 const wxString & iconName = wxEmptyString,
                  const wxString & helpString = wxEmptyString,
                  wxItemKind kind = wxITEM_NORMAL);
 
@@ -196,10 +207,14 @@ private:
 //-------------
 
 inline void
-ToolManager::AddTool(int id, const wxString & label, const wxString & iconName,
-                     const wxString & helpString, wxItemKind kind)
+ToolManager::AddTool(int id,
+                     const wxString & label,
+                     wxObjectEventFunction function,
+                     const wxString & iconName,
+                     const wxString & helpString,
+                     wxItemKind kind)
 {
-    m_toolList.push_back(ToolInfo(id, label, iconName, helpString, kind));
+    m_toolList.push_back(ToolInfo(id, label, function, iconName, helpString, kind));
 }
 
 

@@ -785,3 +785,27 @@ wxFB_ConvertDialog::~wxFB_ConvertDialog()
 	m_specifyDirectory->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxFB_ConvertDialog::OnSpecifyDirectory ), NULL, this );
 	m_useLog->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnUseLog ), NULL, this );
 }
+
+LicenseDialog::LicenseDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer22;
+	bSizer22 = new wxBoxSizer( wxVERTICAL );
+	
+	m_textCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
+	bSizer22->Add( m_textCtrl, 1, wxALL|wxEXPAND, 10 );
+	
+	m_sdbSizer2 = new wxStdDialogButtonSizer();
+	m_sdbSizer2OK = new wxButton( this, wxID_OK );
+	m_sdbSizer2->AddButton( m_sdbSizer2OK );
+	m_sdbSizer2->Realize();
+	bSizer22->Add( m_sdbSizer2, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	this->SetSizer( bSizer22 );
+	this->Layout();
+}
+
+LicenseDialog::~LicenseDialog()
+{
+}

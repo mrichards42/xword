@@ -39,12 +39,12 @@ class ToolInfo
 public:
     ToolInfo(int id,
              const wxString & label,
+             wxObjectEventFunction function,
              const wxString & iconName,
              const wxString & helpStr = wxEmptyString,
              wxItemKind kind = wxITEM_NORMAL);
 
     ~ToolInfo() {}
-
 
     // Get tool information
     //---------------------
@@ -73,6 +73,7 @@ public:
 private:
     int m_id;
     wxString m_label;
+    wxObjectEventFunction m_function;
     wxString m_iconName;
     wxString m_helpStr;
     wxItemKind m_kind;

@@ -50,11 +50,23 @@ ToolManager::ToolManager()
       m_managedWindow(NULL)
 {
     m_iconLocation = wxPathOnly(wxTheApp->argv[0]);
-
-    Connect( wxEVT_COMMAND_MENU_SELECTED,
-             wxCommandEventHandler(ToolManager::OnToolSelected) );
-
 }
+
+
+
+void
+ToolManager::SetDesc(const ToolDesc tools [])
+{
+    for ( ; tools->id != TOOL_NONE; ++tools)
+        AddTool(tools->id,
+                tools->label,
+                tools->function,
+                tools->iconName,
+                tools->helpStr,
+                tools->kind);
+}
+
+
 
 ToolManager::~ToolManager()
 {
@@ -68,6 +80,8 @@ ToolManager::SetManagedWindow(wxWindow * window)
 {
     m_managedWindow = window;
     window->PushEventHandler(this);
+    wxEvtHandler::Connect(wxEVT_COMMAND_MENU_SELECTED,
+                           wxCommandEventHandler(ToolManager::OnToolSelected));
 }
 
 void
@@ -75,6 +89,8 @@ ToolManager::UnInit()
 {
     if (m_managedWindow != NULL)
         m_managedWindow->RemoveEventHandler(this);
+    wxEvtHandler::Disconnect(wxEVT_COMMAND_MENU_SELECTED,
+                             wxCommandEventHandler(ToolManager::OnToolSelected));
 }
 
 
@@ -93,17 +109,58 @@ ToolManager::OnToolSelected(wxCommandEvent & evt)
 
 
 
+//------------------------------------------------------------------------------
+// Connect / Disconnect events
+//------------------------------------------------------------------------------
 
 
 void
-ToolManager::SetDesc(const ToolDesc tools [])
+ToolManager::Connect(const ToolInfo * tool)
 {
-    for ( ; tools->id != TOOL_NONE; ++tools)
-        AddTool(tools->id,
-                tools->label,
-                tools->iconName,
-                tools->helpStr,
-                tools->kind);
+    wxASSERT(tool && m_managedWindow);
+    m_managedWindow->Connect(tool->m_id,
+                             wxEVT_COMMAND_MENU_SELECTED,
+                             tool->m_function,
+                             NULL,
+                             m_managedWindow);
+}
+
+bool
+ToolManager::Disconnect(const ToolInfo * tool)
+{
+    wxASSERT(tool && m_managedWindow);
+    return m_managedWindow->Disconnect(tool->m_id,
+                                       wxEVT_COMMAND_MENU_SELECTED,
+                                       tool->m_function,
+                                       NULL,
+                                       m_managedWindow);
+}
+
+
+void
+ToolManager::ConnectEvents()
+{
+    wxASSERT(m_managedWindow);
+    for (std::list<ToolInfo>::const_iterator it = m_toolList.begin();
+         it != m_toolList.end();
+         ++it)
+    {
+        if (! it->m_function == NULL)
+            Connect(&*it);
+    }
+}
+
+void
+ToolManager::DisconnectEvents()
+{
+    wxASSERT(m_managedWindow);
+    for (std::list<ToolInfo>::const_iterator it = m_toolList.begin();
+         it != m_toolList.end();
+         ++it)
+    {
+        if (! it->m_function == NULL)
+            Disconnect(&*it);
+    }
 }
 
 

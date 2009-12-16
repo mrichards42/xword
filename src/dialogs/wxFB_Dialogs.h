@@ -183,4 +183,23 @@ class wxFB_ConvertDialog : public wxDialog
 	
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class LicenseDialog
+///////////////////////////////////////////////////////////////////////////////
+class LicenseDialog : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStdDialogButtonSizer* m_sdbSizer2;
+		wxButton* m_sdbSizer2OK;
+	
+	public:
+		wxTextCtrl* m_textCtrl;
+		
+		LicenseDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("XWord License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 371,262 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~LicenseDialog();
+	
+};
+
 #endif //__wxFB_Dialogs__

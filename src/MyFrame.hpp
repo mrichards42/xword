@@ -251,6 +251,10 @@ private:
     void OnPrintPreview(wxCommandEvent & WXUNUSED(evt));
     void OnPrint(wxCommandEvent & WXUNUSED(evt));
 
+    // Help
+    void OnAbout(wxCommandEvent & WXUNUSED(evt));
+    void OnLicense(wxCommandEvent & WXUNUSED(evt));
+
     // XGridCtrl and CluePanel events
     //------------------------------
     void OnGridFocus  (wxPuzEvent & evt);
