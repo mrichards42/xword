@@ -177,12 +177,10 @@ PuzHandler::DoSave()
     // Get checksums
     unsigned short c_cib;
     unsigned short c_primary;
-    ByteArray      c_masked;
+    unsigned char c_masked[8];
 
     Checksummer cksum(*m_puz, 13);
-    cksum.GetChecksums(&c_cib, &c_primary, &c_masked);
-
-    wxASSERT(c_masked.size() == 8);
+    cksum.GetChecksums(&c_cib, &c_primary, c_masked);
 
     // Write the header
     Write(&c_primary, 2);
@@ -229,15 +227,17 @@ PuzHandler::DoSave()
     }
     Write(solution);
     Write(grid);
-    Write(m_puz->m_title     + _T('\0'));
-    Write(m_puz->m_author    + _T('\0'));
-    Write(m_puz->m_copyright + _T('\0'));
+    Write(m_puz->m_title); Write('\0');
+    Write(m_puz->m_author); Write('\0');
+    Write(m_puz->m_copyright); Write('\0');
 
     std::vector<wxString>::iterator it;
     for (it = m_puz->m_clues.begin(); it != m_puz->m_clues.end(); ++it)
-        Write(*it + _T('\0'));
+    {
+        Write(*it); Write('\0');
+    }
 
-    Write(m_puz->m_notes + _T('\0'));
+    Write(m_puz->m_notes); Write('\0');
 
     WriteSections();
 }

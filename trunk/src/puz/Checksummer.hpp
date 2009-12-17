@@ -35,7 +35,7 @@ public:
     // Usually these are the only two functions you need to call
     void GetChecksums(unsigned short * cib,
                       unsigned short * primary,
-                      ByteArray      * masked);
+                      unsigned char  masked []);
 
     bool TestChecksums(unsigned short cib,
                        unsigned short primary,
@@ -64,7 +64,16 @@ public:
     void SetAuthor    (const wxString & author)    { m_author    = author; }
     void SetCopyright (const wxString & copyright) { m_copyright = copyright; }
     void SetNotes     (const wxString & notes)     { m_notes     = notes; }    
-    void SetClues     (const std::vector<wxString> & clues) { m_clues = clues; }
+    void SetClues     (const std::vector<wxString> & clues)
+    {
+        m_clues.clear();
+        for (std::vector<wxString>::const_iterator it = clues.begin();
+             it != clues.end();
+             ++it)
+        {
+            m_clues.push_back(*it);
+        }
+    }
 
     void SetVersion   (unsigned short version)     { m_version   = version; }
 
@@ -78,18 +87,18 @@ public:
 
     static
     unsigned short cksum_region(const ByteArray & data, unsigned short cksum)
-        { return cksum_region(&data[0], data.size(), cksum); }
+        { return cksum_region(data.c_str(), data.size(), cksum); }
 
 
 private:
     unsigned char m_cib[8];
     ByteArray m_solution;
     ByteArray m_gridText;
-    wxString m_title;
-    wxString m_author;
-    wxString m_copyright;
-    wxString m_notes;
-    std::vector<wxString> m_clues;
+    ByteArray m_title;
+    ByteArray m_author;
+    ByteArray m_copyright;
+    ByteArray m_notes;
+    std::vector<ByteArray> m_clues;
     unsigned short m_version;
 };
 

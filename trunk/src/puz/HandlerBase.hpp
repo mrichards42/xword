@@ -184,7 +184,7 @@ protected:
     void Write(const void * buffer, size_t count);
     void Write(const char ch) { Write(&ch, 1); }
     void Write(const char * str) { Write(str, strlen(str)); }
-    void Write(const ByteArray & bytes) { Write(&bytes[0], bytes.size()); }
+    void Write(const ByteArray & bytes) { Write(bytes.c_str(), bytes.size()); }
 
     // Internal use
     void CheckError(wxStreamBase & stream);
@@ -223,15 +223,16 @@ inline
 wxString
 HandlerBase::ReadString()
 {
-    wxString str;
+    ByteArray bytes;
     unsigned char ch;
     Read(&ch, 1);
     while (ch != 0)
     {
-       str.Append(static_cast<wxChar>(ch));
+       bytes.push_back(ch);
        Read(&ch, 1);
     }
-    return str;
+
+    return bytes.to_string(wxCSConv(wxFONTENCODING_CP1252));
 }
 
 

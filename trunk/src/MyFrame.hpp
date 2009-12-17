@@ -48,7 +48,7 @@ class MyPrintout;
 #include "utils/ToolManager.hpp"
 
 #include <wx/fileconf.h> // Used to get the layouts directly from wxConfig
-
+#include "wxlua/include/wxlua.h"
 
 //#define USE_AUI_TOOLBAR
 
@@ -267,6 +267,10 @@ private:
     void OnActivate   (wxActivateEvent & evt);
     void OnClose      (wxCloseEvent & evt);
 
+    void OnLuaScript  (wxCommandEvent & WXUNUSED(evt));
+    void OnLuaPrint   (wxLuaEvent & evt);
+    void OnLuaError   (wxLuaEvent & evt);
+    wxLuaState m_lua;
 
 private:
     // Debugging

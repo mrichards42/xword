@@ -25,9 +25,10 @@ Checksummer::Checksummer(const XPuzzle & puz, unsigned short version)
       m_author   (puz.m_author),
       m_copyright(puz.m_copyright),
       m_notes    (puz.m_notes),
-      m_clues(puz.m_clues),
       m_version  (version)
 {
+    SetClues(puz.m_clues);
+
     // Setup CIB manually
     SetWidth     (puz.m_grid.GetWidth());
     SetHeight    (puz.m_grid.GetHeight());
@@ -70,8 +71,8 @@ Checksummer::TestChecksums(unsigned short cib,
 {
     unsigned short c_cib;
     unsigned short c_primary;
-    ByteArray c_masked;
-    GetChecksums(&c_cib, &c_primary, &c_masked);
+    unsigned char  c_masked[8];
+    GetChecksums(&c_cib, &c_primary, c_masked);
 
     // Print the checksums
     wxLogDebug(_T("Checksums      actual      calc'd"));
@@ -102,12 +103,12 @@ Checksummer::TestChecksums(unsigned short cib,
 void
 Checksummer::GetChecksums(unsigned short * cib,
                           unsigned short * primary,
-                          ByteArray * masked)
+                          unsigned char masked [])
 {
     // References make the syntax nicer
-    unsigned short & c_cib     = *cib;
-    unsigned short & c_primary = *primary;
-    ByteArray &      c_masked  = *masked;
+    unsigned short & c_cib       = *cib;
+    unsigned short & c_primary   = *primary;
+    unsigned char * c_masked     = masked;
 
 
     // CIB checksum
@@ -119,21 +120,21 @@ Checksummer::GetChecksums(unsigned short * cib,
     c_primary = cksum_region(m_solution,                 c_primary);
     c_primary = cksum_region(m_gridText,                 c_primary);
     if (! m_title.empty())
-        c_primary = cksum_region(m_title      + _T('\0'), c_primary);
+        c_primary = cksum_region(m_title.c_str(), m_title.size() + 1, c_primary);
     if (! m_author.empty())
-        c_primary = cksum_region(m_author     + _T('\0'), c_primary);
+        c_primary = cksum_region(m_author.c_str(), m_author.size() + 1, c_primary);
     if (! m_copyright.empty())
-        c_primary = cksum_region(m_copyright  + _T('\0'), c_primary);
+        c_primary = cksum_region(m_copyright.c_str(), m_copyright.size() + 1, c_primary);
 
-    for (std::vector<wxString>::const_iterator it = m_clues.begin();
+    for (std::vector<ByteArray>::const_iterator it = m_clues.begin();
          it != m_clues.end();
          ++it)
     {
-        c_primary = cksum_region(*it, c_primary);
+        c_primary = cksum_region(it->c_str(), it->size(), c_primary);
     }
 
     if (! m_notes.empty() && m_version >= 13)
-        c_primary = cksum_region(m_notes + _T('\0'), c_primary);
+        c_primary = cksum_region(m_notes.c_str(), m_notes.size() + 1, c_primary);
 
 
     // Masked checksums
@@ -142,23 +143,21 @@ Checksummer::GetChecksums(unsigned short * cib,
 
     unsigned short c_part = 0;
     if (! m_title.empty())
-        c_part = cksum_region(m_title      + _T('\0'), c_part);
+        c_part = cksum_region(m_title.c_str(), m_title.size() + 1, c_part);
     if (! m_author.empty())
-        c_part = cksum_region(m_author     + _T('\0'), c_part);
+        c_part = cksum_region(m_author.c_str(), m_author.size() + 1, c_part);
     if (! m_copyright.empty())
-        c_part = cksum_region(m_copyright  + _T('\0'), c_part);
+        c_part = cksum_region(m_copyright.c_str(), m_copyright.size() + 1, c_part);
 
-    for (std::vector<wxString>::const_iterator it = m_clues.begin();
+    for (std::vector<ByteArray>::const_iterator it = m_clues.begin();
          it != m_clues.end();
          ++it)
     {
-        c_part = cksum_region(*it, c_part);
+        c_part = cksum_region(it->c_str(), it->size(), c_part);
     }
 
     if (! m_notes.empty() && m_version >= 13)
-        c_part = cksum_region(m_notes + _T('\0'), c_part);
-
-    c_masked.resize(8);
+        c_part = cksum_region(m_notes.c_str(), m_notes.size() + 1, c_part);
 
     // le-low bits
     c_masked[0] = 'I' ^ LoByte(c_cib);

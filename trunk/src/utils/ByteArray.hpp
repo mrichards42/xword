@@ -19,31 +19,45 @@
 #ifndef BYTE_ARRAY_H
 #define BYTE_ARRAY_H
 
-#include <vector>
+#include <string>
 #include <wx/string.h>
 
 class ByteArray
-    : public std::vector<unsigned char>
+    : public std::basic_string<unsigned char>
 {
-    typedef std::vector<unsigned char> _base;
+    typedef std::basic_string<unsigned char> _base;
 
 public:
     // Conversion from string
-    ByteArray(const wxString & str)
+    ByteArray(const wxString & str, const wxMBConv & conv = wxCSConv(wxFONTENCODING_CP1252))
         : _base()
     {
-        push_string(str);
+        push_string(str, conv);
     }
 
-    // Standard std::vector constructors
-    //----------------------------------
+
+
+    // std::string constructors
+    //-------------------------
     ByteArray()
         : _base()
     {}
 
     explicit
-    ByteArray(_base::size_type num, const unsigned char val = 0)
-        : _base(num, val)
+    ByteArray(_base::size_type length, const unsigned char & ch = 0)
+        : _base(length, ch)
+    {}
+
+    ByteArray(const unsigned char * str)
+        : _base(str)
+    {}
+
+    ByteArray(const unsigned char * str, size_type length)
+        : _base(str, length)
+    {}
+
+    ByteArray(const ByteArray & bytes, _base::size_type index, _base::size_type length)
+        : _base(bytes, index, length)
     {}
 
     template<class input_iterator>
@@ -69,9 +83,13 @@ public:
 
     // wxString helpers
     //-----------------
-    void     push_string(const wxString & str, size_t nItems = wxString::npos);
-    wxString to_string(size_t nItems = wxString::npos) const;
-    void     append_to(wxString & str, size_t nItems = wxString::npos) const;
+    void     push_string(const wxString & str,
+                         const wxMBConv & conv = wxCSConv(wxFONTENCODING_CP1252));
+
+    wxString to_string(const wxMBConv & conv = wxCSConv(wxFONTENCODING_CP1252)) const;
+
+    void     append_to(wxString & str,
+                       const wxMBConv & conv = wxCSConv(wxFONTENCODING_CP1252)) const;
 };
 
 
