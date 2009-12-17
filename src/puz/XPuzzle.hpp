@@ -55,14 +55,51 @@ public:
     bool IsScrambled() const { return m_grid.IsScrambled(); }
     short GetVersion() const { return m_version; }
 
+    
+    class Clue;
+    typedef std::vector<Clue> ClueList;
+
+    // Getter / Setters
+    //-----------------
+    const wxString & GetFilename() const { return m_filename; }
+    void SetFilename(const wxString & filename) { m_filename = filename; }
+
+    bool GetModified() const { return m_modified; }
+    void SetModified(bool modified) { m_modified = modified; }
+
+    int GetTime() const { return m_time; }
+    void SetTime(int time) { m_time = time; }
+
+    const wxString & GetTitle() const { return m_title; }
+    void SetTitle(const wxString & title) { m_title = title; }
+
+    const wxString & GetAuthor() const { return m_author; }
+    void SetAuthor(const wxString & author) { m_author = author; }
+
+    const wxString & GetCopyright() const { return m_copyright; }
+    void SetCopyright(const wxString & copyright) { m_copyright = copyright; }
+
+    const wxString & GetNotes() const { return m_notes; }
+    void SetNotes(const wxString & notes) { m_notes = notes; }
+
+    ClueList & GetAcross() { return m_across; }
+    void SetAcross(const ClueList & across) { m_across = across; }
+
+    ClueList & GetDown() { return m_down; }
+    void SetDown(const ClueList & down) { m_down = down; }
+
+    std::vector<wxString> & GetClues() { return m_clues; }
+    void SetClues(const std::vector<wxString> & clues) { m_clues = clues;}
+
+    XGrid & GetGrid() { return m_grid; }
+    void SetGrid(const XGrid & grid) { m_grid = grid; }
+
+
     wxString m_filename;
     bool m_modified;
 
     int m_time;
     bool m_isTimerRunning;
-
-    class Clue;
-    typedef std::vector<Clue> ClueList;
 
     wxString m_title;
     wxString m_author;

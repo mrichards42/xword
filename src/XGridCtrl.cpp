@@ -581,11 +581,6 @@ XGridCtrl::MakeVisible(const XSquare & square)
 void
 XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
 {
-    if (m_wantsRebus)
-    {
-        square.SetText(text);
-        return;
-    }
     // Adjust blank and incorrect counts each time a letter is changed
     // The logic is a little confusing at first, but it's correct
     const int correctBefore = square.Check();
@@ -599,12 +594,17 @@ XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
     m_blankSquares     += blankAfter   - blankBefore;
     m_incorrectSquares -= correctAfter - correctBefore;
 
-    if (HasStyle(CHECK_WHILE_TYPING) && ! m_grid->IsScrambled())
-        CheckLetter(NO_REVEAL_ANSWER | NO_MESSAGE_BOX);
+    // Don't send letter updated events if the user is in the middle of entering
+    // a rebus entry.
+    if (! m_wantsRebus)
+    {
+        if (HasStyle(CHECK_WHILE_TYPING) && ! m_grid->IsScrambled())
+            CheckLetter(NO_REVEAL_ANSWER | NO_MESSAGE_BOX);
 
-    wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
-    evt.SetString(text);
-    GetEventHandler()->ProcessEvent(evt);
+        wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
+        evt.SetString(text);
+        GetEventHandler()->ProcessEvent(evt);
+    }
 }
 
 
@@ -1339,9 +1339,10 @@ XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
         if (square->IsBlank())
             return;
         if ((mod & (wxMOD_CONTROL | wxMOD_SHIFT)) != 0)
-            square->SetText(_T(""));
+            m_grid.SetSquareText(*square, _T(""));
         else
-            square->SetText(square->GetText().substr(0, square->GetText().length() - 1));
+            m_grid.SetSquareText(*square,
+                square->GetText().substr(0, square->GetText().length() - 1));
         m_grid.RefreshSquare();
     }
     else if (key == WXK_DELETE || key == WXK_NUMPAD_DELETE)
@@ -1350,9 +1351,9 @@ XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
         if (square->IsBlank())
             return;
         if ((mod & (wxMOD_CONTROL | wxMOD_SHIFT)) != 0)
-            square->SetText(_T(""));
+            m_grid.SetSquareText(*square, _T(""));
         else
-            square->SetText(square->GetText().substr(1));
+            m_grid.SetSquareText(*square, square->GetText().substr(1));
         m_grid.RefreshSquare();
     }
 
@@ -1374,8 +1375,8 @@ XGridRebusHandler::OnChar(wxKeyEvent & evt)
         return;
 
     if (square->IsBlank())
-        square->SetText(key);
+        m_grid.SetSquareText(*square, key);
     else
-        square->SetText(square->GetText() + key);
+        m_grid.SetSquareText(*square, square->GetText() + key);
     m_grid.RefreshSquare();
 }

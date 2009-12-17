@@ -55,6 +55,11 @@
 
 #include <algorithm>
 
+// Lua!
+//#include "wxlua/include/wxlua.h"
+//#include "wxbind/include/wxbinddefs.h"
+//WXLUA_DECLARE_BIND_STD
+extern bool wxLuaBinding_xword_init();
 
 #if !defined(__WXMSW__) && !defined(__WXPM__)
     #include "../images/xword.xpm"
@@ -110,6 +115,8 @@ enum toolIds
     //wxID_ABOUT,
     ID_LICENSE,
 
+    ID_LUA_SCRIPT,
+
 #ifdef __WXDEBUG__
 
     ID_DUMP_STATUS,
@@ -124,6 +131,8 @@ enum toolIds
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_TIMER          (wxID_ANY,             MyFrame::OnTimerNotify)
 
+    EVT_LUA_PRINT      (wxID_ANY,             MyFrame::OnLuaPrint)
+    EVT_LUA_ERROR      (wxID_ANY,             MyFrame::OnLuaError)
 
     EVT_PUZ_GRID_FOCUS (                      MyFrame::OnGridFocus)
     EVT_PUZ_CLUE_FOCUS (                      MyFrame::OnClueFocus)
@@ -236,6 +245,9 @@ MyFrame::ManageTools()
         { ID_SWAP_DIRECTION, wxITEM_NORMAL, _T("Swap across and down"), NULL, NULL,
                    _handler(MyFrame::OnSwapDirection) },
 
+        { ID_LUA_SCRIPT, wxITEM_NORMAL, _T("Run script"), NULL, NULL,
+                   _handler(MyFrame::OnLuaScript) },
+
 
         { wxID_ABOUT, wxITEM_NORMAL, _T("&About XWord..."), NULL, NULL,
                    _handler(MyFrame::OnAbout) },
@@ -327,6 +339,12 @@ MyFrame::MyFrame()
     UpdateLayout();
 
     SetIcon(wxICON(xword));
+
+    // Lua stuff
+    // Initialze *before* creating the wxLuaState object.
+    //WXLUA_IMPLEMENT_BIND_STD
+    wxLuaBinding_xword_init();
+    m_lua = wxLuaState(this, wxID_ANY);
 
     ShowPuzzle();
 }
@@ -737,6 +755,7 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, ID_TIMER);
         m_toolMgr.Add(menu, ID_CONVERT);
         m_toolMgr.Add(menu, ID_SWAP_DIRECTION);
+        m_toolMgr.Add(menu, ID_LUA_SCRIPT);
     mb->Append(menu, _T("&Tools"));
 
     // Help Menu
@@ -1673,6 +1692,32 @@ MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
         StopTimer();
 }
 
+
+
+
+
+void
+MyFrame::OnLuaScript(wxCommandEvent & WXUNUSED(evt))
+{
+    const wxString & filename = wxFileSelector(_T("Select a script to run"));
+    if (! filename.IsEmpty())
+        m_lua.RunFile(filename);
+}
+
+void
+MyFrame::OnLuaPrint(wxLuaEvent & evt)
+{
+    //wxLogDebug(_T("Got a message from lua!"));
+    wxLogDebug(evt.GetString());
+}
+
+
+void
+MyFrame::OnLuaError(wxLuaEvent & evt)
+{
+    wxLogDebug(_T("Got an error from lua!"));
+    wxLogDebug(evt.GetString());
+}
 
 // Preferences
 //------------

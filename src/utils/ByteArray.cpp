@@ -20,54 +20,28 @@
 
 
 wxString
-ByteArray::to_string(size_t nItems) const
+ByteArray::to_string(const wxMBConv & conv) const
 {
-    wxString str;
-    append_to(str, nItems);
-    return str;
+    return wxString(reinterpret_cast<const char*>(c_str()), conv);
 }
 
 
 
 void
-ByteArray::append_to(wxString & str, size_t nItems) const
+ByteArray::append_to(wxString & str, const wxMBConv & conv) const
 {
-    const_iterator it = ByteArray::begin();
-    const_iterator end;
-
-    if (nItems == wxString::npos)
-    {
-        end = ByteArray::end();
-        str.reserve(str.length() + size());
-    }
-    else
-    {
-        end = it + nItems;
-        str.reserve(str.length() + nItems);
-    }
-
-    for (; it != end; ++it)
-        str.Append(static_cast<wxChar>(*it));
+    str.Append(to_string(conv));
 }
 
 
 void
-ByteArray::push_string(const wxString & str, size_t nItems)
+ByteArray::push_string(const wxString & str, const wxMBConv & conv)
 {
-    wxString::const_iterator it = str.begin();
-    wxString::const_iterator end;
-
-    if (nItems == wxString::npos)
-    {
-        end = str.end();
-        reserve(size() + str.length());
-    }
-    else
-    {
-        end = it + nItems;
-        reserve(size() + nItems);
-    }
-
-    for (; it != end; ++it)
-        push_back(static_cast<unsigned char>(*it));
+    // Now that is some ugly casting.
+    // wxString::mb_str returns const wxCharBuffer in unicode build, which is implicity converted
+    // to const char*.
+    // Since we need to _explicitly_ cast to const unsigned char*, we need
+    // the extra static_cast to const char*
+    append(reinterpret_cast<const unsigned char*>(
+                static_cast<const char*>(str.mb_str(conv))));
 }
