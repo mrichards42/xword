@@ -1,6 +1,6 @@
 -- ----------------------------------------------------------------------------
 -- Rules to build the XWord app's bindings for wxLua
---  load using : $lua -e"rulesFilename=\"rules.lua\"" genwxbind.lua
+--  load using : $lua -e"rulesFilename='xword_rules.lua'" genxwordbind.lua
 -- ----------------------------------------------------------------------------
 
 -- ============================================================================
@@ -65,12 +65,16 @@ hook_cpp_binding_includes = ""
 -- ----------------------------------------------------------------------------
 -- Set any #includes or other C++ code to be placed verbatim below the
 --   #includes of every generated cpp file or "" for none
-hook_cpp_binding_post_includes = ""
+hook_cpp_binding_post_includes = [[
+#include "xword_bind_helpers.hpp"
+]]
 
 -- ----------------------------------------------------------------------------
 -- Add additional include information or C++ code for the binding header file.
 --  This code will be place directly after any #includes at the top of the file
-hook_cpp_binding_header_includes = "#include \"wxbind/include/wxcore_bind.h\"\n"
+hook_cpp_binding_header_includes =  [[
+#include "wxbind/include/wxcore_bind.h"
+]]
 
 -- ----------------------------------------------------------------------------
 -- Set any #includes or other C++ code to be placed verbatim at the top of
@@ -85,16 +89,13 @@ interface_filepath = "."
 -- A list of interface files to use to make the bindings. These files will be
 --   converted into *.cpp and placed in the output_cpp_filepath directory.
 --   The files are loaded from the interface_filepath.
-interface_fileTable =
-{
-    "xwordlua.i"
-}
+interface_fileTable = { 'xword.i' }
 
 -- ----------------------------------------------------------------------------
 -- A list of files that contain bindings that need to be overridden or empty
 --   table {} for none.
 --   The files are loaded from the interface_filepath.
-override_fileTable = {}
+override_fileTable = { 'xword_override.hpp' }
 
 -- ============================================================================
 -- A table containing filenames of XXX_datatype.lua from other wrappers to
@@ -104,7 +105,7 @@ override_fileTable = {}
 --        files are updated. Make sure you delete or have updated any cache file
 --        that changes any data types used by this binding.
 
-datatype_cache_input_fileTable = { "../../../bindings/wxwidgets/wx_datatypes.lua" }
+datatype_cache_input_fileTable = { "wx_datatypes.lua" }
 
 -- ----------------------------------------------------------------------------
 -- The file to output the data type cache for later use with a binding that

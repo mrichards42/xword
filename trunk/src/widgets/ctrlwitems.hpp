@@ -62,7 +62,7 @@
 // ----------------------------------------------------------------------------
 
 template<typename T>
-class WXDLLEXPORT wxItemContainerImmutable_T
+class wxItemContainerImmutable_T
 {
 public:
     typedef T item_t;
@@ -127,7 +127,7 @@ protected:
 
 
 template <typename T>
-class WXDLLEXPORT wxItemContainer_T
+class wxItemContainer_T
     : public wxItemContainerImmutable_T<T>
 {
 public:
@@ -163,7 +163,7 @@ protected:
 
 
 template <typename T>
-class WXDLLEXPORT wxControlWithItems_T
+class wxControlWithItems_T
     : public wxControl,
       public wxItemContainer_T<T>
 {

@@ -65,7 +65,7 @@ wxString GetConfigFile()
 
 wxString GetImagesDirectory()
 {
-    // Look in several locations for the images file (order is preserved)
+    // Look in several locations for the images directory (order is preserved)
     // We can't use wxPathList to search for a directory (only a file), but we
     // can use it to make sure that directories aren't added twice.  Since it
     // inherits from wxArrayString, we can just iterate over the elements
@@ -89,6 +89,46 @@ wxString GetImagesDirectory()
 
     // If there is no images directory, alert the user
     wxString message = _T("Could not find \"images\" folder.  ")
+                       _T("Folders searched:\n");
+    for (wxArrayString::const_iterator it = directories.begin();
+         it != directories.end();
+         ++it)
+    {
+        message.append(*it + _T("\n"));
+    }
+    wxLogError(message);
+
+    return wxEmptyString;
+}
+
+
+
+wxString GetScriptsDirectory()
+{
+    // Look in several locations for the scripts directory (order is preserved)
+    // We can't use wxPathList to search for a directory (only a file), but we
+    // can use it to make sure that directories aren't added twice.  Since it
+    // inherits from wxArrayString, we can just iterate over the elements
+    // directory to search for the directory.
+    wxPathList directories;
+    directories.Add(wxPathOnly(wxString(wxTheApp->argv[0])));
+    directories.Add(wxStandardPaths::Get().GetUserDataDir());
+    directories.Add(wxStandardPaths::Get().GetLocalDataDir());
+    directories.Add(wxStandardPaths::Get().GetDataDir());
+    directories.Add(wxStandardPaths::Get().GetResourcesDir());
+
+    for (wxArrayString::const_iterator it = directories.begin();
+                 it != directories.end();
+                 ++it)
+    {
+        wxFileName dir; dir.AssignDir(*it);
+        dir.AppendDir(_T("scripts"));
+        if (dir.DirExists())
+            return dir.GetFullPath();
+    }
+
+    // If there is no images directory, alert the user
+    wxString message = _T("Could not find \"scripts\" folder.  ")
                        _T("Folders searched:\n");
     for (wxArrayString::const_iterator it = directories.begin();
          it != directories.end();

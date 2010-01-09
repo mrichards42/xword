@@ -56,4 +56,9 @@ int XWordMessage(const wxString & fmt, ...);
 bool XWordPrompt(XWordMessageId id, ...);
 bool XWordPrompt(const wxString & fmt, ...);
 
+// Return the raw return value of the wxMessagebox
+// The return value is pretty much meaningless, since an error dialog
+// should only have an OK button anyways.
+int XWordErrorMessage(const wxString & fmt, ...);
+
 #endif // MY_MESSAGES_H

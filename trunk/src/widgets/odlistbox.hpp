@@ -42,9 +42,9 @@ static const wxChar * wxOwnerDrawnListBoxNameStr = _T("OwnerDrawnListBox");
 
 // At some point we can use another parent class . . . not yet
 template<typename T = wxString, class _Parent = wxCachedVListBox>
-class WXDLLEXPORT wxOwnerDrawnListBox
+class wxOwnerDrawnListBox
     : public _Parent,
-      public wxItemContainer_T<T>
+	  public wxItemContainer_T<T>
 {
 public:
     typedef typename std::vector<T> container_t;

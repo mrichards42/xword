@@ -48,7 +48,11 @@ class MyPrintout;
 #include "utils/ToolManager.hpp"
 
 #include <wx/fileconf.h> // Used to get the layouts directly from wxConfig
+
+#ifdef XWORD_USE_LUA
+// wxLua
 #include "wxlua/include/wxlua.h"
+#endif // XWORD_USE_LUA
 
 //#define USE_AUI_TOOLBAR
 
@@ -72,6 +76,7 @@ public:
     bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
     void CheckPuzzle();
     void ShowPuzzle();  // Displays the actual puzzle
+	XPuzzle & GetPuzzle() { return m_puz; }
 
     // Window Management
     //-----------
@@ -93,6 +98,7 @@ public:
     //-----------
     bool IsTimerRunning() { return m_timer.IsRunning(); }
     void SetTime  (int time) { m_time = time; m_status->SetTime(time); }
+	int GetTime() { return m_time; }
     void ResetTimer()     { SetTime(0); }
     void StartTimer();
     void StopTimer();
@@ -101,6 +107,16 @@ public:
 
     void OnAppDeactivate();
     void OnAppActivate();
+
+    // Access to focus information
+    //----------------------------
+	XSquare * GetFocusedSquare();
+	void GetFocusedWord(XSquare ** start, XSquare ** end);
+    bool GetFocusedDirection() const;
+	const XPuzzle::Clue * GetFocusedClue();
+
+	// Lua
+	void RunLuaScript(const wxString & filename);
 
 private:
     // Windows
@@ -267,10 +283,13 @@ private:
     void OnActivate   (wxActivateEvent & evt);
     void OnClose      (wxCloseEvent & evt);
 
+#ifdef XWORD_USE_LUA
     void OnLuaScript  (wxCommandEvent & WXUNUSED(evt));
     void OnLuaPrint   (wxLuaEvent & evt);
     void OnLuaError   (wxLuaEvent & evt);
-    wxLuaState m_lua;
+	wxLuaState m_lua;
+	void LuaInit();
+#endif // XWORD_USE_LUA
 
 private:
     // Debugging

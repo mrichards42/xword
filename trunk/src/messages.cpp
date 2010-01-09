@@ -132,7 +132,7 @@ wxCOMPILE_TIME_ASSERT(sizeof(messageTable) / sizeof(MessageDesc) == MSG_TOTAL_ME
 
 
 //-----------------------------------------------------------------------------
-// Message / Prompt functions
+// Message / Prompt / Error functions
 //-----------------------------------------------------------------------------
 
 // Make message formatting a little cleaner
@@ -172,5 +172,13 @@ bool XWordPrompt(const wxString & fmt, ...)
     const int ret = wxMessageBox(message, questionTitle, questionFlags);
     return (ret == wxYES || ret == wxOK);
 }
+
+
+int XWordErrorMessage(const wxString & fmt, ...)
+{
+    _FORMAT_MESSAGE(fmt, fmt, message);
+    return wxMessageBox(message, errorTitle, errorFlags);
+}
+
 
 #undef _FORMAT_MESSAGE

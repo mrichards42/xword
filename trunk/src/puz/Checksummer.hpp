@@ -73,6 +73,7 @@ public:
         {
             m_clues.push_back(*it);
         }
+		SetClueLength(m_clues.size());
     }
 
     void SetVersion   (unsigned short version)     { m_version   = version; }
