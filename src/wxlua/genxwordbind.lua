@@ -1,3 +1,29 @@
+-- ============================================================================
+-- Edits for XWord:
+
+-- Everything that is changed is delimited by the following:
+
+-- XWORD START ----------------------------------------------------------------
+--   [[ Code ]]
+-- XWORD END ------------------------------------------------------------------
+
+
+-- Replace
+--     [Old]                      [New]
+--     wxlua_pushwxString         xword_pushwxString
+--     wxlua_getwxStringtype      xword_getwxStringtype
+
+-- XWord needs to convert to and from wxString using
+-- wxCSConv(wxFONTENCODING_CP1252) so that puz files can be saved in windows
+-- encoding.
+
+-- Add garbage collection support for references.
+
+-- ============================================================================
+
+
+
+
 -- ---------------------------------------------------------------------------
 -- Name:        genwxbind.lua
 -- Purpose:     This script generates wrapper files from the table interface_fileTable (see below)
@@ -2956,7 +2982,9 @@ function GenerateLuaLanguageBinding(interface)
 
                 if memberType == "wxString" then
                     CommentBindingTable(codeList, "    // push the result string\n")
-                    table.insert(codeList, "    wxlua_pushwxString(L, "..self_name..member.Name..");\n")
+-- XWORD START ----------------------------------------------------------------
+                    table.insert(codeList, "    xword_pushwxString(L, "..self_name..member.Name..");\n")
+-- XWORD END ------------------------------------------------------------------
                 elseif not numeric and (not memberPtr or (memberPtr == "&")) then
                     CommentBindingTable(codeList, "    // push the result datatype\n")
 
@@ -3520,6 +3548,19 @@ function GenerateLuaLanguageBinding(interface)
                                 argItem = "("..argTypeWithAttrib..")wxlua_touserdata(L, "..argNum..")"
                             end
 
+-- XWORD START ----------------------------------------------------------------
+                            -- Add Garbage collection detection for references
+                            if param.GC then
+                                if dataTypeTable[argType]["%encapsulate"] then
+                                    table.insert(gcList, "    if (!wxluaO_isgcobject(L, "..argName..")) wxluaO_addgcobject(L, (void*)"..argName..", new wxLua_wxObject_"..MakeVar(argType).."("..argName.."));\n")
+                                else
+                                    table.insert(gcList, "    if (!wxluaO_isgcobject(L, "..argName..")) wxluaO_addgcobject(L, "..argName..");\n")
+                                end
+                            elseif param.UnGC then
+                                table.insert(gcList, "    if (wxluaO_isgcobject(L, "..argName..")) wxluaO_undeletegcobject(L, "..argName..");\n")
+                            end
+-- XWORD END ------------------------------------------------------------------
+
                             -- Default Value
                             if opt then opt = "&"..opt end
 
@@ -3912,6 +3953,20 @@ function GenerateLuaLanguageBinding(interface)
 
                         elseif (not member["%operator"]) and (memberPtr == "&") and string.find(memberTypeWithAttrib, "*") and (memberType ~= "wxString") then
                             table.insert(codeList, "    "..memberTypeWithAttrib.." returns = &"..functor..";\n")
+
+-- XWORD START ----------------------------------------------------------------
+                            -- Add garbage collection support for returning references
+                            if member.GC then
+                                if dataTypeTable[memberType]["%encapsulate"] then
+                                    table.insert(codeList, "    if (!wxluaO_isgcobject(L, returns)) wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_"..MakeVar(memberType).."(returns));\n")
+                                else
+                                    table.insert(codeList, "    if (!wxluaO_isgcobject(L, returns)) wxluaO_addgcobject(L, returns);\n")
+                                end
+                            elseif member.UnGC then
+                                table.insert(codeList, "    if (wxluaO_isgcobject(L, returns)) wxluaO_undeletegcobject(L, returns);\n")
+                            end
+-- XWORD END ------------------------------------------------------------------
+
                         elseif (memberPtr == "*") or (memberType == "voidptr_long") then
                             table.insert(codeList, "    "..memberTypeWithAttrib.." returns = ("..memberTypeWithAttrib..")"..functor..";\n")
 
@@ -3932,7 +3987,9 @@ function GenerateLuaLanguageBinding(interface)
                         -- bind return value
                         if memberType == "wxString" then
                             CommentBindingTable(codeList, "    // push the result string\n")
-                            table.insert(codeList, "    wxlua_pushwxString(L, "..returnPtr.."returns);\n")
+-- XWORD START ----------------------------------------------------------------
+                            table.insert(codeList, "    xword_pushwxString(L, "..returnPtr.."returns);\n")
+-- XWORD END ------------------------------------------------------------------
                         elseif not numeric then
                             CommentBindingTable(codeList, "    // push the result datatype\n")
                             table.insert(codeList, "    wxluaT_pushuserdatatype(L, returns, wxluatype_"..MakeClassVar(memberType)..");\n")

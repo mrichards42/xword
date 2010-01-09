@@ -201,7 +201,6 @@ protected:
     void SetGridCksum(unsigned short cksum) { m_puz->m_grid.m_cksum = cksum; }
 
     void SetupGrid() { m_puz->m_grid.SetupGrid(); }
-    void SetupClues();
 };
 
 

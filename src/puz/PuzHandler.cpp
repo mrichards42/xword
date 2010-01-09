@@ -104,10 +104,12 @@ PuzHandler::DoLoad()
     m_puz->m_author      = ReadString();
     m_puz->m_copyright   = ReadString();
 
+	std::vector<wxString> clues;
     for (size_t i = 0; i < h.num_clues; ++i)
-        m_puz->m_clues.push_back(ReadString());
+        clues.push_back(ReadString());
 
-    SetupClues();
+	if (! m_puz->SetClueList(clues))
+		throw FatalPuzError(_T("Clues and grid don't match."));
 
     m_puz->m_notes = ReadString();
 
@@ -203,7 +205,9 @@ PuzHandler::DoSave()
 
     unsigned short width  = m_puz->m_grid.GetWidth();
     unsigned short height = m_puz->m_grid.GetHeight();
-    unsigned short nClues = m_puz->m_clues.size();
+	std::vector<wxString> clues;
+	m_puz->GetClueList(&clues);
+    unsigned short nClues = clues.size();
 
     Write(&width,  1);
     Write(&height, 1);
@@ -232,10 +236,11 @@ PuzHandler::DoSave()
     Write(m_puz->m_copyright); Write('\0');
 
     std::vector<wxString>::iterator it;
-    for (it = m_puz->m_clues.begin(); it != m_puz->m_clues.end(); ++it)
-    {
-        Write(*it); Write('\0');
-    }
+    for (it = clues.begin(); it != clues.end(); ++it)
+	{
+        Write(*it);
+		Write('\0');
+	}
 
     Write(m_puz->m_notes); Write('\0');
 

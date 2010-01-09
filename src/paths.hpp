@@ -23,5 +23,6 @@
 // Locations where the application expects to find its files
 wxString GetConfigFile();
 wxString GetImagesDirectory();
+wxString GetScriptsDirectory();
 
 #endif // MY_PATHS_H

@@ -27,12 +27,13 @@ Checksummer::Checksummer(const XPuzzle & puz, unsigned short version)
       m_notes    (puz.m_notes),
       m_version  (version)
 {
-    SetClues(puz.m_clues);
+	std::vector<wxString> clues;
+	puz.GetClueList(&clues);
+    SetClues(clues);
 
     // Setup CIB manually
     SetWidth     (puz.m_grid.GetWidth());
     SetHeight    (puz.m_grid.GetHeight());
-    SetClueLength(puz.m_clues.size());
     SetGridType  (puz.m_grid.m_type);
     SetGridFlag  (puz.m_grid.m_flag);
 }

@@ -53,13 +53,16 @@
 
 #include "utils/SizerPrinter.hpp"
 
-#include <algorithm>
+#ifdef XWORD_USE_LUA
+	// Lua!
+	#include "wxlua/include/wxlua.h"
+	#include "wxbind/include/wxbinddefs.h"
+	WXLUA_DECLARE_BIND_ALL
+	extern bool wxLuaBinding_xword_init();
 
-// Lua!
-//#include "wxlua/include/wxlua.h"
-//#include "wxbind/include/wxbinddefs.h"
-//WXLUA_DECLARE_BIND_STD
-extern bool wxLuaBinding_xword_init();
+	// For traversing the lua scripts directory
+	#include <wx/dir.h>
+#endif // XWORD_USE_LUA
 
 #if !defined(__WXMSW__) && !defined(__WXPM__)
     #include "../images/xword.xpm"
@@ -115,7 +118,9 @@ enum toolIds
     //wxID_ABOUT,
     ID_LICENSE,
 
+#ifdef XWORD_USE_LUA
     ID_LUA_SCRIPT,
+#endif // XWORD_USE_LUA
 
 #ifdef __WXDEBUG__
 
@@ -131,8 +136,10 @@ enum toolIds
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_TIMER          (wxID_ANY,             MyFrame::OnTimerNotify)
 
+#ifdef XWORD_USE_LUA
     EVT_LUA_PRINT      (wxID_ANY,             MyFrame::OnLuaPrint)
     EVT_LUA_ERROR      (wxID_ANY,             MyFrame::OnLuaError)
+#endif // XWORD_USE_LUA
 
     EVT_PUZ_GRID_FOCUS (                      MyFrame::OnGridFocus)
     EVT_PUZ_CLUE_FOCUS (                      MyFrame::OnClueFocus)
@@ -192,7 +199,7 @@ MyFrame::ManageTools()
                     _handler(MyFrame::OnZoomFit) },
 
         { wxID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out"), NULL,
-                    _handler(MyFrame::OnQuit) },
+                    _handler(MyFrame::OnZoomOut) },
 
 
         { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble..."), NULL, NULL,
@@ -245,9 +252,10 @@ MyFrame::ManageTools()
         { ID_SWAP_DIRECTION, wxITEM_NORMAL, _T("Swap across and down"), NULL, NULL,
                    _handler(MyFrame::OnSwapDirection) },
 
+#ifdef XWORD_USE_LUA
         { ID_LUA_SCRIPT, wxITEM_NORMAL, _T("Run script"), NULL, NULL,
                    _handler(MyFrame::OnLuaScript) },
-
+#endif // XWORD_USE_LUA
 
         { wxID_ABOUT, wxITEM_NORMAL, _T("&About XWord..."), NULL, NULL,
                    _handler(MyFrame::OnAbout) },
@@ -295,9 +303,12 @@ public:
     virtual bool OnDropFiles(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
                              const wxArrayString & filenames)
     {
-        if ( ! m_frame->ClosePuzzle(true) ) // Prompt for save
-            return false;
-        m_frame->LoadPuzzle(filenames.Item(0));
+		// Run the file as a script if it ends with .lua
+		if (filenames.Item(0).EndsWith(_T(".lua")))
+			m_frame->RunLuaScript(filenames.Item(0));
+		// Otherwise try to open as a puzzle
+		else
+			m_frame->LoadPuzzle(filenames.Item(0));
         return true;
     }
 
@@ -340,11 +351,13 @@ MyFrame::MyFrame()
 
     SetIcon(wxICON(xword));
 
-    // Lua stuff
-    // Initialze *before* creating the wxLuaState object.
-    //WXLUA_IMPLEMENT_BIND_STD
-    wxLuaBinding_xword_init();
-    m_lua = wxLuaState(this, wxID_ANY);
+#ifdef XWORD_USE_LUA
+	LuaInit();
+#endif // XWORD_USE_LUA
+
+#ifdef __WXDEBUG__
+	LoadPuzzle(_T("D:\\C++\\XWord\\test_files\\sunday.puz"));
+#endif // __WXDEBUG__
 
     ShowPuzzle();
 }
@@ -354,6 +367,11 @@ MyFrame::~MyFrame()
 {
     // Let the App know we've been destroyed
     wxGetApp().m_frame = NULL;
+
+#ifdef XWORD_USE_LUA
+	// Lua cleanup
+	m_lua.CloseLuaState(true);
+#endif // XWORD_USE_LUA
 
     // Cleanup
     m_toolMgr.DisconnectEvents();
@@ -371,6 +389,9 @@ MyFrame::~MyFrame()
 bool
 MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
 {
+	if ( ! ClosePuzzle(true) ) // Prompt for save
+		return false;
+
     wxStopWatch sw;
 
     try
@@ -755,7 +776,9 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, ID_TIMER);
         m_toolMgr.Add(menu, ID_CONVERT);
         m_toolMgr.Add(menu, ID_SWAP_DIRECTION);
+#ifdef XWORD_USE_LUA
         m_toolMgr.Add(menu, ID_LUA_SCRIPT);
+#endif // XWORD_USE_LUA
     mb->Append(menu, _T("&Tools"));
 
     // Help Menu
@@ -1246,6 +1269,52 @@ MyFrame::SaveConfig()
     config.WriteLong(_T("bottom"), g_pageSetupData->GetMarginBottomRight().y);
 }
 
+
+
+//------------------------------------------------------------------------------
+// Access to focus information
+//------------------------------------------------------------------------------
+XSquare *
+MyFrame::GetFocusedSquare()
+{
+	if (m_gridCtrl->IsEmpty())
+		return NULL;
+	else
+		return m_gridCtrl->GetFocusedSquare();
+}
+
+void
+MyFrame::GetFocusedWord(XSquare ** start, XSquare ** end)
+{
+	if (m_gridCtrl->IsEmpty())
+	{
+		*start = NULL;
+		*end = NULL;
+	}
+	else
+		m_gridCtrl->GetFocusedWord(start, end);
+}
+
+bool
+MyFrame::GetFocusedDirection() const
+{
+	return m_gridCtrl->GetDirection();
+}
+
+const XPuzzle::Clue *
+MyFrame::GetFocusedClue()
+{
+	XSquare * start;
+	XSquare * end;
+	GetFocusedWord(&start, &end);
+	if (start == NULL)
+		return NULL;
+	else if (GetFocusedDirection() == DIR_ACROSS)
+		return &*m_puz.GetAcross().Find(start->GetNumber());
+	else
+		return &*m_puz.GetDown().Find(start->GetNumber());
+}
+
 //------------------------------------------------------------------------------
 // Menu and toolbar events
 //------------------------------------------------------------------------------
@@ -1587,21 +1656,6 @@ MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
 // Swap across / down
 //-------------------
 
-// Helper functor for OnSwapDirection
-struct find_clue_number
-{
-    find_clue_number(int num)
-        : m_num(num)
-    {}
-
-    bool operator() (const XPuzzle::Clue & clue)
-    {
-        return clue.Number() == m_num;
-    }
-
-    int m_num;
-};
-
 
 void
 MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
@@ -1620,7 +1674,6 @@ MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
 
     m_puz.m_across.clear();
     m_puz.m_down.clear();
-    m_puz.m_clues.clear();
 
     // Iterate through the grid (downward), and look for all clue squares.
     // These will all still be clue squares when the grid is swapped.
@@ -1634,24 +1687,18 @@ MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
         // Down clues will become across clues
         if (square->HasClue(DIR_DOWN))
         {
-            XPuzzle::ClueList::iterator clue_it = 
-                std::find_if(oldDown.begin(), oldDown.end(),
-                             find_clue_number(square->GetNumber()));
+			XPuzzle::ClueList::iterator clue_it = oldDown.Find(square->GetNumber());
             wxASSERT(clue_it != oldDown.end());
             m_puz.m_across.push_back(*clue_it);
             m_puz.m_across.back().m_num = clueNumber;
-            m_puz.m_clues.push_back(clue_it->Text());
         }
         // Across clues will become down clues
         if (square->HasClue(DIR_ACROSS))
         {
-            XPuzzle::ClueList::iterator clue_it = 
-                std::find_if(oldAcross.begin(), oldAcross.end(),
-                             find_clue_number(square->GetNumber()));
+			XPuzzle::ClueList::iterator clue_it = oldAcross.Find(square->GetNumber());
             wxASSERT(clue_it != oldAcross.end());
             m_puz.m_down.push_back(*clue_it);
             m_puz.m_down.back().m_num = clueNumber;
-            m_puz.m_clues.push_back(clue_it->Text());
         }
         if (square->HasClue())
             ++clueNumber;
@@ -1694,14 +1741,85 @@ MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
 
 
 
+#ifdef XWORD_USE_LUA
+void
+MyFrame::LuaInit()
+{
+    // Initialze wxLua.
+    WXLUA_IMPLEMENT_BIND_ALL
+    wxLuaBinding_xword_init();
+	m_lua = wxLuaState(this, wxID_ANY);
 
+	m_lua.RunString(_T("print(package.path, package.cpath)"));
+	// Add the scripts directory to the lua search path
+	const wxString scriptsDir = GetScriptsDirectory();
+	// Can't do anything if we can't find the scripts directory
+	if (scriptsDir.IsEmpty())
+		return;
+
+	// Set the lua search paths
+	/*
+	m_lua.RunString(wxString::Format(
+		_T("package.path = [[%s?.lua;%s?\\init.lua;%slibs\\?.lua;%slibs\\?\\init.lua]]"),
+		scriptsDir, scriptsDir, scriptsDir, scriptsDir));
+
+	m_lua.RunString(wxString::Format(
+		_T("package.cpath = [[%s?.dll;%s?51.dll;%sclibs\\?.dll;%sclibs\\?51.dll]]"),
+		scriptsDir, scriptsDir, scriptsDir, scriptsDir));
+	*/
+
+	// Initialize the lua additions to the xword package
+	RunLuaScript(scriptsDir + _T("xword\\init.lua"));
+	// Add the XWord scripts directory to the global xword table
+	m_lua.RunString(wxString::Format(_T("xword.scriptsdir = [[%s]]"), scriptsDir));
+
+	// Load all .lua scripts in the scripts folder
+	// All scripts will be loaded using
+	//     require 'path.to.script'
+	// with the exception of path\to\init.lua which will be loaded as
+	//     require 'path.to'
+	// require makes sure that the script ends up in package.loaded so that
+	// modules are loaded only once.  In order to make sure that modules aren't
+    // double-loaded, script-writers *must* use the same convention when
+    // requiring other modules.  Note that the script path is stored in
+    // package.loaded literally, so 'path\to\script' is different from
+    // 'path.to.script'.  If a script-writer uses require 'path\to\script',
+    // the script will be initialized twice.  Don't do it.
+	wxArrayString files;
+	// Run the init.lua files first
+	wxDir::GetAllFiles(scriptsDir, &files, _T("init.lua"));
+	// Then add all the .lua files
+	wxDir::GetAllFiles(scriptsDir, &files, _T("*.lua"));
+	for (wxArrayString::iterator it = files.begin(); it != files.end(); ++it)
+	{
+		wxFileName fn(*it);
+		fn.MakeRelativeTo(scriptsDir);
+		fn.SetExt(_T(""));
+		// At this point, fn has the directory and filename (i.e "xword\\init")
+		// Transform the directory splitter into a dot
+		wxString path = fn.GetFullPath();
+		path.Replace(_T("\\"), _T("/"));
+		path.Replace(_T("/"), _T("."));
+		// If this is an init script, just import the package itself
+		if (path.EndsWith(_T(".init")))
+			path = path.Mid(0, path.size() - 5);
+		// require the script so that it is added to the package.loaded table.
+		m_lua.RunString(wxString::Format(_T("require'%s'"), path));
+	}
+}
+
+void
+MyFrame::RunLuaScript(const wxString & filename)
+{
+	m_lua.RunFile(filename);
+}
 
 void
 MyFrame::OnLuaScript(wxCommandEvent & WXUNUSED(evt))
 {
     const wxString & filename = wxFileSelector(_T("Select a script to run"));
     if (! filename.IsEmpty())
-        m_lua.RunFile(filename);
+		RunLuaScript(filename);
 }
 
 void
@@ -1715,9 +1833,10 @@ MyFrame::OnLuaPrint(wxLuaEvent & evt)
 void
 MyFrame::OnLuaError(wxLuaEvent & evt)
 {
-    wxLogDebug(_T("Got an error from lua!"));
-    wxLogDebug(evt.GetString());
+	XWordErrorMessage(evt.GetString());
 }
+
+#endif // XWORD_USE_LUA
 
 // Preferences
 //------------
