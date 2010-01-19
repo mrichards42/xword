@@ -66,18 +66,16 @@ static int LUACALL wxLua_XSquare_Check(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetCol[] = { &wxluatype_XSquare, NULL };
 static int LUACALL wxLua_XSquare_GetCol(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetCol[1] = {{ wxLua_XSquare_GetCol, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetCol }};
-//     short GetCol() const
+// %override wxLua_XSquare_GetCol
+// short GetCol() const
 static int LUACALL wxLua_XSquare_GetCol(lua_State *L)
 {
-    // get this
     XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetCol
-    short returns = (self->GetCol());
-    // push the result number
-    lua_pushnumber(L, returns);
-
+    short col = (self->GetCol()) + 1; // Add 1 because lua is 1-based
+    lua_pushnumber(L, col);
     return 1;
 }
+
 
 static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetFlag[] = { &wxluatype_XSquare, NULL };
 static int LUACALL wxLua_XSquare_GetFlag(lua_State *L);
@@ -142,18 +140,16 @@ static int LUACALL wxLua_XSquare_GetPlainText(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetRow[] = { &wxluatype_XSquare, NULL };
 static int LUACALL wxLua_XSquare_GetRow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetRow[1] = {{ wxLua_XSquare_GetRow, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetRow }};
-//     short GetRow() const
+// %override wxLua_XSquare_GetRow
+// short GetCol() const
 static int LUACALL wxLua_XSquare_GetRow(lua_State *L)
 {
-    // get this
     XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetRow
-    short returns = (self->GetRow());
-    // push the result number
-    lua_pushnumber(L, returns);
-
+    short row = (self->GetRow()) + 1; // Add 1 because lua is 1-based
+    lua_pushnumber(L, row);
     return 1;
 }
+
 
 static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetSolution[] = { &wxluatype_XSquare, NULL };
 static int LUACALL wxLua_XSquare_GetSolution(lua_State *L);
@@ -2164,6 +2160,40 @@ static int LUACALL wxLua_MyFrame_SavePuzzle(lua_State *L)
     return 1;
 }
 
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetFocusedDirection[] = { &wxluatype_MyFrame, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_MyFrame_SetFocusedDirection(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetFocusedDirection[1] = {{ wxLua_MyFrame_SetFocusedDirection, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_SetFocusedDirection }};
+//     void SetFocusedDirection(bool direction)
+static int LUACALL wxLua_MyFrame_SetFocusedDirection(lua_State *L)
+{
+    // bool direction
+    bool direction = wxlua_getbooleantype(L, 2);
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call SetFocusedDirection
+    self->SetFocusedDirection(direction);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetFocusedSquare[] = { &wxluatype_MyFrame, &wxluatype_XSquare, NULL };
+static int LUACALL wxLua_MyFrame_SetFocusedSquare(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetFocusedSquare[1] = {{ wxLua_MyFrame_SetFocusedSquare, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_SetFocusedSquare }};
+//     XSquare * SetFocusedSquare(XSquare * square)
+static int LUACALL wxLua_MyFrame_SetFocusedSquare(lua_State *L)
+{
+    // XSquare square
+    XSquare * square = (XSquare *)wxluaT_getuserdatatype(L, 2, wxluatype_XSquare);
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call SetFocusedSquare
+    XSquare* returns = (XSquare*)self->SetFocusedSquare(square);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
+
+    return 1;
+}
+
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetStatus[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_MyFrame_SetStatus(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetStatus[1] = {{ wxLua_MyFrame_SetStatus, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_SetStatus }};
@@ -2192,6 +2222,76 @@ static int LUACALL wxLua_MyFrame_SetTime(lua_State *L)
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
     // call SetTime
     self->SetTime(time);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_ShowAuthor[] = { &wxluatype_MyFrame, NULL };
+static int LUACALL wxLua_MyFrame_ShowAuthor(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_ShowAuthor[1] = {{ wxLua_MyFrame_ShowAuthor, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_ShowAuthor }};
+//     void ShowAuthor()
+static int LUACALL wxLua_MyFrame_ShowAuthor(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call ShowAuthor
+    self->ShowAuthor();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_ShowClues[] = { &wxluatype_MyFrame, NULL };
+static int LUACALL wxLua_MyFrame_ShowClues(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_ShowClues[1] = {{ wxLua_MyFrame_ShowClues, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_ShowClues }};
+//     void ShowClues()
+static int LUACALL wxLua_MyFrame_ShowClues(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call ShowClues
+    self->ShowClues();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_ShowCopyright[] = { &wxluatype_MyFrame, NULL };
+static int LUACALL wxLua_MyFrame_ShowCopyright(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_ShowCopyright[1] = {{ wxLua_MyFrame_ShowCopyright, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_ShowCopyright }};
+//     void ShowCopyright()
+static int LUACALL wxLua_MyFrame_ShowCopyright(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call ShowCopyright
+    self->ShowCopyright();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_ShowGrid[] = { &wxluatype_MyFrame, NULL };
+static int LUACALL wxLua_MyFrame_ShowGrid(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_ShowGrid[1] = {{ wxLua_MyFrame_ShowGrid, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_ShowGrid }};
+//     void ShowGrid()
+static int LUACALL wxLua_MyFrame_ShowGrid(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call ShowGrid
+    self->ShowGrid();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_ShowNotes[] = { &wxluatype_MyFrame, NULL };
+static int LUACALL wxLua_MyFrame_ShowNotes(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_ShowNotes[1] = {{ wxLua_MyFrame_ShowNotes, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_ShowNotes }};
+//     void ShowNotes()
+static int LUACALL wxLua_MyFrame_ShowNotes(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call ShowNotes
+    self->ShowNotes();
 
     return 0;
 }
@@ -2226,6 +2326,20 @@ static int LUACALL wxLua_MyFrame_ShowPuzzle(lua_State *L)
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
     // call ShowPuzzle
     self->ShowPuzzle();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_ShowTitle[] = { &wxluatype_MyFrame, NULL };
+static int LUACALL wxLua_MyFrame_ShowTitle(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_ShowTitle[1] = {{ wxLua_MyFrame_ShowTitle, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_ShowTitle }};
+//     void ShowTitle()
+static int LUACALL wxLua_MyFrame_ShowTitle(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call ShowTitle
+    self->ShowTitle();
 
     return 0;
 }
@@ -2289,10 +2403,18 @@ wxLuaBindMethod MyFrame_methods[] = {
     { "LoadPuzzle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_LoadPuzzle, 1, NULL },
     { "ResetTimer", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ResetTimer, 1, NULL },
     { "SavePuzzle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SavePuzzle, 1, NULL },
+    { "SetFocusedDirection", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetFocusedDirection, 1, NULL },
+    { "SetFocusedSquare", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetFocusedSquare, 1, NULL },
     { "SetStatus", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetStatus, 1, NULL },
     { "SetTime", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetTime, 1, NULL },
+    { "ShowAuthor", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowAuthor, 1, NULL },
+    { "ShowClues", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowClues, 1, NULL },
+    { "ShowCopyright", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowCopyright, 1, NULL },
+    { "ShowGrid", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowGrid, 1, NULL },
+    { "ShowNotes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowNotes, 1, NULL },
     { "ShowPane", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowPane, 1, NULL },
     { "ShowPuzzle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowPuzzle, 1, NULL },
+    { "ShowTitle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowTitle, 1, NULL },
     { "StartTimer", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_StartTimer, 1, NULL },
     { "StopTimer", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_StopTimer, 1, NULL },
     { "ToggleTimer", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ToggleTimer, 1, NULL },

@@ -75,7 +75,16 @@ public:
     bool SavePuzzle(      wxString   filename, const wxString & ext = _T(""));
     bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
     void CheckPuzzle();
-    void ShowPuzzle();  // Displays the actual puzzle
+
+	// Gui display / updating
+    void ShowPuzzle(); // Everything
+	void ShowGrid();
+	void ShowClues();
+	void ShowAuthor();
+	void ShowTitle();
+	void ShowCopyright();
+	void ShowNotes();
+
 	XPuzzle & GetPuzzle() { return m_puz; }
 
     // Window Management
@@ -111,8 +120,10 @@ public:
     // Access to focus information
     //----------------------------
 	XSquare * GetFocusedSquare();
+	XSquare * SetFocusedSquare(XSquare * square);
 	void GetFocusedWord(XSquare ** start, XSquare ** end);
     bool GetFocusedDirection() const;
+	void SetFocusedDirection(bool direction);
 	const XPuzzle::Clue * GetFocusedClue();
 
 	// Lua

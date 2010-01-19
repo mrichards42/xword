@@ -217,7 +217,27 @@ static int LUACALL wxLua_XGrid_CountClues(lua_State *L)
 //-----------------------------------------------------------------------------
 // XSquare overrides
 //-----------------------------------------------------------------------------
+%override wxLua_XSquare_GetCol
+// short GetCol() const
+static int LUACALL wxLua_XSquare_GetCol(lua_State *L)
+{
+    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
+    short col = (self->GetCol()) + 1; // Add 1 because lua is 1-based
+    lua_pushnumber(L, col);
+    return 1;
+}
+%end
 
+%override wxLua_XSquare_GetRow
+// short GetCol() const
+static int LUACALL wxLua_XSquare_GetRow(lua_State *L)
+{
+    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
+    short row = (self->GetRow()) + 1; // Add 1 because lua is 1-based
+    lua_pushnumber(L, row);
+    return 1;
+}
+%end
 
 %override wxLua_XSquare_GetPlainText
 // char GetPlainText() const
