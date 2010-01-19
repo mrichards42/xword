@@ -1,3 +1,29 @@
+Version 0.4 (1/??/2010)
+    New Features
+    * Embedded lua for scripting.  Included scripts:
+        * Puzzle downloading
+        * "Swap across and down" written in lua
+        * OneAcross.com search
+        * Non-native file import (currently only is XML supported)
+    * User is now prompted before revealing the entire grid.
+
+    Bug Fixes
+    * .puz files now correctly use the full Windows-1252 code page instead of
+      latin 1.
+    * Fixed a bug with obscure rebus entry behavior resulting in incorrectly
+      reported solved / unsolved puzzles.
+    * "Move to next blank" will now wrap to the first blank in the word if the
+      last blank has been entered (i.e. A-A-T; the user enters "I" as the 4th
+      letter, and the cursor moves to the second letter).
+    * Spacebar always deletes the current letter and moves to the next square
+      regardless of preferences.
+
+    Misc
+    * Revamped build system using premake4 to generate platform-specific
+      project files and makefiles.
+      Projects for XCode 3, MSVC2006, and MSVC2008.
+      Makefile for linux (working on a configure script).
+
 Version 0.3.1 (12/11/2009)
     * Fixed "Move to next blank" bug (really, this time I mean it)
 

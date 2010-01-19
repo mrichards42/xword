@@ -50,8 +50,15 @@
 // Lua is not allowed to delete XSquares, because they are always owned by
 // an XGrid.
 %class %noclassinfo %encapsulate XSquare
-    short GetCol() const
-    short GetRow() const
+    // Override GetCol / GetRow to reflect lua's 1-based indecies
+
+    // %override lua_number XSquare::GetCol()
+    // short GetCol() const
+    int GetCol() const
+
+    // %override lua_number XSquare::GetCol()
+    // short GetRow() const
+    int GetRow() const
 
 
     bool IsWhite() const
@@ -268,7 +275,15 @@
 
 %class MyFrame, wxFrame
     %ungc XPuzzle & GetPuzzle()
+
     void ShowPuzzle()
+    void ShowGrid()
+    void ShowClues()
+    void ShowTitle()
+    void ShowAuthor()
+    void ShowCopyright()
+    void ShowNotes()
+
     bool LoadPuzzle(const wxString & filename, const wxString & ext = wxEmptyString)
     bool SavePuzzle(wxString filename, const wxString & ext = wxEmptyString)
     // Return true = puzzle is closed
@@ -289,14 +304,15 @@
     void StopTimer()
     void ToggleTimer()
 
-
     XSquare * GetFocusedSquare()
+    XSquare * SetFocusedSquare(XSquare * square)
 
     // %override [Lua table] MyFrame::GetFocusedWord()
     // void MyFrame::GetFocusedWord(XSquare ** start, XSquare ** end)
     int GetFocusedWord()
 
     bool GetFocusedDirection() const
+    void SetFocusedDirection(bool direction)
 
     // %override number, text MyFrame::GetFocusedClue()
     // const XPuzzle::Clue * MyFrame::GetFocusedClue()

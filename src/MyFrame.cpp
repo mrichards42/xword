@@ -55,6 +55,7 @@
 
 #ifdef XWORD_USE_LUA
 	// Lua!
+#define wxLUA_USEBINDING_WXLUASOCKET 0
 	#include "wxlua/include/wxlua.h"
 	#include "wxbind/include/wxbinddefs.h"
 	WXLUA_DECLARE_BIND_ALL
@@ -303,11 +304,13 @@ public:
     virtual bool OnDropFiles(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
                              const wxArrayString & filenames)
     {
+#if XWORD_USE_LUA
 		// Run the file as a script if it ends with .lua
 		if (filenames.Item(0).EndsWith(_T(".lua")))
 			m_frame->RunLuaScript(filenames.Item(0));
 		// Otherwise try to open as a puzzle
 		else
+#endif
 			m_frame->LoadPuzzle(filenames.Item(0));
         return true;
     }
@@ -356,7 +359,7 @@ MyFrame::MyFrame()
 #endif // XWORD_USE_LUA
 
 #ifdef __WXDEBUG__
-	LoadPuzzle(_T("D:\\C++\\XWord\\test_files\\sunday.puz"));
+	//LoadPuzzle(_T("D:\\C++\\XWord\\test_files\\sunday.puz"));
 #endif // __WXDEBUG__
 
     ShowPuzzle();
@@ -529,43 +532,47 @@ MyFrame::ShowPuzzle()
 {
     // If there is no puzzle, display a blank frame
     if (! m_puz.IsOk())
-    {
-        SetTitle(_T("XWord"));
         m_puz.Clear();
-        m_gridCtrl->SetXGrid(NULL);
-    }
-    else
-    {
-        SetTitle(m_puz.m_title + _T(" - XWord"));
-        m_gridCtrl->SetXGrid     (&m_puz.m_grid);
-    }
-    // Everything else is fine to set with or without a loaded puzzle
 
-
-    m_across   ->SetClueList(m_puz.m_across);
-    m_down     ->SetClueList(m_puz.m_down);
-    m_title    ->SetLabel   (m_puz.m_title);
-    m_author   ->SetLabel   (m_puz.m_author);
-    m_copyright->SetLabel   (m_puz.m_copyright);
-    m_notes    ->ChangeValue(m_puz.m_notes);
-
-    // Reset save/save as flag
+    // Enable / disable tools
     EnableSaveAs();
-
-
-    // Set the notes bitmap depending on whether there are notes or not
-    if (m_puz.m_notes.empty())
-        m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
-    else
-        m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes_new"));
-
     if (m_puz.IsOk())
     {
         SetStatus(m_puz.m_filename);
         EnableTools(true);
+    }
+    else
+    {
+        EnableTools(false);
+        m_cluePrompt->Clear();
+    }
 
+	// Update the GUI
+	ShowClues();
+	ShowAuthor();
+	ShowTitle();
+	ShowCopyright();
+	ShowNotes();
+	ShowGrid();
+
+	// Timer
+    StopTimer();
+    SetTime(m_puz.m_time);
+    if (m_puz.m_isTimerRunning)
+        StartTimer();
+}
+
+void
+MyFrame::ShowGrid()
+{
+    if (! m_puz.IsOk())
+        m_gridCtrl->SetXGrid(NULL);
+	else
+	{
+		m_gridCtrl->SetXGrid(&m_puz.m_grid);
 
         const bool scrambled = m_puz.IsScrambled();
+		// Enable / disable scrambling tools
         m_toolMgr.Enable(ID_SCRAMBLE,   ! scrambled);
         m_toolMgr.Enable(ID_UNSCRAMBLE, scrambled);
         EnableCheck(! scrambled);
@@ -575,22 +582,60 @@ MyFrame::ShowPuzzle()
 
         // Inform user if puzzle is already completed
         CheckPuzzle();
-    }
-    else
-    {
-        EnableTools(false);
-        m_cluePrompt->Clear();
-    }
-
-    StopTimer();
-    SetTime(m_puz.m_time);
-    if (m_puz.m_isTimerRunning)
-        StartTimer();
+	}
 
     m_gridCtrl->SetPaused(false);
     m_gridCtrl->Refresh();
 }
 
+
+void
+MyFrame::ShowClues()
+{
+	m_across->SetClueList(m_puz.m_across);
+    m_down  ->SetClueList(m_puz.m_down);
+}
+
+
+void
+MyFrame::ShowTitle()
+{
+    if (! m_puz.IsOk())
+	{
+        SetTitle(_T("XWord"));
+		m_title->SetLabel(_T(""));
+	}
+	else
+	{
+		SetTitle(m_puz.m_title + _T(" - XWord"));
+		m_title->SetLabel(m_puz.m_title);
+	}
+}
+
+void
+MyFrame::ShowAuthor()
+{
+    m_author->SetLabel(m_puz.m_author);
+}
+
+void
+MyFrame::ShowCopyright()
+{
+    m_copyright->SetLabel(m_puz.m_copyright);
+}
+
+
+void
+MyFrame::ShowNotes()
+{
+	m_notes->ChangeValue(m_puz.m_notes);
+    // Set the notes bitmap depending on whether there are notes or not
+    if (m_puz.m_notes.empty())
+        m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
+    else
+        m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes_new"));
+
+}
 
 void
 MyFrame::CheckPuzzle()
@@ -1283,6 +1328,16 @@ MyFrame::GetFocusedSquare()
 		return m_gridCtrl->GetFocusedSquare();
 }
 
+XSquare *
+MyFrame::SetFocusedSquare(XSquare * square)
+{
+	if (m_gridCtrl->IsEmpty())
+		return false;
+	else
+		// TODO:These function names should really be consistent
+		return m_gridCtrl->SetSquareFocus(square);
+}
+
 void
 MyFrame::GetFocusedWord(XSquare ** start, XSquare ** end)
 {
@@ -1299,6 +1354,12 @@ bool
 MyFrame::GetFocusedDirection() const
 {
 	return m_gridCtrl->GetDirection();
+}
+
+void
+MyFrame::SetFocusedDirection(bool direction)
+{
+	m_gridCtrl->SetDirection(direction);
 }
 
 const XPuzzle::Clue *
@@ -1720,7 +1781,7 @@ MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
     for (int row = 0; row < gridCopy.size(); ++row)
         for (int col = 0; col < gridCopy.at(row).size(); ++col)
             // Swap the square
-            m_puz.m_grid.m_grid.at(row).at(col) = gridCopy.at(col).at(row);
+            m_puz.m_grid.m_grid.at(col).at(row) = gridCopy.at(row).at(col);
 
     // Re-setup the grid.
     m_puz.m_grid.SetupIteration();
@@ -1758,6 +1819,7 @@ MyFrame::LuaInit()
 		return;
 
 	// Set the lua search paths
+	// This is now a modification of the lua source code directly
 	/*
 	m_lua.RunString(wxString::Format(
 		_T("package.path = [[%s?.lua;%s?\\init.lua;%slibs\\?.lua;%slibs\\?\\init.lua]]"),
@@ -1769,43 +1831,10 @@ MyFrame::LuaInit()
 	*/
 
 	// Initialize the lua additions to the xword package
-	RunLuaScript(scriptsDir + _T("xword\\init.lua"));
-	// Add the XWord scripts directory to the global xword table
+	// Set the scripts directory first
 	m_lua.RunString(wxString::Format(_T("xword.scriptsdir = [[%s]]"), scriptsDir));
-
-	// Load all .lua scripts in the scripts folder
-	// All scripts will be loaded using
-	//     require 'path.to.script'
-	// with the exception of path\to\init.lua which will be loaded as
-	//     require 'path.to'
-	// require makes sure that the script ends up in package.loaded so that
-	// modules are loaded only once.  In order to make sure that modules aren't
-    // double-loaded, script-writers *must* use the same convention when
-    // requiring other modules.  Note that the script path is stored in
-    // package.loaded literally, so 'path\to\script' is different from
-    // 'path.to.script'.  If a script-writer uses require 'path\to\script',
-    // the script will be initialized twice.  Don't do it.
-	wxArrayString files;
-	// Run the init.lua files first
-	wxDir::GetAllFiles(scriptsDir, &files, _T("init.lua"));
-	// Then add all the .lua files
-	wxDir::GetAllFiles(scriptsDir, &files, _T("*.lua"));
-	for (wxArrayString::iterator it = files.begin(); it != files.end(); ++it)
-	{
-		wxFileName fn(*it);
-		fn.MakeRelativeTo(scriptsDir);
-		fn.SetExt(_T(""));
-		// At this point, fn has the directory and filename (i.e "xword\\init")
-		// Transform the directory splitter into a dot
-		wxString path = fn.GetFullPath();
-		path.Replace(_T("\\"), _T("/"));
-		path.Replace(_T("/"), _T("."));
-		// If this is an init script, just import the package itself
-		if (path.EndsWith(_T(".init")))
-			path = path.Mid(0, path.size() - 5);
-		// require the script so that it is added to the package.loaded table.
-		m_lua.RunString(wxString::Format(_T("require'%s'"), path));
-	}
+	RunLuaScript(scriptsDir + _T("xword/init.lua"));
+	// Add the XWord scripts directory to the global xword table
 }
 
 void

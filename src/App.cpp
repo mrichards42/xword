@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
 #include "App.hpp"
 #include <wx/cmdline.h>
 #include "MyFrame.hpp"
@@ -27,7 +26,6 @@
 
 #include <cstdlib> // srand()
 #include <ctime>   // time()
-
 
 // Initialize the global printing variables
 wxPrintData * g_printData = (wxPrintData*)NULL;
@@ -76,6 +74,7 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
 bool
 MyApp::OnInit()
 {
+	//_CrtSetBreakAlloc(34280);
     m_frame = NULL;
 
     wxLogDebug(_T("Starting App"));

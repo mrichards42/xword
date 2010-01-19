@@ -1,12 +1,12 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="XWord"
-	ProjectGUID="{B5EEF4F2-FCDE-4257-B060-07F2EE546B3F}"
+	ProjectGUID="{1F5161EA-3E7C-4349-86DC-E024D1FC1F98}"
 	RootNamespace="XWord"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="196613"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -17,11 +17,11 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Unicode Debug|Win32"
-			OutputDirectory="$(SolutionDir)\build\debug"
-			IntermediateDirectory="$(SolutionDir)\build\debug"
+			Name="Debug|Win32"
+			OutputDirectory="."
+			IntermediateDirectory="obj\Debug"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,33 +41,37 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(WXWIN)\lib\vc_lib\mswud&quot;;&quot;$(WXLUA)\modules&quot;;&quot;$(WXLUA)\modules\lua\include&quot;;&quot;$(WXLUA)\modules\wxbind\setup&quot;"
-				PreprocessorDefinitions="_UNICODE;_DEBUG;__WXDEBUG__;__WXMSW__;WIN32;_WINDOWS"
-				IgnoreStandardIncludePath="false"
-				GeneratePreprocessedFile="0"
+				AdditionalIncludeDirectories="$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud;wxlua;wxlua\lua\include;wxlua\wxbind\setup"
+				PreprocessorDefinitions="UNICODE;_UNICODE;XWORD_USE_LUA;WIN32;_WINDOWS;DEBUG;_DEBUG;__WXDEBUG__;__WXMSW__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				ForceConformanceInForLoopScope="false"
-				WarningLevel="4"
-				DebugInformationFormat="3"
+				RuntimeLibrary="3"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(OutDir)\XWord.pdb"
+				WarningLevel="3"
+				DebugInformationFormat="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="UNICODE;_UNICODE;XWORD_USE_LUA;WIN32;_WINDOWS;DEBUG;_DEBUG;__WXDEBUG__;__WXMSW__"
+				AdditionalIncludeDirectories="$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud;wxlua;wxlua\lua\include;wxlua\wxbind\setup"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxlua_msw28ud_wxluasocket.lib wxlua_msw28ud_wxluadebug.lib wxlua_msw28ud_wxbindadv.lib wxlua_msw28ud_wxbindaui.lib wxlua_msw28ud_wxbindbase.lib wxlua_msw28ud_wxbindcore.lib wxlua_msw28ud_wxbindhtml.lib wxlua_msw28ud_wxbindmedia.lib wxlua_msw28ud_wxbindnet.lib wxlua_msw28ud_wxbindxml.lib wxlua_msw28ud_wxbindxrc.lib wxlua_msw28ud_wxlua.lib lua5.1.lib wxmsw28ud_xrc.lib wxmsw28ud_html.lib wxmsw28ud_gl.lib wxmsw28ud_aui.lib wxmsw28ud_media.lib wxmsw28ud_adv.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxmsw28ud_core.lib wxbase28ud.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib oleacc.lib"
+				AdditionalDependencies="wxlua\wxbind\wxbindadv.lib wxlua\wxbind\wxbindaui.lib wxlua\wxbind\wxbindbase.lib wxlua\wxbind\wxbindcore.lib wxlua\wxbind\wxbindhtml.lib wxlua\wxbind\wxbindmedia.lib wxlua\wxbind\wxbindnet.lib wxlua\wxbind\wxbindxml.lib wxlua\wxbind\wxbindxrc.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib oleacc.lib wxmsw28ud_xrc.lib wxmsw28ud_html.lib wxmsw28ud_gl.lib wxmsw28ud_aui.lib wxmsw28ud_media.lib wxmsw28ud_adv.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxmsw28ud_core.lib wxbase28ud.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexud.lib wxexpatd.lib"
+				OutputFile="$(OutDir)\XWord.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(WXLUA)\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="$(WXWIN)\lib\vc_lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -92,11 +96,11 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Unicode Release|Win32"
-			OutputDirectory="$(SolutionDir)\build\release"
-			IntermediateDirectory="$(SolutionDir)\build\release"
+			Name="Release|Win32"
+			OutputDirectory="."
+			IntermediateDirectory="obj\Release"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -115,31 +119,39 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				FavorSizeOrSpeed="0"
-				AdditionalIncludeDirectories="&quot;$(WXWIN)\lib\vc_lib\mswu&quot;;&quot;$(WXLUA)\modules&quot;;&quot;$(WXLUA)\modules\lua\include&quot;;&quot;$(WXLUA)\modules\wxbind\setup&quot;"
-				PreprocessorDefinitions="WIN32;_UNICODE;__WXMSW__;_WINDOWS"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="0"
-				RuntimeLibrary="0"
-				DebugInformationFormat="3"
+				Optimization="3"
+				AdditionalIncludeDirectories="$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu;wxlua;wxlua\lua\include;wxlua\wxbind\setup"
+				PreprocessorDefinitions="UNICODE;_UNICODE;XWORD_USE_LUA;WIN32;_WINDOWS;NDEBUG;__WXMSW__"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(OutDir)\XWord.pdb"
+				WarningLevel="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="UNICODE;_UNICODE;XWORD_USE_LUA;WIN32;_WINDOWS;NDEBUG;__WXMSW__"
+				AdditionalIncludeDirectories="$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu;wxlua;wxlua\lua\include;wxlua\wxbind\setup"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxlua_msw28u_wxluasocket.lib wxlua_msw28u_wxluadebug.lib wxlua_msw28u_wxbindadv.lib wxlua_msw28u_wxbindaui.lib wxlua_msw28u_wxbindbase.lib wxlua_msw28u_wxbindcore.lib wxlua_msw28u_wxbindhtml.lib wxlua_msw28u_wxbindmedia.lib wxlua_msw28u_wxbindnet.lib wxlua_msw28u_wxbindxml.lib wxlua_msw28u_wxbindxrc.lib wxlua_msw28u_wxlua.lib lua5.1.lib wxmsw28u_xrc.lib wxmsw28u_html.lib wxmsw28u_gl.lib wxmsw28u_aui.lib wxmsw28u_media.lib wxmsw28u_adv.lib wxbase28u_net.lib wxbase28u_xml.lib wxmsw28u_core.lib wxbase28u.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib oleacc.lib"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(WXLUA)\lib\vc_lib&quot;"
+				AdditionalDependencies="wxlua\wxbind\wxbindadv.lib wxlua\wxbind\wxbindaui.lib wxlua\wxbind\wxbindbase.lib wxlua\wxbind\wxbindcore.lib wxlua\wxbind\wxbindhtml.lib wxlua\wxbind\wxbindmedia.lib wxlua\wxbind\wxbindnet.lib wxlua\wxbind\wxbindxml.lib wxlua\wxbind\wxbindxrc.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib oleacc.lib wxmsw28u_xrc.lib wxmsw28u_html.lib wxmsw28u_gl.lib wxmsw28u_aui.lib wxmsw28u_media.lib wxmsw28u_adv.lib wxbase28u_net.lib wxbase28u_xml.lib wxmsw28u_core.lib wxbase28u.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib"
+				OutputFile="$(OutDir)\XWord.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="$(WXWIN)\lib\vc_lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -168,341 +180,305 @@
 	</References>
 	<Files>
 		<Filter
-			Name="utils"
-			>
-			<Filter
-				Name="Header Files"
-				>
-				<File
-					RelativePath=".\src\utils\ByteArray.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\utils\ConfigManager.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\utils\ToolInfo.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\utils\ToolManager.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\utils\wrap.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				>
-				<File
-					RelativePath=".\src\utils\ByteArray.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\utils\ToolInfo.cpp"
-					>
-					<FileConfiguration
-						Name="Unicode Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							GeneratePreprocessedFile="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\src\utils\ToolManager.cpp"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="widgets"
-			>
-			<Filter
-				Name="Header Files"
-				>
-				<File
-					RelativePath=".\src\widgets\ctrlwitems.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\mlistbox.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\odlistbox.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\SizedText.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\vlboxcache.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				>
-				<File
-					RelativePath=".\src\widgets\SizedText.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\vlboxcache.cpp"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="dialogs"
-			>
-			<Filter
-				Name="Source Files"
-				>
-				<File
-					RelativePath=".\src\dialogs\Convert.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\Preferences.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\wxFB_Dialogs.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Header Files"
-				>
-				<File
-					RelativePath=".\src\dialogs\Convert.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\Layout.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\Preferences.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\wxFB_Dialogs.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name=".Header Files"
+			Name="src"
 			>
 			<File
-				RelativePath=".\src\App.hpp"
+				RelativePath="src\App.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\ClueListBox.hpp"
+				RelativePath="src\App.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\CluePanel.hpp"
+				RelativePath="src\ClueListBox.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\CluePrompt.hpp"
+				RelativePath="src\ClueListBox.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\messages.hpp"
+				RelativePath="src\CluePanel.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\MyFrame.hpp"
+				RelativePath="src\CluePanel.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\MyStatusBar.hpp"
+				RelativePath="src\CluePrompt.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\paths.cpp"
+				RelativePath="src\CluePrompt.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\printout.hpp"
+				RelativePath="src\messages.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\PuzEvent.hpp"
+				RelativePath="src\messages.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\wxluasetup.h"
+				RelativePath="src\MyFrame.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\XGridCtrl.hpp"
+				RelativePath="src\MyFrame.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\XGridDrawer.hpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name=".Source Files"
-			>
-			<File
-				RelativePath=".\src\App.cpp"
+				RelativePath="src\MyStatusBar.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\ClueListBox.cpp"
+				RelativePath="src\MyStatusBar.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\CluePanel.cpp"
+				RelativePath="src\paths.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\CluePrompt.cpp"
+				RelativePath="src\paths.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\messages.cpp"
+				RelativePath="src\printout.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\MyFrame.cpp"
+				RelativePath="src\printout.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\MyStatusBar.cpp"
+				RelativePath="src\PuzEvent.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\paths.hpp"
+				RelativePath="src\PuzEvent.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\printout.cpp"
+				RelativePath="src\wxleaks.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\PuzEvent.cpp"
+				RelativePath="src\XGridCtrl.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\XGridCtrl.cpp"
+				RelativePath="src\XGridCtrl.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\XGridDrawer.cpp"
+				RelativePath="src\XGridDrawer.cpp"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="puz"
-			>
+			<File
+				RelativePath="src\XGridDrawer.hpp"
+				>
+			</File>
 			<Filter
-				Name="Header Files"
+				Name="dialogs"
 				>
 				<File
-					RelativePath=".\src\puz\Checksummer.hpp"
+					RelativePath="src\dialogs\Convert.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\HandlerBase.hpp"
+					RelativePath="src\dialogs\Convert.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\PuzCk.hpp"
+					RelativePath="src\dialogs\Layout.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\PuzHandler.hpp"
+					RelativePath="src\dialogs\Preferences.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\Scrambler.hpp"
+					RelativePath="src\dialogs\Preferences.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\TxtHandler.hpp"
+					RelativePath="src\dialogs\wxFB_Dialogs.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\XGrid.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\XPuzzle.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\puz\XSquare.hpp"
+					RelativePath="src\dialogs\wxFB_Dialogs.h"
 					>
 				</File>
 			</Filter>
 			<Filter
-				Name="Source Files"
+				Name="puz"
 				>
 				<File
-					RelativePath=".\src\puz\Checksummer.cpp"
+					RelativePath="src\puz\Checksummer.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\HandlerBase.cpp"
+					RelativePath="src\puz\Checksummer.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\PuzHandler.cpp"
+					RelativePath="src\puz\HandlerBase.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\Scrambler.cpp"
+					RelativePath="src\puz\HandlerBase.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\TxtHandler.cpp"
+					RelativePath="src\puz\PuzCk.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\XGrid.cpp"
+					RelativePath="src\puz\PuzHandler.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\XPuzzle.cpp"
+					RelativePath="src\puz\PuzHandler.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\puz\XSquare.cpp"
+					RelativePath="src\puz\Scrambler.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\Scrambler.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\TxtHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\TxtHandler.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\XGrid.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\XGrid.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\XPuzzle.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\XPuzzle.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\XSquare.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\puz\XSquare.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="src\utils\ByteArray.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\utils\ByteArray.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\utils\ConfigManager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\utils\SizerPrinter.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\utils\ToolInfo.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\utils\ToolInfo.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\utils\ToolManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\utils\ToolManager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\utils\wrap.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="widgets"
+				>
+				<File
+					RelativePath="src\widgets\ctrlwitems.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\widgets\mlistbox.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\widgets\odlistbox.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\widgets\SizedText.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\widgets\SizedText.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\widgets\vlboxcache.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\widgets\vlboxcache.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wxlua"
+				>
+				<File
+					RelativePath="src\wxlua\xword_bind.cpp"
+					>
+				</File>
+				<File
+					RelativePath="src\wxlua\xword_bind.h"
+					>
+				</File>
+				<File
+					RelativePath="src\wxlua\xword_bind_helpers.hpp"
+					>
+				</File>
+				<File
+					RelativePath="src\wxlua\xword_override.hpp"
 					>
 				</File>
 			</Filter>
 		</Filter>
-		<Filter
-			Name="wxlua"
-			>
-			<File
-				RelativePath=".\src\wxlua\xword_bind.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\wxlua\xword_bind.h"
-				>
-			</File>
-		</Filter>
-		<File
-			RelativePath=".\src\resource.rc"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
