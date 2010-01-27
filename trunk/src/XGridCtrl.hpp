@@ -173,8 +173,8 @@ public:
     void SetSquareText(XSquare & square, const wxString & text = _T(""));
 
     XSquare * GetFocusedSquare() { return m_focusedSquare; }
-	void GetFocusedWord(XSquare ** start, XSquare ** end)
-		{ *start = m_focusedStart; * end = m_focusedEnd; }
+    void GetFocusedWord(XSquare ** start, XSquare ** end)
+        { *start = m_focusedStart; * end = m_focusedEnd; }
 
     void CheckGrid  (int options = NO_REVEAL_ANSWER | MESSAGE_BOX);
     void CheckWord  (int options = NO_REVEAL_ANSWER | MESSAGE_BOX);

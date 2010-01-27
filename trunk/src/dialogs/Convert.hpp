@@ -81,13 +81,13 @@ protected:
     // Options events
     //---------------
     virtual void OnShowOptions(wxCommandEvent & WXUNUSED(evt));
-	virtual void OnSpecifyDirectory(wxCommandEvent & evt);
-	virtual void OnUseLog(wxCommandEvent & evt);
+    virtual void OnSpecifyDirectory(wxCommandEvent & evt);
+    virtual void OnUseLog(wxCommandEvent & evt);
 
     // Files list events
     //------------------
-	virtual void OnAdd(wxCommandEvent & WXUNUSED(evt));
-	virtual void OnRemove(wxCommandEvent & WXUNUSED(evt));
+    virtual void OnAdd(wxCommandEvent & WXUNUSED(evt));
+    virtual void OnRemove(wxCommandEvent & WXUNUSED(evt));
     virtual void OnRunButton(wxCommandEvent & WXUNUSED(evt));
     virtual void OnDoubleClick(wxMouseEvent & evt);
     // This is where the conversion takes place.

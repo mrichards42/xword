@@ -168,18 +168,18 @@ public:
     // Clue list font
     //---------------
 
-	// This function is a mess, because we need to finish creating the underlying
-	// wxPanel before we can create child windows, but the wxMac implementation
-	// calls SetFont while the wxPanel is being created . . .
-	bool SetFont(const wxFont & font)
-	{
-		bool ret = wxPanel::SetFont(font);
-		if (! ret)
-			return false;
-		if (m_clueList != NULL)
-			ret &= m_clueList->SetFont(font);
-		return ret;
-	}
+    // This function is a mess, because we need to finish creating the underlying
+    // wxPanel before we can create child windows, but the wxMac implementation
+    // calls SetFont while the wxPanel is being created . . .
+    bool SetFont(const wxFont & font)
+    {
+        bool ret = wxPanel::SetFont(font);
+        if (! ret)
+            return false;
+        if (m_clueList != NULL)
+            ret &= m_clueList->SetFont(font);
+        return ret;
+    }
 
 
     // Clue list margins

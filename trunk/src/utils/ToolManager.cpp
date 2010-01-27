@@ -195,7 +195,7 @@ ToolManager::GetBitmap(const ToolInfo * tool, int iconSize) const
 
      wxASSERT(GetImage(tool, iconSize).IsOk());
 
-	return wxBitmap(GetImage(tool, iconSize));
+    return wxBitmap(GetImage(tool, iconSize));
 }
 
 
