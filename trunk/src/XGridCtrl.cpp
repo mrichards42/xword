@@ -140,9 +140,9 @@ XGridCtrl::Create(wxWindow * parent,
     if (! wxScrolledWindow::Create(parent, id, pos, size, style, name))
         return false;
 
-	// Have to do this here, or wxMac will break
-	// (XGridDrawer would use GetTextExtent on a not yet created window)
-	m_drawer.SetWindow(this);
+    // Have to do this here, or wxMac will break
+    // (XGridDrawer would use GetTextExtent on a not yet created window)
+    m_drawer.SetWindow(this);
 
     SetXGrid(grid);
 
@@ -861,7 +861,6 @@ XGridCtrl::OnRightDown(wxMouseEvent & evt)
 void
 XGridCtrl::OnKeyDown(wxKeyEvent & evt)
 {
-    wxLogDebug(_T("OnKeyDown at XGridCtrl"));
     wxASSERT(! IsEmpty());
 
     const int key = evt.GetKeyCode();
@@ -905,10 +904,21 @@ XGridCtrl::OnChar(wxKeyEvent & evt)
     const int key = evt.GetKeyCode();
     const int mod = evt.GetModifiers();
 
-    if (XSquare::IsValidChar(static_cast<wxChar>(key)))
-        OnLetter(wxToupper(key), mod);
+    wxLogDebug(_T("Grid Character: \"%c\""), key);
+
+    if (key == _T('*'))
+    {
+        GetFocusedSquare()->ToggleFlag(XFLAG_CIRCLE);
+        RefreshSquare();
+    }
     else if (key == WXK_SPACE && ! m_wantsRebus)
+    {
         OnLetter(key, mod);
+    }
+    else if (XSquare::IsValidChar(static_cast<wxChar>(key)))
+    {
+        OnLetter(wxToupper(key), mod);
+    }
 }
 
 
@@ -1319,7 +1329,6 @@ XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
 {
     // Skip this event by default so that we recieve EVT_CHAR events.
     evt.Skip();
-    wxLogDebug(_T("KeyDown at XGridRebusHandler"));
 
     const int key = evt.GetKeyCode();
     const int mod = evt.GetModifiers();
