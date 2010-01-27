@@ -149,7 +149,7 @@ int XWordMessage(XWordMessageId id, ...)
     return wxMessageBox(message, desc.title, desc.flags);
 }
 
-int XWordMessage(const wxString & fmt, ...)
+int XWordMessage(const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
     return wxMessageBox(message, messageTitle, messageFlags);
@@ -166,7 +166,7 @@ bool XWordPrompt(XWordMessageId id, ...)
     return (ret == wxYES || ret == wxOK);
 }
 
-bool XWordPrompt(const wxString & fmt, ...)
+bool XWordPrompt(const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
     const int ret = wxMessageBox(message, questionTitle, questionFlags);
@@ -174,7 +174,7 @@ bool XWordPrompt(const wxString & fmt, ...)
 }
 
 
-int XWordErrorMessage(const wxString & fmt, ...)
+int XWordErrorMessage(const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
     return wxMessageBox(message, errorTitle, errorFlags);

@@ -50,15 +50,15 @@ enum XWordMessageId
 // Return the raw return value of the wxMessagebox
 // (wxYES / wxNO / wxCANCEL / wxOK)
 int XWordMessage(XWordMessageId id, ...);
-int XWordMessage(const wxString & fmt, ...);
+int XWordMessage(const wxChar * fmt, ...);
 
 // Return true if the wxMessageBox returns either wxYES or wxOK
 bool XWordPrompt(XWordMessageId id, ...);
-bool XWordPrompt(const wxString & fmt, ...);
+bool XWordPrompt(const wxChar * fmt, ...);
 
 // Return the raw return value of the wxMessagebox
 // The return value is pretty much meaningless, since an error dialog
 // should only have an OK button anyways.
-int XWordErrorMessage(const wxString & fmt, ...);
+int XWordErrorMessage(const wxChar * fmt, ...);
 
 #endif // MY_MESSAGES_H
