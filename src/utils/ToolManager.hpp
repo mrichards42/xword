@@ -108,7 +108,7 @@ public:
     void SetIconLocation(const wxString & path) { m_iconLocation = path; }
     const wxString & GetIconLocation() const    { return m_iconLocation; }
 
-	// Use a wxImage instead of a wxIcon so that the toolbar icons look OK on a Mac.
+    // Use a wxImage instead of a wxIcon so that the toolbar icons look OK on a Mac.
     wxImage  GetImage (int id, int size) const { return GetImage (GetTool(id), size); }
     wxBitmap GetBitmap(int id, int size) const { return GetBitmap(GetTool(id), size); }
 

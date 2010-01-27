@@ -50,12 +50,12 @@ protected:
     static bool HasFlag (int flag, int test) { return (flag & test) != 0; }
     void AddRemoveGridFlag(wxCommandEvent & evt, int flag);
 
-	virtual void OnAfterLetter(wxCommandEvent & evt);
-	virtual void OnBlankOnDirection(wxCommandEvent & evt);
-	virtual void OnBlankOnNewWord(wxCommandEvent & evt);
-	virtual void OnPauseOnSwitch(wxCommandEvent & evt);
-	virtual void OnMoveOnRightClick(wxCommandEvent & evt);
-	virtual void OnCheckWhileTyping(wxCommandEvent & evt);
+    virtual void OnAfterLetter(wxCommandEvent & evt);
+    virtual void OnBlankOnDirection(wxCommandEvent & evt);
+    virtual void OnBlankOnNewWord(wxCommandEvent & evt);
+    virtual void OnPauseOnSwitch(wxCommandEvent & evt);
+    virtual void OnMoveOnRightClick(wxCommandEvent & evt);
+    virtual void OnCheckWhileTyping(wxCommandEvent & evt);
 
     // Colors
     //-------
@@ -70,36 +70,36 @@ protected:
     }
 
     // Grid
-	virtual void OnSelectedLetterColor(wxColourPickerEvent & evt);
-	virtual void OnSelectedWordColor(wxColourPickerEvent & evt);
-	virtual void OnPenColor(wxColourPickerEvent & evt);
-	virtual void OnPencilColor(wxColourPickerEvent & evt);
+    virtual void OnSelectedLetterColor(wxColourPickerEvent & evt);
+    virtual void OnSelectedWordColor(wxColourPickerEvent & evt);
+    virtual void OnPenColor(wxColourPickerEvent & evt);
+    virtual void OnPencilColor(wxColourPickerEvent & evt);
 
     // Clue Prompt
-	virtual void OnPromptBackgroundColor(wxColourPickerEvent & evt);
-	virtual void OnPromptTextColor(wxColourPickerEvent & evt);
+    virtual void OnPromptBackgroundColor(wxColourPickerEvent & evt);
+    virtual void OnPromptTextColor(wxColourPickerEvent & evt);
 
     // Clue List
-	virtual void OnClueBackgroundColor(wxColourPickerEvent & evt);
-	virtual void OnClueTextColor(wxColourPickerEvent & evt);
-	virtual void OnSelectedClueBackgroundColor(wxColourPickerEvent & evt);
-	virtual void OnSelectedClueTextColor(wxColourPickerEvent & evt);
-	virtual void OnCrossingClueBackgroundColor(wxColourPickerEvent & evt);
-	virtual void OnCrossingClueTextColor(wxColourPickerEvent & evt);
-	virtual void OnClueHeadingTextColor(wxColourPickerEvent & evt);
-	virtual void OnClueHeadingBackgroundColor(wxColourPickerEvent & evt);
+    virtual void OnClueBackgroundColor(wxColourPickerEvent & evt);
+    virtual void OnClueTextColor(wxColourPickerEvent & evt);
+    virtual void OnSelectedClueBackgroundColor(wxColourPickerEvent & evt);
+    virtual void OnSelectedClueTextColor(wxColourPickerEvent & evt);
+    virtual void OnCrossingClueBackgroundColor(wxColourPickerEvent & evt);
+    virtual void OnCrossingClueTextColor(wxColourPickerEvent & evt);
+    virtual void OnClueHeadingTextColor(wxColourPickerEvent & evt);
+    virtual void OnClueHeadingBackgroundColor(wxColourPickerEvent & evt);
 
     // Fonts
     //------
-	virtual void OnGridLetterFont(wxFontPickerEvent & evt);
+    virtual void OnGridLetterFont(wxFontPickerEvent & evt);
     virtual void OnGridNumberFont(wxFontPickerEvent & evt);
-	virtual void OnCluePromptFont(wxFontPickerEvent & evt);
-	virtual void OnClueFont(wxFontPickerEvent & evt);
-	virtual void OnClueHeadingFont(wxFontPickerEvent & evt);
+    virtual void OnCluePromptFont(wxFontPickerEvent & evt);
+    virtual void OnClueFont(wxFontPickerEvent & evt);
+    virtual void OnClueHeadingFont(wxFontPickerEvent & evt);
 
     // Misc
     //-----
-	virtual void OnCluePromptFormat(wxCommandEvent & evt);
+    virtual void OnCluePromptFormat(wxCommandEvent & evt);
     virtual void OnLetterScale(wxSpinEvent & evt);
     virtual void OnNumberScale(wxSpinEvent & evt);
 

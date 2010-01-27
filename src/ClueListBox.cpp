@@ -33,7 +33,7 @@ ClueListBox::Create(wxWindow * parent, wxWindowID id)
         return false;
 
     // Connect the single event here so we don't need the event macros
-	wxCachedVListBox::Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(ClueListBox::OnLeftDown));
+    wxCachedVListBox::Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(ClueListBox::OnLeftDown));
 
     return true;
 }
@@ -108,13 +108,13 @@ ClueListBox::OnDrawItem(wxDC & dc, const wxRect & rect, size_t n) const
 
     dc.DrawLabel(wxString::Format(_T("%d."), clue.Number()), numRect, wxALIGN_RIGHT|wxALIGN_TOP);
 
-	const wxString & clueText = m_cachedClues.at(n);
-	// The clue text could be empty if we loaded a corrupted puzzle and the user OK'd the action.
-	if (! clueText.empty())
-		dc.DrawLabel(clueText, textRect);
+    const wxString & clueText = m_cachedClues.at(n);
+    // The clue text could be empty if we loaded a corrupted puzzle and the user OK'd the action.
+    if (! clueText.empty())
+        dc.DrawLabel(clueText, textRect);
 #if __WXDEBUG__
-	else
-		wxLogDebug(_T("Clue text is empty (clue number %d)!"), n);
+    else
+        wxLogDebug(_T("Clue text is empty (clue number %d)!"), n);
 #endif // __WXDEBUG__
 
     //dc.DrawLine(textRect.x, textRect.y, textRect.x + textRect.width, textRect.y + textRect.height);
@@ -147,7 +147,7 @@ ClueListBox::OnMeasureItem(size_t n) const
         height += lineHeight;
     }
 
-	return std::max(height, GetCharHeight());
+    return std::max(height, GetCharHeight());
 }
 
 
