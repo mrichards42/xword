@@ -60,21 +60,21 @@ local function SwapAcrossDown(puz)
         end
     end
 
-    -- Set the puzzle's grid.  The puzzle now has ownership of the grid; lua
-    -- will not garbage collect the grid's userdata.
+    -- Set the puzzle's grid.  The puzzle now has ownership of the grid.
+    -- lua will not garbage collect the grid's userdata.
     puz.Grid = newGrid
 end
 
 
 local function init()
-    xword.frame:AddMenuItem({'Tools'}, 'Lua Swap Across and Down',
+    xword.frame:AddMenuItem({'Tools'}, 'Swap Across and Down',
         -- The menu callback function
         function(evt)
+            -- Can't do anything unless we have a puzzle
+            if not xword.HasPuzzle() then return end
+
             local puz = xword.frame.Puzzle
             local frame = xword.frame
-
-            -- Can't do anything unless the puzzle is loaded correctly
-            if not puz:IsOk() then return end
 
             -- Save the current square and direction focus
             local square = frame:GetFocusedSquare()

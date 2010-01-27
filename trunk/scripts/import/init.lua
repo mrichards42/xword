@@ -28,8 +28,8 @@ import.handlers = {}
 -- Add a handler to the import handlers table
 -- addType will add the file selector dialogs, etc.
 
--- loadfunc should take a filename as the parameter, and return true if loading
--- succeeded.  loadfunc can get a puzzle using xword.frame:GetPuzzle().
+-- loadfunc should take a filename and a puzzle as parameteters.  It should
+-- return true on succes, and false, errormessage on failure
 
 -- types should be a table { ext = 'file description', [...] }
 -- ============================================================================
@@ -49,31 +49,38 @@ function import.addType(label, types, loadfunc)
     import.handlers[label] = {
         types = types,
         load = function(filename)
+            local puz = xword.frame.Puzzle
             -- Load and display the puzzle
-            xword.frame.Puzzle:Clear()
-            local success, err = pcall(loadfunc, filename, xword.frame.Puzzle)
-            if err then
-                wx.wxMessageBox(err)
+            puz:Clear()
+            local success, err = loadfunc(filename, puz)
+            if success then
+                -- Make sure grid has clue numbers assigned, etc.
+                puz.Grid:SetupGrid()
+                puz:SetFilename(filename)
+                puz:SetOk(true)
             else
-                xword.frame.Puzzle:SetFilename(filename)
-                xword.frame.Puzzle:SetOk(true)
+                xword.Error(err)
             end
             -- Show the puzzle regardless (a failed puzzle will display blank)
             xword.frame:ShowPuzzle()
         end,
         convert = function(filename, deleteOld)
             local puz = xword.XPuzzle()
-            local success, err = pcall(loadfunc, filename, puz)
-            if err then
-                return false, err
-            else
+            local success, err = loadfunc(filename, puz)
+            if success then
                 -- Save the file as a .puz
                 local newfile = filename:match("^(.*)%..*$") or filename
                 puz:Save(newfile..'.puz')
                 -- Remove the old file
                 if deleteOld then os.remove(filename) end
+                puz = nil -- garbage collect
                 return true
             end
+
+            -- Error
+            puz = nil -- garbage collect
+            print(err)
+            return false, err
         end,
     }
 
@@ -131,6 +138,7 @@ local function init()
 
     -- Require the rest of the files in the import directory
     xword.requiredir('import')
+    --require 'import.xml-uclick'
 end
 
 init()
