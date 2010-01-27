@@ -16,13 +16,18 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+
+// NOTE: If compiling a debug build of XWord, the build directory must not
+// begin with "debug" (default is "Unicode Debug").  If the directory
+// begins with "debug" some of these functions (notably, those using
+// wxStandardPaths::GetResourcesDir()) will return an incorrect path.
+// See stdpaths.cpp in the wxwidgets source tree.
+
+
 #include "paths.hpp"
 #include <wx/string.h>
-#include <wx/filefn.h>   // wxPathList
 #include <wx/filename.h> // wxFileName
 #include <wx/stdpaths.h> // wxStandardPaths
-#include <wx/app.h>      // wxTheApp
-#include <wx/log.h>
 
 #ifdef __UNIX__
 const wxChar * configFileName = _T(".xword");
@@ -30,113 +35,105 @@ const wxChar * configFileName = _T(".xword");
 const wxChar * configFileName = _T("config.ini");
 #endif // __UNIX__ / ! __UNIX__
 
+wxChar sep()
+{
+    return wxFileName::GetPathSeparator();
+}
+
+wxString exedir()
+{
+    return wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+}
+
+
+// Portable mode is used when a file "portable_mode_enabled" is present
+// in the executable directory.
+bool IsPortable()
+{
+    return wxFileExists(exedir() + sep() + _T("portable_mode_enabled"));
+}
+
+
+
+wxString GetConfigDirectory()
+{
+    if (IsPortable())
+        return exedir() + sep() + _T("config");
+    else
+        return wxStandardPaths::Get().GetUserDataDir() + sep() + _T("config");
+}
 
 wxString GetConfigFile()
+{
+    return GetConfigDirectory() + sep() + configFileName;
+}
+
+// If wxWidgets is compiled in debug mode under windows, *and* the exe is located
+// in a folder that begins with "debug" certain wxStandardPaths functions return
+// the parent directory instead of the exe directory.  This is clearly intended
+// as a feature, but I find it to be a pain.
+// The following are affected:
+//     wxStandardPaths::GetDataDir
+//     wxStandardPaths::GetPluginsDir
+//     wxStandardPaths::GetResourcesDir
+//     wxStandardPaths::GetAppDir
+// Fortunately these should always return the exe directory.
+#if ! defined(__WXDEBUG__) || ! defined(__WXMSW__)
+
+wxString GetImagesDirectory()
+{
+    if (IsPortable())
+        return exedir() + sep() + _T("images");
+    else
+        return wxStandardPaths::Get().GetResourcesDir() + sep() + _T("images");
+}
+
+
+wxString GetScriptsDirectory()
+{
+    if (IsPortable())
+        return exedir() + sep() + _T("scripts");
+    else
+        return wxStandardPaths::Get().GetResourcesDir() + sep() + _T("scripts");
+}
+
+#else
+
+wxString GetImagesDirectory()
+{
+    return exedir() + sep() + _T("images");
+}
+
+
+wxString GetScriptsDirectory()
+{
+    return exedir() + sep() + _T("scripts");
+}
+
+#endif // ! defined(__WXDEBUG__) || ! defined(__WXMSW__)
+
+
+
+// Compatibility with old versions of XWord
+
+// Find the config file in places that XWord 0.3 expected.
+wxString GetConfigFile_XWord_3()
 {
     wxString filename;
 
     // Look in several locations for the config file (order is preserved)
     wxPathList paths;
+    paths.Add(exedir());
 
-    paths.EnsureFileAccessible(wxString(wxTheApp->argv[0]));
-
-    // Check to see if config.ini is present in the application's directory. If
-    // so, use that file (portable mode).
+    // Look for config.ini in the executable directory
     filename = paths.FindAbsoluteValidPath(_T("config.ini"));
     if (! filename.empty())
         return filename;
 
+    // It's not there . . . check other directories
     paths.Add(wxStandardPaths::Get().GetUserConfigDir());
     paths.Add(wxStandardPaths::Get().GetUserDataDir());
     paths.Add(wxStandardPaths::Get().GetDataDir());
 
-    filename = paths.FindAbsoluteValidPath(configFileName);
-
-    // If there is no config file, put it in the same directory as the executable
-    if (filename.empty())
-        filename = wxPathOnly(wxTheApp->argv[0]) +
-                   wxFileName::GetPathSeparator() +
-                   configFileName;
-
-    return filename;
-}
-
-
-
-wxString GetImagesDirectory()
-{
-    // Look in several locations for the images directory (order is preserved)
-    // We can't use wxPathList to search for a directory (only a file), but we
-    // can use it to make sure that directories aren't added twice.  Since it
-    // inherits from wxArrayString, we can just iterate over the elements
-    // directory to search for the directory.
-    wxPathList directories;
-    directories.Add(wxPathOnly(wxString(wxTheApp->argv[0])));
-    directories.Add(wxStandardPaths::Get().GetUserDataDir());
-    directories.Add(wxStandardPaths::Get().GetLocalDataDir());
-    directories.Add(wxStandardPaths::Get().GetDataDir());
-    directories.Add(wxStandardPaths::Get().GetResourcesDir());
-
-    for (wxArrayString::const_iterator it = directories.begin();
-                 it != directories.end();
-                 ++it)
-    {
-        wxFileName dir; dir.AssignDir(*it);
-        dir.AppendDir(_T("images"));
-        if (dir.DirExists())
-            return dir.GetFullPath();
-    }
-
-    // If there is no images directory, alert the user
-    wxString message = _T("Could not find \"images\" folder.  ")
-                       _T("Folders searched:\n");
-    for (wxArrayString::const_iterator it = directories.begin();
-         it != directories.end();
-         ++it)
-    {
-        message.append(*it + _T("\n"));
-    }
-    wxLogError(message);
-
-    return wxEmptyString;
-}
-
-
-
-wxString GetScriptsDirectory()
-{
-    // Look in several locations for the scripts directory (order is preserved)
-    // We can't use wxPathList to search for a directory (only a file), but we
-    // can use it to make sure that directories aren't added twice.  Since it
-    // inherits from wxArrayString, we can just iterate over the elements
-    // directory to search for the directory.
-    wxPathList directories;
-    directories.Add(wxPathOnly(wxString(wxTheApp->argv[0])));
-    directories.Add(wxStandardPaths::Get().GetUserDataDir());
-    directories.Add(wxStandardPaths::Get().GetLocalDataDir());
-    directories.Add(wxStandardPaths::Get().GetDataDir());
-    directories.Add(wxStandardPaths::Get().GetResourcesDir());
-
-    for (wxArrayString::const_iterator it = directories.begin();
-                 it != directories.end();
-                 ++it)
-    {
-        wxFileName dir; dir.AssignDir(*it);
-        dir.AppendDir(_T("scripts"));
-        if (dir.DirExists())
-            return dir.GetFullPath();
-    }
-
-    // If there is no images directory, alert the user
-    wxString message = _T("Could not find \"scripts\" folder.  ")
-                       _T("Folders searched:\n");
-    for (wxArrayString::const_iterator it = directories.begin();
-         it != directories.end();
-         ++it)
-    {
-        message.append(*it + _T("\n"));
-    }
-    wxLogError(message);
-
-    return wxEmptyString;
+    return paths.FindAbsoluteValidPath(configFileName);
 }

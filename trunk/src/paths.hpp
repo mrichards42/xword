@@ -20,9 +20,15 @@
 
 #include <wx/string.h>
 
-// Locations where the application expects to find its files
+// Locations where the application expects to find its files.
+// It is up to the caller to determine whether or not the path exists.
+bool IsPortable();
 wxString GetConfigFile();
+wxString GetConfigDirectory();
 wxString GetImagesDirectory();
 wxString GetScriptsDirectory();
+
+// Compatibility with older versions
+wxString GetConfigFile_XWord_3();
 
 #endif // MY_PATHS_H
