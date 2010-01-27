@@ -3,10 +3,9 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="wxbindbase"
-	ProjectGUID="{742A6D3A-038A-D840-9F72-963F3ECA3AEE}"
+	ProjectGUID="{CBDD78EE-B688-BF44-A022-19961EB07EBE}"
 	RootNamespace="wxbindbase"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -18,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="."
+			OutputDirectory="..\..\lib\Debug"
 			IntermediateDirectory="obj\Debug\wxbindbase"
 			ConfigurationType="4"
 			CharacterSet="2"
@@ -40,16 +39,17 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996"
 				Optimization="0"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;DEBUG;_DEBUG;__WXDEBUG__;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;DEBUG;_DEBUG;__WXDEBUG__;WIN32;_WINDOWS;__WXMSW__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)\wxbindbase.pdb"
 				WarningLevel="3"
+				ProgramDataBaseFileName="$(OutDir)\wxbindbase.pdb"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -57,19 +57,22 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;DEBUG;_DEBUG;__WXDEBUG__;__WXMSW__"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;DEBUG;_DEBUG;__WXDEBUG__;WIN32;_WINDOWS;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="..\wxlua\wxlua.lib"
+				AdditionalDependencies="..\..\lib\Debug\wxlua.lib"
 				OutputFile="$(OutDir)\wxbindbase.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -81,12 +84,18 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="."
+			OutputDirectory="..\..\lib\Release"
 			IntermediateDirectory="obj\Release\wxbindbase"
 			ConfigurationType="4"
 			CharacterSet="2"
@@ -108,15 +117,16 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996"
 				Optimization="3"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;NDEBUG;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;NDEBUG;WIN32;_WINDOWS;__WXMSW__"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)\wxbindbase.pdb"
 				WarningLevel="3"
+				ProgramDataBaseFileName="$(OutDir)\wxbindbase.pdb"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -124,19 +134,22 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;NDEBUG;__WXMSW__"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;NDEBUG;WIN32;_WINDOWS;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="..\wxlua\wxlua.lib"
+				AdditionalDependencies="..\..\lib\Release\wxlua.lib"
 				OutputFile="$(OutDir)\wxbindbase.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -148,6 +161,12 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -156,44 +175,56 @@
 	</References>
 	<Files>
 		<Filter
-			Name="src"
+			Name="lua"
+			Filter=""
 			>
-			<File
-				RelativePath="src\dummy.cpp"
+			<Filter
+				Name="wxbind"
+				Filter=""
 				>
-			</File>
-			<File
-				RelativePath="src\wxbase_base.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\wxbase_bind.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\wxbase_config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\wxbase_data.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\wxbase_datetime.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\wxbase_file.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="include"
-			>
-			<File
-				RelativePath="include\wxbase_bind.h"
-				>
-			</File>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxbase_base.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxbase_bind.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxbase_config.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxbase_data.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxbase_datetime.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxbase_file.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="include"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\include\wxbase_bind.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
