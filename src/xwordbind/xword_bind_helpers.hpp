@@ -45,6 +45,10 @@ wxString LUACALL xword_getwxStringtype(lua_State *L, int stack_idx)
 #undef _XWORD_STRING_CONV
 
 
+//----------------------------------------------------------------------------
+// Clue List
+//----------------------------------------------------------------------------
+
 
 // Helper function for GetAcross / GetDown
 // Push a lua table on to the stack given an XPuzzle::ClueList
@@ -85,7 +89,7 @@ int xword_table2ClueList(lua_State *L, int index, XPuzzle::ClueList * clues)
         // key is index -2
         // value is index -1
         int number = wxlua_getnumbertype(L, -2);
-		wxString text = xword_getwxStringtype(L, -1);
+        wxString text = xword_getwxStringtype(L, -1);
         clues->push_back(XPuzzle::Clue(number, text));
 
         /* removes 'value'; keeps 'key' for next iteration */
@@ -101,6 +105,97 @@ int xword_table2ClueList(lua_State *L, int index, XPuzzle::ClueList * clues)
 
 
 
+//----------------------------------------------------------------------------
+// Puzzle Errors
+//----------------------------------------------------------------------------
+#include "../puz/HandlerBase.hpp" // puzzle exceptions
+
+// Throw a puzzle loading error to lua
+void xword_puz_error(lua_State * L,
+                     const wxString & message,
+                     const wxString & type,
+                     bool fatal)
+{
+    // Create the table (and push on to the stack)
+    lua_newtable(L);
+
+    // Add the message
+    lua_pushnumber(L, 1);
+    wxlua_pushwxString(L, message);
+    lua_settable(L, -3);
+
+    // Add the type
+    lua_pushnumber(L, 2);
+    wxlua_pushwxString(L, type);
+    lua_settable(L, -3);
+
+    // Add the fatal flag
+    lua_pushnumber(L, 3);
+    lua_pushboolean(L, fatal);
+    lua_settable(L, -3);
+
+    // Throw the lua error on the top of the stack (the table we just created).
+    lua_error(L);
+}
+
+#define _CATCH_PUZ_EXCEPTION(name)                                            \
+    catch(Puz ## name ## Error & error)                                       \
+    {                                                                         \
+        xword_puz_error(L, error.message, _T(#name) ## _T("Error"), false);   \
+    }
+
+#define _CATCH_FATAL_PUZ_EXCEPTION(name)                                      \
+    catch(Puz ## name ## Error & error)                                       \
+    {                                                                         \
+        xword_puz_error(L, error.message, _T(#name) ## _T("Error"), true);    \
+    }
+
+void
+xword_handle_exceptions(lua_State * L)
+{
+    // Rethrow the previous exception
+    try
+    {
+        throw;
+    }
+
+    _CATCH_PUZ_EXCEPTION(Checksum)
+    _CATCH_PUZ_EXCEPTION(Section)
+    _CATCH_PUZ_EXCEPTION(Data)
+    _CATCH_PUZ_EXCEPTION(File)
+
+    _CATCH_FATAL_PUZ_EXCEPTION(Type)
+    _CATCH_FATAL_PUZ_EXCEPTION(Header)
+
+    // Special formatting for some errors
+    catch(FatalPuzFileError & error)
+    {
+        xword_puz_error(L, error.message, _T("FileError"), true);
+    }
+
+    // The base XWord errors
+    catch(FatalPuzError & error)
+    {
+        xword_puz_error(L, error.message, _T("Error"), true);
+    }
+    catch(BasePuzError & error)
+    {
+        xword_puz_error(L, error.message, _T("Error"), false);
+    }
+
+    // Non-XWord errors
+    catch (std::exception & error)
+    {
+        xword_puz_error(L, wxString(error.what(), wxConvCurrent), _T("std::exception"), true);
+    }
+    catch (...)
+    {
+        xword_puz_error(L, _T("Unknown error"), _T("Unknown"), true);
+    }
+}
+
+#undef _CATCH_PUZ_EXCEPTION
+#undef _CATCH_FATAL_PUZ_EXCEPTION
+
 
 #endif // XWORD_BIND_HELP_H
-

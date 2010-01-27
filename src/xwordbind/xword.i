@@ -1,4 +1,11 @@
 //----------------------------------------------------------------------------
+// lua interface to XWord
+// Execute this to generate bindings:
+//     lua -e"rulesFilename='xword_rules.lua'" genxwordbind.lua
+//----------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------
 // The puz library
 //----------------------------------------------------------------------------
 
@@ -142,7 +149,6 @@
 %class %delete %noclassinfo %encapsulate XGrid
     XGrid(size_t width = 0, size_t height = 0)
 
-    void SetupIteration()
     void SetupGrid()
 
     // Size
@@ -177,6 +183,7 @@
     bool IsBetween(const XSquare * square, const XSquare * start, const XSquare * end) const
 
     // %override [across, down] XGrid::CountClues()
+    // if across or down are nil, the function failed
     int CountClues();
 
     bool IsScrambled() const
@@ -196,10 +203,17 @@
 
 
 %class %delete %noclassinfo %encapsulate XPuzzle
-    XPuzzle(const wxString & filename = wxEmptyString)
+    // Override loading functions to catch exceptions and report them
+    // as lua errors.  The error will be a table:
+    // { "message", "exception type", fatal_true_false }
 
-    bool Load(const wxString & filename, wxString ext = wxEmptyString)
-    bool Save(const wxString & filename, wxString ext = wxEmptyString)
+    // %override XPuzzle(const wxString & filename = wxEmptyString)
+    XPuzzle()
+
+    // %override bool Load(const wxString & filename, wxString ext = wxEmptyString)
+    int Load()
+    // %override bool Save(const wxString & filename, wxString ext = wxEmptyString)
+    int Save()
 
     void Clear()
     bool IsOk()        const
@@ -322,3 +336,4 @@
 
 // %override MyFrame * GetFrame()
 %function MyFrame * GetFrame()
+
