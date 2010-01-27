@@ -66,10 +66,12 @@
 @* checks for initialization code.
 ** CHANGE them if you want different names.
 */
-#define LUA_PATH        "XWORD_LUA_PATH"
-#define LUA_CPATH       "XWORD_LUA_CPATH"
-#define LUA_INIT	"XWORD_LUA_INIT"
 
+/* XWord does not check environmental variables.  These are kept here just in
+   case removing them causes something to complain. */
+#define LUA_PATH    "XWORD_LUA_PATH"
+#define LUA_CPATH   "XWORD_LUA_CPATH"
+#define LUA_INIT	"XWORD_LUA_INIT"
 
 
 /*
@@ -81,20 +83,35 @@
 ** hierarchy or if you want to install your libraries in
 ** non-conventional directories.
 */
+
+
+/*
+@@ LUA_EXE_NAME is the name of the executable.  It is used to construct the
+@* Application Data path under Windows.
+*/
+#define LUA_EXE_NAME "XWord"
+
+
+
 #if defined(_WIN32)
 /*
 ** In Windows, any exclamation mark ('!') in the path is replaced by the
 ** path of the directory of the executable file of the current process.
+** XWord: any tilde ('~') in the path is replaced by the application data
+** folder for XWord (%APPDATA%\XWord)
 */
-#define LUA_LDIR	"!\\scripts\\"
-#define LUA_CDIR	"!\\scripts\\libs\\"
+#define LUA_LDIR	"\\scripts\\"
+#define LUA_CDIR	"\\scripts\\libs\\"
 #define LUA_PATH_DEFAULT  \
-		".\\?.lua;"  LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
-        LUA_LDIR"libs\\?.lua;"  LUA_LDIR"libs\\?\\init.lua;"
+		".\\?.lua;" \
+        "!"LUA_LDIR"?.lua;"              "~"LUA_LDIR"?.lua;" \
+        "!"LUA_LDIR"?\\init.lua;"        "~"LUA_LDIR"?\\init.lua;" \
+        "!"LUA_CDIR"?.lua;"              "~"LUA_CDIR"?.lua;" \
+        "!"LUA_CDIR"?\\init.lua;"        "~"LUA_CDIR"?\\init.lua;"
 
 #define LUA_CPATH_DEFAULT \
-	".\\?.dll;"    LUA_CDIR"?.dll;" \
-    ".\\?51.dll;"  LUA_CDIR"?51.dll;"
+	".\\?.dll;"    "!"LUA_CDIR"?.dll;"      "~"LUA_CDIR"?.dll;" \
+    ".\\?51.dll;"  "!"LUA_CDIR"?51.dll;"    "~"LUA_CDIR"?51.dll;"
 
 #else
 #define LUA_ROOT	"/usr/local/"
@@ -137,6 +154,10 @@
 #define LUA_EXECDIR	"!"
 #define LUA_IGMARK	"-"
 
+/* This is a new one for XWord:
+   The string to replace with the application data directory */
+
+#define LUA_APPDATADIR "~"
 
 /*
 @@ LUA_INTEGER is the integral type used by lua_pushinteger/lua_tointeger.
