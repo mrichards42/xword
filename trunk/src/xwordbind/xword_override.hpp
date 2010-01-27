@@ -3,6 +3,112 @@
 // XPuzzle overrides
 //-----------------------------------------------------------------------------
 
+// Handle exceptions from the constructor
+%override wxLua_XPuzzle_constructor
+// XPuzzle(const wxString & filename = wxEmptyString)
+static int LUACALL wxLua_XPuzzle_constructor(lua_State *L)
+{
+    try
+    {
+        // get number of arguments
+        int argCount = lua_gettop(L);
+        // const wxString filename = wxEmptyString
+        const wxString filename = (argCount >= 1 ? wxlua_getwxStringtype(L, 1) : wxString(wxEmptyString));
+        // Check to see if file exists
+        if (! filename.IsEmpty() && ! wxFileExists(filename))
+        {
+            wxlua_pushwxString(L,
+                wxString::Format(_T("File does not exist: %s"),
+                                 filename.c_str()));
+            lua_error(L);
+        }
+        // call constructor
+        XPuzzle* returns = new XPuzzle(filename);
+        // add to tracked memory list
+        wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_XPuzzle((XPuzzle*)returns));
+        // push the constructed class pointer
+        wxluaT_pushuserdatatype(L, returns, wxluatype_XPuzzle);
+
+        return 1;
+    }
+    catch(...)
+    {
+        xword_handle_exceptions(L);
+        return 0;
+    }
+}
+%end
+
+// Handle exceptions from XPuzzle::Load
+%override wxLua_XPuzzle_Load
+// bool Load(const wxString & filename, wxString ext = wxEmptyString)
+static int LUACALL wxLua_XPuzzle_Load(lua_State *L)
+{
+    try
+    {
+        // get number of arguments
+        int argCount = lua_gettop(L);
+        // wxString ext = wxEmptyString
+        wxString ext = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
+        // const wxString filename
+        const wxString filename = wxlua_getwxStringtype(L, 2);
+        // Check to see if file exists
+        if (! wxFileExists(filename))
+        {
+            wxlua_pushwxString(L,
+                wxString::Format(_T("File does not exist: %s"),
+                                 filename.c_str()));
+            lua_error(L);
+        }
+        // get this
+        XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
+        // call Load
+        bool returns = (self->Load(filename, ext));
+        // push the result flag
+        lua_pushboolean(L, returns);
+
+        return 1;
+    }
+    catch(...)
+    {
+        xword_handle_exceptions(L);
+        return 0;
+    }
+}
+%end
+
+
+// Handle exceptions from XPuzzle::Save
+%override wxLua_XPuzzle_Save
+// bool Save(const wxString & filename, wxString ext = wxEmptyString)
+static int LUACALL wxLua_XPuzzle_Save(lua_State *L)
+{
+    try
+    {
+        // get number of arguments
+        int argCount = lua_gettop(L);
+        // wxString ext = wxEmptyString
+        wxString ext = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
+        // const wxString filename
+        const wxString filename = wxlua_getwxStringtype(L, 2);
+        // get this
+        XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
+        // call Save
+        bool returns = (self->Save(filename, ext));
+        // push the result flag
+        lua_pushboolean(L, returns);
+
+        return 1;
+    }
+    catch(...)
+    {
+        xword_handle_exceptions(L);
+        return 0;
+    }
+}
+%end
+
+
 %override wxLua_XPuzzle_GetAcross
 // XPuzzle::ClueList & GetAcross()
 static int LUACALL wxLua_XPuzzle_GetAcross(lua_State *L)
@@ -206,9 +312,16 @@ static int LUACALL wxLua_XGrid_CountClues(lua_State *L)
 {
     XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
     size_t across, down;
-    self->CountClues(&across, &down);
-    lua_pushnumber(L, across);
-    lua_pushnumber(L, down);
+    if (self->CountClues(&across, &down))
+    {
+        lua_pushnumber(L, across);
+        lua_pushnumber(L, down);
+    }
+    else
+    {
+        lua_pushnil(L);
+        lua_pushnil(L);
+    }
     return 2;
 }
 %end
