@@ -74,7 +74,7 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
 bool
 MyApp::OnInit()
 {
-	//_CrtSetBreakAlloc(34280);
+    //_CrtSetBreakAlloc(34280);
     m_frame = NULL;
 
     wxLogDebug(_T("Starting App"));
@@ -180,8 +180,8 @@ MyApp::ReadCommandLine()
 
     m_frame = new MyFrame();
 
-    // Log to a window
-#if defined(__WXDEBUG__ ) && ! defined(__VISUALC__)
+    // Log to a window for debug
+#if defined(__WXDEBUG__ )
     wxLogWindow *w = new wxLogWindow(m_frame, _T("Logger"));
     w->Show();
 #endif
@@ -202,18 +202,18 @@ MyApp::ReadCommandLine()
 //------------------------------------------------------------------------------
 // Config
 //------------------------------------------------------------------------------
-
 void
 MyApp::SetupConfig()
 {
     wxFileName configFile(GetConfigFile());
     wxLogDebug(_T("Config file: %s"), configFile.GetFullPath().c_str());
 
-    /*
-    // Create a blank file it it doesn't exist
+    // Compatibility:
+    // Search for the config file anywhere it could possibly be found from
+    // previous versions.
     if (! configFile.FileExists())
-        wxFile(configFile.GetFullPath(), wxFile::write);
-    */
+        configFile.Assign(GetConfigFile_XWord_3());
+
 
     // Setup wxFileConfig
     if (configFile.FileExists())
