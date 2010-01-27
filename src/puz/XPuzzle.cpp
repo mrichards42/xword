@@ -31,85 +31,107 @@
 #include "TxtHandler.hpp"
 
 
+bool
+XPuzzle::GetClueList(std::vector<wxString> * clues)
+{
+    // Make sure the grid has clue numbers assigned, etc.
+    if (! m_grid.SetupGrid())
+        return false;
+    return DoGetClueList(clues);
+}
 
-
-
-void
+bool
 XPuzzle::GetClueList(std::vector<wxString> * clues) const
 {
-	// Assemble the clues list from across and down
-	XPuzzle::ClueList::const_iterator across_it = m_across.begin();
+    // Make sure the grid has clue numbers assigned, etc.
+    if (! m_grid.SetupGrid())
+        return false;
+    return DoGetClueList(clues);
+}
+
+
+bool
+XPuzzle::DoGetClueList(std::vector<wxString> * clues) const
+{
+    // Assemble the clues list from across and down
+    XPuzzle::ClueList::const_iterator across_it = m_across.begin();
     XPuzzle::ClueList::const_iterator down_it   = m_down.begin();
 
-	clues->clear();
+    clues->clear();
     for (const XSquare * square = m_grid.First();
          square != NULL;
          square = square->Next())
     {
         if (square->HasClue(DIR_ACROSS))
-		{
+        {
             clues->push_back(across_it->Text());
-			++across_it;
-		}
+            ++across_it;
+        }
         if (square->HasClue(DIR_DOWN))
-		{
+        {
             clues->push_back(down_it->Text());
-			++down_it;
-		}
+            ++down_it;
+        }
     }
+    return across_it == m_across.end() && down_it == m_down.end();
 }
-
 
 
 bool
 XPuzzle::SetClueList(const std::vector<wxString> & clues)
 {
-	// Write across and down clues from the clue list
-	m_across.clear();
-	m_down.clear();
-	std::vector<wxString>::const_iterator it = clues.begin();
+    // Make sure the grid has clue numbers assigned, etc.
+    m_grid.SetupGrid();
+
+    // Write across and down clues from the clue list
+    m_across.clear();
+    m_down.clear();
+    std::vector<wxString>::const_iterator it = clues.begin();
 
     for (XSquare * square = m_grid.First();
          square != NULL;
          square = square->Next())
     {
         if (square->HasClue(DIR_ACROSS))
-		{
-			if (it == clues.end())
-				return false;
-			m_across.push_back(XPuzzle::Clue(square->GetNumber(), *it++));
-		}
+        {
+            if (it == clues.end())
+                return false;
+            m_across.push_back(XPuzzle::Clue(square->GetNumber(), *it++));
+        }
         if (square->HasClue(DIR_DOWN))
-		{
-			if (it == clues.end())
-				return false;
-			m_down.push_back(XPuzzle::Clue(square->GetNumber(), *it++));
-		}
+        {
+            if (it == clues.end())
+                return false;
+            m_down.push_back(XPuzzle::Clue(square->GetNumber(), *it++));
+        }
     }
-	return it == clues.end();
+    return it == clues.end();
 }
 
 
 void
 XPuzzle::RenumberClues()
 {
-	XPuzzle::ClueList::iterator across_it = m_across.begin();
-	XPuzzle::ClueList::iterator down_it   = m_down.begin();
+    // Make sure the grid has clue numbers assigned, etc.
+    m_grid.SetupGrid();
+
+    XPuzzle::ClueList::iterator across_it = m_across.begin();
+    XPuzzle::ClueList::iterator down_it   = m_down.begin();
 
     for (XSquare * square = m_grid.First();
          square != NULL;
          square = square->Next())
     {
         if (square->HasClue(DIR_ACROSS))
-		{
-			across_it->m_num = square->GetNumber();
-			++across_it;
-		}
+        {
+            across_it->m_num = square->GetNumber();
+            ++across_it;
+        }
         if (square->HasClue(DIR_DOWN))
-		{
-			down_it->m_num = square->GetNumber();
-			++down_it;
-		}
+        {
+            down_it->m_num = square->GetNumber();
+            ++down_it;
+        }
     }
 }
 
@@ -170,6 +192,9 @@ XPuzzle::Save(const wxString & filename, wxString ext)
     fn.MakeAbsolute();
     if (ext == wxEmptyString && fn.HasExt())
         ext = fn.GetExt();
+
+    // Make sure the grid has clue numbers assigned, etc.
+    m_grid.SetupGrid();
 
     return Save(fn.GetFullPath(), GetHandler(ext));
 }

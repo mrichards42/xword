@@ -72,7 +72,26 @@ public:
     // Fills in XSquare Next / Prev, etc.  Called automatically from SetSize.
     void SetupIteration();
     // Setup numbers, etc.  This must be called after the solution is filled.
-    void SetupGrid();
+    void SetupSolution();
+
+    // Ensure that the grid is setup in this order:
+    //    SetSize
+    //    SetupIteration
+    //    SetupGrid
+    enum GridState
+    {
+        GRID_NONE = 0,
+        GRID_SIZE,
+        GRID_ITERATION,
+        GRID_SOLUTION,
+        GRID_ALL = GRID_SOLUTION
+    };
+    // Return true on success (we can at least report success for
+    // a const overload).
+    bool SetupGrid(GridState state = GRID_ALL);
+    bool SetupGrid(GridState state = GRID_ALL) const
+        { return state <= m_gridState; }
+    GridState m_gridState;
 
     // Size
     //-----
@@ -145,7 +164,9 @@ public:
                    const XSquare * start,
                    const XSquare * end) const;
 
-    void CountClues(size_t * across, size_t * down) const;
+    // These are necessary for the SetupGrid() const overload
+    bool CountClues(size_t * across, size_t * down);
+    bool CountClues(size_t * across, size_t * down) const;
 
 
     // Check functions
@@ -181,6 +202,9 @@ protected:
     // These are used for grid scrambling
     unsigned short m_key;
     unsigned short m_cksum;
+
+    // Used with SetupGrid() const-overloading
+    bool DoCountClues(size_t * across, size_t * down) const;
 };
 
 
@@ -199,6 +223,7 @@ XGrid::Clear()
     m_firstWhite = NULL;
     m_lastWhite = NULL;
     SetSize(0,0);
+    m_gridState = GRID_NONE;
 }
 
 

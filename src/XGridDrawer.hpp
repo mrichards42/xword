@@ -82,6 +82,7 @@ public:
     //------
     const wxFont & GetLetterFont()   const { return m_letterFont[0]; }
     const wxFont & GetNumberFont()   const { return m_numberFont; }
+    bool HasSymbolFont() const { return m_hasSymbolFont; }
 
     void SetLetterFont(const wxFont & font);
     void SetNumberFont(const wxFont & font);
@@ -179,11 +180,14 @@ private:
     // Fonts
     wxFont m_numberFont;
     wxFont m_letterFont[8];  // Cache fonts for all rebus lengths
+    wxFont m_symbolFont;
+    bool m_hasSymbolFont;
 
     void ScaleFont(wxFont * font, int maxWidth, int maxHeight);
-    void ScaleFonts() { ScaleNumberFont(); ScaleLetterFont(); }
+    void ScaleFonts() { ScaleNumberFont(); ScaleLetterFont(); ScaleSymbolFont(); }
     void ScaleNumberFont() { ScaleFont(&m_numberFont, -1, GetNumberHeight()); }
     void ScaleLetterFont();
+    void ScaleSymbolFont();
     static double GetScale(int width, int height, int maxWidth, int maxHeight);
 
     // Colors

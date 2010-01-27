@@ -53,6 +53,7 @@
 #include "Scrambler.hpp"
 
 
+
 XGrid::XGrid(size_t width, size_t height)
     : m_width(0), m_height(0)
 {
@@ -91,6 +92,7 @@ XGrid::SetSize(size_t width, size_t height)
     m_height = height;
     m_width  = width;
 
+    m_gridState = GRID_SIZE;
     SetupIteration();
 }
 
@@ -160,6 +162,7 @@ XGrid::SetupIteration()
             square.m_isLast[DIR_DOWN]  [FIND_PREV] =  row == 0;
         }
     }
+    m_gridState = GRID_ITERATION;
 }
 
 
@@ -193,22 +196,14 @@ XGrid::CheckScrambledGrid()
 }
 
 
-#include <wx/stopwatch.h>
-#include <wx/log.h>
-
-
-// Setup the entire grid:
+// Setup the grid after the solution is set:
 //  (1) Assigns clue numbers to each square (0 if no clue).
 //  (2) Assigns the word start and end to each square.
 //  (3) If the text is empty, fill it with blanks (or "." for black squares)
 void
-XGrid::SetupGrid()
+XGrid::SetupSolution()
 {
-    wxASSERT(GetWidth() > 0 && GetHeight() > 0);
-
-    wxStopWatch sw;
-
-    SetupIteration();
+    wxASSERT(SetupGrid(GRID_ITERATION));
 
     m_firstWhite = NULL;
     m_lastWhite  = NULL;
@@ -233,9 +228,6 @@ XGrid::SetupGrid()
         }
         else
         {
-            // 12-3-09: I'm not sure why this assert is here.
-            //wxASSERT(square->m_text != _T("-"));
-
             if (square->m_text == _T("-"))
                 square->m_text = _T("");
 
@@ -344,12 +336,63 @@ XGrid::SetupGrid()
         }
     }
 
-    wxLogDebug(_T("Time to set up grid: %d"), sw.Time());
+    m_gridState = GRID_SOLUTION;
 }
 
 
-void
+// Make sure the grid has gotten past the given setup stage.
+// Call all setup functions up to the given setup stage.
+// Return false if the grid cannot be setup (i.e. SetSize() was never called).
+bool
+XGrid::SetupGrid(GridState state)
+{
+    wxASSERT(state > GRID_NONE);
+
+    // The grid is already at or beyond this setup stage.
+    if (state <= m_gridState)
+        return true;
+
+    // Make sure everything before this stage is setup.
+    if (! SetupGrid(static_cast<GridState>(state - 1)))
+        return false;
+
+    // Setup this stage
+    switch(state)
+    {
+        case GRID_SOLUTION:
+            SetupSolution();
+        break;
+        case GRID_ITERATION:
+            SetupIteration();
+        break;
+        case GRID_SIZE:
+            if (! (GetWidth() > 0 && GetHeight() > 0))
+            return false;
+        break;
+    }
+    return true;
+}
+
+
+
+bool
+XGrid::CountClues(size_t * across, size_t * down)
+{
+    if (! SetupGrid(GRID_SOLUTION))
+        return false;
+    return DoCountClues(across, down);
+}
+
+bool
 XGrid::CountClues(size_t * across, size_t * down) const
+{
+    if (! SetupGrid(GRID_SOLUTION))
+        return false;
+    return DoCountClues(across, down);
+}
+
+bool
+XGrid::DoCountClues(size_t * across, size_t * down) const
 {
     *across = 0;
     *down = 0;
@@ -362,7 +405,8 @@ XGrid::CountClues(size_t * across, size_t * down) const
             ++(*across);
         if (square->HasClue(DIR_DOWN))
             ++(*down);
-     }
+    }
+    return true;
 }
 
 
