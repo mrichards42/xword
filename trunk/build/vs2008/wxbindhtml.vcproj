@@ -3,10 +3,9 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="wxbindhtml"
-	ProjectGUID="{6B056542-371A-C74C-B14F-343231C6A4B3}"
+	ProjectGUID="{0066341E-35CD-1345-A18C-282F56D6A6F4}"
 	RootNamespace="wxbindhtml"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -18,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="."
+			OutputDirectory="..\..\lib\Debug"
 			IntermediateDirectory="obj\Debug\wxbindhtml"
 			ConfigurationType="4"
 			CharacterSet="2"
@@ -40,16 +39,17 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996"
 				Optimization="0"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;DEBUG;_DEBUG;__WXDEBUG__;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;DEBUG;_DEBUG;__WXDEBUG__;WIN32;_WINDOWS;__WXMSW__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)\wxbindhtml.pdb"
 				WarningLevel="3"
+				ProgramDataBaseFileName="$(OutDir)\wxbindhtml.pdb"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -57,19 +57,22 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;DEBUG;_DEBUG;__WXDEBUG__;__WXMSW__"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;DEBUG;_DEBUG;__WXDEBUG__;WIN32;_WINDOWS;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="wxbindcore.lib"
+				AdditionalDependencies="..\..\lib\Debug\wxbindcore.lib"
 				OutputFile="$(OutDir)\wxbindhtml.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -81,12 +84,18 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="."
+			OutputDirectory="..\..\lib\Release"
 			IntermediateDirectory="obj\Release\wxbindhtml"
 			ConfigurationType="4"
 			CharacterSet="2"
@@ -108,15 +117,16 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996"
 				Optimization="3"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;NDEBUG;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;NDEBUG;WIN32;_WINDOWS;__WXMSW__"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)\wxbindhtml.pdb"
 				WarningLevel="3"
+				ProgramDataBaseFileName="$(OutDir)\wxbindhtml.pdb"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -124,8 +134,8 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;NDEBUG;__WXMSW__"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;NDEBUG;WIN32;_WINDOWS;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -138,6 +148,9 @@
 				Name="VCALinkTool"
 			/>
 			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
 				Name="VCXDCMakeTool"
 			/>
 			<Tool
@@ -145,6 +158,12 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -155,32 +174,44 @@
 	</References>
 	<Files>
 		<Filter
-			Name="src"
+			Name="lua"
+			Filter=""
 			>
-			<File
-				RelativePath="src\dummy.cpp"
+			<Filter
+				Name="wxbind"
+				Filter=""
 				>
-			</File>
-			<File
-				RelativePath="src\wxhtml_bind.cpp"
-				>
-			</File>
-			<File
-				RelativePath="src\wxhtml_wxlhtml.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="include"
-			>
-			<File
-				RelativePath="include\wxhtml_bind.h"
-				>
-			</File>
-			<File
-				RelativePath="include\wxhtml_wxlhtml.h"
-				>
-			</File>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxhtml_bind.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxhtml_wxlhtml.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="include"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\include\wxhtml_bind.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\include\wxhtml_wxlhtml.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

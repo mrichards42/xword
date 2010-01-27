@@ -2,11 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="wxbindaui"
-	ProjectGUID="{4365FFFD-B8B5-6049-A532-8F70E541DBD6}"
-	RootNamespace="wxbindaui"
+	Name="wxbindxrc"
+	ProjectGUID="{673F4CFF-C9ED-BB4A-BD0B-D10BB2B004A6}"
+	RootNamespace="wxbindxrc"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -18,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="."
-			IntermediateDirectory="obj\Debug\wxbindaui"
+			OutputDirectory="..\..\lib\Debug"
+			IntermediateDirectory="obj\Debug\wxbindxrc"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -40,16 +39,17 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996"
 				Optimization="0"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;DEBUG;_DEBUG;__WXDEBUG__;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;DEBUG;_DEBUG;__WXDEBUG__;WIN32;_WINDOWS;__WXMSW__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)\wxbindaui.pdb"
 				WarningLevel="3"
+				ProgramDataBaseFileName="$(OutDir)\wxbindxrc.pdb"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -57,19 +57,22 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;DEBUG;_DEBUG;__WXDEBUG__;__WXMSW__"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;DEBUG;_DEBUG;__WXDEBUG__;WIN32;_WINDOWS;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="wxbindcore.lib"
-				OutputFile="$(OutDir)\wxbindaui.lib"
+				AdditionalDependencies="..\..\lib\Debug\wxbindadv.lib ..\..\lib\Debug\wxbindhtml.lib ..\..\lib\Debug\wxbindxml.lib"
+				OutputFile="$(OutDir)\wxbindxrc.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -81,13 +84,19 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="."
-			IntermediateDirectory="obj\Release\wxbindaui"
+			OutputDirectory="..\..\lib\Release"
+			IntermediateDirectory="obj\Release\wxbindxrc"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -108,15 +117,16 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996"
 				Optimization="3"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;NDEBUG;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;NDEBUG;WIN32;_WINDOWS;__WXMSW__"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)\wxbindaui.pdb"
 				WarningLevel="3"
+				ProgramDataBaseFileName="$(OutDir)\wxbindxrc.pdb"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -124,18 +134,21 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;WIN32;_WINDOWS;NDEBUG;__WXMSW__"
-				AdditionalIncludeDirectories="setup;..\lua\include;..;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
+				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;NDEBUG;WIN32;_WINDOWS;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\wxbindaui.lib"
+				OutputFile="$(OutDir)\wxbindxrc.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -145,6 +158,12 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -155,24 +174,36 @@
 	</References>
 	<Files>
 		<Filter
-			Name="src"
+			Name="lua"
+			Filter=""
 			>
-			<File
-				RelativePath="src\dummy.cpp"
+			<Filter
+				Name="wxbind"
+				Filter=""
 				>
-			</File>
-			<File
-				RelativePath="src\wxaui_bind.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="include"
-			>
-			<File
-				RelativePath="include\wxaui_bind.h"
-				>
-			</File>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxxrc_bind.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="include"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\include\wxxrc_bind.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

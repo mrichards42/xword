@@ -1,38 +1,34 @@
 local wxWidgets = '$(WXWIN)'
 
+
 solution "XWord"
     configurations { "Debug", "Release" }
 
+    location ("build/".._ACTION)
+
     -- ------------------------------------------------------------------------
-    -- Lua
+    -- General
     -- ------------------------------------------------------------------------
-    -- Dependencies
-    include "wxlua/lua"
+    -- Copy the images and scripts directories to the build directory
 
-    include "wxlua/wxlua"
-    links { "lua" }
+    configuration {}
 
-    include "wxlua/wxbind"
-
-    -- Add a dependency for wxbind
-    project "wxbindbase"
-        links { "wxlua" }
 
     -- ------------------------------------------------------------------------
     -- XWord
     -- ------------------------------------------------------------------------
     project "XWord"
         links {
-            "wxbindadv",
-            "wxbindaui",
             "wxbindbase",
             "wxbindcore",
+            "wxbindadv",
+            "wxbindaui",
             "wxbindhtml",
-            "wxbindmedia",
             "wxbindnet",
             "wxbindxml",
             "wxbindxrc",
         }
+
         -- --------------------------------------------------------------------
         -- General
         -- --------------------------------------------------------------------
@@ -41,6 +37,9 @@ solution "XWord"
         files { "src/**.hpp", "src/**.cpp", "src/**.h" }
 
         defines { "UNICODE", "_UNICODE", "XWORD_USE_LUA" }
+
+        configuration "Debug"   targetdir "bin/Debug"
+        configuration "Release" targetdir "bin/Release"
 
         configuration "windows"
             defines { "WIN32", "_WINDOWS" }
@@ -125,7 +124,32 @@ solution "XWord"
         -- --------------------------------------------------------------------
         configuration {}
         includedirs {
-            "wxlua",
-            "wxlua/lua/include",
-            "wxlua/wxbind/setup",
+            "lua",
+            "lua/lua/include",
+            "lua/wxbind/setup",
         }
+
+        -- --------------------------------------------------------------------
+        -- Resource files
+        -- --------------------------------------------------------------------
+        configuration "windows"
+            files { "src/**.rc" }
+            resincludedirs { "." }
+
+
+
+    -- ------------------------------------------------------------------------
+    -- Lua
+    -- ------------------------------------------------------------------------
+    configuration {}
+
+    -- Dependencies
+    dofile "premake4_lua.lua"
+
+    dofile "premake4_wxlua.lua"
+        links { "lua" }
+
+    dofile "premake4_wxbind.lua"
+
+    project "wxbindbase"
+        links { "wxlua" }
