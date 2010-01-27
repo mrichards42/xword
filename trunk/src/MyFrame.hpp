@@ -76,16 +76,16 @@ public:
     bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
     void CheckPuzzle();
 
-	// Gui display / updating
+    // Gui display / updating
     void ShowPuzzle(); // Everything
-	void ShowGrid();
-	void ShowClues();
-	void ShowAuthor();
-	void ShowTitle();
-	void ShowCopyright();
-	void ShowNotes();
+    void ShowGrid();
+    void ShowClues();
+    void ShowAuthor();
+    void ShowTitle();
+    void ShowCopyright();
+    void ShowNotes();
 
-	XPuzzle & GetPuzzle() { return m_puz; }
+    XPuzzle & GetPuzzle() { return m_puz; }
 
     // Window Management
     //-----------
@@ -107,7 +107,7 @@ public:
     //-----------
     bool IsTimerRunning() { return m_timer.IsRunning(); }
     void SetTime  (int time) { m_time = time; m_status->SetTime(time); }
-	int GetTime() { return m_time; }
+    int GetTime() { return m_time; }
     void ResetTimer()     { SetTime(0); }
     void StartTimer();
     void StopTimer();
@@ -119,15 +119,15 @@ public:
 
     // Access to focus information
     //----------------------------
-	XSquare * GetFocusedSquare();
-	XSquare * SetFocusedSquare(XSquare * square);
-	void GetFocusedWord(XSquare ** start, XSquare ** end);
+    XSquare * GetFocusedSquare();
+    XSquare * SetFocusedSquare(XSquare * square);
+    void GetFocusedWord(XSquare ** start, XSquare ** end);
     bool GetFocusedDirection() const;
-	void SetFocusedDirection(bool direction);
-	const XPuzzle::Clue * GetFocusedClue();
+    void SetFocusedDirection(bool direction);
+    const XPuzzle::Clue * GetFocusedClue();
 
-	// Lua
-	void RunLuaScript(const wxString & filename);
+    // Lua
+    void RunLuaScript(const wxString & filename);
 
 private:
     // Windows
@@ -266,8 +266,6 @@ private:
     // File conversion
     void OnConvert    (wxCommandEvent & WXUNUSED(evt));
 
-    // Just for fun
-    void OnSwapDirection(wxCommandEvent & WXUNUSED(evt));
 
     // Preferences
     void OnPreferences(wxCommandEvent & WXUNUSED(evt));
@@ -298,8 +296,8 @@ private:
     void OnLuaScript  (wxCommandEvent & WXUNUSED(evt));
     void OnLuaPrint   (wxLuaEvent & evt);
     void OnLuaError   (wxLuaEvent & evt);
-	wxLuaState m_lua;
-	void LuaInit();
+    wxLuaState m_lua;
+    void LuaInit();
 #endif // XWORD_USE_LUA
 
 private:
@@ -313,7 +311,7 @@ private:
     void OnDumpStatus (wxCommandEvent & WXUNUSED(evt));
     void OnBruteForceUnscramble (wxCommandEvent & WXUNUSED(evt));
 
-#endif
+#endif // __WXDEBUG__
 
     DECLARE_EVENT_TABLE()
 };
