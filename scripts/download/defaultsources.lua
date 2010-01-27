@@ -1,15 +1,4 @@
--- ============================================================================
--- Download sources and configuration
--- ============================================================================
-
--- Create the download module table if it doesn't exist
-if not download then download = {} end
-
--- Download output folder (created if it doesn't exist)
-download.localfolder = [[D:\C++\XWord\trunk\scripts\download\puzzles]]
-
--- strftime format for the column headers in the download dialog
-download.headerformat = '%a, %b %d'
+-- Default download sources
 
 --[[
 Each entry in the sources table should consist of the following:
@@ -34,6 +23,14 @@ Each entry in the sources table should consist of the following:
 
 download.sources = 
 {
+    {
+        display = "NY Times",
+        url = "http://www.xwordinfo.com/XPF/?date=%m/%d/%Y",
+        filename = "nyt%Y%m%d.puz",
+        days = { true, true, true, true, true, true, true },
+        format = "XPF"
+    },
+
     {
         display = "CrosSynergy",
         url = "http://www.chron.com/apps/games/xword/puzzles/cs%y%m%d.puz",

@@ -7,19 +7,16 @@
 -- codes.
 if not download then download = {} end
 
--- ===========================================================================
--- Everything declared after this statement is part of the download package
--- ===========================================================================
-setfenv(1, download)
+local P = download
 
 -- ----------------------------------------------------------------------------
 -- Message codes
 -- ----------------------------------------------------------------------------
-DL_START = 1
-DL_PROGRESS = 2
-DL_END = 3
-DL_MESSAGE = 4
-DL_UNKNOWN = -10
+P.DL_START = 1
+P.DL_PROGRESS = 2
+P.DL_END = 3
+P.DL_MESSAGE = 4
+P.DL_UNKNOWN = -10
 
-DL_ABORT = -1
-DL_ERROR = -2
+P.DL_ABORT = -1
+P.DL_ERROR = -2

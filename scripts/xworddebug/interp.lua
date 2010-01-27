@@ -58,7 +58,6 @@ local function createInterpreter(parent, dlg, id, value, pos, size, style)
             local char = evt:GetKeyCode()
             if char == wx.WXK_TAB then
                 interpreter:WriteText('    ')
-                wx.wxMessageBox("tab")
                 evt:Skip(false)
                 return
             -- Enter a command

@@ -13,44 +13,10 @@
 --     queues getting tangled.
 -- ============================================================================
 
-assert(require 'task')
-assert(require 'queue')
-assert(require 'table')
-
-
--- ============================================================================
--- Serialization
--- ============================================================================
-
--- Serialize function adapted from PiL 12.1.1
--- This will serialize simple non-cyclic tables (nested tables OK)
-local function serialize (obj)
-    local ret = {}
-    if type(obj) == "number" then
-        table.insert(ret, tostring(obj))
-    elseif type(obj) == "string" then
-        table.insert(ret, string.format("%q", obj))
-    elseif type(obj) == "table" then
-        table.insert(ret, '{')
-        for k,v in pairs(obj) do
-            table.insert(ret, '['..serialize(k)..']='..serialize(v)..',')
-        end
-        table.insert(ret, '}')
-    else
-        error("cannot serialize a " .. type(obj))
-    end
-    return table.concat(ret)
-end
-
--- This of course has the potential to be horribly terribly unsafe.
--- However, in order to expliot this, the user would have to install an
--- untrusted add-on that includes a call to task.post() with a string
--- containing arbitrary code.  At that point, the add-on could just execute
--- whatever code it wants to, since we're using lua as a scripting language.
--- So effectively, this isn't a security hole.
-local function deserialize(str)
-    return loadstring('return '..str)()
-end
+require 'task'
+require 'queue'
+require 'table'
+require 'serialize'
 
 
 -- ============================================================================
@@ -96,7 +62,7 @@ task.receive = function(timeout, task_id)
     -- out of messages.
     while rc == 0 do
         -- Read the serialized message
-        local success, data = pcall(deserialize, msg)
+        local success, data = pcall(loadstring(msg))
         -- If the message cannot be deserialized, assume it came from an
         -- unknown thread.
         if not success then

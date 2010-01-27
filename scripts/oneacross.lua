@@ -34,7 +34,13 @@ end
 
 
 local function init()
-    xword.frame:AddMenuItem({'Tools'}, 'Search OneAcross', OneAcrossSearch)
+    xword.frame:AddMenuItem({'Tools'}, 'Search OneAcross',
+        function(evt)
+            -- Can't do anything unless we have a puzzle
+            if not xword.HasPuzzle() then return end
+            OneAcrossSearch()
+        end
+    )
 end
 
 init()

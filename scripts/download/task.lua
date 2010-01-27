@@ -30,7 +30,8 @@ local function progressFunc(linda)
 
         -- Check to see if we should abort the download
         local msg, flag, rc = task.receive(0, 1) -- no timeout; from main thread
-        if rc and flag == download.DL_ABORT then
+        if rc == 0 and flag == download.DL_ABORT then
+            task.post(parent, 'ABORTING', download.DL_MESSAGE)
             return 1
         else
             return 0
