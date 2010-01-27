@@ -78,7 +78,7 @@ XSquare::InitCharTable()
     sm_charTable[_T('?')] = 'Q';  // [Q]uestion mark
 
     // '[' number ']' is used to indicate a webdings value
-    // Across Lite replaces these with a blank
+    // Across Lite replaces these with a blank in the user grid.
     sm_charTable[_T('[')] = '-';
 
     // Add regular letters

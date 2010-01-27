@@ -118,7 +118,9 @@ public:
 
     void SetText    (const wxString & text);
     void SetSolution(const wxString & solution, wxChar plain = '\0');
-    void SetPlainSolution(wxChar plain);
+    void SetPlainSolution(wxChar plain); // Leave solution rebus unchanged
+    void SetSolutionRebus(const wxString & rebus); // Leave plain solution unchanged
+    void SetSolutionSymbol(unsigned short symbol); // Must set plain solution separately
 
     bool Check(bool checkBlank = NO_CHECK_BLANK) const;
 
@@ -130,11 +132,12 @@ public:
     bool HasTextSymbol()     const;
     bool HasSolutionSymbol() const;
 
-    int GetTextSymbol()      const;
-    int GetSolutionSymbol()  const;
+    unsigned short GetTextSymbol()      const;
+    unsigned short GetSolutionSymbol()  const;
 
     static bool IsValidChar(wxChar ch);
     static bool IsValidString(const wxString & str);
+    static bool IsSymbol(const wxString & str);
 
     // Clue
     //-----
@@ -149,6 +152,8 @@ public:
     void   SetFlag     (wxByte flag)       { m_flag = flag; }
     void   AddFlag     (wxByte flag)       { m_flag |=   flag; }
     void   RemoveFlag  (wxByte flag)       { m_flag &= ~ flag; }
+    void   ToggleFlag  (wxByte flag)
+        { if (HasFlag(flag)) RemoveFlag(flag); else AddFlag(flag); }
 
     wxByte GetFlag     ()            const { return m_flag; }
     bool   HasFlag     (wxByte flag) const { return (m_flag & flag) != 0; }
@@ -248,8 +253,13 @@ inline
 void
 XSquare::SetText(const wxString & text)
 {
-    wxASSERT(IsValidString(text));
-    m_text = text.Upper();
+    if (IsSymbol(text))
+        m_text = text;
+    else
+    {
+        wxASSERT(IsValidString(text));
+        m_text = text.Upper();
+    }
 }
 
 
@@ -257,8 +267,7 @@ inline
 void
 XSquare::SetSolution(const wxString & solution, wxChar plain)
 {
-    wxASSERT(IsValidString(solution));
-    m_solution = solution.Upper();
+    SetSolutionRebus(solution);
 
     if (plain != '\0')
         SetPlainSolution(plain);
@@ -275,6 +284,30 @@ XSquare::SetPlainSolution(wxChar solution)
     wxASSERT(wxIsupper(solution) || solution == _T('.'));
     m_asciiSolution = solution;
 }
+
+inline
+void
+XSquare::SetSolutionRebus(const wxString & rebus)
+{
+    if (IsSymbol(rebus))
+    {
+        SetSolutionSymbol(static_cast<unsigned short>(rebus.at(1)));
+    }
+    else
+    {
+        wxASSERT(IsValidString(rebus));
+        m_solution = rebus.Upper();
+    }
+}
+
+inline
+void
+XSquare::SetSolutionSymbol(unsigned short symbol)
+{
+    m_solution = wxString::Format(_T("[%c]"), symbol);
+}
+
+
 
 
 inline
@@ -319,8 +352,7 @@ inline
 bool
 XSquare::HasTextSymbol() const
 {
-    return m_text.length() == 3
-        && m_text.at(0) == _T('[') && m_text.at(2) == _T(']');
+    return IsSymbol(m_text);
 }
 
 
@@ -329,32 +361,31 @@ bool
 XSquare::HasSolutionSymbol() const
 {
     wxASSERT(! m_solution.empty());
-    return m_solution.length() == 3
-        && m_solution.at(0) == _T('[') && m_solution.at(2) == _T(']');
+    return IsSymbol(m_solution);
 }
 
 
 inline
-int
+unsigned short
 XSquare::GetTextSymbol() const
 {
     wxASSERT(HasTextSymbol());
-    return static_cast<int>(m_text.at(1));
+    return static_cast<unsigned short>(m_text.at(1));
 }
 
 
 inline
-int
+unsigned short
 XSquare::GetSolutionSymbol() const
 {
     wxASSERT(HasSolutionSymbol());
-    return static_cast<int>(m_solution.at(1));
+    return static_cast<unsigned short>(m_solution.at(1));
 }
 
 
 
 //------------------------------------------------------------------------------
-// Character table functions
+// Character table functions (static)
 //------------------------------------------------------------------------------
 
 inline
@@ -383,6 +414,14 @@ XSquare::IsValidString(const wxString & str)
         if (! IsValidChar(*it))
             return false;
     return true;
+}
+
+inline
+bool
+XSquare::IsSymbol(const wxString & str)
+{
+    return str.length() == 3
+        && str.at(0) == _T('[') && str.at(2) == _T(']');
 }
 
 

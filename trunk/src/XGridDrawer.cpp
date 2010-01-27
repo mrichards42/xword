@@ -18,6 +18,7 @@
 #include "XGridDrawer.hpp"
 #include "puz/XGrid.hpp"
 #include "puz/XSquare.hpp"
+#include <wx/fontenum.h> // wxFontEnumerator to test for Webdings
 
 const int MAX_POINT_SIZE = 150;
 const int MIN_POINT_SIZE = 2;
@@ -61,6 +62,18 @@ XGridDrawer::Init()
 
     SetNumberFont(*wxSWISS_FONT);
     SetLetterFont(*wxSWISS_FONT);
+    // Webdings are used for the symbol font
+    if (wxFontEnumerator::IsValidFacename(_T("Webdings")))
+    {
+        m_hasSymbolFont = true;
+        m_symbolFont = wxFont(12, wxFONTFAMILY_DEFAULT,
+                              wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL,
+                              false, _T("Webdings"));
+    }
+    else
+    {
+        m_hasSymbolFont = false;
+    }
 
     SetWhiteSquareColor(*wxWHITE);
     SetBlackSquareColor(*wxBLACK);
@@ -299,6 +312,14 @@ XGridDrawer::ScaleLetterFont()
     m_letterFont[7] = m_letterFont[6];
 }
 
+void
+XGridDrawer::ScaleSymbolFont()
+{
+    if (! m_hasSymbolFont)
+        return;
+    ScaleFont(&m_symbolFont, -1, GetLetterHeight());
+}
+
 
 
 void
@@ -315,6 +336,7 @@ XGridDrawer::SetLetterScale(double scale)
 {
     m_letterScale = scale;
     ScaleLetterFont();
+    ScaleSymbolFont();
 }
 
 
@@ -448,14 +470,43 @@ XGridDrawer::DrawSquare(wxDC & dc,
     if (HasFlag(DRAW_TEXT) && ! square.IsBlank())
     {
         wxString text;
+        bool isSymbol = false;
+        // User Text
         if (HasFlag(DRAW_USER_TEXT))
-            text = square.GetText();
+        {
+            if (square.HasTextSymbol())
+            {
+                if (m_hasSymbolFont)
+                {
+                    isSymbol = true;
+                    text = static_cast<wxChar>(square.GetTextSymbol());
+                }
+                else
+                    text = static_cast<wxChar>(square.GetPlainText());
+            }
+            else
+                text = square.GetText();
+        }
+        // Solution
         else
         {
             wxASSERT(HasFlag(DRAW_SOLUTION));
-            text = square.GetSolution();
+            if (square.HasSolutionSymbol())
+            {
+                if (m_hasSymbolFont)
+                {
+                    isSymbol = true;
+                    text = static_cast<wxChar>(square.GetSolutionSymbol());
+                }
+                else
+                    text = static_cast<wxChar>(square.GetPlainSolution());
+            }
+            else
+                text = square.GetSolution();
         }
 
+
+        // Rebus entries
         if (text.length() > 4)
         {
             const int len = (text.length() + 1) / 2;
@@ -464,7 +515,12 @@ XGridDrawer::DrawSquare(wxDC & dc,
             dc.SetFont(m_letterFont[3]);
         }
         else
-            dc.SetFont(m_letterFont[text.length() - 1]);
+        {
+            if (! isSymbol)
+                dc.SetFont(m_letterFont[text.size() - 1]);
+            else
+                dc.SetFont(m_symbolFont);
+        }
 
         dc.DrawLabel(text,
                      wxRect(x, y + m_boxSize - GetLetterHeight(),

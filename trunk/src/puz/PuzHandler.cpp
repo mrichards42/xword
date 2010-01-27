@@ -104,12 +104,12 @@ PuzHandler::DoLoad()
     m_puz->m_author      = ReadString();
     m_puz->m_copyright   = ReadString();
 
-	std::vector<wxString> clues;
+    std::vector<wxString> clues;
     for (size_t i = 0; i < h.num_clues; ++i)
         clues.push_back(ReadString());
 
-	if (! m_puz->SetClueList(clues))
-		throw FatalPuzError(_T("Clues and grid don't match."));
+    if (! m_puz->SetClueList(clues))
+        throw FatalPuzError(_T("Clues and grid don't match."));
 
     m_puz->m_notes = ReadString();
 
@@ -205,8 +205,8 @@ PuzHandler::DoSave()
 
     unsigned short width  = m_puz->m_grid.GetWidth();
     unsigned short height = m_puz->m_grid.GetHeight();
-	std::vector<wxString> clues;
-	m_puz->GetClueList(&clues);
+    std::vector<wxString> clues;
+    m_puz->GetClueList(&clues);
     unsigned short nClues = clues.size();
 
     Write(&width,  1);
@@ -237,10 +237,10 @@ PuzHandler::DoSave()
 
     std::vector<wxString>::iterator it;
     for (it = clues.begin(); it != clues.end(); ++it)
-	{
+    {
         Write(*it);
-		Write('\0');
-	}
+        Write('\0');
+    }
 
     Write(m_puz->m_notes); Write('\0');
 
@@ -405,7 +405,7 @@ PuzHandler::SetRUSR(const ByteArray & data)
         // Make sure symbols are entered correctly
         if (str.at(0) == _T('['))
         {
-            if (str.at(3) != _T(']'))
+            if (str.at(2) != _T(']'))
                 throw PuzSectionError(_T("Missing ']' in RUSR section"));
 
             wxChar num = str.at(1);
@@ -487,12 +487,8 @@ PuzHandler::SetSolutionRebus(const ByteArray & table, const ByteArray & grid)
             if (it == rebusTable.end())
                 throw PuzSectionError(_T("Invalid value in GRBS section"));
 
-            // Make sure we're not overwriting the plain solution for
-            // unscrambling
-            if (m_puz->m_grid.IsScrambled())
-                square->SetSolution(it->second, square->GetPlainSolution());
-            else
-                square->SetSolution(it->second);
+            // Don't overwrite the plain solution
+            square->SetSolutionRebus(it->second);
         }
         ++rebus_it;
     }

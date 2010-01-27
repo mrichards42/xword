@@ -109,28 +109,28 @@ TxtHandler::DoLoad()
         size_t nAcross, nDown;
         m_puz->m_grid.CountClues(&nAcross, &nDown);
 
-		// We'll read the clues into their respective lists a dummy clue numbers (-1).
-		// Afterwards, we'll call XPuzzle::RenumberClues() to fix the numbers.
+        // We'll read the clues into their respective lists a dummy clue numbers (-1).
+        // Afterwards, we'll call XPuzzle::RenumberClues() to fix the numbers.
 
         CheckSection(_T("<ACROSS>"));
         for (size_t i = 0; i < nAcross; ++i)
         {
-			const wxString & clue = ReadLine();
+            const wxString & clue = ReadLine();
             if (clue == _T("<DOWN>") || clue.empty())
                 throw PuzDataError(_T("Missing some across clues"));
-			m_puz->m_across.push_back(XPuzzle::Clue(-1, clue));
+            m_puz->m_across.push_back(XPuzzle::Clue(-1, clue));
         }
 
         CheckSection(_T("<DOWN>"));
         for (size_t i = 0; i < nDown; ++i)
         {
-			const wxString & clue = ReadLine();
+            const wxString & clue = ReadLine();
             if (clue.empty())
                 throw PuzDataError(_T("Missing some down clues"));
-			m_puz->m_down.push_back(XPuzzle::Clue(-1, clue));
+            m_puz->m_down.push_back(XPuzzle::Clue(-1, clue));
         }
 
-		m_puz->RenumberClues();
+        m_puz->RenumberClues();
 
 
         wxString header = ReadLine();

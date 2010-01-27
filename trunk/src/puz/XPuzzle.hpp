@@ -34,10 +34,10 @@ class XPuzzle
     friend class HandlerBase;
 public:
 
-	class Clue;
-	class ClueList;
+    class Clue;
+    class ClueList;
 
-	explicit XPuzzle(const wxString & filename = wxEmptyString)
+    explicit XPuzzle(const wxString & filename = wxEmptyString)
     {
         m_modified = false;
         m_time = 0;
@@ -82,89 +82,92 @@ public:
     const wxString & GetNotes() const { return m_notes; }
     void SetNotes(const wxString & notes) { m_notes = notes; }
 
-	// Clues
-	//------
+    // Clues
+    //------
     ClueList & GetAcross() { return m_across; }
     void SetAcross(const ClueList & across) { m_across = across; }
 
     ClueList & GetDown() { return m_down; }
     void SetDown(const ClueList & down) { m_down = down; }
 
-    void GetClueList(std::vector<wxString> * clues) const;
-	// Return false if the clues don't match the grid
+    // The non-const version attempts to setup the grid if it is not already setup.
+    bool GetClueList(std::vector<wxString> * clues);
+    bool GetClueList(std::vector<wxString> * clues) const;
+
+    // Return false if the clues don't match the grid
     bool SetClueList(const std::vector<wxString> & clues);
 
-	// Call this after SetAcross / SetDown if you are unable to determine the clue numbers
-	void RenumberClues();
+    // Call this after SetAcross / SetDown if you are unable to determine the clue numbers
+    void RenumberClues();
 
     XGrid & GetGrid() { return m_grid; }
 
-	// XGrid has pointers to its data members.  These won't be copied, and the pointers will
-	// refer to non-existant XSquares once the grid parameter is destroyed.  Therefore, we need
-	// to setup the grid independently in this function.
-    void SetGrid(const XGrid & grid) { m_grid = grid; m_grid.SetupIteration(); m_grid.SetupGrid(); }
+    // XGrid has pointers to its data members.  These won't be copied, and the pointers will
+    // refer to non-existant XSquares once the grid parameter is destroyed.  Therefore, we need
+    // to setup the grid independently in this function.
+    void SetGrid(const XGrid & grid) { m_grid = grid; m_grid.SetupGrid(); }
 
 
-	//--------------------------------------------------------------------
-	// Clue and ClueList
-	//--------------------------------------------------------------------
-	// This makes access to the clues nicer:
-	class XPuzzle::Clue
-	{
-	public:
-		Clue(int num, const wxString & str)
-			: m_num(num), m_str(str)
-		{}
+    //--------------------------------------------------------------------
+    // Clue and ClueList
+    //--------------------------------------------------------------------
+    // This makes access to the clues nicer:
+    class XPuzzle::Clue
+    {
+    public:
+        Clue(int num, const wxString & str)
+            : m_num(num), m_str(str)
+        {}
 
-		const wxString & Text()   const { return m_str; }
-			  wxString & Text()         { return m_str; }
-			  int        Number() const { return m_num; }
+        const wxString & Text()   const { return m_str; }
+              wxString & Text()         { return m_str; }
+              int        Number() const { return m_num; }
 
-		int m_num;
-		wxString m_str;
-		bool operator==(const XPuzzle::Clue & other) const
-			{ return other.m_num == m_num && other.m_str == m_str; }
+        int m_num;
+        wxString m_str;
+        bool operator==(const XPuzzle::Clue & other) const
+            { return other.m_num == m_num && other.m_str == m_str; }
 
-		// This makes sorting a lot easier
-		bool operator<(const XPuzzle::Clue & other) const
-			{ return m_num < other.m_num; }
-	};
-
-
-	class XPuzzle::ClueList : public std::vector<XPuzzle::Clue>
-	{
-		typedef std::vector<XPuzzle::Clue> _base;
-	public:
-		// Basic constructor
-		ClueList() : _base() {}
-
-		// Clue finding
-		//-------------
-		const_iterator
-		Find(int num) const
-		{
-			const_iterator it;
-			for (it = begin(); it != end(); ++it)
-				if (it->Number() == num)
-					break;
-			return it;
-		}
-
-		iterator
-		Find(int num)
-		{
-			iterator it;
-			for (it = begin(); it != end(); ++it)
-				if (it->Number() == num)
-					break;
-			return it;
-		}
-	};
+        // This makes sorting a lot easier
+        bool operator<(const XPuzzle::Clue & other) const
+            { return m_num < other.m_num; }
+    };
 
 
-	//--------------------------------------------------------------------
-	// Members
-	//--------------------------------------------------------------------
+    class XPuzzle::ClueList : public std::vector<XPuzzle::Clue>
+    {
+        typedef std::vector<XPuzzle::Clue> _base;
+    public:
+        // Basic constructor
+        ClueList() : _base() {}
+
+        // Clue finding
+        //-------------
+        const_iterator
+        Find(int num) const
+        {
+            const_iterator it;
+            for (it = begin(); it != end(); ++it)
+                if (it->Number() == num)
+                    break;
+            return it;
+        }
+
+        iterator
+        Find(int num)
+        {
+            iterator it;
+            for (it = begin(); it != end(); ++it)
+                if (it->Number() == num)
+                    break;
+            return it;
+        }
+    };
+
+
+    //--------------------------------------------------------------------
+    // Members
+    //--------------------------------------------------------------------
     wxString m_filename;
     bool m_modified;
 
@@ -196,6 +199,9 @@ public:
 protected:
     bool m_isOk;
     short m_version;
+
+    // Const / non-const helpers
+    bool DoGetClueList(std::vector<wxString> * clues) const;
 
 private:
     // Load / save stuff

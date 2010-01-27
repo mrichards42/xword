@@ -27,8 +27,8 @@ Checksummer::Checksummer(const XPuzzle & puz, unsigned short version)
       m_notes    (puz.m_notes),
       m_version  (version)
 {
-	std::vector<wxString> clues;
-	puz.GetClueList(&clues);
+    std::vector<wxString> clues;
+    puz.GetClueList(&clues);
     SetClues(clues);
 
     // Setup CIB manually
