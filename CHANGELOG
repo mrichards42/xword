@@ -1,11 +1,13 @@
-Version 0.4 (1/??/2010)
+Version 0.4 (?/??/2010)
     New Features
     * Embedded lua for scripting.  Included scripts:
         * Puzzle downloading
         * "Swap across and down" written in lua
         * OneAcross.com search
-        * Non-native file import (currently only is XML supported)
+        * Wikipedia.com search
+        * Non-native file import
     * User is now prompted before revealing the entire grid.
+    * Shift+8 (asterisk) toggles a circle in the current square.
 
     Bug Fixes
     * .puz files now correctly use the full Windows-1252 code page instead of
@@ -17,6 +19,9 @@ Version 0.4 (1/??/2010)
       letter, and the cursor moves to the second letter).
     * Spacebar always deletes the current letter and moves to the next square
       regardless of preferences.
+    * XWord correctly loads puzzles using webdings for rebus entries (entering
+      webdings symbols in the grid is not currently supported, though XWord
+      can display symbols in a puzzle previously saved by Across Lite).
 
     Misc
     * Revamped build system using premake4 to generate platform-specific
