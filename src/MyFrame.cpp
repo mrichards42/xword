@@ -54,15 +54,23 @@
 #include "utils/SizerPrinter.hpp"
 
 #ifdef XWORD_USE_LUA
-	// Lua!
-#define wxLUA_USEBINDING_WXLUASOCKET 0
-	#include "wxlua/include/wxlua.h"
-	#include "wxbind/include/wxbinddefs.h"
-	WXLUA_DECLARE_BIND_ALL
-	extern bool wxLuaBinding_xword_init();
+    // Lua!
 
-	// For traversing the lua scripts directory
-	#include <wx/dir.h>
+    // wxWidgets binding initialization
+    #define wxLUA_USEBINDING_WXLUASOCKET 0
+    #define wxLUA_USEBINDING_WXGL 0
+    #define wxLUA_USEBINDING_WXMEDIA 0
+    #define wxLUA_USEBINDING_WXRICHTEXT 0
+
+    #include "wxlua/include/wxlua.h"
+    #include "wxbind/include/wxbinddefs.h"
+    WXLUA_DECLARE_BIND_ALL
+
+    // XWord binding initialization
+    extern bool wxLuaBinding_xword_init();
+
+    // For traversing the lua scripts directory
+    #include <wx/dir.h>
 #endif // XWORD_USE_LUA
 
 #if !defined(__WXMSW__) && !defined(__WXPM__)
@@ -76,7 +84,7 @@
 
 enum toolIds
 {
-	ID_DUMMY_FIRST = wxID_HIGHEST,
+    ID_DUMMY_FIRST = wxID_HIGHEST,
     //wxID_OPEN,
     //wxID_SAVE,
     //wxID_SAVEAS,
@@ -108,7 +116,6 @@ enum toolIds
 
     ID_TIMER,
     ID_CONVERT,
-    ID_SWAP_DIRECTION,
 
     //wxID_PREFERENCES,
 
@@ -127,9 +134,8 @@ enum toolIds
 
     ID_DUMP_STATUS,
     ID_DUMP_LAYOUT,
-    ID_FORCE_UNSCRAMBLE
-
-#endif
+    ID_FORCE_UNSCRAMBLE,
+#endif // __WXDEBUG__
 };
 
 
@@ -250,9 +256,6 @@ MyFrame::ManageTools()
         { ID_CONVERT,        wxITEM_NORMAL, _T("Convert files"), NULL, NULL,
                    _handler(MyFrame::OnConvert) },
 
-        { ID_SWAP_DIRECTION, wxITEM_NORMAL, _T("Swap across and down"), NULL, NULL,
-                   _handler(MyFrame::OnSwapDirection) },
-
 #ifdef XWORD_USE_LUA
         { ID_LUA_SCRIPT, wxITEM_NORMAL, _T("Run script"), NULL, NULL,
                    _handler(MyFrame::OnLuaScript) },
@@ -273,7 +276,9 @@ MyFrame::ManageTools()
 
         { ID_FORCE_UNSCRAMBLE, wxITEM_NORMAL, _T("Brute force unscramble"), NULL, NULL,
                    _handler(MyFrame::OnBruteForceUnscramble) },
-#endif
+
+
+#endif // __WXDEBUG__
 
         { TOOL_NONE }
     };
@@ -305,13 +310,13 @@ public:
                              const wxArrayString & filenames)
     {
 #if XWORD_USE_LUA
-		// Run the file as a script if it ends with .lua
-		if (filenames.Item(0).EndsWith(_T(".lua")))
-			m_frame->RunLuaScript(filenames.Item(0));
-		// Otherwise try to open as a puzzle
-		else
+        // Run the file as a script if it ends with .lua
+        if (filenames.Item(0).EndsWith(_T(".lua")))
+            m_frame->RunLuaScript(filenames.Item(0));
+        // Otherwise try to open as a puzzle
+        else
 #endif
-			m_frame->LoadPuzzle(filenames.Item(0));
+            m_frame->LoadPuzzle(filenames.Item(0));
         return true;
     }
 
@@ -355,11 +360,11 @@ MyFrame::MyFrame()
     SetIcon(wxICON(xword));
 
 #ifdef XWORD_USE_LUA
-	LuaInit();
+    LuaInit();
 #endif // XWORD_USE_LUA
 
 #ifdef __WXDEBUG__
-	//LoadPuzzle(_T("D:\\C++\\XWord\\test_files\\sunday.puz"));
+    //LoadPuzzle(_T("D:\\C++\\XWord\\test_files\\sunday.puz"));
 #endif // __WXDEBUG__
 
     ShowPuzzle();
@@ -372,8 +377,8 @@ MyFrame::~MyFrame()
     wxGetApp().m_frame = NULL;
 
 #ifdef XWORD_USE_LUA
-	// Lua cleanup
-	m_lua.CloseLuaState(true);
+    // Lua cleanup
+    m_lua.CloseLuaState(true);
 #endif // XWORD_USE_LUA
 
     // Cleanup
@@ -392,8 +397,8 @@ MyFrame::~MyFrame()
 bool
 MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
 {
-	if ( ! ClosePuzzle(true) ) // Prompt for save
-		return false;
+    if ( ! ClosePuzzle(true) ) // Prompt for save
+        return false;
 
     wxStopWatch sw;
 
@@ -547,15 +552,15 @@ MyFrame::ShowPuzzle()
         m_cluePrompt->Clear();
     }
 
-	// Update the GUI
-	ShowClues();
-	ShowAuthor();
-	ShowTitle();
-	ShowCopyright();
-	ShowNotes();
-	ShowGrid();
+    // Update the GUI
+    ShowClues();
+    ShowAuthor();
+    ShowTitle();
+    ShowCopyright();
+    ShowNotes();
+    ShowGrid();
 
-	// Timer
+    // Timer
     StopTimer();
     SetTime(m_puz.m_time);
     if (m_puz.m_isTimerRunning)
@@ -567,12 +572,15 @@ MyFrame::ShowGrid()
 {
     if (! m_puz.IsOk())
         m_gridCtrl->SetXGrid(NULL);
-	else
-	{
-		m_gridCtrl->SetXGrid(&m_puz.m_grid);
+    else
+    {
+        // Make sure the grid has clue numbers assigned, etc.
+        m_puz.m_grid.SetupGrid();
+
+        m_gridCtrl->SetXGrid(&m_puz.m_grid);
 
         const bool scrambled = m_puz.IsScrambled();
-		// Enable / disable scrambling tools
+        // Enable / disable scrambling tools
         m_toolMgr.Enable(ID_SCRAMBLE,   ! scrambled);
         m_toolMgr.Enable(ID_UNSCRAMBLE, scrambled);
         EnableCheck(! scrambled);
@@ -582,7 +590,7 @@ MyFrame::ShowGrid()
 
         // Inform user if puzzle is already completed
         CheckPuzzle();
-	}
+    }
 
     m_gridCtrl->SetPaused(false);
     m_gridCtrl->Refresh();
@@ -592,7 +600,7 @@ MyFrame::ShowGrid()
 void
 MyFrame::ShowClues()
 {
-	m_across->SetClueList(m_puz.m_across);
+    m_across->SetClueList(m_puz.m_across);
     m_down  ->SetClueList(m_puz.m_down);
 }
 
@@ -601,15 +609,15 @@ void
 MyFrame::ShowTitle()
 {
     if (! m_puz.IsOk())
-	{
+    {
         SetTitle(_T("XWord"));
-		m_title->SetLabel(_T(""));
-	}
-	else
-	{
-		SetTitle(m_puz.m_title + _T(" - XWord"));
-		m_title->SetLabel(m_puz.m_title);
-	}
+        m_title->SetLabel(_T(""));
+    }
+    else
+    {
+        SetTitle(m_puz.m_title + _T(" - XWord"));
+        m_title->SetLabel(m_puz.m_title);
+    }
 }
 
 void
@@ -628,7 +636,7 @@ MyFrame::ShowCopyright()
 void
 MyFrame::ShowNotes()
 {
-	m_notes->ChangeValue(m_puz.m_notes);
+    m_notes->ChangeValue(m_puz.m_notes);
     // Set the notes bitmap depending on whether there are notes or not
     if (m_puz.m_notes.empty())
         m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
@@ -687,18 +695,18 @@ MyFrame::CreateWindows()
                                   wxTE_MULTILINE);
 
     if (m_toolMgr.GetIconLocation() != wxEmptyString)
-	{
+    {
 #ifdef USE_AUI_TOOLBAR
         m_toolbar = CreateAuiToolBar();
 #else // ! USE_AUI_TOOLBAR
         m_toolbar = CreateToolBar();
-		SetToolBar(m_toolbar);
+        SetToolBar(m_toolbar);
 #endif // USE_AUI_TOOLBAR / !
-	}
+    }
     else
-	{
+    {
         m_toolbar = NULL;
-	}
+    }
 
     m_menubar = CreateMenuBar();
     SetMenuBar(m_menubar);
@@ -820,7 +828,6 @@ MyFrame::CreateMenuBar()
     menu = new wxMenu();
         m_toolMgr.Add(menu, ID_TIMER);
         m_toolMgr.Add(menu, ID_CONVERT);
-        m_toolMgr.Add(menu, ID_SWAP_DIRECTION);
 #ifdef XWORD_USE_LUA
         m_toolMgr.Add(menu, ID_LUA_SCRIPT);
 #endif // XWORD_USE_LUA
@@ -841,7 +848,7 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, ID_FORCE_UNSCRAMBLE);
     mb->Append(menu, _T("&Debug"));
 
-#endif
+#endif // __WXDEBUG__
 
     return mb;
 }
@@ -1000,7 +1007,16 @@ MyFrame::SetupToolManager()
     m_toolMgr.SetIconSize_AuiToolBar(24);
     m_toolMgr.SetIconSize_ToolBar(24);
     m_toolMgr.SetIconSize_Menu(16);
-    m_toolMgr.SetIconLocation( GetImagesDirectory() );
+    wxString imagesdir = GetImagesDirectory();
+    if (wxDirExists(imagesdir))
+    {
+        m_toolMgr.SetIconLocation(imagesdir);
+    }
+    else
+    {
+        XWordErrorMessage(_T("Cannot find images directory:\n%s"), imagesdir);
+        m_toolMgr.SetIconLocation(_T(""));
+    }
 }
 
 
@@ -1022,7 +1038,6 @@ MyFrame::EnableTools(bool enable)
     m_toolMgr.Enable(ID_TIMER, enable);
     m_toolMgr.Enable(wxID_PREVIEW, enable);
     m_toolMgr.Enable(wxID_PRINT, enable);
-    m_toolMgr.Enable(ID_SWAP_DIRECTION, enable);
 }
 
 
@@ -1322,58 +1337,58 @@ MyFrame::SaveConfig()
 XSquare *
 MyFrame::GetFocusedSquare()
 {
-	if (m_gridCtrl->IsEmpty())
-		return NULL;
-	else
-		return m_gridCtrl->GetFocusedSquare();
+    if (m_gridCtrl->IsEmpty())
+        return NULL;
+    else
+        return m_gridCtrl->GetFocusedSquare();
 }
 
 XSquare *
 MyFrame::SetFocusedSquare(XSquare * square)
 {
-	if (m_gridCtrl->IsEmpty())
-		return false;
-	else
-		// TODO:These function names should really be consistent
-		return m_gridCtrl->SetSquareFocus(square);
+    if (m_gridCtrl->IsEmpty())
+        return false;
+    else
+        // TODO:These function names should really be consistent
+        return m_gridCtrl->SetSquareFocus(square);
 }
 
 void
 MyFrame::GetFocusedWord(XSquare ** start, XSquare ** end)
 {
-	if (m_gridCtrl->IsEmpty())
-	{
-		*start = NULL;
-		*end = NULL;
-	}
-	else
-		m_gridCtrl->GetFocusedWord(start, end);
+    if (m_gridCtrl->IsEmpty())
+    {
+        *start = NULL;
+        *end = NULL;
+    }
+    else
+        m_gridCtrl->GetFocusedWord(start, end);
 }
 
 bool
 MyFrame::GetFocusedDirection() const
 {
-	return m_gridCtrl->GetDirection();
+    return m_gridCtrl->GetDirection();
 }
 
 void
 MyFrame::SetFocusedDirection(bool direction)
 {
-	m_gridCtrl->SetDirection(direction);
+    m_gridCtrl->SetDirection(direction);
 }
 
 const XPuzzle::Clue *
 MyFrame::GetFocusedClue()
 {
-	XSquare * start;
-	XSquare * end;
-	GetFocusedWord(&start, &end);
-	if (start == NULL)
-		return NULL;
-	else if (GetFocusedDirection() == DIR_ACROSS)
-		return &*m_puz.GetAcross().Find(start->GetNumber());
-	else
-		return &*m_puz.GetDown().Find(start->GetNumber());
+    XSquare * start;
+    XSquare * end;
+    GetFocusedWord(&start, &end);
+    if (start == NULL)
+        return NULL;
+    else if (GetFocusedDirection() == DIR_ACROSS)
+        return &*m_puz.GetAcross().Find(start->GetNumber());
+    else
+        return &*m_puz.GetDown().Find(start->GetNumber());
 }
 
 //------------------------------------------------------------------------------
@@ -1714,133 +1729,27 @@ MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
 
 
 
-// Swap across / down
-//-------------------
-
-
-void
-MyFrame::OnSwapDirection(wxCommandEvent & WXUNUSED(evt))
-{
-    // Save important puzzle state information.
-    int focusedRow = m_gridCtrl->GetFocusedSquare()->GetRow();
-    int focusedCol = m_gridCtrl->GetFocusedSquare()->GetCol();
-    bool focusedDir = m_gridCtrl->GetDirection();
-    int oldTime = m_time;
-    bool wasTimerRunning = IsTimerRunning();
-
-    // Swap the clues
-    //---------------
-    XPuzzle::ClueList oldAcross = m_puz.m_across;
-    XPuzzle::ClueList oldDown   = m_puz.m_down;
-
-    m_puz.m_across.clear();
-    m_puz.m_down.clear();
-
-    // Iterate through the grid (downward), and look for all clue squares.
-    // These will all still be clue squares when the grid is swapped.
-    // The clues will sorted correctly.
-    // Fill in the new clue numbers as we go.
-    int clueNumber = 1;
-    for (XSquare * square = m_puz.m_grid.First();
-         square != NULL;
-         square = square->Next(DIR_DOWN))
-    {
-        // Down clues will become across clues
-        if (square->HasClue(DIR_DOWN))
-        {
-			XPuzzle::ClueList::iterator clue_it = oldDown.Find(square->GetNumber());
-            wxASSERT(clue_it != oldDown.end());
-            m_puz.m_across.push_back(*clue_it);
-            m_puz.m_across.back().m_num = clueNumber;
-        }
-        // Across clues will become down clues
-        if (square->HasClue(DIR_ACROSS))
-        {
-			XPuzzle::ClueList::iterator clue_it = oldAcross.Find(square->GetNumber());
-            wxASSERT(clue_it != oldAcross.end());
-            m_puz.m_down.push_back(*clue_it);
-            m_puz.m_down.back().m_num = clueNumber;
-        }
-        if (square->HasClue())
-            ++clueNumber;
-    }
-    wxASSERT(oldAcross.size() == m_puz.m_down.size());
-    wxASSERT(oldDown.size()   == m_puz.m_across.size());
-
-
-    // Swap the grid
-    //--------------
-
-    // Make a copy of the grid vector
-    XGrid::Grid_t gridCopy = m_puz.m_grid.m_grid;
-
-    // Resize the old grid
-    m_puz.m_grid.SetSize(gridCopy.size(), gridCopy.at(0).size());
-
-    // Fill in the new squares
-    for (int row = 0; row < gridCopy.size(); ++row)
-        for (int col = 0; col < gridCopy.at(row).size(); ++col)
-            // Swap the square
-            m_puz.m_grid.m_grid.at(col).at(row) = gridCopy.at(row).at(col);
-
-    // Re-setup the grid.
-    m_puz.m_grid.SetupIteration();
-    m_puz.m_grid.SetupGrid();
-
-
-    // Show the new puzzle
-    ShowPuzzle();
-
-    // Restore the puzzle state
-    m_gridCtrl->SetSquareFocus(&m_gridCtrl->At(focusedRow, focusedCol), ! focusedDir);
-    SetTime(oldTime);
-    if (wasTimerRunning)
-        StartTimer();
-    else
-        StopTimer();
-}
-
 
 
 #ifdef XWORD_USE_LUA
+
+#include <wx/stdpaths.h>
 void
 MyFrame::LuaInit()
 {
     // Initialze wxLua.
     WXLUA_IMPLEMENT_BIND_ALL
     wxLuaBinding_xword_init();
-	m_lua = wxLuaState(this, wxID_ANY);
+    m_lua = wxLuaState(this, wxID_ANY);
 
-	m_lua.RunString(_T("print(package.path, package.cpath)"));
-	// Add the scripts directory to the lua search path
-	const wxString scriptsDir = GetScriptsDirectory();
-	// Can't do anything if we can't find the scripts directory
-	if (scriptsDir.IsEmpty())
-		return;
-
-	// Set the lua search paths
-	// This is now a modification of the lua source code directly
-	/*
-	m_lua.RunString(wxString::Format(
-		_T("package.path = [[%s?.lua;%s?\\init.lua;%slibs\\?.lua;%slibs\\?\\init.lua]]"),
-		scriptsDir, scriptsDir, scriptsDir, scriptsDir));
-
-	m_lua.RunString(wxString::Format(
-		_T("package.cpath = [[%s?.dll;%s?51.dll;%sclibs\\?.dll;%sclibs\\?51.dll]]"),
-		scriptsDir, scriptsDir, scriptsDir, scriptsDir));
-	*/
-
-	// Initialize the lua additions to the xword package
-	// Set the scripts directory first
-	m_lua.RunString(wxString::Format(_T("xword.scriptsdir = [[%s]]"), scriptsDir));
-	RunLuaScript(scriptsDir + _T("xword/init.lua"));
-	// Add the XWord scripts directory to the global xword table
+    // Initialize the lua additions to the xword package
+    RunLuaScript(wxPathOnly(wxStandardPaths::Get().GetExecutablePath()) + _T("/scripts/xword/init.lua"));
 }
 
 void
 MyFrame::RunLuaScript(const wxString & filename)
 {
-	m_lua.RunFile(filename);
+    m_lua.RunFile(filename);
 }
 
 void
@@ -1848,21 +1757,26 @@ MyFrame::OnLuaScript(wxCommandEvent & WXUNUSED(evt))
 {
     const wxString & filename = wxFileSelector(_T("Select a script to run"));
     if (! filename.IsEmpty())
-		RunLuaScript(filename);
+        RunLuaScript(filename);
 }
 
 void
 MyFrame::OnLuaPrint(wxLuaEvent & evt)
 {
-    //wxLogDebug(_T("Got a message from lua!"));
-    wxLogDebug(evt.GetString());
+    // Escape % to %% for printing
+    wxString msg = evt.GetString();
+    msg.Replace(_T("%"), _T("%%"));
+    wxLogDebug(msg);
 }
 
 
 void
 MyFrame::OnLuaError(wxLuaEvent & evt)
 {
-	XWordErrorMessage(evt.GetString());
+    // Escape % to %% for printing
+    wxString msg = evt.GetString();
+    msg.Replace(_T("%"), _T("%%"));
+    XWordErrorMessage(msg);
 }
 
 #endif // XWORD_USE_LUA
@@ -2428,5 +2342,6 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
         EnableReveal(true);
     }
 }
+
 
 #endif // __WXDEBUG__
