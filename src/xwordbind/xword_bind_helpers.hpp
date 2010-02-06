@@ -141,13 +141,13 @@ void xword_puz_error(lua_State * L,
 #define _CATCH_PUZ_EXCEPTION(name)                                            \
     catch(Puz ## name ## Error & error)                                       \
     {                                                                         \
-        xword_puz_error(L, error.message, _T(#name) ## _T("Error"), false);   \
+        xword_puz_error(L, error.message, _T(#name) _T("Error"), false);   \
     }
 
 #define _CATCH_FATAL_PUZ_EXCEPTION(name)                                      \
     catch(Puz ## name ## Error & error)                                       \
     {                                                                         \
-        xword_puz_error(L, error.message, _T(#name) ## _T("Error"), true);    \
+        xword_puz_error(L, error.message, _T(#name) _T("Error"), true);    \
     }
 
 void
