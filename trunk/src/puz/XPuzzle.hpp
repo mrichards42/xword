@@ -105,14 +105,14 @@ public:
     // XGrid has pointers to its data members.  These won't be copied, and the pointers will
     // refer to non-existant XSquares once the grid parameter is destroyed.  Therefore, we need
     // to setup the grid independently in this function.
-    void SetGrid(const XGrid & grid) { m_grid = grid; m_grid.SetupGrid(); }
+    void SetGrid(const XGrid & grid) { m_grid = grid; m_grid.SetupIteration(); m_grid.SetupGrid(); }
 
 
     //--------------------------------------------------------------------
     // Clue and ClueList
     //--------------------------------------------------------------------
     // This makes access to the clues nicer:
-    class XPuzzle::Clue
+    class Clue
     {
     public:
         Clue(int num, const wxString & str)
@@ -134,7 +134,7 @@ public:
     };
 
 
-    class XPuzzle::ClueList : public std::vector<XPuzzle::Clue>
+    class ClueList : public std::vector<XPuzzle::Clue>
     {
         typedef std::vector<XPuzzle::Clue> _base;
     public:
