@@ -1014,7 +1014,7 @@ MyFrame::SetupToolManager()
     }
     else
     {
-        XWordErrorMessage(_T("Cannot find images directory:\n%s"), imagesdir);
+        XWordErrorMessage(_T("Cannot find images directory:\n%s"), imagesdir.c_str());
         m_toolMgr.SetIconLocation(_T(""));
     }
 }
