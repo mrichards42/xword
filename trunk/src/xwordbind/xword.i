@@ -334,6 +334,10 @@
 
 %endclass
 
+
 // %override MyFrame * GetFrame()
 %function MyFrame * GetFrame()
+
+// %override bool MyApp::IsPortable()
+%function bool IsPortable()
 

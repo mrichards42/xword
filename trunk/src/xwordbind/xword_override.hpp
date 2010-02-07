@@ -504,3 +504,14 @@ int wxLua_function_GetFrame(lua_State *L)
     return 1; // One object on the stack for lua.
 }
 %end
+
+
+
+%override wxLua_function_IsPortable
+// bool MyApp::IsPortable()
+int wxLua_function_IsPortable(lua_State *L)
+{
+    lua_pushboolean(L, GetApp().IsPortable());
+    return 1;
+}
+%end

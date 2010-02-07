@@ -54,7 +54,9 @@ public:
     void SetReturnCode(int code) { m_retCode = code; }
 
     ConfigManager & GetConfigManager() { return m_config; }
-    wxString GetConfigPath();
+
+    // Portable mode
+    bool IsPortable() { return m_isPortable; }
 
 private:
     void OnActivate(wxActivateEvent & evt);
@@ -66,6 +68,9 @@ private:
     ConfigManager m_config;
     int m_retCode;
     bool m_isTimerRunning;
+
+    // Portable mode
+    bool m_isPortable;
 
     DECLARE_EVENT_TABLE()
 };

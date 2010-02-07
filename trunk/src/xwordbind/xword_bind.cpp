@@ -2577,6 +2577,16 @@ int wxLua_function_GetFrame(lua_State *L)
 
 static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetFrame[1] = {{ wxLua_function_GetFrame, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
 
+// %override wxLua_function_IsPortable
+// bool MyApp::IsPortable()
+int wxLua_function_IsPortable(lua_State *L)
+{
+    lua_pushboolean(L, wxGetApp().IsPortable());
+    return 1;
+}
+
+static wxLuaBindCFunc s_wxluafunc_wxLua_function_IsPortable[1] = {{ wxLua_function_IsPortable, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
+
 // ---------------------------------------------------------------------------
 // wxLuaGetFunctionList_xword() is called to register global functions
 // ---------------------------------------------------------------------------
@@ -2586,6 +2596,7 @@ wxLuaBindMethod* wxLuaGetFunctionList_xword(size_t &count)
     static wxLuaBindMethod functionList[] =
     {
         { "GetFrame", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetFrame, 1, NULL },
+        { "IsPortable", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_IsPortable, 1, NULL },
 
         { 0, 0, 0, 0 }, 
     };

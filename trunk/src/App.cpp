@@ -53,6 +53,10 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
       _T("w"), _T("overwrite"),
       _T("overwrite existing files") },
 
+    { wxCMD_LINE_SWITCH,
+      _T("P"), _T("portable"),
+      _T("portable mode") },
+
     { wxCMD_LINE_OPTION,
       _T("d"), _T("directory"),
       _T("parent directory for output of converted files") },
@@ -84,6 +88,14 @@ MyApp::OnInit()
 
     // Seed random number generator (for grid scrambling)
     srand( time(NULL) );
+
+    // Portable mode is enabled if there is a file named
+    // "portable_mode_enabled" in the executable directory.
+    // Portable mode can also be enabled via command line switches:
+    // --portable OR -P
+    wxFileName portable(argv[0]);
+    portable.SetFullName(_T("portable_mode_enabled"));
+    m_isPortable = portable.FileExists();
 
     SetupConfig();
     SetupPrinting();
@@ -123,6 +135,9 @@ MyApp::ReadCommandLine()
 
     const size_t param_count = cmd.GetParamCount();
     wxLogDebug(_T("Command count: %d"), param_count);
+
+    // Portable mode?
+    m_isPortable = m_isPortable || cmd.Found(_T("portable"));
 
     // Convert files
     if (cmd.Found(_T("c")))

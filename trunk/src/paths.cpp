@@ -15,19 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-
-// NOTE: If compiling a debug build of XWord, the build directory must not
-// begin with "debug" (default is "Unicode Debug").  If the directory
-// begins with "debug" some of these functions (notably, those using
-// wxStandardPaths::GetResourcesDir()) will return an incorrect path.
-// See stdpaths.cpp in the wxwidgets source tree.
-
-
 #include "paths.hpp"
 #include <wx/string.h>
 #include <wx/filename.h> // wxFileName
 #include <wx/stdpaths.h> // wxStandardPaths
+#include "App.hpp" // wxGetApp().IsPortable()
 
 #ifdef __UNIX__
 const wxChar * configFileName = _T(".xword");
@@ -46,18 +38,9 @@ wxString exedir()
 }
 
 
-// Portable mode is used when a file "portable_mode_enabled" is present
-// in the executable directory.
-bool IsPortable()
-{
-    return wxFileExists(exedir() + sep() + _T("portable_mode_enabled"));
-}
-
-
-
 wxString GetConfigDirectory()
 {
-    if (IsPortable())
+    if (wxGetApp().IsPortable())
         return exedir() + sep() + _T("config");
     else
         return wxStandardPaths::Get().GetUserDataDir() + sep() + _T("config");
@@ -82,7 +65,7 @@ wxString GetConfigFile()
 
 wxString GetImagesDirectory()
 {
-    if (IsPortable())
+    if (wxGetApp().IsPortable())
         return exedir() + sep() + _T("images");
     else
         return wxStandardPaths::Get().GetResourcesDir() + sep() + _T("images");
@@ -91,7 +74,7 @@ wxString GetImagesDirectory()
 
 wxString GetScriptsDirectory()
 {
-    if (IsPortable())
+    if (wxGetApp().IsPortable())
         return exedir() + sep() + _T("scripts");
     else
         return wxStandardPaths::Get().GetResourcesDir() + sep() + _T("scripts");
