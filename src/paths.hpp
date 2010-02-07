@@ -22,7 +22,6 @@
 
 // Locations where the application expects to find its files.
 // It is up to the caller to determine whether or not the path exists.
-bool IsPortable();
 wxString GetConfigFile();
 wxString GetConfigDirectory();
 wxString GetImagesDirectory();
