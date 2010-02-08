@@ -189,9 +189,11 @@
     bool IsScrambled() const
     bool HasSolution() const
     unsigned short GetFlag() const
+    void SetFlag(unsigned short flag)
 
     bool IsDiagramless() const
     unsigned short GetType() const
+    void SetType(unsigned short type)
 
     bool ScrambleSolution(unsigned short key = 0)
     bool UnscrambleSolution(unsigned short key)
@@ -199,6 +201,8 @@
 
     unsigned short GetKey() const
     unsigned short GetCksum() const
+    void SetKey(unsigned short key)
+    void SetCksum(unsigned short cksum)
 %endclass
 
 

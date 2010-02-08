@@ -511,7 +511,7 @@ int wxLua_function_GetFrame(lua_State *L)
 // bool MyApp::IsPortable()
 int wxLua_function_IsPortable(lua_State *L)
 {
-    lua_pushboolean(L, GetApp().IsPortable());
+    lua_pushboolean(L, wxGetApp().IsPortable());
     return 1;
 }
 %end
