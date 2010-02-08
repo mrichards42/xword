@@ -146,10 +146,12 @@ public:
     bool IsScrambled() const { return (m_flag & XFLAG_SCRAMBLED) != 0; }
     bool HasSolution() const { return (m_flag & XFLAG_NO_SOLUTION) == 0; }
     unsigned short GetFlag() const { return m_flag; }
+    void SetFlag(unsigned short flag) { m_flag = flag; }
 
     // Type
     bool IsDiagramless() const { return m_type == XTYPE_DIAGRAMLESS; }
     unsigned short GetType() const { return m_type; }
+    void SetType(unsigned short type) { m_type = type; }
 
     // Scrambling
     bool ScrambleSolution  (unsigned short key = 0);
@@ -159,6 +161,8 @@ public:
 
     unsigned short  GetKey()   const { return m_key; }
     unsigned short  GetCksum() const { return m_cksum; }
+    void SetKey(unsigned short key) { m_key = key; }
+    void SetCksum(unsigned short cksum) { m_cksum = cksum; }
 
     bool IsBetween(const XSquare * square,
                    const XSquare * start,

@@ -1090,6 +1090,54 @@ static int LUACALL wxLua_XGrid_ScrambleSolution(lua_State *L)
     return 1;
 }
 
+static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetCksum[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_XGrid_SetCksum(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetCksum[1] = {{ wxLua_XGrid_SetCksum, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_SetCksum }};
+//     void SetCksum(unsigned short cksum)
+static int LUACALL wxLua_XGrid_SetCksum(lua_State *L)
+{
+    // unsigned short cksum
+    unsigned short cksum = (unsigned short)wxlua_getuintegertype(L, 2);
+    // get this
+    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
+    // call SetCksum
+    self->SetCksum(cksum);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetFlag[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_XGrid_SetFlag(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetFlag[1] = {{ wxLua_XGrid_SetFlag, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_SetFlag }};
+//     void SetFlag(unsigned short flag)
+static int LUACALL wxLua_XGrid_SetFlag(lua_State *L)
+{
+    // unsigned short flag
+    unsigned short flag = (unsigned short)wxlua_getuintegertype(L, 2);
+    // get this
+    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
+    // call SetFlag
+    self->SetFlag(flag);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetKey[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_XGrid_SetKey(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetKey[1] = {{ wxLua_XGrid_SetKey, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_SetKey }};
+//     void SetKey(unsigned short key)
+static int LUACALL wxLua_XGrid_SetKey(lua_State *L)
+{
+    // unsigned short key
+    unsigned short key = (unsigned short)wxlua_getuintegertype(L, 2);
+    // get this
+    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
+    // call SetKey
+    self->SetKey(key);
+
+    return 0;
+}
+
 static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetSize[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_XGrid_SetSize(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetSize[1] = {{ wxLua_XGrid_SetSize, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_XGrid_SetSize }};
@@ -1104,6 +1152,22 @@ static int LUACALL wxLua_XGrid_SetSize(lua_State *L)
     XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
     // call SetSize
     self->SetSize(width, height);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetType[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_XGrid_SetType(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetType[1] = {{ wxLua_XGrid_SetType, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_SetType }};
+//     void SetType(unsigned short type)
+static int LUACALL wxLua_XGrid_SetType(lua_State *L)
+{
+    // unsigned short type
+    unsigned short type = (unsigned short)wxlua_getuintegertype(L, 2);
+    // get this
+    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
+    // call SetType
+    self->SetType(type);
 
     return 0;
 }
@@ -1299,7 +1363,11 @@ wxLuaBindMethod XGrid_methods[] = {
     { "LastRow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_LastRow, 1, NULL },
     { "LastWhite", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_LastWhite, 1, NULL },
     { "ScrambleSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_ScrambleSolution, 1, NULL },
+    { "SetCksum", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetCksum, 1, NULL },
+    { "SetFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetFlag, 1, NULL },
+    { "SetKey", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetKey, 1, NULL },
     { "SetSize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetSize, 1, NULL },
+    { "SetType", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetType, 1, NULL },
     { "SetupGrid", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetupGrid, 1, NULL },
     { "UnscrambleSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_UnscrambleSolution, 1, NULL },
     { "XGrid", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_XGrid_constructor, 1, NULL },
