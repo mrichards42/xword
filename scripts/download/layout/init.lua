@@ -20,7 +20,7 @@ layout.layouts = {}
 -- Return today with no time
 function layout.today()
     local d = date()
-    d:sethours(0, 0, 0, 0)
+    d.dayfrc = 0 -- clear the time
     return d
 end
 
@@ -48,16 +48,21 @@ function layout.createMenu()
 end
 
 
--- Create and return a single download ctrl, adding it to the download dialog's
--- list of downloads.
+-- Create a single download ctrl, adding it to the download dialog's
+-- list of downloads if it does not already exist.
 function layout.createDownloadCtrl(source, d)
     local dlg = assert(P.dlg)
     if not dlg.downloads[source.display] then
-        dlg.downloads[source.display] = {}
+        dlg.downloads:addsource(source.display)
     end
-    local dl = P.DownloadCtrl(dlg.panel, source, d)
-    table.insert(dlg.downloads, dl)
-    dlg.downloads[source.display][{d:getdate()}] = dl
+    local dl = dlg.downloads[source.display][d]
+    -- Download does not exist; create it.
+    if not dl then
+        dl = P.DownloadCtrl(dlg.panel, source, d)
+        dlg.downloads[source.display][d] = dl
+    end
+    -- Add the download to the various downloads list.
+    table.insert(dlg.downloadslist, dl)
     table.insert(dlg.pendingdownloads, dl)
 end
 
@@ -78,19 +83,7 @@ Parameters:
             Default: today
 ]]
 function layout.createDownloadCtrls(...)
-    -- Destroy the old download controls and the old sizer.
-    --dlg.panel:SetSizer(wx.NULL)
-    --dlg.panel:DestroyChildren()
-
-    -- downloads owned by the dialog
-    -- This will have both an array and a hash part
-    -- dlg.downloads[1 - xxx] is the array
-    -- dlg.downloads["displayName"][date] is the hash
     local dlg = assert(P.dlg)
-    dlg.downloads = {}
-
-    dlg.activedownloads = {}
-    dlg.pendingdownloads = {}
 
     local sources, start_date, end_date
 
@@ -130,7 +123,7 @@ function layout.createDownloadCtrls(...)
         sources = { sources }
     end
 
-    -- create the download
+    -- Create all the matching downloads
     for _, source in ipairs(sources) do
         local d = start_date:copy()
         while d <= end_date do
@@ -140,6 +133,46 @@ function layout.createDownloadCtrls(...)
     end
 end
 
+
+-- Destroy old download ctrls and remove them from dlg.downloads.
+-- New ctrls are those that are present in both dlg.downloadslist and
+-- dlg.downloads (i.e. they have been created since the last call to
+--  layout.setLayout()
+-- The layout function may call this function after creating all download ctrls.
+function layout.cleanDownloadCtrls()
+    -- Create a reverse download ctrl table { [dl] = idx }
+    local ctrls = {}
+    for k, v in pairs(P.dlg.downloadslist) do ctrls[v] = k end
+
+    -- Find all the extra download ctrls
+    for _, dls in pairs(P.dlg.downloads) do
+        for dl_date, dl in pairs(dls) do
+            if not ctrls[dl] then
+                print("Destroying", dl.ctrl)
+                dl.ctrl:Destroy()
+                -- Lua reference manual says this is OK
+                dls[dl_date] = nil
+            end
+        end
+    end
+end
+
+-- Destroy all windows that are not attached to a sizer in the current layout.
+-- This is called at the end of layout.setLayout()
+function layout.cleanLayout()
+    -- Clean download ctrls from dlg.downloads
+    layout.cleanDownloadCtrls()
+    --if true then return end
+
+    -- Destroy any extra child windows
+    local child = P.dlg.panel.Children.First
+    while child do
+        local window = child.Data:DynamicCast("wxWindow")
+        -- Get the next node *before* we destroy the window
+        child = child.Next
+        if not window.ContainingSizer then window:Destroy() end
+    end
+end
 
 
 -- Change the layout, providing either a function or a name.
@@ -183,18 +216,35 @@ function layout.setLayout(func, start_date, ...)
     dlg:Freeze()
     -- Set a dummy sizer to destroy the previous one
     dlg.panel:SetSizer(wx.wxBoxSizer(wx.wxVERTICAL))
-    dlg.panel:DestroyChildren()
-    dlg.downloads = {}
+    --dlg.panel:DestroyChildren()
+
+    -- downloads owned by the dialog:
+    -- (hash)  downloads["displayName"][date]
+    -- (array) downloadslist[] ...
+    -- Don't touch dlg.downloads yet, in case we need to use existing ctrls.
+    dlg.downloadslist = {}
     dlg.pendingdownloads = {}
     dlg.activedownloads = {}
 
     func(start_date, unpack(arg))
 
+    -- Make sure the layout set a sizer or we'll have big problems
+    assert(dlg.panel.Sizer)
+
+    -- Our own version of lua's "tag and sweep" garbage collection!
+    -- Clean up any windows that are not used in the current layout.  Any
+    -- window that is not part of a sizer will be destroyed.
+    layout.cleanLayout()
+
     dlg.scroller:FitInside()
     dlg.scroller:Scroll(0,0)
+
     dlg:Thaw()
 end
 
+-- ============================================================================
+-- Button callbacks
+-- ============================================================================
 
 -- Return a callback function that will start all downloads in the given
 -- table of DownloadCtrls.
@@ -202,7 +252,7 @@ end
 function layout.downloadAll(ctrls)
     -- ipairs will only iterate numeric keys, so the entire download table
     -- is safe to use here.
-    local ctrls = ctrls or P.dlg.downloads
+    local ctrls = ctrls or P.dlg.downloadslist
 
     return function()
         for _, dl in ipairs(ctrls) do
@@ -217,11 +267,9 @@ end
 function layout.downloadAllDates(target_date)
     local ctrls = {}
     for name, dates in pairs(P.dlg.downloads) do
-        if type(name) == 'string' then
-            for date_tbl, dl in pairs(dates) do
-                if date(unpack(date_tbl)) == target_date then
-                    table.insert(ctrls, dl)
-                end
+        for dl_date, dl in pairs(dates) do
+            if target_date == dl_date then
+                table.insert(ctrls, dl)
             end
         end
     end

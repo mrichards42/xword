@@ -35,11 +35,13 @@ local function layoutGrid(start_date, direction)
 
     -- Create the download ctrls
     layout.createDownloadCtrls(start_date, end_date)
+    -- Clean up extraneous downloads
+    layout.cleanDownloadCtrls()
 
     -- ------------------------------------------------------------------------
     -- Layout
     -- ------------------------------------------------------------------------
-    local sizer = wx.wxGridBagSizer(5, 5)
+    local sizer = wx.wxGridBagSizer(5,5)
 
     -- Swap button
     local btn = wx.wxBitmapButton(panel, wx.wxID_ANY, P.bmp.swap)
@@ -74,12 +76,12 @@ local function layoutGrid(start_date, direction)
                   GBPosition(0, col), wx.wxGBSpan(1,1), wx.wxALIGN_CENTER)
 
         -- Add the actual download controls to the grid
-        for date_tbl, dl in pairs(dlg.downloads[source.display]) do
-            local row = (end_date - date(unpack(date_tbl))):spandays() + 1
+        for dl_date, dl in pairs(dlg.downloads[source.display]) do
+            local row = (end_date - dl_date):spandays() + 1
             sizer:Add(dl.ctrl,
                       GBPosition(row, col),
                       wx.wxGBSpan(1,1),
-                      wx.wxALIGN_CENTER)
+                      wx.wxALIGN_CENTER)-- + wx.wxEXPAND)
         end
 
         -- All puzzles for a given source
