@@ -3,8 +3,8 @@
 Queue = {}
 function Queue:new()
     local obj = {first = 0, last = -1}
-    setmetatable(obj, self)
     self.__index = self
+    setmetatable(obj, self)
     return obj
 end
 
@@ -18,7 +18,21 @@ function Queue:pop()
   local last = self.last
   if self.first > last then return nil end -- queue is empty
   local value = self[last]
-  self[last] = nil         -- to allow garbage collection
+  self[last] = nil -- allow garbage collection
   self.last = last - 1
   return value
+end
+
+function Queue:clear()
+  while self.first <= self.last do
+    self[self.last] = nil -- garbage collect this value
+    self.last = self.last - 1
+  end
+  self.first = 0
+  self.last = -1
+end
+
+-- Using __len doesn't override the # operator for tables
+function Queue:length()
+    return self.last - self.first + 1
 end
