@@ -60,6 +60,12 @@ local function SwapAcrossDown(puz)
         end
     end
 
+    -- Copy over metadata
+    newGrid.Type = puz.Grid.Type
+    newGrid.Flag = puz.Grid.Flag
+    newGrid.Cksum = puz.Grid.Cksum
+    newGrid.Key = puz.Grid.Key
+
     -- Set the puzzle's grid.  The puzzle now has ownership of the grid.
     -- lua will not garbage collect the grid's userdata.
     puz.Grid = newGrid
@@ -89,7 +95,7 @@ local function init()
             frame:ShowClues()
 
             -- Restore the focused square (swapping direction)
-            frame:SetFocusedSquare(puz.Grid[{row, col}])
+            frame:SetFocusedSquare(xword.frame.Puzzle.Grid[{row, col}])
             frame:SetFocusedDirection(not direction)
         end
     )
