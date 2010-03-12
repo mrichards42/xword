@@ -141,9 +141,8 @@ local replacement_table = {
 }
 
 
-
 -- Convert a multi-byte sequence to a unicode code point
-function multibyte_to_unicode(b)
+local function multibyte_to_unicode(b)
     local len = #b
 
     -- Single-byte is always ASCII
@@ -218,10 +217,24 @@ function xword.conv_utf8(str, replace_char, error_char)
 
         -- Find the Windows encoded version of this string
         local code_point = multibyte_to_unicode(sequence)
-        if code_point < 128 then
-            table.insert(chars, string.char(code_point))
+        if code_point then
+            if code_point < 128 then
+                table.insert(chars, string.char(code_point))
+            else
+                local ch = replacement_table[code_point]
+                if ch then
+                    table.insert(chars, string.char(ch))
+                elseif code_point < 256 then
+                    -- If this doesn't have a direct mapping, but the code
+                    -- point is within the range of windows encoding, try to
+                    -- use that character directly.
+                    table.insert(chars, string.char(code_point))
+                else
+                    table.insert(chars, replace_char)
+                end
+            end
         else
-            table.insert(chars, string.char(replacement_table[code_point]) or replace_char)
+            table.insert(chars, error_char)
         end
         -- Reset the sequence table
         nBytes = -1
