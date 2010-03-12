@@ -3,9 +3,13 @@ local P = download
 local layout = P.layout
 
 local function layoutByPuzzle()
-    layout.createDownloadCtrls()
     local dlg = assert(P.dlg)
     local panel = dlg.panel
+
+    -- Create the download ctrls
+    layout.createDownloadCtrls()
+    -- Clean up extraneous downloads
+    layout.cleanDownloadCtrls()
 
     local today = layout.today()
 
@@ -17,10 +21,9 @@ local function layoutByPuzzle()
         local dlSizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
 
         -- Add the actual download controls to the grid
-        for date_tbl, dl in pairs(dlg.downloads[source.display]) do
-            local d = date(unpack(date_tbl))
+        for dl_date, dl in pairs(dlg.downloads[source.display]) do
             local datesizer = wx.wxBoxSizer(wx.wxVERTICAL)
-                datesizer:Add(layout.Header(panel, d:fmt(P.dateformat), d == today),
+                datesizer:Add(layout.Header(panel, dl_date:fmt(P.dateformat), dl_date == today),
                               0, wx.wxEXPAND + wx.wxALL, 5)
                 datesizer:Add(dl.ctrl, 0, wx.wxEXPAND + wx.wxALL, 5)
             dlSizer:Add(datesizer, 0, wx.wxEXPAND + wx.wxALL, 5)
