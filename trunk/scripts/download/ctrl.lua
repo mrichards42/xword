@@ -97,6 +97,37 @@ local function getConversion(filename, loadtype)
     return checkPuz
 end
 
+-- Return started (bool), comlete (pct), time (secs)
+local function puzzleStats(filename)
+    local success, puz = pcall(xword.XPuzzle, filename)
+    if not success then return end
+    local blank = 0
+    local total = 0
+    local started = puz.Time > 0
+    local square = puz.Grid:First()
+    while square do
+        if square:IsWhite() then
+            total = total + 1
+            if square:IsBlank() then
+                blank = blank + 1
+                if not started then
+                    -- Flags that indicate that the user has entered something in
+                    -- the square
+                    started = square:HasFlag(xword.XFLAG_X +
+                                             xword.XFLAG_RED +
+                                             xword.XFLAG_BLACK)
+                end
+            elseif not started then
+                started = true
+            end
+        end
+        square = square:Next()
+    end
+    return started,
+           math.floor(100 - blank / total * 100 + 0.5), -- Round
+           puz.Time
+end
+
 
 local P = download
 
@@ -112,10 +143,11 @@ Parameters:
         source: a table from the download.sources table.
         date:   the date for the download.
 
-    DownloadCtrl(parent, url, [filename], [loadtype]):
+    DownloadCtrl(parent, url, [curlopts], [filename], [loadtype]):
         url:      the url to download
         filename: the output filename.  If not supplied, use the filename
                   from the url.
+        curlopts: a table of curl opts:  { [curl.OPT_NAME] = 'value', }
         loadtype: the file type of the downloaded puzzle, used to convert
                   the download to a valid .puz file.  If not supplied, guess
                   based on the extension of the url.  Default to Across
@@ -135,10 +167,11 @@ function P.DownloadCtrl(parent, ...)
         dl.url = d:fmt(source.url)
         dl.filename = P.localfolder..'\\'..d:fmt(source.filename)
         dl.convert = getConversion(dl.filename, source.format)
+        dl.curlopts = source.curlopts
 
-    -- DownloadCtrl(parent, url, [filename], [loadtype])
+    -- DownloadCtrl(parent, url, [filename], [loadtype], [curlopts])
     else
-        dl.url, dl.filename, type = unpack(arg)
+        dl.url, dl.filename, type, dl.curlopts = unpack(arg)
         dl.filename = getFilename(dl.url, dl.filename)
         dl.convert = getConversion(dl.filename, type)
     end
@@ -154,31 +187,107 @@ function P.DownloadCtrl(parent, ...)
     dl.ctrl = wx.wxPanel(
         parent, wx.wxID_ANY,
         wx.wxDefaultPosition, wx.wxDefaultSize,
-        wx.wxTAB_TRAVERSAL + wx.wxBORDER_NONE,
+        wx.wxTAB_TRAVERSAL + wx.wxBORDER_DOUBLE,
         "DownloadCtrl"
     )
-    local downloadButton = wx.wxBitmapButton(dl.ctrl, wx.wxID_ANY, bmp.download, wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxBORDER_NONE)
-    local playButton = wx.wxBitmapButton(dl.ctrl, wx.wxID_ANY, bmp.play, wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxBORDER_NONE)
+    local downloadButton = wx.wxBitmapButton(
+        dl.ctrl, wx.wxID_ANY, bmp.download,
+        wx.wxDefaultPosition, wx.wxDefaultSize,
+        wx.wxBORDER_NONE
+    )
+    downloadButton:SetToolTip("Download")
+    local playButton = wx.wxBitmapButton(
+        dl.ctrl, wx.wxID_ANY, bmp.play,
+        wx.wxDefaultPosition, wx.wxDefaultSize,
+        wx.wxBORDER_NONE
+    )
+    playButton:SetToolTip("Open")
     local gauge = wx.wxGauge(
         dl.ctrl, wx.wxID_ANY, 0,
-        wx.wxDefaultPosition, wx.wxSize(-1, 15)
+        wx.wxDefaultPosition, wx.wxSize(45, 16)
     )
-    local statusCtrl = wx.wxStaticText(dl.ctrl, wx.wxID_ANY, 'Connecting...')
+    local statusCtrl = wx.wxStaticText(dl.ctrl, wx.wxID_ANY, 'Status')
 
     -- ------------------------------------------------------------------------
     -- Layout
     -- ------------------------------------------------------------------------
-    local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
+
+    local sizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
+        sizer:Add(gauge, 1, wx.wxALL + wx.wxALIGN_CENTER_VERTICAL, 5)
+        sizer:Add(statusCtrl, 0, wx.wxALL + wx.wxALIGN_CENTER_VERTICAL, 5)
         local buttonSizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-            buttonSizer:Add(downloadButton, 0, wx.wxEXPAND + wx.wxALL, 5)
-            buttonSizer:Add(playButton, 0, wx.wxEXPAND + wx.wxALL, 5)
-        sizer:Add(buttonSizer, 0, wx.wxEXPAND + wx.wxALL, 5)
-        sizer:Add(gauge, 0, wx.wxEXPAND + wx.wxALL, 5)
-        sizer:Add(statusCtrl, 0, wx.wxEXPAND + wx.wxALL, 5)
-        -- download info is hidden until the download actually starts
-        sizer:Show(gauge, false)
-        sizer:Show(statusCtrl, false)
-    dl.ctrl:SetSizerAndFit(sizer)
+            buttonSizer:Add(downloadButton, 0, wx.wxALL, 5)
+            buttonSizer:Add(playButton, 0, wx.wxALL, 5)
+        sizer:Add(buttonSizer, 0, wx.wxEXPAND + wx.wxALL + wx.wxALIGN_CENTER_VERTICAL, 0)
+    -- Keep everything centered horizontally
+    local bordersizer = wx.wxBoxSizer(wx.wxVERTICAL)
+    bordersizer:Add(sizer, 1, wx.wxEXPAND + wx.wxALIGN_CENTER, 0)
+    dl.ctrl:SetSizer(bordersizer)
+
+    -- Change layout based on status of puzfile
+    local function UpdateLayout()
+        dl.ctrl:Freeze()
+        -- The download has completed
+        if dl.res then
+            if dl.res == 0 then -- Successful download
+                -- Indicate that the download is complete
+                gauge:SetRange(100)
+                gauge:SetValue(100)
+                buttonSizer:Show(playButton, true)
+                buttonSizer:Show(downloadButton, false)
+                buttonSizer:Layout()
+            else
+                if not dl.err then dl.err = 'Unknown' end
+                downloadButton:SetToolTip('Error: '..dl.err..'   Redownload.')
+                downloadButton:SetBitmapLabel(bmp.downloaderror)
+                buttonSizer:Show(playButton, true)
+                buttonSizer:Show(downloadButton, false)
+                buttonSizer:Layout()
+            end
+            sizer:Show(buttonSizer, true)
+            sizer:Show(statusCtrl, false)
+            sizer:Show(gauge, false)
+        -- The download has not started
+        elseif not dl.task then
+            local started, blank, time = puzzleStats(dl.puzfile)
+            -- Puzzle does not exist
+            if not blank then
+                sizer:Show(gauge, false)
+                sizer:Show(statusCtrl, false)
+                sizer:Show(buttonSizer, true)
+            -- Puzzle exists
+            else
+                sizer:Show(gauge, false)
+                sizer:Show(buttonSizer, true)
+                buttonSizer:Show(downloadButton, false)
+                buttonSizer:Show(playButton, true)
+
+                if started then
+                    sizer:Show(statusCtrl, true)
+                    local status = blank.."%"
+                     -- Display time if it is > 0
+                    if time > 0 then
+                        if time > 60*60 then
+                            status = status.."\n"..date(time):fmt("%H:%M:%S")
+                        else
+                            status = status.."\n"..date(time):fmt("%M:%S")
+                        end
+                    end
+                    statusCtrl:SetLabel(status)
+                else
+                    sizer:Show(statusCtrl, false)
+                end
+            end
+        elseif not dl.res then
+        -- The download has finished
+        end
+        sizer:Layout()
+        dl.ctrl:Thaw()
+        parent:Layout()
+    end
+
+    UpdateLayout()
+    --dl.ctrl:Fit()
 
     -- ------------------------------------------------------------------------
     -- Thread message callbacks
@@ -217,24 +326,10 @@ function P.DownloadCtrl(parent, ...)
                 end
             end
 
-            if dl.res == 0 then -- Successful download
-                -- Indicate that the download is complete
-                gauge:SetRange(100)
-                gauge:SetValue(100)
-                statusCtrl:SetLabel('Done')
-                print("(DL_END) Success: " .. dl.url)
-            else
-                if not dl.err then dl.err = 'Unknown' end
-                statusCtrl:SetLabel('Error: '..dl.err)
-                statusCtrl:SetToolTip('Error: '..dl.err)
-                print("(DL_END) Error: " .. dl.url)
-            end
-            -- Display the status instead of the gauge
-            sizer:Show(statusCtrl, true)
-            sizer:Show(gauge, false)
-            sizer:Layout()
             -- Stop checking the message queue
             dl.ctrl:Disconnect(wx.wxEVT_IDLE)
+
+            UpdateLayout()
         end,
 
         [P.DL_MESSAGE] = function(msg)
@@ -321,9 +416,13 @@ function P.DownloadCtrl(parent, ...)
         -- Don't re-start currently running downloads.
         if dl.isrunning() then return end
 
-        -- Show download info / hide button
+        dl.res = nil
+        dl.err = nil
+
+        -- Show only the gauge
         sizer:Show(gauge, true)
         sizer:Show(buttonSizer, false)
+        sizer:Show(statusCtrl, false)
         sizer:Layout()
 
         -- Start handling idle events (for download callbacks)
@@ -333,8 +432,16 @@ function P.DownloadCtrl(parent, ...)
         xword.makeDirs(dl.filename)
 
         -- Start the download in a new thread
+        local args = { 1, dl.url, dl.filename }
+        if dl.curlopts then
+            for k,v in pairs(dl.curlopts) do
+                table.insert(args, k)
+                table.insert(args, v)
+            end
+        end
+        for k,v in pairs(args) do print(k,v) end
         dl.task_id = task.create(xword.scriptsdir..'/download/task.lua',
-                                 {1, dl.url, dl.filename})
+                                 args)
     end
 
     function dl.isrunning()
