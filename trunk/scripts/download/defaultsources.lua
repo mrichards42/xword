@@ -19,16 +19,27 @@ Each entry in the sources table should consist of the following:
         <string> a string indicating the file format as used by the "import"
                  add-on.  If no format is given, XWord will try to load the
                  puzzle as either Across Lite .puz or .txt format.
+    curlopts (optional)
+        <table> a table of curl options for the download:
+        { [curl.OPT_OPTION_NAME] = 'option value' }
+        See luacurl documentation for valid option values
+        
 ]]
+
+require 'luacurl'
 
 download.sources = 
 {
     {
         display = "NY Times",
         url = "http://www.xwordinfo.com/XPF/?date=%m/%d/%Y",
-        filename = "nyt%Y%m%d.puz",
+        filename = "nyt%Y%m%d.xml",
         days = { true, true, true, true, true, true, true },
-        format = "XPF"
+        format = "XPF",
+        curlopts =
+        {
+            [curl.OPT_REFERER] = 'http://www.xwordinfo.com/',
+        },
     },
 
     {
@@ -93,7 +104,7 @@ download.sources =
 
     {
         display = "Wall Street Journal",
-        url = "http://mazerlm.home.att.net/wsj%y%m%d.puz",
+        url = "http://mazerlm.home.comcast.net/wsj%y%m%d.puz",
         filename = "wsj%Y%m%d.puz",
         days = { false, false, false, false, true, false, false },
     },
@@ -107,7 +118,7 @@ download.sources =
 
     {
         display = "Philidelphia Inquirer",
-        url = "http://mazerlm.home.att.net/pi%y%m%d.puz",
+        url = "http://mazerlm.home.comcast.net/pi%y%m%d.puz",
         filename = "pi%Y%m%d.puz",
         days = { false, false, false, false, false, false, true },
     },
