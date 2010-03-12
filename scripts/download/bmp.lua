@@ -5,7 +5,8 @@ download.bmp = {}
 for _, name in pairs({
     'download',
     'play',
-    'swap'
+    'swap',
+    'downloaderror',
 }) do
     download.bmp[name] =
         wx.wxBitmap(wx.wxImage(
