@@ -4,10 +4,10 @@
 --     application exit, the dialog terminates all active download threads.
 -- ============================================================================
 
-
 require 'mtask'
 require 'download.ctrl'
 require 'download.layout'
+require 'download.dltable'
 require 'date'
 
 assert(download, 'Must load download package first')
@@ -61,8 +61,9 @@ function P.GetDialog()
     dlg:SetSizerAndFit(sizer)
 
 
-
-    dlg.downloads = {}
+    -- Download controls
+    dlg.downloads = download.dltable() -- Special hash table for downlod ctrls
+    dlg.downloadslist = {}
     dlg.activedownloads = {}
     dlg.pendingdownloads = {}
 
