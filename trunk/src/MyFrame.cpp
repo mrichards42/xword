@@ -357,15 +357,15 @@ MyFrame::MyFrame()
     LoadLayout(_T("(Previous)"));
     UpdateLayout();
 
-    SetIcon(wxICON(xword));
+#if defined(__WXMSW__) && !defined(__WXPM__)
+    SetIcon(wxIcon(_T("aa_main_icon")));
+#else
+    SetIcon(wxIcon(xword_xpm));
+#endif // __WXMSW__ && ! __WXPM__
 
 #ifdef XWORD_USE_LUA
     LuaInit();
 #endif // XWORD_USE_LUA
-
-#ifdef __WXDEBUG__
-    //LoadPuzzle(_T("D:\\C++\\XWord\\test_files\\sunday.puz"));
-#endif // __WXDEBUG__
 
     ShowPuzzle();
 }
