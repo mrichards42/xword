@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="wxbindxml"
-	ProjectGUID="{8489A829-CEDB-404E-A5F6-B8EC594C8667}"
+	ProjectGUID="{AD633B11-A25F-A043-97FA-AE679EFFB433}"
 	RootNamespace="wxbindxml"
 	Keyword="Win32Proj"
 	>
@@ -65,7 +65,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="..\..\lib\Debug\wxbindbase.lib"
 				OutputFile="$(OutDir)\wxbindxml.lib"
 			/>
 			<Tool

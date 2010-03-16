@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="wxbindaui"
-	ProjectGUID="{21C29538-2793-354A-B9CE-D9CDAC3E89A6}"
+	ProjectGUID="{B29DD7F2-A668-514A-90B8-E971E8C7F77A}"
 	RootNamespace="wxbindaui"
 	Keyword="Win32Proj"
 	>
@@ -65,7 +65,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="..\..\lib\Debug\wxbindcore.lib"
 				OutputFile="$(OutDir)\wxbindaui.lib"
 			/>
 			<Tool

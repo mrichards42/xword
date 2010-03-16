@@ -14,7 +14,7 @@ end
         language "C++"
         files { "lua/wxlua/src/*", "lua/wxlua/include/*" }
 
-        defines { "UNICODE", "_UNICODE", "_LIB" }
+        defines { "UNICODE", "_UNICODE", }
         includedirs { "lua/wxbind/setup", "lua/lua/include", "lua",  }
 
         -- Output directories
@@ -38,7 +38,7 @@ end
         -- Platform-specific
         -- --------------------------------------------------------------------
         configuration "windows"
-            defines { "WIN32", "_WINDOWS" }
+            defines { "WIN32", "_WINDOWS", "_LIB" }
 
         -- Disable some warnings
         configuration "vs*"
@@ -51,10 +51,10 @@ end
         -- wxWidgets
         -- --------------------------------------------------------------------
         configuration {}
-        includedirs { wxWidgets.."/include" }
 
         -- Platform-specific
         configuration "windows"
+            includedirs { wxWidgets.."/include" }
             defines { "__WXMSW__" }
 
             configuration { "windows", "Release" }
@@ -62,3 +62,7 @@ end
 
             configuration { "windows", "Debug" }
                 includedirs { wxWidgets .. "/lib/vc_lib/mswud" }
+
+        configuration "linux"
+            buildoptions "`wx-config --cxxflags`"
+            linkoptions "`wx-config --libs`"

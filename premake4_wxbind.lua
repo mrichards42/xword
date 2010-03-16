@@ -48,10 +48,10 @@ project("wxbind"..name)
     -- wxWidgets
     -- ------------------------------------------------------------------------
     configuration {}
-    includedirs { wxWidgets.."/include" }
 
     -- Platform-specific
     configuration "windows"
+        includedirs { wxWidgets.."/include" }
         defines { "__WXMSW__" }
 
         configuration { "windows", "Release" }
@@ -59,6 +59,11 @@ project("wxbind"..name)
 
         configuration { "windows", "Debug" }
             includedirs { wxWidgets .. "/lib/vc_lib/mswud" }
+
+    configuration "linux"
+        links { "wxlua" }
+        buildoptions "`wx-config --cxxflags`"
+        linkoptions "`wx-config --libs`"
 
 end
 

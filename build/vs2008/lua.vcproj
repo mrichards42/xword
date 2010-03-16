@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="lua"
-	ProjectGUID="{1CF780A5-2375-E546-8510-966C457599D2}"
+	ProjectGUID="{08C477C4-F3C7-0344-A337-3263A9D29436}"
 	RootNamespace="lua"
 	Keyword="Win32Proj"
 	>
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
-				PreprocessorDefinitions="_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;DEBUG;_DEBUG;LUA_USE_APICHECK"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;DEBUG;_DEBUG;LUA_USE_APICHECK"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -56,7 +56,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;DEBUG;_DEBUG;LUA_USE_APICHECK"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;DEBUG;_DEBUG;LUA_USE_APICHECK"
 				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
 			/>
 			<Tool
@@ -125,7 +125,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
-				PreprocessorDefinitions="_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -139,7 +139,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;NDEBUG"
 				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
 			/>
 			<Tool

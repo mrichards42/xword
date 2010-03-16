@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="XWord"
-	ProjectGUID="{F831E8CA-5BF1-DB44-9707-546FE4CF131B}"
+	ProjectGUID="{8A84E458-FA91-FF42-93C7-FFF48C4DBBB5}"
 	RootNamespace="XWord"
 	Keyword="Win32Proj"
 	>
@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\lib\Debug\wxbindbase.lib ..\..\lib\Debug\wxbindcore.lib ..\..\lib\Debug\wxbindadv.lib ..\..\lib\Debug\wxbindaui.lib ..\..\lib\Debug\wxbindhtml.lib ..\..\lib\Debug\wxbindnet.lib ..\..\lib\Debug\wxbindxml.lib ..\..\lib\Debug\wxbindxrc.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib oleacc.lib wxmsw28ud_xrc.lib wxmsw28ud_html.lib wxmsw28ud_gl.lib wxmsw28ud_aui.lib wxmsw28ud_media.lib wxmsw28ud_adv.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxmsw28ud_core.lib wxbase28ud.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexud.lib wxexpatd.lib"
+				AdditionalDependencies="..\..\bin\Debug\lua5.1.lib ..\..\lib\Debug\wxlua.lib ..\..\lib\Debug\wxbindbase.lib ..\..\lib\Debug\wxbindcore.lib ..\..\lib\Debug\wxbindadv.lib ..\..\lib\Debug\wxbindaui.lib ..\..\lib\Debug\wxbindhtml.lib ..\..\lib\Debug\wxbindnet.lib ..\..\lib\Debug\wxbindxml.lib ..\..\lib\Debug\wxbindxrc.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib oleacc.lib wxmsw28ud_xrc.lib wxmsw28ud_html.lib wxmsw28ud_gl.lib wxmsw28ud_aui.lib wxmsw28ud_media.lib wxmsw28ud_adv.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxmsw28ud_core.lib wxbase28ud.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexud.lib wxexpatd.lib"
 				OutputFile="$(OutDir)\XWord.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(WXWIN)\lib\vc_lib"
@@ -146,7 +146,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\lib\Release\wxbindbase.lib ..\..\lib\Release\wxbindcore.lib ..\..\lib\Release\wxbindadv.lib ..\..\lib\Release\wxbindaui.lib ..\..\lib\Release\wxbindhtml.lib ..\..\lib\Release\wxbindnet.lib ..\..\lib\Release\wxbindxml.lib ..\..\lib\Release\wxbindxrc.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib oleacc.lib wxmsw28u_xrc.lib wxmsw28u_html.lib wxmsw28u_gl.lib wxmsw28u_aui.lib wxmsw28u_media.lib wxmsw28u_adv.lib wxbase28u_net.lib wxbase28u_xml.lib wxmsw28u_core.lib wxbase28u.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib"
+				AdditionalDependencies="..\..\bin\Release\lua5.1.lib ..\..\lib\Release\wxlua.lib ..\..\lib\Release\wxbindbase.lib ..\..\lib\Release\wxbindcore.lib ..\..\lib\Release\wxbindadv.lib ..\..\lib\Release\wxbindaui.lib ..\..\lib\Release\wxbindhtml.lib ..\..\lib\Release\wxbindnet.lib ..\..\lib\Release\wxbindxml.lib ..\..\lib\Release\wxbindxrc.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib oleacc.lib wxmsw28u_xrc.lib wxmsw28u_html.lib wxmsw28u_gl.lib wxmsw28u_aui.lib wxmsw28u_media.lib wxmsw28u_adv.lib wxbase28u_net.lib wxbase28u_xml.lib wxmsw28u_core.lib wxbase28u.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib"
 				OutputFile="$(OutDir)\XWord.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(WXWIN)\lib\vc_lib"

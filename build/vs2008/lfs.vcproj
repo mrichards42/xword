@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="wxbindnet"
-	ProjectGUID="{FFEEDA56-25DB-8B4C-81EA-F09A05C95361}"
-	RootNamespace="wxbindnet"
+	Name="lfs"
+	ProjectGUID="{73D2912E-B039-084C-9EA1-461350858DC9}"
+	RootNamespace="lfs"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,9 +17,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\lib\Debug"
-			IntermediateDirectory="obj\Debug\wxbindnet"
-			ConfigurationType="4"
+			OutputDirectory="..\..\bin\Debug\scripts\libs"
+			IntermediateDirectory="obj\Debug\lfs"
+			ConfigurationType="2"
 			CharacterSet="2"
 			>
 			<Tool
@@ -39,17 +39,16 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/wd4996"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;DEBUG;_DEBUG;__WXDEBUG__;WIN32;_WINDOWS;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
+				PreprocessorDefinitions="LUA_LIB;_WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;DEBUG;_DEBUG;LUA_USE_APICHECK"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				ProgramDataBaseFileName="$(OutDir)\wxbindnet.pdb"
+				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -57,15 +56,23 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;DEBUG;_DEBUG;__WXDEBUG__;WIN32;_WINDOWS;__WXMSW__"
-				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswud"
+				PreprocessorDefinitions="LUA_LIB;_WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;DEBUG;_DEBUG;LUA_USE_APICHECK"
+				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\wxbindnet.lib"
+				Name="VCLinkerTool"
+				AdditionalDependencies="..\..\bin\Debug\lua5.1.lib"
+				OutputFile="$(OutDir)\lfs.dll"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories=""
+				GenerateDebugInformation="true"
+				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
+				SubSystem="2"
+				ImportLibrary="..\..\bin\Debug\scripts\libs\lfs.lib"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -94,9 +101,9 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\lib\Release"
-			IntermediateDirectory="obj\Release\wxbindnet"
-			ConfigurationType="4"
+			OutputDirectory="..\..\bin\Release\scripts\libs"
+			IntermediateDirectory="obj\Release\lfs"
+			ConfigurationType="2"
 			CharacterSet="2"
 			>
 			<Tool
@@ -116,16 +123,15 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/wd4996"
 				Optimization="3"
-				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;NDEBUG;WIN32;_WINDOWS;__WXMSW__"
+				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
+				PreprocessorDefinitions="LUA_LIB;_WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				ProgramDataBaseFileName="$(OutDir)\wxbindnet.pdb"
+				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -133,15 +139,24 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="UNICODE;_UNICODE;_LIB;NDEBUG;WIN32;_WINDOWS;__WXMSW__"
-				AdditionalIncludeDirectories="..\..\lua\wxbind\setup;..\..\lua\lua\include;..\..\lua;$(WXWIN)\include;$(WXWIN)\lib\vc_lib\mswu"
+				PreprocessorDefinitions="LUA_LIB;_WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;DLL_EXPORTS;LUA_BUILD_AS_DLL;NDEBUG"
+				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\wxbindnet.lib"
+				Name="VCLinkerTool"
+				AdditionalDependencies="..\..\bin\Release\lua5.1.lib"
+				OutputFile="$(OutDir)\lfs.dll"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories=""
+				GenerateDebugInformation="false"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				ImportLibrary="..\..\bin\Release\scripts\libs\lfs.lib"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -177,7 +192,7 @@
 			Filter=""
 			>
 			<Filter
-				Name="wxbind"
+				Name="lfs"
 				Filter=""
 				>
 				<Filter
@@ -185,20 +200,11 @@
 					Filter=""
 					>
 					<File
-						RelativePath="..\..\lua\wxbind\src\wxnet_bind.cpp"
+						RelativePath="..\..\lua\lfs\src\lfs.c"
 						>
 					</File>
 					<File
-						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="include"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxbind\include\wxnet_bind.h"
+						RelativePath="..\..\lua\lfs\src\lfs.h"
 						>
 					</File>
 				</Filter>
