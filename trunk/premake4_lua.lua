@@ -49,15 +49,17 @@ end
 
         includedirs { "lua/lua", "lua/lua/include" }
 
-        links { "winmm" }
-
-        defines { "_USRDLL", "DLL_EXPORTS", "LUA_BUILD_AS_DLL" }
-
         -- --------------------------------------------------------------------
         -- Platform-specific
         -- --------------------------------------------------------------------
         configuration "windows"
-            defines { "WIN32", "_WINDOWS", "_CRT_SECURE_NO_WARNINGS" }
+            defines { "WIN32", "_WINDOWS", "_CRT_SECURE_NO_WARNINGS",
+                      "_USRDLL", "DLL_EXPORTS", "LUA_BUILD_AS_DLL" }
+            links { "winmm" }
+
+        configuration "linux"
+            defines { "LUA_USE_LINUX" }
+            links { "dl" }
 
         -- --------------------------------------------------------------------
         -- Configurations

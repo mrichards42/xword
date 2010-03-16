@@ -1,6 +1,3 @@
-local wxWidgets = '$(WXWIN)'
-
-
 solution "XWord"
     configurations { "Debug", "Release" }
 
@@ -9,7 +6,6 @@ solution "XWord"
     -- ------------------------------------------------------------------------
     -- General
     -- ------------------------------------------------------------------------
-    -- Copy the images and scripts directories to the build directory
 
     configuration {}
 
@@ -19,6 +15,8 @@ solution "XWord"
     -- ------------------------------------------------------------------------
     project "XWord"
         links {
+            "lua",
+            "wxlua",
             "wxbindbase",
             "wxbindcore",
             "wxbindadv",
@@ -61,12 +59,12 @@ solution "XWord"
         -- wxWidgets
         -- --------------------------------------------------------------------
         configuration {}
-        includedirs { wxWidgets.."/include" }
 
         -- Platform-specific
         configuration "windows"
+            includedirs { "$(WXWIN)/include" }
             defines { "__WXMSW__" }
-            libdirs { wxWidgets.."/lib/vc_lib" }
+            libdirs { "$(WXWIN)/lib/vc_lib" }
             links {
                 "winmm",
                 "comctl32",
@@ -77,7 +75,7 @@ solution "XWord"
             }
 
             configuration { "windows", "Release" }
-                includedirs { wxWidgets .. "/lib/vc_lib/mswu" }
+                includedirs { "$(WXWIN)/lib/vc_lib/mswu" }
                 links {
                     "wxmsw28u_xrc",
                     "wxmsw28u_html",
@@ -98,7 +96,7 @@ solution "XWord"
                 }
 
             configuration { "windows", "Debug" }
-                includedirs { wxWidgets .. "/lib/vc_lib/mswud" }
+                includedirs { "$(WXWIN)/lib/vc_lib/mswud" }
                 links {
                     "wxmsw28ud_xrc",
                     "wxmsw28ud_html",
@@ -117,6 +115,10 @@ solution "XWord"
                     "wxregexud",
                     "wxexpatd",
                 }
+
+        configuration "linux"
+            buildoptions "`wx-config --cxxflags`"
+            linkoptions "`wx-config --libs`"
 
 
         -- --------------------------------------------------------------------
@@ -149,7 +151,12 @@ solution "XWord"
     dofile "premake4_wxlua.lua"
         links { "lua" }
 
+    -- wxlua
     dofile "premake4_wxbind.lua"
 
     project "wxbindbase"
         links { "wxlua" }
+
+    dofile "premake4_lfs.lua"
+    dofile "premake4_luatask.lua"
+    dofile "premake4_luacurl.lua"
