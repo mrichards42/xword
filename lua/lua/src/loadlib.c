@@ -1,5 +1,5 @@
 /*
-** $Id: loadlib.c,v 1.4 2008/10/27 02:27:20 jrl1 Exp $
+** $Id: loadlib.c,v 1.52.1.3 2008/08/06 13:29:28 roberto Exp $
 ** Dynamic library loader for Lua
 ** See Copyright Notice in lua.h
 **
@@ -90,12 +90,11 @@ static lua_CFunction ll_sym (lua_State *L, void *lib, const char *sym) {
 */
 
 #include <windows.h>
-#include <shlobj.h>
+
 
 #undef setprogdir
 
 static void setprogdir (lua_State *L) {
-  /* Get the executable path */
   char buff[MAX_PATH + 1];
   char *lb;
   DWORD nsize = sizeof(buff)/sizeof(char);
@@ -103,29 +102,8 @@ static void setprogdir (lua_State *L) {
   if (n == 0 || n == nsize || (lb = strrchr(buff, '\\')) == NULL)
     luaL_error(L, "unable to get ModuleFileName");
   else {
-    /* Replace '!' in the path string with the executable path */
     *lb = '\0';
     luaL_gsub(L, lua_tostring(L, -1), LUA_EXECDIR, buff);
-    lua_remove(L, -2);  /* remove original string */
-  }
-
-  /* Get the Application Data path */
-  n = SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, 0, buff);
-  if (n != S_OK)
-    luaL_error(L, "unable to get ApplicationDataFolder");
-  else {
-    /* Replace LUA_APPDATADIR in the path string with the application data
-       path (%APPDATA%\XWord) */
-
-    /* Add "\\XWord" to the application data folder */
-    lua_pushstring(L, buff);
-    lua_pushstring(L, LUA_DIRSEP LUA_EXE_NAME);
-    lua_concat(L, 2);
-
-    luaL_gsub(L, lua_tostring(L, -2),
-                 LUA_APPDATADIR,
-                 lua_tostring(L, -1));
-    lua_remove(L, -3);  /* remove application data string */
     lua_remove(L, -2);  /* remove original string */
   }
 }
@@ -613,9 +591,6 @@ static int ll_seeall (lua_State *L) {
 
 static void setpath (lua_State *L, const char *fieldname, const char *envname,
                                    const char *def) {
-  /* XWord will not check for the LUA_PATH environmental variable,
-     but instead always uses the supplied default */
-#if 0
   const char *path = getenv(envname);
   if (path == NULL)  /* no environment variable? */
     lua_pushstring(L, def);  /* use default */
@@ -626,12 +601,6 @@ static void setpath (lua_State *L, const char *fieldname, const char *envname,
     luaL_gsub(L, path, AUXMARK, def);
     lua_remove(L, -2);
   }
-#endif
-
-  /* XWord will always use the default path */
-  lua_pushstring(L, def);
-  /* Replace '!' with executable directory and '~' with application data
-     directory */
   setprogdir(L);
   lua_setfield(L, -2, fieldname);
 }
