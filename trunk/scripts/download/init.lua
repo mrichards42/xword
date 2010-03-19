@@ -22,10 +22,10 @@ require 'download.dialog'
 -- Configuration
 -- ----------------------------------------------------------------------------
 require 'download.defaultconfig'
-pcall(dofile, xword.configdir..'/download/config.lua') -- Use default config if this fails
+pcall(dofile, xword.GetConfigDir()..'/download/config.lua') -- Use default config if this fails
 
 require 'download.defaultsources'
-pcall(dofile, xword.configdir..'/download/sources.lua') -- Use default sources if this fails
+pcall(dofile, xword.GetConfigDir()..'/download/sources.lua') -- Use default sources if this fails
 
 require 'serialize'
 require 'io'
@@ -41,7 +41,7 @@ local function savevariable(f, varname, var)
 end
 
 local function saveconfig()
-    f = assert(io.open(xword.configdir .. '/download/config.lua', 'wb'))
+    f = assert(io.open(xword.GetConfigDir() .. '/download/config.lua', 'wb'))
     f:write("-- Download package configuration\n")
     f:write("\n")
     f:write("-- Download output folder (created if it doesn't exist\n")
@@ -65,7 +65,7 @@ local function savesources()
     end
 
     -- Save the sources table
-    f = assert(io.open(xword.configdir .. '/download/sources.lua', 'wb'))
+    f = assert(io.open(xword.GetConfigDir() .. '/download/sources.lua', 'wb'))
     f:write("-- Download sources\n")
     f:write("\n")
     f:write('download.sources =\n')

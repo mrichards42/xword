@@ -43,6 +43,7 @@ extern WXLUA_NO_DLLIMPEXP bool wxLuaBinding_xword_init();
 
 #include "../App.hpp"
 #include "../MyFrame.hpp"
+#include "../paths.hpp"
 #include "../puz/XGrid.hpp"
 #include "../puz/XPuzzle.hpp"
 #include "../puz/XSquare.hpp"

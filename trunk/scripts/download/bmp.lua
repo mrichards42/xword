@@ -2,6 +2,8 @@
 
 download.bmp = {}
 
+local scriptsdir = xword.GetScriptsDir()
+
 for _, name in pairs({
     'download',
     'play',
@@ -10,7 +12,7 @@ for _, name in pairs({
 }) do
     download.bmp[name] =
         wx.wxBitmap(wx.wxImage(
-                    xword.scriptsdir .. '/download/images/'..name..'.png',
+                    scriptsdir .. '/download/images/'..name..'.png',
                     wx.wxBITMAP_TYPE_PNG)
         )
 end

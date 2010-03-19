@@ -37,18 +37,23 @@ wxString exedir()
     return wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
 }
 
-
-wxString GetConfigDirectory()
+wxString GetUserDataDir()
 {
     if (wxGetApp().IsPortable())
-        return exedir() + sep() + _T("config");
+        return exedir();
     else
-        return wxStandardPaths::Get().GetUserDataDir() + sep() + _T("config");
+        return wxStandardPaths::Get().GetUserDataDir();
+}
+
+
+wxString GetConfigDir()
+{
+    return GetUserDataDir() + sep() + _T("config");
 }
 
 wxString GetConfigFile()
 {
-    return GetConfigDirectory() + sep() + configFileName;
+    return GetConfigDir() + sep() + configFileName;
 }
 
 // If wxWidgets is compiled in debug mode under windows, *and* the exe is located
@@ -63,7 +68,20 @@ wxString GetConfigFile()
 // Fortunately these should always return the exe directory.
 #if ! defined(__WXDEBUG__) || ! defined(__WXMSW__)
 
-wxString GetImagesDirectory()
+wxString GetImagesDir()
+{
+    return exedir() + sep() + _T("images");
+}
+
+
+wxString GetScriptsDir()
+{
+    return exedir() + sep() + _T("scripts");
+}
+
+#else
+
+wxString GetImagesDir()
 {
     if (wxGetApp().IsPortable())
         return exedir() + sep() + _T("images");
@@ -72,28 +90,12 @@ wxString GetImagesDirectory()
 }
 
 
-wxString GetScriptsDirectory()
+wxString GetScriptsDir()
 {
     if (wxGetApp().IsPortable())
         return exedir() + sep() + _T("scripts");
     else
-        return wxStandardPaths::Get().GetResourcesDir() + sep() + _T("scripts");
-}
-
-#else
-
-wxString GetImagesDirectory()
-{
-    return exedir() + sep() + _T("images");
-}
-
-
-wxString GetScriptsDirectory()
-{
-    if (wxGetApp().IsPortable())
-        return exedir() + sep() + _T("scripts");
-    else
-        return wxStandardPaths::Get().GetUserDataDir() + sep() + _T("scripts");
+        return wxStandardPaths::Get().GetPluginsDir() + sep() + _T("scripts");
 }
 
 #endif // ! defined(__WXDEBUG__) || ! defined(__WXMSW__)

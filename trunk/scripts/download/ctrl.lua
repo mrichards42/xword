@@ -440,7 +440,7 @@ function P.DownloadCtrl(parent, ...)
             end
         end
         for k,v in pairs(args) do print(k,v) end
-        dl.task_id = task.create(xword.scriptsdir..'/download/task.lua',
+        dl.task_id = task.create(xword.GetScriptsDir()..'/download/task.lua',
                                  args)
     end
 
