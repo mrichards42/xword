@@ -1007,7 +1007,7 @@ MyFrame::SetupToolManager()
     m_toolMgr.SetIconSize_AuiToolBar(24);
     m_toolMgr.SetIconSize_ToolBar(24);
     m_toolMgr.SetIconSize_Menu(16);
-    wxString imagesdir = GetImagesDirectory();
+    wxString imagesdir = GetImagesDir();
     if (wxDirExists(imagesdir))
     {
         m_toolMgr.SetIconLocation(imagesdir);
@@ -1743,7 +1743,7 @@ MyFrame::LuaInit()
     m_lua = wxLuaState(this, wxID_ANY);
 
     // Initialize the lua additions to the xword package
-    RunLuaScript(GetScriptsDirectory() + _T("/xword/init.lua"));
+    RunLuaScript(GetScriptsDir() + _T("/xword/init.lua"));
 }
 
 void

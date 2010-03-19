@@ -4,15 +4,19 @@
 //     lua -e"rulesFilename='xword_rules.lua'" genxwordbind.lua
 //----------------------------------------------------------------------------
 
-
-//----------------------------------------------------------------------------
-// The puz library
-//----------------------------------------------------------------------------
-
 %include "../puz/XPuzzle.hpp"
 %include "../puz/XGrid.hpp"
 %include "../puz/XSquare.hpp"
 %include <vector>
+
+%include "../MyFrame.hpp"
+%include "../App.hpp"
+%include "../paths.hpp"
+
+
+//----------------------------------------------------------------------------
+// The puz library
+//----------------------------------------------------------------------------
 
 // enum XGridFlag
 %define XFLAG_NORMAL       XFLAG_NORMAL
@@ -288,8 +292,6 @@
 //----------------------------------------------------------------------------
 // Gui stuff
 //----------------------------------------------------------------------------
-%include "../MyFrame.hpp"
-%include "../App.hpp"
 
 %class MyFrame, wxFrame
     %ungc XPuzzle & GetPuzzle()
@@ -344,4 +346,9 @@
 
 // %override bool MyApp::IsPortable()
 %function bool IsPortable()
+
+%function wxString GetUserDataDir()
+%function wxString GetConfigDir()
+%function wxString GetScriptsDir()
+%function wxString GetImagesDir()
 

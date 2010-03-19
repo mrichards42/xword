@@ -22,26 +22,14 @@ local function join(...)
     return table.concat(arg, string.char(wx.wxFileName.GetPathSeparator()))
 end
 
--- Figure out the standard paths used by Xword
-local stdpaths = wx.wxStandardPaths.Get()
-local exedir = wx.wxPathOnly(stdpaths.ExecutablePath)
-
-if xword.IsPortable() then
-    xword.configdir  = join(exedir, 'config')
-    xword.imagesdir  = join(exedir, 'images')
-    xword.scriptsdir = join(exedir, 'scripts')
-else
-    xword.configdir  = join(stdpaths.UserDataDir, 'config')
-    xword.imagesdir  = join(stdpaths.ResourcesDir, 'images')
-    xword.scriptsdir = join(stdpaths.UserDataDir, 'scripts')
-end
+local scriptsdir = xword.GetScriptsDir()
 
 -- Set the search paths
 package.path = table.concat({
-    join(xword.scriptsdir, '?.lua'),
-    join(xword.scriptsdir, '?', 'init.lua'),
-    join(xword.scriptsdir, 'libs', '?.lua'),
-    join(xword.scriptsdir, 'libs', '?', '.lua'),
+    join(scriptsdir, '?.lua'),
+    join(scriptsdir, '?', 'init.lua'),
+    join(scriptsdir, 'libs', '?.lua'),
+    join(scriptsdir, 'libs', '?', '.lua'),
 }, ';')
 
 local ext
@@ -55,8 +43,8 @@ else
 end
 
 package.cpath = table.concat({
-    join(xword.scriptsdir, 'libs', '?.'..ext),
-    join(xword.scriptsdir, 'libs', '?51.'..ext),
+    join(scriptsdir, 'libs', '?.'..ext),
+    join(scriptsdir, 'libs', '?51.'..ext),
 }, ';')
 
 
@@ -91,7 +79,7 @@ function xword.requiredir(dirname, packages)
     if dirname ~= '' then dirname = dirname .. '/' end
     local pkgname = dirname:gsub('[\\/]', '.')
 
-    dirname = xword.scriptsdir..'/'..dirname
+    dirname = scriptsdir..'/'..dirname
 
     -- iterate all files and directories
     for script in lfs.dir(dirname) do

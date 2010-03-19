@@ -22,10 +22,11 @@
 
 // Locations where the application expects to find its files.
 // It is up to the caller to determine whether or not the path exists.
-wxString GetConfigFile();
-wxString GetConfigDirectory();
-wxString GetImagesDirectory();
-wxString GetScriptsDirectory();
+wxString GetUserDataDir(); // Directory for user data
+wxString GetConfigDir();   // Directory for config files (DataDir/config)
+wxString GetConfigFile();  // The main XWord config file (DataDir/config/config.ini)
+wxString GetImagesDir();   // Images
+wxString GetScriptsDir();  // Scripts
 
 // Compatibility with older versions
 wxString GetConfigFile_XWord_3();

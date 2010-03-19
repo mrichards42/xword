@@ -2623,6 +2623,18 @@ wxLuaBindObject* wxLuaGetObjectList_xword(size_t &count)
 // wxLuaGetFunctionList_xword() is called to register global functions
 // ---------------------------------------------------------------------------
 
+// %function wxString GetConfigDir()
+static int LUACALL wxLua_function_GetConfigDir(lua_State *L)
+{
+    // call GetConfigDir
+    wxString returns = (GetConfigDir());
+    // push the result string
+    xword_pushwxString(L, returns);
+
+    return 1;
+}
+static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetConfigDir[1] = {{ wxLua_function_GetConfigDir, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
+
 // %override wxLua_function_GetFrame
 // MyFrame * GetFrame()
 // This is a lua-only function (it can't be accessed through the XWord C++ API)
@@ -2645,6 +2657,42 @@ int wxLua_function_GetFrame(lua_State *L)
 
 static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetFrame[1] = {{ wxLua_function_GetFrame, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
 
+// %function wxString GetImagesDir()
+static int LUACALL wxLua_function_GetImagesDir(lua_State *L)
+{
+    // call GetImagesDir
+    wxString returns = (GetImagesDir());
+    // push the result string
+    xword_pushwxString(L, returns);
+
+    return 1;
+}
+static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetImagesDir[1] = {{ wxLua_function_GetImagesDir, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
+
+// %function wxString GetScriptsDir()
+static int LUACALL wxLua_function_GetScriptsDir(lua_State *L)
+{
+    // call GetScriptsDir
+    wxString returns = (GetScriptsDir());
+    // push the result string
+    xword_pushwxString(L, returns);
+
+    return 1;
+}
+static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetScriptsDir[1] = {{ wxLua_function_GetScriptsDir, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
+
+// %function wxString GetUserDataDir()
+static int LUACALL wxLua_function_GetUserDataDir(lua_State *L)
+{
+    // call GetUserDataDir
+    wxString returns = (GetUserDataDir());
+    // push the result string
+    xword_pushwxString(L, returns);
+
+    return 1;
+}
+static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetUserDataDir[1] = {{ wxLua_function_GetUserDataDir, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
+
 // %override wxLua_function_IsPortable
 // bool MyApp::IsPortable()
 int wxLua_function_IsPortable(lua_State *L)
@@ -2663,7 +2711,11 @@ wxLuaBindMethod* wxLuaGetFunctionList_xword(size_t &count)
 {
     static wxLuaBindMethod functionList[] =
     {
+        { "GetConfigDir", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetConfigDir, 1, NULL },
         { "GetFrame", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetFrame, 1, NULL },
+        { "GetImagesDir", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetImagesDir, 1, NULL },
+        { "GetScriptsDir", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetScriptsDir, 1, NULL },
+        { "GetUserDataDir", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetUserDataDir, 1, NULL },
         { "IsPortable", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_IsPortable, 1, NULL },
 
         { 0, 0, 0, 0 }, 

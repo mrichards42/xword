@@ -515,3 +515,4 @@ int wxLua_function_IsPortable(lua_State *L)
     return 1;
 }
 %end
+
