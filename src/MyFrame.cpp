@@ -1743,7 +1743,7 @@ MyFrame::LuaInit()
     m_lua = wxLuaState(this, wxID_ANY);
 
     // Initialize the lua additions to the xword package
-    RunLuaScript(wxPathOnly(wxStandardPaths::Get().GetExecutablePath()) + _T("/scripts/xword/init.lua"));
+    RunLuaScript(GetScriptsDirectory() + _T("/xword/init.lua"));
 }
 
 void

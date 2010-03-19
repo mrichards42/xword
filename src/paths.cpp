@@ -90,7 +90,10 @@ wxString GetImagesDirectory()
 
 wxString GetScriptsDirectory()
 {
-    return exedir() + sep() + _T("scripts");
+    if (wxGetApp().IsPortable())
+        return exedir() + sep() + _T("scripts");
+    else
+        return wxStandardPaths::Get().GetUserDataDir() + sep() + _T("scripts");
 }
 
 #endif // ! defined(__WXDEBUG__) || ! defined(__WXMSW__)
