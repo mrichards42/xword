@@ -1,7 +1,34 @@
 solution "XWord"
-    configurations { "Debug", "Release" }
+    configurations { "Release", "Debug" }
 
+    -- Output for premake4 (vs projects / makefiles, etc)
     location ("build/".._ACTION)
+
+    -- Output for compiled files
+    configuration { "Debug" }
+        targetdir "bin/Debug"
+
+    configuration { "Release" }
+        targetdir "bin/Release"
+
+    -- --------------------------------------------------------------------
+    -- Debug / Release
+    -- --------------------------------------------------------------------
+    configuration "Release"
+        defines { "NDEBUG" }
+        flags { "Optimize" }
+        libdirs { "bin/Release", "lib/Release" }
+
+    configuration "Debug"
+        defines { "DEBUG", "_DEBUG" }
+        flags { "Symbols" }
+        libdirs { "bin/Debug", "lib/Debug" }
+
+    -- --------------------------------------------------------------------
+    -- Platform-specific
+    -- --------------------------------------------------------------------
+    configuration "windows"
+        defines { "WIN32", "_WINDOWS" }
 
     -- ------------------------------------------------------------------------
     -- General
@@ -9,154 +36,5 @@ solution "XWord"
 
     configuration {}
 
-
-    -- ------------------------------------------------------------------------
-    -- XWord
-    -- ------------------------------------------------------------------------
-    project "XWord"
-        links {
-            "lua",
-            "wxlua",
-            "wxbindbase",
-            "wxbindcore",
-            "wxbindadv",
-            "wxbindaui",
-            "wxbindhtml",
-            "wxbindnet",
-            "wxbindxml",
-            "wxbindxrc",
-        }
-
-        -- --------------------------------------------------------------------
-        -- General
-        -- --------------------------------------------------------------------
-        kind "WindowedApp"
-        language "C++"
-        files { "src/**.hpp", "src/**.cpp", "src/**.h" }
-
-        defines { "UNICODE", "_UNICODE", "XWORD_USE_LUA" }
-
-        configuration "Debug"   targetdir "bin/Debug"
-        configuration "Release" targetdir "bin/Release"
-
-        configuration "windows"
-            defines { "WIN32", "_WINDOWS" }
-            -- Use WinMain() instead of main() for windows apps
-            flags { "WinMain" }
-
-        -- --------------------------------------------------------------------
-        -- Configurations
-        -- --------------------------------------------------------------------
-        configuration "Release"
-            defines { "NDEBUG" }
-            flags { "Optimize" }
-
-        configuration "Debug"
-            defines { "DEBUG", "_DEBUG", "__WXDEBUG__" }
-            flags { "Symbols" }
-
-        -- --------------------------------------------------------------------
-        -- wxWidgets
-        -- --------------------------------------------------------------------
-        configuration {}
-
-        -- Platform-specific
-        configuration "windows"
-            includedirs { "$(WXWIN)/include" }
-            defines { "__WXMSW__" }
-            libdirs { "$(WXWIN)/lib/vc_lib" }
-            links {
-                "winmm",
-                "comctl32",
-                "rpcrt4",
-                "wsock32",
-                "odbc32",
-                "oleacc",
-            }
-
-            configuration { "windows", "Release" }
-                includedirs { "$(WXWIN)/lib/vc_lib/mswu" }
-                links {
-                    "wxmsw28u_xrc",
-                    "wxmsw28u_html",
-                    "wxmsw28u_gl",
-                    "wxmsw28u_aui",
-                    "wxmsw28u_media",
-                    "wxmsw28u_adv",
-                    "wxbase28u_net",
-                    "wxbase28u_xml",
-                    "wxmsw28u_core",
-                    "wxbase28u",
-                    "wxtiff",
-                    "wxjpeg",
-                    "wxpng",
-                    "wxzlib",
-                    "wxregexu",
-                    "wxexpat",
-                }
-
-            configuration { "windows", "Debug" }
-                includedirs { "$(WXWIN)/lib/vc_lib/mswud" }
-                links {
-                    "wxmsw28ud_xrc",
-                    "wxmsw28ud_html",
-                    "wxmsw28ud_gl",
-                    "wxmsw28ud_aui",
-                    "wxmsw28ud_media",
-                    "wxmsw28ud_adv",
-                    "wxbase28ud_net",
-                    "wxbase28ud_xml",
-                    "wxmsw28ud_core",
-                    "wxbase28ud",
-                    "wxtiffd",
-                    "wxjpegd",
-                    "wxpngd",
-                    "wxzlibd",
-                    "wxregexud",
-                    "wxexpatd",
-                }
-
-        configuration "linux"
-            buildoptions "`wx-config --cxxflags`"
-            linkoptions "`wx-config --libs`"
-
-
-        -- --------------------------------------------------------------------
-        -- wxLua
-        -- --------------------------------------------------------------------
-        configuration {}
-        includedirs {
-            "lua",
-            "lua/lua/include",
-            "lua/wxbind/setup",
-        }
-
-        -- --------------------------------------------------------------------
-        -- Resource files
-        -- --------------------------------------------------------------------
-        configuration "windows"
-            files { "src/**.rc" }
-            resincludedirs { "." }
-
-
-
-    -- ------------------------------------------------------------------------
-    -- Lua
-    -- ------------------------------------------------------------------------
-    configuration {}
-
-    -- Dependencies
-    dofile "premake4_lua.lua"
-
-    dofile "premake4_wxlua.lua"
-        links { "lua" }
-
-    -- wxlua
-    dofile "premake4_wxbind.lua"
-
-    project "wxbindbase"
-        links { "wxlua" }
-
-    dofile "premake4_lfs.lua"
-    dofile "premake4_luatask.lua"
-    dofile "premake4_luacurl.lua"
+    include "src" -- the XWord premake file
+    include "lua" -- lua libraries
