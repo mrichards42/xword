@@ -419,8 +419,8 @@ XGrid::CheckGrid(bool checkBlank)
 
     XSquare * square;
     for (square = First(); square != NULL; square = square->Next())
-            if (! square->Check(checkBlank))
-                incorrect.push_back(square);
+        if (! square->Check(checkBlank))
+            incorrect.push_back(square);
 
     return incorrect;
 }
