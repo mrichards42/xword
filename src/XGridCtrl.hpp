@@ -72,11 +72,17 @@ enum GridStyle
 extern const wxChar * XGridCtrlNameStr;
 
 class XGridRebusHandler;
+class XGridSelectionHandler;
+class XGridSelectionEvent;
+class XGridCheckSelectionClass;
 
 class XGridCtrl
     : public wxScrolledWindow
 {
     friend class XGridRebusHandler;
+    friend class XGridSelectionHandler;
+    friend class XGridCheckSelectionClass;
+
 public: // Enums
     // Colors
     enum Color
@@ -84,11 +90,12 @@ public: // Enums
         WHITE = 0,
         BLACK,
         LETTER,
+        SELECTION,
         WORD,
 
         PEN,
         PENCIL,
-        COLOR_COUNT
+        COLOR_COUNT,
     };
 
 public:
@@ -170,13 +177,18 @@ public:
         }
     }
 
-    void SetSquareText(XSquare & square, const wxString & text = _T(""));
+    bool SetSquareText(XSquare & square, const wxString & text = _T(""));
 
     XSquare * GetFocusedSquare() { return m_focusedSquare; }
     void GetFocusedWord(XSquare ** start, XSquare ** end)
         { *start = m_focusedStart; * end = m_focusedEnd; }
 
+    // Create this class to start a selection and call a function afterward
+    void StartSelection(wxObjectEventFunction func, wxEvtHandler * evtSink = NULL);
+    std::vector<XSquare *> GetSelection();
+
     void CheckGrid  (int options = NO_REVEAL_ANSWER | MESSAGE_BOX);
+    void CheckSelection(int options = NO_REVEAL_ANSWER | MESSAGE_BOX);
     void CheckWord  (int options = NO_REVEAL_ANSWER | MESSAGE_BOX);
     void CheckLetter(int options = NO_REVEAL_ANSWER | MESSAGE_BOX);
 
@@ -200,6 +212,8 @@ public:
         { m_colors[PEN]  = color; if (! IsEmpty()) Refresh(); }
     void SetPencilColor(const wxColor & color)
         { m_colors[PENCIL] = color; if (! IsEmpty()) Refresh(); }
+    void SetSelectionColor(const wxColor & color)
+        { m_colors[SELECTION] = color; if (HasSelection()) Refresh(); }
 
     const wxColor & GetFocusedLetterColor() const { return m_colors[LETTER]; }
     const wxColor & GetFocusedWordColor()   const { return m_colors[WORD]; }
@@ -284,10 +298,19 @@ public:
     bool IsFocusedLetter(const XSquare & square);
     bool IsFocusedWord  (const XSquare & square);
 
+    bool HasSelection() { return m_selectionStart != NULL; }
+    bool IsSelected(const XSquare & square);
+
+    void HitTest(int x, int y, int * col, int * row);
     XSquare * HitTest(int x, int y);
+    XSquare * HitTestNearest(int x, int y);
 
 protected:
     void Init();
+
+    // Common CheckXXX function
+    void PostCheck(std::vector<XSquare *> & incorrect, int options);
+    void DoCheckSelection(XSquare * start, XSquare * end, int options);
 
     // Drawing functions
     void OnPaint(wxPaintEvent & evt);
@@ -326,6 +349,11 @@ protected:
     XSquare * m_focusedSquare;
     XSquare * m_focusedStart;
     XSquare * m_focusedEnd;
+    // A selection block (NULL if there is no selection)
+    XSquare * m_selectionStart;
+    XSquare * m_selectionEnd;
+    bool m_isSelecting;
+    void EndSelection(bool success = true);
 
     // Focused direction
     bool m_direction;
@@ -400,9 +428,22 @@ XGridCtrl::SetLetterFont(const wxFont & font)
 
 
 inline bool
-XGridCtrl::IsFocusedLetter(const XSquare & Square)
+XGridCtrl::IsFocusedLetter(const XSquare & square)
 {
-    return m_focusedSquare == &Square;
+    return m_focusedSquare == &square;
+}
+
+inline bool
+XGridCtrl::IsFocusedWord(const XSquare & square)
+{
+    return m_grid->IsBetween(&square, m_focusedStart, m_focusedEnd);
+}
+
+inline bool
+XGridCtrl::IsSelected(const XSquare & square)
+{
+    wxASSERT(HasSelection());
+    return m_grid->IsBetween(&square, m_selectionStart, m_selectionEnd);
 }
 
 

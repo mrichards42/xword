@@ -264,6 +264,8 @@ MyApp::SetupConfig()
     m_config.AddColor(_T("focusedWordColor"),       *wxLIGHT_GREY);
     m_config.AddColor(_T("whiteSquareColor"),       *wxWHITE);
     m_config.AddColor(_T("blackSquareColor"),       *wxBLACK);
+    m_config.AddColor(_T("selectionColor"),
+        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
     m_config.AddColor(_T("penColor"),               *wxBLACK);
     m_config.AddColor(_T("pencilColor"),            wxColor(200,200,200));
     m_config.AddLong(_T("numberScale"),             42);
