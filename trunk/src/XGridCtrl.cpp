@@ -23,29 +23,16 @@
 #include "PuzEvent.hpp"
 #include "XGridDrawer.hpp"
 #include "messages.hpp"
+#include "SelectionEvent.hpp"
 
 // This class will take over the XGridCtrl's event processing
-// when needed.  It must be created on the heap, and it will
-// destroy itself when it is done.
+// for rebus entries.  It must be created on the heap, and it
+// will destroy itself when it is done.
 class XGridRebusHandler : wxEvtHandler
 {
 public:
-    XGridRebusHandler(XGridCtrl & grid)
-        : m_grid(grid)
-    {
-        m_grid.PushEventHandler(this);
-        // Kill the grid's own event handling
-        m_grid.Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(XGridCtrl::OnKeyDown));
-        m_grid.Disconnect(wxEVT_CHAR,     wxKeyEventHandler(XGridCtrl::OnChar));
-    }
-
-    void EndEventHandling()
-    {
-        m_grid.RemoveEventHandler(this);
-        // Restore the grid's own key handling
-        m_grid.Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(XGridCtrl::OnKeyDown));
-        m_grid.Connect(wxEVT_CHAR,     wxKeyEventHandler(XGridCtrl::OnChar));
-    }
+    XGridRebusHandler(XGridCtrl & grid);
+    void EndEventHandling();
 
     DECLARE_EVENT_TABLE()
 
@@ -55,6 +42,33 @@ private:
     // The event handling
     void OnKeyDown(wxKeyEvent & evt);
     void OnChar   (wxKeyEvent & evt);
+};
+
+
+// This class will take over the XGridCtrl's event processing
+// for selections.  It must be created on the heap, and it
+// will destroy itself when it is done.
+class XGridSelectionHandler : wxEvtHandler
+{
+public:
+    XGridSelectionHandler (XGridCtrl & grid);
+    void EndEventHandling();
+
+    DECLARE_EVENT_TABLE()
+
+private:
+    XGridCtrl & m_grid;
+    XSquare * m_start;
+    XSquare * m_end;
+    wxRect m_selection;
+    wxRect m_lastSelection;
+
+    // The event handling
+    void OnLeftDown(wxMouseEvent & evt);
+    void OnLeftUp(wxMouseEvent & evt);
+    void OnMouseMove(wxMouseEvent & evt);
+    void OnKeyDown(wxKeyEvent & evt);
+    void OnMouseCaptureLost(wxMouseCaptureLostEvent & WXUNUSED(evt));
 };
 
 
@@ -108,6 +122,10 @@ void XGridCtrl::Init()
     m_focusedSquare = NULL;
     m_focusedStart = NULL;
     m_focusedEnd = NULL;
+
+    m_selectionStart = NULL;
+    m_selectionEnd = NULL;
+    m_isSelecting = false;
 
     m_direction = DIR_ACROSS;
 
@@ -578,13 +596,20 @@ XGridCtrl::MakeVisible(const XSquare & square)
 
 
 
-void
+bool
 XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
 {
+    // Not allowed to overwrite revealed letters
+    if (square.HasFlag(XFLAG_RED))
+        return false;
+
     // Adjust blank and incorrect counts each time a letter is changed
     // The logic is a little confusing at first, but it's correct
     const int correctBefore = square.Check();
     const int blankBefore   = square.IsBlank();
+
+    if (square.HasFlag(XFLAG_X))
+        square.ReplaceFlag(XFLAG_X, XFLAG_BLACK);
 
     square.SetText(text);
 
@@ -605,6 +630,62 @@ XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
         evt.SetString(text);
         GetEventHandler()->ProcessEvent(evt);
     }
+
+    return true;
+}
+
+
+
+void
+XGridCtrl::StartSelection(wxObjectEventFunction func, wxEvtHandler * evtSink)
+{
+    Disconnect(wxEVT_XGRID_SELECTION);
+    Connect(wxEVT_XGRID_SELECTION, func, NULL, evtSink);
+    // Don't create another selection handler if we already have one.
+    if (! m_isSelecting)
+    {
+        new XGridSelectionHandler(*this);
+        m_isSelecting = true;
+    }
+}
+
+void
+XGridCtrl::EndSelection(bool success)
+{
+    // Process this event instead of Posting it so that the function
+    // is called immediately.
+
+    // The attached function will always be called.  Let the function
+    // know if the selection failed here.
+    if (! success)
+    {
+        m_selectionStart = NULL;
+        m_selectionEnd   = NULL;
+    }
+    GetEventHandler()->ProcessEvent(
+        XGridSelectionEvent(GetId(), wxEVT_XGRID_SELECTION,
+                            this,
+                            m_selectionStart, m_selectionEnd)
+    );
+    Disconnect(wxEVT_XGRID_SELECTION);
+    m_selectionStart = NULL;
+    m_selectionEnd   = NULL;
+    m_isSelecting = false;
+    Refresh();
+    // XGridSelectionHandler will destroy itself
+}
+
+std::vector<XSquare *>
+XGridCtrl::GetSelection()
+{
+    std::vector<XSquare *> selection;
+
+    XSquare * square;
+    for (square = m_grid->First(); square != NULL; square = square->Next())
+        if (IsSelected(*square))
+            selection.push_back(square);
+
+    return selection;
 }
 
 
@@ -685,32 +766,7 @@ XGridCtrl::CheckGrid(int options)
     std::vector<XSquare *> incorrect = \
         m_grid->CheckGrid(checkBlank);
 
-    if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
-    {
-        XWordMessage( MSG_NO_INCORRECT );
-        return;
-    }
-
-    wxClientDC dc(this); DoPrepareDC(dc);
-    for (std::vector<XSquare *>::iterator it = incorrect.begin();
-         it != incorrect.end();
-         ++it)
-    {
-        XSquare * square = *it;
-
-        if ( (options & REVEAL_ANSWER) != 0)
-        {
-            SetSquareText(*square, square->GetSolution());
-            square->RemoveFlag(XFLAG_BLACK | XFLAG_X);
-            square->AddFlag(XFLAG_RED);
-        }
-        else
-        {
-            square->RemoveFlag(XFLAG_BLACK);
-            square->AddFlag(XFLAG_X);
-        }
-        RefreshSquare(dc, *square);
-    }
+    PostCheck(incorrect, options);
 }
 
 
@@ -725,6 +781,31 @@ XGridCtrl::CheckWord(int options)
                            m_focusedSquare->GetWordEnd  (m_direction),
                            checkBlank);
 
+    PostCheck(incorrect, options);
+}
+
+
+
+void
+XGridCtrl::CheckLetter(int options)
+{
+    wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
+
+    XSquare & square = *GetFocusedSquare();
+
+    const bool checkBlank = (options & CHECK_ALL) != 0;
+
+    std::vector<XSquare *> incorrect;
+    if (! m_grid->CheckSquare(square, checkBlank))
+        incorrect.push_back(&square);
+
+    PostCheck(incorrect, options);
+}
+
+
+void
+XGridCtrl::PostCheck(std::vector<XSquare *> & incorrect, int options)
+{
     if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
         XWordMessage( MSG_NO_INCORRECT );
@@ -754,37 +835,87 @@ XGridCtrl::CheckWord(int options)
 }
 
 
+// Check selection functions
+//--------------------------
 
+// This is a bit messy:
+//    (1) StartSelection() creates a new instance of XGridSelectionHandler
+//        which takes over event handling for the grid.
+//    (2) The user makes a selection.
+//    (3) XGridSelectionHandler destroys itself, returns event handling
+//        control to the XGridCtrl, and calls EndSelection().
+//    (4) EndSelection() dispatches an XGridSelectionEvent which was
+//        bound in the call to StartSelection(function, sink), then
+//        Unconnects the event.
+//
+// Unfortunately, in order to pass a function to StartSelection() as
+// an event handler [StartSelection() calls wxEvtHandler::Connect()],
+// the function must be a member function of a wxEvtHandler - derived
+// class which takes wxEvent & as its only argument.
+// i.e. wxEvtHandler::Function(wxEvent & evt)
+// In order to pass real arguments to DoCheckSelection, there is an
+// itermediate class (XGridCheckSelectionClass) which is used like a
+// functor -- that is, it is passed arguments in the constructor
+// which are subsequently used in the only function call.
+//
+// These class names are an absolte mess.
+
+
+// A dummy class that is used to call DoCheckSelection with the
+// correct variables.
+class XGridCheckSelectionClass : public wxEvtHandler
+{
+public:
+    XGridCheckSelectionClass(XGridCtrl * a_grid, int a_options)
+        : m_grid(a_grid),
+          m_options(a_options)
+    {}
+
+    // We have to make sure this function gets called so that this
+    // heap-allocated class gets destroyed.
+    void CheckSelection(XGridSelectionEvent & evt)
+    {
+        if (evt.HasSelection())
+            m_grid->DoCheckSelection(evt.GetSelectionStart(),
+                                     evt.GetSelectionEnd(),
+                                     m_options);
+        delete this;
+    }
+
+private:
+    XGridCtrl * m_grid;
+    int m_options;
+};
+
+
+// The real action takes place here
 void
-XGridCtrl::CheckLetter(int options)
+XGridCtrl::DoCheckSelection(XSquare * start, XSquare * end, int options)
 {
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
-    XSquare & square = *GetFocusedSquare();
-
     const bool checkBlank = (options & CHECK_ALL) != 0;
-    if (! m_grid->CheckSquare(square, checkBlank))
-    {
-        if ( (options & REVEAL_ANSWER) != 0)
+
+    std::vector<XSquare *> incorrect;
+
+    for (int col = start->GetCol(); col <= end->GetCol(); ++col)
+        for (int row = start->GetRow(); row <= end->GetRow(); ++row)
         {
-            SetSquareText(square, square.GetSolution());
-            square.RemoveFlag(XFLAG_BLACK | XFLAG_X);
-            square.AddFlag(XFLAG_RED);
+            XSquare * square = &At(col, row);
+            if (square->IsWhite() && ! square->Check(checkBlank))
+                incorrect.push_back(square);
         }
-        else
-        {
-            square.RemoveFlag(XFLAG_BLACK);
-            square.AddFlag(XFLAG_X);
-        }
-        RefreshSquare(*m_focusedSquare);
-    }
-    else if ( (options & NO_MESSAGE_BOX) == 0)
-        XWordMessage( MSG_NO_INCORRECT );
+
+    PostCheck(incorrect, options);
 }
 
-
-
-
+// Start the selection process and defer checking the squares until later.
+void
+XGridCtrl::CheckSelection(int options)
+{
+    XGridCheckSelectionClass * handler = new XGridCheckSelectionClass(this, options);
+    StartSelection(XGridSelectionEventHandler(XGridCheckSelectionClass::CheckSelection), handler);
+}
 
 
 
@@ -935,17 +1066,10 @@ XGridCtrl::OnLetter(wxChar key, int mod)
     XSquare & square = *GetFocusedSquare();
     wxASSERT(! m_wantsRebus);
 
-    if (square.HasFlag(XFLAG_X))
-        square.ReplaceFlag(XFLAG_X, XFLAG_BLACK);
-
-    // Not allowed to overwrite revealed letters
-    if (! square.HasFlag(XFLAG_RED))
-    {
-        if (static_cast<int>(key) == WXK_SPACE)
-            SetSquareText(square, _T(""));
-        else
-            SetSquareText(square, key);
-    }
+    if (static_cast<int>(key) == WXK_SPACE)
+        SetSquareText(square, _T(""));
+    else
+        SetSquareText(square, key);
 
     // Space bar always moves forward one square
     if (static_cast<int>(key) == WXK_SPACE)
@@ -1078,12 +1202,7 @@ XGridCtrl::OnBackspace(int WXUNUSED(mod))
     wxASSERT(! IsEmpty());
     XSquare & square = *m_focusedSquare;
 
-    if (square.HasFlag(XFLAG_X))
-        square.ReplaceFlag(XFLAG_X, XFLAG_BLACK);
-
-    // Not allowed to overwrite revealed letters
-    if (! square.HasFlag(XFLAG_RED))
-            SetSquareText(square, _T(""));
+    SetSquareText(square, _T(""));
 
     SetSquareFocus(FindNextSquare(m_focusedSquare,
                                   FIND_WHITE_SQUARE,
@@ -1100,12 +1219,7 @@ XGridCtrl::OnDelete(int WXUNUSED(mod))
     wxASSERT(! IsEmpty());
     XSquare & square = *m_focusedSquare;
 
-    if (square.HasFlag(XFLAG_X))
-        square.ReplaceFlag(XFLAG_X, XFLAG_BLACK);
-
-    // Not allowed to overwrite revealed letters
-    if (! square.HasFlag(XFLAG_RED))
-        SetSquareText(square, _T(""));
+    SetSquareText(square, _T(""));
 
     SetSquareFocus(m_focusedSquare, m_direction);
 }
@@ -1253,15 +1367,25 @@ XGridCtrl::OnTab(int mod)
 //-------------------------------------------------------
 // Information functions
 //-------------------------------------------------------
-XSquare *
-XGridCtrl::HitTest(int x, int y)
+
+// Find the row and column that (x, y) would be at (does not
+// need to be a valid square).
+void
+XGridCtrl::HitTest(int x, int y, int * col, int * row)
 {
     CalcUnscrolledPosition(x, y, &x, &y);
     x -= (m_drawer.GetLeft() + m_drawer.GetBorderSize());
     y -= (m_drawer.GetTop() + m_drawer.GetBorderSize());
-    int col = floor(static_cast<double>(x) / (m_drawer.GetSquareSize()));
-    int row = floor(static_cast<double>(y) / (m_drawer.GetSquareSize()));
+    *col = floor(static_cast<double>(x) / (m_drawer.GetSquareSize()));
+    *row = floor(static_cast<double>(y) / (m_drawer.GetSquareSize()));
+}
 
+// Find the square that exists at (x, y) or NULL
+XSquare *
+XGridCtrl::HitTest(int x, int y)
+{
+    int col, row;
+    HitTest(x, y, &col, &row);
     if (   0 <= col && col < m_grid->GetWidth()
         && 0 <= row && row < m_grid->GetHeight())
     {
@@ -1270,11 +1394,27 @@ XGridCtrl::HitTest(int x, int y)
     return NULL;
 }
 
+// Find the square nearest to (x, y)
+XSquare *
+XGridCtrl::HitTestNearest(int x, int y)
+{
+    int col, row;
+    HitTest(x, y, &col, &row);
+
+    return &At(
+        std::min(std::max(col, 0), m_grid->LastCol()),
+        std::min(std::max(row, 0), m_grid->LastRow())
+    );
+}
+
+
 
 const wxColor &
 XGridCtrl::GetSquareColor(const XSquare & square)
 {
-    if (IsFocusedLetter(square))
+    if (HasSelection() && IsSelected(square))
+            return m_colors[SELECTION];
+    else if (IsFocusedLetter(square))
         return m_colors[LETTER];
     else if (IsFocusedWord(square))
         return m_colors[WORD];
@@ -1282,13 +1422,6 @@ XGridCtrl::GetSquareColor(const XSquare & square)
         return m_colors[WHITE];
 }
 
-
-
-bool
-XGridCtrl::IsFocusedWord(const XSquare & square)
-{
-    return m_grid->IsBetween(&square, m_focusedStart, m_focusedEnd);
-}
 
 
 
@@ -1323,6 +1456,24 @@ BEGIN_EVENT_TABLE(XGridRebusHandler, wxEvtHandler)
     EVT_KEY_DOWN    (XGridRebusHandler::OnKeyDown)
     EVT_CHAR        (XGridRebusHandler::OnChar)
 END_EVENT_TABLE()
+
+XGridRebusHandler::XGridRebusHandler(XGridCtrl & grid)
+    : m_grid(grid)
+{
+    m_grid.PushEventHandler(this);
+    // Kill the grid's own event handling
+    m_grid.Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(XGridCtrl::OnKeyDown));
+    m_grid.Disconnect(wxEVT_CHAR,     wxKeyEventHandler(XGridCtrl::OnChar));
+}
+
+void
+XGridRebusHandler::EndEventHandling()
+{
+    m_grid.RemoveEventHandler(this);
+    // Restore the grid's own key handling
+    m_grid.Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(XGridCtrl::OnKeyDown));
+    m_grid.Connect(wxEVT_CHAR,     wxKeyEventHandler(XGridCtrl::OnChar));
+}
 
 void
 XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
@@ -1388,4 +1539,144 @@ XGridRebusHandler::OnChar(wxKeyEvent & evt)
     else
         m_grid.SetSquareText(*square, square->GetText() + key);
     m_grid.RefreshSquare();
+}
+
+
+
+//------------------------------------------------------------------------------
+// XGridSelectionHandler implementation
+//------------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(XGridSelectionHandler, wxEvtHandler)
+    EVT_LEFT_DOWN            (XGridSelectionHandler::OnLeftDown)
+    EVT_MOTION               (XGridSelectionHandler::OnMouseMove)
+    EVT_LEFT_UP              (XGridSelectionHandler::OnLeftUp)
+    EVT_KEY_DOWN             (XGridSelectionHandler::OnKeyDown)
+    EVT_MOUSE_CAPTURE_LOST   (XGridSelectionHandler::OnMouseCaptureLost)
+END_EVENT_TABLE()
+
+XGridSelectionHandler::XGridSelectionHandler(XGridCtrl & grid)
+    : m_grid(grid),
+      m_start(NULL),
+      m_end(NULL)
+{
+    m_grid.PushEventHandler(this);
+    // Kill the grid's own event handling
+    m_grid.Disconnect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
+    m_grid.Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+    m_grid.Disconnect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
+    m_grid.Disconnect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
+
+    m_grid.m_selectionStart = NULL;
+    m_grid.m_selectionEnd = NULL;
+
+    m_grid.SetCursor(wxCursor(wxCURSOR_CROSS));
+}
+
+void
+XGridSelectionHandler::EndEventHandling()
+{
+    m_grid.RemoveEventHandler(this);
+    // Restore the grid's own key handling
+    m_grid.Connect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
+    m_grid.Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+    m_grid.Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
+    m_grid.Connect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
+
+    m_grid.SetCursor(wxNullCursor);
+
+    if (m_grid.HasCapture())
+        m_grid.ReleaseMouse();
+}
+
+
+void
+XGridSelectionHandler::OnLeftDown(wxMouseEvent & evt)
+{
+    // Set the first square in the selection
+    wxPoint pt = evt.GetPosition();
+    m_start = m_grid.HitTestNearest(pt.x, pt.y);
+    wxASSERT(m_start != NULL);
+    m_selection.x = m_start->GetCol();
+    m_selection.y = m_start->GetRow();
+    m_selection.SetSize(wxSize(1,1));
+
+    m_grid.CaptureMouse();
+}
+
+void
+XGridSelectionHandler::OnMouseMove(wxMouseEvent & evt)
+{
+    if (m_start == NULL)
+        return;
+
+    // Find the second corner of the selection
+    wxPoint pt = evt.GetPosition();
+    m_end = m_grid.HitTestNearest(pt.x, pt.y);
+    wxASSERT(m_end != NULL);
+
+    // Set the top left and bottom right squares of this selection region.
+    m_selection.SetLeft  (std::min(m_start->GetCol(), m_end->GetCol()));
+    m_selection.SetTop   (std::min(m_start->GetRow(), m_end->GetRow()));
+    m_selection.SetRight (std::max(m_start->GetCol(), m_end->GetCol()));
+    m_selection.SetBottom(std::max(m_start->GetRow(), m_end->GetRow()));
+
+    m_grid.m_selectionStart = &m_grid.At(m_selection.GetLeft(),
+                                         m_selection.GetTop());
+    m_grid.m_selectionEnd   = &m_grid.At(m_selection.GetRight(),
+                                         m_selection.GetBottom());
+
+    // Redraw needed squares
+    wxRect total = m_selection;
+    total.Union(m_lastSelection);
+
+    wxClientDC dc(&m_grid);
+    m_grid.DoPrepareDC(dc);
+    for (int col = total.GetLeft(); col <= total.GetRight(); ++col)
+        for (int row = total.GetTop(); row <= total.GetBottom(); ++row)
+            // Draw newly selected squares
+            if (m_selection.Contains(col, row))
+            {
+                if (! m_lastSelection.Contains(col, row))
+                    m_grid.DrawSquare(dc, col, row);
+            }
+            // Draw newly unselected squares
+            else if (m_lastSelection.Contains(col, row))
+            {
+                    m_grid.DrawSquare(dc, col, row);
+            }
+
+    m_lastSelection = m_selection;
+}
+
+void
+XGridSelectionHandler::OnLeftUp(wxMouseEvent & evt)
+{
+    if (m_start == NULL)
+        return;
+
+    // The selection should already be set at this point.
+    EndEventHandling();
+    // Notify the XGridCtrl that we are done capturing events.
+    m_grid.EndSelection(true);
+    delete this;
+}
+
+
+void
+XGridSelectionHandler::OnKeyDown(wxKeyEvent & evt)
+{
+    if (evt.GetKeyCode() == WXK_ESCAPE)
+    {
+        EndEventHandling();
+        m_grid.EndSelection(false); // Abort
+        delete this;
+    }
+}
+
+void
+XGridSelectionHandler::OnMouseCaptureLost(wxMouseCaptureLostEvent & WXUNUSED(evt))
+{
+    EndEventHandling();
+    m_grid.EndSelection(false); // Abort
+    delete this;
 }
