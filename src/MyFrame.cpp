@@ -98,10 +98,13 @@ enum toolIds
 
     ID_CHECK_LETTER,
     ID_CHECK_WORD,
+    ID_CHECK_SELECTION,
     ID_CHECK_GRID,
     ID_REVEAL_LETTER,
     ID_REVEAL_WORD,
     ID_REVEAL_INCORRECT,
+    ID_REVEAL_INCORRECT_SELECTION,
+    ID_REVEAL_SELECTION,
     ID_REVEAL_GRID,
 
 
@@ -221,6 +224,9 @@ MyFrame::ManageTools()
         { ID_CHECK_WORD,       wxITEM_NORMAL, _T("Check Word"),   _T("check_word"), NULL,
                     _handler(MyFrame::OnCheckWord) },
 
+        { ID_CHECK_SELECTION,  wxITEM_NORMAL, _T("Check Selection..."),    NULL, NULL,
+                   _handler(MyFrame::OnCheckSelection) },
+
         { ID_CHECK_GRID,       wxITEM_NORMAL, _T("Check All"),    _T("check_grid"), NULL,
                    _handler(MyFrame::OnCheckGrid) },
 
@@ -232,6 +238,12 @@ MyFrame::ManageTools()
 
         { ID_REVEAL_INCORRECT, wxITEM_NORMAL, _T("Reveal Incorrect letters"), NULL, NULL,
                    _handler(MyFrame::OnRevealIncorrect) },
+
+        { ID_REVEAL_INCORRECT_SELECTION, wxITEM_NORMAL, _T("Reveal Incorrect letters (selection)..."), NULL, NULL,
+                   _handler(MyFrame::OnRevealIncorrectSelection) },
+
+        { ID_REVEAL_SELECTION,      wxITEM_NORMAL, _T("Reveal Selection..."), NULL, NULL,
+                   _handler(MyFrame::OnRevealSelection) },
 
         { ID_REVEAL_GRID,      wxITEM_NORMAL, _T("Reveal Solution"), NULL, NULL,
                    _handler(MyFrame::OnRevealGrid) },
@@ -261,7 +273,7 @@ MyFrame::ManageTools()
                    _handler(MyFrame::OnLuaScript) },
 #endif // XWORD_USE_LUA
 
-        { wxID_ABOUT, wxITEM_NORMAL, _T("&About XWord..."), NULL, NULL,
+        { wxID_ABOUT, wxITEM_NORMAL, _T("&About ") XWORD_APP_NAME _T("..."), NULL, NULL,
                    _handler(MyFrame::OnAbout) },
 
         { ID_LICENSE, wxITEM_NORMAL, _T("&License..."), NULL, NULL,
@@ -330,7 +342,7 @@ private:
 //------------------------------------------------------------------------------
 
 MyFrame::MyFrame()
-    : wxFrame(NULL, -1, _T("XWord"), wxDefaultPosition, wxSize(700,700)),
+    : wxFrame(NULL, -1, XWORD_APP_NAME, wxDefaultPosition, wxSize(700,700)),
       m_timer(this),
       m_isTimerRunning(false),
       m_preferencesDialog(NULL)
@@ -610,12 +622,12 @@ MyFrame::ShowTitle()
 {
     if (! m_puz.IsOk())
     {
-        SetTitle(_T("XWord"));
+        SetTitle(XWORD_APP_NAME);
         m_title->SetLabel(_T(""));
     }
     else
     {
-        SetTitle(m_puz.m_title + _T(" - XWord"));
+        SetTitle(m_puz.m_title + _T(" - ") XWORD_APP_NAME);
         m_title->SetLabel(m_puz.m_title);
     }
 }
@@ -811,12 +823,16 @@ MyFrame::CreateMenuBar()
         wxMenu * subMenu = new wxMenu();
             m_toolMgr.Add(subMenu, ID_CHECK_LETTER);
             m_toolMgr.Add(subMenu, ID_CHECK_WORD);
+            m_toolMgr.Add(subMenu, ID_CHECK_SELECTION);
             m_toolMgr.Add(subMenu, ID_CHECK_GRID);
         menu->AppendSubMenu(subMenu, _T("Check"));
         subMenu = new wxMenu();
             m_toolMgr.Add(subMenu, ID_REVEAL_LETTER);
             m_toolMgr.Add(subMenu, ID_REVEAL_WORD);
             m_toolMgr.Add(subMenu, ID_REVEAL_INCORRECT);
+            m_toolMgr.Add(subMenu, ID_REVEAL_INCORRECT_SELECTION);
+            subMenu->AppendSeparator();
+            m_toolMgr.Add(subMenu, ID_REVEAL_SELECTION);
             m_toolMgr.Add(subMenu, ID_REVEAL_GRID);
         menu->AppendSubMenu(subMenu, _T("Reveal"));
         menu->AppendSeparator();
@@ -1088,9 +1104,10 @@ MyFrame::EnableGridSize(bool enable)
 void
 MyFrame::EnableCheck(bool enable)
 {
-    m_toolMgr.Enable(ID_CHECK_LETTER, enable);
-    m_toolMgr.Enable(ID_CHECK_WORD,   enable);
-    m_toolMgr.Enable(ID_CHECK_GRID,   enable);
+    m_toolMgr.Enable(ID_CHECK_LETTER,    enable);
+    m_toolMgr.Enable(ID_CHECK_WORD,      enable);
+    m_toolMgr.Enable(ID_CHECK_SELECTION, enable);
+    m_toolMgr.Enable(ID_CHECK_GRID,      enable);
     m_menubar->Enable(m_menubar->FindMenuItem(_T("Solution"), _T("Check")),
                       enable);
 
@@ -1102,6 +1119,8 @@ MyFrame::EnableReveal(bool enable)
     m_toolMgr.Enable(ID_REVEAL_LETTER,    enable);
     m_toolMgr.Enable(ID_REVEAL_WORD,      enable);
     m_toolMgr.Enable(ID_REVEAL_INCORRECT, enable);
+    m_toolMgr.Enable(ID_REVEAL_INCORRECT_SELECTION, enable);
+    m_toolMgr.Enable(ID_REVEAL_SELECTION, enable);
     m_toolMgr.Enable(ID_REVEAL_GRID,      enable);
     m_menubar->Enable(m_menubar->FindMenuItem(_T("Solution"),_T("Reveal")),
                       enable);
@@ -1158,6 +1177,8 @@ MyFrame::LoadConfig()
         config.ReadColor(_T("whiteSquareColor")) );
     m_gridCtrl->SetBlackSquareColor(
         config.ReadColor(_T("blackSquareColor"))) ;
+    m_gridCtrl->SetSelectionColor(
+        config.ReadColor(_T("selectionColor"))) ;
     m_gridCtrl->SetPenColor(
         config.ReadColor(_T("penColor")) );
     m_gridCtrl->SetPencilColor(
@@ -1332,7 +1353,7 @@ MyFrame::SaveConfig()
 
 
 //------------------------------------------------------------------------------
-// Access to focus information
+// Access to grid (mostly for Lua)
 //------------------------------------------------------------------------------
 XSquare *
 MyFrame::GetFocusedSquare()
@@ -1389,6 +1410,14 @@ MyFrame::GetFocusedClue()
         return &*m_puz.GetAcross().Find(start->GetNumber());
     else
         return &*m_puz.GetDown().Find(start->GetNumber());
+}
+
+bool
+MyFrame::SetSquareText(XSquare * square, const wxString & text)
+{
+    const bool ret = m_gridCtrl->SetSquareText(*square, text);
+    m_gridCtrl->RefreshSquare(*square);
+    return ret;
 }
 
 //------------------------------------------------------------------------------
@@ -1464,6 +1493,12 @@ MyFrame::OnCheckGrid(wxCommandEvent & WXUNUSED(evt))
 }
 
 void
+MyFrame::OnCheckSelection(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckSelection();
+}
+
+void
 MyFrame::OnCheckWord(wxCommandEvent & WXUNUSED(evt))
 {
     m_gridCtrl->CheckWord();
@@ -1480,6 +1515,18 @@ MyFrame::OnRevealGrid(wxCommandEvent & WXUNUSED(evt))
 {
     if (XWordPrompt(MSG_REVEAL_ALL))
         m_gridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL);
+}
+
+void
+MyFrame::OnRevealSelection(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckSelection(REVEAL_ANSWER | CHECK_ALL);
+}
+
+void
+MyFrame::OnRevealIncorrectSelection(wxCommandEvent & WXUNUSED(evt))
+{
+    m_gridCtrl->CheckSelection(REVEAL_ANSWER);
 }
 
 void
@@ -1817,11 +1864,11 @@ void
 MyFrame::OnAbout(wxCommandEvent & WXUNUSED(evt))
 {
     wxAboutDialogInfo info;
-    info.SetName(_T("XWord"));
+    info.SetName(XWORD_APP_NAME);
 
     info.SetVersion(XWORD_VERSION_STRING _T(" (") __TDATE__ _T(")"));
 
-    info.SetCopyright(_T("(C) 2009 Mike Richards <mrichards42@gmx.com>"));
+    info.SetCopyright(XWORD_COPYRIGHT_STRING);
 
     info.SetDescription(_T("http://sourceforge.net/projects/wx-xword/"));
     wxAboutBox(info);
@@ -1831,8 +1878,8 @@ void
 MyFrame::OnLicense(wxCommandEvent & WXUNUSED(evt))
 {
     const wxString licenseText(
-        _T("XWord ") XWORD_VERSION_STRING _T("\n")
-        _T("Copyright (C) 2009 Mike Richards <mrichards42@gmx.com>\n")
+        XWORD_APP_NAME _T(" ") XWORD_VERSION_STRING _T("\n")
+        _T("Copyright ") XWORD_COPYRIGHT_STRING _T("\n")
         _T("\n")
         _T("This program is free software; you can redistribute it and/or ")
         _T("modify it under the terms of the GNU General Public License ")
@@ -2290,7 +2337,7 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
     if (! m_puz.IsScrambled())
     {
         wxMessageBox(_T("Puzzle is not scrambled"),
-                     _T("XWord Debug"),
+                     XWORD_APP_NAME _T(" Debug"),
                      wxOK);
         return;
     }
@@ -2322,7 +2369,7 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
         wxMessageBox(wxString::Format(
                         _T("Unscrambling failed!\n")
                         _T("Elapsed time: %f seconds"), sw.Time() / 1000.),
-                     _T("XWord Debug"),
+                    XWORD_APP_NAME _T(" Debug"),
                      wxOK);
     }
     else
@@ -2331,7 +2378,7 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
                         _T("Unscrambling succeeded!\n")
                         _T("Key: %d\n")
                         _T("Elapsed time: %f seconds"), key, sw.Time() / 1000.),
-                     _T("XWord Debug"),
+                     XWORD_APP_NAME _T(" Debug"),
                      wxOK);
 
         // Let the rest of the frame know that we did it.

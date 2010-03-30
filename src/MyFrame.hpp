@@ -117,14 +117,15 @@ public:
     void OnAppDeactivate();
     void OnAppActivate();
 
-    // Access to focus information
-    //----------------------------
+    // Access to the grid
+    //-------------------
     XSquare * GetFocusedSquare();
     XSquare * SetFocusedSquare(XSquare * square);
     void GetFocusedWord(XSquare ** start, XSquare ** end);
     bool GetFocusedDirection() const;
     void SetFocusedDirection(bool direction);
     const XPuzzle::Clue * GetFocusedClue();
+    bool SetSquareText(XSquare * square, const wxString & text = _T(""));
 
     // Lua
     void RunLuaScript(const wxString & filename);
@@ -241,9 +242,12 @@ private:
 
     // Check / Reveal
     void OnCheckGrid      (wxCommandEvent & WXUNUSED(evt));
+    void OnCheckSelection (wxCommandEvent & WXUNUSED(evt));
     void OnCheckWord      (wxCommandEvent & WXUNUSED(evt));
     void OnCheckLetter    (wxCommandEvent & WXUNUSED(evt));
     void OnRevealGrid     (wxCommandEvent & WXUNUSED(evt));
+    void OnRevealSelection(wxCommandEvent & WXUNUSED(evt));
+    void OnRevealIncorrectSelection(wxCommandEvent & WXUNUSED(evt));
     void OnRevealIncorrect(wxCommandEvent & WXUNUSED(evt));
     void OnRevealWord     (wxCommandEvent & WXUNUSED(evt));
     void OnRevealLetter   (wxCommandEvent & WXUNUSED(evt));

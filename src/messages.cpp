@@ -15,6 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "App.hpp"
 #include "messages.hpp"
 #include <wx/msgdlg.h>
 
@@ -31,15 +32,15 @@ struct MessageDesc
 };
 
 // A generic error
-const wxString errorTitle = _T("XWord Error");
+const wxString errorTitle = XWORD_APP_NAME _T(" Error");
 const int errorFlags = wxOK | wxICON_ERROR;
 
 // A generic message
-const wxString messageTitle = _T("XWord Message");
+const wxString messageTitle = XWORD_APP_NAME _T(" Message");
 const int messageFlags = wxOK | wxICON_INFORMATION;
 
 // A generic question
-const wxString questionTitle = _T("XWord Message");
+const wxString questionTitle = XWORD_APP_NAME _T(" Message");
 const int questionFlags = wxYES_NO | wxICON_QUESTION;
 
 

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
+#include "../App.hpp"
 #include "PuzHandler.hpp"
 #include "PuzCk.hpp"
 #include <wx/msgdlg.h>
@@ -41,7 +41,7 @@ PuzHandler::DoLoad()
 
     if (h.version[0] != '1')
         throw PuzHeaderError(_T("This puzzle uses a later version that this ")
-                           _T("version of XWord can't read."));
+                           _T("version of ") XWORD_APP_NAME _T(" can't read."));
     if (h.version[2] < '1' || h.version[2] > '9')
          throw PuzHeaderError(_T("Bad puzzle version"));
 
