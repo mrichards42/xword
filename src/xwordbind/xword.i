@@ -326,6 +326,7 @@
 
     XSquare * GetFocusedSquare()
     XSquare * SetFocusedSquare(XSquare * square)
+    bool SetSquareText(XSquare * square, const wxString & text)
 
     // %override [Lua table] MyFrame::GetFocusedWord()
     // void MyFrame::GetFocusedWord(XSquare ** start, XSquare ** end)
