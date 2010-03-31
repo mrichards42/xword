@@ -2299,6 +2299,26 @@ static int LUACALL wxLua_MyFrame_SetFocusedSquare(lua_State *L)
     return 1;
 }
 
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetSquareText[] = { &wxluatype_MyFrame, &wxluatype_XSquare, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_MyFrame_SetSquareText(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetSquareText[1] = {{ wxLua_MyFrame_SetSquareText, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_MyFrame_SetSquareText }};
+//     bool SetSquareText(XSquare * square, const wxString & text)
+static int LUACALL wxLua_MyFrame_SetSquareText(lua_State *L)
+{
+    // const wxString text
+    const wxString text = wxlua_getwxStringtype(L, 3);
+    // XSquare square
+    XSquare * square = (XSquare *)wxluaT_getuserdatatype(L, 2, wxluatype_XSquare);
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call SetSquareText
+    bool returns = (self->SetSquareText(square, text));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetStatus[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_MyFrame_SetStatus(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetStatus[1] = {{ wxLua_MyFrame_SetStatus, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_SetStatus }};
@@ -2510,6 +2530,7 @@ wxLuaBindMethod MyFrame_methods[] = {
     { "SavePuzzle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SavePuzzle, 1, NULL },
     { "SetFocusedDirection", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetFocusedDirection, 1, NULL },
     { "SetFocusedSquare", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetFocusedSquare, 1, NULL },
+    { "SetSquareText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetSquareText, 1, NULL },
     { "SetStatus", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetStatus, 1, NULL },
     { "SetTime", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetTime, 1, NULL },
     { "ShowAuthor", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ShowAuthor, 1, NULL },
