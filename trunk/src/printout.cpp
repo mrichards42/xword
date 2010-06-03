@@ -16,7 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "printout.hpp"
-#include "puz/XPuzzle.hpp"
+#include "puz/Puzzle.hpp"
 #include "App.hpp" // For the global print data pointers, and ConfigManager
 #include "utils/wrap.hpp"
 #include "MyFrame.hpp"
@@ -55,8 +55,8 @@ public:
 // Setup functions
 //--------------------------------------------------------------------------------
 
-MyPrintout::MyPrintout(MyFrame * frame, XPuzzle * puz, int numPages)
-    : wxPrintout(puz->m_title),
+MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, int numPages)
+    : wxPrintout(puz2wx(puz->m_title)),
       m_frame(frame),
       m_puz(puz),
       m_drawer(&puz->m_grid),
@@ -87,8 +87,8 @@ MyPrintout::ReadConfig()
     }
     else
     {
-        m_drawer.SetNumberFont(m_frame->m_gridCtrl->GetNumberFont());
-        m_drawer.SetLetterFont(m_frame->m_gridCtrl->GetLetterFont());
+        m_drawer.SetNumberFont(m_frame->m_XGridCtrl->GetNumberFont());
+        m_drawer.SetLetterFont(m_frame->m_XGridCtrl->GetLetterFont());
         m_clueFont = m_frame->m_across->GetFont();
     }
     m_drawer.SetNumberScale(config.ReadLong(_T("/Grid/numberScale")) / 100.);
@@ -131,7 +131,7 @@ MyPrintout::HasPage(int pageNum)
 wxString
 MyPrintout::GetTitle()
 {
-    return m_puz->m_title;
+    return puz2wx(m_puz->m_title);
 }
 
 void
@@ -263,8 +263,8 @@ MyPrintout::LayoutGrid(double gridScale)
     //------------------------------------
 
     // The most space we will allow the grid to take up
-    const double maxGridWidth  = pageRect.width  * (gridScale - GRID_PADDING);
-    const double maxGridHeight = pageRect.height * (gridScale - GRID_PADDING);
+    const double maGridWidth  = pageRect.width  * (gridScale - GRID_PADDING);
+    const double maGridHeight = pageRect.height * (gridScale - GRID_PADDING);
 
     // Calculate the size of each square
     const int borderSize = m_drawer.GetBorderSize();
@@ -274,10 +274,10 @@ MyPrintout::LayoutGrid(double gridScale)
     // The largest a square can be is the total allowed space less the borders
     // divided by the number of squares in a row / col.
     const double boxWidth =
-        (maxGridWidth  - borderSize * (gridWidth + 1)) / gridWidth;
+        (maGridWidth  - borderSize * (gridWidth + 1)) / gridWidth;
 
     const double boxHeight =
-        (maxGridHeight - borderSize * (gridHeight + 1)) / gridHeight;
+        (maGridHeight - borderSize * (gridHeight + 1)) / gridHeight;
 
     const double boxSize = std::min(boxWidth, boxHeight);
 
@@ -351,14 +351,14 @@ MyPrintout::DrawText()
 
     // Title and author
     dc->SetFont(m_titleFont);
-    DrawTextLine(WrapText(m_puz->m_title, m_columnWidth), &x, &y);
+    DrawTextLine(WrapText(puz2wx(m_puz->m_title), m_columnWidth), &x, &y);
 
     dc->SetFont(m_authorFont);
-    DrawTextLine(WrapText(m_puz->m_author, m_columnWidth), &x, &y);
+    DrawTextLine(WrapText(puz2wx(m_puz->m_author), m_columnWidth), &x, &y);
 
     // Draw clue lists
     const wxString heading_list[2] = { _T("ACROSS"), _T("DOWN") };
-    const XPuzzle::ClueList * clue_list[2] = { &m_puz->m_across, &m_puz->m_down };
+    const puz::Puzzle::ClueList * clue_list[2] = { &m_puz->m_across, &m_puz->m_down };
     for (int i = 0; i < 2; ++i)
     {
         // Add some space above ACROSS and DOWN clues.
@@ -369,7 +369,7 @@ MyPrintout::DrawText()
         DrawTextLine(WrapText(heading_list[i], m_columnWidth), &x, &y);
 
         // Draw the clues
-        for (XPuzzle::ClueList::const_iterator it = clue_list[i]->begin();
+        for (puz::Puzzle::ClueList::const_iterator it = clue_list[i]->begin();
              it != clue_list[i]->end();
              ++it)
         {
@@ -409,7 +409,7 @@ MyPrintout::LayoutColumns()
 
 
 void
-MyPrintout::DrawClue(const XPuzzle::Clue & clue, int * x, int * y)
+MyPrintout::DrawClue(const puz::Puzzle::Clue & clue, int * x, int * y)
 {
     // Draw clue text
 
@@ -421,7 +421,7 @@ MyPrintout::DrawClue(const XPuzzle::Clue & clue, int * x, int * y)
     *x += m_numberWidth + NUMBER_PADDING;
     dc->SetFont(m_clueFont);
     int height;
-    DrawTextLine(WrapText(clue.Text(), m_clueWidth), x, y, NULL, &height);
+    DrawTextLine(WrapText(puz2wx(clue.Text()), m_clueWidth), x, y, NULL, &height);
     *x -= m_numberWidth + NUMBER_PADDING;
 
     if (m_isDrawing)

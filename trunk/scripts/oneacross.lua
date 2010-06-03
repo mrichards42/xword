@@ -1,6 +1,6 @@
 -- ============================================================================
 -- OneAcross search
---     A sligntly more complicated XWord add-on (compared to Wikipedia search)
+--     A slightly more complicated XWord add-on (compared to Wikipedia search)
 --     that searches OneAcross with the currently selected clue and word.
 -- ============================================================================
 

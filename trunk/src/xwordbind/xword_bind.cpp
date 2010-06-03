@@ -21,1986 +21,6 @@
 
 
 // ---------------------------------------------------------------------------
-// Bind class XSquare
-// ---------------------------------------------------------------------------
-
-// Lua MetaTable Tag for Class 'XSquare'
-int wxluatype_XSquare = WXLUA_TUNKNOWN;
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_AddFlag[] = { &wxluatype_XSquare, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XSquare_AddFlag(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_AddFlag[1] = {{ wxLua_XSquare_AddFlag, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_AddFlag }};
-//     void   AddFlag     (wxByte flag)
-static int LUACALL wxLua_XSquare_AddFlag(lua_State *L)
-{
-    // wxByte flag
-    wxByte flag = (wxByte)wxlua_getnumbertype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call AddFlag
-    self->AddFlag(flag);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_Check[] = { &wxluatype_XSquare, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_XSquare_Check(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_Check[1] = {{ wxLua_XSquare_Check, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_XSquare_Check }};
-//     bool Check(bool checkBlank = NO_CHECK_BLANK) const
-static int LUACALL wxLua_XSquare_Check(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // bool checkBlank = NO_CHECK_BLANK
-    bool checkBlank = (argCount >= 2 ? wxlua_getbooleantype(L, 2) : NO_CHECK_BLANK);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call Check
-    bool returns = (self->Check(checkBlank));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetCol[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetCol(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetCol[1] = {{ wxLua_XSquare_GetCol, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetCol }};
-// %override wxLua_XSquare_GetCol
-// short GetCol() const
-static int LUACALL wxLua_XSquare_GetCol(lua_State *L)
-{
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    short col = (self->GetCol()) + 1; // Add 1 because lua is 1-based
-    lua_pushnumber(L, col);
-    return 1;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetFlag[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetFlag(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetFlag[1] = {{ wxLua_XSquare_GetFlag, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetFlag }};
-//     wxByte GetFlag     ()            const
-static int LUACALL wxLua_XSquare_GetFlag(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetFlag
-    wxByte returns = (self->GetFlag());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetNumber[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetNumber(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetNumber[1] = {{ wxLua_XSquare_GetNumber, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetNumber }};
-//     short GetNumber() const
-static int LUACALL wxLua_XSquare_GetNumber(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetNumber
-    short returns = (self->GetNumber());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetPlainSolution[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetPlainSolution(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetPlainSolution[1] = {{ wxLua_XSquare_GetPlainSolution, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetPlainSolution }};
-// %override wxLua_XSquare_GetPlainSolution
-// char GetPlainSolution() const
-static int LUACALL wxLua_XSquare_GetPlainSolution(lua_State *L)
-{
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    char solution = self->GetPlainSolution();
-    lua_pushstring(L, &solution);
-    return 1;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetPlainText[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetPlainText(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetPlainText[1] = {{ wxLua_XSquare_GetPlainText, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetPlainText }};
-// %override wxLua_XSquare_GetPlainText
-// char GetPlainText() const
-static int LUACALL wxLua_XSquare_GetPlainText(lua_State *L)
-{
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    char text = self->GetPlainText();
-    lua_pushstring(L, &text);
-    return 1;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetRow[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetRow(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetRow[1] = {{ wxLua_XSquare_GetRow, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetRow }};
-// %override wxLua_XSquare_GetRow
-// short GetCol() const
-static int LUACALL wxLua_XSquare_GetRow(lua_State *L)
-{
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    short row = (self->GetRow()) + 1; // Add 1 because lua is 1-based
-    lua_pushnumber(L, row);
-    return 1;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetSolution[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetSolution(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetSolution[1] = {{ wxLua_XSquare_GetSolution, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetSolution }};
-//     const wxString & GetSolution() const
-static int LUACALL wxLua_XSquare_GetSolution(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetSolution
-    wxString returns = (self->GetSolution());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetSolutionSymbol[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetSolutionSymbol(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetSolutionSymbol[1] = {{ wxLua_XSquare_GetSolutionSymbol, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetSolutionSymbol }};
-//     int GetSolutionSymbol() const
-static int LUACALL wxLua_XSquare_GetSolutionSymbol(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetSolutionSymbol
-    int returns = (self->GetSolutionSymbol());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetText[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetText(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetText[1] = {{ wxLua_XSquare_GetText, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetText }};
-//     const wxString & GetText() const
-static int LUACALL wxLua_XSquare_GetText(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetText
-    wxString returns = (self->GetText());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetTextSymbol[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_GetTextSymbol(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetTextSymbol[1] = {{ wxLua_XSquare_GetTextSymbol, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_GetTextSymbol }};
-//     int GetTextSymbol() const
-static int LUACALL wxLua_XSquare_GetTextSymbol(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetTextSymbol
-    int returns = (self->GetTextSymbol());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetWordEnd[] = { &wxluatype_XSquare, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_XSquare_GetWordEnd(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetWordEnd[1] = {{ wxLua_XSquare_GetWordEnd, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_GetWordEnd }};
-//     XSquare * GetWordEnd(bool dir)
-static int LUACALL wxLua_XSquare_GetWordEnd(lua_State *L)
-{
-    // bool dir
-    bool dir = wxlua_getbooleantype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetWordEnd
-    XSquare* returns = (XSquare*)self->GetWordEnd(dir);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_GetWordStart[] = { &wxluatype_XSquare, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_XSquare_GetWordStart(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_GetWordStart[1] = {{ wxLua_XSquare_GetWordStart, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_GetWordStart }};
-//     XSquare * GetWordStart(bool dir)
-static int LUACALL wxLua_XSquare_GetWordStart(lua_State *L)
-{
-    // bool dir
-    bool dir = wxlua_getbooleantype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call GetWordStart
-    XSquare* returns = (XSquare*)self->GetWordStart(dir);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_HasClue[] = { &wxluatype_XSquare, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_XSquare_HasClue(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_HasClue[1] = {{ wxLua_XSquare_HasClue, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_HasClue }};
-//     bool HasClue(bool direction) const
-static int LUACALL wxLua_XSquare_HasClue(lua_State *L)
-{
-    // bool direction
-    bool direction = wxlua_getbooleantype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call HasClue
-    bool returns = (self->HasClue(direction));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_HasClue1[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_HasClue1(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_HasClue1[1] = {{ wxLua_XSquare_HasClue1, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_HasClue1 }};
-//     bool HasClue() const
-static int LUACALL wxLua_XSquare_HasClue1(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call HasClue
-    bool returns = (self->HasClue());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_HasFlag[] = { &wxluatype_XSquare, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XSquare_HasFlag(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_HasFlag[1] = {{ wxLua_XSquare_HasFlag, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_HasFlag }};
-//     bool   HasFlag     (wxByte flag) const
-static int LUACALL wxLua_XSquare_HasFlag(lua_State *L)
-{
-    // wxByte flag
-    wxByte flag = (wxByte)wxlua_getnumbertype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call HasFlag
-    bool returns = (self->HasFlag(flag));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_HasSolutionRebus[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_HasSolutionRebus(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_HasSolutionRebus[1] = {{ wxLua_XSquare_HasSolutionRebus, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_HasSolutionRebus }};
-//     bool HasSolutionRebus() const
-static int LUACALL wxLua_XSquare_HasSolutionRebus(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call HasSolutionRebus
-    bool returns = (self->HasSolutionRebus());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_HasSolutionSymbol[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_HasSolutionSymbol(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_HasSolutionSymbol[1] = {{ wxLua_XSquare_HasSolutionSymbol, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_HasSolutionSymbol }};
-//     bool HasSolutionSymbol() const
-static int LUACALL wxLua_XSquare_HasSolutionSymbol(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call HasSolutionSymbol
-    bool returns = (self->HasSolutionSymbol());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_HasTextRebus[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_HasTextRebus(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_HasTextRebus[1] = {{ wxLua_XSquare_HasTextRebus, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_HasTextRebus }};
-//     bool HasTextRebus() const
-static int LUACALL wxLua_XSquare_HasTextRebus(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call HasTextRebus
-    bool returns = (self->HasTextRebus());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_HasTextSymbol[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_HasTextSymbol(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_HasTextSymbol[1] = {{ wxLua_XSquare_HasTextSymbol, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_HasTextSymbol }};
-//     bool HasTextSymbol() const
-static int LUACALL wxLua_XSquare_HasTextSymbol(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call HasTextSymbol
-    bool returns = (self->HasTextSymbol());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_IsBlack[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_IsBlack(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_IsBlack[1] = {{ wxLua_XSquare_IsBlack, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_IsBlack }};
-//     bool IsBlack() const
-static int LUACALL wxLua_XSquare_IsBlack(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call IsBlack
-    bool returns = (self->IsBlack());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_IsBlank[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_IsBlank(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_IsBlank[1] = {{ wxLua_XSquare_IsBlank, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_IsBlank }};
-//     bool IsBlank() const
-static int LUACALL wxLua_XSquare_IsBlank(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call IsBlank
-    bool returns = (self->IsBlank());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_IsFirst[] = { &wxluatype_XSquare, &wxluatype_TBOOLEAN, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XSquare_IsFirst(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_IsFirst[1] = {{ wxLua_XSquare_IsFirst, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_XSquare_IsFirst }};
-//     bool IsFirst(bool direction, int increment = FIND_NEXT) const
-static int LUACALL wxLua_XSquare_IsFirst(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // int increment = FIND_NEXT
-    int increment = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : FIND_NEXT);
-    // bool direction
-    bool direction = wxlua_getbooleantype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call IsFirst
-    bool returns = (self->IsFirst(direction, increment));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_IsLast[] = { &wxluatype_XSquare, &wxluatype_TBOOLEAN, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XSquare_IsLast(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_IsLast[1] = {{ wxLua_XSquare_IsLast, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_XSquare_IsLast }};
-//     bool IsLast(bool direction, int increment = FIND_NEXT) const
-static int LUACALL wxLua_XSquare_IsLast(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // int increment = FIND_NEXT
-    int increment = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : FIND_NEXT);
-    // bool direction
-    bool direction = wxlua_getbooleantype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call IsLast
-    bool returns = (self->IsLast(direction, increment));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_IsValidChar[] = { &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XSquare_IsValidChar(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_IsValidChar[1] = {{ wxLua_XSquare_IsValidChar, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_XSquare_IsValidChar }};
-//     static bool IsValidChar(wxChar ch)
-static int LUACALL wxLua_XSquare_IsValidChar(lua_State *L)
-{
-    // wxChar ch
-    wxChar ch = (wxChar)wxlua_getnumbertype(L, 1);
-    // call IsValidChar
-    bool returns = (XSquare::IsValidChar(ch));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_IsValidString[] = { &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_XSquare_IsValidString(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_IsValidString[1] = {{ wxLua_XSquare_IsValidString, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_XSquare_IsValidString }};
-//     static bool IsValidString(const wxString & str)
-static int LUACALL wxLua_XSquare_IsValidString(lua_State *L)
-{
-    // const wxString str
-    const wxString str = wxlua_getwxStringtype(L, 1);
-    // call IsValidString
-    bool returns = (XSquare::IsValidString(str));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_IsWhite[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_IsWhite(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_IsWhite[1] = {{ wxLua_XSquare_IsWhite, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_IsWhite }};
-//     bool IsWhite() const
-static int LUACALL wxLua_XSquare_IsWhite(lua_State *L)
-{
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call IsWhite
-    bool returns = (self->IsWhite());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_Next[] = { &wxluatype_XSquare, &wxluatype_TBOOLEAN, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_XSquare_Next(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_Next[1] = {{ wxLua_XSquare_Next, WXLUAMETHOD_METHOD, 1, 3, s_wxluatypeArray_wxLua_XSquare_Next }};
-//     XSquare * Next(bool dir = DIR_ACROSS, bool inc = FIND_NEXT)
-static int LUACALL wxLua_XSquare_Next(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // bool inc = FIND_NEXT
-    bool inc = (argCount >= 3 ? wxlua_getbooleantype(L, 3) : FIND_NEXT);
-    // bool dir = DIR_ACROSS
-    bool dir = (argCount >= 2 ? wxlua_getbooleantype(L, 2) : DIR_ACROSS);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call Next
-    XSquare* returns = (XSquare*)self->Next(dir, inc);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_Prev[] = { &wxluatype_XSquare, &wxluatype_TBOOLEAN, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_XSquare_Prev(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_Prev[1] = {{ wxLua_XSquare_Prev, WXLUAMETHOD_METHOD, 1, 3, s_wxluatypeArray_wxLua_XSquare_Prev }};
-//     XSquare * Prev(bool dir = DIR_ACROSS, bool inc = FIND_NEXT)
-static int LUACALL wxLua_XSquare_Prev(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // bool inc = FIND_NEXT
-    bool inc = (argCount >= 3 ? wxlua_getbooleantype(L, 3) : FIND_NEXT);
-    // bool dir = DIR_ACROSS
-    bool dir = (argCount >= 2 ? wxlua_getbooleantype(L, 2) : DIR_ACROSS);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call Prev
-    XSquare* returns = (XSquare*)self->Prev(dir, inc);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_RemoveFlag[] = { &wxluatype_XSquare, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XSquare_RemoveFlag(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_RemoveFlag[1] = {{ wxLua_XSquare_RemoveFlag, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_RemoveFlag }};
-//     void   RemoveFlag  (wxByte flag)
-static int LUACALL wxLua_XSquare_RemoveFlag(lua_State *L)
-{
-    // wxByte flag
-    wxByte flag = (wxByte)wxlua_getnumbertype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call RemoveFlag
-    self->RemoveFlag(flag);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_ReplaceFlag[] = { &wxluatype_XSquare, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XSquare_ReplaceFlag(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_ReplaceFlag[1] = {{ wxLua_XSquare_ReplaceFlag, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_XSquare_ReplaceFlag }};
-//     void   ReplaceFlag (wxByte flag1, wxByte flag2)
-static int LUACALL wxLua_XSquare_ReplaceFlag(lua_State *L)
-{
-    // wxByte flag2
-    wxByte flag2 = (wxByte)wxlua_getnumbertype(L, 3);
-    // wxByte flag1
-    wxByte flag1 = (wxByte)wxlua_getnumbertype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call ReplaceFlag
-    self->ReplaceFlag(flag1, flag2);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_SetFlag[] = { &wxluatype_XSquare, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XSquare_SetFlag(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_SetFlag[1] = {{ wxLua_XSquare_SetFlag, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_SetFlag }};
-//     void   SetFlag     (wxByte flag)
-static int LUACALL wxLua_XSquare_SetFlag(lua_State *L)
-{
-    // wxByte flag
-    wxByte flag = (wxByte)wxlua_getnumbertype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call SetFlag
-    self->SetFlag(flag);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_SetPlainSolution[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_SetPlainSolution(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_SetPlainSolution[1] = {{ wxLua_XSquare_SetPlainSolution, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_SetPlainSolution }};
-// %override wxLua_XSquare_SetPlainSolution
-// void SetPlainSolution(wxChar plain)
-static int LUACALL wxLua_XSquare_SetPlainSolution(lua_State *L)
-{
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    wxString plain = xword_getwxStringtype(L, 2);
-    self->SetPlainSolution(plain.at(0));
-    return 0;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_SetSolution[] = { &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XSquare_SetSolution(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_SetSolution[1] = {{ wxLua_XSquare_SetSolution, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_SetSolution }};
-// %override wxLua_XSquare_SetSolution
-// void SetSolution(const wxString & solution, wxChar plain)
-static int LUACALL wxLua_XSquare_SetSolution(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    wxString solution = xword_getwxStringtype(L, 2);
-    // Default argument for plain : '\0'
-    wxString plain = (argCount >= 3 ? xword_getwxStringtype(L, 3) : _T("\0"));
-
-    self->SetSolution(solution, plain.at(0));
-    return 0;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XSquare_SetText[] = { &wxluatype_XSquare, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_XSquare_SetText(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_SetText[1] = {{ wxLua_XSquare_SetText, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_SetText }};
-//     void SetText(const wxString & text)
-static int LUACALL wxLua_XSquare_SetText(lua_State *L)
-{
-    // const wxString text
-    const wxString text = wxlua_getwxStringtype(L, 2);
-    // get this
-    XSquare * self = (XSquare *)wxluaT_getuserdatatype(L, 1, wxluatype_XSquare);
-    // call SetText
-    self->SetText(text);
-
-    return 0;
-}
-
-
-
-// function overload table
-static wxLuaBindCFunc s_wxluafunc_wxLua_XSquare_HasClue_overload[] =
-{
-    { wxLua_XSquare_HasClue, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XSquare_HasClue },
-    { wxLua_XSquare_HasClue1, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XSquare_HasClue1 },
-};
-static int s_wxluafunc_wxLua_XSquare_HasClue_overload_count = sizeof(s_wxluafunc_wxLua_XSquare_HasClue_overload)/sizeof(wxLuaBindCFunc);
-
-
-// Map Lua Class Methods to C Binding Functions
-wxLuaBindMethod XSquare_methods[] = {
-    { "AddFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_AddFlag, 1, NULL },
-    { "Check", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_Check, 1, NULL },
-    { "GetCol", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetCol, 1, NULL },
-    { "GetFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetFlag, 1, NULL },
-    { "GetNumber", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetNumber, 1, NULL },
-    { "GetPlainSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetPlainSolution, 1, NULL },
-    { "GetPlainText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetPlainText, 1, NULL },
-    { "GetRow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetRow, 1, NULL },
-    { "GetSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetSolution, 1, NULL },
-    { "GetSolutionSymbol", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetSolutionSymbol, 1, NULL },
-    { "GetText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetText, 1, NULL },
-    { "GetTextSymbol", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetTextSymbol, 1, NULL },
-    { "GetWordEnd", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetWordEnd, 1, NULL },
-    { "GetWordStart", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_GetWordStart, 1, NULL },
-
-    { "HasClue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_HasClue_overload, s_wxluafunc_wxLua_XSquare_HasClue_overload_count, 0 },
-
-    { "HasFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_HasFlag, 1, NULL },
-    { "HasSolutionRebus", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_HasSolutionRebus, 1, NULL },
-    { "HasSolutionSymbol", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_HasSolutionSymbol, 1, NULL },
-    { "HasTextRebus", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_HasTextRebus, 1, NULL },
-    { "HasTextSymbol", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_HasTextSymbol, 1, NULL },
-    { "IsBlack", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_IsBlack, 1, NULL },
-    { "IsBlank", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_IsBlank, 1, NULL },
-    { "IsFirst", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_IsFirst, 1, NULL },
-    { "IsLast", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_IsLast, 1, NULL },
-    { "IsValidChar", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_XSquare_IsValidChar, 1, NULL },
-    { "IsValidString", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_XSquare_IsValidString, 1, NULL },
-    { "IsWhite", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_IsWhite, 1, NULL },
-    { "Next", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_Next, 1, NULL },
-    { "Prev", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_Prev, 1, NULL },
-    { "RemoveFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_RemoveFlag, 1, NULL },
-    { "ReplaceFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_ReplaceFlag, 1, NULL },
-    { "SetFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_SetFlag, 1, NULL },
-    { "SetPlainSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_SetPlainSolution, 1, NULL },
-    { "SetSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_SetSolution, 1, NULL },
-    { "SetText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XSquare_SetText, 1, NULL },
-    { 0, 0, 0, 0 },
-};
-
-int XSquare_methodCount = sizeof(XSquare_methods)/sizeof(wxLuaBindMethod) - 1;
-
-
-// ---------------------------------------------------------------------------
-// Bind class XGrid
-// ---------------------------------------------------------------------------
-
-// Lua MetaTable Tag for Class 'XGrid'
-int wxluatype_XGrid = WXLUA_TUNKNOWN;
-
-#if wxLUA_USE_wxPointSizeRect
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_At1[] = { &wxluatype_XGrid, &wxluatype_wxPoint, NULL };
-static int LUACALL wxLua_XGrid_At1(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_At1[1] = {{ wxLua_XGrid_At1, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_At1 }};
-//     XSquare & At(wxPoint pt);
-static int LUACALL wxLua_XGrid_At1(lua_State *L)
-{
-    // wxPoint pt
-    wxPoint pt = *(wxPoint*)wxluaT_getuserdatatype(L, 2, wxluatype_wxPoint);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call At
-    XSquare* returns = &self->At(pt);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-#endif // wxLUA_USE_wxPointSizeRect
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_At[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_At(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_At[1] = {{ wxLua_XGrid_At, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_XGrid_At }};
-//     XSquare & At(size_t col, size_t row);
-static int LUACALL wxLua_XGrid_At(lua_State *L)
-{
-    // size_t row
-    size_t row = (size_t)wxlua_getuintegertype(L, 3);
-    // size_t col
-    size_t col = (size_t)wxlua_getuintegertype(L, 2);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call At
-    XSquare* returns = &self->At(col, row);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_CheckScrambledGrid[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_CheckScrambledGrid(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_CheckScrambledGrid[1] = {{ wxLua_XGrid_CheckScrambledGrid, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_CheckScrambledGrid }};
-//     bool CheckScrambledGrid()
-static int LUACALL wxLua_XGrid_CheckScrambledGrid(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call CheckScrambledGrid
-    bool returns = (self->CheckScrambledGrid());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_Clear[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_Clear(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_Clear[1] = {{ wxLua_XGrid_Clear, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_Clear }};
-//     void Clear()
-static int LUACALL wxLua_XGrid_Clear(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call Clear
-    self->Clear();
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_CountClues[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_CountClues(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_CountClues[1] = {{ wxLua_XGrid_CountClues, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_CountClues }};
-// %override wxLua_XGrid_CountClues
-// void CountClues(size_t * across, size_t * down) const
-static int LUACALL wxLua_XGrid_CountClues(lua_State *L)
-{
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    size_t across, down;
-    if (self->CountClues(&across, &down))
-    {
-        lua_pushnumber(L, across);
-        lua_pushnumber(L, down);
-    }
-    else
-    {
-        lua_pushnil(L);
-        lua_pushnil(L);
-    }
-    return 2;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_First[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_First(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_First[1] = {{ wxLua_XGrid_First, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_First }};
-//     XSquare * First()
-static int LUACALL wxLua_XGrid_First(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call First
-    XSquare* returns = (XSquare*)self->First();
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_FirstWhite[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_FirstWhite(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_FirstWhite[1] = {{ wxLua_XGrid_FirstWhite, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_FirstWhite }};
-//     XSquare * FirstWhite()
-static int LUACALL wxLua_XGrid_FirstWhite(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call FirstWhite
-    XSquare* returns = (XSquare*)self->FirstWhite();
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_GetCksum[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_GetCksum(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_GetCksum[1] = {{ wxLua_XGrid_GetCksum, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_GetCksum }};
-//     unsigned short GetCksum() const
-static int LUACALL wxLua_XGrid_GetCksum(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call GetCksum
-    unsigned short returns = (self->GetCksum());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_GetFlag[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_GetFlag(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_GetFlag[1] = {{ wxLua_XGrid_GetFlag, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_GetFlag }};
-//     unsigned short GetFlag() const
-static int LUACALL wxLua_XGrid_GetFlag(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call GetFlag
-    unsigned short returns = (self->GetFlag());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_GetHeight[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_GetHeight(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_GetHeight[1] = {{ wxLua_XGrid_GetHeight, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_GetHeight }};
-//     size_t GetHeight() const
-static int LUACALL wxLua_XGrid_GetHeight(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call GetHeight
-    size_t returns = (self->GetHeight());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_GetKey[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_GetKey(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_GetKey[1] = {{ wxLua_XGrid_GetKey, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_GetKey }};
-//     unsigned short GetKey() const
-static int LUACALL wxLua_XGrid_GetKey(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call GetKey
-    unsigned short returns = (self->GetKey());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_GetType[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_GetType(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_GetType[1] = {{ wxLua_XGrid_GetType, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_GetType }};
-//     unsigned short GetType() const
-static int LUACALL wxLua_XGrid_GetType(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call GetType
-    unsigned short returns = (self->GetType());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_GetWidth[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_GetWidth(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_GetWidth[1] = {{ wxLua_XGrid_GetWidth, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_GetWidth }};
-//     size_t GetWidth()  const
-static int LUACALL wxLua_XGrid_GetWidth(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call GetWidth
-    size_t returns = (self->GetWidth());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_HasSolution[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_HasSolution(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_HasSolution[1] = {{ wxLua_XGrid_HasSolution, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_HasSolution }};
-//     bool HasSolution() const
-static int LUACALL wxLua_XGrid_HasSolution(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call HasSolution
-    bool returns = (self->HasSolution());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_IsBetween[] = { &wxluatype_XGrid, &wxluatype_XSquare, &wxluatype_XSquare, &wxluatype_XSquare, NULL };
-static int LUACALL wxLua_XGrid_IsBetween(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_IsBetween[1] = {{ wxLua_XGrid_IsBetween, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_XGrid_IsBetween }};
-//     bool IsBetween(const XSquare * square, const XSquare * start, const XSquare * end) const
-static int LUACALL wxLua_XGrid_IsBetween(lua_State *L)
-{
-    // const XSquare end
-    const XSquare * end = (const XSquare *)wxluaT_getuserdatatype(L, 4, wxluatype_XSquare);
-    // const XSquare start
-    const XSquare * start = (const XSquare *)wxluaT_getuserdatatype(L, 3, wxluatype_XSquare);
-    // const XSquare square
-    const XSquare * square = (const XSquare *)wxluaT_getuserdatatype(L, 2, wxluatype_XSquare);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call IsBetween
-    bool returns = (self->IsBetween(square, start, end));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_IsDiagramless[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_IsDiagramless(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_IsDiagramless[1] = {{ wxLua_XGrid_IsDiagramless, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_IsDiagramless }};
-//     bool IsDiagramless() const
-static int LUACALL wxLua_XGrid_IsDiagramless(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call IsDiagramless
-    bool returns = (self->IsDiagramless());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_IsEmpty[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_IsEmpty(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_IsEmpty[1] = {{ wxLua_XGrid_IsEmpty, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_IsEmpty }};
-//     bool IsEmpty() const
-static int LUACALL wxLua_XGrid_IsEmpty(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call IsEmpty
-    bool returns = (self->IsEmpty());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_IsScrambled[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_IsScrambled(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_IsScrambled[1] = {{ wxLua_XGrid_IsScrambled, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_IsScrambled }};
-//     bool IsScrambled() const
-static int LUACALL wxLua_XGrid_IsScrambled(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call IsScrambled
-    bool returns = (self->IsScrambled());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_Last[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_Last(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_Last[1] = {{ wxLua_XGrid_Last, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_Last }};
-//     XSquare * Last()
-static int LUACALL wxLua_XGrid_Last(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call Last
-    XSquare* returns = (XSquare*)self->Last();
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_LastCol[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_LastCol(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_LastCol[1] = {{ wxLua_XGrid_LastCol, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_LastCol }};
-//     int    LastCol()   const
-static int LUACALL wxLua_XGrid_LastCol(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call LastCol
-    int returns = (self->LastCol());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_LastRow[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_LastRow(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_LastRow[1] = {{ wxLua_XGrid_LastRow, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_LastRow }};
-//     int    LastRow()   const
-static int LUACALL wxLua_XGrid_LastRow(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call LastRow
-    int returns = (self->LastRow());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_LastWhite[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_LastWhite(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_LastWhite[1] = {{ wxLua_XGrid_LastWhite, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_LastWhite }};
-//     XSquare * LastWhite()
-static int LUACALL wxLua_XGrid_LastWhite(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call LastWhite
-    XSquare* returns = (XSquare*)self->LastWhite();
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_ScrambleSolution[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_ScrambleSolution(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_ScrambleSolution[1] = {{ wxLua_XGrid_ScrambleSolution, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_XGrid_ScrambleSolution }};
-//     bool ScrambleSolution(unsigned short key = 0)
-static int LUACALL wxLua_XGrid_ScrambleSolution(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // unsigned short key = 0
-    unsigned short key = (argCount >= 2 ? (unsigned short)wxlua_getuintegertype(L, 2) : 0);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call ScrambleSolution
-    bool returns = (self->ScrambleSolution(key));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetCksum[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_SetCksum(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetCksum[1] = {{ wxLua_XGrid_SetCksum, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_SetCksum }};
-//     void SetCksum(unsigned short cksum)
-static int LUACALL wxLua_XGrid_SetCksum(lua_State *L)
-{
-    // unsigned short cksum
-    unsigned short cksum = (unsigned short)wxlua_getuintegertype(L, 2);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call SetCksum
-    self->SetCksum(cksum);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetFlag[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_SetFlag(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetFlag[1] = {{ wxLua_XGrid_SetFlag, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_SetFlag }};
-//     void SetFlag(unsigned short flag)
-static int LUACALL wxLua_XGrid_SetFlag(lua_State *L)
-{
-    // unsigned short flag
-    unsigned short flag = (unsigned short)wxlua_getuintegertype(L, 2);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call SetFlag
-    self->SetFlag(flag);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetKey[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_SetKey(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetKey[1] = {{ wxLua_XGrid_SetKey, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_SetKey }};
-//     void SetKey(unsigned short key)
-static int LUACALL wxLua_XGrid_SetKey(lua_State *L)
-{
-    // unsigned short key
-    unsigned short key = (unsigned short)wxlua_getuintegertype(L, 2);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call SetKey
-    self->SetKey(key);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetSize[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_SetSize(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetSize[1] = {{ wxLua_XGrid_SetSize, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_XGrid_SetSize }};
-//     void SetSize(size_t width, size_t height)
-static int LUACALL wxLua_XGrid_SetSize(lua_State *L)
-{
-    // size_t height
-    size_t height = (size_t)wxlua_getuintegertype(L, 3);
-    // size_t width
-    size_t width = (size_t)wxlua_getuintegertype(L, 2);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call SetSize
-    self->SetSize(width, height);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetType[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_SetType(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetType[1] = {{ wxLua_XGrid_SetType, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_SetType }};
-//     void SetType(unsigned short type)
-static int LUACALL wxLua_XGrid_SetType(lua_State *L)
-{
-    // unsigned short type
-    unsigned short type = (unsigned short)wxlua_getuintegertype(L, 2);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call SetType
-    self->SetType(type);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_SetupGrid[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid_SetupGrid(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_SetupGrid[1] = {{ wxLua_XGrid_SetupGrid, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid_SetupGrid }};
-//     void SetupGrid()
-static int LUACALL wxLua_XGrid_SetupGrid(lua_State *L)
-{
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call SetupGrid
-    self->SetupGrid();
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_UnscrambleSolution[] = { &wxluatype_XGrid, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_UnscrambleSolution(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_UnscrambleSolution[1] = {{ wxLua_XGrid_UnscrambleSolution, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_UnscrambleSolution }};
-//     bool UnscrambleSolution(unsigned short key)
-static int LUACALL wxLua_XGrid_UnscrambleSolution(lua_State *L)
-{
-    // unsigned short key
-    unsigned short key = (unsigned short)wxlua_getuintegertype(L, 2);
-    // get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-    // call UnscrambleSolution
-    bool returns = (self->UnscrambleSolution(key));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_constructor[] = { &wxluatype_TINTEGER, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_XGrid_constructor(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_constructor[1] = {{ wxLua_XGrid_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_XGrid_constructor }};
-//     XGrid(size_t width = 0, size_t height = 0)
-static int LUACALL wxLua_XGrid_constructor(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // size_t height = 0
-    size_t height = (argCount >= 2 ? (size_t)wxlua_getuintegertype(L, 2) : 0);
-    // size_t width = 0
-    size_t width = (argCount >= 1 ? (size_t)wxlua_getuintegertype(L, 1) : 0);
-    // call constructor
-    XGrid* returns = new XGrid(width, height);
-    // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_XGrid((XGrid*)returns));
-    // push the constructed class pointer
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XGrid);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid___index[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid___index(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid___index[1] = {{ wxLua_XGrid___index, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid___index }};
-// %override wxLua_XGrid___index
-// %override [lua table] XGrid::operator[]({col, row})
-static int LUACALL wxLua_XGrid___index(lua_State *L)
-{
-    // Get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-
-    // Make sure the second arg is a table with 2 items
-    if (! lua_istable(L, 2) || lua_objlen(L, 2) != 2)
-        wxlua_argerror(L, 2, wxT("a table {col, row}"));
-
-    // Read col and row
-    lua_pushnil(L); // First index of the table
-
-    lua_next(L, 2); // Push key and value
-    int col = wxlua_getnumbertype(L, -1);
-    lua_pop(L, 1); // Pop key
-
-    lua_next(L, 2); // Push key and value
-    int row = wxlua_getnumbertype(L, -1);
-    lua_pop(L, 1); // Pop key
-
-    // Make col and row 0-based
-    --col;
-    --row;
-
-    // Ensure that col and row are within the grid
-    if (col < 0 || col >= self->GetWidth()
-        || row < 0 || row >= self->GetHeight())
-    {
-        lua_pushnil(L);
-        return 1;
-    }
-
-    wxluaT_pushuserdatatype(L, &self->At(col, row), wxluatype_XSquare);
-
-    return 1;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid___newindex[] = { &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XGrid___newindex(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid___newindex[1] = {{ wxLua_XGrid___newindex, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XGrid___newindex }};
-// %override wxLua_XGrid___newindex
-// %override [lua table] XGrid::operator[]({col, row})
-static int LUACALL wxLua_XGrid___newindex(lua_State *L)
-{
-    // Get this
-    XGrid * self = (XGrid *)wxluaT_getuserdatatype(L, 1, wxluatype_XGrid);
-
-    // Make sure the second arg is a table with 2 items
-    if (! lua_istable(L, 2) || lua_objlen(L, 2) != 2)
-        wxlua_argerror(L, 2, wxT("a table {col, row}"));
-
-    // Read col and row
-    lua_pushnil(L); // First index of the table
-
-    lua_next(L, 2); // Push key and value
-    int col = wxlua_getnumbertype(L, -1);
-    lua_pop(L, 1); // Pop key
-
-    lua_next(L, 2); // Push key and value
-    int row = wxlua_getnumbertype(L, -1);
-    lua_pop(L, 1); // Pop key
-
-    // Make col and row 0-based
-    --col;
-    --row;
-
-    // Ensure that col and row are within the grid
-    if (col < 0 || col >= self->GetWidth()
-        || row < 0 || row >= self->GetHeight())
-    {
-        wxlua_error(L, wxString::Format(
-                        _T("col and row must be within the bounds of the grid (%d <= col <= %d; %d <= row <= %d)"),
-                        1, self->GetWidth(), 1, self->GetHeight()));
-    }
-
-    // Get new square
-    XSquare * square = (XSquare *)wxluaT_getuserdatatype(L, 3, wxluatype_XSquare);
-
-    // Set the square
-    self->At(col, row) = *square;
-
-    return 0;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XGrid_delete[] = { &wxluatype_XGrid, NULL };
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_XGrid_delete }};
-
-
-
-#if (wxLUA_USE_wxPointSizeRect)
-// function overload table
-static wxLuaBindCFunc s_wxluafunc_wxLua_XGrid_At_overload[] =
-{
-
-#if wxLUA_USE_wxPointSizeRect
-    { wxLua_XGrid_At1, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XGrid_At1 },
-#endif // wxLUA_USE_wxPointSizeRect
-    { wxLua_XGrid_At, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_XGrid_At },
-};
-static int s_wxluafunc_wxLua_XGrid_At_overload_count = sizeof(s_wxluafunc_wxLua_XGrid_At_overload)/sizeof(wxLuaBindCFunc);
-
-#endif // (wxLUA_USE_wxPointSizeRect)
-
-// Map Lua Class Methods to C Binding Functions
-wxLuaBindMethod XGrid_methods[] = {
-#if (wxLUA_USE_wxPointSizeRect)
-    { "At", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_At_overload, s_wxluafunc_wxLua_XGrid_At_overload_count, 0 },
-#endif // (wxLUA_USE_wxPointSizeRect)
-
-    { "CheckScrambledGrid", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_CheckScrambledGrid, 1, NULL },
-    { "Clear", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_Clear, 1, NULL },
-    { "CountClues", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_CountClues, 1, NULL },
-    { "First", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_First, 1, NULL },
-    { "FirstWhite", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_FirstWhite, 1, NULL },
-    { "GetCksum", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_GetCksum, 1, NULL },
-    { "GetFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_GetFlag, 1, NULL },
-    { "GetHeight", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_GetHeight, 1, NULL },
-    { "GetKey", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_GetKey, 1, NULL },
-    { "GetType", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_GetType, 1, NULL },
-    { "GetWidth", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_GetWidth, 1, NULL },
-    { "HasSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_HasSolution, 1, NULL },
-    { "IsBetween", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_IsBetween, 1, NULL },
-    { "IsDiagramless", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_IsDiagramless, 1, NULL },
-    { "IsEmpty", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_IsEmpty, 1, NULL },
-    { "IsScrambled", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_IsScrambled, 1, NULL },
-    { "Last", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_Last, 1, NULL },
-    { "LastCol", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_LastCol, 1, NULL },
-    { "LastRow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_LastRow, 1, NULL },
-    { "LastWhite", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_LastWhite, 1, NULL },
-    { "ScrambleSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_ScrambleSolution, 1, NULL },
-    { "SetCksum", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetCksum, 1, NULL },
-    { "SetFlag", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetFlag, 1, NULL },
-    { "SetKey", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetKey, 1, NULL },
-    { "SetSize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetSize, 1, NULL },
-    { "SetType", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetType, 1, NULL },
-    { "SetupGrid", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_SetupGrid, 1, NULL },
-    { "UnscrambleSolution", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid_UnscrambleSolution, 1, NULL },
-    { "XGrid", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_XGrid_constructor, 1, NULL },
-    { "__index", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid___index, 1, NULL },
-    { "__newindex", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XGrid___newindex, 1, NULL },
-    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_XGrid_delete, 1, NULL },
-    { 0, 0, 0, 0 },
-};
-
-int XGrid_methodCount = sizeof(XGrid_methods)/sizeof(wxLuaBindMethod) - 1;
-
-
-// ---------------------------------------------------------------------------
-// Bind class XPuzzle
-// ---------------------------------------------------------------------------
-
-// Lua MetaTable Tag for Class 'XPuzzle'
-int wxluatype_XPuzzle = WXLUA_TUNKNOWN;
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_Clear[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_Clear(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_Clear[1] = {{ wxLua_XPuzzle_Clear, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_Clear }};
-//     void Clear()
-static int LUACALL wxLua_XPuzzle_Clear(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call Clear
-    self->Clear();
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetAcross[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetAcross(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetAcross[1] = {{ wxLua_XPuzzle_GetAcross, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetAcross }};
-// %override wxLua_XPuzzle_GetAcross
-// XPuzzle::ClueList & GetAcross()
-static int LUACALL wxLua_XPuzzle_GetAcross(lua_State *L)
-{
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    return xword_pushClueList(L, self->GetAcross());
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetAuthor[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetAuthor(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetAuthor[1] = {{ wxLua_XPuzzle_GetAuthor, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetAuthor }};
-//     const wxString & GetAuthor() const 
-static int LUACALL wxLua_XPuzzle_GetAuthor(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetAuthor
-    wxString returns = (self->GetAuthor());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetClueList[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetClueList(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetClueList[1] = {{ wxLua_XPuzzle_GetClueList, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetClueList }};
-// %override wxLua_XPuzzle_GetClueList
-// void GetClueList(std::vector<wxString> * clues)
-static int LUACALL wxLua_XPuzzle_GetClueList(lua_State *L)
-{
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    std::vector<wxString> clues;
-    self->GetClueList(&clues);
-
-    // Create a table (and push on to the stack)
-    lua_newtable(L);
-
-    int i = 1; // Starting index is always 1 in lua
-    for (std::vector<wxString>::const_iterator it = clues.begin();
-         it != clues.end();
-         ++it)
-    {
-        lua_pushnumber(L, i++);
-        xword_pushwxString(L, *it);
-        // t[number] = text
-        lua_settable(L, -3); // -3 = third from the top of the stack
-    }
-
-    return 1; // One object on the stack for lua.
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetCopyright[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetCopyright(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetCopyright[1] = {{ wxLua_XPuzzle_GetCopyright, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetCopyright }};
-//     const wxString & GetCopyright() const 
-static int LUACALL wxLua_XPuzzle_GetCopyright(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetCopyright
-    wxString returns = (self->GetCopyright());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetDown[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetDown(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetDown[1] = {{ wxLua_XPuzzle_GetDown, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetDown }};
-// %override wxLua_XPuzzle_GetDown
-// XPuzzle::ClueList & GetDown()
-static int LUACALL wxLua_XPuzzle_GetDown(lua_State *L)
-{
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    return xword_pushClueList(L, self->GetDown());
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetFilename[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetFilename(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetFilename[1] = {{ wxLua_XPuzzle_GetFilename, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetFilename }};
-//     const wxString & GetFilename() const
-static int LUACALL wxLua_XPuzzle_GetFilename(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetFilename
-    wxString returns = (self->GetFilename());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetGrid[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetGrid(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetGrid[1] = {{ wxLua_XPuzzle_GetGrid, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetGrid }};
-//     %ungc XGrid & GetGrid()
-static int LUACALL wxLua_XPuzzle_GetGrid(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetGrid
-    XGrid* returns = &self->GetGrid();
-    if (wxluaO_isgcobject(L, returns)) wxluaO_undeletegcobject(L, returns);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XGrid);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetModified[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetModified(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetModified[1] = {{ wxLua_XPuzzle_GetModified, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetModified }};
-//     bool GetModified() const 
-static int LUACALL wxLua_XPuzzle_GetModified(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetModified
-    bool returns = (self->GetModified());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetNotes[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetNotes(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetNotes[1] = {{ wxLua_XPuzzle_GetNotes, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetNotes }};
-//     const wxString & GetNotes() const 
-static int LUACALL wxLua_XPuzzle_GetNotes(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetNotes
-    wxString returns = (self->GetNotes());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetTime[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetTime(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetTime[1] = {{ wxLua_XPuzzle_GetTime, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetTime }};
-//     int GetTime() const 
-static int LUACALL wxLua_XPuzzle_GetTime(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetTime
-    int returns = (self->GetTime());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetTitle[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetTitle(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetTitle[1] = {{ wxLua_XPuzzle_GetTitle, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetTitle }};
-//     const wxString & GetTitle() const 
-static int LUACALL wxLua_XPuzzle_GetTitle(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetTitle
-    wxString returns = (self->GetTitle());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_GetVersion[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_GetVersion(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_GetVersion[1] = {{ wxLua_XPuzzle_GetVersion, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_GetVersion }};
-//     short GetVersion() const
-static int LUACALL wxLua_XPuzzle_GetVersion(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call GetVersion
-    short returns = (self->GetVersion());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_IsOk[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_IsOk(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_IsOk[1] = {{ wxLua_XPuzzle_IsOk, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_IsOk }};
-//     bool IsOk()        const
-static int LUACALL wxLua_XPuzzle_IsOk(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call IsOk
-    bool returns = (self->IsOk());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_IsScrambled[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_IsScrambled(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_IsScrambled[1] = {{ wxLua_XPuzzle_IsScrambled, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_IsScrambled }};
-//     bool IsScrambled() const
-static int LUACALL wxLua_XPuzzle_IsScrambled(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call IsScrambled
-    bool returns = (self->IsScrambled());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_Load[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_Load(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_Load[1] = {{ wxLua_XPuzzle_Load, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_Load }};
-// %override wxLua_XPuzzle_Load
-// bool Load(const wxString & filename, wxString ext = wxEmptyString)
-static int LUACALL wxLua_XPuzzle_Load(lua_State *L)
-{
-    try
-    {
-        // get number of arguments
-        int argCount = lua_gettop(L);
-        // wxString ext = wxEmptyString
-        wxString ext = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-        // const wxString filename
-        const wxString filename = wxlua_getwxStringtype(L, 2);
-        // Check to see if file exists
-        if (! wxFileExists(filename))
-        {
-            wxlua_pushwxString(L,
-                wxString::Format(_T("File does not exist: %s"),
-                                 filename.c_str()));
-            lua_error(L);
-        }
-        // get this
-        XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-        // call Load
-        bool returns = (self->Load(filename, ext));
-        // push the result flag
-        lua_pushboolean(L, returns);
-
-        return 1;
-    }
-    catch(...)
-    {
-        xword_handle_exceptions(L);
-        return 0;
-    }
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_RenumberClues[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_RenumberClues(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_RenumberClues[1] = {{ wxLua_XPuzzle_RenumberClues, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_RenumberClues }};
-//     void RenumberClues()
-static int LUACALL wxLua_XPuzzle_RenumberClues(lua_State *L)
-{
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call RenumberClues
-    self->RenumberClues();
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_Save[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_Save(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_Save[1] = {{ wxLua_XPuzzle_Save, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_Save }};
-// %override wxLua_XPuzzle_Save
-// bool Save(const wxString & filename, wxString ext = wxEmptyString)
-static int LUACALL wxLua_XPuzzle_Save(lua_State *L)
-{
-    try
-    {
-        // get number of arguments
-        int argCount = lua_gettop(L);
-        // wxString ext = wxEmptyString
-        wxString ext = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-        // const wxString filename
-        const wxString filename = wxlua_getwxStringtype(L, 2);
-        // get this
-        XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-        // call Save
-        bool returns = (self->Save(filename, ext));
-        // push the result flag
-        lua_pushboolean(L, returns);
-
-        return 1;
-    }
-    catch(...)
-    {
-        xword_handle_exceptions(L);
-        return 0;
-    }
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetAcross[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_SetAcross(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetAcross[1] = {{ wxLua_XPuzzle_SetAcross, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_SetAcross }};
-// %override wxLua_XPuzzle_SetAcross
-// void SetAcross(XSquare::ClueList & across) const
-static int LUACALL wxLua_XPuzzle_SetAcross(lua_State *L)
-{
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    xword_table2ClueList(L, 2, &self->GetAcross());
-    return 0;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetAuthor[] = { &wxluatype_XPuzzle, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_XPuzzle_SetAuthor(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetAuthor[1] = {{ wxLua_XPuzzle_SetAuthor, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XPuzzle_SetAuthor }};
-//     void SetAuthor(const wxString & author) 
-static int LUACALL wxLua_XPuzzle_SetAuthor(lua_State *L)
-{
-    // const wxString author
-    const wxString author = wxlua_getwxStringtype(L, 2);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetAuthor
-    self->SetAuthor(author);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetClueList[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_SetClueList(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetClueList[1] = {{ wxLua_XPuzzle_SetClueList, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_SetClueList }};
-// %override wxLua_XPuzzle_SetClueList
-// bool SetClueList(const std::vector<wxString> & clues)
-static int LUACALL wxLua_XPuzzle_SetClueList(lua_State *L)
-{
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-
-    std::vector<wxString> clues;
-
-    // Iterate the table on the stack
-    lua_pushnil(L);  /* first key */
-    while (lua_next(L, 2) != 0) // Table is the 2nd argument
-    {
-        // key is index -2
-        // value is index -1
-        clues.push_back(xword_getwxStringtype(L, -1));
-
-        /* removes 'value'; keeps 'key' for next iteration */
-        lua_pop(L, 1);
-    }
-
-    lua_pushboolean(L, self->SetClueList(clues));
-
-    return 1; // One object on the stack for lua.
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetCopyright[] = { &wxluatype_XPuzzle, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_XPuzzle_SetCopyright(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetCopyright[1] = {{ wxLua_XPuzzle_SetCopyright, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XPuzzle_SetCopyright }};
-//     void SetCopyright(const wxString & copyright) 
-static int LUACALL wxLua_XPuzzle_SetCopyright(lua_State *L)
-{
-    // const wxString copyright
-    const wxString copyright = wxlua_getwxStringtype(L, 2);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetCopyright
-    self->SetCopyright(copyright);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetDown[] = { &wxluatype_XPuzzle, NULL };
-static int LUACALL wxLua_XPuzzle_SetDown(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetDown[1] = {{ wxLua_XPuzzle_SetDown, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_SetDown }};
-// %override wxLua_XPuzzle_SetDown
-// void SetDown(XSquare::ClueList & down) const
-static int LUACALL wxLua_XPuzzle_SetDown(lua_State *L)
-{
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    xword_table2ClueList(L, 2, &self->GetDown());
-    return 0;
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetFilename[] = { &wxluatype_XPuzzle, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_XPuzzle_SetFilename(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetFilename[1] = {{ wxLua_XPuzzle_SetFilename, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XPuzzle_SetFilename }};
-//     void SetFilename(const wxString & filename)
-static int LUACALL wxLua_XPuzzle_SetFilename(lua_State *L)
-{
-    // const wxString filename
-    const wxString filename = wxlua_getwxStringtype(L, 2);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetFilename
-    self->SetFilename(filename);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetGrid[] = { &wxluatype_XPuzzle, &wxluatype_XGrid, NULL };
-static int LUACALL wxLua_XPuzzle_SetGrid(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetGrid[1] = {{ wxLua_XPuzzle_SetGrid, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XPuzzle_SetGrid }};
-//     void SetGrid(const XGrid & grid)
-static int LUACALL wxLua_XPuzzle_SetGrid(lua_State *L)
-{
-    // const XGrid grid
-    const XGrid * grid = (const XGrid *)wxluaT_getuserdatatype(L, 2, wxluatype_XGrid);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetGrid
-    self->SetGrid(*grid);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetModified[] = { &wxluatype_XPuzzle, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_XPuzzle_SetModified(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetModified[1] = {{ wxLua_XPuzzle_SetModified, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XPuzzle_SetModified }};
-//     void SetModified(bool modified) 
-static int LUACALL wxLua_XPuzzle_SetModified(lua_State *L)
-{
-    // bool modified
-    bool modified = wxlua_getbooleantype(L, 2);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetModified
-    self->SetModified(modified);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetNotes[] = { &wxluatype_XPuzzle, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_XPuzzle_SetNotes(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetNotes[1] = {{ wxLua_XPuzzle_SetNotes, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XPuzzle_SetNotes }};
-//     void SetNotes(const wxString & notes) 
-static int LUACALL wxLua_XPuzzle_SetNotes(lua_State *L)
-{
-    // const wxString notes
-    const wxString notes = wxlua_getwxStringtype(L, 2);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetNotes
-    self->SetNotes(notes);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetOk[] = { &wxluatype_XPuzzle, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_XPuzzle_SetOk(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetOk[1] = {{ wxLua_XPuzzle_SetOk, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_XPuzzle_SetOk }};
-//     void SetOk(bool doit=true)
-static int LUACALL wxLua_XPuzzle_SetOk(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // bool doit = true
-    bool doit = (argCount >= 2 ? wxlua_getbooleantype(L, 2) : true);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetOk
-    self->SetOk(doit);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetTime[] = { &wxluatype_XPuzzle, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_XPuzzle_SetTime(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetTime[1] = {{ wxLua_XPuzzle_SetTime, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XPuzzle_SetTime }};
-//     void SetTime(int time) 
-static int LUACALL wxLua_XPuzzle_SetTime(lua_State *L)
-{
-    // int time
-    int time = (int)wxlua_getnumbertype(L, 2);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetTime
-    self->SetTime(time);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_SetTitle[] = { &wxluatype_XPuzzle, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_XPuzzle_SetTitle(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_SetTitle[1] = {{ wxLua_XPuzzle_SetTitle, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_XPuzzle_SetTitle }};
-//     void SetTitle(const wxString & title) 
-static int LUACALL wxLua_XPuzzle_SetTitle(lua_State *L)
-{
-    // const wxString title
-    const wxString title = wxlua_getwxStringtype(L, 2);
-    // get this
-    XPuzzle * self = (XPuzzle *)wxluaT_getuserdatatype(L, 1, wxluatype_XPuzzle);
-    // call SetTitle
-    self->SetTitle(title);
-
-    return 0;
-}
-
-static int LUACALL wxLua_XPuzzle_constructor(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_constructor[1] = {{ wxLua_XPuzzle_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-// %override wxLua_XPuzzle_constructor
-// XPuzzle(const wxString & filename = wxEmptyString)
-static int LUACALL wxLua_XPuzzle_constructor(lua_State *L)
-{
-    try
-    {
-        // get number of arguments
-        int argCount = lua_gettop(L);
-        // const wxString filename = wxEmptyString
-        const wxString filename = (argCount >= 1 ? wxlua_getwxStringtype(L, 1) : wxString(wxEmptyString));
-        // Check to see if file exists
-        if (! filename.IsEmpty() && ! wxFileExists(filename))
-        {
-            wxlua_pushwxString(L,
-                wxString::Format(_T("File does not exist: %s"),
-                                 filename.c_str()));
-            lua_error(L);
-        }
-        // call constructor
-        XPuzzle* returns = new XPuzzle(filename);
-        // add to tracked memory list
-        wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_XPuzzle((XPuzzle*)returns));
-        // push the constructed class pointer
-        wxluaT_pushuserdatatype(L, returns, wxluatype_XPuzzle);
-
-        return 1;
-    }
-    catch(...)
-    {
-        xword_handle_exceptions(L);
-        return 0;
-    }
-}
-
-
-static wxLuaArgType s_wxluatypeArray_wxLua_XPuzzle_delete[] = { &wxluatype_XPuzzle, NULL };
-static wxLuaBindCFunc s_wxluafunc_wxLua_XPuzzle_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_XPuzzle_delete }};
-
-
-
-// Map Lua Class Methods to C Binding Functions
-wxLuaBindMethod XPuzzle_methods[] = {
-    { "Clear", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_Clear, 1, NULL },
-    { "GetAcross", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetAcross, 1, NULL },
-    { "GetAuthor", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetAuthor, 1, NULL },
-    { "GetClueList", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetClueList, 1, NULL },
-    { "GetCopyright", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetCopyright, 1, NULL },
-    { "GetDown", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetDown, 1, NULL },
-    { "GetFilename", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetFilename, 1, NULL },
-    { "GetGrid", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetGrid, 1, NULL },
-    { "GetModified", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetModified, 1, NULL },
-    { "GetNotes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetNotes, 1, NULL },
-    { "GetTime", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetTime, 1, NULL },
-    { "GetTitle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetTitle, 1, NULL },
-    { "GetVersion", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_GetVersion, 1, NULL },
-    { "IsOk", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_IsOk, 1, NULL },
-    { "IsScrambled", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_IsScrambled, 1, NULL },
-    { "Load", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_Load, 1, NULL },
-    { "RenumberClues", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_RenumberClues, 1, NULL },
-    { "Save", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_Save, 1, NULL },
-    { "SetAcross", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetAcross, 1, NULL },
-    { "SetAuthor", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetAuthor, 1, NULL },
-    { "SetClueList", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetClueList, 1, NULL },
-    { "SetCopyright", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetCopyright, 1, NULL },
-    { "SetDown", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetDown, 1, NULL },
-    { "SetFilename", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetFilename, 1, NULL },
-    { "SetGrid", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetGrid, 1, NULL },
-    { "SetModified", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetModified, 1, NULL },
-    { "SetNotes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetNotes, 1, NULL },
-    { "SetOk", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetOk, 1, NULL },
-    { "SetTime", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetTime, 1, NULL },
-    { "SetTitle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_XPuzzle_SetTitle, 1, NULL },
-    { "XPuzzle", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_XPuzzle_constructor, 1, NULL },
-    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_XPuzzle_delete, 1, NULL },
-    { 0, 0, 0, 0 },
-};
-
-int XPuzzle_methodCount = sizeof(XPuzzle_methods)/sizeof(wxLuaBindMethod) - 1;
-
-
-// ---------------------------------------------------------------------------
 // Bind class MyFrame
 // ---------------------------------------------------------------------------
 
@@ -2045,14 +65,14 @@ static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_GetFocusedClue[] = { &wxluaty
 static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_GetFocusedClue[1] = {{ wxLua_MyFrame_GetFocusedClue, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_GetFocusedClue }};
 // %override wxLua_MyFrame_GetFocusedClue
-// const XPuzzle::Clue * MyFrame::GetFocusedClue()
+// const puz::Puzzle::Clue * MyFrame::GetFocusedClue()
 static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L)
 {
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
     // call GetFocusedClue
-    const XPuzzle::Clue * clue =  self->GetFocusedClue();
+    const puz::Puzzle::Clue * clue =  self->GetFocusedClue();
 
     // Return two nils if there is no focused clue
     if (clue == NULL)
@@ -2064,7 +84,7 @@ static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L)
 
     // Return a pair (number, text)
     lua_pushnumber(L, clue->Number());
-    xword_pushwxString(L, clue->Text());
+    lua_pushstring(L, clue->Text().c_str());
     return 2;
 }
 
@@ -2072,48 +92,49 @@ static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_GetFocusedDirection[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_GetFocusedDirection(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_GetFocusedDirection[1] = {{ wxLua_MyFrame_GetFocusedDirection, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_GetFocusedDirection }};
-//     bool GetFocusedDirection() const
+// %override wxLua_MyFrame_GetFocusedDirection
+// puz::GridDirection GetFocusedDirection()
 static int LUACALL wxLua_MyFrame_GetFocusedDirection(lua_State *L)
 {
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
-    // call GetFocusedDirection
-    bool returns = (self->GetFocusedDirection());
-    // push the result flag
-    lua_pushboolean(L, returns);
 
+    puz::GridDirection returns = self->GetFocusedDirection();
+    luapuz_pushGridDirection(L, returns);
     return 1;
 }
+
 
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_GetFocusedSquare[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_GetFocusedSquare(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_GetFocusedSquare[1] = {{ wxLua_MyFrame_GetFocusedSquare, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_GetFocusedSquare }};
-//     XSquare * GetFocusedSquare()
+// %override wxLua_MyFrame_GetFocusedSquare
+// puz::Square * GetFocusedSquare()
 static int LUACALL wxLua_MyFrame_GetFocusedSquare(lua_State *L)
 {
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
-    // call GetFocusedSquare
-    XSquare* returns = (XSquare*)self->GetFocusedSquare();
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
 
+    puz::Square * returns = self->GetFocusedSquare();
+    luapuz_pushSquare(L, returns);
     return 1;
 }
+
 
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_GetFocusedWord[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_GetFocusedWord[1] = {{ wxLua_MyFrame_GetFocusedWord, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_GetFocusedWord }};
 // %override wxLua_MyFrame_GetFocusedWord
-// void GetFocusedWord(XSquare * start, XSquare * end)
+// %override [Lua table] MyFrame::GetFocusedWord()
+// void GetFocusedWord(puz::Square * start, puz::Square * end)
 static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L)
 {
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
     // call GetFocusedWord
-    XSquare * start;
-    XSquare * end;
+    puz::Square * start;
+    puz::Square * end;
     self->GetFocusedWord(&start, &end);
 
     // Return nil if there is no focused word
@@ -2128,12 +149,12 @@ static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L)
     lua_newtable(L);
 
     int i = 1; // lua indicies start with 1 not 0
-    bool dir = self->GetFocusedDirection();
+    puz::GridDirection dir = self->GetFocusedDirection();
     end = end->Next(dir); // This has to be one past the last square.
-    for (XSquare * square = start; square != end; square = square->Next(dir))
+    for (puz::Square * square = start; square != end; square = square->Next(dir))
     {
         lua_pushnumber(L, i++);
-        wxluaT_pushuserdatatype(L, square, wxluatype_XSquare);
+        luapuz_pushSquare(L, square);
         // t[i] = square
         lua_settable(L, -3); // -3 = third from the top of the stack
     }
@@ -2145,19 +166,18 @@ static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_GetPuzzle[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_GetPuzzle(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_GetPuzzle[1] = {{ wxLua_MyFrame_GetPuzzle, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_GetPuzzle }};
-//     %ungc XPuzzle & GetPuzzle()
+// %override wxLua_MyFrame_GetPuzzle
+// puz::Puzzle & GetPuzzle()
 static int LUACALL wxLua_MyFrame_GetPuzzle(lua_State *L)
 {
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
-    // call GetPuzzle
-    XPuzzle* returns = &self->GetPuzzle();
-    if (wxluaO_isgcobject(L, returns)) wxluaO_undeletegcobject(L, returns);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XPuzzle);
 
+    puz::Puzzle & returns = self->GetPuzzle();
+    luapuz_pushPuzzle(L, &returns);
     return 1;
 }
+
 
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_GetTime[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_GetTime(lua_State *L);
@@ -2207,22 +227,18 @@ static int LUACALL wxLua_MyFrame_IsTimerRunning(lua_State *L)
     return 1;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_LoadPuzzle[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_LoadPuzzle[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_MyFrame_LoadPuzzle(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_LoadPuzzle[1] = {{ wxLua_MyFrame_LoadPuzzle, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_MyFrame_LoadPuzzle }};
-//     bool LoadPuzzle(const wxString & filename, const wxString & ext = wxEmptyString)
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_LoadPuzzle[1] = {{ wxLua_MyFrame_LoadPuzzle, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_LoadPuzzle }};
+//     bool LoadPuzzle(const wxString & filename)
 static int LUACALL wxLua_MyFrame_LoadPuzzle(lua_State *L)
 {
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // const wxString ext = wxEmptyString
-    const wxString ext = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
     // const wxString filename
     const wxString filename = wxlua_getwxStringtype(L, 2);
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
     // call LoadPuzzle
-    bool returns = (self->LoadPuzzle(filename, ext));
+    bool returns = (self->LoadPuzzle(filename));
     // push the result flag
     lua_pushboolean(L, returns);
 
@@ -2243,81 +259,74 @@ static int LUACALL wxLua_MyFrame_ResetTimer(lua_State *L)
     return 0;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SavePuzzle[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SavePuzzle[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_MyFrame_SavePuzzle(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SavePuzzle[1] = {{ wxLua_MyFrame_SavePuzzle, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_MyFrame_SavePuzzle }};
-//     bool SavePuzzle(wxString filename, const wxString & ext = wxEmptyString)
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SavePuzzle[1] = {{ wxLua_MyFrame_SavePuzzle, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_SavePuzzle }};
+//     bool SavePuzzle(wxString filename)
 static int LUACALL wxLua_MyFrame_SavePuzzle(lua_State *L)
 {
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // const wxString ext = wxEmptyString
-    const wxString ext = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
     // wxString filename
     wxString filename = wxlua_getwxStringtype(L, 2);
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
     // call SavePuzzle
-    bool returns = (self->SavePuzzle(filename, ext));
+    bool returns = (self->SavePuzzle(filename));
     // push the result flag
     lua_pushboolean(L, returns);
 
     return 1;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetFocusedDirection[] = { &wxluatype_MyFrame, &wxluatype_TBOOLEAN, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetFocusedDirection[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_SetFocusedDirection(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetFocusedDirection[1] = {{ wxLua_MyFrame_SetFocusedDirection, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_SetFocusedDirection }};
-//     void SetFocusedDirection(bool direction)
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetFocusedDirection[1] = {{ wxLua_MyFrame_SetFocusedDirection, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_SetFocusedDirection }};
+// %override wxLua_MyFrame_SetFocusedDirection
+// void SetFocusedDirection(puz::GridDirection)
 static int LUACALL wxLua_MyFrame_SetFocusedDirection(lua_State *L)
 {
-    // bool direction
-    bool direction = wxlua_getbooleantype(L, 2);
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
-    // call SetFocusedDirection
-    self->SetFocusedDirection(direction);
 
+    puz::GridDirection direction = luapuz_checkGridDirection(L, 2);
+    self->SetFocusedDirection(direction);
     return 0;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetFocusedSquare[] = { &wxluatype_MyFrame, &wxluatype_XSquare, NULL };
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetFocusedSquare[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_SetFocusedSquare(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetFocusedSquare[1] = {{ wxLua_MyFrame_SetFocusedSquare, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_SetFocusedSquare }};
-//     XSquare * SetFocusedSquare(XSquare * square)
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetFocusedSquare[1] = {{ wxLua_MyFrame_SetFocusedSquare, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_SetFocusedSquare }};
+// %override wxLua_MyFrame_SetFocusedSquare
+// puz::Square * SetFocusedSquare(puz::Square * square)
 static int LUACALL wxLua_MyFrame_SetFocusedSquare(lua_State *L)
 {
-    // XSquare square
-    XSquare * square = (XSquare *)wxluaT_getuserdatatype(L, 2, wxluatype_XSquare);
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
-    // call SetFocusedSquare
-    XSquare* returns = (XSquare*)self->SetFocusedSquare(square);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_XSquare);
 
+    puz::Square * square = luapuz_checkSquare(L, 2);
+    puz::Square * returns = self->SetFocusedSquare(square);
+    luapuz_pushSquare(L, returns);
     return 1;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetSquareText[] = { &wxluatype_MyFrame, &wxluatype_XSquare, &wxluatype_TSTRING, NULL };
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetSquareText[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_SetSquareText(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetSquareText[1] = {{ wxLua_MyFrame_SetSquareText, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_MyFrame_SetSquareText }};
-//     bool SetSquareText(XSquare * square, const wxString & text)
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SetSquareText[1] = {{ wxLua_MyFrame_SetSquareText, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_SetSquareText }};
+// %override wxLua_MyFrame_SetSquareText
+// bool SetSquareText(puz::Square * square, const wxString & text)
 static int LUACALL wxLua_MyFrame_SetSquareText(lua_State *L)
 {
-    // const wxString text
-    const wxString text = wxlua_getwxStringtype(L, 3);
-    // XSquare square
-    XSquare * square = (XSquare *)wxluaT_getuserdatatype(L, 2, wxluatype_XSquare);
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
-    // call SetSquareText
-    bool returns = (self->SetSquareText(square, text));
-    // push the result flag
-    lua_pushboolean(L, returns);
 
+    puz::Square * square = luapuz_checkSquare(L, 2);
+    const wxString text = wxlua_getwxStringtype(L, 3);
+    bool returns = self->SetSquareText(square, text);
+    lua_pushboolean(L, returns);
     return 1;
 }
+
 
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetStatus[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_MyFrame_SetStatus(lua_State *L);
@@ -2582,26 +591,6 @@ wxLuaBindNumber* wxLuaGetDefineList_xword(size_t &count)
 {
     static wxLuaBindNumber numberList[] =
     {
-        { "ACROSS_CLUE", ACROSS_CLUE },
-        { "CHECK_BLANK", CHECK_BLANK },
-        { "DIR_ACROSS", DIR_ACROSS },
-        { "DIR_DOWN", DIR_DOWN },
-        { "DOWN_CLUE", DOWN_CLUE },
-        { "FIND_NEXT", FIND_NEXT },
-        { "FIND_PREV", FIND_PREV },
-        { "NO_CHECK_BLANK", NO_CHECK_BLANK },
-        { "NO_CLUE", NO_CLUE },
-        { "XFLAG_BLACK", XFLAG_BLACK },
-        { "XFLAG_CIRCLE", XFLAG_CIRCLE },
-        { "XFLAG_CLEAR", XFLAG_CLEAR },
-        { "XFLAG_NORMAL", XFLAG_NORMAL },
-        { "XFLAG_NO_SOLUTION", XFLAG_NO_SOLUTION },
-        { "XFLAG_PENCIL", XFLAG_PENCIL },
-        { "XFLAG_RED", XFLAG_RED },
-        { "XFLAG_SCRAMBLED", XFLAG_SCRAMBLED },
-        { "XFLAG_X", XFLAG_X },
-        { "XTYPE_DIAGRAMLESS", XTYPE_DIAGRAMLESS },
-        { "XTYPE_NORMAL", XTYPE_NORMAL },
 
         { 0, 0 },
     };
@@ -2752,9 +741,6 @@ wxLuaBindMethod* wxLuaGetFunctionList_xword(size_t &count)
 // ---------------------------------------------------------------------------
 
 static const char* wxluaclassname_MyFrame = "MyFrame";
-static const char* wxluaclassname_XGrid = "XGrid";
-static const char* wxluaclassname_XPuzzle = "XPuzzle";
-static const char* wxluaclassname_XSquare = "XSquare";
 static const char* wxluaclassname_wxFrame = "wxFrame";
 
 static const char* wxluabaseclassnames_MyFrame[] = { wxluaclassname_wxFrame, NULL };
@@ -2765,12 +751,6 @@ static wxLuaBindClass* wxluabaseclassbinds_MyFrame[] = { NULL };
 
 extern wxLuaBindMethod MyFrame_methods[];
 extern int MyFrame_methodCount;
-extern wxLuaBindMethod XGrid_methods[];
-extern int XGrid_methodCount;
-extern wxLuaBindMethod XPuzzle_methods[];
-extern int XPuzzle_methodCount;
-extern wxLuaBindMethod XSquare_methods[];
-extern int XSquare_methodCount;
 
 
 
@@ -2780,9 +760,6 @@ wxLuaBindClass* wxLuaGetClassList_xword(size_t &count)
     static wxLuaBindClass classList[] =
     {
         { wxluaclassname_MyFrame, MyFrame_methods, MyFrame_methodCount, CLASSINFO(MyFrame), &wxluatype_MyFrame, wxluabaseclassnames_MyFrame, wxluabaseclassbinds_MyFrame, g_wxluanumberArray_None, 0, }, 
-        { wxluaclassname_XGrid, XGrid_methods, XGrid_methodCount, NULL, &wxluatype_XGrid, NULL, NULL, g_wxluanumberArray_None, 0, }, 
-        { wxluaclassname_XPuzzle, XPuzzle_methods, XPuzzle_methodCount, NULL, &wxluatype_XPuzzle, NULL, NULL, g_wxluanumberArray_None, 0, }, 
-        { wxluaclassname_XSquare, XSquare_methods, XSquare_methodCount, NULL, &wxluatype_XSquare, NULL, NULL, g_wxluanumberArray_None, 0, }, 
 
         { 0, 0, 0, 0, 0, 0, 0 }, 
     };
@@ -2822,7 +799,4 @@ bool wxLuaBinding_xword_init()
     return true;
 }
 
-wxLUA_IMPLEMENT_ENCAPSULATION(XGrid, XGrid)
-wxLUA_IMPLEMENT_ENCAPSULATION(XPuzzle, XPuzzle)
-wxLUA_IMPLEMENT_ENCAPSULATION(XSquare, XSquare)
 

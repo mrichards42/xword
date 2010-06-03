@@ -37,12 +37,12 @@ PreferencesDialog::PreferencesDialog(MyFrame * frame)
 void
 PreferencesDialog::AddRemoveGridFlag(wxCommandEvent & evt, int flag)
 {
-    int style = m_frame->m_gridCtrl->GetGridStyle();
+    int style = m_frame->m_XGridCtrl->GetGridStyle();
     if (evt.IsChecked())
         style = AddFlag(style, flag);
     else
         style = RemoveFlag(style, flag);
-    m_frame->m_gridCtrl->SetGridStyle(style);
+    m_frame->m_XGridCtrl->SetGridStyle(style);
     evt.Skip();
 }
 
@@ -51,7 +51,7 @@ void
 PreferencesDialog::OnAfterLetter(wxCommandEvent & evt)
 {
     const int selection = evt.GetInt();
-    int style = m_frame->m_gridCtrl->GetGridStyle();
+    int style = m_frame->m_XGridCtrl->GetGridStyle();
     if (selection == 0)
         style = RemoveFlag(style, MOVE_AFTER_LETTER | MOVE_TO_NEXT_BLANK);
     else if (selection == 1)
@@ -61,7 +61,7 @@ PreferencesDialog::OnAfterLetter(wxCommandEvent & evt)
         wxASSERT(selection == 2);
         style = AddFlag(style, MOVE_AFTER_LETTER | MOVE_TO_NEXT_BLANK);
     }
-    m_frame->m_gridCtrl->SetGridStyle(style);
+    m_frame->m_XGridCtrl->SetGridStyle(style);
     evt.Skip();
 }
 
@@ -103,32 +103,66 @@ PreferencesDialog::OnCheckWhileTyping(wxCommandEvent & evt)
 // Grid
 //-----
 void
+PreferencesDialog::OnPenColor(wxColourPickerEvent & evt)
+{
+    m_frame->m_XGridCtrl->SetPenColor(evt.GetColour());
+    evt.Skip();
+}
+
+/*
+void
+PreferencesDialog::OnPencilColor(wxColourPickerEvent & evt)
+{
+    m_frame->m_XGridCtrl->SetPencilColor(evt.GetColour());
+    evt.Skip();
+}
+*/
+
+void
 PreferencesDialog::OnSelectedLetterColor(wxColourPickerEvent & evt)
 {
-    m_frame->m_gridCtrl->SetFocusedLetterColor(evt.GetColour());
+    m_frame->m_XGridCtrl->SetFocusedLetterColor(evt.GetColour());
     evt.Skip();
 }
 
 void
 PreferencesDialog::OnSelectedWordColor(wxColourPickerEvent & evt)
 {
-    m_frame->m_gridCtrl->SetFocusedWordColor(evt.GetColour());
+    m_frame->m_XGridCtrl->SetFocusedWordColor(evt.GetColour());
+    evt.Skip();
+}
+
+
+
+void
+PreferencesDialog::OnGridBackgroundColor(wxColourPickerEvent & evt)
+{
+    m_frame->m_XGridCtrl->SetBackgroundColour(evt.GetColour());
+    m_frame->m_XGridCtrl->Refresh();
     evt.Skip();
 }
 
 void
-PreferencesDialog::OnPenColor(wxColourPickerEvent & evt)
+PreferencesDialog::OnWhiteSquareColor(wxColourPickerEvent & evt)
 {
-    m_frame->m_gridCtrl->SetPenColor(evt.GetColour());
+    m_frame->m_XGridCtrl->SetWhiteSquareColor(evt.GetColour());
     evt.Skip();
 }
 
 void
-PreferencesDialog::OnPencilColor(wxColourPickerEvent & evt)
+PreferencesDialog::OnBlackSquareColor(wxColourPickerEvent & evt)
 {
-    m_frame->m_gridCtrl->SetPencilColor(evt.GetColour());
+    m_frame->m_XGridCtrl->SetBlackSquareColor(evt.GetColour());
     evt.Skip();
 }
+
+void
+PreferencesDialog::OnGridSelectionColor(wxColourPickerEvent & evt)
+{
+    m_frame->m_XGridCtrl->SetSelectionColor(evt.GetColour());
+    evt.Skip();
+}
+
 
 
 // Clue Prompt
@@ -208,16 +242,16 @@ PreferencesDialog::OnClueHeadingBackgroundColor(wxColourPickerEvent & evt)
 void
 PreferencesDialog::OnGridLetterFont(wxFontPickerEvent & evt)
 {
-    m_frame->m_gridCtrl->SetLetterFont(evt.GetFont());
-    m_frame->m_gridCtrl->Refresh();
+    m_frame->m_XGridCtrl->SetLetterFont(evt.GetFont());
+    m_frame->m_XGridCtrl->Refresh();
     evt.Skip();
 }
 
 void
 PreferencesDialog::OnGridNumberFont(wxFontPickerEvent & evt)
 {
-    m_frame->m_gridCtrl->SetNumberFont(evt.GetFont());
-    m_frame->m_gridCtrl->Refresh();
+    m_frame->m_XGridCtrl->SetNumberFont(evt.GetFont());
+    m_frame->m_XGridCtrl->Refresh();
     evt.Skip();
 }
 
@@ -255,11 +289,11 @@ PreferencesDialog::OnCluePromptFormat(wxCommandEvent & evt)
     m_frame->m_cluePrompt->SetDisplayFormat(m_cluePromptFormat->GetValue());
 
     // Refresh the text
-    if (m_frame->m_gridCtrl->GetDirection() == DIR_ACROSS)
+    if (m_frame->m_XGridCtrl->GetDirection() == puz::ACROSS)
     {
         m_frame->m_cluePrompt->SetClue(
             m_frame->m_across->GetClueNumber(),
-            DIR_ACROSS,
+            puz::ACROSS,
             m_frame->m_across->GetClueText()
         );
     }
@@ -267,7 +301,7 @@ PreferencesDialog::OnCluePromptFormat(wxCommandEvent & evt)
     {
         m_frame->m_cluePrompt->SetClue(
             m_frame->m_down->GetClueNumber(),
-            DIR_DOWN,
+            puz::DOWN,
             m_frame->m_down->GetClueText()
         );
     }
@@ -279,16 +313,16 @@ PreferencesDialog::OnCluePromptFormat(wxCommandEvent & evt)
 void
 PreferencesDialog::OnLetterScale(wxSpinEvent & evt)
 {
-    m_frame->m_gridCtrl->SetLetterScale(evt.GetPosition() / 100.);
-    m_frame->m_gridCtrl->Refresh();
+    m_frame->m_XGridCtrl->SetLetterScale(evt.GetPosition() / 100.);
+    m_frame->m_XGridCtrl->Refresh();
     evt.Skip();
 }
 
 void
 PreferencesDialog::OnNumberScale(wxSpinEvent & evt)
 {
-    m_frame->m_gridCtrl->SetNumberScale(evt.GetPosition() / 100.);
-    m_frame->m_gridCtrl->Refresh();
+    m_frame->m_XGridCtrl->SetNumberScale(evt.GetPosition() / 100.);
+    m_frame->m_XGridCtrl->Refresh();
     evt.Skip();
 }
 
@@ -326,7 +360,7 @@ void
 PreferencesDialog::LoadConfig()
 {
     // Grid Style
-    const int gridStyle = m_frame->m_gridCtrl->GetGridStyle();
+    const int gridStyle = m_frame->m_XGridCtrl->GetGridStyle();
 
     if (HasFlag(gridStyle, MOVE_AFTER_LETTER))
     {
@@ -346,10 +380,14 @@ PreferencesDialog::LoadConfig()
 
 
     // Colors
-    m_selectedLetterColor->SetColour(m_frame->m_gridCtrl->GetFocusedLetterColor());
-    m_selectedWordColor  ->SetColour(m_frame->m_gridCtrl->GetFocusedWordColor());
-    m_penColor           ->SetColour(m_frame->m_gridCtrl->GetPenColor());
-    m_pencilColor        ->SetColour(m_frame->m_gridCtrl->GetPencilColor());
+    m_selectedLetterColor->SetColour(m_frame->m_XGridCtrl->GetFocusedLetterColor());
+    m_selectedWordColor  ->SetColour(m_frame->m_XGridCtrl->GetFocusedWordColor());
+    m_penColor           ->SetColour(m_frame->m_XGridCtrl->GetPenColor());
+    //m_pencilColor        ->SetColour(m_frame->m_XGridCtrl->GetPencilColor());
+    m_gridBackgroundColor->SetColour(m_frame->m_XGridCtrl->GetBackgroundColour());
+    m_whiteSquareColor   ->SetColour(m_frame->m_XGridCtrl->GetWhiteSquareColor());
+    m_blackSquareColor   ->SetColour(m_frame->m_XGridCtrl->GetBlackSquareColor());
+    m_gridSelectionColor ->SetColour(m_frame->m_XGridCtrl->GetSelectionColor());
 
     m_cluePromptBackground->SetColour(m_frame->m_cluePrompt->GetBackgroundColour());
     m_cluePromptText      ->SetColour(m_frame->m_cluePrompt->GetForegroundColour());
@@ -364,16 +402,16 @@ PreferencesDialog::LoadConfig()
     m_clueHeadingText       ->SetColour(m_frame->m_across->GetHeadingForeground());
 
     // Fonts
-    m_gridLetterFont->SetSelectedFont(m_frame->m_gridCtrl->GetLetterFont());
-    m_gridNumberFont->SetSelectedFont(m_frame->m_gridCtrl->GetNumberFont());
+    m_gridLetterFont->SetSelectedFont(m_frame->m_XGridCtrl->GetLetterFont());
+    m_gridNumberFont->SetSelectedFont(m_frame->m_XGridCtrl->GetNumberFont());
     m_clueFont      ->SetSelectedFont(m_frame->m_across->GetFont());
     m_cluePromptFont->SetSelectedFont(m_frame->m_cluePrompt->GetFont());
     m_clueHeadingFont->SetSelectedFont(m_frame->m_across->GetHeadingFont());
 
     // Misc
     m_cluePromptFormat->ChangeValue(m_frame->m_cluePrompt->GetDisplayFormat());
-    m_letterScale->SetValue(m_frame->m_gridCtrl->GetLetterScale() * 100);
-    m_numberScale->SetValue(m_frame->m_gridCtrl->GetNumberScale() * 100);
+    m_letterScale->SetValue(m_frame->m_XGridCtrl->GetLetterScale() * 100);
+    m_numberScale->SetValue(m_frame->m_XGridCtrl->GetNumberScale() * 100);
 
     // Printing
     ConfigManager & config = wxGetApp().GetConfigManager();

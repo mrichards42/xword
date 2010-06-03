@@ -66,7 +66,7 @@ wxString GetConfigFile()
 //     wxStandardPaths::GetResourcesDir
 //     wxStandardPaths::GetAppDir
 // Fortunately these should always return the exe directory.
-#if ! defined(__WXDEBUG__) || ! defined(__WXMSW__)
+#if defined(__WXDEBUG__) && defined(__WXMSW__)
 
 wxString GetImagesDir()
 {
@@ -78,6 +78,8 @@ wxString GetScriptsDir()
 {
     return exedir() + sep() + _T("scripts");
 }
+
+#define GetPluginsDir() exedir()
 
 #else
 
@@ -98,8 +100,126 @@ wxString GetScriptsDir()
         return wxStandardPaths::Get().GetPluginsDir() + sep() + _T("scripts");
 }
 
-#endif // ! defined(__WXDEBUG__) || ! defined(__WXMSW__)
+#define GetPluginsDir() wxStandardPaths::Get().GetPluginsDir()
 
+#endif // __WXDEBUG__ && __WXMSW__
+
+
+#ifdef XWORD_USE_LUA
+
+#include <luaconf.h>
+
+const wxArrayString & GetLuaPathList()
+{
+    static wxArrayString pathList;
+    if (pathList.empty())
+    {
+        wxString scripts = GetScriptsDir();
+        pathList.push_back(scripts + sep() + _T("?.lua"));
+        pathList.push_back(scripts + sep() + _T("?") + sep() + _T("init.lua"));
+        pathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?.lua"));
+        pathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?") + sep() + _T(".lua"));
+    }
+    return pathList;
+}
+
+wxString GetLuaPath()
+{
+    wxString path;
+    const wxArrayString & pathList = GetLuaPathList();
+    assert(! pathList.empty());
+    wxArrayString::const_iterator it;
+    for (it = pathList.begin(); it != pathList.end()-1; ++it)
+    {
+        path.append(*it);
+        path.append(_T(";"));
+    }
+    path.append(pathList.back());
+    return path;
+}
+
+
+
+// Shared library extensions for different operating systems
+#if defined(__WXMSW__)
+#   define LUA_DLL_EXT _T(".dll")
+#elif defined(__WXMAC__)
+#   define LUA_DLL_EXT _T(".dylib")
+#else
+#   define LUA_DLL_EXT _T(".so")
+#endif
+
+const wxArrayString & GetLuaCPathList()
+{
+    static wxArrayString cpathList;
+    if (cpathList.empty())
+    {
+        wxString scripts = GetScriptsDir();
+        wxString plugins = GetPluginsDir();
+        cpathList.push_back(plugins + sep() + _T("?") + LUA_DLL_EXT);
+        cpathList.push_back(plugins + sep() + _T("?51") + LUA_DLL_EXT);
+        cpathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?") + LUA_DLL_EXT);
+        cpathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?51") + LUA_DLL_EXT);
+    }
+    return cpathList;
+}
+
+wxString GetLuaCPath()
+{
+    wxString cpath;
+    const wxArrayString & cpathList = GetLuaCPathList();
+    assert(! cpathList.empty());
+    wxArrayString::const_iterator it;
+    for (it = cpathList.begin(); it != cpathList.end()-1; ++it)
+    {
+        cpath.append(*it);
+        cpath.append(_T(";"));
+    }
+    cpath.append(cpathList.back());
+    return cpath;
+}
+
+
+
+bool FindLuaScript(const wxString & name, wxString * result)
+{
+    if (wxFileName::FileExists(name))
+    {
+        *result = name;
+        return true;
+    }
+
+    wxString filename;
+    // Chop off the extension
+    if (name.EndsWith(_T(".lua")))
+        filename = name.substr(0, name.length() - 4);
+    else
+        filename = name;
+
+    wxString error;
+    error << _T("Could not find file: ") << name << _T(". Paths searched:");
+
+    const wxArrayString & pathList = GetLuaPathList();
+    wxArrayString::const_iterator it;
+    for (it = pathList.begin(); it != pathList.end(); ++it)
+    {
+        wxString path = *it;
+        path.Replace(_T(LUA_PATH_MARK), filename);
+        wxFileName fn(path);
+        fn.Normalize();
+        if (fn.FileExists())
+        {
+            *result = fn.GetFullPath();
+            return true;
+        }
+        else
+            error << _T("\n") << fn.GetFullPath();
+    }
+    *result = error;
+    return false;
+}
+
+#endif // XWORD_USE_LUA
 
 
 // Compatibility with old versions of XWord

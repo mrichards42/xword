@@ -19,8 +19,9 @@
 #include <wx/cmdline.h>
 #include "MyFrame.hpp"
 #include "paths.hpp"
-#include "dialogs/Convert.hpp"
 #include <wx/wfstream.h> // wxFileInputStream / wxFileOutputStream for config
+#include "messages.hpp"
+#include "utils/string.hpp"
 
 #include <wx/log.h>
 
@@ -42,32 +43,20 @@ END_EVENT_TABLE()
 const wxCmdLineEntryDesc cmdLineDesc[] =
 {
     { wxCMD_LINE_SWITCH,
-      _T("c"), _T("convert"),
-      _T("convert files") },
-
-    { wxCMD_LINE_SWITCH,
-      _T("o"), _T("output-files"),
-      _T("specify output file after each input file") },
-
-    { wxCMD_LINE_SWITCH,
-      _T("w"), _T("overwrite"),
-      _T("overwrite existing files") },
-
-    { wxCMD_LINE_SWITCH,
-      _T("P"), _T("portable"),
+      _T("p"), _T("portable"),
       _T("portable mode") },
 
     { wxCMD_LINE_OPTION,
-      _T("d"), _T("directory"),
-      _T("parent directory for output of converted files") },
-
-    { wxCMD_LINE_OPTION,
-      _T("l"), _T("log"),
-      _T("log file for conversion") },
+      _T("s"), _T("script"),
+      _T("lua script to execute") },
 
     { wxCMD_LINE_PARAM,
       NULL, NULL,
+#ifdef XWORD_USE_LUA
+      _T("crossword puzzle or arguments for the script"),
+#else
       _T("crossword puzzle"),
+#endif // XWORD_USE_LUA
       wxCMD_LINE_VAL_STRING,
       wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
 
@@ -78,11 +67,9 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
 bool
 MyApp::OnInit()
 {
-    //_CrtSetBreakAlloc(34280);
     m_frame = NULL;
 
     wxLogDebug(_T("Starting App"));
-    SetReturnCode(0);
 
     m_isTimerRunning = false;
 
@@ -92,15 +79,56 @@ MyApp::OnInit()
     // Portable mode is enabled if there is a file named
     // "portable_mode_enabled" in the executable directory.
     // Portable mode can also be enabled via command line switches:
-    // --portable OR -P
+    // --portable OR -p
     wxFileName portable(argv[0]);
     portable.SetFullName(_T("portable_mode_enabled"));
     m_isPortable = portable.FileExists();
 
+    wxCmdLineParser cmd(cmdLineDesc, argc, argv);
+
+#ifdef XWORD_USE_LUA
+    // Check to see if we are just running a lua script
+
+    // Make sure that lua isn't allowed to call 
+    // wx.wxGetApp:MainLoop()
+    wxLuaState::sm_wxAppMainLoop_will_run = true;
+
+    switch (CheckCommandLineForLua())
+    {
+        case NO_SCRIPT:
+            break; // Continue as usual
+        case GUI_SCRIPT:
+            return true; // Run MainLoop()
+        case CONSOLE_SCRIPT:
+            return false; // Script is finished; exit immediately
+    }
+#endif // XWORD_USE_LUA
+
+    // Check to see if "portable" was specified on the command line
+    // before SetupConfig because it affects the location of the
+    // config file
+    cmd.Parse(false); // don't show usage
+    m_isPortable = m_isPortable || cmd.Found(_T("portable"));
+
+    // SetupConfig before creating the frame because the frame
+    // uses config stuff for initialization.
     SetupConfig();
     SetupPrinting();
 
-    return ReadCommandLine();
+    // Create the frame before completely parsing the command line
+    // because we might have puzzles to load.
+    m_frame = new MyFrame();
+
+    // Log to a window for debug
+#if defined(__WXDEBUG__ )
+    wxLogWindow *w = new wxLogWindow(m_frame, _T("Logger"));
+    w->Show();
+#endif
+
+    ReadCommandLine(cmd);
+    m_frame->Show();
+
+    return true;
 }
 
 
@@ -126,88 +154,89 @@ MyApp::OnExit()
 }
 
 
-bool
-MyApp::ReadCommandLine()
+#if XWORD_USE_LUA
+
+MyApp::CmdLineScriptValue
+MyApp::CheckCommandLineForLua()
 {
-    wxCmdLineParser cmd(argc, argv);
-    cmd.SetDesc(cmdLineDesc);
-    cmd.Parse(false); // don't show usage
+    wxString scriptFilename;
+    // argv[0] is always the executable name
+    for (int i = 1; i < argc; ++i)
+    {
+        wxString arg(argv[i]);
+        // Script file can be specified using any of 
+        // -s
+        // /s
+        // --script
+        if (arg.StartsWith(_T("-s"), &scriptFilename) ||
+            arg.StartsWith(_T("/s"), &scriptFilename) ||
+            arg.StartsWith(_T("--script"), &scriptFilename))
+        {
+            int previousArg = i-1;
+            if (scriptFilename.empty())
+            {
+                // The filename is separated by a space.
+                if (i < argc)
+                    scriptFilename = argv[++i];
+                else
+                    return NO_SCRIPT; // Poorly formed command line
+            }
+            else if (scriptFilename.StartsWith(_T(":")))
+            {
+                // The filename is separated by a colon.
+                scriptFilename = scriptFilename.substr(1);
+            }
 
-    const size_t param_count = cmd.GetParamCount();
-    wxLogDebug(_T("Command count: %d"), param_count);
+            // Read the command line up until the script switch
+            wxCmdLineParser cmd(cmdLineDesc, previousArg, argv);
+            cmd.Parse(false); // don't show usage
+            ReadCommandLine(cmd);
 
+            RunLuaScript(scriptFilename, i);
+
+            // Start the main loop if there are any windows.
+            if (wxTopLevelWindows.GetFirst() != NULL)
+                return GUI_SCRIPT;
+            else
+                return CONSOLE_SCRIPT;
+        }
+    }
+    return NO_SCRIPT;
+}
+
+#endif // XWORD_USE_LUA
+
+
+void
+MyApp::ReadCommandLine(wxCmdLineParser & cmd)
+{
     // Portable mode?
     m_isPortable = m_isPortable || cmd.Found(_T("portable"));
 
-    // Convert files
-    if (cmd.Found(_T("c")))
+    // Load file(s)
+    if (m_frame)
     {
-        // Gather other options
-        const bool output_files = cmd.Found(_T("o"));
-        const bool overwrite_files = cmd.Found(_T("w"));
-        wxString defaultDir;
-        const bool use_directory = cmd.Found(_T("d"), &defaultDir);
-        wxString logfile;
-        cmd.Found(_T("l"), &logfile);
+        const size_t param_count = cmd.GetParamCount();
+        wxLogDebug(_T("Command count: %d"), param_count);
 
-
-        wxArrayString input_list;
-        wxArrayString output_list;
-        for (size_t i = 0; i < param_count; ++i)
+        // Open files
+        for (int i = 0; i < param_count; ++i)
         {
-            // If output files are specified, we need to make
-            // sure there is at least one more parameter.
-            if (output_files && i + 1 >= param_count)
-                break;
-
-            // Get the input and output files
-            wxFileName in_file(cmd.GetParam(i));
-            in_file.MakeAbsolute();
-            input_list.push_back(in_file.GetFullPath());
-
-            if (output_files)
+            wxFileName fn(cmd.GetParam(i));
+            if (fn.FileExists() && puz::Puzzle::CanLoad(wx2puz(fn.GetFullPath())))
             {
-                ++i;
-                wxFileName out_file(cmd.GetParam(i));
-                if (use_directory)
-                    out_file.MakeAbsolute(defaultDir);
+                m_frame->LoadPuzzle(fn.GetFullPath());
+            }
+            else
+            {
+                wxString result;
+                if (FindLuaScript(fn.GetFullPath(), &result))
+                    m_frame->RunLuaScript(result);
                 else
-                    out_file.MakeAbsolute(in_file.GetPath());
-                output_list.push_back(out_file.GetFullPath());
+                    XWordErrorMessage(_T("%s"), result.c_str());
             }
         }
-
-        // Show a conversion dialog, then end the application.
-        ConvertDialog * dlg = new ConvertDialog(NULL,
-                                                input_list,
-                                                output_list,
-                                                defaultDir,
-                                                logfile,
-                                                overwrite_files);
-        dlg->ShowModal();
-        // Destroy is necessary to end the application.
-        dlg->Destroy();
-        return true;
     }
-
-    // End of non-GUI parameters
-    //--------------------------
-
-    m_frame = new MyFrame();
-
-    // Log to a window for debug
-#if defined(__WXDEBUG__ )
-    wxLogWindow *w = new wxLogWindow(m_frame, _T("Logger"));
-    w->Show();
-#endif
-
-
-    // XWord puzzle to open
-    if (param_count > 0)
-        m_frame->LoadPuzzle( cmd.GetParam(0) );
-    m_frame->Show();
-
-    return true;
 }
 
 
@@ -260,6 +289,8 @@ MyApp::SetupConfig()
     m_config.AddFont(_T("letterFont"),      *wxSWISS_FONT);
     m_config.AddFont(_T("numberFont"),      *wxSWISS_FONT);
     m_config.AddLong(_T("lineThickness"), 1);
+    m_config.AddColor(_T("backgroundColor"),
+        wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
     m_config.AddColor(_T("focusedLetterColor"),     *wxGREEN);
     m_config.AddColor(_T("focusedWordColor"),       *wxLIGHT_GREY);
     m_config.AddColor(_T("whiteSquareColor"),       *wxWHITE);
@@ -358,3 +389,93 @@ MyApp::SetupPrinting()
     g_printData = new wxPrintData;
     g_pageSetupData = new wxPageSetupDialogData;
 }
+
+
+
+//------------------------------------------------------------------------------
+// Lua
+//------------------------------------------------------------------------------
+
+#ifdef XWORD_USE_LUA
+
+#include "xwordlua.hpp"
+
+// When calling a script from the command line, there is no frame.
+// Shortcut the GetFrame function here.
+int xword_GetFrame_nil(lua_State * L)
+{
+    lua_pushnil(L);
+    return 1;
+}
+
+// Create a wxLuaState, run a script, and return
+void
+MyApp::RunLuaScript(const wxString & filename, int lastarg)
+{
+    // Connect lua events
+    Connect(wxEVT_LUA_PRINT, wxLuaEventHandler(MyApp::OnLuaPrint));
+    Connect(wxEVT_LUA_ERROR, wxLuaEventHandler(MyApp::OnLuaError));
+
+    // Initialze wxLua.
+    XWORD_LUA_IMPLEMENT_BIND_ALL
+    wxLuaState lua(this, wxID_ANY);
+    xword_setup_lua_paths(lua);
+
+    lua_State * L = lua.GetLuaState();
+
+    // xword.GetFrame = xword_GetFrame_nil
+    lua_getglobal(L, "xword");
+    lua_pushstring(L, "GetFrame");
+    lua_pushcfunction(L, xword_GetFrame_nil);
+    lua_settable(L, -3);
+
+    // Initialize the lua additions to the xword package
+    lua.RunFile(GetScriptsDir() + _T("/xword/init.lua"));
+
+    wxString result;
+    if (! FindLuaScript(filename, &result))
+    {
+        XWordErrorMessage(_T("%s"), result.c_str());
+        return;
+    }
+
+    // Create an arg table for the arguments
+    lua_newtable(L);
+    if (lastarg != -1)
+    {
+        // push arguments
+        for (int i = 0; i < argc; ++i)
+        {
+            lua_pushnumber(L, i - lastarg);
+            if (i == lastarg)
+                lua_pushstring(L, wx2lua(filename));
+            else
+                lua_pushstring(L, wx2lua(argv[i]));
+            lua_settable(L, -3);
+        }
+    }
+    lua_setglobal(L, "arg");
+
+    // Run the script
+    lua.RunFile(result);
+}
+
+void
+MyApp::OnLuaPrint(wxLuaEvent & evt)
+{
+    // Escape % to %% for printing
+    wxString msg = evt.GetString();
+    msg.Replace(_T("%"), _T("%%"));
+    wxLogDebug(msg);
+}
+
+void
+MyApp::OnLuaError(wxLuaEvent & evt)
+{
+    // Escape % to %% for printing
+    wxString msg = evt.GetString();
+    msg.Replace(_T("%"), _T("%%"));
+    XWordErrorMessage(msg);
+}
+
+#endif // XWORD_USE_LUA

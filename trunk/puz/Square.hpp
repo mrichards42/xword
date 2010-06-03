@@ -397,7 +397,7 @@ inline
 bool
 Square::IsValidString(const std::string & str)
 {
-    if (str == ".")
+    if (str == "." || str.empty())
         return true;
     for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
         if (! IsValidChar(*it) || *it == '.')

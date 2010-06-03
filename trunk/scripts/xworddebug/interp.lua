@@ -9,16 +9,27 @@ local fixedWidthFont = wx.wxFont(8, wx.wxFONTFAMILY_MODERN,
                                  wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_NORMAL)
 
 -- Make a string given a table
-local function table2String(t)
-    str = ''
-    for i,val in ipairs(t) do
-        val = tostring(val)
-        str = str .. val
-        if i < #t then
-            str = str .. string.rep(' ', 20 - #val)
+local function table2String(t, indent)
+    -- Find the longest key
+    local maxKey = 0
+    for k,v in pairs(t) do
+        local len = #tostring(k)
+        if len > maxKey then
+            maxKey = len
         end
     end
-    return str
+
+    local indent = indent or 1
+    result = {}
+    table.insert(result, string.rep(" ", 4*(indent-1)) .. tostring(t))
+    table.insert(result, string.rep(" ", 4*(indent-1)) .. "{")
+    for k,v in pairs(t) do
+        table.insert(result, string.rep(" ", 4*indent) ..
+                             tostring(k) .. ":" .. string.rep(" ", maxKey - #tostring(k) + 2) ..
+                             tostring(v))
+    end
+    table.insert(result, string.rep("    ", indent-1) .. "}")
+    return table.concat(result, "\n")
 end
 
 
@@ -137,10 +148,12 @@ local function CreateDialog()
     dlg:SetSizerAndFit(mainSizer)
 
     -- Printing functions
+    --[[
     local realprint = print
     function print(...)
         dlg.errorctrl:AppendText(table2String(arg) .. '\n')
     end
+    ]]
 
     dlg.printResult = function(results)
         dlg.interpreter:AppendText('\n')
@@ -149,11 +162,15 @@ local function CreateDialog()
         -- Otherwise, store the whole table in _
         if #results == 1 then
             _G['_'] = results[1]
+            if type(results[1]) == "table" then
+                dlg.interpreter:AppendText(table2String(results[1]))
+            else
+                dlg.interpreter:AppendText(tostring(results[1]))
+            end
         else
             _G['_'] = results
+            dlg.interpreter:AppendText(table2String(results))
         end
-
-        dlg.interpreter:AppendText(table2String(results))
     end
 
     dlg.printError = function(msg)
@@ -198,7 +215,7 @@ local function CreateDialog()
                  wx.wxEVT_CLOSE_WINDOW,
                  function(evt)
                     dlg:Destroy()
-                    print = realprint
+                    --print = realprint
                  end)
 
     dlg:SetSize(750, 500)

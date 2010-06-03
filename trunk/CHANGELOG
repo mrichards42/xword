@@ -2,12 +2,15 @@ Version 0.4 (?/??/2010)
     New Features
     * Embedded lua for scripting.  Included scripts:
         * Puzzle downloading
+        * Puzzle database
         * "Swap across and down" written in lua
         * OneAcross.com search
         * Wikipedia.com search
         * Non-native file import
+        * Try all letters (A-Z) in a blank square of the current word.
     * User is now prompted before revealing the entire grid.
     * Shift+8 (asterisk) toggles a circle in the current square.
+    * Check / Reveal can use a user-defined selection of squares.
 
     Bug Fixes
     * .puz files now correctly use the full Windows-1252 code page instead of
@@ -27,7 +30,7 @@ Version 0.4 (?/??/2010)
     * Revamped build system using premake4 to generate platform-specific
       project files and makefiles.
       Projects for XCode 3, MSVC2006, and MSVC2008.
-      Makefile for linux (working on a configure script).
+      Makefile for linux.
 
 Version 0.3.1 (12/11/2009)
     * Fixed "Move to next blank" bug (really, this time I mean it)

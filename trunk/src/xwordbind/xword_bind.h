@@ -41,12 +41,10 @@ extern WXLUA_NO_DLLIMPEXP bool wxLuaBinding_xword_init();
 // Includes
 // ---------------------------------------------------------------------------
 
+#include "../../lua/luapuz/bind/luapuz.hpp"
 #include "../App.hpp"
 #include "../MyFrame.hpp"
 #include "../paths.hpp"
-#include "../puz/XGrid.hpp"
-#include "../puz/XPuzzle.hpp"
-#include "../puz/XSquare.hpp"
 #include <vector>
 
 // ---------------------------------------------------------------------------
@@ -54,18 +52,11 @@ extern WXLUA_NO_DLLIMPEXP bool wxLuaBinding_xword_init();
 // ---------------------------------------------------------------------------
 
 extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_MyFrame;
-extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_XGrid;
-extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_XPuzzle;
-extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_XSquare;
 
 
 // ---------------------------------------------------------------------------
 // Encapsulation Declarations - need to be public for other bindings.
 // ---------------------------------------------------------------------------
-
-wxLUA_DECLARE_ENCAPSULATION(WXLUA_NO_DLLIMPEXP, XGrid, XGrid)
-wxLUA_DECLARE_ENCAPSULATION(WXLUA_NO_DLLIMPEXP, XPuzzle, XPuzzle)
-wxLUA_DECLARE_ENCAPSULATION(WXLUA_NO_DLLIMPEXP, XSquare, XSquare)
 
 
 #endif // __HOOK_WXLUA_xword_H__

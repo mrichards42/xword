@@ -26,8 +26,10 @@
 #endif
 
 // Forward declarations
-class XGrid;
-class XSquare;
+namespace puz {
+    class Grid;
+    class Square;
+}
 
 //=============================================================================
 // XGridDrawer is a class designed to scale and draw various parts of the
@@ -40,9 +42,9 @@ class XSquare;
 class XGridDrawer
 {
 public:
-    XGridDrawer(XGrid * grid = NULL);
-    XGridDrawer(wxDC * dc, XGrid * grid = NULL);
-    XGridDrawer(wxWindow * window, XGrid * grid = NULL);
+    XGridDrawer(puz::Grid * grid = NULL);
+    XGridDrawer(wxDC * dc, puz::Grid * grid = NULL);
+    XGridDrawer(wxWindow * window, puz::Grid * grid = NULL);
 
     void SetDC(wxDC * dc);
     void SetWindow(wxWindow * window);
@@ -128,17 +130,17 @@ public:
     void RemoveFlag(int flag)       { m_drawOptions &= ~ flag; }
     void SetFlags  (int flags)      { m_drawOptions = flags; }
 
-    // XGrid
+    // Grid
     //------
-    XGrid * GetGrid() { return m_grid; }
-    const XGrid * GetGrid() const { return m_grid; }
-    void SetGrid(XGrid * grid) { m_grid = grid; UpdateGridSize(); }
+    puz::Grid * GetGrid() { return m_grid; }
+    const puz::Grid * GetGrid() const { return m_grid; }
+    void SetGrid(puz::Grid * grid) { m_grid = grid; UpdateGridSize(); }
 
-    void DrawSquare(wxDC & dc, const XSquare & square,
+    void DrawSquare(wxDC & dc, const puz::Square & square,
                     const wxColour & bgColor,
                     const wxColour & textColor);
 
-    void DrawSquare(wxDC & dc, const XSquare & square);
+    void DrawSquare(wxDC & dc, const puz::Square & square);
 
     void DrawGrid(wxDC & dc);
 
@@ -164,7 +166,7 @@ private:
                        int* descent = NULL, int* externalLeading = NULL,
                        wxFont* font = NULL) const;
 
-    XGrid * m_grid;
+    puz::Grid * m_grid;
     // Size
     long m_align;
     int m_boxSize;

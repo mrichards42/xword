@@ -28,6 +28,14 @@ wxString GetConfigFile();  // The main XWord config file (DataDir/config/config.
 wxString GetImagesDir();   // Images
 wxString GetScriptsDir();  // Scripts
 
+#ifdef XWORD_USE_LUA
+wxString GetLuaPath();
+const wxArrayString & GetLuaPathList();
+wxString GetLuaCPath();
+const wxArrayString & GetLuaCPathList();
+bool FindLuaScript(const wxString & name, wxString * result);
+#endif // XWORD_USE_LUA
+
 // Compatibility with older versions
 wxString GetConfigFile_XWord_3();
 

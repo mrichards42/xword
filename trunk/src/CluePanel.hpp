@@ -26,6 +26,7 @@
 #endif
 
 #include "ClueListBox.hpp"
+#include "utils/string.hpp" // puz / wx string conversions
 
 
 extern const wxChar* CluePanelNameStr;
@@ -57,7 +58,7 @@ public:
     CluePanel(wxWindow * parent,
               wxWindowID id,
               const wxString & heading,
-              bool direction,
+              puz::GridDirection direction,
               const wxPoint & pos = wxDefaultPosition,
               const wxSize & size = wxDefaultSize,
               long style = wxBORDER_NONE,
@@ -73,14 +74,14 @@ public:
     bool Create(wxWindow * parent,
                 wxWindowID id,
                 const wxString & heading,
-                bool direction,
+                puz::GridDirection direction,
                 const wxPoint & pos = wxDefaultPosition,
                 const wxSize & size = wxDefaultSize,
                 long style = wxBORDER_NONE,
                 const wxString & name = CluePanelNameStr);
 
 
-    bool GetDirection() const { return m_direction; }
+    puz::GridDirection GetDirection() const { return m_direction; }
 
 
     // Access to the ClueListBox
@@ -100,8 +101,8 @@ public:
         m_clueList->SetClueNumber(number);
     }
 
-    const wxString & GetClueText()   const
-        { return m_clueList->GetItem(m_clueList->GetSelection()).Text(); }
+    wxString GetClueText()   const
+        { return puz2wx(m_clueList->GetItem(m_clueList->GetSelection()).Text()); }
 
     unsigned int    GetClueNumber()  const
         { return m_clueList->GetItem(m_clueList->GetSelection()).Number(); }
@@ -217,11 +218,11 @@ public:
 
 
 private:
-    void Init() { m_heading = NULL; m_clueList = NULL; m_direction = DIR_ACROSS; }
+    void Init() { m_heading = NULL; m_clueList = NULL; m_direction = puz::ACROSS; }
 
     wxStaticText * m_heading;
     ClueListBox * m_clueList;
-    bool m_direction;
+    puz::GridDirection m_direction;
     focusDirection m_focusDirection;
 
     // [ Focused / unfocused ][ text / background ]

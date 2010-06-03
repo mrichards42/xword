@@ -24,14 +24,15 @@
 #include "XGridDrawer.hpp"
 #include "messages.hpp"
 #include "SelectionEvent.hpp"
+#include "utils/string.hpp"
 
 // This class will take over the XGridCtrl's event processing
 // for rebus entries.  It must be created on the heap, and it
 // will destroy itself when it is done.
-class XGridRebusHandler : wxEvtHandler
+class GridRebusHandler : wxEvtHandler
 {
 public:
-    XGridRebusHandler(XGridCtrl & grid);
+    GridRebusHandler(XGridCtrl & grid);
     void EndEventHandling();
 
     DECLARE_EVENT_TABLE()
@@ -48,18 +49,18 @@ private:
 // This class will take over the XGridCtrl's event processing
 // for selections.  It must be created on the heap, and it
 // will destroy itself when it is done.
-class XGridSelectionHandler : wxEvtHandler
+class GridSelectionHandler : wxEvtHandler
 {
 public:
-    XGridSelectionHandler (XGridCtrl & grid);
+    GridSelectionHandler (XGridCtrl & grid);
     void EndEventHandling();
 
     DECLARE_EVENT_TABLE()
 
 private:
     XGridCtrl & m_grid;
-    XSquare * m_start;
-    XSquare * m_end;
+    puz::Square * m_start;
+    puz::Square * m_end;
     wxRect m_selection;
     wxRect m_lastSelection;
 
@@ -95,15 +96,15 @@ const int UNDEFINED_BOX_SIZE = -1;
 
 // Helper functions for all of the "lookup" functions that return NULL
 inline void
-SetIfExists(XSquare * &current, XSquare * test)
+SetIfExists(puz::Square * &current, puz::Square * test)
 {
     if (test != NULL)
         current = test;
 }
 
 
-inline XSquare *
-EitherOr(XSquare * current, XSquare * test)
+inline puz::Square *
+EitherOr(puz::Square * current, puz::Square * test)
 {
     if (test != NULL)
         return test;
@@ -127,7 +128,7 @@ void XGridCtrl::Init()
     m_selectionEnd = NULL;
     m_isSelecting = false;
 
-    m_direction = DIR_ACROSS;
+    m_direction = puz::ACROSS;
 
     m_isPaused = false;
     m_fit = true;
@@ -150,7 +151,7 @@ XGridCtrl::Create(wxWindow * parent,
                   wxWindowID id,
                   const wxPoint & pos,
                   const wxSize & size,
-                  XGrid * grid,
+                  puz::Grid * grid,
                   long style,
                   const wxString & name)
 {
@@ -162,7 +163,7 @@ XGridCtrl::Create(wxWindow * parent,
     // (XGridDrawer would use GetTextExtent on a not yet created window)
     m_drawer.SetWindow(this);
 
-    SetXGrid(grid);
+    SetGrid(grid);
 
     SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
@@ -171,6 +172,7 @@ XGridCtrl::Create(wxWindow * parent,
     SetWhiteSquareColor(*wxWHITE);
     SetPenColor(*wxBLACK);
     SetPencilColor(wxColor(200,200,200));
+    SetSelectionColor(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
 
     // Custom background style needed for wxAutoBufferedPaintDC
     SetBackgroundStyle(wxBG_STYLE_CUSTOM);
@@ -188,14 +190,14 @@ XGridCtrl::~XGridCtrl()
 
 
 void
-XGridCtrl::SetXGrid(XGrid * grid)
+XGridCtrl::SetGrid(puz::Grid * grid)
 {
     if (grid == NULL)
     {
         m_grid = NULL;
         m_incorrectSquares = 0;
         m_blankSquares = 0;
-        m_direction = DIR_ACROSS;
+        m_direction = puz::ACROSS;
         m_focusedSquare = NULL;
         m_focusedStart = NULL;
         m_focusedEnd = NULL;
@@ -208,7 +210,7 @@ XGridCtrl::SetXGrid(XGrid * grid)
 
         RecheckGrid();
 
-        m_direction     = DIR_ACROSS;
+        m_direction     = puz::ACROSS;
         m_focusedSquare = m_grid->FirstWhite();
         m_focusedStart  = m_focusedSquare->GetWordStart(m_direction);
         m_focusedEnd    = m_focusedSquare->GetWordEnd  (m_direction);
@@ -224,8 +226,8 @@ void
 XGridCtrl::RecheckGrid()
 {
     wxASSERT(! IsEmpty());
-    std::vector<XSquare *> incorrect    = m_grid->CheckGrid();
-    std::vector<XSquare *> wrongOrBlank = m_grid->CheckGrid(true);
+    std::vector<puz::Square *> incorrect    = m_grid->CheckGrid();
+    std::vector<puz::Square *> wrongOrBlank = m_grid->CheckGrid(true);
 
     m_incorrectSquares = incorrect.size();
     m_blankSquares     = wrongOrBlank.size() - incorrect.size();
@@ -315,7 +317,7 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
 
     dc.DrawRectangle(m_drawer.GetRect());
 
-    XSquare * square;
+    puz::Square * square;
 
     // If we don't have an update region, redraw all squares
     if (updateRegion.IsEmpty())
@@ -373,7 +375,7 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
 
 
 void
-XGridCtrl::DrawSquare(wxDC & dc, const XSquare & square, const wxColour & color)
+XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & color)
 {
     // Don't draw black squares
     if (square.IsBlack())
@@ -414,16 +416,16 @@ XGridCtrl::DrawSquare(wxDC & dc, const XSquare & square, const wxColour & color)
 //-------------------------------------------------------
 // Focus functions
 //-------------------------------------------------------
-XSquare *
-XGridCtrl::ChangeSquareFocus(XSquare * square, bool direction)
+puz::Square *
+XGridCtrl::ChangeSquareFocus(puz::Square * square, puz::GridDirection direction)
 {
     wxASSERT(m_focusedSquare != NULL || square != NULL);
 
     // Save old state
     //-------------------
-    XSquare * oldFocused = m_focusedSquare;
-    XSquare * oldStart;
-    XSquare * oldEnd;
+    puz::Square * oldFocused = m_focusedSquare;
+    puz::Square * oldStart;
+    puz::Square * oldEnd;
     if (oldFocused == NULL)
     {
         oldStart = NULL;
@@ -435,7 +437,7 @@ XGridCtrl::ChangeSquareFocus(XSquare * square, bool direction)
         oldEnd   = oldFocused->GetWordEnd(m_direction);
     }
 
-    bool oldDirection = m_direction;
+    puz::GridDirection oldDirection = m_direction;
 
     // Set new state
     //-------------------
@@ -446,7 +448,7 @@ XGridCtrl::ChangeSquareFocus(XSquare * square, bool direction)
 
     // If there is no word for this direction, try the other direction
     if (m_focusedSquare->GetWordStart(m_direction) == NULL)
-        m_direction = ! m_direction;
+        m_direction = puz::SwapDirection(m_direction);
 
     m_focusedStart  = m_focusedSquare->GetWordStart(m_direction);
     m_focusedEnd    = m_focusedSquare->GetWordEnd  (m_direction);
@@ -498,22 +500,22 @@ XGridCtrl::ChangeSquareFocus(XSquare * square, bool direction)
 }
 
 
-XSquare *
-XGridCtrl::SetSquareFocus(XSquare * square, bool direction)
+puz::Square *
+XGridCtrl::SetSquareFocus(puz::Square * square, puz::GridDirection direction)
 {
     square = ChangeSquareFocus(square, direction);
 
     wxPuzEvent evt(wxEVT_PUZ_GRID_FOCUS, GetId());
 
     // Check for across clue
-    XSquare * start = square->GetWordStart(DIR_ACROSS);
+    puz::Square * start = square->GetWordStart(puz::ACROSS);
     if (start == NULL)
         evt.SetAcrossClue(0);
     else
         evt.SetAcrossClue(start->GetNumber());
 
     // Check for down clue
-    start = square->GetWordStart(DIR_DOWN);
+    start = square->GetWordStart(puz::DOWN);
     if (start == NULL)
         evt.SetDownClue(0);
     else
@@ -523,7 +525,7 @@ XGridCtrl::SetSquareFocus(XSquare * square, bool direction)
     wxASSERT(evt.GetAcrossClue() != 0 || evt.GetDownClue() != 0);
 
     evt.SetDirection(direction);
-    evt.SetString(square->GetText());
+    evt.SetString(puz2wx(square->GetText()));
     GetEventHandler()->ProcessEvent(evt);
 
     return square;
@@ -531,16 +533,16 @@ XGridCtrl::SetSquareFocus(XSquare * square, bool direction)
 
 
 void
-XGridCtrl::ChangeFocusedClue(int cluenum, bool direction)
+XGridCtrl::ChangeFocusedClue(int cluenum, puz::GridDirection direction)
 {
-    XSquare * square = GetClueNumber(cluenum);
+    puz::Square * square = GetClueNumber(cluenum);
     if (square == NULL)
         return;
 
     if (HasStyle(BLANK_ON_NEW_WORD))
         SetIfExists(square,
                     FindSquare(square->GetWordStart(direction),
-                               FIND_BLANK_SQUARE,
+                               puz::FIND_BLANK_SQUARE,
                                direction) );
 
     ChangeSquareFocus(square, direction);
@@ -548,7 +550,7 @@ XGridCtrl::ChangeFocusedClue(int cluenum, bool direction)
 
 
 void
-XGridCtrl::MakeVisible(const XSquare & square)
+XGridCtrl::MakeVisible(const puz::Square & square)
 {
     if (m_fit || IsEmpty())
         return;
@@ -597,10 +599,10 @@ XGridCtrl::MakeVisible(const XSquare & square)
 
 
 bool
-XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
+XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
 {
     // Not allowed to overwrite revealed letters
-    if (square.HasFlag(XFLAG_RED))
+    if (square.HasFlag(puz::FLAG_RED))
         return false;
 
     // Adjust blank and incorrect counts each time a letter is changed
@@ -608,10 +610,12 @@ XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
     const int correctBefore = square.Check();
     const int blankBefore   = square.IsBlank();
 
-    if (square.HasFlag(XFLAG_X))
-        square.ReplaceFlag(XFLAG_X, XFLAG_BLACK);
+    // This could throw an exception if text is longer than
+    // 8 characeters, so try this first.
+    square.SetText(wx2puz(text));
 
-    square.SetText(text);
+    if (square.HasFlag(puz::FLAG_X))
+        square.ReplaceFlag(puz::FLAG_X, puz::FLAG_BLACK);
 
     const int correctAfter = square.Check();
     const int blankAfter   = square.IsBlank();
@@ -639,12 +643,12 @@ XGridCtrl::SetSquareText(XSquare & square, const wxString & text)
 void
 XGridCtrl::StartSelection(wxObjectEventFunction func, wxEvtHandler * evtSink)
 {
-    Disconnect(wxEVT_XGRID_SELECTION);
-    Connect(wxEVT_XGRID_SELECTION, func, NULL, evtSink);
+    Disconnect(wxEVT_Grid_SELECTION);
+    Connect(wxEVT_Grid_SELECTION, func, NULL, evtSink);
     // Don't create another selection handler if we already have one.
     if (! m_isSelecting)
     {
-        new XGridSelectionHandler(*this);
+        new GridSelectionHandler(*this);
         m_isSelecting = true;
     }
 }
@@ -663,24 +667,24 @@ XGridCtrl::EndSelection(bool success)
         m_selectionEnd   = NULL;
     }
     GetEventHandler()->ProcessEvent(
-        XGridSelectionEvent(GetId(), wxEVT_XGRID_SELECTION,
+        GridSelectionEvent(GetId(), wxEVT_Grid_SELECTION,
                             this,
                             m_selectionStart, m_selectionEnd)
     );
-    Disconnect(wxEVT_XGRID_SELECTION);
+    Disconnect(wxEVT_Grid_SELECTION);
     m_selectionStart = NULL;
     m_selectionEnd   = NULL;
     m_isSelecting = false;
     Refresh();
-    // XGridSelectionHandler will destroy itself
+    // GridSelectionHandler will destroy itself
 }
 
-std::vector<XSquare *>
+std::vector<puz::Square *>
 XGridCtrl::GetSelection()
 {
-    std::vector<XSquare *> selection;
+    std::vector<puz::Square *> selection;
 
-    XSquare * square;
+    puz::Square * square;
     for (square = m_grid->First(); square != NULL; square = square->Next())
         if (IsSelected(*square))
             selection.push_back(square);
@@ -763,7 +767,7 @@ XGridCtrl::CheckGrid(int options)
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
     const bool checkBlank = (options & CHECK_ALL) != 0;
-    std::vector<XSquare *> incorrect = \
+    std::vector<puz::Square *> incorrect = \
         m_grid->CheckGrid(checkBlank);
 
     PostCheck(incorrect, options);
@@ -776,7 +780,7 @@ XGridCtrl::CheckWord(int options)
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
     const bool checkBlank = (options & CHECK_ALL) != 0;
-    std::vector<XSquare *> incorrect =
+    std::vector<puz::Square *> incorrect =
         m_grid->CheckWord( m_focusedSquare->GetWordStart(m_direction),
                            m_focusedSquare->GetWordEnd  (m_direction),
                            checkBlank);
@@ -791,11 +795,11 @@ XGridCtrl::CheckLetter(int options)
 {
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
-    XSquare & square = *GetFocusedSquare();
+    puz::Square & square = *GetFocusedSquare();
 
     const bool checkBlank = (options & CHECK_ALL) != 0;
 
-    std::vector<XSquare *> incorrect;
+    std::vector<puz::Square *> incorrect;
     if (! m_grid->CheckSquare(square, checkBlank))
         incorrect.push_back(&square);
 
@@ -804,7 +808,7 @@ XGridCtrl::CheckLetter(int options)
 
 
 void
-XGridCtrl::PostCheck(std::vector<XSquare *> & incorrect, int options)
+XGridCtrl::PostCheck(std::vector<puz::Square *> & incorrect, int options)
 {
     if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
@@ -813,22 +817,22 @@ XGridCtrl::PostCheck(std::vector<XSquare *> & incorrect, int options)
     }
 
     wxClientDC dc(this); DoPrepareDC(dc);
-    for (std::vector<XSquare *>::iterator it = incorrect.begin();
+    for (std::vector<puz::Square *>::iterator it = incorrect.begin();
          it != incorrect.end();
          ++it)
     {
-        XSquare * square = *it;
+        puz::Square * square = *it;
 
         if ( (options & REVEAL_ANSWER) != 0)
         {
-            SetSquareText(*square, square->GetSolution());
-            square->RemoveFlag(XFLAG_BLACK | XFLAG_X);
-            square->AddFlag(XFLAG_RED);
+            SetSquareText(*square, puz2wx(square->GetSolution()));
+            square->RemoveFlag(puz::FLAG_BLACK | puz::FLAG_X);
+            square->AddFlag(puz::FLAG_RED);
         }
         else
         {
-            square->RemoveFlag(XFLAG_BLACK);
-            square->AddFlag(XFLAG_X);
+            square->RemoveFlag(puz::FLAG_BLACK);
+            square->AddFlag(puz::FLAG_X);
         }
         RefreshSquare(dc, *square);
     }
@@ -839,12 +843,12 @@ XGridCtrl::PostCheck(std::vector<XSquare *> & incorrect, int options)
 //--------------------------
 
 // This is a bit messy:
-//    (1) StartSelection() creates a new instance of XGridSelectionHandler
+//    (1) StartSelection() creates a new instance of GridSelectionHandler
 //        which takes over event handling for the grid.
 //    (2) The user makes a selection.
-//    (3) XGridSelectionHandler destroys itself, returns event handling
+//    (3) GridSelectionHandler destroys itself, returns event handling
 //        control to the XGridCtrl, and calls EndSelection().
-//    (4) EndSelection() dispatches an XGridSelectionEvent which was
+//    (4) EndSelection() dispatches an GridSelectionEvent which was
 //        bound in the call to StartSelection(function, sink), then
 //        Unconnects the event.
 //
@@ -854,7 +858,7 @@ XGridCtrl::PostCheck(std::vector<XSquare *> & incorrect, int options)
 // class which takes wxEvent & as its only argument.
 // i.e. wxEvtHandler::Function(wxEvent & evt)
 // In order to pass real arguments to DoCheckSelection, there is an
-// itermediate class (XGridCheckSelectionClass) which is used like a
+// itermediate class (GridCheckSelectionClass) which is used like a
 // functor -- that is, it is passed arguments in the constructor
 // which are subsequently used in the only function call.
 //
@@ -863,17 +867,17 @@ XGridCtrl::PostCheck(std::vector<XSquare *> & incorrect, int options)
 
 // A dummy class that is used to call DoCheckSelection with the
 // correct variables.
-class XGridCheckSelectionClass : public wxEvtHandler
+class GridCheckSelectionClass : public wxEvtHandler
 {
 public:
-    XGridCheckSelectionClass(XGridCtrl * a_grid, int a_options)
+    GridCheckSelectionClass(XGridCtrl * a_grid, int a_options)
         : m_grid(a_grid),
           m_options(a_options)
     {}
 
     // We have to make sure this function gets called so that this
     // heap-allocated class gets destroyed.
-    void CheckSelection(XGridSelectionEvent & evt)
+    void CheckSelection(GridSelectionEvent & evt)
     {
         if (evt.HasSelection())
             m_grid->DoCheckSelection(evt.GetSelectionStart(),
@@ -890,18 +894,18 @@ private:
 
 // The real action takes place here
 void
-XGridCtrl::DoCheckSelection(XSquare * start, XSquare * end, int options)
+XGridCtrl::DoCheckSelection(puz::Square * start, puz::Square * end, int options)
 {
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
     const bool checkBlank = (options & CHECK_ALL) != 0;
 
-    std::vector<XSquare *> incorrect;
+    std::vector<puz::Square *> incorrect;
 
     for (int col = start->GetCol(); col <= end->GetCol(); ++col)
         for (int row = start->GetRow(); row <= end->GetRow(); ++row)
         {
-            XSquare * square = &At(col, row);
+            puz::Square * square = &At(col, row);
             if (square->IsWhite() && ! square->Check(checkBlank))
                 incorrect.push_back(square);
         }
@@ -913,8 +917,8 @@ XGridCtrl::DoCheckSelection(XSquare * start, XSquare * end, int options)
 void
 XGridCtrl::CheckSelection(int options)
 {
-    XGridCheckSelectionClass * handler = new XGridCheckSelectionClass(this, options);
-    StartSelection(XGridSelectionEventHandler(XGridCheckSelectionClass::CheckSelection), handler);
+    GridCheckSelectionClass * handler = new GridCheckSelectionClass(this, options);
+    StartSelection(GridSelectionEventHandler(GridCheckSelectionClass::CheckSelection), handler);
 }
 
 
@@ -959,7 +963,7 @@ XGridCtrl::OnLeftDown(wxMouseEvent & evt)
     wxASSERT(! IsEmpty());
 
     wxPoint pt = evt.GetPosition();
-    XSquare * square = HitTest(pt.x, pt.y);
+    puz::Square * square = HitTest(pt.x, pt.y);
     if (square != NULL && square->IsWhite())
         SetSquareFocus(square, m_direction);
 
@@ -976,14 +980,14 @@ XGridCtrl::OnRightDown(wxMouseEvent & evt)
     if (HasStyle(CONTEXT_MENU))
         return;
 
-    XSquare * square = GetFocusedSquare();
+    puz::Square * square = GetFocusedSquare();
     if (HasStyle(MOVE_ON_RIGHT_CLICK))
     {
         wxPoint pt = evt.GetPosition();
         square = HitTest(pt.x, pt.y);
     }
     if (square != NULL && square->IsWhite())
-        SetSquareFocus(square, !m_direction);
+        SetSquareFocus(square, puz::SwapDirection(m_direction));
 
     // Kill the event.
 }
@@ -998,13 +1002,13 @@ XGridCtrl::OnKeyDown(wxKeyEvent & evt)
     const int mod = evt.GetModifiers();
 
     if      (key == WXK_LEFT  || key == WXK_NUMPAD_LEFT)     /* Left      */
-        OnArrow(DIR_ACROSS, FIND_PREV, mod);
+        OnArrow(puz::ACROSS, puz::PREV, mod);
     else if (key == WXK_RIGHT || key == WXK_NUMPAD_RIGHT)    /* Right     */
-        OnArrow(DIR_ACROSS, FIND_NEXT, mod);
+        OnArrow(puz::ACROSS, puz::NEXT, mod);
     else if (key == WXK_UP    || key == WXK_NUMPAD_UP)       /* Up        */
-        OnArrow(DIR_DOWN,   FIND_PREV, mod);
+        OnArrow(puz::DOWN,   puz::PREV, mod);
     else if (key == WXK_DOWN  || key == WXK_NUMPAD_DOWN)     /* Down      */
-        OnArrow(DIR_DOWN,   FIND_NEXT, mod);
+        OnArrow(puz::DOWN,   puz::NEXT, mod);
     else if (key == WXK_HOME  || key == WXK_NUMPAD_HOME)     /* Home      */
         OnHome(mod);
     else if (key == WXK_END   || key == WXK_NUMPAD_END)      /* End       */
@@ -1021,8 +1025,10 @@ XGridCtrl::OnKeyDown(wxKeyEvent & evt)
         OnInsert(mod);
         return; // Don't skip this event.
     }
-
-    evt.Skip();
+    else
+    {
+        evt.Skip();
+    }
 }
 
 
@@ -1039,16 +1045,12 @@ XGridCtrl::OnChar(wxKeyEvent & evt)
 
     if (key == _T('*'))
     {
-        GetFocusedSquare()->ToggleFlag(XFLAG_CIRCLE);
+        GetFocusedSquare()->ToggleFlag(puz::FLAG_CIRCLE);
         RefreshSquare();
     }
-    else if (key == WXK_SPACE && ! m_wantsRebus)
+    else if (key < 256 && puz::Square::IsValidChar(static_cast<char>(key)))
     {
         OnLetter(key, mod);
-    }
-    else if (XSquare::IsValidChar(static_cast<wxChar>(key)))
-    {
-        OnLetter(wxToupper(key), mod);
     }
 }
 
@@ -1057,13 +1059,14 @@ XGridCtrl::OnChar(wxKeyEvent & evt)
 void
 XGridCtrl::OnLetter(wxChar key, int mod)
 {
+    wxASSERT(key < 256 && puz::Square::IsValidChar(static_cast<char>(key)));
     wxASSERT(! IsEmpty());
     wxASSERT(m_focusedSquare->GetWordStart(m_direction)->GetNumber() != 0);
 
     if (! (mod == wxMOD_NONE || mod == wxMOD_SHIFT))
         return;
 
-    XSquare & square = *GetFocusedSquare();
+    puz::Square & square = *GetFocusedSquare();
     wxASSERT(! m_wantsRebus);
 
     if (static_cast<int>(key) == WXK_SPACE)
@@ -1073,7 +1076,7 @@ XGridCtrl::OnLetter(wxChar key, int mod)
 
     // Space bar always moves forward one square
     if (static_cast<int>(key) == WXK_SPACE)
-        SetSquareFocus(FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE, m_direction));
+        SetSquareFocus(FindNextSquare(m_focusedSquare, puz::FIND_WHITE_SQUARE, m_direction));
     else
         MoveAfterLetter();
 }
@@ -1082,23 +1085,23 @@ XGridCtrl::OnLetter(wxChar key, int mod)
 void
 XGridCtrl::MoveAfterLetter()
 {
-    XSquare * newSquare = NULL;
+    puz::Square * newSquare = NULL;
 
     if (HasStyle(MOVE_AFTER_LETTER))
     {
         if (HasStyle(MOVE_TO_NEXT_BLANK))
         {
             newSquare = FindNextSquare(m_focusedSquare,
-                                      FIND_BLANK_SQUARE,
+                                      puz::FIND_BLANK_SQUARE,
                                       m_direction,
-                                      FIND_NEXT);
+                                      puz::NEXT);
             // Last blank in the word: jump to the first blank if it exists
             if (newSquare == NULL)
             {
                 newSquare = FindSquare(m_focusedSquare->GetWordStart(m_direction),
-                                       FIND_BLANK_SQUARE,
+                                       puz::FIND_BLANK_SQUARE,
                                        m_direction,
-                                       FIND_NEXT);
+                                       puz::NEXT);
             }
         }
         // Either the user wants "move to next letter", or there are no more blanks in the
@@ -1106,9 +1109,9 @@ XGridCtrl::MoveAfterLetter()
         if (newSquare == NULL)
         {
             newSquare = FindNextSquare(m_focusedSquare,
-                                       FIND_WHITE_SQUARE,
+                                       puz::FIND_WHITE_SQUARE,
                                        m_direction,
-                                       FIND_NEXT);
+                                       puz::NEXT);
             // if newSquare == NULL (possibly again), it's the last square in the word,
             // and the focus won't change.
         }
@@ -1120,10 +1123,10 @@ XGridCtrl::MoveAfterLetter()
 
 
 void
-XGridCtrl::OnArrow(bool arrowDirection, bool increment, int mod)
+XGridCtrl::OnArrow(puz::GridDirection arrowDirection, puz::FindDirection increment, int mod)
 {
     wxASSERT(! IsEmpty());
-    XSquare * newSquare = NULL;
+    puz::Square * newSquare = NULL;
 
     // If there is no word in the arrowDirection, treat it as if shift
     // were pressed.
@@ -1136,11 +1139,11 @@ XGridCtrl::OnArrow(bool arrowDirection, bool increment, int mod)
         {
             newSquare =
                 FindNextSquare(m_focusedSquare,
-                               FIND_WORD(arrowDirection, m_focusedSquare),
+                               puz::FIND_WORD(arrowDirection, m_focusedSquare),
                                arrowDirection,
                                increment,
-                               SKIP_BLACK_SQUARES,
-                               WRAP_LINES);
+                               puz::SKIP_BLACK_SQUARES,
+                               puz::WRAP_LINES);
 
             if (newSquare != NULL)
                 newSquare = newSquare->GetWordStart(arrowDirection);
@@ -1149,10 +1152,10 @@ XGridCtrl::OnArrow(bool arrowDirection, bool increment, int mod)
         {
             newSquare =
                 FindNextSquare(m_focusedSquare,
-                               FIND_WHITE_SQUARE,
+                               puz::FIND_WHITE_SQUARE,
                                arrowDirection,
                                increment,
-                               SKIP_BLACK_SQUARES);
+                               puz::SKIP_BLACK_SQUARES);
         }
 
         // Test BLANK_ON_NEW_WORD
@@ -1164,9 +1167,9 @@ XGridCtrl::OnArrow(bool arrowDirection, bool increment, int mod)
         {
             SetIfExists(newSquare,
                 FindSquare(newSquare->GetWordStart(m_direction),
-                           FIND_BLANK_SQUARE,
+                           puz::FIND_BLANK_SQUARE,
                            m_direction,
-                           FIND_NEXT));
+                           puz::NEXT));
         }
 
         SetSquareFocus(newSquare, m_direction);
@@ -1177,17 +1180,17 @@ XGridCtrl::OnArrow(bool arrowDirection, bool increment, int mod)
             && HasStyle(PAUSE_ON_SWITCH)
             && m_focusedSquare->IsBlank())
         {
-            SetSquareFocus(m_focusedSquare, ! m_direction);
+            SetSquareFocus(m_focusedSquare, puz::SwapDirection(m_direction));
             return;
         }
         else
         {
             newSquare =
                 FindNextSquare(m_focusedSquare,
-                               FIND_WHITE_SQUARE,
+                               puz::FIND_WHITE_SQUARE,
                                arrowDirection,
                                increment,
-                               SKIP_BLACK_SQUARES);
+                               puz::SKIP_BLACK_SQUARES);
         }
 
         SetSquareFocus(newSquare, arrowDirection);
@@ -1200,14 +1203,14 @@ void
 XGridCtrl::OnBackspace(int WXUNUSED(mod))
 {
     wxASSERT(! IsEmpty());
-    XSquare & square = *m_focusedSquare;
+    puz::Square & square = *m_focusedSquare;
 
     SetSquareText(square, _T(""));
 
     SetSquareFocus(FindNextSquare(m_focusedSquare,
-                                  FIND_WHITE_SQUARE,
+                                  puz::FIND_WHITE_SQUARE,
                                   m_direction,
-                                  FIND_PREV),
+                                  puz::PREV),
                    m_direction);
 }
 
@@ -1217,7 +1220,7 @@ void
 XGridCtrl::OnDelete(int WXUNUSED(mod))
 {
     wxASSERT(! IsEmpty());
-    XSquare & square = *m_focusedSquare;
+    puz::Square & square = *m_focusedSquare;
 
     SetSquareText(square, _T(""));
 
@@ -1233,12 +1236,12 @@ XGridCtrl::OnHome(int mod)
     // Shift key is used in Across Lite instead of the usual ctrl / command
     if (mod == wxMOD_CMD || mod == wxMOD_SHIFT)
     {
-        XSquare * newSquare = m_grid->FirstWhite();
+        puz::Square * newSquare = m_grid->FirstWhite();
         if (HasStyle(BLANK_ON_NEW_WORD))
         {
             SetSquareFocus( EitherOr(newSquare,
                                      FindSquare(newSquare,
-                                                FIND_BLANK_SQUARE,
+                                                puz::FIND_BLANK_SQUARE,
                                                 m_direction)),
                              m_direction );
         }
@@ -1276,17 +1279,17 @@ XGridCtrl::OnInsert(int WXUNUSED(mod))
 
         RefreshSquare();
 
-        // XGridRebusHandler will capture keyboard until it is destroyed.
-        // When XGridRebusHandler recieves a key event that indicates that
+        // GridRebusHandler will capture keyboard until it is destroyed.
+        // When GridRebusHandler recieves a key event that indicates that
         // the user is done entering a rebus square, it will destroy itself.
-        new XGridRebusHandler(*this);
+        new GridRebusHandler(*this);
     }
     else
     {
         m_wantsRebus = false;
         // Force checking the square since checking has been prevented by
-        // XGridRebusHandler.
-        SetSquareText(*m_focusedSquare, m_focusedSquare->GetText());
+        // GridRebusHandler.
+        SetSquareText(*m_focusedSquare, puz2wx(m_focusedSquare->GetText()));
 
         if (! m_focusedSquare->IsBlank())
             MoveAfterLetter();
@@ -1302,44 +1305,44 @@ void
 XGridCtrl::OnTab(int mod)
 {
     wxASSERT(! IsEmpty());
-    XSquare * newSquare = NULL;
-    bool newDir = m_direction;
+    puz::Square * newSquare = NULL;
+    puz::GridDirection newDir = m_direction;
     if (mod == wxMOD_SHIFT)
     {
         newSquare =
             FindNextSquare(m_focusedStart,
-                           FIND_CLUE(m_direction, m_focusedStart),
-                           DIR_ACROSS,
-                           FIND_PREV,
-                           SKIP_BLACK_SQUARES,
-                           WRAP_LINES);
+                           puz::FIND_CLUE(m_direction, m_focusedStart),
+                           puz::ACROSS,
+                           puz::PREV,
+                           puz::SKIP_BLACK_SQUARES,
+                           puz::WRAP_LINES);
 
         if (newSquare == NULL) // We're at the start of the grid
         {
             // Find the last clue (different depending on direction)
-            newDir = !newDir;
+            newDir = puz::SwapDirection(newDir);
             newSquare =
                 FindNextSquare(m_grid->LastWhite(),
-                               FIND_CLUE(newDir, m_grid->FirstWhite()),
-                               DIR_ACROSS,
-                               FIND_PREV,
-                               SKIP_BLACK_SQUARES,
-                               WRAP_LINES);
+                               puz::FIND_CLUE(newDir, m_grid->FirstWhite()),
+                               puz::ACROSS,
+                               puz::PREV,
+                               puz::SKIP_BLACK_SQUARES,
+                               puz::WRAP_LINES);
         }
     }
     else
     {
         newSquare =
             FindNextSquare(m_focusedStart,
-                           FIND_CLUE(m_direction, m_focusedStart),
-                           DIR_ACROSS,
-                           FIND_NEXT,
-                           SKIP_BLACK_SQUARES,
-                           WRAP_LINES);
+                           puz::FIND_CLUE(m_direction, m_focusedStart),
+                           puz::ACROSS,
+                           puz::NEXT,
+                           puz::SKIP_BLACK_SQUARES,
+                           puz::WRAP_LINES);
 
         if (newSquare == NULL) // We're at the end of the grid
         {
-            newDir = !newDir;
+            newDir = puz::SwapDirection(newDir);
             newSquare = m_grid->FirstWhite();
         }
     }
@@ -1352,9 +1355,9 @@ XGridCtrl::OnTab(int mod)
     if (HasStyle(BLANK_ON_NEW_WORD) &&  isNewWord)
         SetIfExists( newSquare,
                      FindSquare(newSquare,
-                                FIND_BLANK_SQUARE,
+                                puz::FIND_BLANK_SQUARE,
                                 newDir,
-                                FIND_NEXT) );
+                                puz::NEXT) );
 
     SetSquareFocus(newSquare, newDir);
 }
@@ -1381,7 +1384,7 @@ XGridCtrl::HitTest(int x, int y, int * col, int * row)
 }
 
 // Find the square that exists at (x, y) or NULL
-XSquare *
+puz::Square *
 XGridCtrl::HitTest(int x, int y)
 {
     int col, row;
@@ -1395,7 +1398,7 @@ XGridCtrl::HitTest(int x, int y)
 }
 
 // Find the square nearest to (x, y)
-XSquare *
+puz::Square *
 XGridCtrl::HitTestNearest(int x, int y)
 {
     int col, row;
@@ -1410,27 +1413,27 @@ XGridCtrl::HitTestNearest(int x, int y)
 
 
 const wxColor &
-XGridCtrl::GetSquareColor(const XSquare & square)
+XGridCtrl::GetSquareColor(const puz::Square & square)
 {
     if (HasSelection() && IsSelected(square))
-            return m_colors[SELECTION];
+            return GetSelectionColor();
     else if (IsFocusedLetter(square))
-        return m_colors[LETTER];
+        return GetFocusedLetterColor();
     else if (IsFocusedWord(square))
-        return m_colors[WORD];
+        return GetFocusedWordColor();
     else
-        return m_colors[WHITE];
+        return GetWhiteSquareColor();
 }
 
 
 
 
-XSquare *
+puz::Square *
 XGridCtrl::GetClueNumber(int num)
 {
     wxASSERT(! IsEmpty());
     wxASSERT(m_grid->FirstWhite() != NULL);
-    for (XSquare * square = m_grid->FirstWhite();
+    for (puz::Square * square = m_grid->FirstWhite();
          square != NULL;
          square = square->Next())
     {
@@ -1450,33 +1453,37 @@ XGridCtrl::GetClueNumber(int num)
 
 
 //------------------------------------------------------------------------------
-// XGridRebusHandler implementation
+// GridRebusHandler implementation
 //------------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(XGridRebusHandler, wxEvtHandler)
-    EVT_KEY_DOWN    (XGridRebusHandler::OnKeyDown)
-    EVT_CHAR        (XGridRebusHandler::OnChar)
+BEGIN_EVENT_TABLE(GridRebusHandler, wxEvtHandler)
+    EVT_KEY_DOWN    (GridRebusHandler::OnKeyDown)
+    EVT_CHAR        (GridRebusHandler::OnChar)
 END_EVENT_TABLE()
 
-XGridRebusHandler::XGridRebusHandler(XGridCtrl & grid)
+GridRebusHandler::GridRebusHandler(XGridCtrl & grid)
     : m_grid(grid)
 {
     m_grid.PushEventHandler(this);
     // Kill the grid's own event handling
-    m_grid.Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(XGridCtrl::OnKeyDown));
-    m_grid.Disconnect(wxEVT_CHAR,     wxKeyEventHandler(XGridCtrl::OnChar));
+    m_grid.Disconnect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
+    m_grid.Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+    m_grid.Disconnect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
+    m_grid.Disconnect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
 }
 
 void
-XGridRebusHandler::EndEventHandling()
+GridRebusHandler::EndEventHandling()
 {
     m_grid.RemoveEventHandler(this);
     // Restore the grid's own key handling
-    m_grid.Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(XGridCtrl::OnKeyDown));
-    m_grid.Connect(wxEVT_CHAR,     wxKeyEventHandler(XGridCtrl::OnChar));
+    m_grid.Connect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
+    m_grid.Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+    m_grid.Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
+    m_grid.Connect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
 }
 
 void
-XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
+GridRebusHandler::OnKeyDown(wxKeyEvent & evt)
 {
     // Skip this event by default so that we recieve EVT_CHAR events.
     evt.Skip();
@@ -1495,25 +1502,25 @@ XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
     }
     else if (key == WXK_BACK)
     {
-        XSquare * square = m_grid.GetFocusedSquare();
+        puz::Square * square = m_grid.GetFocusedSquare();
         if (square->IsBlank())
             return;
         if ((mod & (wxMOD_CONTROL | wxMOD_SHIFT)) != 0)
             m_grid.SetSquareText(*square, _T(""));
         else
             m_grid.SetSquareText(*square,
-                square->GetText().substr(0, square->GetText().length() - 1));
+                puz2wx(square->GetText().substr(0, square->GetText().length() - 1)));
         m_grid.RefreshSquare();
     }
     else if (key == WXK_DELETE || key == WXK_NUMPAD_DELETE)
     {
-        XSquare * square = m_grid.GetFocusedSquare();
+        puz::Square * square = m_grid.GetFocusedSquare();
         if (square->IsBlank())
             return;
         if ((mod & (wxMOD_CONTROL | wxMOD_SHIFT)) != 0)
             m_grid.SetSquareText(*square, _T(""));
         else
-            m_grid.SetSquareText(*square, square->GetText().substr(1));
+            m_grid.SetSquareText(*square, puz2wx(square->GetText().substr(1)));
         m_grid.RefreshSquare();
     }
 
@@ -1521,40 +1528,43 @@ XGridRebusHandler::OnKeyDown(wxKeyEvent & evt)
 
 
 void
-XGridRebusHandler::OnChar(wxKeyEvent & evt)
+GridRebusHandler::OnChar(wxKeyEvent & evt)
 {
     evt.Skip();
 
-    const wxChar key = static_cast<wxChar>(wxToupper(evt.GetKeyCode()));
+    const wxChar key = static_cast<wxChar>(evt.GetKeyCode());
 
-    if (! XSquare::IsValidChar(key))
+    if (! puz::Square::IsValidChar(key))
         return;
 
-    XSquare * square = m_grid.GetFocusedSquare();
-    if (square->GetText().length() == 8) // Max of 8 characters
-        return;
+    puz::Square * square = m_grid.GetFocusedSquare();
 
-    if (square->IsBlank())
-        m_grid.SetSquareText(*square, key);
-    else
-        m_grid.SetSquareText(*square, square->GetText() + key);
-    m_grid.RefreshSquare();
+    try {
+        if (square->IsBlank())
+            m_grid.SetSquareText(*square, key);
+        else
+            m_grid.SetSquareText(*square, puz2wx(square->GetText()) + key);
+        m_grid.RefreshSquare();
+    }
+    catch (puz::LongString &) {
+        // Do nothing.
+    }
 }
 
 
 
 //------------------------------------------------------------------------------
-// XGridSelectionHandler implementation
+// GridSelectionHandler implementation
 //------------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(XGridSelectionHandler, wxEvtHandler)
-    EVT_LEFT_DOWN            (XGridSelectionHandler::OnLeftDown)
-    EVT_MOTION               (XGridSelectionHandler::OnMouseMove)
-    EVT_LEFT_UP              (XGridSelectionHandler::OnLeftUp)
-    EVT_KEY_DOWN             (XGridSelectionHandler::OnKeyDown)
-    EVT_MOUSE_CAPTURE_LOST   (XGridSelectionHandler::OnMouseCaptureLost)
+BEGIN_EVENT_TABLE(GridSelectionHandler, wxEvtHandler)
+    EVT_LEFT_DOWN            (GridSelectionHandler::OnLeftDown)
+    EVT_MOTION               (GridSelectionHandler::OnMouseMove)
+    EVT_LEFT_UP              (GridSelectionHandler::OnLeftUp)
+    EVT_KEY_DOWN             (GridSelectionHandler::OnKeyDown)
+    EVT_MOUSE_CAPTURE_LOST   (GridSelectionHandler::OnMouseCaptureLost)
 END_EVENT_TABLE()
 
-XGridSelectionHandler::XGridSelectionHandler(XGridCtrl & grid)
+GridSelectionHandler::GridSelectionHandler(XGridCtrl & grid)
     : m_grid(grid),
       m_start(NULL),
       m_end(NULL)
@@ -1573,7 +1583,7 @@ XGridSelectionHandler::XGridSelectionHandler(XGridCtrl & grid)
 }
 
 void
-XGridSelectionHandler::EndEventHandling()
+GridSelectionHandler::EndEventHandling()
 {
     m_grid.RemoveEventHandler(this);
     // Restore the grid's own key handling
@@ -1590,7 +1600,7 @@ XGridSelectionHandler::EndEventHandling()
 
 
 void
-XGridSelectionHandler::OnLeftDown(wxMouseEvent & evt)
+GridSelectionHandler::OnLeftDown(wxMouseEvent & evt)
 {
     // Set the first square in the selection
     wxPoint pt = evt.GetPosition();
@@ -1604,7 +1614,7 @@ XGridSelectionHandler::OnLeftDown(wxMouseEvent & evt)
 }
 
 void
-XGridSelectionHandler::OnMouseMove(wxMouseEvent & evt)
+GridSelectionHandler::OnMouseMove(wxMouseEvent & evt)
 {
     if (m_start == NULL)
         return;
@@ -1649,7 +1659,7 @@ XGridSelectionHandler::OnMouseMove(wxMouseEvent & evt)
 }
 
 void
-XGridSelectionHandler::OnLeftUp(wxMouseEvent & evt)
+GridSelectionHandler::OnLeftUp(wxMouseEvent & evt)
 {
     if (m_start == NULL)
         return;
@@ -1663,7 +1673,7 @@ XGridSelectionHandler::OnLeftUp(wxMouseEvent & evt)
 
 
 void
-XGridSelectionHandler::OnKeyDown(wxKeyEvent & evt)
+GridSelectionHandler::OnKeyDown(wxKeyEvent & evt)
 {
     if (evt.GetKeyCode() == WXK_ESCAPE)
     {
@@ -1674,7 +1684,7 @@ XGridSelectionHandler::OnKeyDown(wxKeyEvent & evt)
 }
 
 void
-XGridSelectionHandler::OnMouseCaptureLost(wxMouseCaptureLostEvent & WXUNUSED(evt))
+GridSelectionHandler::OnMouseCaptureLost(wxMouseCaptureLostEvent & WXUNUSED(evt))
 {
     EndEventHandling();
     m_grid.EndSelection(false); // Abort

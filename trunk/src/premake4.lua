@@ -1,12 +1,16 @@
+USE_LUA = true
+
 project "XWord"
     -- --------------------------------------------------------------------
     -- General
     -- --------------------------------------------------------------------
     kind "WindowedApp"
     language "C++"
-    files { "**.hpp", "**.cpp", "**.h" }
+    files { "*.hpp", "*.cpp", "*.h", "widgets/*.*", "utils/*.*", "dialogs/*.*", "xwordbind/*.*" }
 
-    defines { "XWORD_USE_LUA" }
+    if USE_LUA then
+        defines { "XWORD_USE_LUA" }
+    end
 
     configuration "windows"
         -- Use WinMain() instead of main() for windows apps
@@ -18,44 +22,71 @@ project "XWord"
     configuration "linux"
         -- These link options ensure that the wxWidgets libraries are
         -- linked in the correct order under linux.
-        linkoptions {
-            "-lwxbindxrc",
-            "-lwxbindxml",
-            "-lwxbindnet",
-            "-lwxbindhtml",
-            "-lwxbindaui",
-            "-lwxbindadv",
-            "-lwxbindcore",
-            "-lwxbindbase",
-            "-lwxlua",
-            "-llua5.1",
-        }
+        if USE_LUA then
+            linkoptions {
+                "-lwxbindxrc",
+                "-lwxbindxml",
+                "-lwxbindnet",
+                "-lwxbindhtml",
+                "-lwxbindaui",
+                "-lwxbindadv",
+                "-lwxbindcore",
+                "-lwxbindbase",
+                "-lwxlua",
+                "-llua5.1",
+            }
+        end
 
     dofile "../premake4_wxdefs.lua"
     dofile "../premake4_wxlibs.lua"
 
     -- --------------------------------------------------------------------
+    -- puz
+    -- --------------------------------------------------------------------
+    includedirs { "../" }
+    links { "puz" }
+    configuration "windows"
+        defines {
+            "PUZ_API=__declspec(dllimport)",
+            "LUAPUZ_API=__declspec(dllimport)",
+        }
+
+    configuration "linux"
+        defines { [[PUZ_API=""]] }
+        links { "dl" }
+
+    -- Disable some warnings
+    configuration "vs*"
+        buildoptions {
+            "/wd4251", -- DLL Exports
+        }
+    -- --------------------------------------------------------------------
     -- wxLua
     -- --------------------------------------------------------------------
     configuration {}
-    includedirs {
-        "../lua",
-        "../lua/lua/include",
-        "../lua/wxbind/setup",
-    }
+    if USE_LUA then
+        includedirs {
+            "../lua",
+            "../lua/lua/include",
+            "../lua/wxbind/setup",
+        }
+    end
 
-    links {
-        "lua",
-        "wxlua",
-        "wxbindbase",
-        "wxbindcore",
-        "wxbindadv",
-        "wxbindaui",
-        "wxbindhtml",
-        "wxbindnet",
-        "wxbindxml",
-        "wxbindxrc",
-    }
+    if USE_LUA then
+        links {
+            "lua",
+            "wxlua",
+            "wxbindbase",
+            "wxbindcore",
+            "wxbindadv",
+            "wxbindaui",
+            "wxbindhtml",
+            "wxbindnet",
+            "wxbindxml",
+            "wxbindxrc",
+            "luapuz",
+        }
+    end
 
     -- --------------------------------------------------------------------
     -- Resource files

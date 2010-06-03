@@ -25,14 +25,14 @@
 
 #include <wx/print.h>
 #include "XGridDrawer.hpp"
-#include "puz/XPuzzle.hpp"
+#include "puz/Puzzle.hpp"
 
 class MyFrame;
 
 class MyPrintout : public wxPrintout
 {
 public:
-    MyPrintout(MyFrame * frame, XPuzzle * puz, int numPages);
+    MyPrintout(MyFrame * frame, puz::Puzzle * puz, int numPages);
 
     bool HasPage(int pageNum);
     wxString GetTitle();
@@ -44,7 +44,7 @@ protected:
     void ReadConfig();
     void LayoutPages();
 
-    XPuzzle * m_puz;
+    puz::Puzzle * m_puz;
     MyFrame * m_frame;
     int m_numPages;
 
@@ -81,7 +81,7 @@ protected:
 
     void DrawText();
     void LayoutColumns();
-    void DrawClue(const XPuzzle::Clue & clue, int * x, int * y);
+    void DrawClue(const puz::Puzzle::Clue & clue, int * x, int * y);
     void DrawTextLine(const wxString & text,
                       int * x, int * y,
                       int * width=NULL, int * height=NULL);

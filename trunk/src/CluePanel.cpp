@@ -33,7 +33,7 @@ bool
 CluePanel::Create(wxWindow* parent,
                   wxWindowID id,
                   const wxString & heading,
-                  bool direction,
+                  puz::GridDirection direction,
                   const wxPoint & pos,
                   const wxSize & size,
                   long style,

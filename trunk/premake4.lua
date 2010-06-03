@@ -1,3 +1,5 @@
+USE_LUA = true
+
 solution "XWord"
     configurations { "Release", "Debug" }
 
@@ -37,4 +39,7 @@ solution "XWord"
     configuration {}
 
     include "src" -- the XWord premake file
-    include "lua" -- lua libraries
+    include "puz" -- the puzzle library
+    if USE_LUA then
+        include "lua" -- lua libraries
+    end
