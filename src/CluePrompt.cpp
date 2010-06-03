@@ -17,7 +17,7 @@
 
 
 #include "CluePrompt.hpp"
-#include "puz/XSquare.hpp" // DIR_ACROSS / DIR_DOWN
+#include "puz/Square.hpp" // puz::ACROSS / puz::DOWN
 
 IMPLEMENT_DYNAMIC_CLASS(CluePrompt, SizedText)
 
@@ -43,7 +43,7 @@ CluePrompt::Create(wxWindow * parent,
 
 
 void
-CluePrompt::SetClue(int number, bool direction, wxString text)
+CluePrompt::SetClue(int number, puz::GridDirection direction, wxString text)
 {
     wxString result = m_displayFormat;
 
@@ -58,7 +58,7 @@ CluePrompt::SetClue(int number, bool direction, wxString text)
     result.Replace(_T("%N"), wxString::Format(_T("%d"), number));
 
     // Clue Direction
-    if (direction == DIR_ACROSS)
+    if (direction == puz::ACROSS)
     {
         result.Replace(_T("%D"), _T("Across"));
         result.Replace(_T("%d"), _T("A"));

@@ -20,6 +20,7 @@ function mt:addsource(src)
     rawset(self, src, download.datetable())
 end
 
+--[[
 -- Force the user to use dltable:addsource, unless they are deleting the index
 function mt:__newindex(index, val)
     if val then
@@ -28,7 +29,7 @@ function mt:__newindex(index, val)
         rawset(index, obj, nil)
     end
 end
-
+]]
 
 -- Convert date() <--> date().daynum
 local function from_date(d)

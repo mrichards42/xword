@@ -4,7 +4,6 @@
 --     add-ons
 -- ============================================================================
 
-
 -- ============================================================================
 -- Paths
 --
@@ -18,36 +17,8 @@
 --     xword.requiredir(dirname, includePackages)
 -- ============================================================================
 
-local function join(...)
-    return table.concat(arg, string.char(wx.wxFileName.GetPathSeparator()))
-end
-
-local scriptsdir = xword.GetScriptsDir()
-
--- Set the search paths
-package.path = table.concat({
-    join(scriptsdir, '?.lua'),
-    join(scriptsdir, '?', 'init.lua'),
-    join(scriptsdir, 'libs', '?.lua'),
-    join(scriptsdir, 'libs', '?', '.lua'),
-}, ';')
-
-local ext
-local osId = wx.wxPlatformInfo.Get():GetOperatingSystemId()
-if bit.band(osId, wx.wxOS_WINDOWS) ~= 0 then
-    ext = 'dll'
-elseif bit.band(osId, wx.wxOS_MAC) ~= 0 then
-    ext = 'dylib'
-else
-    ext = 'so'
-end
-
-package.cpath = table.concat({
-    join(scriptsdir, 'libs', '?.'..ext),
-    join(scriptsdir, 'libs', '?51.'..ext),
-}, ';')
-
-
+-- The puz library
+require "luapuz"
 
 -- ----------------------------------------------------------------------------
 -- Functions
@@ -79,7 +50,7 @@ function xword.requiredir(dirname, packages)
     if dirname ~= '' then dirname = dirname .. '/' end
     local pkgname = dirname:gsub('[\\/]', '.')
 
-    dirname = scriptsdir..'/'..dirname
+    dirname = xword.GetScriptsDir()..'/'..dirname
 
     -- iterate all files and directories
     for script in lfs.dir(dirname) do
@@ -100,9 +71,22 @@ function xword.requiredir(dirname, packages)
     end
 end
 
+xword.frame = xword.GetFrame()
+
 require 'xword.utils'
 require 'xword.messages'
 require 'xword.utf-8'
 
--- Require the scripts directory, including subdirs
-xword.requiredir('', true)
+-- Only load modules if we have a frame.
+-- Otherwise this script is being called from the command line
+if xword.frame then
+    -- Require the scripts directory, including subdirs
+    --xword.requiredir('', true)
+    require "xworddebug"
+    require "swap"
+    require "tryall"
+    require "wikipedia"
+    require "oneacross"
+    require "database"
+    require "import" -- Fix the memory leak!
+end

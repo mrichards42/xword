@@ -20,3 +20,5 @@ configuration "linux"
 
 configuration "Debug"
     defines { "LUA_USE_APICHECK" }
+
+configuration {}

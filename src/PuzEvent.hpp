@@ -21,6 +21,7 @@
 
 #include <wx/event.h>
 #include <wx/gdicmn.h>  // wxPoint
+#include "puz/Square.hpp" // puz::GridDirection
 
 class wxPuzEvent
     : public wxCommandEvent
@@ -29,18 +30,21 @@ public:
     wxPuzEvent(wxEventType commandType = wxEVT_NULL, int id = 0);
 
     // accessors
-    int              GetAcrossClue()   const    { return m_acrossClue; }
-    int              GetDownClue()     const    { return m_downClue; }
-    const wxString & GetClueText()     const    { return m_clueText; }
-    bool             GetDirection()    const    { return m_direction; }
-    int      GetClueNumber(bool dir)   const    { return dir == false ? m_acrossClue : m_downClue; } // DIR_ACROSS = false;
-    int      GetClueNumber()           const    { return GetClueNumber(m_direction); }
+    int                GetAcrossClue() const { return m_acrossClue; }
+    int                GetDownClue()   const { return m_downClue; }
+    const wxString &   GetClueText()   const { return m_clueText; }
+    puz::GridDirection GetDirection()  const { return m_direction; }
+    int GetClueNumber(puz::GridDirection dir) const
+        { return dir == puz::ACROSS ? m_acrossClue : m_downClue; }
+    int GetClueNumber() const
+        { return GetClueNumber(m_direction); }
 
-    void SetAcrossClue   (int num)               { m_acrossClue = num; }
-    void SetDownClue     (int num)               { m_downClue   = num; }
-    void SetClueText     (const wxString & text) { m_clueText   = text; }
-    void SetDirection    (bool dir)              { m_direction  = dir; }
-    void SetClueNumber   (bool dir, int num)     { dir == false ? m_acrossClue = num : m_downClue = num; }
+    void SetAcrossClue(int num)                { m_acrossClue = num; }
+    void SetDownClue  (int num)                { m_downClue   = num; }
+    void SetClueText  (const wxString & text)  { m_clueText   = text; }
+    void SetDirection (puz::GridDirection dir) { m_direction  = dir; }
+    void SetClueNumber(puz::GridDirection dir, int num)
+        { dir == puz::ACROSS ? m_acrossClue = num : m_downClue = num; }
 
     // required for sending with wxPostEvent()
     wxEvent *Clone(void) const { return new wxPuzEvent(*this); }
@@ -50,7 +54,7 @@ private:
     int m_acrossClue;
     int m_downClue;
     wxString m_clueText;
-    bool m_direction;
+    puz::GridDirection m_direction;
 };
 
 

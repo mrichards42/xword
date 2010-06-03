@@ -29,6 +29,9 @@
 class MyFrame;
 class wxPrintData;
 class wxPageSetupDialogData;
+#ifdef XWORD_USE_LUA
+    class wxLuaEvent;
+#endif
 
 // Global printing variables
 extern wxPrintData * g_printData;
@@ -43,17 +46,11 @@ class MyApp : public wxApp
 {
     friend class MyFrame; // So we can set m_frame to NULL when it is deleted
 public:
-    virtual bool OnInit();
-    virtual bool ReadCommandLine();
+    bool OnInit();
+    // expects an already parsed command line
+    void ReadCommandLine(wxCmdLineParser & cmd);
 
-    // return code = number of unsuccessful conversions
-    virtual int OnRun() { wxApp::OnRun(); return m_retCode; }
-
-    virtual int OnExit();
-
-    // Get and set global data from the whole app
-    int  GetReturnCode()  const  { return m_retCode; }
-    void SetReturnCode(int code) { m_retCode = code; }
+    int OnExit();
 
     ConfigManager & GetConfigManager() { return m_config; }
 
@@ -68,11 +65,23 @@ private:
 
     MyFrame * m_frame;
     ConfigManager m_config;
-    int m_retCode;
     bool m_isTimerRunning;
 
     // Portable mode
     bool m_isPortable;
+
+#ifdef XWORD_USE_LUA
+    enum CmdLineScriptValue {
+        NO_SCRIPT,
+        GUI_SCRIPT,
+        CONSOLE_SCRIPT
+    };
+    CmdLineScriptValue CheckCommandLineForLua();
+    // Lua
+    void RunLuaScript(const wxString & filename, int lastarg = -1);
+    void OnLuaPrint(wxLuaEvent & evt);
+    void OnLuaError(wxLuaEvent & evt);
+#endif // XWORD_USE_LUA
 
     DECLARE_EVENT_TABLE()
 };

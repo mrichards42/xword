@@ -29,14 +29,16 @@ function xword.Error(message)
     )
 end
 
--- Check to see if a puzzle is loaded and optionally alert the user if no
--- puzzle is loaded (the default)
-function xword.HasPuzzle(show_message)
-    if not xword.frame.Puzzle:IsOk() then
-        if show_message ~= false then
-            xword.Message("No puzzle is opened");
+if xword.frame then
+    -- Check to see if a puzzle is loaded and optionally alert the user if no
+    -- puzzle is loaded (the default)
+    function xword.HasPuzzle(show_message)
+        if not xword.frame.Puzzle:IsOk() then
+            if show_message ~= false then
+                xword.Message("No puzzle is opened");
+            end
+            return false
         end
-        return false
+        return true
     end
-    return true
 end

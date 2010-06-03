@@ -28,12 +28,29 @@ Each entry in the sources table should consist of the following:
 
 require 'luacurl'
 
+if not download then download = {} end
+
+function download.getBasename(source, date)
+    return source.prefix .. date:fmt(download.puzformat)
+end
+
+function download.getFilename(source, date)
+    return download.localfolder .. '/' ..
+           download.getBasename(source, date) .. '.' .. source.ext
+end
+
+function download.getPuzFile(source, date)
+    return download.localfolder .. '/' ..
+           download.getBasename(source, date) .. '.' .. 'puz'
+end
+
 download.sources = 
 {
     {
         display = "NY Times",
         url = "http://www.xwordinfo.com/XPF/?date=%m/%d/%Y",
-        filename = "nyt%Y%m%d.xml",
+        prefix = "nyt",
+        ext = "xml",
         days = { true, true, true, true, true, true, true },
         format = "XPF",
         curlopts =
@@ -45,14 +62,16 @@ download.sources =
     {
         display = "CrosSynergy",
         url = "http://www.chron.com/apps/games/xword/puzzles/cs%y%m%d.puz",
-        filename = "cs%Y%m%d.puz",
+        prefix = "cs",
+        ext = "puz",
         days = { true, true, true, true, true, true, true },
     },
 
     {
         display = "Newsday",
         url = "http://picayune.uclick.com/comics/crnet/data/crnet%y%m%d-data.xml",
-        filename = "nd%Y%m%d.xml",
+        prefix = "nd",
+        ext = "xml",
         days = { true, true, true, true, true, true, true },
         format = 'XML (uclick)',
     },
@@ -60,7 +79,8 @@ download.sources =
     {
         display = "LA Times",
         url = "http://picayune.uclick.com/comics/tmcal/data/tmcal%y%m%d-data.xml",
-        filename = "lat%Y%m%d.xml",
+        prefix = "lat",
+        ext = "xml",
         days = { true, true, true, true, true, true, true },
         format = 'XML (uclick)',
     },
@@ -68,7 +88,8 @@ download.sources =
     {
         display = "USA Today",
         url = "http://picayune.uclick.com/comics/usaon/data/usaon%y%m%d-data.xml",
-        filename = "usa%Y%m%d.xml",
+        prefix = "usa",
+        ext = "xml",
         days = { true, true, true, true, true, false, false },
         format = 'XML (uclick)',
     },
@@ -76,7 +97,8 @@ download.sources =
     {
         display = "Universal",
         url = "http://picayune.uclick.com/comics/fcx/data/fcx%y%m%d-data.xml",
-        filename = "univ%Y%m%d.xml",
+        prefix = "univ",
+        ext = "xml",
         days = { true, true, true, true, true, true, true },
         format = 'XML (uclick)',
     },
@@ -84,42 +106,48 @@ download.sources =
     {
         display = "Ink Well",
         url = "http://herbach.dnsalias.com/Tausig/vv%y%m%d.puz",
-        filename = "tausig%Y%m%d.puz",
+        prefix = "tausig",
+        ext = "puz",
         days = { false, false, false, false, true, false, false },
     },
 
     {
         display = "The Onion AV Club",
         url = "http://herbach.dnsalias.com/Tausig/av%y%m%d.puz",
-        filename = "av%Y%m%d.puz",
+        prefix = "av",
+        ext = "puz",
         days = { false, false, true, false, false, false, false },
     },
 
     {
         display = "Jonesin'",
         url = "http://herbach.dnsalias.com/Jonesin/jz%y%m%d.puz",
-        filename = "jones%Y%m%d.puz",
+        prefix = "jones",
+        ext = "puz",
         days = { false, false, false, true, false, false, false },
     },
 
     {
         display = "Wall Street Journal",
         url = "http://mazerlm.home.comcast.net/wsj%y%m%d.puz",
-        filename = "wsj%Y%m%d.puz",
+        prefix = "wsj",
+        ext = "puz",
         days = { false, false, false, false, true, false, false },
     },
 
     {
         display = "Boston Globe",
         url = "http://home.comcast.net/~nshack/Puzzles/bg%y%m%d.puz",
-        filename = "bg%Y%m%d.puz",
+        prefix = "bg",
+        ext = "puz",
         days = { false, false, false, false, false, false, true },
     },
 
     {
         display = "Philidelphia Inquirer",
         url = "http://mazerlm.home.comcast.net/pi%y%m%d.puz",
-        filename = "pi%Y%m%d.puz",
+        prefix = "pi",
+        ext = "puz",
         days = { false, false, false, false, false, false, true },
     },
 }

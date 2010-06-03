@@ -33,15 +33,15 @@
 #endif
 
 #include "widgets/odlistbox.hpp"
-#include "puz/XPuzzle.hpp"
+#include "puz/Puzzle.hpp"
 
 extern const wxChar* ClueListBoxNameStr;
 
 class ClueListBox
-    : public wxOwnerDrawnListBox<XPuzzle::Clue>
+    : public wxOwnerDrawnListBox<puz::Puzzle::Clue>
 {
 public:
-    typedef wxOwnerDrawnListBox<XPuzzle::Clue> parent_t;
+    typedef wxOwnerDrawnListBox<puz::Puzzle::Clue> parent_t;
 
     ClueListBox() { Init(); }
 

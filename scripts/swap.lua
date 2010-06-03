@@ -10,7 +10,7 @@
 --      xword.frame.Puzzle / xword.frame:GetPuzzle()
 -- Both approaches are demonstrated here.
 
-local function SwapAcrossDown(puz)
+local function SwapAcrossDown(p)
     -- Swap the clues
     -- --------------
     local across = {}
@@ -18,8 +18,8 @@ local function SwapAcrossDown(puz)
 
     -- Make a local copy because GetAcross / GetDown creates a lua table each
     -- time it is called.
-    local oldAcross = puz:GetAcross()
-    local oldDown   = puz:GetDown()
+    local oldAcross = p:GetAcross()
+    local oldDown   = p:GetDown()
 
     -- Iterate the grid (downward), and look for all clue squares.
     -- These will all remain clue squares after the grid is swapped.
@@ -29,46 +29,46 @@ local function SwapAcrossDown(puz)
 
     -- Squares are accessed using Grid[{col, row}]
     -- lua uses 1-based table indices.
-    local square = puz.Grid[{1, 1}]
+    local square = p.Grid[{1, 1}]
 
     while(square) do
         -- Down clues will become across clues
-        if square:HasClue(xword.DIR_DOWN) then
+        if square:HasClue(puz.DOWN) then
             across[clueNumber] = oldDown[square.Number]
         end
         -- Across clues will become down clues
-        if square:HasClue(xword.DIR_ACROSS) then
+        if square:HasClue(puz.ACROSS) then
             down[clueNumber] = oldAcross[square.Number]
         end
         -- Next clue number
         if square:HasClue() then clueNumber = clueNumber + 1 end
         -- Next square
-        square = square:Next(xword.DIR_DOWN)
+        square = square:Next(puz.DOWN)
     end
 
-    puz.Across = across
-    puz.Down = down
+    p.Across = across
+    p.Down = down
 
     -- Swap the grid
     -- -------------
-    local newGrid = xword.XGrid(puz.Grid.Height, puz.Grid.Width)
+    local newGrid = puz.Grid(p.Grid.Height, p.Grid.Width)
 
-    for row = 1, puz.Grid.Height do
-        for col = 1, puz.Grid.Width do
+    for row = 1, p.Grid.Height do
+        for col = 1, p.Grid.Width do
             -- Swap the square
-            newGrid[{row, col}] = puz.Grid[{col, row}]
+            newGrid[{row, col}] = p.Grid[{col, row}]
         end
     end
 
     -- Copy over metadata
-    newGrid.Type = puz.Grid.Type
-    newGrid.Flag = puz.Grid.Flag
-    newGrid.Cksum = puz.Grid.Cksum
-    newGrid.Key = puz.Grid.Key
+    newGrid.Type = p.Grid.Type
+    newGrid.Flag = p.Grid.Flag
+    newGrid.Cksum = p.Grid.Cksum
+    newGrid.Key = p.Grid.Key
 
     -- Set the puzzle's grid.  The puzzle now has ownership of the grid.
     -- lua will not garbage collect the grid's userdata.
-    puz.Grid = newGrid
+    p.Grid = newGrid
 end
 
 
@@ -79,7 +79,7 @@ local function init()
             -- Can't do anything unless we have a puzzle
             if not xword.HasPuzzle() then return end
 
-            local puz = xword.frame.Puzzle
+            local p = xword.frame.Puzzle
             local frame = xword.frame
 
             -- Save the current square and direction focus
@@ -88,7 +88,7 @@ local function init()
             local direction = frame:GetFocusedDirection()
 
             -- Swap the grid
-            SwapAcrossDown(puz)
+            SwapAcrossDown(p)
 
             -- Update the applicable portions of the gui
             frame:ShowGrid()
@@ -96,7 +96,7 @@ local function init()
 
             -- Restore the focused square (swapping direction)
             frame:SetFocusedSquare(xword.frame.Puzzle.Grid[{row, col}])
-            frame:SetFocusedDirection(not direction)
+            frame:SetFocusedDirection(puz.SwapDirection(direction))
         end
     )
 end

@@ -49,15 +49,14 @@ function import.addType(label, types, loadfunc)
     import.handlers[label] = {
         types = types,
         load = function(filename)
-            local puz = xword.frame.Puzzle
+            local p = xword.frame.Puzzle
             -- Load and display the puzzle
-            puz:Clear()
-            local success, err = loadfunc(filename, puz)
+            p:Clear()
+            local success, err = loadfunc(filename, p)
             if success then
                 -- Make sure grid has clue numbers assigned, etc.
-                puz.Grid:SetupGrid()
-                puz:SetFilename(filename)
-                puz:SetOk(true)
+                p.Grid:SetupGrid()
+                p:SetOk(true)
             else
                 xword.Error(err)
             end
@@ -65,20 +64,20 @@ function import.addType(label, types, loadfunc)
             xword.frame:ShowPuzzle()
         end,
         convert = function(filename, deleteOld)
-            local puz = xword.XPuzzle()
-            local success, err = loadfunc(filename, puz)
+            local p = puz.Puzzle()
+            local success, err = loadfunc(filename, p)
             if success then
                 -- Save the file as a .puz
                 local newfile = filename:match("^(.*)%..*$") or filename
-                puz:Save(newfile..'.puz')
+                p:Save(newfile..'.puz')
                 -- Remove the old file
                 if deleteOld then os.remove(filename) end
-                puz = nil -- garbage collect
+                p = nil -- garbage collect
                 return true
             end
 
             -- Error
-            puz = nil -- garbage collect
+            p = nil -- garbage collect
             print(err)
             return false, err
         end,

@@ -4,6 +4,7 @@
 --       ctrl        the wxPanel object
 --       url         the download url
 --       filename    the local filename
+--       basename    the basename (without path or extension)
 --       puzfile     the local filename after conversion to .puz
 --       task_id     the id for the download thread (nil until the download
 --                   starts)
@@ -97,37 +98,6 @@ local function getConversion(filename, loadtype)
     return checkPuz
 end
 
--- Return started (bool), comlete (pct), time (secs)
-local function puzzleStats(filename)
-    local success, puz = pcall(xword.XPuzzle, filename)
-    if not success then return end
-    local blank = 0
-    local total = 0
-    local started = puz.Time > 0
-    local square = puz.Grid:First()
-    while square do
-        if square:IsWhite() then
-            total = total + 1
-            if square:IsBlank() then
-                blank = blank + 1
-                if not started then
-                    -- Flags that indicate that the user has entered something in
-                    -- the square
-                    started = square:HasFlag(xword.XFLAG_X +
-                                             xword.XFLAG_RED +
-                                             xword.XFLAG_BLACK)
-                end
-            elseif not started then
-                started = true
-            end
-        end
-        square = square:Next()
-    end
-    return started,
-           math.floor(100 - blank / total * 100 + 0.5), -- Round
-           puz.Time
-end
-
 
 local P = download
 
@@ -165,7 +135,7 @@ function P.DownloadCtrl(parent, ...)
         local source, d = unpack(arg)
         if not source.days[d:getisoweekday()] then return nil end
         dl.url = d:fmt(source.url)
-        dl.filename = P.localfolder..'\\'..d:fmt(source.filename)
+        dl.filename = P.getFilename(source, d)
         dl.convert = getConversion(dl.filename, source.format)
         dl.curlopts = source.curlopts
 
@@ -179,6 +149,7 @@ function P.DownloadCtrl(parent, ...)
     assert(dl.url and dl.filename and dl.convert)
 
     -- The name of the file after it has been converted to .puz
+    dl.basename = dl.filename:match(".*/([^/%.]+)%..*")
     dl.puzfile = (dl.filename:match("^(.*)%..*$") or dl.filename)..'.puz'
 
     -- ------------------------------------------------------------------------
@@ -226,68 +197,73 @@ function P.DownloadCtrl(parent, ...)
 
     -- Change layout based on status of puzfile
     local function UpdateLayout()
-        dl.ctrl:Freeze()
+        -- As a rule, show, hide, and layout top level sizers first, then
+        -- mess with nested sizers
+
         -- The download has completed
         if dl.res then
-            if dl.res == 0 then -- Successful download
-                -- Indicate that the download is complete
-                gauge:SetRange(100)
-                gauge:SetValue(100)
-                buttonSizer:Show(playButton, true)
-                buttonSizer:Show(downloadButton, false)
-                buttonSizer:Layout()
-            else
-                if not dl.err then dl.err = 'Unknown' end
-                downloadButton:SetToolTip('Error: '..dl.err..'   Redownload.')
-                downloadButton:SetBitmapLabel(bmp.downloaderror)
-                buttonSizer:Show(playButton, true)
-                buttonSizer:Show(downloadButton, false)
-                buttonSizer:Layout()
-            end
             sizer:Show(buttonSizer, true)
             sizer:Show(statusCtrl, false)
             sizer:Show(gauge, false)
+            sizer:Layout()
+            if dl.res == 0 then -- Successful download
+                print('Download successful:'..dl.filename)
+                buttonSizer:Show(playButton, true)
+                buttonSizer:Show(downloadButton, false)
+                buttonSizer:Layout()
+                print("Is download button shown?"..tostring(buttonSizer:GetItem(downloadButton):IsShown()))
+            else -- Unsuccessful download
+                downloadButton:SetToolTip('Error: '..dl.err..'  Redownload.')
+                downloadButton:SetBitmapLabel(bmp.downloaderror)
+                buttonSizer:Show(playButton, true)
+                buttonSizer:Show(downloadButton, true)
+                buttonSizer:Layout()
+            end
+
         -- The download has not started
-        elseif not dl.task then
-            local started, blank, time = puzzleStats(dl.puzfile)
-            -- Puzzle does not exist
-            if not blank then
+        elseif not dl.isrunning() then
+            local stats = download.sourcecache[dl.basename]
+            if not stats then
+                print('Trying to cache: '..dl.puzfile)
+                stats = download.cachePuzzle(dl.puzfile)
+            end
+            if not stats then -- Puzzle does not exist
                 sizer:Show(gauge, false)
                 sizer:Show(statusCtrl, false)
                 sizer:Show(buttonSizer, true)
-            -- Puzzle exists
-            else
+                sizer:Layout()
+            else -- Puzzle exists
+                dl.fileexists = true
                 sizer:Show(gauge, false)
                 sizer:Show(buttonSizer, true)
-                buttonSizer:Show(downloadButton, false)
-                buttonSizer:Show(playButton, true)
-
-                if started then
+                if stats.started then -- Display puzzle stats if it has been opened
                     sizer:Show(statusCtrl, true)
-                    local status = blank.."%"
+                    local status = stats.complete.."%"
                      -- Display time if it is > 0
-                    if time > 0 then
-                        if time > 60*60 then
-                            status = status.."\n"..date(time):fmt("%H:%M:%S")
+                    if stats.time > 0 then
+                        if stats.time > 60*60 then
+                            status = status.."\n"..date(stats.time):fmt("%H:%M:%S")
                         else
-                            status = status.."\n"..date(time):fmt("%M:%S")
+                            status = status.."\n"..date(stats.time):fmt("%M:%S")
                         end
                     end
                     statusCtrl:SetLabel(status)
                 else
                     sizer:Show(statusCtrl, false)
                 end
+                buttonSizer:Show(downloadButton, false)
+                buttonSizer:Show(playButton, true)
+                buttonSizer:Layout()
             end
-        elseif not dl.res then
-        -- The download has finished
+        else -- Download has just started
+            sizer:Show(gauge, true)
+            sizer:Show(buttonSizer, false)
+            sizer:Show(statusCtrl, false)
         end
+
         sizer:Layout()
-        dl.ctrl:Thaw()
         parent:Layout()
     end
-
-    UpdateLayout()
-    --dl.ctrl:Fit()
 
     -- ------------------------------------------------------------------------
     -- Thread message callbacks
@@ -297,7 +273,7 @@ function P.DownloadCtrl(parent, ...)
     dl.callbacks =
     {
         [P.DL_START] = function()
-            -- do nothing
+            -- Nothing to see here
         end,
 
         [P.DL_PROGRESS] = function(args)
@@ -312,6 +288,10 @@ function P.DownloadCtrl(parent, ...)
         end,
 
         [P.DL_END] = function(args)
+            -- Stop checking the message queue
+            dl.ctrl:Disconnect(wx.wxEVT_IDLE)
+            dl.task_id = nil
+
             -- Cleanup the download
             dl.res, dl.err = unpack(args)
 
@@ -320,14 +300,23 @@ function P.DownloadCtrl(parent, ...)
                 local success, err = dl.convert(dl.filename, true) -- Delete old file
                 if not success then
                     dl.res = -1
-                    dl.err = err
+                    dl.err = err or "Unknown"
                     -- If we can't open the file, delete it.
                     os.remove(dl.filename)
+                    dl.fileexists = false
+                elseif dl.openOnSuccess then
+                    xword.frame:LoadPuzzle(dl.puzfile)
+                    dl.fileexists = true
                 end
+            else
+                -- If the download didn't work, delete the file.
+                os.remove(dl.filename)
+                dl.fileexists = false
             end
 
-            -- Stop checking the message queue
-            dl.ctrl:Disconnect(wx.wxEVT_IDLE)
+            dl.openOnSuccess = nil
+
+            P.dlg.NotifyDownloadEnd(dl)
 
             UpdateLayout()
         end,
@@ -342,24 +331,6 @@ function P.DownloadCtrl(parent, ...)
         end,
     }
 
-    -- Add a callback to the callbacks list.  The old callback is called first.
-    local function appendCallback(id, func)
-        local oldCallback = dl.callbacks[id]
-        dl.callbacks[id] = function(args)
-            oldCallback(args)
-            func(args)
-        end
-    end
-
-    -- Add a callback to the callbacks list.  The old callback is called last.
-    local function prependCallback(id, func)
-        local oldCallback = dl.callbacks[id]
-        dl.callbacks[id] = function(args)
-            func(args)
-            oldCallback(args)
-        end
-    end
-
     -- ------------------------------------------------------------------------
     -- Event Handlers
     -- ------------------------------------------------------------------------
@@ -368,11 +339,13 @@ function P.DownloadCtrl(parent, ...)
     -- Check the download thread message queue and call the appropriate
     -- message callbacks
     local function onIdle(evt)
+        assert(dl.isrunning())
+
         -- Check the message queue
         local data, flag, rc = task.receive(0, dl.task_id)
         if rc ~= 0 then return end
 
-        -- find the callback function
+        -- Find the callback function and call it
         local callback = dl.callbacks[flag]
         if callback then
             callback(data)
@@ -396,14 +369,7 @@ function P.DownloadCtrl(parent, ...)
             if lfs.attributes(dl.puzfile) then -- Does the file exist?
                 xword.frame:LoadPuzzle(dl.puzfile)
             else
-                -- Open the file if the download completes successfully
-                appendCallback(P.DL_END, function()
-                    if dl.res == 0 then
-                        -- Make sure the file is a .puz (conversion happens in the
-                        -- default DL_END callback).
-                        xword.frame:LoadPuzzle(dl.puzfile)
-                    end
-                end)
+                dl.openOnSuccess = true
                 dl.start()
             end
         end
@@ -414,22 +380,20 @@ function P.DownloadCtrl(parent, ...)
     -- ------------------------------------------------------------------------
     function dl.start()
         -- Don't re-start currently running downloads.
-        if dl.isrunning() then return end
+        if dl.isrunning() then print ('Already running: '..dl.filename) return end
 
         dl.res = nil
         dl.err = nil
-
-        -- Show only the gauge
-        sizer:Show(gauge, true)
-        sizer:Show(buttonSizer, false)
-        sizer:Show(statusCtrl, false)
-        sizer:Layout()
 
         -- Start handling idle events (for download callbacks)
         dl.ctrl:Connect(wx.wxEVT_IDLE, onIdle)
 
         -- Ensure the download folder exists
         xword.makeDirs(dl.filename)
+
+        -- Delete the output files
+        os.remove(dl.filename)
+        os.remove(dl.puzfile)
 
         -- Start the download in a new thread
         local args = { 1, dl.url, dl.filename }
@@ -439,14 +403,19 @@ function P.DownloadCtrl(parent, ...)
                 table.insert(args, v)
             end
         end
-        for k,v in pairs(args) do print(k,v) end
         dl.task_id = task.create(xword.GetScriptsDir()..'/download/task.lua',
                                  args)
+
+        P.dlg.NotifyDownloadStart(dl)
+
+        UpdateLayout()
     end
 
     function dl.isrunning()
-        return dl.task_id and task.isrunning(dl.task_id)
+        -- task_id will be set to nil when the download completes
+        return dl.task_id
     end
 
+    UpdateLayout()
     return dl
 end

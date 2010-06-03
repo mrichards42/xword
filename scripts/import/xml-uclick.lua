@@ -28,21 +28,19 @@ end
 
 -- Unscape the hex % codes then convert from UTF-8 to Windows encoding
 local function convStr(str)
-    return xword.conv_utf8(unescape(str), '?', '?')
+    return conv_utf8(unescape(str), '?', '?')
 end
 
-local function importXML(filename, puz)
+local function importXML(p, filename)
     -- wxXmlDocument() calls wxLogError on parsing errors.
     local lognull = wx.wxLogNull()
     local doc = wx.wxXmlDocument(filename)
     lognull:delete()
-    if not doc:IsOk() then
-        return false, 'Error parsing XML file'
-    end
+    if not doc:IsOk() then error('Error parsing XML file') end
 
     -- Root node
     if doc.Root.Name ~= 'crossword' then
-        return false, 'Root node must be "crossword"'
+        error('Root node must be "crossword"')
     end
 
     local width, height
@@ -53,67 +51,64 @@ local function importXML(filename, puz)
     while child do
         if child.Name == 'Title' then
             local exists, title = child:GetPropVal('v')
-            if not exists then return false, 'Missing title' end
-            puz.Title = convStr(title)
+            if not exists then error('Missing title') end
+            p.Title = convStr(title)
         elseif child.Name == 'Author' then
             local exists, author = child:GetPropVal('v')
-            if not exists then return false, 'Missing author' end
-            puz.Author = convStr(author)
+            if not exists then error('Missing author') end
+            p.Author = convStr(author)
         elseif child.Name == 'Width' then
             local exists, value = child:GetPropVal('v')
-            if not exists then return false, 'Missing width' end
+            if not exists then error('Missing width') end
             width = tonumber(value)
         elseif child.Name == 'Height' then
             local exists, value = child:GetPropVal('v')
-            if not exists then return false, 'Missing height' end
+            if not exists then error('Missing height') end
             height = tonumber(value)
         elseif child.Name == 'AllAnswer' then
-            puz.Grid:SetSize(width, height)
+            p.Grid:SetSize(width, height)
             local exists, solution = child:GetPropVal('v')
-            if not exists then return false, 'Missing solution' end
+            if not exists then error('Missing solution') end
             if not #solution == width * height then
-                return false, 'Bad solution size'
+                error('Bad solution size')
             end
-            local square = puz.Grid:First()
+            local square = p.Grid:First()
             -- These XML files use '-' for black squares
             solution = solution:gsub('-', '.')
             for c in solution:gmatch('.') do -- Iterate characters
                 square:SetSolution(c)
-                square = square:Next(xword.DIR_ACROSS)
+                square = square:Next(puz.ACROSS)
             end
-            nAcross, nDown = puz.Grid:CountClues()
+            nAcross, nDown = p.Grid:CountClues()
         elseif child.Name == 'across' then
             local across = {}
             local clue = child.Children
             while clue do
                 local exists, text = clue:GetPropVal('c')
-                if not exists then return false, 'Missing across clue' end
+                if not exists then error('Missing across clue') end
                 table.insert(across, convStr(text))
                 clue = clue:GetNext()
             end
-            if not #across == nAcross then
-                return false, 'Missing across clues'
-            end
-            puz.Across = across
+            if not #across == nAcross then error('Missing across clues') end
+            p.Across = across
         elseif child.Name == 'down' then
             local down = {}
             local clue = child.Children
             while clue do
                 local exists, text = clue:GetPropVal('c')
-                if not exists then return false, 'Missing down clue' end
+                if not exists then error('Missing down clue') end
                 table.insert(down, convStr(text))
                 clue = clue:GetNext()
             end
-            if not #down == nDown then
-                return false, 'Missing down clues'
-            end
-            puz.Down = down
+            if not #down == nDown then error('Missing down clues') end
+            p.Down = down
         end
         child = child:GetNext()
     end
-    puz:RenumberClues()
-    return true
+    p:RenumberClues()
 end
 
 --             Description      ext = file desc    function
-import.addType('XML (uclick)', {xml = 'XML file'}, importXML)
+--import.addType('XML (uclick)', {xml = 'XML file'}, importXML)
+
+puz.Puzzle.AddLoadHandler(importXML, "xml")

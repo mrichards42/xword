@@ -65,24 +65,6 @@ xword_dataTypeTable =
     Name = "WXTYPE",
     ValueType = "number",
   },
-  XGrid = {
-    ["%encapsulate"] = true,
-    IsNumber = false,
-    Name = "XGrid",
-    ValueType = "class",
-  },
-  XPuzzle = {
-    ["%encapsulate"] = true,
-    IsNumber = false,
-    Name = "XPuzzle",
-    ValueType = "class",
-  },
-  XSquare = {
-    ["%encapsulate"] = true,
-    IsNumber = false,
-    Name = "XSquare",
-    ValueType = "class",
-  },
   bool = {
     IsNumber = true,
     Name = "bool",

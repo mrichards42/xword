@@ -16,14 +16,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "XGridDrawer.hpp"
-#include "puz/XGrid.hpp"
-#include "puz/XSquare.hpp"
+#include "puz/Grid.hpp"
+#include "puz/Square.hpp"
 #include <wx/fontenum.h> // wxFontEnumerator to test for Webdings
+#include "utils/string.hpp"
 
 const int MAX_POINT_SIZE = 150;
 const int MIN_POINT_SIZE = 2;
 
-XGridDrawer::XGridDrawer(XGrid * grid)
+XGridDrawer::XGridDrawer(puz::Grid * grid)
     : m_grid(grid),
       m_dc(NULL),
       m_status(INVALID_MEASURER)
@@ -31,14 +32,14 @@ XGridDrawer::XGridDrawer(XGrid * grid)
     Init();
 }
 
-XGridDrawer::XGridDrawer(wxDC * dc, XGrid * grid)
+XGridDrawer::XGridDrawer(wxDC * dc, puz::Grid * grid)
     : m_grid(grid)
 {
     SetDC(dc);
     Init();
 }
 
-XGridDrawer::XGridDrawer(wxWindow * window, XGrid * grid)
+XGridDrawer::XGridDrawer(wxWindow * window, puz::Grid * grid)
     : m_grid(grid)
 {
     SetWindow(window);
@@ -362,7 +363,7 @@ XGridDrawer::SetNumberFont(const wxFont & font)
 // Drawing
 //-----------------------------------------------------------------------------
 void
-XGridDrawer::DrawSquare(wxDC & dc, const XSquare & square)
+XGridDrawer::DrawSquare(wxDC & dc, const puz::Square & square)
 {
     if (square.IsWhite())
         DrawSquare(dc, square, GetWhiteSquareColor(), GetPenColor());
@@ -372,7 +373,7 @@ XGridDrawer::DrawSquare(wxDC & dc, const XSquare & square)
 
 void
 XGridDrawer::DrawSquare(wxDC & dc,
-                           const XSquare & square,
+                           const puz::Square & square,
                            const wxColour & bgColor,
                            const wxColour & textColor)
 {
@@ -420,9 +421,9 @@ XGridDrawer::DrawSquare(wxDC & dc,
     }
 
     // Draw square's flag (top right)
-    if (HasFlag(DRAW_FLAG) && square.HasFlag(XFLAG_RED | XFLAG_BLACK))
+    if (HasFlag(DRAW_FLAG) && square.HasFlag(puz::FLAG_RED | puz::FLAG_BLACK))
     {
-        if (square.HasFlag(XFLAG_RED))
+        if (square.HasFlag(puz::FLAG_RED))
         {
             dc.SetBrush(*wxRED_BRUSH);
             dc.SetPen(*wxRED_PEN);
@@ -440,7 +441,7 @@ XGridDrawer::DrawSquare(wxDC & dc,
     }
 
 
-    if (HasFlag(DRAW_CIRCLE) && square.HasFlag(XFLAG_CIRCLE))
+    if (HasFlag(DRAW_CIRCLE) && square.HasFlag(puz::FLAG_CIRCLE))
     {
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.SetPen(wxPen(*wxBLACK, 1));
@@ -485,7 +486,7 @@ XGridDrawer::DrawSquare(wxDC & dc,
                     text = static_cast<wxChar>(square.GetPlainText());
             }
             else
-                text = square.GetText();
+                text = puz2wx(square.GetText());
         }
         // Solution
         else
@@ -502,7 +503,7 @@ XGridDrawer::DrawSquare(wxDC & dc,
                     text = static_cast<wxChar>(square.GetPlainSolution());
             }
             else
-                text = square.GetSolution();
+                text = puz2wx(square.GetSolution());
         }
 
 
@@ -529,7 +530,7 @@ XGridDrawer::DrawSquare(wxDC & dc,
     }
 
     // Draw an X across the square
-    if (HasFlag(DRAW_X) && square.HasFlag(XFLAG_X))
+    if (HasFlag(DRAW_X) && square.HasFlag(puz::FLAG_X))
     {
         dc.SetPen(wxPen(*wxRED, 2));
         // Funky math here because of the way that DCs draw lines
@@ -555,7 +556,7 @@ XGridDrawer::DrawGrid(wxDC & dc)
 
     dc.DrawRectangle(m_rect);
 
-    for (XSquare * square = m_grid->First();
+    for (puz::Square * square = m_grid->First();
          square != NULL;
          square = square->Next())
     {

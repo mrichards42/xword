@@ -19,7 +19,7 @@
 #define CLUE_PROMPT_H
 
 #include "widgets/SizedText.hpp"
-
+#include "puz/Square.hpp" // puz::GridDirection
 
 class CluePrompt : public SizedText
 {
@@ -52,7 +52,7 @@ public:
         { m_displayFormat = format; }
 
     void Clear() { SetLabel(wxEmptyString); }
-    void SetClue(int number, bool direction, wxString text);
+    void SetClue(int number, puz::GridDirection direction, wxString text);
 
 protected:
     wxString m_displayFormat;

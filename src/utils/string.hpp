@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -15,29 +15,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#ifndef UTILS_STRING_H
+#define UTILS_STRING_H
 
-#include "SelectionEvent.hpp"
-#include "XGridCtrl.hpp"
+#include <wx/string.h>
+#include <string>
 
-DEFINE_EVENT_TYPE( wxEVT_Grid_SELECTION )
+// wxString and std::string conversions
 
-GridSelectionEvent::GridSelectionEvent(
-    int id, wxEventType type,
-    XGridCtrl * grid, puz::Square * start, puz::Square * end)
-    : wxEvent(id, type),
-      m_grid(grid),
-      m_start(start),
-      m_end(end)
-{}
-
-std::vector<puz::Square *>
-GridSelectionEvent::GetSelection()
+static std::string wx2puz(const wxString & str)
 {
-    std::vector<puz::Square *> selection;
-
-    for (int col = m_start->GetCol(); col <= m_end->GetCol(); ++col)
-        for (int row = m_start->GetRow(); row <= m_end->GetRow(); ++row)
-            selection.push_back(&m_grid->At(col, row));
-
-    return selection;
+    // Convert using windows encoding.
+    return std::string(str.mb_str(wxCSConv(wxFONTENCODING_CP1252)));
 }
+
+static wxString puz2wx(const std::string & str)
+{
+    // Convert using windows encoding.
+    return wxString(str.c_str(), wxCSConv(wxFONTENCODING_CP1252));
+}
+
+
+#endif // UTILS_STRING_H

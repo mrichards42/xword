@@ -20,10 +20,11 @@
 //#include "PuzEvent.hpp"
 #include "utils/wrap.hpp"
 #include <wx/tokenzr.h>
+#include "utils/string.hpp"
 
 const wxChar* ClueListBoxNameStr = _T("ClueListBox");
 
-IMPLEMENT_DYNAMIC_CLASS(ClueListBox, wxOwnerDrawnListBox<XPuzzle::Clue>)
+IMPLEMENT_DYNAMIC_CLASS(ClueListBox, wxOwnerDrawnListBox<puz::Puzzle::Clue>)
 
 
 bool
@@ -104,7 +105,7 @@ ClueListBox::OnDrawItem(wxDC & dc, const wxRect & rect, size_t n) const
     else
         dc.SetTextForeground(GetForegroundColour());
 
-    XPuzzle::Clue clue = GetItem(n);
+    puz::Puzzle::Clue clue = GetItem(n);
 
     dc.DrawLabel(wxString::Format(_T("%d."), clue.Number()), numRect, wxALIGN_RIGHT|wxALIGN_TOP);
 
@@ -125,14 +126,14 @@ ClueListBox::OnDrawItem(wxDC & dc, const wxRect & rect, size_t n) const
 wxCoord
 ClueListBox::OnMeasureItem(size_t n) const
 {
-    XPuzzle::Clue clue = GetItem(n);
+    puz::Puzzle::Clue clue = GetItem(n);
 
     // Cache the wrapped clue's text if it isn't already
     if (m_cachedClues.at(n).empty())
     {
         int maxWidth;
         GetClientSize(&maxWidth, NULL);
-        m_cachedClues.at(n) = Wrap(this, clue.Text(),
+        m_cachedClues.at(n) = Wrap(this, puz2wx(clue.Text()),
                                    maxWidth - m_numWidth - GetMargins().x);
     }
 

@@ -510,7 +510,7 @@ PuzHandler::WriteSections()
     WriteSolutionRebus();
 
     // Write the unknown sections
-    std::vector<XPuzzle::section>::iterator s_it;
+    std::vector<puz::Puzzle::section>::iterator s_it;
     for (s_it  = m_puz->m_extraSections.begin();
          s_it != m_puz->m_extraSections.end();
          ++s_it)

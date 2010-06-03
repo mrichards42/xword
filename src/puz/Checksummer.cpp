@@ -75,21 +75,8 @@ Checksummer::TestChecksums(unsigned short cib,
     unsigned char  c_masked[8];
     GetChecksums(&c_cib, &c_primary, c_masked);
 
-    // Print the checksums
-    wxLogDebug(_T("Checksums      actual      calc'd"));
-    wxLogDebug(_T("--------------------------------"));
-    wxLogDebug(_T("CIB        %10d  %10d"), cib, c_cib);
-    wxLogDebug(_T("Primary    %10d  %10d"), primary, c_primary);
-    wxLogDebug(_T("Masked[0]  %10d  %10d"), masked[0], c_masked[0]);
-    wxLogDebug(_T("Masked[1]  %10d  %10d"), masked[1], c_masked[1]);
-    wxLogDebug(_T("Masked[2]  %10d  %10d"), masked[2], c_masked[2]);
-    wxLogDebug(_T("Masked[3]  %10d  %10d"), masked[3], c_masked[3]);
-    wxLogDebug(_T("Masked[4]  %10d  %10d"), masked[4], c_masked[4]);
-    wxLogDebug(_T("Masked[5]  %10d  %10d"), masked[5], c_masked[5]);
-    wxLogDebug(_T("Masked[6]  %10d  %10d"), masked[6], c_masked[6]);
-    wxLogDebug(_T("Masked[7]  %10d  %10d"), masked[7], c_masked[7]);
-
-    return c_cib       == cib
+    const bool success =
+           c_cib       == cib
         && c_primary   == primary
         && c_masked[0] == masked[0]
         && c_masked[1] == masked[1]
@@ -99,6 +86,27 @@ Checksummer::TestChecksums(unsigned short cib,
         && c_masked[5] == masked[5]
         && c_masked[6] == masked[6]
         && c_masked[7] == masked[7];
+
+#ifdef __WXDEBUG__
+    if (! success)
+    {
+        // Print the checksums
+        wxLogDebug(_T("Checksums      actual      calc'd"));
+        wxLogDebug(_T("--------------------------------"));
+        wxLogDebug(_T("CIB        %10d  %10d"), cib, c_cib);
+        wxLogDebug(_T("Primary    %10d  %10d"), primary, c_primary);
+        wxLogDebug(_T("Masked[0]  %10d  %10d"), masked[0], c_masked[0]);
+        wxLogDebug(_T("Masked[1]  %10d  %10d"), masked[1], c_masked[1]);
+        wxLogDebug(_T("Masked[2]  %10d  %10d"), masked[2], c_masked[2]);
+        wxLogDebug(_T("Masked[3]  %10d  %10d"), masked[3], c_masked[3]);
+        wxLogDebug(_T("Masked[4]  %10d  %10d"), masked[4], c_masked[4]);
+        wxLogDebug(_T("Masked[5]  %10d  %10d"), masked[5], c_masked[5]);
+        wxLogDebug(_T("Masked[6]  %10d  %10d"), masked[6], c_masked[6]);
+        wxLogDebug(_T("Masked[7]  %10d  %10d"), masked[7], c_masked[7]);
+    }
+#endif // __WXDEBUG__
+
+    return success;
 }
 
 void

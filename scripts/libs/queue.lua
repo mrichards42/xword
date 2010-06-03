@@ -23,6 +23,18 @@ function Queue:pop()
   return value
 end
 
+function Queue:get_last()
+    return self[self.last]
+end
+
+function Queue:iter()
+    local current = self.last + 1
+    return function()
+        current = current - 1
+        return self[current]
+    end
+end
+
 function Queue:clear()
   while self.first <= self.last do
     self[self.last] = nil -- garbage collect this value

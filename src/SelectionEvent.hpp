@@ -16,60 +16,62 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#ifndef XGRID_SELECTION_EVENT_H
-#define XGRID_SELECTION_EVENT_H
+#ifndef Grid_SELECTION_EVENT_H
+#define Grid_SELECTION_EVENT_H
 
 #include <wx/event.h>
 #include <vector>
 
 class XGridCtrl;
-class XSquare;
+namespace puz {
+    class Square;
+}
 
-class XGridSelectionEvent
+class GridSelectionEvent
     : public wxEvent
 {
 public:
-    XGridSelectionEvent(int id, wxEventType type,
+    GridSelectionEvent(int id, wxEventType type,
                         XGridCtrl * grid,
-                        XSquare * start = NULL, XSquare * end = NULL);
+                        puz::Square * start = NULL, puz::Square * end = NULL);
 
     // accessors
-    XSquare * GetSelectionStart() { return m_start; }
-    XSquare * GetSelectionEnd()   { return m_end; }
-    std::vector<XSquare *> GetSelection();
+    puz::Square * GetSelectionStart() { return m_start; }
+    puz::Square * GetSelectionEnd()   { return m_end; }
+    std::vector<puz::Square *> GetSelection();
 
-    void SetSelectionStart(XSquare * square) { m_start = square; }
-    void SetSelectionEnd(XSquare * square) { m_end = square; }
+    void SetSelectionStart(puz::Square * square) { m_start = square; }
+    void SetSelectionEnd(puz::Square * square) { m_end = square; }
     bool HasSelection() { return m_start != NULL && m_end != NULL; }
 
     // required for sending with wxPostEvent()
-    wxEvent *Clone(void) const { return new XGridSelectionEvent(*this); }
+    wxEvent *Clone(void) const { return new GridSelectionEvent(*this); }
 
 private:
     XGridCtrl * m_grid;
-    XSquare * m_start;
-    XSquare * m_end;
+    puz::Square * m_start;
+    puz::Square * m_end;
 };
 
 
 // Use DECLARE_LOCAL_EVENT_TYPE instead of DECLARE_EVENT_TYPE because
 // wxWidgets built as a DLL will try to import events declared with
 // DECLARE_EVENT_TYPE from the wxWidgets DLL
-DECLARE_LOCAL_EVENT_TYPE( wxEVT_XGRID_SELECTION,     -1 )
+DECLARE_LOCAL_EVENT_TYPE( wxEVT_Grid_SELECTION,     -1 )
 
 
 
 // Event handler function definition
-typedef void (wxEvtHandler::*XGridSelectionEventFunction)(XGridSelectionEvent&);
+typedef void (wxEvtHandler::*GridSelectionEventFunction)(GridSelectionEvent&);
 
-#define XGridSelectionEventHandler(func) \
-    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(XGridSelectionEventFunction, &func)
+#define GridSelectionEventHandler(func) \
+    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GridSelectionEventFunction, &func)
 
 
 // Event table macros
-#define EVT_XGRID_SELECTION(fn) \
-    DECLARE_EVENT_TABLE_ENTRY( wxEVT_XGRID_SELECTION, wxID_ANY, -1, \
+#define EVT_Grid_SELECTION(fn) \
+    DECLARE_EVENT_TABLE_ENTRY( wxEVT_Grid_SELECTION, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( XGridSelectionEventFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent( GridSelectionEventFunction, & fn ), (wxObject *) NULL ),
 
-#endif // XGRID_SELECTION_EVENT_H
+#endif // Grid_SELECTION_EVENT_H

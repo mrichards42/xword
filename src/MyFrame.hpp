@@ -28,7 +28,7 @@
 
 
 // XWord library
-#include "puz/XPuzzle.hpp"
+#include "puz/Puzzle.hpp"
 class wxPuzEvent;
 
 // Windows
@@ -71,10 +71,13 @@ public:
 
     // XWord puzzle loading / saving
     //-----------
-    bool LoadPuzzle(const wxString & filename, const wxString & ext = _T(""));
-    bool SavePuzzle(      wxString   filename, const wxString & ext = _T(""));
+    bool LoadPuzzle(const wxString & filename);
+    bool SavePuzzle(      wxString   filename);
     bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
     void CheckPuzzle();
+
+    static wxString GetSaveTypeString();
+    static wxString GetLoadTypeString();
 
     // Gui display / updating
     void ShowPuzzle(); // Everything
@@ -85,7 +88,7 @@ public:
     void ShowCopyright();
     void ShowNotes();
 
-    XPuzzle & GetPuzzle() { return m_puz; }
+    puz::Puzzle & GetPuzzle() { return m_puz; }
 
     // Window Management
     //-----------
@@ -119,13 +122,13 @@ public:
 
     // Access to the grid
     //-------------------
-    XSquare * GetFocusedSquare();
-    XSquare * SetFocusedSquare(XSquare * square);
-    void GetFocusedWord(XSquare ** start, XSquare ** end);
-    bool GetFocusedDirection() const;
-    void SetFocusedDirection(bool direction);
-    const XPuzzle::Clue * GetFocusedClue();
-    bool SetSquareText(XSquare * square, const wxString & text = _T(""));
+    puz::Square * GetFocusedSquare();
+    puz::Square * SetFocusedSquare(puz::Square * square);
+    void GetFocusedWord(puz::Square ** start, puz::Square ** end);
+    puz::GridDirection GetFocusedDirection() const;
+    void SetFocusedDirection(puz::GridDirection direction);
+    const puz::Puzzle::Clue * GetFocusedClue();
+    bool SetSquareText(puz::Square * square, const wxString & text = _T(""));
 
     // Lua
     void RunLuaScript(const wxString & filename);
@@ -143,7 +146,7 @@ private:
 
     wxMenuBar    * CreateMenuBar();
 
-    XGridCtrl *  m_gridCtrl;
+    XGridCtrl *  m_XGridCtrl;
 
     CluePanel *  m_down;
     CluePanel *  m_across;
@@ -205,7 +208,9 @@ private:
 
     // The XWord puzzle
     //-----------------
-    XPuzzle m_puz;
+    puz::Puzzle m_puz;
+    wxString m_filename;
+    bool m_isModified;
 
 
     // Config
@@ -330,7 +335,7 @@ inline
 CluePanel *
 MyFrame::GetFocusedClues()
 {
-    return (m_gridCtrl->GetDirection() == DIR_ACROSS ?
+    return (m_XGridCtrl->GetDirection() == puz::ACROSS ?
              m_across :
              m_down);
 }
@@ -339,7 +344,7 @@ inline
 CluePanel *
 MyFrame::GetCrossingClues()
 {
-    return (m_gridCtrl->GetDirection() == DIR_DOWN ?
+    return (m_XGridCtrl->GetDirection() == puz::DOWN ?
              m_across :
              m_down);
 }

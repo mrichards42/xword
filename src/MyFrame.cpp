@@ -29,13 +29,12 @@
 // Puz library
 #include "PuzEvent.hpp"
 #include "puz/Scrambler.hpp"
-#include "puz/HandlerBase.hpp" // Puz exceptions
-#include "puz/XPuzzle.hpp"
+#include "puz/exceptions.hpp"
+#include "puz/Puzzle.hpp"
 
 // Dialogs
 #include "dialogs/Layout.hpp"
 #include "dialogs/Preferences.hpp"
-#include "dialogs/Convert.hpp"
 #include "dialogs/wxFB_Dialogs.h"
 #include <wx/aboutdlg.h>
 
@@ -48,30 +47,14 @@
 #include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
 
+#ifdef XWORD_USE_LUA
+#   include "xwordlua.hpp"
+#endif // XWORD_USE_LUA
+
 // For the scrambling dialogs
 #include <wx/numdlg.h>
 
 #include "utils/SizerPrinter.hpp"
-
-#ifdef XWORD_USE_LUA
-    // Lua!
-
-    // wxWidgets binding initialization
-    #define wxLUA_USEBINDING_WXLUASOCKET 0
-    #define wxLUA_USEBINDING_WXGL 0
-    #define wxLUA_USEBINDING_WXMEDIA 0
-    #define wxLUA_USEBINDING_WXRICHTEXT 0
-
-    #include "wxlua/include/wxlua.h"
-    #include "wxbind/include/wxbinddefs.h"
-    WXLUA_DECLARE_BIND_ALL
-
-    // XWord binding initialization
-    extern bool wxLuaBinding_xword_init();
-
-    // For traversing the lua scripts directory
-    #include <wx/dir.h>
-#endif // XWORD_USE_LUA
 
 #if !defined(__WXMSW__) && !defined(__WXPM__)
     #include "../images/xword.xpm"
@@ -406,8 +389,28 @@ MyFrame::~MyFrame()
 // XWord puzzle loading / saving
 //------------------------------------------------------------------------------
 
+wxString
+MyFrame::GetLoadTypeString()
+{
+    return _T("Across Lite Format (*.puz)|*.puz")
+           _T("|")
+           _T("Plain Text Format (*.txt)|*.txt")
+           _T("|")
+           _T("Supported Types (*.puz;*.txt)|*.puz;*.txt")
+           _T("|")
+           _T("All Files (*.*)|*.*");
+}
+
+wxString
+MyFrame::GetSaveTypeString()
+{
+    return _T("Across Lite Format (*.puz)|*.puz")
+           _T("|")
+           _T("Plain Text Format (*.txt)|*.txt");
+}
+
 bool
-MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
+MyFrame::LoadPuzzle(const wxString & filename)
 {
     if ( ! ClosePuzzle(true) ) // Prompt for save
         return false;
@@ -416,21 +419,18 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
 
     try
     {
-        m_puz.Load(filename, ext);
+        m_isModified = false;
+        m_puz.Load(wx2puz(filename));
     }
-    catch (FatalPuzError & error)
-    {
-        // Do something more useful here.
-        m_puz.SetOk(false);
-        XWordMessage(MSG_PUZ_ERROR, error.what().c_str());
-    }
-    catch (PuzChecksumError &)
+    catch (puz::ChecksumError &)
     {
         m_puz.SetOk(XWordPrompt(MSG_CORRUPT_PUZ));
     }
-    catch (BasePuzError &)
+    catch (std::exception & err)
     {
-        m_puz.SetOk(XWordPrompt(MSG_CORRUPT_SECTION));
+        // Do something more useful here.
+        m_puz.SetOk(false);
+        XWordMessage(MSG_PUZ_ERROR, puz2wx(err.what()).c_str());
     }
     catch (...)
     {
@@ -441,12 +441,14 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
 
     ShowPuzzle();
 
+    m_filename = filename;
+
     if (m_puz.IsOk())
     {
         SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
-                                   m_puz.m_filename.c_str(),
+                                   m_filename.c_str(),
                                    sw.Time()));
-        m_gridCtrl->SetFocus();
+        m_XGridCtrl->SetFocus();
     }
     else
         SetStatus(_T("No file loaded"));
@@ -456,9 +458,9 @@ MyFrame::LoadPuzzle(const wxString & filename, const wxString & ext)
 
 
 bool
-MyFrame::SavePuzzle(wxString filename, const wxString & ext)
+MyFrame::SavePuzzle(wxString filename)
 {
-    m_puz.m_notes = m_notes->GetValue();
+    m_puz.m_notes = wx2puz(m_notes->GetValue());
     m_puz.m_time = m_time;
     m_puz.m_isTimerRunning = IsTimerRunning();
 
@@ -466,8 +468,7 @@ MyFrame::SavePuzzle(wxString filename, const wxString & ext)
         filename = wxFileSelector(
                         _T("Save Puzzle As"),
                         wxEmptyString, wxEmptyString, _T("puz"),
-                        XPuzzle::GetSaveTypeString()
-                            + _T("|All Files (*.*)|*.*"),
+                        GetSaveTypeString(),
                         wxFD_SAVE | wxFD_OVERWRITE_PROMPT
                    );
 
@@ -478,13 +479,14 @@ MyFrame::SavePuzzle(wxString filename, const wxString & ext)
 
     try
     {
-        m_puz.Save(filename, ext);
+        m_puz.Save(wx2puz(filename));
+        m_filename = filename;
 
         // Reset save/save as flag
         EnableSaveAs();
 
         SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
-                                   m_puz.m_filename.c_str(),
+                                   m_filename.c_str(),
                                    sw.Time()));
         return true;
     }
@@ -503,13 +505,13 @@ MyFrame::HandlePuzException()
     {
         throw;
     }
-    catch (BasePuzError & error)
+    catch (puz::Exception & err)
     {
-        XWordMessage(MSG_PUZ_ERROR, error.what().c_str());
+        XWordMessage(MSG_PUZ_ERROR, puz2wx(err.what()).c_str());
     }
-    catch (std::exception & error)
+    catch (std::exception & err)
     {
-        XWordMessage(MSG_STD_EXCEPTION, error.what());
+        XWordMessage(MSG_STD_EXCEPTION, err.what());
     }
     catch (...)
     {
@@ -525,7 +527,7 @@ MyFrame::ClosePuzzle(bool prompt)
     if (! m_puz.IsOk())
         return true;
 
-    if (prompt && m_puz.m_modified)
+    if (prompt && m_isModified)
     {
         int ret = XWordMessage(MSG_SAVE_PUZ);
 
@@ -533,7 +535,7 @@ MyFrame::ClosePuzzle(bool prompt)
             return false;
 
         if (ret == wxYES)
-            SavePuzzle(m_puz.m_filename);
+            SavePuzzle(m_filename);
     }
 
     SetStatus(_T("No file loaded"));
@@ -555,7 +557,7 @@ MyFrame::ShowPuzzle()
     EnableSaveAs();
     if (m_puz.IsOk())
     {
-        SetStatus(m_puz.m_filename);
+        SetStatus(m_filename);
         EnableTools(true);
     }
     else
@@ -583,13 +585,13 @@ void
 MyFrame::ShowGrid()
 {
     if (! m_puz.IsOk())
-        m_gridCtrl->SetXGrid(NULL);
+        m_XGridCtrl->SetGrid(NULL);
     else
     {
         // Make sure the grid has clue numbers assigned, etc.
         m_puz.m_grid.SetupGrid();
 
-        m_gridCtrl->SetXGrid(&m_puz.m_grid);
+        m_XGridCtrl->SetGrid(&m_puz.m_grid);
 
         const bool scrambled = m_puz.IsScrambled();
         // Enable / disable scrambling tools
@@ -598,14 +600,14 @@ MyFrame::ShowGrid()
         EnableCheck(! scrambled);
         EnableReveal(! scrambled);
 
-        m_gridCtrl->SetFocusedClue(1, DIR_ACROSS);
+        m_XGridCtrl->SetFocusedClue(1, puz::ACROSS);
 
         // Inform user if puzzle is already completed
         CheckPuzzle();
     }
 
-    m_gridCtrl->SetPaused(false);
-    m_gridCtrl->Refresh();
+    m_XGridCtrl->SetPaused(false);
+    m_XGridCtrl->Refresh();
 }
 
 
@@ -627,28 +629,28 @@ MyFrame::ShowTitle()
     }
     else
     {
-        SetTitle(m_puz.m_title + _T(" - ") XWORD_APP_NAME);
-        m_title->SetLabel(m_puz.m_title);
+        SetTitle(puz2wx(m_puz.m_title) + _T(" - ") XWORD_APP_NAME);
+        m_title->SetLabel(puz2wx(m_puz.m_title));
     }
 }
 
 void
 MyFrame::ShowAuthor()
 {
-    m_author->SetLabel(m_puz.m_author);
+    m_author->SetLabel(puz2wx(m_puz.m_author));
 }
 
 void
 MyFrame::ShowCopyright()
 {
-    m_copyright->SetLabel(m_puz.m_copyright);
+    m_copyright->SetLabel(puz2wx(m_puz.m_copyright));
 }
 
 
 void
 MyFrame::ShowNotes()
 {
-    m_notes->ChangeValue(m_puz.m_notes);
+    m_notes->ChangeValue(puz2wx(m_puz.m_notes));
     // Set the notes bitmap depending on whether there are notes or not
     if (m_puz.m_notes.empty())
         m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
@@ -660,9 +662,9 @@ MyFrame::ShowNotes()
 void
 MyFrame::CheckPuzzle()
 {
-    if (m_gridCtrl->GetBlankCount() == 0)
+    if (m_XGridCtrl->GetBlankCount() == 0)
     {
-        if (m_gridCtrl->IsCorrect())
+        if (m_XGridCtrl->IsCorrect())
         {
             StopTimer();
             m_status->SetAlert(_T("The puzzle is filled correctly!"),
@@ -689,10 +691,10 @@ MyFrame::CheckPuzzle()
 void
 MyFrame::CreateWindows()
 {
-    m_gridCtrl = new XGridCtrl(this);
+    m_XGridCtrl = new XGridCtrl(this);
 
-    m_across = new CluePanel(this, wxID_ANY, _T("Across"), DIR_ACROSS);
-    m_down   = new CluePanel(this, wxID_ANY, _T("Down"),   DIR_DOWN);
+    m_across = new CluePanel(this, wxID_ANY, _T("Across"), puz::ACROSS);
+    m_down   = new CluePanel(this, wxID_ANY, _T("Down"),   puz::DOWN);
 
     m_title      = new SizedText (this, wxID_ANY);
     m_author     = new SizedText (this, wxID_ANY);
@@ -900,7 +902,7 @@ void
 MyFrame::ManageWindows()
 {
     // Give everything a name so we can save and load the layout
-    m_mgr.AddPane(m_gridCtrl,
+    m_mgr.AddPane(m_XGridCtrl,
                   wxAuiPaneInfo()
                   .CaptionVisible(false)
                   .CenterPane()
@@ -1160,32 +1162,34 @@ MyFrame::LoadConfig()
     if (config.ReadBool(_T("fit")))
     {
         m_toolMgr.Check(wxID_ZOOM_FIT);
-        m_gridCtrl->FitGrid();
+        m_XGridCtrl->FitGrid();
     }
-    m_gridCtrl->SetGridStyle(config.ReadLong(_T("style")) );
+    m_XGridCtrl->SetGridStyle(config.ReadLong(_T("style")) );
 
-    m_gridCtrl->SetLetterFont(config.ReadFont(_T("letterFont")) );
-    m_gridCtrl->SetNumberFont(config.ReadFont(_T("numberFont")) );
+    m_XGridCtrl->SetLetterFont(config.ReadFont(_T("letterFont")) );
+    m_XGridCtrl->SetNumberFont(config.ReadFont(_T("numberFont")) );
 
-    m_gridCtrl->SetBorderSize(config.ReadLong(_T("lineThickness")));
+    m_XGridCtrl->SetBorderSize(config.ReadLong(_T("lineThickness")));
 
-    m_gridCtrl->SetFocusedLetterColor(
+    m_XGridCtrl->SetFocusedLetterColor(
         config.ReadColor(_T("focusedLetterColor")) );
-    m_gridCtrl->SetFocusedWordColor(
+    m_XGridCtrl->SetFocusedWordColor(
         config.ReadColor(_T("focusedWordColor")) );
-    m_gridCtrl->SetWhiteSquareColor(
+    m_XGridCtrl->SetBackgroundColour(
+        config.ReadColor(_T("backgroundColor")) );
+    m_XGridCtrl->SetWhiteSquareColor(
         config.ReadColor(_T("whiteSquareColor")) );
-    m_gridCtrl->SetBlackSquareColor(
-        config.ReadColor(_T("blackSquareColor"))) ;
-    m_gridCtrl->SetSelectionColor(
-        config.ReadColor(_T("selectionColor"))) ;
-    m_gridCtrl->SetPenColor(
+    m_XGridCtrl->SetBlackSquareColor(
+        config.ReadColor(_T("blackSquareColor")) );
+    m_XGridCtrl->SetSelectionColor(
+        config.ReadColor(_T("selectionColor")) );
+    m_XGridCtrl->SetPenColor(
         config.ReadColor(_T("penColor")) );
-    m_gridCtrl->SetPencilColor(
+    m_XGridCtrl->SetPencilColor(
         config.ReadColor(_T("pencilColor")) );
-    m_gridCtrl->SetNumberScale(
+    m_XGridCtrl->SetNumberScale(
         config.ReadLong(_T("numberScale")) / 100. );
-    m_gridCtrl->SetLetterScale(
+    m_XGridCtrl->SetLetterScale(
         config.ReadLong(_T("letterScale")) / 100. );
 
     // Clue Boxes
@@ -1249,6 +1253,7 @@ void
 MyFrame::SaveConfig()
 {
     ConfigManager & config = wxGetApp().GetConfigManager();
+
     // Window settings
     //----------------
     config.SetPath(_T("/Window"));
@@ -1277,20 +1282,22 @@ MyFrame::SaveConfig()
     //--------------
     config.SetPath(_T("/Grid"));
 
-    config.WriteLong(_T("style"), m_gridCtrl->GetGridStyle());
+    config.WriteLong(_T("style"), m_XGridCtrl->GetGridStyle());
     config.WriteBool(_T("fit"),   m_toolMgr.IsChecked(wxID_ZOOM_FIT));
-    config.WriteFont(_T("letterFont"),  m_gridCtrl->GetLetterFont());
-    config.WriteFont(_T("numberFont"),  m_gridCtrl->GetNumberFont());
-    config.WriteLong(_T("lineThickness"), m_gridCtrl->GetBorderSize());
+    config.WriteFont(_T("letterFont"),  m_XGridCtrl->GetLetterFont());
+    config.WriteFont(_T("numberFont"),  m_XGridCtrl->GetNumberFont());
+    config.WriteLong(_T("lineThickness"), m_XGridCtrl->GetBorderSize());
 
-    config.WriteColor(_T("focusedLetterColor"), m_gridCtrl->GetFocusedLetterColor());
-    config.WriteColor(_T("focusedWordColor"),   m_gridCtrl->GetFocusedWordColor());
-    config.WriteColor(_T("whiteSquareColor"),   m_gridCtrl->GetWhiteSquareColor());
-    config.WriteColor(_T("blackSquareColor"),   m_gridCtrl->GetBlackSquareColor());
-    config.WriteColor(_T("penColor"),           m_gridCtrl->GetPenColor());
-    config.WriteColor(_T("pencilColor"),        m_gridCtrl->GetPencilColor());
-    config.WriteLong(_T("numberScale"),         m_gridCtrl->GetNumberScale() * 100);
-    config.WriteLong(_T("letterScale"),         m_gridCtrl->GetLetterScale() * 100);
+    config.WriteColor(_T("backgroundColor"),    m_XGridCtrl->GetBackgroundColour());
+    config.WriteColor(_T("selectionColor"),     m_XGridCtrl->GetSelectionColor());
+    config.WriteColor(_T("focusedLetterColor"), m_XGridCtrl->GetFocusedLetterColor());
+    config.WriteColor(_T("focusedWordColor"),   m_XGridCtrl->GetFocusedWordColor());
+    config.WriteColor(_T("whiteSquareColor"),   m_XGridCtrl->GetWhiteSquareColor());
+    config.WriteColor(_T("blackSquareColor"),   m_XGridCtrl->GetBlackSquareColor());
+    config.WriteColor(_T("penColor"),           m_XGridCtrl->GetPenColor());
+    config.WriteColor(_T("pencilColor"),        m_XGridCtrl->GetPencilColor());
+    config.WriteLong(_T("numberScale"),         m_XGridCtrl->GetNumberScale() * 100);
+    config.WriteLong(_T("letterScale"),         m_XGridCtrl->GetLetterScale() * 100);
 
 
     // Clue Panel
@@ -1355,68 +1362,68 @@ MyFrame::SaveConfig()
 //------------------------------------------------------------------------------
 // Access to grid (mostly for Lua)
 //------------------------------------------------------------------------------
-XSquare *
+puz::Square *
 MyFrame::GetFocusedSquare()
 {
-    if (m_gridCtrl->IsEmpty())
+    if (m_XGridCtrl->IsEmpty())
         return NULL;
     else
-        return m_gridCtrl->GetFocusedSquare();
+        return m_XGridCtrl->GetFocusedSquare();
 }
 
-XSquare *
-MyFrame::SetFocusedSquare(XSquare * square)
+puz::Square *
+MyFrame::SetFocusedSquare(puz::Square * square)
 {
-    if (m_gridCtrl->IsEmpty())
+    if (m_XGridCtrl->IsEmpty())
         return false;
     else
         // TODO:These function names should really be consistent
-        return m_gridCtrl->SetSquareFocus(square);
+        return m_XGridCtrl->SetSquareFocus(square);
 }
 
 void
-MyFrame::GetFocusedWord(XSquare ** start, XSquare ** end)
+MyFrame::GetFocusedWord(puz::Square ** start, puz::Square ** end)
 {
-    if (m_gridCtrl->IsEmpty())
+    if (m_XGridCtrl->IsEmpty())
     {
         *start = NULL;
         *end = NULL;
     }
     else
-        m_gridCtrl->GetFocusedWord(start, end);
+        m_XGridCtrl->GetFocusedWord(start, end);
 }
 
-bool
+puz::GridDirection
 MyFrame::GetFocusedDirection() const
 {
-    return m_gridCtrl->GetDirection();
+    return m_XGridCtrl->GetDirection();
 }
 
 void
-MyFrame::SetFocusedDirection(bool direction)
+MyFrame::SetFocusedDirection(puz::GridDirection direction)
 {
-    m_gridCtrl->SetDirection(direction);
+    m_XGridCtrl->SetDirection(direction);
 }
 
-const XPuzzle::Clue *
+const puz::Puzzle::Clue *
 MyFrame::GetFocusedClue()
 {
-    XSquare * start;
-    XSquare * end;
+    puz::Square * start;
+    puz::Square * end;
     GetFocusedWord(&start, &end);
     if (start == NULL)
         return NULL;
-    else if (GetFocusedDirection() == DIR_ACROSS)
+    else if (GetFocusedDirection() == puz::ACROSS)
         return &*m_puz.GetAcross().Find(start->GetNumber());
     else
         return &*m_puz.GetDown().Find(start->GetNumber());
 }
 
 bool
-MyFrame::SetSquareText(XSquare * square, const wxString & text)
+MyFrame::SetSquareText(puz::Square * square, const wxString & text)
 {
-    const bool ret = m_gridCtrl->SetSquareText(*square, text);
-    m_gridCtrl->RefreshSquare(*square);
+    const bool ret = m_XGridCtrl->SetSquareText(*square, text);
+    m_XGridCtrl->RefreshSquare(*square);
     return ret;
 }
 
@@ -1435,8 +1442,7 @@ MyFrame::OnOpenPuzzle(wxCommandEvent & WXUNUSED(evt))
                             wxEmptyString,
                             wxEmptyString,
                             _T("puz"),
-                            XPuzzle::GetLoadTypeString()
-                                + _T("|All Files (*.*)|*.*"),
+                            GetLoadTypeString(),
                             wxFD_OPEN | wxFD_FILE_MUST_EXIST
                         );
 
@@ -1455,7 +1461,7 @@ MyFrame::OnSavePuzzleAs(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnSavePuzzle(wxCommandEvent & WXUNUSED(evt))
 {
-    SavePuzzle(m_puz.m_filename);
+    SavePuzzle(m_filename);
 }
 
 
@@ -1464,7 +1470,7 @@ MyFrame::OnSavePuzzle(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnZoomFit(wxCommandEvent & evt)
 {
-    m_gridCtrl->FitGrid(evt.IsChecked());
+    m_XGridCtrl->FitGrid(evt.IsChecked());
 }
 
 
@@ -1472,7 +1478,7 @@ void
 MyFrame::OnZoomIn(wxCommandEvent & WXUNUSED(evt))
 {
     m_toolMgr.Check(wxID_ZOOM_FIT, false);
-    m_gridCtrl->ZoomIn();
+    m_XGridCtrl->ZoomIn();
 }
 
 
@@ -1480,7 +1486,7 @@ void
 MyFrame::OnZoomOut(wxCommandEvent & WXUNUSED(evt))
 {
     m_toolMgr.Check(wxID_ZOOM_FIT, false);
-    m_gridCtrl->ZoomOut();
+    m_XGridCtrl->ZoomOut();
 }
 
 
@@ -1489,62 +1495,62 @@ MyFrame::OnZoomOut(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnCheckGrid(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckGrid();
+    m_XGridCtrl->CheckGrid();
 }
 
 void
 MyFrame::OnCheckSelection(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckSelection();
+    m_XGridCtrl->CheckSelection();
 }
 
 void
 MyFrame::OnCheckWord(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckWord();
+    m_XGridCtrl->CheckWord();
 }
 
 void
 MyFrame::OnCheckLetter(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckLetter();
+    m_XGridCtrl->CheckLetter();
 }
 
 void
 MyFrame::OnRevealGrid(wxCommandEvent & WXUNUSED(evt))
 {
     if (XWordPrompt(MSG_REVEAL_ALL))
-        m_gridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL);
+        m_XGridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL);
 }
 
 void
 MyFrame::OnRevealSelection(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckSelection(REVEAL_ANSWER | CHECK_ALL);
+    m_XGridCtrl->CheckSelection(REVEAL_ANSWER | CHECK_ALL);
 }
 
 void
 MyFrame::OnRevealIncorrectSelection(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckSelection(REVEAL_ANSWER);
+    m_XGridCtrl->CheckSelection(REVEAL_ANSWER);
 }
 
 void
 MyFrame::OnRevealIncorrect(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckGrid(REVEAL_ANSWER);
+    m_XGridCtrl->CheckGrid(REVEAL_ANSWER);
 }
 
 void
 MyFrame::OnRevealWord(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckWord(REVEAL_ANSWER | CHECK_ALL);
+    m_XGridCtrl->CheckWord(REVEAL_ANSWER | CHECK_ALL);
 }
 
 void
 MyFrame::OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
 {
-    m_gridCtrl->CheckLetter(REVEAL_ANSWER | CHECK_ALL);
+    m_XGridCtrl->CheckLetter(REVEAL_ANSWER | CHECK_ALL);
 }
 
 
@@ -1553,7 +1559,7 @@ MyFrame::OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 {
-    wxASSERT(m_gridCtrl->GetXGrid() != NULL);
+    wxASSERT(m_XGridCtrl->GetGrid() != NULL);
     int key = wxGetNumberFromUser(
                     _T("Enter a four-digit key"),
                     _T("Key (0 to generate automatically):"),
@@ -1567,11 +1573,11 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
     if (key < 1000)
         key = 0;
 
-    if (m_gridCtrl->GetXGrid()->ScrambleSolution(key))
+    if (m_XGridCtrl->GetGrid()->ScrambleSolution(key))
     {
-        XWordMessage(MSG_SCRAMBLE, m_gridCtrl->GetXGrid()->GetKey());
+        XWordMessage(MSG_SCRAMBLE, m_XGridCtrl->GetGrid()->GetKey());
 
-        m_gridCtrl->RecheckGrid();
+        m_XGridCtrl->RecheckGrid();
         CheckPuzzle();
 
         m_toolMgr.Enable(ID_SCRAMBLE, false);
@@ -1592,9 +1598,9 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 {
-    wxASSERT(m_gridCtrl->GetXGrid() != NULL);
+    wxASSERT(m_XGridCtrl->GetGrid() != NULL);
 
-    int key = m_gridCtrl->GetXGrid()->GetKey();
+    int key = m_XGridCtrl->GetGrid()->GetKey();
 
     if (key == 0)
     {
@@ -1609,7 +1615,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
             return;
     }
 
-    if (m_gridCtrl->UnscrambleSolution(key))
+    if (m_XGridCtrl->UnscrambleSolution(key))
     {
         XWordMessage(MSG_UNSCRAMBLE);
 
@@ -1771,7 +1777,7 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
 void
 MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
 {
-    ConvertDialog(this).ShowModal();
+    //ConvertDialog(this).ShowModal();
 }
 
 
@@ -1780,14 +1786,13 @@ MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
 
 #ifdef XWORD_USE_LUA
 
-#include <wx/stdpaths.h>
 void
 MyFrame::LuaInit()
 {
     // Initialze wxLua.
-    WXLUA_IMPLEMENT_BIND_ALL
-    wxLuaBinding_xword_init();
+    XWORD_LUA_IMPLEMENT_BIND_ALL
     m_lua = wxLuaState(this, wxID_ANY);
+    xword_setup_lua_paths(m_lua);
 
     // Initialize the lua additions to the xword package
     RunLuaScript(GetScriptsDir() + _T("/xword/init.lua"));
@@ -1811,9 +1816,7 @@ void
 MyFrame::OnLuaPrint(wxLuaEvent & evt)
 {
     // Escape % to %% for printing
-    wxString msg = evt.GetString();
-    msg.Replace(_T("%"), _T("%%"));
-    wxLogDebug(msg);
+    wxLogDebug(_T("%s"), evt.GetString());
 }
 
 
@@ -1821,9 +1824,7 @@ void
 MyFrame::OnLuaError(wxLuaEvent & evt)
 {
     // Escape % to %% for printing
-    wxString msg = evt.GetString();
-    msg.Replace(_T("%"), _T("%%"));
-    XWordErrorMessage(msg);
+    XWordErrorMessage(_T("%s"), evt.GetString());
 }
 
 #endif // XWORD_USE_LUA
@@ -1973,18 +1974,18 @@ MyFrame::OnGridFocus(wxPuzEvent & evt)
 {
     // Update everything
 
-    if (evt.GetDirection() == DIR_ACROSS)
+    if (evt.GetDirection() == puz::ACROSS)
     {
         m_across->SetClueNumber(evt.GetAcrossClue(), CluePanel::FOCUSED);
         m_down  ->SetClueNumber(evt.GetDownClue(), CluePanel::CROSSING);
-        m_cluePrompt->SetClue(evt.GetAcrossClue(), DIR_ACROSS,
+        m_cluePrompt->SetClue(evt.GetAcrossClue(), puz::ACROSS,
                               m_across->GetClueText());
     }
     else
     {
         m_across->SetClueNumber(evt.GetAcrossClue(), CluePanel::CROSSING);
         m_down  ->SetClueNumber(evt.GetDownClue(), CluePanel::FOCUSED);
-        m_cluePrompt->SetClue(evt.GetDownClue(), DIR_DOWN,
+        m_cluePrompt->SetClue(evt.GetDownClue(), puz::DOWN,
                               m_down->GetClueText());
     }
 
@@ -1996,18 +1997,18 @@ MyFrame::OnGridFocus(wxPuzEvent & evt)
 void
 MyFrame::OnClueFocus(wxPuzEvent & evt)
 {
-    m_gridCtrl->ChangeFocusedClue(evt.GetClueNumber(), evt.GetDirection());
+    m_XGridCtrl->ChangeFocusedClue(evt.GetClueNumber(), evt.GetDirection());
 
     m_cluePrompt->SetClue(evt.GetClueNumber(), evt.GetDirection(),
                           evt.GetClueText());
 
-    const XSquare * crossingStart = m_gridCtrl->GetFocusedSquare()
-                                        ->GetWordStart(! evt.GetDirection());
+    const puz::Square * crossingStart = m_XGridCtrl->GetFocusedSquare()
+        ->GetWordStart(evt.GetDirection() == puz::ACROSS ? puz::DOWN : puz::ACROSS);
     const int crossingClue = (crossingStart == NULL ?
                                0 :
                                crossingStart->GetNumber());
 
-    if (evt.GetDirection() == DIR_ACROSS)
+    if (evt.GetDirection() == puz::ACROSS)
         m_down->  SetClueNumber(crossingClue, CluePanel::CROSSING);
     else
         m_across->SetClueNumber(crossingClue, CluePanel::CROSSING);
@@ -2018,9 +2019,9 @@ void
 MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
 {
     // Change the save/save as button
-    if (! m_puz.m_modified)
+    if (! m_isModified)
     {
-        m_puz.m_modified = true;
+        m_isModified = true;
         EnableSave();
     }
     CheckPuzzle();
@@ -2045,7 +2046,7 @@ MyFrame::OnActivate(wxActivateEvent & evt)
             // Keep focus on the XGridCtrl
             // This isn't the best solution, but seems to work despite all the
             // SetFocus() failed messages
-            m_gridCtrl->SetFocus();
+            m_XGridCtrl->SetFocus();
 
             OnAppActivate();
         }
@@ -2062,7 +2063,7 @@ MyFrame::OnAppActivate()
     {
         wxLogDebug(_T("Starting timer."));
         m_timer.Start();
-        m_gridCtrl->SetPaused(false);
+        m_XGridCtrl->SetPaused(false);
     }
 }
 
@@ -2073,7 +2074,7 @@ MyFrame::OnAppDeactivate()
     if (m_toolMgr.IsChecked(ID_TIMER))
     {
         m_timer.Stop();
-        m_gridCtrl->SetPaused(true);
+        m_XGridCtrl->SetPaused(true);
     }
 }
 
@@ -2148,7 +2149,7 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
 
     wxString str;
 
-    XGrid * grid = m_gridCtrl->GetXGrid();
+    puz::Grid * grid = m_XGridCtrl->GetGrid();
 
     str << _T("Grid size (w x h): ") << _T("\n")
         << (int)grid->GetWidth() << _T(" x ")
@@ -2159,12 +2160,12 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
 
     str << _T("Solution:") << _T("\n");
 
-    for (XSquare * square = grid->First();
+    for (puz::Square * square = grid->First();
          square != NULL;
          square = square->Next())
     {
         str << static_cast<wxChar>(square->GetPlainSolution());
-        if (square->IsLast(DIR_ACROSS))
+        if (square->IsLast(puz::ACROSS))
             str << _T("\n");
     }
 
@@ -2172,12 +2173,12 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
 
     str << _T("User grid:") << _T("\n");
 
-    for (XSquare * square = grid->First();
+    for (puz::Square * square = grid->First();
          square != NULL;
          square = square->Next())
     {
         str << static_cast<wxChar>(square->GetPlainText());
-        if (square->IsLast(DIR_ACROSS))
+        if (square->IsLast(puz::ACROSS))
             str << _T("\n");
     }
 
@@ -2218,7 +2219,7 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
     str << _T("\n");
 
     str << _T("User rebus:") <<_T("\n");
-    for (XSquare * square = grid->First();
+    for (puz::Square * square = grid->First();
          square != NULL;
          square = square->Next())
     {
@@ -2230,20 +2231,20 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
                     << static_cast<int>(square->GetText().at(2))
                     << _T("]");
             else
-                str << square->GetText();
+                str << puz2wx(square->GetText());
         }
         else
             str << _T(" ");
         str << _T("]");
 
-        if (square->IsLast(DIR_ACROSS))
+        if (square->IsLast(puz::ACROSS))
             str << _T("\n");
     }
 
     str << _T("\n");
 
     str << _T("Solution rebus:") <<_T("\n");
-    for (XSquare * square = grid->First();
+    for (puz::Square * square = grid->First();
          square != NULL;
          square = square->Next())
     {
@@ -2255,13 +2256,13 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
                     << static_cast<int>(square->GetSolution().at(2))
                     << _T("]");
             else
-                str << square->GetSolution();
+                str << puz2wx(square->GetSolution());
         }
         else
             str << _T(" ");
         str << _T("]");
 
-        if (square->IsLast(DIR_ACROSS))
+        if (square->IsLast(puz::ACROSS))
             str << _T("\n");
     }
 
@@ -2269,12 +2270,12 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
 
     str << _T("Unrecognized sections:") <<_T("\n");
 
-    std::vector<XPuzzle::section>::iterator it;
+    std::vector<puz::Puzzle::section>::iterator it;
     for (it  = m_puz.m_extraSections.begin();
          it != m_puz.m_extraSections.end();
          ++it)
     {
-        str << it->name
+        str << puz2wx(it->name)
             << wxString::Format(_T("  (length = %d)"), it->data.size())
             << _T("\n");
     }
@@ -2344,7 +2345,7 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
 
     UnscrambleDialog * dlg = new UnscrambleDialog(this);
     dlg->Show();
-    XGridScrambler scrambler(m_puz.m_grid);
+    puz::Scrambler scrambler(m_puz.m_grid);
     unsigned short key = 0;
     wxStopWatch sw;
     dlg->StartTimer();

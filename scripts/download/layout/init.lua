@@ -32,20 +32,8 @@ function layout.addLayout(name, func, ...)
     layout.layouts[name] = { name = name, func = func, args = arg }
 end
 
-
--- Create a menu for switching layouts
-function layout.createMenu()
-    local dlg = assert(P.dlg)
-    local menu = wx.wxMenu()
-        for _, l in ipairs(layout.layouts) do
-            local item = menu:AppendRadioItem(wx.wxID_ANY, l.name)
-            dlg:Connect(item:GetId(), wx.wxEVT_COMMAND_MENU_SELECTED,
-                function(evt)
-                    layout.setLayout(l.func, nil, unpack(l.args))
-                end)
-        end
-    return menu
-end
+require 'download.layout.callbacks'
+require 'download.layout.menus'
 
 
 -- Create a single download ctrl, adding it to the download dialog's
@@ -56,14 +44,12 @@ function layout.createDownloadCtrl(source, d)
         dlg.downloads:addsource(source.display)
     end
     local dl = dlg.downloads[source.display][d]
-    -- Download does not exist; create it.
-    if not dl then
+    if not dl then -- Download does not exist so create it.
         dl = P.DownloadCtrl(dlg.panel, source, d)
         dlg.downloads[source.display][d] = dl
     end
-    -- Add the download to the various downloads list.
-    table.insert(dlg.downloadslist, dl)
-    table.insert(dlg.pendingdownloads, dl)
+    -- Add the download to the various download lists.
+    table.insert(dlg.alldownloads, dl)
 end
 
 
@@ -89,22 +75,17 @@ function layout.createDownloadCtrls(...)
 
     -- Figure out which parameters we got
 
-    -- All args
     if #arg >= 3 then
         sources, start_date, end_date = unpack(arg)
     elseif #arg == 2 then
-        -- start_date, end_date
         if arg[1].daynum then -- arg[1] is a date
             start_date, end_date = unpack(arg)
-        -- sources, start_date
         else
             sources, start_date = unpack(arg)
         end
     elseif #arg == 1 then
-        -- start_date
         if arg[1].daynum then -- arg[1] is a date
             start_date = unpack(arg)
-        -- sources
         else
             sources = unpack(arg)
         end
@@ -128,30 +109,30 @@ function layout.createDownloadCtrls(...)
         local d = start_date:copy()
         while d <= end_date do
             layout.createDownloadCtrl(source, d)
-            d:adddays(1) -- Next day
+            d:adddays(1)
         end
     end
 end
 
 
 -- Destroy old download ctrls and remove them from dlg.downloads.
--- New ctrls are those that are present in both dlg.downloadslist and
+-- New ctrls are those that are present in both dlg.alldownloads and
 -- dlg.downloads (i.e. they have been created since the last call to
---  layout.setLayout()
--- The layout function may call this function after creating all download ctrls.
+--  layout.setLayout()).  Old downloads are only present in dlg.downloads.
 function layout.cleanDownloadCtrls()
     -- Create a reverse download ctrl table { [dl] = idx }
     local ctrls = {}
-    for k, v in pairs(P.dlg.downloadslist) do ctrls[v] = k end
+    for k, v in pairs(P.dlg.alldownloads) do ctrls[v] = k end
 
     -- Find all the extra download ctrls
-    for _, dls in pairs(P.dlg.downloads) do
-        for dl_date, dl in pairs(dls) do
+    for _, source in pairs(P.dlg.downloads) do
+        for dl_date, dl in pairs(source) do
             if not ctrls[dl] then
                 print("Destroying", dl.ctrl)
                 dl.ctrl:Destroy()
-                -- Lua reference manual says this is OK
-                dls[dl_date] = nil
+                -- Lua reference manual says it is OK to remove a value from
+                -- a hash table during iteration.
+                source[dl_date] = nil
             end
         end
     end
@@ -162,9 +143,8 @@ end
 function layout.cleanLayout()
     -- Clean download ctrls from dlg.downloads
     layout.cleanDownloadCtrls()
-    --if true then return end
 
-    -- Destroy any extra child windows
+    -- Destroy any other child windows
     local child = P.dlg.panel.Children.First
     while child do
         local window = child.Data:DynamicCast("wxWindow")
@@ -175,15 +155,14 @@ function layout.cleanLayout()
 end
 
 
--- Change the layout, providing either a function or a name.
+-- Change the layout, providing either a function or a layout name.
 -- Handle aborting current downloads, freezing and thawing the dialog,
 -- resetting the download tables, destroying child windows, etc.
-function layout.setLayout(func, start_date, ...)
+function layout.setLayout(layoutFunc, start_date, ...)
     -- Find the function in the layouts table if we were given a string
-    if type(func) == "string" then
-        local desc = layout.layouts[func]
-        if not desc then return end
-        func = desc.func
+    if type(layoutFunc) == "string" then
+        local desc = assert(layout.layouts[layoutFunc])
+        layoutFunc = desc.func
         if #arg == 0 then arg = desc.args end
     end
 
@@ -201,10 +180,10 @@ function layout.setLayout(func, start_date, ...)
                              #dlg.activedownloads))
         then
             dlg.AbortDownloads()
-            -- Call this function again when all downloads have ended.
+            -- Call this function again when all downloads have completed.
             dlg.OnDownloadEnd(
                 function()
-                    layout.setLayout(func, start_date, unpack(arg))
+                    layout.setLayout(layoutFunc, start_date, unpack(arg))
                 end)
         else
             -- Do nothing if the user answered "No"
@@ -212,21 +191,21 @@ function layout.setLayout(func, start_date, ...)
         end
     end
 
-    -- Do the layout
     dlg:Freeze()
+
     -- Set a dummy sizer to destroy the previous one
     dlg.panel:SetSizer(wx.wxBoxSizer(wx.wxVERTICAL))
-    --dlg.panel:DestroyChildren()
 
     -- downloads owned by the dialog:
     -- (hash)  downloads["displayName"][date]
-    -- (array) downloadslist[] ...
-    -- Don't touch dlg.downloads yet, in case we need to use existing ctrls.
-    dlg.downloadslist = {}
-    dlg.pendingdownloads = {}
+    -- (array) alldownloads[] ...
+    -- We won't touch the dlg.downloads hash table in case we can reuse some
+    -- of the existing download ctrls.
+    dlg.alldownloads = {}
     dlg.activedownloads = {}
 
-    func(start_date, unpack(arg))
+    -- Create the new layout
+    layoutFunc(start_date, unpack(arg))
 
     -- Make sure the layout set a sizer or we'll have big problems
     assert(dlg.panel.Sizer)
@@ -236,54 +215,12 @@ function layout.setLayout(func, start_date, ...)
     -- window that is not part of a sizer will be destroyed.
     layout.cleanLayout()
 
+    layout.updateMenus()
+
     dlg.scroller:FitInside()
     dlg.scroller:Scroll(0,0)
 
     dlg:Thaw()
-end
-
--- ============================================================================
--- Button callbacks
--- ============================================================================
-
--- Return a callback function that will start all downloads in the given
--- table of DownloadCtrls.
--- Default is all download controls
-function layout.downloadAll(ctrls)
-    -- ipairs will only iterate numeric keys, so the entire download table
-    -- is safe to use here.
-    local ctrls = ctrls or P.dlg.downloadslist
-
-    return function()
-        for _, dl in ipairs(ctrls) do
-            wx.wxSafeYield() -- Prevent locking
-            dl.start()
-        end
-    end
-end
-
-
--- Download all puzzles on a given date
-function layout.downloadAllDates(target_date)
-    local ctrls = {}
-    for name, dates in pairs(P.dlg.downloads) do
-        for dl_date, dl in pairs(dates) do
-            if target_date == dl_date then
-                table.insert(ctrls, dl)
-            end
-        end
-    end
-    return layout.downloadAll(ctrls)
-end
-
-
--- Download all available puzzles from a given source
-function layout.downloadAllPuzzles(target_label)
-    local ctrls = {}
-    for _, dl in pairs(P.dlg.downloads[target_label]) do
-        table.insert(ctrls, dl)
-    end
-    return layout.downloadAll(ctrls)
 end
 
 
@@ -308,6 +245,7 @@ function layout.Header(parent, text, bold)
     return header
 end
 
--- Require the actual layouts (order is important)
+
+-- Require the layouts (this order determines the menu order)
 require 'download.layout.grid'
 require 'download.layout.puzzle'

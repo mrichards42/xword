@@ -73,7 +73,11 @@ protected:
     virtual void OnSelectedLetterColor(wxColourPickerEvent & evt);
     virtual void OnSelectedWordColor(wxColourPickerEvent & evt);
     virtual void OnPenColor(wxColourPickerEvent & evt);
-    virtual void OnPencilColor(wxColourPickerEvent & evt);
+    // virtual void OnPencilColor(wxColourPickerEvent & evt);
+    virtual void OnGridBackgroundColor(wxColourPickerEvent & evt);
+    virtual void OnWhiteSquareColor(wxColourPickerEvent & evt);
+    virtual void OnBlackSquareColor(wxColourPickerEvent & evt);
+    virtual void OnGridSelectionColor(wxColourPickerEvent & evt);
 
     // Clue Prompt
     virtual void OnPromptBackgroundColor(wxColourPickerEvent & evt);

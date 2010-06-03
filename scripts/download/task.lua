@@ -10,7 +10,6 @@ require 'download.defs'
 -- curl options and values are optional, but must come in pairs.
 -- Only string and number values are allowed
 local parent, url, filename = unpack(arg)
-for k,v in pairs(arg) do task.debug(k.." = "..v) end
 assert(parent)
 assert(url)
 assert(filename)
@@ -65,7 +64,6 @@ end
 
 local f = assert(io.open(filename, 'wb'))
 
-task.debug("curl setup")
 -- Setup the cURL object
 require 'luacurl'
 local c = curl.easy_init()
@@ -77,11 +75,9 @@ c:setopt(curl.OPT_NOPROGRESS, 0)
 
 -- Set user-defined options
 for k, v in pairs(curlopts) do c:setopt(k, v) end
-task.debug("curl start")
 -- Run the download
 task.post(parent, '', download.DL_START)
 local rc, errstr = c:perform()
 task.post(parent, {rc, errstr}, download.DL_END)
-task.debug("curl end")
 -- Cleanup
 f:close()
