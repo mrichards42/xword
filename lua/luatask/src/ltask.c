@@ -328,11 +328,12 @@ static int reg_taskfind( lua_State *L) {
     OsLockMutex( tlMutex, INFINITE);
     
     for( i = 0; i < countTask; i++)
-        if( aTask[i]->id != NULL)
-            if( !strcmp( aTask[i]->id, id)) {
-                lrc = i + 1;
-                break;
-            }
+        if( aTask[i]->running != 0) /* segfault trying to compare strings on nonexistent tasks */
+            if (aTask[i]->id != NULL)
+                if( !strcmp( aTask[i]->id, id)) {
+                    lrc = i + 1;
+                    break;
+                }
 
     OsUnlockMutex( tlMutex);
 
