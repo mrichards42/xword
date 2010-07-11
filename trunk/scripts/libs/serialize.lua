@@ -159,3 +159,57 @@ function serialize (x)
       return "return " .. toplevel
    end
 end
+
+
+-- Pretty print a non-recursive table of number, string, or boolean values
+-- Returns a string
+function pprintTable(t, indent, prev_tables)
+    assert(type(t) == "table")
+    indent = indent or 0
+    prev_tables = prev_tables or {}
+    prev_tables[t] = true
+
+    local function serializeKey(k)
+        local tp = type(k)
+        if tp == "string" then
+            if k:match("[_%a][_%a%d]*") == k then
+                return k
+            else
+                return string.format("[%q]", k)
+            end
+        elseif tp == "number" or tp == "boolean" then
+            return '['..tostring(k)..']'
+        else
+            error("Can't serialize key type: "..tp)
+        end
+    end
+
+    local function serializeValue(v)
+        local tp = type(v)
+        if tp == "table" then
+            if prev_tables[v] then error("Recursive table found: "..tostring(v)) end
+            return '\n'..pprintTable(v, indent + 1, prev_tables)
+        elseif tp == "string" then
+            return string.format("%q", v)
+        elseif tp == "number" or tp == "boolean" then
+            return tostring(v)
+        else
+            error("Can't serialize value type: "..tp)
+        end
+    end
+
+    local ret = {}
+    table.insert(ret, string.rep(" ", 4*indent).."{")
+    local array_part = {}
+    for i,v in ipairs(t) do
+        array_part[i] = true
+        table.insert(ret, string.rep(" ", 4*(indent+1))..serializeValue(v)..',')
+    end
+    for k,v in pairs(t) do
+        if not array_part[k] then
+            table.insert(ret, string.rep(" ", 4*(indent+1))..serializeKey(k)..' = '..serializeValue(v)..',')
+        end
+    end
+    table.insert(ret, string.rep(" ", 4*indent).."}")
+    return table.concat(ret, "\n")
+end

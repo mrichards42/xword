@@ -1,6 +1,7 @@
 -- Adapting the queue example from PiL as a class
 
-Queue = {}
+local Queue = {}
+
 function Queue:new()
     local obj = {first = 0, last = -1}
     self.__index = self
@@ -47,4 +48,8 @@ end
 -- Using __len doesn't override the # operator for tables
 function Queue:length()
     return self.last - self.first + 1
+end
+
+function task.newQueue()
+    return Queue:new()
 end
