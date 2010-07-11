@@ -33,6 +33,7 @@ end
 
 function mt:subst_new()      return self.type.new end
 function mt:subst_var()      return self.name end
+function mt:subst_qname()    return self.type:subst_qname() end
 function mt:subst_get()      return self.type.get end
 function mt:subst_push()     return self.type.push end
 function mt:subst_query()      return self.type.query end

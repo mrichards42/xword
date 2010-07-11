@@ -17,6 +17,7 @@ extern "C" {
 // luapuz
 // ---------------------------------------------------------------------------
 
+#include "luapuz_std.hpp"
 #include "luapuz_puz.hpp"
 
 // This needs to be extern "C" because of C++ name mangling

@@ -92,7 +92,9 @@ extern "C" {
 ]]))
     -- Register the namespaces
     for _, ns in ipairs(bind.global_namespace.namespaces) do
-        f:write(ns:fmt("    [openfunc](L);\n"))
+        if ns.register ~= false then
+            f:write(ns:fmt("    [openfunc](L);\n"))
+        end
     end
 
     f:write(self:fmt([[

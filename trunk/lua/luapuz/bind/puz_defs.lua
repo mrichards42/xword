@@ -4,6 +4,15 @@ dofile "init.lua"
 
 library("luapuz", "puz")
 
+namespace{"std", register=false}
+typedef{"vector<puz::Square*>", luatype="LUA_TTABLE",
+        headers={"<vector>", "puz/Square.hpp"},
+        get = "luapuz_checkSquareVector",
+        push = "luapuz_pushSquareVector",
+        check_func=overrides.checkSquareVector,
+        push_func=overrides.pushSquareVector,
+        subst_var="squares"}
+
 namespace "puz"
 
 enum{ "GridDirection", header="puz/Square.hpp",
@@ -54,33 +63,34 @@ class{"Square", header="puz/Square.hpp"}
     func{"IsFirst", returns="bool",
          arg("GridDirection", "dir"), arg("FindDirection", "inc", "puz::NEXT")}
 
+    func{"IsOk", returns="bool"}
     func{"IsWhite", returns="bool"}
     func{"IsBlack", returns="bool"}
     func{"IsBlank", returns="bool"}
 
     func{"GetText", returns="std::string"}
     func{"GetPlainText", returns="char"}
-    func{"GetTextSymbol", returns="unsigned short", throws=true}
+    func{"GetTextSymbol", returns="unsigned char", throws=true}
     func{"SetText", arg("std::string", "text"), throws=true}
     func{"HasTextRebus", returns="bool"}
     func{"HasTextSymbol", returns="bool"}
 
     func{"GetSolution", returns="std::string"}
     func{"GetPlainSolution", returns="char"}
-    func{"GetSolutionSymbol", returns="unsigned short", throws=true}
+    func{"GetSolutionSymbol", returns="unsigned char", throws=true}
     func{"SetSolution", arg("std::string", "solution"), throws=true}
     func{"SetSolution", arg("std::string", "solution"), arg("char", "plain"), throws=true}
     func{"SetPlainSolution", arg("char", "plain")}
     func{"SetSolutionRebus", arg("std::string", "rebus"), throws=true}
-    func{"SetSolutionSymbol", arg("unsigned short", "symbol"), throws=true}
+    func{"SetSolutionSymbol", arg("unsigned char", "symbol"), throws=true}
     func{"HasSolutionRebus", returns="bool"}
     func{"HasSolutionSymbol", returns="bool"}
 
-    func{"Check", returns="bool", arg("bool", "checkBlank")}
+    func{"Check", returns="bool", arg("bool", "checkBlank", "false"),
+                                  arg("bool", "strictRebus", "false") }
 
     func{"GetNumber", returns="short"}
-    func{"HasClue", returns="bool"}
-    func{"HasClue", returns="bool", arg("GridDirection", "dir")}
+    func{"HasClue", returns="bool", arg("GridDirection", "dir", "puz::NONE")}
 
     func{"SetFlag", arg("unsigned char", "flag")}
     func{"AddFlag", arg("unsigned char", "flag")}
@@ -105,6 +115,7 @@ class{"Square", header="puz/Square.hpp"}
     func{"IsValidChar", static=true, returns="bool", arg("char", "ch")}
     func{"IsSymbol", static=true, returns="bool", arg("std::string", "str")}
 
+
 class{"Grid", header="puz/Grid.hpp"}
     enum {"GridState",
         "GRID_NONE",
@@ -125,8 +136,8 @@ class{"Grid", header="puz/Grid.hpp"}
     func{"SetSize", arg("size_t", "width"), arg("size_t", "height")}
     func{"GetWidth", returns="size_t"}
     func{"GetHeight", returns="size_t"}
-    func{"LastRow", returns="int"}
-    func{"LastCol", returns="int"}
+    func{"LastRow", override=overrides.Grid_LastRow}
+    func{"LastCol", override=overrides.Grid_LastCol}
 
     func{"IsEmpty", returns="bool"}
     func{"Clear"}
@@ -155,38 +166,50 @@ class{"Grid", header="puz/Grid.hpp"}
                       arg("Square *", "start"),
                       arg("Square *", "end")}
 
-    func{"CheckSquare", returns="bool", arg("Square &", "square"), arg("bool", "checkBlank", "false")}
+    func{"CountClues", override=overrides.Grid_CountClues}
+
+    func{"CheckGrid", returns="vector<puz::Square*>", override=overrides.Grid_CheckGrid}
+    func{"CheckWord", override=overrides.Grid_CheckWord}
+    func{"CheckSquare", returns="bool",
+                        arg("Square &", "square"),
+                        arg("bool", "checkBlank", "false"),
+                        arg("bool", "strictRebus", "false")}
+
+    -- Find functions
+    func{"FindSquare", override=overrides.Grid_FindSquare,
+                       arg("GridDirection", "direction"),
+                       arg("FindDirection", "increment")}
 
 class{"Puzzle", header="puz/Puzzle.hpp", cppheader="luapuz_puz_Puzzle_helpers.hpp"}
     typedef{"ClueList", luatype="LUA_TTABLE",
-            check=overrides.checkClueList,
             header="<algorithm>",
-            push=overrides.pushClueList}
+            check_func=overrides.checkClueList,
+            push_func=overrides.pushClueList}
 
     func{"Puzzle", override=overrides.Puzzle_Puzzle}
     func{"Load", override=overrides.Puzzle_Load}
     func{"Save", override=overrides.Puzzle_Save}
 
-    func{"AddLoadHandler", override=overrides.Puzzle_AddLoadHandler, static=true}
-    func{"AddSaveHandler", override=overrides.Puzzle_AddSaveHandler, static=true}
     func{"CanLoad", static=true, returns="bool", arg("std::string", "filename")}
     func{"CanSave", static=true, returns="bool", arg("std::string", "filename")}
+
+    func{"Clear"}
 
     -- Misc
     func{"GetVersion", returns="short"}
     func{"IsScrambled", returns="bool"}
     func{"IsOk", returns="bool"}
     func{"SetOk", arg("bool", "ok")}
-    func{"IsTimerRunning", returns="bool"}
-    func{"SetTimerRunning", arg("bool", "running")}
 
     -- Data
     property{"std::string", "Author"}
     property{"std::string", "Title"}
     property{"std::string", "Copyright"}
-    property{"int", "Time"}
-    property{"std::string", "Notes"}
     property{"Grid &", "Grid"}
+    property{"int", "Time"}
+    func{"IsTimerRunning", returns="bool"}
+    func{"SetTimerRunning", arg("bool", "running")}
+    property{"std::string", "Notes"}
 
     func{"GetAcross", returns="ClueList &"}
     func{"GetDown", returns="ClueList &"}

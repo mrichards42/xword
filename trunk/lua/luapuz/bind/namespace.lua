@@ -43,6 +43,7 @@ function mt:writecpp(f)
     -- Write functions and enumerations
     bind.base_mt.writecpp(self, f)
 
+    if self.register ~= false then
     -- Register the library
     f:write(self:fmt([[
 void [openfunc] (lua_State *L) {
@@ -60,7 +61,9 @@ void [openfunc] (lua_State *L) {
     -- Register the namespaces
     if self.namespaces then
         for _, ns in ipairs(self.namespaces) do
-            f:write(ns:fmt("    [openfunc](L);\n"))
+            if ns.register ~= false then
+                f:write(ns:fmt("    [openfunc](L);\n"))
+            end
         end
     end
 
@@ -74,6 +77,7 @@ void [openfunc] (lua_State *L) {
     end
 
     f:write("}\n")
+    end -- self.register
 
 end
 
@@ -209,16 +213,17 @@ function namespace(opts)
         bind.namespace = bind.global_namespace
         return
     end
-    if type(opts) ~= "table" then
-        return namespace{opts}
+    if type(opts) == "string" then
+        opts = {opts}
     end
 
     local ns = bind.find_namespace(opts)
     if not ns then
         local name = opts[#opts]
+        opts.name = name
         -- Create a new namespace
         print("Creating namespace "..name)
-        ns = mt:new(name)
+        ns = mt:new(opts)
         -- Register this namespace with the current namespace
         table.insert(bind.namespace.namespaces, ns) -- array
         bind.namespace.namespaces[name] = ns        -- hash

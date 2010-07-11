@@ -85,8 +85,7 @@ int Puzzle_tostring(lua_State * L)
 //----------------
 // Puzzle()
 // Puzzle(const std::string & filename)
-// Puzzle(const std::string & filename, const std::string & ext)
-// Puzzle(const std::string & filename, FileHandlerDesc * desc)
+// Puzzle(const std::string & filename, const FileHandlerDesc * desc)
 int Puzzle_Puzzle(lua_State * L)
 {
     try {
@@ -96,38 +95,24 @@ int Puzzle_Puzzle(lua_State * L)
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
         {
-            std::string filename = luapuz_checkStdString(L, 2);
-            if (lua_isstring(L, 3))
-            {
-                std::string ext = luapuz_checkStdString(L, 3);
-                returns = new puz::Puzzle(filename, ext);
-            }
-            else if (lua_isfunction(L, 3))
-            {
-                // make sure the function is on top of the stack
-                lua_pushvalue(L, 3);
-                luapuz_LoadSaveData luapuzdata(L);
+            const std::string filename = luapuz_checkStdString(L, 2);
+            luaL_checktype(L, 3, LUA_TFUNCTION);
 
-                // Create the puz::Puzzle file handler
-                puz::Puzzle::FileHandlerDesc desc;
-                desc.data = &luapuzdata;
-                desc.handler = luapuz_LoadSave_Puzzle;
+            // Push the function for luapuz_Load_Puzzle.
+            lua_pushvalue(L, 3); // Function
 
-                returns = new puz::Puzzle(filename, &desc);
+            // Create the puz::Puzzle file handler
+            puz::Puzzle::FileHandlerDesc desc;
+            desc.data = L;
+            desc.handler = luapuz_Load_Puzzle;
 
-                // Clean up our data pointer
-                luapuzdata.unref();
-            }
-            else
-            {
-                luaL_typerror(L, 3, "string or function");
-            }
+            // Call the constructor
+            returns = new puz::Puzzle(filename, &desc);
         }
         else if (argCount >= 1)
         {
             std::string filename = luapuz_checkStdString(L, 2);
             returns = new puz::Puzzle(filename);
-
         }
         else if (argCount >= 0)
         {
@@ -135,6 +120,7 @@ int Puzzle_Puzzle(lua_State * L)
         }
 
         luapuz_newPuzzle(L, returns);
+
         if (returns->HasError())
         {
             lua_pushstring(L, returns->GetError().c_str());
@@ -149,44 +135,31 @@ int Puzzle_Puzzle(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
+    lua_error(L); // We should have returned by now
     return 0;
 }
 // void Load(const std::string & filename)
-// void Load(const std::string & filename, const std::string & ext)
 // void Load(const std::string & filename, FileHandlerDesc * desc)
 int Puzzle_Load(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string filename = luapuz_checkStdString(L, 2);
+    const std::string filename = luapuz_checkStdString(L, 2);
     try {
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
         {
-            if (lua_isstring(L, 3))
-            {
-                std::string ext = luapuz_checkStdString(L, 3);
-                puzzle->Load(filename, ext);
-            }
-            else if (lua_isfunction(L, 3))
-            {
-                // make sure the function is on top of the stack
-                lua_pushvalue(L, 3);
-                luapuz_LoadSaveData luapuzdata(L);
+            luaL_checktype(L, 3, LUA_TFUNCTION);
 
-                // Create the puz::Puzzle file handler
-                puz::Puzzle::FileHandlerDesc desc;
-                desc.data = &luapuzdata;
-                desc.handler = luapuz_LoadSave_Puzzle;
+            // Push the function for luapuz_Load_Puzzle.
+            lua_pushvalue(L, 3); // Function
 
-                puzzle->Load(filename, &desc);
+            // Create the puz::Puzzle file handler
+            puz::Puzzle::FileHandlerDesc desc;
+            desc.data = L;
+            desc.handler = luapuz_Load_Puzzle;
 
-                // Clean up our data pointer
-                luapuzdata.unref();
-            }
-            else
-            {
-                luaL_typerror(L, 3, "string or function");
-            }
+            // Call Load()
+            puzzle->Load(filename, &desc);
         }
         else
         {
@@ -207,9 +180,9 @@ int Puzzle_Load(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
+    lua_error(L); // We should have returned by now
     return 0;
 }// void Save(const std::string & filename)
-// void Save(const std::string & filename, const std::string & ext)
 // void Save(const std::string & filename, FileHandlerDesc * desc)
 int Puzzle_Save(lua_State * L)
 {
@@ -219,31 +192,18 @@ int Puzzle_Save(lua_State * L)
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
         {
-            if (lua_isstring(L, 3))
-            {
-                std::string ext = luapuz_checkStdString(L, 3);
-                puzzle->Save(filename, ext);
-            }
-            else if (lua_isfunction(L, 3))
-            {
-                // make sure the function is on top of the stack
-                lua_pushvalue(L, 3);
-                luapuz_LoadSaveData luapuzdata(L);
+            luaL_checktype(L, 3, LUA_TFUNCTION);
 
-                // Create the puz::Puzzle file handler
-                puz::Puzzle::FileHandlerDesc desc;
-                desc.data = &luapuzdata;
-                desc.handler = luapuz_LoadSave_Puzzle;
+            // Push the function for luapuz_Save_Puzzle.
+            lua_pushvalue(L, 3); // Function
 
-                puzzle->Save(filename, &desc);
+            // Create the puz::Puzzle file handler
+            puz::Puzzle::FileHandlerDesc desc;
+            desc.data = L;
+            desc.handler = luapuz_Save_Puzzle;
 
-                // Clean up our data pointer
-                luapuzdata.unref();
-            }
-            else
-            {
-                luaL_typerror(L, 3, "string or function");
-            }
+            // Call Save()
+            puzzle->Save(filename, &desc);
         }
         else
         {
@@ -264,38 +224,7 @@ int Puzzle_Save(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    return 0;
-}
-// static void AddLoadHandler(FileHandler func, const char * ext, void * data)
-int Puzzle_AddLoadHandler(lua_State * L)
-{
-    if (! lua_isfunction(L, 1))
-        luaL_typerror(L, 1, "function");
-    const char * ext = luaL_checkstring(L, 2);
-
-    // Push the function for luapuz_LoadSaveData
-    lua_pushvalue(L, 1);
-    luapuz_newLoadSaveData(L);
-
-    puz::Puzzle::AddLoadHandler(luapuz_LoadSave_Puzzle,
-                                ext,
-                                luapuz_checkLoadSaveData(L, -1));
-    return 0;
-}
-// static void AddSaveHandler(FileHandler func, const char * ext, void * data)
-int Puzzle_AddSaveHandler(lua_State * L)
-{
-    if (! lua_isfunction(L, 1))
-        luaL_typerror(L, 1, "function");
-    const char * ext = luaL_checkstring(L, 2);
-
-    // Push the function for luapuz_LoadSaveData
-    lua_pushvalue(L, 1);
-    luapuz_newLoadSaveData(L);
-
-    puz::Puzzle::AddSaveHandler(luapuz_LoadSave_Puzzle,
-                                ext,
-                                luapuz_checkLoadSaveData(L, -1));
+    lua_error(L); // We should have returned by now
     return 0;
 }
 // static bool CanLoad(std::string filename)
@@ -313,6 +242,13 @@ static int Puzzle_CanSave(lua_State * L)
     bool returns = puz::Puzzle::CanSave(filename);
     lua_pushboolean(L, returns);
     return 1;
+}
+// void Clear()
+static int Puzzle_Clear(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puzzle->Clear();
+    return 0;
 }
 // short GetVersion()
 static int Puzzle_GetVersion(lua_State * L)
@@ -344,22 +280,6 @@ static int Puzzle_SetOk(lua_State * L)
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     bool ok = luapuz_checkboolean(L, 2);
     puzzle->SetOk(ok);
-    return 0;
-}
-// bool IsTimerRunning()
-static int Puzzle_IsTimerRunning(lua_State * L)
-{
-    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    bool returns = puzzle->IsTimerRunning();
-    lua_pushboolean(L, returns);
-    return 1;
-}
-// void SetTimerRunning(bool running)
-static int Puzzle_SetTimerRunning(lua_State * L)
-{
-    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    bool running = luapuz_checkboolean(L, 2);
-    puzzle->SetTimerRunning(running);
     return 0;
 }
 // std::string GetAuthor()
@@ -410,6 +330,22 @@ static int Puzzle_SetCopyright(lua_State * L)
     puzzle->SetCopyright(copyright);
     return 0;
 }
+// Grid & GetGrid()
+static int Puzzle_GetGrid(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::Grid * returns = &puzzle->GetGrid();
+    luapuz_pushGrid(L, returns);
+    return 1;
+}
+// void SetGrid(puz::Grid & grid)
+static int Puzzle_SetGrid(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::Grid * grid = luapuz_checkGrid(L, 2);
+    puzzle->SetGrid(*grid);
+    return 0;
+}
 // int GetTime()
 static int Puzzle_GetTime(lua_State * L)
 {
@@ -426,6 +362,22 @@ static int Puzzle_SetTime(lua_State * L)
     puzzle->SetTime(time);
     return 0;
 }
+// bool IsTimerRunning()
+static int Puzzle_IsTimerRunning(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    bool returns = puzzle->IsTimerRunning();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// void SetTimerRunning(bool running)
+static int Puzzle_SetTimerRunning(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    bool running = luapuz_checkboolean(L, 2);
+    puzzle->SetTimerRunning(running);
+    return 0;
+}
 // std::string GetNotes()
 static int Puzzle_GetNotes(lua_State * L)
 {
@@ -440,22 +392,6 @@ static int Puzzle_SetNotes(lua_State * L)
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     std::string notes = luapuz_checkStdString(L, 2);
     puzzle->SetNotes(notes);
-    return 0;
-}
-// Grid & GetGrid()
-static int Puzzle_GetGrid(lua_State * L)
-{
-    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::Grid * returns = &puzzle->GetGrid();
-    luapuz_pushGrid(L, returns);
-    return 1;
-}
-// void SetGrid(puz::Grid & grid)
-static int Puzzle_SetGrid(lua_State * L)
-{
-    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::Grid * grid = luapuz_checkGrid(L, 2);
-    puzzle->SetGrid(*grid);
     return 0;
 }
 // ClueList & GetAcross()
@@ -502,28 +438,27 @@ static int Puzzle_RenumberClues(lua_State * L)
 static const luaL_reg Puzzlelib[] = {
     {"Load", Puzzle_Load},
     {"Save", Puzzle_Save},
-    {"AddLoadHandler", Puzzle_AddLoadHandler},
-    {"AddSaveHandler", Puzzle_AddSaveHandler},
     {"CanLoad", Puzzle_CanLoad},
     {"CanSave", Puzzle_CanSave},
+    {"Clear", Puzzle_Clear},
     {"GetVersion", Puzzle_GetVersion},
     {"IsScrambled", Puzzle_IsScrambled},
     {"IsOk", Puzzle_IsOk},
     {"SetOk", Puzzle_SetOk},
-    {"IsTimerRunning", Puzzle_IsTimerRunning},
-    {"SetTimerRunning", Puzzle_SetTimerRunning},
     {"GetAuthor", Puzzle_GetAuthor},
     {"SetAuthor", Puzzle_SetAuthor},
     {"GetTitle", Puzzle_GetTitle},
     {"SetTitle", Puzzle_SetTitle},
     {"GetCopyright", Puzzle_GetCopyright},
     {"SetCopyright", Puzzle_SetCopyright},
-    {"GetTime", Puzzle_GetTime},
-    {"SetTime", Puzzle_SetTime},
-    {"GetNotes", Puzzle_GetNotes},
-    {"SetNotes", Puzzle_SetNotes},
     {"GetGrid", Puzzle_GetGrid},
     {"SetGrid", Puzzle_SetGrid},
+    {"GetTime", Puzzle_GetTime},
+    {"SetTime", Puzzle_SetTime},
+    {"IsTimerRunning", Puzzle_IsTimerRunning},
+    {"SetTimerRunning", Puzzle_SetTimerRunning},
+    {"GetNotes", Puzzle_GetNotes},
+    {"SetNotes", Puzzle_SetNotes},
     {"GetAcross", Puzzle_GetAcross},
     {"GetDown", Puzzle_GetDown},
     {"SetAcross", Puzzle_SetAcross},
@@ -566,22 +501,19 @@ int luapuz_pushClueList(lua_State * L, puz::Puzzle::ClueList * clues)
     // The clue table
     lua_newtable(L);
 
-    for (puz::Puzzle::ClueList::const_iterator it = clues->begin();
+    for (puz::Puzzle::ClueList::iterator it = clues->begin();
          it != clues->end();
          ++it)
     {
         // t[number] = text
-        lua_pushnumber(L, it->Number());
         luapuz_pushStdString(L, it->Text());
-        lua_settable(L, -3);
+        lua_rawseti(L, -2, it->Number());
     }
 
     return 1;
 }
 
 const luaL_reg staticPuzzlelib[] = {
-    {"AddLoadHandler", Puzzle_AddLoadHandler},
-    {"AddSaveHandler", Puzzle_AddSaveHandler},
     {"CanLoad", Puzzle_CanLoad},
     {"CanSave", Puzzle_CanSave},
     {NULL, NULL}
@@ -608,8 +540,10 @@ void luapuz_openPuzzlelib (lua_State *L) {
     // puz.Puzzle table
     lua_newtable(L);
     luaL_register(L, NULL, staticPuzzlelib);
+    luaL_register(L, NULL, Puzzlelib);
     // Register constructor
     luapuz_registerConstructor(L, Puzzle_Puzzle);
+
     // puz.Puzzle = the table
     lua_setfield(L, -2, "Puzzle");
 }

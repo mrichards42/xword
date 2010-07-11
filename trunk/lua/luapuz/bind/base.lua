@@ -111,18 +111,21 @@ bind.obj_mt = obj_mt
 -- --------------------------------------------------------------------------
 local mt = bind.obj_mt:subclass()
 
-function mt:new(name)
-    local obj = {
-        name = name,
-        classes = {},
-        funcs = {},
-        types = {},
-        enums = {},
-        typedefs = {},
-        usertypes = {},
-        namespaces = {},
-    }
-    return bind.obj_mt.new(self, obj)
+function mt:new(obj)
+    local o
+    if type(obj) ~= "table" then
+        o = {name=obj}
+    else
+        o = obj
+    end
+    o.classes = {}
+    o.funcs = {}
+    o.types = {}
+    o.enums = {}
+    o.typedefs = {}
+    o.usertypes = {}
+    o.namespaces = {}
+    return bind.obj_mt.new(self, o)
 end
 
 
@@ -367,7 +370,9 @@ function mt:writehpp(f)
         td:writehpp(f)
     end
 
-    f:write(self:fmt("void [openfunc] (lua_State *L);\n"))
+    if self.register ~= false then
+        f:write(self:fmt("void [openfunc] (lua_State *L);\n"))
+    end
 end
 
 function mt:writecpp(f)
@@ -376,15 +381,17 @@ function mt:writecpp(f)
         func:writecpp(f)
     end
 
-    -- Write the registration table
-    f:write(self:fmt("static const luaL_reg [lib][] = {\n"))
-    for _, func in ipairs(self.funcs) do
-        if not func.is_constructor then
-            f:write(func:fmt('    {"[luafunc]", [cfunc]},\n'))
+    if self.register ~= false then
+        -- Write the registration table
+        f:write(self:fmt("static const luaL_reg [lib][] = {\n"))
+        for _, func in ipairs(self.funcs) do
+            if not func.is_constructor then
+                f:write(func:fmt('    {"[luafunc]", [cfunc]},\n'))
+            end
         end
+        f:write('    {NULL, NULL}\n')
+        f:write('};\n\n')
     end
-    f:write('    {NULL, NULL}\n')
-    f:write('};\n\n')
 
     -- Write the enumerations
     for _, enum in ipairs(self.enums) do
