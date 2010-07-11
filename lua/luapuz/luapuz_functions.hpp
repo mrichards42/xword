@@ -163,10 +163,10 @@ static void luapuz_handleExceptions(lua_State * L)
         throw;
     }
     catch (std::exception & err) {
-        luaL_error(L, err.what());
+        lua_pushstring(L, err.what());
     }
     catch (...) {
-        luaL_error(L, "Unknown error");
+        lua_pushstring(L, "Unknown error");
     }
 }
 
@@ -227,14 +227,12 @@ static int luapuz_index(lua_State * L)
             // Push the argument to this function as the second argument
             lua_pushvalue(L, 2);
             // Call the index function
-            lua_call(L, 2, 1);
-            return 1;
+            if (lua_pcall(L, 2, 1, 0) == 0)
+                return 1;
         }
-        else
-        {
-            luaL_error(L, "method Get%s does not exist", name);
-            return 0;
-        }
+
+        luaL_error(L, "method Get%s does not exist", name);
+        return 0;
     }
 
     // Look for an "_index" method (single underscore)

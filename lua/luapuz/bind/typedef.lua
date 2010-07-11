@@ -2,13 +2,13 @@
 -- Global functions
 -- --------------------------------------------------------------------------
 
--- typedef{"name", luatype="typename", check="code", push="code", query="code"}
+-- typedef{"name", luatype="typename", check_func="code", push_func="code", query_func="code"}
 function typedef(opts)
     opts.name = opts[1]
     local name = opts.name
     table.remove(opts, 1)
     assert(opts.luatype)
-    assert(opts.check or opts.push or opts.query)
+    assert(opts.check_func or opts.push_func or opts.query_func)
 
     local headers = opts.headers or { opts.header }
     opts.header = nil
@@ -54,21 +54,21 @@ function mt:writehpp(f)
 //-------------
 
 ]]))
-    if self.check then
+    if self.check_func then
         f:write(self:fmt([[
 [api] void [checkfunc](lua_State * L, int index, [type] * [var]);
 
 ]]))
     end
 
-    if self.push then
+    if self.push_func then
         f:write(self:fmt([[
 [api] int [pushfunc](lua_State * L, [type] * [var]);
 
 ]]))
     end
 
-    if self.query then
+    if self.query_func then
         f:write(self:fmt([[
 [api] bool [queryfunc](lua_State * L, int index);
 
@@ -84,16 +84,16 @@ function mt:writecpp(f)
 
 ]]))
 
-    if self.check then
-        f:write(self.check)
+    if self.check_func then
+        f:write(self.check_func)
         f:write("\n")
     end
-    if self.push then
-        f:write(self.push)
+    if self.push_func then
+        f:write(self.push_func)
         f:write("\n")
     end
-    if self.query then
-        f:write(self.query)
+    if self.query_func then
+        f:write(self.query_func)
         f:write("\n")
     end
 end

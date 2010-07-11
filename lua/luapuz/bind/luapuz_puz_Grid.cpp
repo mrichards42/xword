@@ -13,7 +13,9 @@ extern "C" {
 #include "../luapuz_functions.hpp"
 #include "../luapuz_tracking.hpp"
 
+#include "luapuz_puz.hpp"
 #include "luapuz_puz_Square.hpp"
+#include "luapuz_std.hpp"
 #include "luapuz_puz_Grid.hpp"
 // ---------------------------------------------------------------------------
 // class Grid
@@ -213,7 +215,7 @@ static int Grid_GetHeight(lua_State * L)
 static int Grid_LastRow(lua_State * L)
 {
     puz::Grid * grid = luapuz_checkGrid(L, 1);
-    int returns = grid->LastRow();
+    int returns = grid->LastRow() + 1; // Lua indices are 1-based
     lua_pushnumber(L, returns);
     return 1;
 }
@@ -221,7 +223,7 @@ static int Grid_LastRow(lua_State * L)
 static int Grid_LastCol(lua_State * L)
 {
     puz::Grid * grid = luapuz_checkGrid(L, 1);
-    int returns = grid->LastCol();
+    int returns = grid->LastCol() + 1; // Lua indices are 1-based
     lua_pushnumber(L, returns);
     return 1;
 }
@@ -398,15 +400,116 @@ static int Grid_IsBetween(lua_State * L)
     lua_pushboolean(L, returns);
     return 1;
 }
-// bool CheckSquare(puz::Square & square, bool checkBlank = false)
+// size_t across, size_t down = CountClues()
+static int Grid_CountClues(lua_State * L)
+{
+    puz::Grid * grid = luapuz_checkGrid(L, 1);
+    size_t across, down;
+    try {
+        grid->CountClues(&across, &down);
+        lua_pushnumber(L, across);
+        lua_pushnumber(L, down);
+        return 2;
+    }
+    catch (...) {
+        luapuz_handleExceptions(L);
+    }
+    lua_error(L); // We should have returned by now
+    return 0;
+}
+// { puz::Square*, ... } CheckGrid(bool checkBlank = false, bool strictRebus = false)
+static int Grid_CheckGrid(lua_State * L)
+{
+    puz::Grid * grid = luapuz_checkGrid(L, 1);
+    int argCount = lua_gettop(L);
+    bool checkBlank = (argCount >= 2 ? luapuz_checkboolean(L, 2) : false);
+    bool strictRebus = (argCount >= 3 ? luapuz_checkboolean(L, 3) : false);
+    std::vector<puz::Square*> returns;
+    grid->CheckGrid(&returns, checkBlank, strictRebus);
+    luapuz_pushSquareVector(L, &returns);
+    return 1;
+}
+// { puz::Square*, ... } CheckWord(puz::Square * start, puz::Square * end, bool checkBlank = false, bool strictRebus = false)
+static int Grid_CheckWord(lua_State * L)
+{
+    puz::Grid * grid = luapuz_checkGrid(L, 1);
+    int argCount = lua_gettop(L);
+    puz::Square * start = luapuz_checkSquare(L, 2);
+    puz::Square * end = luapuz_checkSquare(L, 3);
+    bool checkBlank = (argCount >= 4 ? luapuz_checkboolean(L, 4) : false);
+    bool strictRebus = (argCount >= 5 ? luapuz_checkboolean(L, 5) : false);
+    try {
+        std::vector<puz::Square*> returns;
+        grid->CheckWord(&returns, start, end, checkBlank, strictRebus);
+        luapuz_pushSquareVector(L, &returns);
+        return 1;
+    }
+    catch (...) {
+        luapuz_handleExceptions(L);
+    }
+    lua_error(L); // We should have returned by now
+    return 0;
+}
+// bool CheckSquare(puz::Square & square, bool checkBlank = false, bool strictRebus = false)
 static int Grid_CheckSquare(lua_State * L)
 {
     puz::Grid * grid = luapuz_checkGrid(L, 1);
     int argCount = lua_gettop(L);
     puz::Square * square = luapuz_checkSquare(L, 2);
     bool checkBlank = (argCount >= 3 ? luapuz_checkboolean(L, 3) : false);
-    bool returns = grid->CheckSquare(*square, checkBlank);
+    bool strictRebus = (argCount >= 4 ? luapuz_checkboolean(L, 4) : false);
+    bool returns = grid->CheckSquare(*square, checkBlank, strictRebus);
     lua_pushboolean(L, returns);
+    return 1;
+}
+// Helper for FindSquare
+struct luapuz_FindSquare_Struct
+{
+    luapuz_FindSquare_Struct(lua_State * L)
+        : m_L(L)
+    {}
+
+    lua_State * m_L;
+
+    bool operator() (puz::Square * square)
+    {
+        // Push the function (on top of the stack)
+        // lua_call() pops this function, so we'll make a copy
+        // for further iterations.
+        lua_pushvalue(m_L, -1);
+        luapuz_pushSquare(m_L, square);
+        lua_call(m_L, 1, 1);
+        bool result = luapuz_checkboolean(m_L, -1);
+        lua_pop(m_L, 1); // Pop the result (stack is balanced).
+        return result;
+    }
+};
+
+
+// puz::Square * FindSquare(puz::Square * start, function findFunc,
+//                          puz::GridDirection direction,
+//                          puz::FindDirection increment = puz::NEXT,
+//                          bool skipBlack = false, bool wrapLines = false)
+static int Grid_FindSquare(lua_State * L)
+{
+    puz::Grid * grid = luapuz_checkGrid(L, 1);
+    int argCount = lua_gettop(L);
+    puz::Square * start = luapuz_checkSquare(L, 2);
+    luaL_checktype(L, 3, LUA_TFUNCTION);
+    puz::GridDirection direction = luapuz_checkGridDirection(L, 4);
+    puz::FindDirection increment = (argCount >= 5 ? luapuz_checkFindDirection(L, 5) : puz::NEXT);
+    bool skipBlack = (argCount >= 6 ? luapuz_checkboolean(L, 6) : false);
+    bool wrapLines = (argCount >= 7 ? luapuz_checkboolean(L, 7) : false);
+
+    // Push the function on the stack for luapuz_FindSquare_Struct
+    lua_pushvalue(L, 3);
+    luapuz_FindSquare_Struct func(L);
+
+    puz::Square * returns = grid->FindSquare(start, func,
+                                             direction, increment,
+                                             skipBlack, wrapLines);
+
+    luapuz_pushSquare(L, returns);
     return 1;
 }
 static const luaL_reg Gridlib[] = {
@@ -440,7 +543,11 @@ static const luaL_reg Gridlib[] = {
     {"GetCksum", Grid_GetCksum},
     {"SetCksum", Grid_SetCksum},
     {"IsBetween", Grid_IsBetween},
+    {"CountClues", Grid_CountClues},
+    {"CheckGrid", Grid_CheckGrid},
+    {"CheckWord", Grid_CheckWord},
     {"CheckSquare", Grid_CheckSquare},
+    {"FindSquare", Grid_FindSquare},
     {NULL, NULL}
 };
 
@@ -484,9 +591,11 @@ void luapuz_openGridlib (lua_State *L) {
     // puz.Grid table
     lua_newtable(L);
     luaL_register(L, NULL, staticGridlib);
+    luaL_register(L, NULL, Gridlib);
     // Register constructor
     luapuz_registerConstructor(L, Grid_Grid);
     luapuz_registerEnum(L, GridState_meta, GridState_reg);
+
     // puz.Grid = the table
     lua_setfield(L, -2, "Grid");
 }

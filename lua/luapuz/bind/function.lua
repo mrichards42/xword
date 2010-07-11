@@ -166,11 +166,6 @@ function mt:subst_luafunc()
 end
 
 -- Write the executing code of the function
-function mt:writeexec(f)
-
-end
-
--- Write the executing code of the function
 function mt:writeexec(f, name)
     f:write("// "..tostring(self).."\n")
 
@@ -279,8 +274,9 @@ static int [cfunc](lua_State * L)
     }
     catch (...) {
         [prefix]_handleExceptions(L);
-        return 0;
     }
+    lua_error(L); // We should have returned by now
+    return 0;
 ]]))
     else -- No throw
         f:write("    "..fstring..";\n")

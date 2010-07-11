@@ -280,6 +280,7 @@ void [openfunc] (lua_State *L) {
     // [luatype] table
     lua_newtable(L);
     luaL_register(L, NULL, static[lib]);
+    luaL_register(L, NULL, [lib]);
 ]]))
     -- Register the constructor
     if self.constructor then
@@ -298,6 +299,7 @@ void [openfunc] (lua_State *L) {
     end
 
     f:write(self:fmt([[
+
     // [luatype] = the table
     lua_setfield(L, -2, "[name]");
 }
