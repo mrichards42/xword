@@ -21,7 +21,7 @@
 
 #include "wxFB_Dialogs.h"
 
-#include "../MyFrame.hpp"
+class MyFrame;
 
 class PreferencesDialog : public wxFB_PreferencesDialog
 {
@@ -56,18 +56,9 @@ protected:
     virtual void OnPauseOnSwitch(wxCommandEvent & evt);
     virtual void OnMoveOnRightClick(wxCommandEvent & evt);
     virtual void OnCheckWhileTyping(wxCommandEvent & evt);
-
+    virtual void OnStrictRebus(wxCommandEvent & evt);
     // Colors
     //-------
-
-    // Helpers
-    template <typename T>
-    void SetClueListColor(wxColourPickerEvent & evt, T func)
-    {
-        (m_frame->m_across->*func)(evt.GetColour());
-        (m_frame->m_down->*func)(evt.GetColour());
-        evt.Skip();
-    }
 
     // Grid
     virtual void OnSelectedLetterColor(wxColourPickerEvent & evt);
@@ -106,6 +97,7 @@ protected:
     virtual void OnCluePromptFormat(wxCommandEvent & evt);
     virtual void OnLetterScale(wxSpinEvent & evt);
     virtual void OnNumberScale(wxSpinEvent & evt);
+    virtual void OnLineThickness(wxSpinEvent & evt);
 
     // Printing
     //---------
