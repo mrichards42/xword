@@ -2,19 +2,23 @@
 # Type "make help" for usage help
 
 ifndef config
-  config=debug
+  config=release
 endif
 export config
 
-PROJECTS := XWord lua wxlua wxbindxrc wxbindxml wxbindnet wxbindhtml wxbindaui wxbindadv wxbindcore wxbindbase lfs luatask luacurl
+PROJECTS := XWord puz lua wxlua wxbindxrc wxbindxml wxbindnet wxbindhtml wxbindaui wxbindadv wxbindcore wxbindbase luatask lfs luacurl lsqlite3 luapuz
 
 .PHONY: all clean help $(PROJECTS)
 
 all: $(PROJECTS)
 
-XWord: lua wxlua wxbindbase wxbindcore wxbindadv wxbindaui wxbindhtml wxbindnet wxbindxml wxbindxrc
+XWord: puz lua wxlua wxbindbase wxbindcore wxbindadv wxbindaui wxbindhtml wxbindnet wxbindxml wxbindxrc luapuz
 	@echo ==== Building XWord ====
 	@${MAKE} --no-print-directory -C . -f XWord.make
+
+puz: 
+	@echo ==== Building puz ====
+	@${MAKE} --no-print-directory -C . -f puz.make
 
 lua: 
 	@echo ==== Building lua ====
@@ -24,31 +28,31 @@ wxlua: lua
 	@echo ==== Building wxlua ====
 	@${MAKE} --no-print-directory -C . -f wxlua.make
 
-wxbindxrc: wxlua wxbindadv wxbindhtml wxbindxml
+wxbindxrc: wxbindadv wxbindhtml wxbindxml
 	@echo ==== Building wxbindxrc ====
 	@${MAKE} --no-print-directory -C . -f wxbindxrc.make
 
-wxbindxml: wxlua wxbindbase
+wxbindxml: wxbindbase
 	@echo ==== Building wxbindxml ====
 	@${MAKE} --no-print-directory -C . -f wxbindxml.make
 
-wxbindnet: wxlua wxbindbase
+wxbindnet: wxbindbase
 	@echo ==== Building wxbindnet ====
 	@${MAKE} --no-print-directory -C . -f wxbindnet.make
 
-wxbindhtml: wxlua wxbindcore
+wxbindhtml: wxbindcore
 	@echo ==== Building wxbindhtml ====
 	@${MAKE} --no-print-directory -C . -f wxbindhtml.make
 
-wxbindaui: wxlua wxbindcore
+wxbindaui: wxbindcore
 	@echo ==== Building wxbindaui ====
 	@${MAKE} --no-print-directory -C . -f wxbindaui.make
 
-wxbindadv: wxlua wxbindcore
+wxbindadv: wxbindcore
 	@echo ==== Building wxbindadv ====
 	@${MAKE} --no-print-directory -C . -f wxbindadv.make
 
-wxbindcore: wxlua wxbindbase
+wxbindcore: wxbindbase
 	@echo ==== Building wxbindcore ====
 	@${MAKE} --no-print-directory -C . -f wxbindcore.make
 
@@ -56,20 +60,29 @@ wxbindbase: wxlua
 	@echo ==== Building wxbindbase ====
 	@${MAKE} --no-print-directory -C . -f wxbindbase.make
 
-lfs: lua
-	@echo ==== Building lfs ====
-	@${MAKE} --no-print-directory -C . -f lfs.make
-
 luatask: lua
 	@echo ==== Building luatask ====
 	@${MAKE} --no-print-directory -C . -f luatask.make
+
+lfs: lua
+	@echo ==== Building lfs ====
+	@${MAKE} --no-print-directory -C . -f lfs.make
 
 luacurl: lua
 	@echo ==== Building luacurl ====
 	@${MAKE} --no-print-directory -C . -f luacurl.make
 
+lsqlite3: lua
+	@echo ==== Building lsqlite3 ====
+	@${MAKE} --no-print-directory -C . -f lsqlite3.make
+
+luapuz: lua puz
+	@echo ==== Building luapuz ====
+	@${MAKE} --no-print-directory -C . -f luapuz.make
+
 clean:
 	@${MAKE} --no-print-directory -C . -f XWord.make clean
+	@${MAKE} --no-print-directory -C . -f puz.make clean
 	@${MAKE} --no-print-directory -C . -f lua.make clean
 	@${MAKE} --no-print-directory -C . -f wxlua.make clean
 	@${MAKE} --no-print-directory -C . -f wxbindxrc.make clean
@@ -80,21 +93,24 @@ clean:
 	@${MAKE} --no-print-directory -C . -f wxbindadv.make clean
 	@${MAKE} --no-print-directory -C . -f wxbindcore.make clean
 	@${MAKE} --no-print-directory -C . -f wxbindbase.make clean
-	@${MAKE} --no-print-directory -C . -f lfs.make clean
 	@${MAKE} --no-print-directory -C . -f luatask.make clean
+	@${MAKE} --no-print-directory -C . -f lfs.make clean
 	@${MAKE} --no-print-directory -C . -f luacurl.make clean
+	@${MAKE} --no-print-directory -C . -f lsqlite3.make clean
+	@${MAKE} --no-print-directory -C . -f luapuz.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
 	@echo ""
 	@echo "CONFIGURATIONS:"
-	@echo "   debug"
 	@echo "   release"
+	@echo "   debug"
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
 	@echo "   XWord"
+	@echo "   puz"
 	@echo "   lua"
 	@echo "   wxlua"
 	@echo "   wxbindxrc"
@@ -105,8 +121,10 @@ help:
 	@echo "   wxbindadv"
 	@echo "   wxbindcore"
 	@echo "   wxbindbase"
-	@echo "   lfs"
 	@echo "   luatask"
+	@echo "   lfs"
 	@echo "   luacurl"
+	@echo "   lsqlite3"
+	@echo "   luapuz"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"
