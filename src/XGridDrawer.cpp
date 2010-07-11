@@ -20,6 +20,8 @@
 #include "puz/Square.hpp"
 #include <wx/fontenum.h> // wxFontEnumerator to test for Webdings
 #include "utils/string.hpp"
+#include "utils/timeit.hpp"
+#define XWORD_USE_GC 0
 
 const int MAX_POINT_SIZE = 150;
 const int MIN_POINT_SIZE = 2;
@@ -372,7 +374,7 @@ XGridDrawer::DrawSquare(wxDC & dc, const puz::Square & square)
 }
 
 void
-XGridDrawer::DrawSquare(wxDC & dc,
+XGridDrawer::DrawSquare(wxDC & adc,
                            const puz::Square & square,
                            const wxColour & bgColor,
                            const wxColour & textColor)
@@ -390,6 +392,12 @@ XGridDrawer::DrawSquare(wxDC & dc,
     // the default square background, and then draw the outline using the
     // bgColor.
 
+#if wxUSE_GRAPHICS_CONTEXT && XWORD_USE_GC
+    wxGCDC dc((wxWindowDC&)adc);
+    //wxDC & dc = adc;
+#else
+    wxDC & dc = adc;
+#endif
     const int x = m_rect.x + m_borderSize + square.GetCol() * GetSquareSize();
     const int y = m_rect.y + m_borderSize + square.GetRow() * GetSquareSize();
 
@@ -445,7 +453,7 @@ XGridDrawer::DrawSquare(wxDC & dc,
     {
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.SetPen(wxPen(*wxBLACK, 1));
-        dc.DrawCircle(x + m_boxSize/2, y + m_boxSize/2, m_boxSize/2);
+        dc.DrawEllipse(x, y, m_boxSize, m_boxSize);
     }
 
     dc.SetTextForeground(textColor);
@@ -480,10 +488,10 @@ XGridDrawer::DrawSquare(wxDC & dc,
                 if (m_hasSymbolFont)
                 {
                     isSymbol = true;
-                    text = static_cast<wxChar>(square.GetTextSymbol());
+                    text.append(1, square.GetTextSymbol());
                 }
                 else
-                    text = static_cast<wxChar>(square.GetPlainText());
+                    text.append(1, static_cast<wxChar>(square.GetPlainText()));
             }
             else
                 text = puz2wx(square.GetText());
@@ -545,10 +553,7 @@ void
 XGridDrawer::DrawGrid(wxDC & dc)
 {
     if (m_grid == NULL || m_grid->IsEmpty())
-    {
-        wxLogDebug(_T("Grid is empty"));
         return;
-    }
 
     // Draw black as crossword background
     dc.SetBrush(wxBrush(*wxBLACK));
