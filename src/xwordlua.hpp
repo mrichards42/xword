@@ -18,6 +18,8 @@
 #ifndef XWORD_LUA_H
 #define XWORD_LUA_H
 
+// This must be included after #include <wx/wx.h>
+
 // Lua!
 
 // wxLua binding initialization
@@ -37,24 +39,45 @@ extern bool wxLuaBinding_xword_init();
         WXLUA_IMPLEMENT_BIND_ALL     \
         wxLuaBinding_xword_init();
 
-static void xword_setup_lua_paths(wxLuaState & lua)
+static void xword_setup_lua(wxLuaState & lua)
 {
     lua_State * L = lua.GetLuaState();
 
-    // push the package table
+    // Set package.path and package.cpath
     lua_getglobal(L, "package");
 
-    // package.path
-    lua_pushstring(L, "path");
     lua_pushstring(L, wx2lua(GetLuaPath()));
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "path");
 
-    // package.cpath
-    lua_pushstring(L, "cpath");
     lua_pushstring(L, wx2lua(GetLuaCPath()));
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "cpath");
 
-    // pop the package table
+    lua_pop(L, 1);
+
+
+    // Set values in xword table:
+    //    configdir
+    //    scriptsdir
+    //    imagesdir
+    //    userdatadir
+    //    isportable
+    lua_getglobal(L, "xword");
+
+    lua_pushstring(L, wx2lua(GetConfigDir().c_str()));
+    lua_setfield(L, -2, "configdir");
+
+    lua_pushstring(L, wx2lua(GetScriptsDir().c_str()));
+    lua_setfield(L, -2, "scriptsdir");
+
+    lua_pushstring(L, wx2lua(GetImagesDir().c_str()));
+    lua_setfield(L, -2, "imagesdir");
+
+    lua_pushstring(L, wx2lua(GetUserDataDir().c_str()));
+    lua_setfield(L, -2, "userdatadir");
+
+    lua_pushboolean(L, wxGetApp().IsPortable());
+    lua_setfield(L, -2, "isportable");
+
     lua_pop(L, 1);
 }
 

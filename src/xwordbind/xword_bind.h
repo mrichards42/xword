@@ -42,6 +42,8 @@ extern WXLUA_NO_DLLIMPEXP bool wxLuaBinding_xword_init();
 // ---------------------------------------------------------------------------
 
 #include "../../lua/luapuz/bind/luapuz.hpp"
+#include "../../lua/luapuz/bind/luapuz_puz_Puzzle_helpers.hpp"
+#include "../../lua/wxbind/include/wxaui_bind.h"
 #include "../App.hpp"
 #include "../MyFrame.hpp"
 #include "../paths.hpp"
