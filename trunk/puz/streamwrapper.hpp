@@ -44,9 +44,7 @@ public:
 
     unsigned char ReadChar()
     {
-        unsigned char ch;
-        m_stream.read(reinterpret_cast<char*>(&ch), 1);
-        return ch;
+        return static_cast<unsigned char>(m_stream.get());
     }
 
     void ReadCharArray(unsigned char * chars, size_t size)

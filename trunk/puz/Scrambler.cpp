@@ -390,16 +390,4 @@ Scrambler::CheckUserGrid(Grid & grid)
 }
 
 
-
-unsigned short
-Scrambler::BruteForceUnscramble()
-{
-    for (unsigned short i = 1000; i <= 9999; ++i)
-    {
-        if (UnscrambleSolution(i))
-            return i;
-    }
-    return 0;
-}
-
 } // namespace puz

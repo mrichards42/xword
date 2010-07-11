@@ -118,73 +118,46 @@ Square & Square::operator=(const Square & other)
 }
 
 
-
-
-// Replacement characters:
-
-// A-Z and a-z are converted to upper case
-
-// Symbols and numbers are replaced with their first letter:
-// # = H[ash],
-// $ = D[ollar],
-// % = P[ercent],
-// & = A[mpersand],
-// + = P[lus],
-// ? = Q[uestion]
-
-// '[' number ']' is used to indicate a webdings symbol; these are replaced
-// by a blank ('-') in the user grid.
-
-// '.' indicates a black square.
-
-// All others are invalid in the grid and cannot be converted.
-
-const char squareChars[] = {
-/*         0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f 
-/* 0 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* 1 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* 2 */  '-',   0,   0, 'H', 'D', 'P', 'A',   0,   0,   0,   0, 'P',   0,   0, '.',   0,
-/* 3 */  'Z', 'O', 'T', 'T', 'F', 'F', 'S', 'S', 'E', 'N',   0,   0,   0,   0,   0, 'Q',
-/* 4 */  'A', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-/* 5 */  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '-',   0,   0,   0,   0,
-/* 6 */    0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-/* 7 */  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',   0,   0,   0,   0,   0,
-/* 8 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* 9 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* a */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* b */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* c */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* d */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* e */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-/* f */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-};
+#include "char_tables.hpp"
 
 //------------------------------------------------------------------------------
 // Character table functions (static)
 //------------------------------------------------------------------------------
 
-char
-Square::ToAscii(char ch)
+unsigned char
+Square::ToPlain(unsigned char ch)
 {
-    assert(IsValidChar(ch));
-    return squareChars[static_cast<unsigned char>(ch)];
+#ifdef PUZ_CHECK_STRINGS
+    assert(IsValidChar(static_cast<char>(ch)));
+#endif
+    return static_cast<char>(ascii[static_cast<unsigned char>(ch)]);
 }
 
+unsigned char
+Square::ToUpper(unsigned char ch)
+{
+#ifdef PUZ_CHECK_STRINGS
+    assert(IsValidChar(static_cast<char>(ch)));
+#endif
+    return upperCase[ch];
+}
 
 bool
 Square::IsValidChar(char ch)
 {
-    return squareChars[static_cast<unsigned char>(ch)] != 0;
+    return upperCase[static_cast<unsigned char>(ch)] != 0;
 }
-
 
 
 void
 Square::SetPlainSolution(char solution)
 {
+    solution = ToPlain(solution);
+#ifdef PUZ_CHECK_STRINGS
     // Valid characters for the plain solution
-    if (! (isupper(solution) || solution == '.'))
-        throw InvalidString(std::string(solution, 1));
+    if (solution == 0)
+        throw InvalidString();
+#endif
 
     // Check to see if we are changing from black to white
     // or vice-versa.

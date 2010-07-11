@@ -457,8 +457,6 @@ void LoadSolutionRebus(Puzzle * puz,
             // Don't overwrite the plain solution
             square->SetSolutionRebus(it->second);
         }
-        if (grid_stream.ReadChar() != 0)
-            throw SectionError("Missing nul-terminator in GRBS");
     }
     if (! grid_stream.CheckEof())
         throw SectionError("Too many values in GRBS section");
@@ -470,7 +468,7 @@ void UnLoadSolutionRebus(Puzzle * puz)
          square != NULL;
          square = square->Next())
     {
-        square->SetSolutionRebus("");
+        square->SetSolutionRebus(std::string(1, square->GetPlainSolution()));
     }
 }
 

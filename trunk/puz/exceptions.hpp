@@ -51,7 +51,7 @@ PUZ_EXCEPTION(LongString, InvalidString, "Overlong string");
 PUZ_EXCEPTION(NoSymbol, Exception, "Square does not have a symbol");
 
 // Grid exceptions
-PUZ_EXCEPTION(InvalidGrid, Exception, "Grid must be larger than 0x0");
+PUZ_EXCEPTION(InvalidGrid, Exception, "Grid must be larger than 0 x 0");
 PUZ_EXCEPTION(NoWord, Exception, "Start and end squares are not aligned");
 
 // Clue exceptions
@@ -69,7 +69,7 @@ PUZ_EXCEPTION(DataError, FileError, "Unknown non-fatal file data error");
 PUZ_EXCEPTION(SectionError, DataError, "Puz section error");
 PUZ_EXCEPTION(ChecksumError, DataError, "Puz checksum mismatch error");
 
-PUZ_EXCEPTION(MissingHandler, Exception, "Unknown file handler");
+PUZ_EXCEPTION(MissingHandler, Exception, "Unknown file type");
 
 } // namespace puz
 

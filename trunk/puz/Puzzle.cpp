@@ -30,45 +30,56 @@
 
 namespace puz {
 
-// Functors for find_if used with load and save handlers
-struct find_ext
+// -----------------------------------------------------------------------
+// Load functions
+// -----------------------------------------------------------------------
+void
+Puzzle::Load(const std::string & filename, const FileHandlerDesc * desc)
 {
-    find_ext(const std::string & ext)
-        : m_ext(ext)
-    {
-        MakeLower(m_ext);
-    }
+    if (! desc)
+        desc = FindLoadHandler(GetExtension(filename));
 
-    bool operator()(const Puzzle::FileHandlerDesc & desc)
-    {
-        return desc.ext == m_ext;
-    }
+    ClearError();
+    if (! desc)
+        throw MissingHandler();
 
-private:
-    std::string m_ext;
-};
+    Clear();
+    desc->handler(this, filename, desc->data);
 
-struct find_handler
+#ifndef NDEBUG
+    TestOk();
+#endif NDEBUG
+}
+
+
+// -----------------------------------------------------------------------
+// Save functions
+// -----------------------------------------------------------------------
+void
+Puzzle::Save(const std::string & filename, const FileHandlerDesc * desc)
 {
-    find_handler(Puzzle::FileHandler handler, void * data)
-        : m_handler(handler),
-          m_data(data)
-    {
-    }
+    if (! desc)
+        desc = FindSaveHandler(GetExtension(filename));
 
-    bool operator()(const Puzzle::FileHandlerDesc & desc)
-    {
-        return desc.handler == m_handler
-            && desc.data == m_data;
-    }
+    ClearError();
+    if (! desc)
+        throw MissingHandler();
 
-private:
-    Puzzle::FileHandler m_handler;
-    void * m_data;
-};
+    // Make sure the grid has clue numbers assigned, etc.
+    m_grid.SetupGrid();
+
+#ifndef NDEBUG
+    TestOk();
+#endif
+
+    desc->handler(this, filename, desc->data);
+}
 
 
 
+// -----------------------------------------------------------------------
+// Clue functions
+// -----------------------------------------------------------------------
 void
 Puzzle::GetClueList(std::vector<std::string> * clues)
 {
@@ -173,186 +184,84 @@ Puzzle::RenumberClues()
 }
 
 
-
+//------------------------------------------------------------------------------
+// Error checking
+//------------------------------------------------------------------------------
 void
-Puzzle::Load(const std::string & filename)
+Puzzle::TestOk() const
 {
-    Load(filename, GetExtension(filename));
-}
-
-
-void
-Puzzle::Load(const std::string & filename, const std::string & ext)
-{
-    // Try to load the puzzle with all known handlers for this extension.
-    std::vector<FileHandlerDesc>::iterator it = sm_loadHandlers.begin();
-    std::vector<FileHandlerDesc>::iterator end = sm_loadHandlers.end();
-
-    it = std::find_if(it, end, find_ext(ext));
-    if (it == end)
-        throw MissingHandler();
-
-    for (;;)
+    // Make sure all squares have a solution
+    for (const Square * square = m_grid.First();
+         square != NULL;
+         square = square->Next())
     {
-        try
-        {
-            Load(filename, &*it);
-            return;
-        }
-        catch (...)
-        {
-            ++it;
-            it = std::find_if(it, end, find_ext(ext));
-            // We've already tried all the handlers, so rethrow
-            if (it == end)
-                throw;
-        }
+        if (square->GetSolution().empty() || square->GetPlainSolution() == 0)
+            throw InvalidGrid("All squares must have a solution");
     }
+
+    // Make sure we have the correct number of clues
+    size_t expected_across, expected_down;
+    m_grid.CountClues(&expected_across, &expected_down);
+
+    size_t across_clues = m_across.size();
+    if (across_clues < expected_across)
+        throw puz::InvalidClues("Missing across clues");
+    if (across_clues > expected_across)
+        throw puz::InvalidClues("Extra across clues");
+
+    size_t down_clues = m_down.size();
+    if (down_clues < expected_down)
+        throw puz::InvalidClues("Missing down clues");
+    if (down_clues > expected_down)
+        throw puz::InvalidClues("Extra down clues");
 }
-
-
-void
-Puzzle::Load(const std::string & filename, FileHandlerDesc * desc)
-{
-    ClearError();
-    if (! desc)
-        throw MissingHandler();
-
-    Clear();
-    desc->handler(this, filename, desc->data);
-}
-
-
-void
-Puzzle::Save(const std::string & filename)
-{
-    Save(filename, GetExtension(filename));
-}
-
-void
-Puzzle::Save(const std::string & filename, const std::string & ext)
-{
-    // Try to save the puzzle with all known handlers for this extension.
-    std::vector<FileHandlerDesc>::iterator it = sm_saveHandlers.begin();
-    std::vector<FileHandlerDesc>::iterator end = sm_saveHandlers.end();
-
-    it = std::find_if(it, end, find_ext(ext));
-    if (it == end)
-        throw MissingHandler();
-
-    for (;;)
-    {
-        try
-        {
-            Save(filename, &*it);
-            return;
-        }
-        catch (...)
-        {
-            it = std::find_if(it, end, find_ext(ext));
-            // We've already tried all the handlers, so rethrow
-            if (it == end)
-                throw;
-        }
-    }
-}
-
-
-
-void
-Puzzle::Save(const std::string & filename, FileHandlerDesc * desc)
-{
-    ClearError();
-    if (! desc)
-        throw MissingHandler();
-
-    // Make sure the grid has clue numbers assigned, etc.
-    m_grid.SetupGrid();
-
-    desc->handler(this, filename, desc->data);
-}
-
 
 //------------------------------------------------------------------------------
-// Static functions
+// Static functions (load/save handlers)
 //------------------------------------------------------------------------------
 
 bool
 Puzzle::CanLoad(const std::string & filename)
 {
-    return GetLoadHandler(GetExtension(filename)) != NULL;
+    return FindLoadHandler(GetExtension(filename)) != NULL;
 }
 
 
 bool
 Puzzle::CanSave(const std::string & filename)
 {
-    return GetSaveHandler(GetExtension(filename)) != NULL;
+    return FindSaveHandler(GetExtension(filename)) != NULL;
 }
 
 
-void
-Puzzle::AddLoadHandler(FileHandler handler, const char * extension, void * data)
+
+// Helper for find functions
+const Puzzle::FileHandlerDesc *
+FindHandler(const Puzzle::FileHandlerDesc * start, const std::string & ext)
 {
-    FileHandlerDesc d;
-    d.handler = handler;
-    d.ext = extension;
-    d.data = data;
-    sm_loadHandlers.push_back(d);
+    for (const Puzzle::FileHandlerDesc * d = start; d->ext != NULL; ++d)
+        if (ext == d->ext)
+            return d;
+    return NULL;
 }
 
-
-void
-Puzzle::AddSaveHandler(FileHandler handler, const char * extension, void * data)
+const Puzzle::FileHandlerDesc *
+Puzzle::FindLoadHandler(const std::string & ext)
 {
-    FileHandlerDesc d;
-    d.handler = handler;
-    d.ext = extension;
-    d.data = data;
-    sm_saveHandlers.push_back(d);
+    return FindHandler(sm_loadHandlers, ext);
 }
 
-void
-Puzzle::RemoveLoadHandler(FileHandler handler, void * data)
+
+const Puzzle::FileHandlerDesc *
+Puzzle::FindSaveHandler(const std::string & ext)
 {
-    std::vector<FileHandlerDesc>::iterator end = sm_loadHandlers.end();
-    std::vector<FileHandlerDesc>::iterator it =
-        std::find_if(sm_loadHandlers.begin(), end, find_handler(handler, data));
-    if (it != end)
-        sm_loadHandlers.erase(it);
+    return FindHandler(sm_saveHandlers, ext);
 }
 
-void
-Puzzle::RemoveSaveHandler(FileHandler handler, void * data)
-{
-    std::vector<FileHandlerDesc>::iterator end = sm_loadHandlers.end();
-    std::vector<FileHandlerDesc>::iterator it =
-        std::find_if(sm_loadHandlers.begin(), end, find_handler(handler, data));
-    if (it != end)
-        sm_saveHandlers.erase(it);
-}
 
-Puzzle::FileHandlerDesc *
-Puzzle::GetLoadHandler(const std::string & ext)
-{
-    std::vector<FileHandlerDesc>::iterator end = sm_loadHandlers.end();
-    std::vector<FileHandlerDesc>::iterator it =
-        std::find_if(sm_loadHandlers.begin(), end, find_ext(ext));
-    if (it == end)
-        return NULL;
-    return &*it;
-}
-
-Puzzle::FileHandlerDesc *
-Puzzle::GetSaveHandler(const std::string & ext)
-{
-    std::vector<FileHandlerDesc>::iterator end = sm_saveHandlers.end();
-    std::vector<FileHandlerDesc>::iterator it =
-        std::find_if(sm_saveHandlers.begin(), end, find_ext(ext));
-    if (it == end)
-        return NULL;
-    return &*it;
-}
+// -----------------------------------------------------------------------
+// C++ load and save handlers
+// -----------------------------------------------------------------------
 
 void HandleExceptions(Puzzle * puz)
 {
@@ -371,9 +280,10 @@ void HandleExceptions(Puzzle * puz)
     // Everything else falls through
 }
 
+
 void CppLoad(Puzzle * puz, const std::string & filename, void * function)
 {
-    std::ifstream stream(filename.c_str());
+    std::ifstream stream(filename.c_str(), std::ios::in | std::ios::binary);
     if (stream.fail())
         throw FatalFileError(std::string("Unable to open file: ") + filename);
     try
@@ -390,7 +300,7 @@ void CppLoad(Puzzle * puz, const std::string & filename, void * function)
 
 void CppSave(Puzzle * puz, const std::string & filename, void * function)
 {
-    std::ofstream stream(filename.c_str());
+    std::ofstream stream(filename.c_str(), std::ios::out | std::ios::binary);
     if (stream.fail())
     {
         remove(filename.c_str());
@@ -410,23 +320,14 @@ void CppSave(Puzzle * puz, const std::string & filename, void * function)
 }
 
 
-const Puzzle::FileHandlerDesc g_initLH[] = {
-    { CppLoad, "puz", LoadPuz }
+const Puzzle::FileHandlerDesc Puzzle::sm_loadHandlers[] = {
+    { CppLoad, "puz", "Across Lite", LoadPuz },
+    { NULL, NULL, NULL }
 };
 
-std::vector<Puzzle::FileHandlerDesc> Puzzle::sm_loadHandlers(
-    g_initLH + 0,
-    g_initLH + sizeof(Puzzle::FileHandlerDesc) / sizeof(g_initLH)
-);
-
-
-const Puzzle::FileHandlerDesc g_initSH[] = {
-    { CppSave, "puz", SavePuz }
+const Puzzle::FileHandlerDesc Puzzle::sm_saveHandlers[] = {
+    { CppSave, "puz", "Across Lite", SavePuz },
+    { NULL, NULL, NULL }
 };
-
-std::vector<Puzzle::FileHandlerDesc> Puzzle::sm_saveHandlers(
-    g_initSH + 0,
-    g_initSH + sizeof(Puzzle::FileHandlerDesc) / sizeof(g_initSH)
-);
 
 } // namespace puz
