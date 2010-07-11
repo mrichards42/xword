@@ -49,13 +49,15 @@ enum GridStyle
     MOVE_AFTER_LETTER   = 0x0004,
     MOVE_TO_NEXT_BLANK  = 0x0008,
     BLANK_ON_DIRECTION  = 0x0010,
-    CONTEXT_MENU        = 0x0020,
-    MOVE_ON_RIGHT_CLICK = 0x0040,
-    CHECK_WHILE_TYPING  = 0x0080,
+    MOVE_ON_RIGHT_CLICK = 0x0020,
+    CHECK_WHILE_TYPING  = 0x0040,
+    STRICT_REBUS        = 0x0080,
+    CONTEXT_MENU        = 0x0100, // Not yet(?) implemented
 
     DEFAULT_GRID_STYLE = PAUSE_ON_SWITCH
                        | MOVE_AFTER_LETTER
-                       | BLANK_ON_NEW_WORD,
+                       | BLANK_ON_NEW_WORD
+                       | STRICT_REBUS,
 
     GRID_STYLE_MASK = PAUSE_ON_SWITCH
                     | BLANK_ON_NEW_WORD
@@ -65,6 +67,7 @@ enum GridStyle
                     | CONTEXT_MENU
                     | MOVE_ON_RIGHT_CLICK
                     | CHECK_WHILE_TYPING
+                    | STRICT_REBUS
 };
 
 
@@ -236,8 +239,8 @@ public:
     int    GetNumberHeight() const { return m_drawer.GetNumberHeight(); }
     int    GetLetterHeight() const { return m_drawer.GetLetterHeight(); }
 
-    void SetBoxSize(int size)         { m_drawer.SetBoxSize(size); }
-    void SetBorderSize(int size)      { m_drawer.SetBorderSize(size); }
+    void SetBoxSize(int size)         { m_drawer.SetBoxSize(size); Scale(); }
+    void SetBorderSize(int size)      { m_drawer.SetBorderSize(size); Scale(); }
     void SetLetterScale(double scale) { m_drawer.SetLetterScale(scale); }
     void SetNumberScale(double scale) { m_drawer.SetNumberScale(scale); }
 
@@ -308,6 +311,10 @@ public:
 protected:
     void Init();
 
+    // Misc
+    static bool IsValidChar(wxChar ch)
+        { return ch < 256 && puz::Square::IsValidChar(static_cast<char>(ch)); }
+
     // Common CheckXXX function
     void PostCheck(std::vector<puz::Square *> & incorrect, int options);
     void DoCheckSelection(puz::Square * start, puz::Square * end, int options);
@@ -376,6 +383,7 @@ private:
 
     void OnLeftDown    (wxMouseEvent & evt);
     void OnRightDown   (wxMouseEvent & evt);
+    void OnContextMenu (wxContextMenuEvent & evt);
     void OnKeyDown     (wxKeyEvent & evt);
     void OnChar        (wxKeyEvent & evt);
 
