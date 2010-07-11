@@ -50,7 +50,7 @@ public:
               const wxString & label = wxEmptyString,
               const wxPoint & position = wxDefaultPosition,
               const wxSize & size = wxDefaultSize,
-              long style = wxBORDER_NONE | wxALIGN_CENTER | ST_WRAP,
+              long style = wxALIGN_CENTER | ST_WRAP,
               const wxString & name = _T("SizedText"))
     {
         Create(parent, id, label, position, size, style, name);
@@ -68,16 +68,24 @@ public:
 
     void SetLabel(const wxString & label)
     {
-        m_fullLabel = label;
-        ResizeLabel();
+        // Only update the label if it has changed.
+        if (label != m_fullLabel)
+        {
+            m_fullLabel = label;
+            ResizeLabel();
+        }
     }
 
     bool SetFont(const wxFont & font)
     {
+        m_displayFont = font;
         bool ret = wxControl::SetFont(font);
         ResizeLabel();
         return ret;
     }
+
+    wxCoord GetPadding() const { return m_padding; }
+    void SetPadding(wxCoord padding) { m_padding = padding; }
 
     const wxString & GetFullLabel() { return m_fullLabel; }
 
@@ -105,6 +113,13 @@ protected:
     void OnPaint(wxPaintEvent & WXUNUSED(evt));
 
     wxString m_fullLabel;
+    wxCoord m_padding;
+    wxFont m_displayFont;
+
+    // implement/override some base class virtuals
+    virtual wxBorder GetDefaultBorder() const { return wxBORDER_NONE; }
+    virtual wxSize DoGetBestSize() const;
+    wxSize GetExtraSpace() const; // Border and padding
 
     DECLARE_EVENT_TABLE()
     DECLARE_NO_COPY_CLASS(SizedText)

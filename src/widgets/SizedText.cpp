@@ -35,6 +35,8 @@ SizedText::Create(wxWindow * parent,
                   long style,
                   const wxString & name)
 {
+    m_padding = 0;
+
     if (! wxControl::Create(parent, id,
                             position, size,
                             style,
@@ -51,6 +53,7 @@ SizedText::Create(wxWindow * parent,
 void
 SizedText::ResizeLabel()
 {
+    InvalidateBestSize();
     if (m_fullLabel.empty())
         wxControl::SetLabel(_T(""));
     else if (IsTruncated())
@@ -58,9 +61,6 @@ SizedText::ResizeLabel()
     else
         WrapLabel();
 
-    // An advantage of deriving from wxControl instead of wxStaticText is that
-    // there is no automatic repaint functionality.  We get to decide when that
-    // happens, which means no extra refreshing.
     Refresh();
 }
 
@@ -77,6 +77,8 @@ SizedText::WrapLabel()
 
     int maxWidth, maxHeight;
     GetClientSize(&maxWidth, &maxHeight);
+    maxWidth -= 2 * GetPadding();
+    maxHeight -= 2 * GetPadding();
 
     int textWidth, textHeight;
     GetTextExtent(label, &textWidth, &textHeight);
@@ -143,7 +145,9 @@ SizedText::WrapLabel()
                                   &font);
     }
 
-    wxControl::SetFont(font);
+    CacheBestSize(wxSize(textWidth, textHeight) + GetExtraSpace());
+
+    m_displayFont = font;
     wxControl::SetLabel(label);
 }
 
@@ -154,9 +158,12 @@ SizedText::TruncateLabel()
 {
     int maxWidth;
     GetClientSize(&maxWidth, NULL);
+    maxWidth -= 2 * GetPadding();
 
     int lineWidth;
     GetTextExtent(m_fullLabel, &lineWidth, NULL);
+
+    CacheBestSize(wxSize(lineWidth, GetCharHeight()) + GetExtraSpace());
 
     if (lineWidth <= maxWidth)
     {
@@ -185,17 +192,80 @@ SizedText::TruncateLabel()
     wxControl::SetLabel(label);
 }
 
+// Return space that needs to be accounted for aside from the text.
+wxSize
+SizedText::GetExtraSpace() const
+{
+    // This is pretty much lifted from wxStaticText::DoGetBestSize (src/msw/stattext.cpp)
+    // border takes extra space
+    //
+    // TODO: this is probably not wxStaticText-specific and should be moved
+    wxCoord border;
+    switch ( GetBorder() )
+    {
+        case wxBORDER_STATIC:
+        case wxBORDER_SIMPLE:
+            border = 1;
+            break;
+
+        case wxBORDER_SUNKEN:
+            border = 2;
+            break;
+
+        case wxBORDER_RAISED:
+        case wxBORDER_DOUBLE:
+            border = 3;
+            break;
+
+        default:
+            wxFAIL_MSG( _T("unknown border style") );
+            // fall through
+
+        case wxBORDER_NONE:
+            border = 0;
+    }
+    // SizedText: Add space for padding
+    border += GetPadding();
+
+    return wxSize(2*border, 2*border);
+}
+
+
+wxSize
+SizedText::DoGetBestSize() const
+{
+    // This is pretty much lifted from wxStaticText (src/msw/stattext.cpp)
+
+    wxClientDC dc(wx_const_cast(SizedText *, this));
+    wxFont font(GetFont());
+    if (!font.Ok())
+        font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+
+    dc.SetFont(font);
+
+    wxCoord widthTextMax, heightTextTotal;
+    // SizedText: Use GetLabel() instead of GetLabelText()
+    // i.e. don't strip menu codes
+    dc.GetMultiLineTextExtent(GetLabel(), &widthTextMax, &heightTextTotal);
+
+    wxSize best(widthTextMax, heightTextTotal);
+    best += GetExtraSpace(); // SizedText-specific method
+    CacheBestSize(best);
+    return best;
+}
+
 
 void
 SizedText::OnPaint(wxPaintEvent & WXUNUSED(evt))
 {
     wxPaintDC dc(this);
-    wxSize clientSize = GetClientSize();
-    dc.SetFont(GetFont());
+    wxRect rect(GetClientSize());
+    rect.Deflate(GetPadding());
+    dc.SetFont(m_displayFont);
     dc.SetBackground(wxBrush(GetBackgroundColour()));
     dc.SetTextForeground(GetForegroundColour());
     dc.Clear();
     dc.DrawLabel(GetLabel(),
-                 wxRect(clientSize),
+                 rect,
                  GetWindowStyle() & wxALIGN_MASK);
 }
