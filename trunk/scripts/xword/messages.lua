@@ -3,30 +3,31 @@
 --     Standard XWord message boxes
 -- ============================================================================
 
+if wx then
+    function xword.Message(message)
+        wx.wxMessageBox(
+            message,
+            "XWord Message",
+            wx.wxOK + wx.wxICON_INFORMATION
+        )
+    end
 
-function xword.Message(message)
-    wx.wxMessageBox(
-        message,
-        "XWord Message",
-        wx.wxOK + wx.wxICON_INFORMATION
-    )
-end
 
+    function xword.Prompt(message)
+        return wx.wxMessageBox(
+            message,
+            "XWord Message",
+            wx.wxYES_NO + wx.wxICON_QUESTION
+        ) == wx.wxYES
+    end
 
-function xword.Prompt(message)
-    return wx.wxMessageBox(
-        message,
-        "XWord Message",
-        wx.wxYES_NO + wx.wxICON_QUESTION
-    ) == wx.wxYES
-end
-
-function xword.Error(message)
-    wx.wxMessageBox(
-        message,
-        "XWord Error",
-        wx.wxOK + wx.wxICON_ERROR
-    )
+    function xword.Error(message)
+        wx.wxMessageBox(
+            message,
+            "XWord Error",
+            wx.wxOK + wx.wxICON_ERROR
+        )
+    end
 end
 
 if xword.frame then
