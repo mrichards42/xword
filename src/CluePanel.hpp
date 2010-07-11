@@ -30,10 +30,12 @@
 
 
 extern const wxChar* CluePanelNameStr;
+class MyFrame;
 
 class CluePanel
     : public wxPanel
 {
+    friend class MyFrame;
 public:
     // Enums
     //------
@@ -215,7 +217,6 @@ public:
         { return m_heading->GetForegroundColour(); }
     wxColour GetHeadingBackground() const
         { return m_heading->GetBackgroundColour(); }
-
 
 private:
     void Init() { m_heading = NULL; m_clueList = NULL; m_direction = puz::ACROSS; }

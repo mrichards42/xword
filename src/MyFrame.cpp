@@ -35,6 +35,7 @@
 // Dialogs
 #include "dialogs/Layout.hpp"
 #include "dialogs/Preferences.hpp"
+#include "dialogs/Characters.hpp"
 #include "dialogs/wxFB_Dialogs.h"
 #include <wx/aboutdlg.h>
 
@@ -101,7 +102,7 @@ enum toolIds
     ID_SHOW_NOTES,
 
     ID_TIMER,
-    ID_CONVERT,
+    ID_CHARACTER_MAP,
 
     //wxID_PREFERENCES,
 
@@ -140,7 +141,11 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
     EVT_ACTIVATE       (                      MyFrame::OnActivate)
     EVT_CLOSE          (                      MyFrame::OnClose)
-    EVT_AUI_PANE_CLOSE (                      MyFrame::OnAuiPaneClose)
+
+    EVT_AUI_PANE_CLOSE (                      MyFrame::OnPaneClose)
+
+    EVT_UPDATE_UI      (ID_SHOW_NOTES,        MyFrame::OnUpdateUI)
+    EVT_UPDATE_UI      (ID_CHARACTER_MAP,     MyFrame::OnUpdateUI)
 
 END_EVENT_TABLE()
 
@@ -185,74 +190,75 @@ MyFrame::ManageTools()
                      _handler(MyFrame::OnQuit) },
 
 
-        { wxID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom In"),  _T("zoom_in"), NULL,
+        { wxID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom &In\tCtrl+="),  _T("zoom_in"), NULL,
                     _handler(MyFrame::OnZoomIn) },
 
-        { wxID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom Fit"), _T("zoom_fit"), NULL,
+        { wxID_ZOOM_FIT, wxITEM_CHECK,  _T("Zoom &Fit\tCtrl+0"), _T("zoom_fit"), NULL,
                     _handler(MyFrame::OnZoomFit) },
 
-        { wxID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom Out"), _T("zoom_out"), NULL,
+        { wxID_ZOOM_OUT, wxITEM_NORMAL, _T("Zoom &Out\tCtrl+-"), _T("zoom_out"), NULL,
                     _handler(MyFrame::OnZoomOut) },
 
 
-        { ID_SCRAMBLE,   wxITEM_NORMAL, _T("Scramble..."), NULL, NULL,
+        { ID_SCRAMBLE,   wxITEM_NORMAL, _T("&Scramble..."), NULL, NULL,
                     _handler(MyFrame::OnScramble) },
 
-        { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("Unscramble..."), NULL, NULL,
+        { ID_UNSCRAMBLE, wxITEM_NORMAL, _T("&Unscramble..."), NULL, NULL,
                     _handler(MyFrame::OnUnscramble) },
 
-        { ID_CHECK_LETTER,     wxITEM_NORMAL, _T("Check Letter"), _T("check_letter"), NULL,
+        { ID_CHECK_LETTER,     wxITEM_NORMAL, _T("Check &Letter\tCtrl+Shift+L"), _T("check_letter"), NULL,
                     _handler(MyFrame::OnCheckLetter) },
 
-        { ID_CHECK_WORD,       wxITEM_NORMAL, _T("Check Word"),   _T("check_word"), NULL,
+        { ID_CHECK_WORD,       wxITEM_NORMAL, _T("Check &Word\tCtrl+Shift+W"),   _T("check_word"), NULL,
                     _handler(MyFrame::OnCheckWord) },
 
-        { ID_CHECK_SELECTION,  wxITEM_NORMAL, _T("Check Selection..."),    NULL, NULL,
+        { ID_CHECK_SELECTION,  wxITEM_NORMAL, _T("Check &Selection..."),    NULL, NULL,
                    _handler(MyFrame::OnCheckSelection) },
 
-        { ID_CHECK_GRID,       wxITEM_NORMAL, _T("Check All"),    _T("check_grid"), NULL,
+        { ID_CHECK_GRID,       wxITEM_NORMAL, _T("Check &Grid\tCtrl+Shift+G"),    _T("check_grid"), NULL,
                    _handler(MyFrame::OnCheckGrid) },
 
-        { ID_REVEAL_LETTER,    wxITEM_NORMAL, _T("Reveal Letter"), NULL, NULL,
+        { ID_REVEAL_LETTER,    wxITEM_NORMAL, _T("Reveal &Letter"), NULL, NULL,
                    _handler(MyFrame::OnRevealLetter) },
 
-        { ID_REVEAL_WORD,      wxITEM_NORMAL, _T("Reveal Word"), NULL, NULL,
+        { ID_REVEAL_WORD,      wxITEM_NORMAL, _T("Reveal &Word"), NULL, NULL,
                    _handler(MyFrame::OnRevealWord) },
 
-        { ID_REVEAL_INCORRECT, wxITEM_NORMAL, _T("Reveal Incorrect letters"), NULL, NULL,
+        { ID_REVEAL_INCORRECT, wxITEM_NORMAL, _T("Reveal &Incorrect letters"), NULL, NULL,
                    _handler(MyFrame::OnRevealIncorrect) },
 
         { ID_REVEAL_INCORRECT_SELECTION, wxITEM_NORMAL, _T("Reveal Incorrect letters (selection)..."), NULL, NULL,
                    _handler(MyFrame::OnRevealIncorrectSelection) },
 
-        { ID_REVEAL_SELECTION,      wxITEM_NORMAL, _T("Reveal Selection..."), NULL, NULL,
+        { ID_REVEAL_SELECTION,      wxITEM_NORMAL, _T("Reveal &Selection..."), NULL, NULL,
                    _handler(MyFrame::OnRevealSelection) },
 
-        { ID_REVEAL_GRID,      wxITEM_NORMAL, _T("Reveal Solution"), NULL, NULL,
+        { ID_REVEAL_GRID,      wxITEM_NORMAL, _T("Reveal &Grid"), NULL, NULL,
                    _handler(MyFrame::OnRevealGrid) },
 
 
-        { ID_LAYOUT_PANES, wxITEM_CHECK,  _T("Edit Layout"), _T("layout"), NULL,
-                   _handler(MyFrame::OnLayout) },
+        { ID_LAYOUT_PANES, wxITEM_CHECK,  _T("&Edit Layout"), _T("layout"), NULL,
+                   _handler(MyFrame::OnEditLayout) },
 
-        { ID_LOAD_LAYOUT,  wxITEM_NORMAL, _T("Load Layout"), NULL, NULL,
+        { ID_LOAD_LAYOUT,  wxITEM_NORMAL, _T("&Load Layout"), NULL, NULL,
                    _handler(MyFrame::OnLoadLayout) },
 
-        { ID_SAVE_LAYOUT,  wxITEM_NORMAL, _T("Save Layout"), NULL, NULL,
+        { ID_SAVE_LAYOUT,  wxITEM_NORMAL, _T("&Save Layout"), NULL, NULL,
                    _handler(MyFrame::OnSaveLayout) },
 
-        { ID_SHOW_NOTES,   wxITEM_CHECK,  _T("Notes"), _T("notes"), NULL,
+        { ID_SHOW_NOTES,   wxITEM_CHECK,  _T("&Notes\tCtrl+N"), _T("notes"), NULL,
                    _handler(MyFrame::OnShowNotes) },
 
 
-        { ID_TIMER,          wxITEM_CHECK, _T("Timer"), _T("timer"), NULL,
+        { ID_TIMER,          wxITEM_CHECK, _T("&Timer\tCtrl+T"), _T("timer"), NULL,
                    _handler(MyFrame::OnTimer) },
 
-        { ID_CONVERT,        wxITEM_NORMAL, _T("Convert files"), NULL, NULL,
-                   _handler(MyFrame::OnConvert) },
+        { ID_CHARACTER_MAP,  wxITEM_CHECK, _T("&Character Map\tCtrl+M"), NULL, NULL,
+                   _handler(MyFrame::OnCharacterMap) },
+
 
 #ifdef XWORD_USE_LUA
-        { ID_LUA_SCRIPT, wxITEM_NORMAL, _T("Run script"), NULL, NULL,
+        { ID_LUA_SCRIPT, wxITEM_NORMAL, _T("Run &Script"), NULL, NULL,
                    _handler(MyFrame::OnLuaScript) },
 #endif // XWORD_USE_LUA
 
@@ -328,8 +334,28 @@ MyFrame::MyFrame()
     : wxFrame(NULL, -1, XWORD_APP_NAME, wxDefaultPosition, wxSize(700,700)),
       m_timer(this),
       m_isTimerRunning(false),
-      m_preferencesDialog(NULL)
+      m_preferencesDialog(NULL),
+      m_charactersPanel(NULL),
+      m_mgr(this),
+      m_isIdleConnected(false)
 {
+#ifdef __WXDEBUG__
+    // Debug window
+    wxTextCtrl * logctrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString,
+                                          wxDefaultPosition, wxDefaultSize,
+                                          wxTE_MULTILINE);
+    new wxLogChain(new wxLogTextCtrl(logctrl));
+    m_mgr.AddPane(logctrl,
+                  wxAuiPaneInfo()
+                  .BestSize(350, 300)
+                  .PinButton()
+                  .CloseButton()
+                  .Layer(900)
+                  .Left()
+                  .Caption(_T("Logger"))
+                  .Name(_T("Logger")) );
+#endif // __WXDEBUG__
+
     // Set the initial timer amount
     m_timer.Start(1000);
     m_timer.Stop();
@@ -350,7 +376,11 @@ MyFrame::MyFrame()
     LoadConfig();
 
     LoadLayout(_T("(Previous)"));
-    UpdateLayout();
+    m_mgr.Update();
+
+    // Check to see if we know about some windows.
+    if (m_mgr.HasCachedPane(_T("Characters")))
+        ShowCharacterMap();
 
 #if defined(__WXMSW__) && !defined(__WXPM__)
     SetIcon(wxIcon(_T("aa_main_icon")));
@@ -370,11 +400,6 @@ MyFrame::~MyFrame()
 {
     // Let the App know we've been destroyed
     wxGetApp().m_frame = NULL;
-
-#ifdef XWORD_USE_LUA
-    // Lua cleanup
-    m_lua.CloseLuaState(true);
-#endif // XWORD_USE_LUA
 
     // Cleanup
     m_toolMgr.DisconnectEvents();
@@ -404,13 +429,12 @@ MyFrame::GetLoadTypeString()
 wxString
 MyFrame::GetSaveTypeString()
 {
-    return _T("Across Lite Format (*.puz)|*.puz")
-           _T("|")
-           _T("Plain Text Format (*.txt)|*.txt");
+    return _T("Across Lite Format (*.puz)|*.puz");
 }
 
+
 bool
-MyFrame::LoadPuzzle(const wxString & filename)
+MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
 {
     if ( ! ClosePuzzle(true) ) // Prompt for save
         return false;
@@ -420,17 +444,11 @@ MyFrame::LoadPuzzle(const wxString & filename)
     try
     {
         m_isModified = false;
-        m_puz.Load(wx2puz(filename));
+        m_puz.Load(wx2puz(filename), handler);
     }
     catch (puz::ChecksumError &)
     {
         m_puz.SetOk(XWordPrompt(MSG_CORRUPT_PUZ));
-    }
-    catch (std::exception & err)
-    {
-        // Do something more useful here.
-        m_puz.SetOk(false);
-        XWordMessage(MSG_PUZ_ERROR, puz2wx(err.what()).c_str());
     }
     catch (...)
     {
@@ -458,29 +476,31 @@ MyFrame::LoadPuzzle(const wxString & filename)
 
 
 bool
-MyFrame::SavePuzzle(wxString filename)
+MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
 {
     m_puz.m_notes = wx2puz(m_notes->GetValue());
     m_puz.m_time = m_time;
     m_puz.m_isTimerRunning = IsTimerRunning();
 
-    if (filename.empty())
-        filename = wxFileSelector(
-                        _T("Save Puzzle As"),
-                        wxEmptyString, wxEmptyString, _T("puz"),
-                        GetSaveTypeString(),
-                        wxFD_SAVE | wxFD_OVERWRITE_PROMPT
-                   );
+    wxString fn = filename;
+    if (fn.empty())
+        fn = wxFileSelector(
+                 _T("Save Puzzle As"),
+                 wxEmptyString, wxEmptyString, _T("puz"),
+                 GetSaveTypeString(),
+                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT
+            );
 
-    if (filename.empty())
+    if (fn.empty())
         return false;
 
     wxStopWatch sw;
 
     try
     {
-        m_puz.Save(wx2puz(filename));
-        m_filename = filename;
+        m_puz.Save(wx2puz(fn), handler);
+        m_filename = fn;
+        m_isModified = false;
 
         // Reset save/save as flag
         EnableSaveAs();
@@ -511,6 +531,7 @@ MyFrame::HandlePuzException()
     }
     catch (std::exception & err)
     {
+
         XWordMessage(MSG_STD_EXCEPTION, err.what());
     }
     catch (...)
@@ -626,11 +647,13 @@ MyFrame::ShowTitle()
     {
         SetTitle(XWORD_APP_NAME);
         m_title->SetLabel(_T(""));
+        m_title->SetToolTip(_T(""));
     }
     else
     {
         SetTitle(puz2wx(m_puz.m_title) + _T(" - ") XWORD_APP_NAME);
         m_title->SetLabel(puz2wx(m_puz.m_title));
+        m_title->SetToolTip(puz2wx(m_puz.m_title));
     }
 }
 
@@ -638,12 +661,14 @@ void
 MyFrame::ShowAuthor()
 {
     m_author->SetLabel(puz2wx(m_puz.m_author));
+    m_author->SetToolTip(puz2wx(m_puz.m_author));
 }
 
 void
 MyFrame::ShowCopyright()
 {
     m_copyright->SetLabel(puz2wx(m_puz.m_copyright));
+    m_copyright->SetToolTip(puz2wx(m_puz.m_copyright));
 }
 
 
@@ -818,6 +843,9 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, ID_LAYOUT_PANES);
         m_toolMgr.Add(menu, ID_LOAD_LAYOUT);
         m_toolMgr.Add(menu, ID_SAVE_LAYOUT);
+        wxMenu * paneMenu = new wxMenu();
+        m_mgr.SetManagedMenu(paneMenu);
+        menu->AppendSubMenu(paneMenu, _T("Panes"));
     mb->Append(menu, _T("&View"));
 
     // Solution Menu
@@ -827,7 +855,7 @@ MyFrame::CreateMenuBar()
             m_toolMgr.Add(subMenu, ID_CHECK_WORD);
             m_toolMgr.Add(subMenu, ID_CHECK_SELECTION);
             m_toolMgr.Add(subMenu, ID_CHECK_GRID);
-        menu->AppendSubMenu(subMenu, _T("Check"));
+        menu->AppendSubMenu(subMenu, _T("&Check"));
         subMenu = new wxMenu();
             m_toolMgr.Add(subMenu, ID_REVEAL_LETTER);
             m_toolMgr.Add(subMenu, ID_REVEAL_WORD);
@@ -836,7 +864,7 @@ MyFrame::CreateMenuBar()
             subMenu->AppendSeparator();
             m_toolMgr.Add(subMenu, ID_REVEAL_SELECTION);
             m_toolMgr.Add(subMenu, ID_REVEAL_GRID);
-        menu->AppendSubMenu(subMenu, _T("Reveal"));
+        menu->AppendSubMenu(subMenu, _T("&Reveal"));
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_SCRAMBLE);
         m_toolMgr.Add(menu, ID_UNSCRAMBLE);
@@ -845,7 +873,7 @@ MyFrame::CreateMenuBar()
     // Tools Menu
     menu = new wxMenu();
         m_toolMgr.Add(menu, ID_TIMER);
-        m_toolMgr.Add(menu, ID_CONVERT);
+        m_toolMgr.Add(menu, ID_CHARACTER_MAP);
 #ifdef XWORD_USE_LUA
         m_toolMgr.Add(menu, ID_LUA_SCRIPT);
 #endif // XWORD_USE_LUA
@@ -880,7 +908,6 @@ MyFrame::CreateMenuBar()
 void
 MyFrame::SetupWindowManager()
 {
-    m_mgr.SetManagedWindow(this);
     wxAuiDockArt * art = m_mgr.GetArtProvider();
 
     wxColor active = wxSystemSettings::GetColour(
@@ -898,13 +925,43 @@ MyFrame::SetupWindowManager()
 }
 
 
+// This is an external entry point for adding Aui panes (i.e. through lua)
+void
+MyFrame::AddPane(wxWindow * window, const wxAuiPaneInfo & info)
+{
+    // The default wxAuiPaneInfo is good, except all panes should
+    // have a pin button.
+    wxAuiPaneInfo the_info = info;
+    the_info.PinButton();
+    m_mgr.AddPane(window, the_info);
+    m_mgr.Update();
+}
+
+void
+MyFrame::OnPaneClose(wxAuiManagerEvent & evt)
+{
+    // Pass pane close to the child window
+    wxAuiPaneInfo * pane = evt.GetPane();
+    if (pane && pane->window)
+        pane->window->GetEventHandler()->ProcessEvent(evt);
+    evt.Skip();
+}
+
 void
 MyFrame::ManageWindows()
 {
+    // The default wxAuiPaneInfo.
+    // ** We have to "declare" all the buttons we want to use here
+    // or they won't ever show up!
+    wxAuiPaneInfo baseInfo;
+    baseInfo.CaptionVisible(false)
+            .PinButton()
+            .CloseButton()
+            .MinSize(15,15);
+
     // Give everything a name so we can save and load the layout
     m_mgr.AddPane(m_XGridCtrl,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
+                  wxAuiPaneInfo(baseInfo)
                   .CenterPane()
                   .Caption(_T("Grid"))
                   .Name(_T("Grid")) );
@@ -925,92 +982,66 @@ MyFrame::ManageWindows()
 #endif // USE_AUI_TOOLBAR
 
     m_mgr.AddPane(m_across,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
+                  wxAuiPaneInfo(baseInfo)
                   .BestSize(300,-1)
                   .Layer(4)
                   .Left()
                   .Caption(_T("Across"))
                   .Name(_T("Across")) );
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_across), m_across->m_heading);
 
     m_mgr.AddPane(m_down,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
+                  wxAuiPaneInfo(baseInfo)
                   .BestSize(300,-1)
                   .Layer(4)
                   .Left()
                   .Caption(_T("Down"))
                   .Name(_T("Down")) );
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_down), m_down->m_heading);
 
     m_mgr.AddPane(m_title,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
+                  wxAuiPaneInfo(baseInfo)
                   .Layer(3)
                   .Top()
                   .Caption(_T("Title"))
                   .Name(_T("Title")) );
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_title), m_title);
 
     m_mgr.AddPane(m_author,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
+                  wxAuiPaneInfo(baseInfo)
                   .Layer(3)
                   .Top()
                   .Caption(_T("Author"))
                   .Name(_T("Author")) );
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_author), m_author);
 
     m_mgr.AddPane(m_copyright,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
+                  wxAuiPaneInfo(baseInfo)
                   .Layer(3)
                   .Top()
                   .Caption(_T("Copyright"))
                   .Name(_T("Copyright")) );
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_copyright), m_copyright);
 
     m_mgr.AddPane(m_cluePrompt,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
+                  wxAuiPaneInfo(baseInfo)
                   .BestSize(-1, 75)
                   .Layer(2)
                   .Top()
-                  .Caption(_T("Clue"))
+                  .Caption(_T("Clue Prompt"))
                   .Name(_T("Clue")) );
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_cluePrompt), m_cluePrompt);
 
     m_mgr.AddPane(m_notes,
-                  wxAuiPaneInfo()
-                  .CaptionVisible(false)
+                  wxAuiPaneInfo(baseInfo)
+                  .CaptionVisible(true)
                   .Float()
+                  .FloatingSize(250,250)
                   .Hide()
-                  .CloseButton(true)
                   .Caption(_T("Notes"))
                   .Name(_T("Notes")));
 
     SaveLayout(_T("XWord Default"));
-}
-
-
-bool
-MyFrame::LoadLayoutString(const wxString & layout, bool update)
-{
-    // Save the toolbar size so it isn't cut off
-    //wxSize tbSize = m_toolbar->GetMinSize();
-
-    if (! m_mgr.LoadPerspective(layout, false))
-        return false;
-
-    // Restore toolbar size
-    //m_mgr.GetPane(m_toolbar).BestSize(tbSize);
-
-    m_toolMgr.Check(ID_SHOW_NOTES, m_mgr.GetPane(_T("Notes")).IsShown());
-
-    // Make sure that the user can always close the notes panel.
-    wxAuiPaneInfo & notes = m_mgr.GetPane(_T("Notes"));
-    notes.CloseButton(true);
-
-
-    if (update)
-        m_mgr.Update();
-
-    return true;
 }
 
 
@@ -1638,27 +1669,40 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 // Window Layout
 //--------------
 void
-MyFrame::OnLayout(wxCommandEvent & evt)
+MyFrame::OnEditLayout(wxCommandEvent & evt)
 {
-    const bool allowMove = evt.IsChecked();
-
-    wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
-
-    // Loop through all panes and make each one movable
-    for (size_t i = 0; i < panes.Count(); ++i)
+    // Save which panes have captions so we can restore them
+    if (evt.IsChecked())
     {
-        wxAuiPaneInfo & info = panes.Item(i);
-        info.Floatable(allowMove).Dockable(allowMove);
-        info.CaptionVisible(allowMove);
-        // We need to provide a means to reopen closed windows before we allow
-        // closing.
-        //info.CloseButton(allowMove);
+        // Make all the captions visible
+        m_hasPaneCaption.clear();
+        wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
+        for (size_t i = 0; i < panes.Count(); ++i)
+        {
+            wxAuiPaneInfo & pane = panes.Item(i);
+            if (pane.name.StartsWith(_T("__")))
+                continue;
+            m_hasPaneCaption[pane.name] = pane.HasCaption();
+            pane.CaptionVisible(true);
+        }
     }
-
-    // Ensure the notes panel keeps its default settings
-    wxAuiPaneInfo & notes = m_mgr.GetPane(_T("Notes"));
-    notes.CloseButton(true);
-
+    else
+    {
+        // Restore the captions to their previous state
+        wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
+        for (size_t i = 0; i < panes.Count(); ++i)
+        {
+            wxAuiPaneInfo & pane = panes.Item(i);
+            if (pane.name.StartsWith(_T("__")))
+                continue;
+            std::map<wxString, bool>::iterator it = m_hasPaneCaption.find(pane.name);
+            if (it == m_hasPaneCaption.end())
+                pane.CaptionVisible(true);
+            else
+                pane.CaptionVisible(it->second);
+        }
+        m_hasPaneCaption.clear();
+    }
     m_mgr.Update();
 }
 
@@ -1711,7 +1755,7 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
 
     // If the dialog is canceled, load the previous layout
     if (dlg.ShowModal() != wxID_OK)
-        LoadLayoutString(layoutArray.front(), true);
+        m_mgr.LoadPerspective(layoutArray.front(), true);
 
 }
 
@@ -1734,14 +1778,23 @@ MyFrame::OnShowNotes(wxCommandEvent & evt)
     ShowPane(_T("Notes"), evt.IsChecked());
 }
 
-
 void
-MyFrame::OnAuiPaneClose(wxAuiManagerEvent & evt)
+MyFrame::OnUpdateUI(wxUpdateUIEvent & evt)
 {
-    // Keep track of the state of our panels
-    if (evt.GetPane()->name == _T("Notes"))
-        m_toolMgr.Check(ID_SHOW_NOTES, false);
+    switch (evt.GetId())
+    {
+        case ID_SHOW_NOTES:
+            evt.Check(m_mgr.GetPane(_T("Notes")).IsShown());
+            break;
+        case ID_CHARACTER_MAP:
+        {
+            wxAuiPaneInfo & pane = m_mgr.GetPane(_T("Characters"));
+            evt.Check(pane.IsOk() && pane.IsShown());
+        }
+            break;
+    }
 }
+
 
 // Timer
 //------
@@ -1774,13 +1827,37 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
 }
 
 
+// Character Map
+//--------------
 void
-MyFrame::OnConvert(wxCommandEvent & WXUNUSED(evt))
+MyFrame::OnCharacterMap(wxCommandEvent & evt)
 {
-    //ConvertDialog(this).ShowModal();
+    if (evt.IsChecked())
+        ShowCharacterMap();
+    else
+        ShowPane(_T("Characters"), false);
 }
 
-
+// Show the character map, creating the panel if necessary
+void
+MyFrame::ShowCharacterMap()
+{
+    if (m_charactersPanel == NULL)
+    {
+        m_charactersPanel = new CharactersPanel(this);
+        AddPane(m_charactersPanel, wxAuiPaneInfo()
+                                    .Name(_T("Characters"))
+                                    .Caption(_T("Character Map"))
+                                    .FloatingSize(250,250)
+                                    .Float());
+    }
+    wxAuiPaneInfo & pane = m_mgr.GetPane(m_charactersPanel);
+    if (m_mgr.IsPaneClosed(pane))
+    {
+        pane.Show();
+        m_mgr.Update();
+    }
+}
 
 
 
@@ -1792,10 +1869,20 @@ MyFrame::LuaInit()
     // Initialze wxLua.
     XWORD_LUA_IMPLEMENT_BIND_ALL
     m_lua = wxLuaState(this, wxID_ANY);
-    xword_setup_lua_paths(m_lua);
+    xword_setup_lua(m_lua);
 
     // Initialize the lua additions to the xword package
     RunLuaScript(GetScriptsDir() + _T("/xword/init.lua"));
+}
+
+void
+MyFrame::LuaUninit()
+{
+    // Cleanup the lua additions to the xword package
+    RunLuaScript(GetScriptsDir() + _T("/xword/cleanup.lua"));
+
+    // Close lua itself
+    m_lua.CloseLuaState(true);
 }
 
 void
@@ -1988,9 +2075,6 @@ MyFrame::OnGridFocus(wxPuzEvent & evt)
         m_cluePrompt->SetClue(evt.GetDownClue(), puz::DOWN,
                               m_down->GetClueText());
     }
-
-    // We shouldn't need this if we're fast enough
-    // m_cluePrompt->Update();
 }
 
 
@@ -2033,25 +2117,38 @@ MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
 // Frame events
 //------------------------------------------------------------------------------
 
-// Here's the weird way this needs to happen:
-// The wxApp stops the timer
-// The wxFrame starts the timer
+// wxTLW::OnActivate tries to restore focus to the previously focused window.
+// This usually fails (especially under wxMSW).  It seems that EVT_ACTIVATE
+// is sent while IsIconized() still returns true.  Perhaps MSW does not
+// allow the focus to be on a window that is not shown (sensibly so).
+// Our OnActivate handler connects an idle event that trys to SetFocus()
+// until it actually works.  At this point, it disconnects itself.
+// Brute force.
+// Unfortunately, I can't get EVT_ICONIZE to be reliable.
+
 void
 MyFrame::OnActivate(wxActivateEvent & evt)
 {
-    if (evt.GetActive())
+    if (evt.GetActive() && ! m_isIdleConnected)
     {
-        if (! IsIconized())
-        {
-            // Keep focus on the XGridCtrl
-            // This isn't the best solution, but seems to work despite all the
-            // SetFocus() failed messages
-            m_XGridCtrl->SetFocus();
-
-            OnAppActivate();
-        }
+        m_isIdleConnected = true;
+        Connect(wxEVT_IDLE, wxIdleEventHandler(MyFrame::SetFocusOnIdle));
     }
+    evt.Skip();
+}
 
+void
+MyFrame::SetFocusOnIdle(wxIdleEvent & evt)
+{
+    if (m_winLastFocused && m_winLastFocused != wxWindow::FindFocus())
+        m_winLastFocused->SetFocus();
+    // We need to check again because the previous call to SetFocus()
+    // isn't guaranteed to work.
+    if (! m_winLastFocused || m_winLastFocused == wxWindow::FindFocus())
+    {
+        m_isIdleConnected = false;
+        Disconnect(wxEVT_IDLE, wxIdleEventHandler(MyFrame::SetFocusOnIdle));
+    }
     evt.Skip();
 }
 
@@ -2061,7 +2158,7 @@ MyFrame::OnAppActivate()
 {
     if (m_toolMgr.IsChecked(ID_TIMER))
     {
-        wxLogDebug(_T("Starting timer."));
+        wxLogDebug(_T("Starting timer"));
         m_timer.Start();
         m_XGridCtrl->SetPaused(false);
     }
@@ -2073,6 +2170,7 @@ MyFrame::OnAppDeactivate()
 {
     if (m_toolMgr.IsChecked(ID_TIMER))
     {
+        wxLogDebug(_T("Stopping timer"));
         m_timer.Stop();
         m_XGridCtrl->SetPaused(true);
     }
@@ -2085,6 +2183,9 @@ MyFrame::OnClose(wxCloseEvent & evt)
 {
     if (ClosePuzzle() || ! evt.CanVeto())
     {
+#ifdef XWORD_USE_LUA
+        LuaUninit();
+#endif
         SaveConfig();
         Hide();
         Destroy();

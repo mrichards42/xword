@@ -24,7 +24,8 @@
 #    include <wx/frame.h>
 #endif
 
-#include <wx/aui/aui.h>
+//#include <wx/aui/aui.h>
+#include "MyAuiMgr.hpp"
 
 
 // XWord library
@@ -38,6 +39,7 @@ class SizedText;
 class CluePanel;
 class LayoutDialog;
 class PreferencesDialog;
+class CharactersPanel;
 
 class MyPrintout;
 
@@ -48,6 +50,8 @@ class MyPrintout;
 #include "utils/ToolManager.hpp"
 
 #include <wx/fileconf.h> // Used to get the layouts directly from wxConfig
+
+#include <map>
 
 #ifdef XWORD_USE_LUA
 // wxLua
@@ -64,6 +68,7 @@ class MyPrintout;
 class MyFrame : public wxFrame
 {
     friend class PreferencesDialog;
+    friend class CharactersDialog;
     friend class MyPrintout;
 public:
     MyFrame();
@@ -71,8 +76,8 @@ public:
 
     // XWord puzzle loading / saving
     //-----------
-    bool LoadPuzzle(const wxString & filename);
-    bool SavePuzzle(      wxString   filename);
+    bool LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL);
+    bool SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL);
     bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
     void CheckPuzzle();
 
@@ -94,12 +99,11 @@ public:
     //-----------
     void ShowPane(const wxString & name, bool show = true);
     void HidePane(const wxString & name) { return ShowPane(name, false); }
+    void AddPane(wxWindow * window, const wxAuiPaneInfo & info);
 
     void SaveLayout      (const wxString & name);
-    bool LoadLayout      (const wxString & name, bool update = false);
-    bool LoadLayoutString(const wxString & layout, bool update = false);
-    void UpdateLayout();
-
+    bool LoadLayout      (const wxString & name, bool update = true);
+    bool LoadPerspective (const wxString & perspective, bool update = true);
 
     // Status bar
     //-----------
@@ -174,8 +178,9 @@ private:
     //------------------
     void SetupWindowManager();
     void ManageWindows();
+    void OnPaneClose(wxAuiManagerEvent & evt);
 
-    wxAuiManager m_mgr;
+    MyAuiManager m_mgr;
 
 
     // Tool Management
@@ -221,6 +226,7 @@ private:
     wxFileConfig * GetConfig();
 
     PreferencesDialog * m_preferencesDialog;
+    CharactersPanel * m_charactersPanel;
 
 
 private:
@@ -262,19 +268,22 @@ private:
     void OnUnscramble (wxCommandEvent & WXUNUSED(evt));
 
     // Window layout
-    void OnLayout     (wxCommandEvent & WXUNUSED(evt));
+    void OnEditLayout (wxCommandEvent & WXUNUSED(evt));
+    std::map<wxString, bool> m_hasPaneCaption;
     void OnLoadLayout (wxCommandEvent & WXUNUSED(evt));
     void OnSaveLayout (wxCommandEvent & WXUNUSED(evt));
     void OnShowNotes  (wxCommandEvent & WXUNUSED(evt));
-    void OnAuiPaneClose(wxAuiManagerEvent & evt);
+
+    // Menus / toolbar stuff
+    void OnUpdateUI   (wxUpdateUIEvent & evt);
 
     // Timer
     void OnTimer      (wxCommandEvent & WXUNUSED(evt));
     void OnTimerNotify(wxTimerEvent   & WXUNUSED(evt));
 
-    // File conversion
-    void OnConvert    (wxCommandEvent & WXUNUSED(evt));
-
+    // Char Map
+    void OnCharacterMap(wxCommandEvent & WXUNUSED(evt));
+    void ShowCharacterMap();
 
     // Preferences
     void OnPreferences(wxCommandEvent & WXUNUSED(evt));
@@ -298,8 +307,10 @@ private:
 
     // Frame events
     //-------------
-    void OnActivate   (wxActivateEvent & evt);
-    void OnClose      (wxCloseEvent & evt);
+    void OnActivate    (wxActivateEvent & evt);
+    void SetFocusOnIdle(wxIdleEvent & evt);
+    bool m_isIdleConnected;
+    void OnClose       (wxCloseEvent & evt);
 
 #ifdef XWORD_USE_LUA
     void OnLuaScript  (wxCommandEvent & WXUNUSED(evt));
@@ -307,6 +318,7 @@ private:
     void OnLuaError   (wxLuaEvent & evt);
     wxLuaState m_lua;
     void LuaInit();
+    void LuaUninit();
 #endif // XWORD_USE_LUA
 
 private:
@@ -368,16 +380,6 @@ MyFrame::GetConfig()
 //------------------
 
 inline void
-MyFrame::UpdateLayout()
-{
-    // Save the toolbar size so it isn't cut off
-    //wxSize tbSize = m_toolbar->GetMinSize();
-    //m_mgr.GetPane(m_toolbar).BestSize(tbSize);
-    m_mgr.Update();
-}
-
-
-inline void
 MyFrame::SaveLayout(const wxString & name)
 {
     GetConfig()->Write(wxString::Format(_T("/Layouts/%s"), name.c_str()),
@@ -394,7 +396,14 @@ MyFrame::LoadLayout(const wxString & name, bool update)
                             &perspective) )
         return false;
 
-    return LoadLayoutString(perspective, update);
+    return LoadPerspective(perspective, update);
+}
+
+inline bool
+MyFrame::LoadPerspective(const wxString & perspective, bool update)
+
+{
+    return m_mgr.LoadPerspective(perspective, update);
 }
 
 
@@ -405,7 +414,7 @@ MyFrame::ShowPane(const wxString & name, bool show)
     wxASSERT(info.IsOk());
 
     info.Show(show);
-    UpdateLayout();
+    m_mgr.Update();
 }
 
 #endif // MY_FRAME_H

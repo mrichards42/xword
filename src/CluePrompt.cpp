@@ -76,4 +76,5 @@ CluePrompt::SetClue(int number, puz::GridDirection direction, wxString text)
     result.Replace(_T("%Z"), _T("%"));
 
     SetLabel(result);
+    SetToolTip(result);
 }

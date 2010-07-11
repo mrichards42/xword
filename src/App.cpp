@@ -67,6 +67,7 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
 bool
 MyApp::OnInit()
 {
+    //_CrtSetBreakAlloc(37630);
     m_frame = NULL;
 
     wxLogDebug(_T("Starting App"));
@@ -118,12 +119,6 @@ MyApp::OnInit()
     // Create the frame before completely parsing the command line
     // because we might have puzzles to load.
     m_frame = new MyFrame();
-
-    // Log to a window for debug
-#if defined(__WXDEBUG__ )
-    wxLogWindow *w = new wxLogWindow(m_frame, _T("Logger"));
-    w->Show();
-#endif
 
     ReadCommandLine(cmd);
     m_frame->Show();
@@ -367,11 +362,14 @@ MyApp::OnActivate(wxActivateEvent & evt)
     // MyFrame will NULL this pointer when it is destroyed
     if (m_frame != NULL)
     {
-        // The frame will handle starting the timer
-        if (! evt.GetActive())
+        if (evt.GetActive())
+        {
+            wxLogDebug(_T("App Activate"));
+            m_frame->OnAppActivate();
+        }
+        else
         {
             wxLogDebug(_T("App Deactivate"));
-            wxLogDebug(_T("Stopping timer."));
             m_frame->OnAppDeactivate();
         }
     }
@@ -419,7 +417,7 @@ MyApp::RunLuaScript(const wxString & filename, int lastarg)
     // Initialze wxLua.
     XWORD_LUA_IMPLEMENT_BIND_ALL
     wxLuaState lua(this, wxID_ANY);
-    xword_setup_lua_paths(lua);
+    xword_setup_lua(lua);
 
     lua_State * L = lua.GetLuaState();
 

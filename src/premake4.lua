@@ -6,7 +6,14 @@ project "XWord"
     -- --------------------------------------------------------------------
     kind "WindowedApp"
     language "C++"
-    files { "*.hpp", "*.cpp", "*.h", "widgets/*.*", "utils/*.*", "dialogs/*.*", "xwordbind/*.*" }
+    files
+    {
+        "*.hpp", "*.cpp", "*.h",
+        "widgets/*.hpp",   "widgets/*.cpp",   "widgets/*.h",
+        "utils/*.hpp",     "utils/*.cpp",     "utils/*.h",
+        "dialogs/*.hpp",   "dialogs/*.cpp",   "dialogs/*.h",
+        "xwordbind/*.hpp", "xwordbind/*.cpp", "xwordbind/*.h",
+    }
 
     if USE_LUA then
         defines { "XWORD_USE_LUA" }
