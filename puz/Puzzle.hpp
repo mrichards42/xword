@@ -29,20 +29,7 @@ namespace puz {
 class PUZ_API Puzzle
 {
 public:
-    typedef void (*FileHandler)(Puzzle *, const std::string &, void *);
-    typedef void (*CppLoadHandler)(Puzzle *, std::istream &);
-    typedef void (*CppSaveHandler)(Puzzle *, std::ostream &);
-
-    // The load and save functions are passed a void pointer with whatever
-    // data the handler needs. This is kind of hackish and mostly just
-    // for lua, but it might be useful at some other point.
-    struct PUZ_API FileHandlerDesc
-    {
-        FileHandler handler;
-        std::string ext;
-        void * data;
-    };
-
+    struct PUZ_API FileHandlerDesc;
     class PUZ_API Clue;
     class PUZ_API ClueList;
 
@@ -53,27 +40,8 @@ public:
           m_isOk(false)
     {}
 
-    explicit Puzzle(const std::string & filename)
-        : m_time(0),
-          m_isTimerRunning(false),
-          m_version(13),
-          m_isOk(false)
-    {
-        Load(filename);
-    }
-
     explicit Puzzle(const std::string & filename,
-                    const std::string & ext)
-        : m_time(0),
-          m_isTimerRunning(false),
-          m_version(13),
-          m_isOk(false)
-    {
-        Load(filename, ext);
-    }
-
-    explicit Puzzle(const std::string & filename,
-                    FileHandlerDesc * desc)
+                    const FileHandlerDesc * desc = NULL)
         : m_time(0),
           m_isTimerRunning(false),
           m_version(13),
@@ -84,19 +52,17 @@ public:
 
     ~Puzzle() {}
 
-    void Load(const std::string & filename);
-    void Load(const std::string & filename, const std::string & ext);
-    void Load(const std::string & filename, FileHandlerDesc * handler);
-
-    void Save(const std::string & filename);
-    void Save(const std::string & filename, const std::string & ext);
-    void Save(const std::string & filename, FileHandlerDesc * handler);
+    void Load(const std::string & filename, const FileHandlerDesc * handler = NULL);
+    void Save(const std::string & filename, const FileHandlerDesc * handler = NULL);
 
     void Clear();
     bool IsOk()        const { return m_isOk; }
     void SetOk(bool doit=true) { m_isOk = doit; }
     bool IsScrambled() const { return m_grid.IsScrambled(); }
     short GetVersion() const { return m_version; }
+
+    // Verify that the puzzle is valid and raise an exception if it is not.
+    void TestOk() const;
 
     // Getter / Setters
     //-----------------
@@ -202,9 +168,9 @@ public:
     };
 
 
-    //--------------------------------------------------------------------
+    // -------------------------------------------------------------------
     // Members
-    //--------------------------------------------------------------------
+    // -------------------------------------------------------------------
     int m_time;
     bool m_isTimerRunning;
 
@@ -223,17 +189,32 @@ public:
     struct PUZ_API section;
     std::vector<section> m_extraSections;
 
-    static std::string GetLoadTypeString();
-    static std::string GetSaveTypeString();
+    // -------------------------------------------------------------------
+    // Load / Save
+    // -------------------------------------------------------------------
+    typedef void (*FileHandler)(Puzzle *, const std::string &, void *);
+    typedef void (*CppLoadHandler)(Puzzle *, std::istream &);
+    typedef void (*CppSaveHandler)(Puzzle *, std::ostream &);
+
+    // The load and save functions are passed a void pointer with whatever
+    // data the handler needs. This is kind of hackish and mostly just
+    // for lua, but it might be useful at some other point.
+    struct PUZ_API FileHandlerDesc
+    {
+        FileHandler handler;
+        const char * ext;
+        const char * desc;
+        void * data;
+    };
+
+    static const FileHandlerDesc sm_loadHandlers[];
+    static const FileHandlerDesc sm_saveHandlers[];
+
     static bool CanLoad(const std::string & filename);
     static bool CanSave(const std::string & filename);
 
-    static void AddLoadHandler(CppLoadHandler handler, const char * ext);
-    static void AddSaveHandler(CppSaveHandler handler, const char * ext);
-    static void AddLoadHandler(FileHandler handler, const char * ext, void * data = NULL);
-    static void AddSaveHandler(FileHandler handler, const char * ext, void * data = NULL);
-    static void RemoveLoadHandler(FileHandler handler, void * data = NULL);
-    static void RemoveSaveHandler(FileHandler handler, void * data = NULL);
+    static const FileHandlerDesc * FindLoadHandler(const std::string & ext);
+    static const FileHandlerDesc * FindSaveHandler(const std::string & ext);
 
 protected:
     bool m_isOk;
@@ -243,13 +224,6 @@ protected:
     void DoGetClueList(std::vector<std::string> * clues) const;
 
 private:
-    // Load / save stuff
-    static FileHandlerDesc * GetLoadHandler(const std::string & ext);
-    static FileHandlerDesc * GetSaveHandler(const std::string & ext);
-
-    static std::vector<FileHandlerDesc> sm_loadHandlers;
-    static std::vector<FileHandlerDesc> sm_saveHandlers;
-
     std::string m_lastError;
 };
 

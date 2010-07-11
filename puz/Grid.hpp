@@ -168,7 +168,6 @@ public:
     // Scrambling
     bool ScrambleSolution  (unsigned short key = 0);
     bool UnscrambleSolution(unsigned short key);
-    unsigned short BruteForceUnscramble();
     bool CheckScrambledGrid();
 
     unsigned short  GetKey()   const { return m_key; }
@@ -187,12 +186,16 @@ public:
 
     // Check functions
     //----------------
-    std::vector<Square *> CheckGrid(bool checkBlank = false);
-    std::vector<Square *> CheckWord(Square * start,
-                                     Square * end,
-                                     bool checkBlank = false);
-    bool CheckSquare(const Square & square, bool checkBlank = false) const
-        { return square.Check(checkBlank); }
+    void CheckGrid(std::vector<Square *> * incorrect,
+                   bool checkBlank = false,
+                   bool strictRebus = false);
+    void CheckWord(std::vector<Square *> * incorrect,
+                   Square * start, Square * end,
+                   bool checkBlank = false,
+                   bool strictRebus = false);
+    bool CheckSquare(const Square & square, bool checkBlank = false,
+                                            bool strictRebus = false) const
+        { return square.Check(checkBlank, strictRebus); }
 
 
     // These all operate with ASCII

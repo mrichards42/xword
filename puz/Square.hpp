@@ -28,14 +28,12 @@ namespace puz {
 
 const int REBUS_ENTRY_LENGTH = 8;
 
-// Clue flags
-enum ClueFlag
-{
-    NO_CLUE     = 0x00,
-    ACROSS_CLUE = 0x01,
-    DOWN_CLUE   = 0x02,
-};
-
+//#define PUZ_CHECK_STRINGS
+#ifdef PUZ_CHECK_STRINGS
+#   define PuzCheckString(str) Square::CheckString(str)
+#else
+#   define PuzCheckString
+#endif
 
 // GEXT flags
 enum GextFlag
@@ -125,11 +123,11 @@ public:
     void SetSolution(const std::string & solution, char plain);
     void SetPlainSolution(char plain); // Leave solution rebus unchanged
     void SetSolutionRebus(const std::string & rebus); // Leave plain solution unchanged
-    void SetSolutionSymbol(unsigned short symbol); // Must set plain solution separately
+    void SetSolutionSymbol(unsigned char symbol); // Must set plain solution separately
 
-    bool Check(bool checkBlank = NO_CHECK_BLANK) const;
+    bool Check(bool checkBlank = false, bool strictRebus = false) const;
 
-    char GetPlainText()     const { return ToAscii(m_text); }
+    char GetPlainText()     const { return ToPlain(m_text); }
     char GetPlainSolution() const { return m_asciiSolution; }
 
     bool HasTextRebus()      const;
@@ -137,19 +135,26 @@ public:
     bool HasTextSymbol()     const;
     bool HasSolutionSymbol() const;
 
-    unsigned short GetTextSymbol()      const;
-    unsigned short GetSolutionSymbol()  const;
+    unsigned char GetTextSymbol()      const;
+    unsigned char GetSolutionSymbol()  const;
 
+    // Character lookup functions
     static bool IsValidChar(char ch);
     static bool IsValidString(const std::string & str);
     static bool IsSymbol(const std::string & str);
+    static unsigned char ToUpper(unsigned char ch);
+    static std::string ToUpper(const std::string & str);
+    static unsigned char ToPlain(unsigned char ch);
+    static unsigned char ToPlain(const std::string & str)
+        { return str.empty() ? '-' : ToPlain(str.at(0)); }
 
     // Clue
     //-----
     short GetNumber() const { return m_number; }
-    bool HasClue(GridDirection dir) const
-        { return GetWordStart(dir) == this; }
-    bool HasClue() const { return HasClue(ACROSS) || HasClue(DOWN); }
+    bool HasClue(GridDirection dir = NONE) const
+       { return dir == NONE
+                    ? HasClue(ACROSS) || HasClue(DOWN)
+                    : GetWordStart(dir) == this; }
 
 
     // Flag (GEXT)
@@ -234,14 +239,11 @@ protected:
     Square * m_wordStart[2];  // [ across / down ]
     Square * m_wordEnd  [2];  // [ across / down ]
 
+#ifdef PUZ_CHECK_STRINGS
     // Throw an exception if we get a bad string
     void CheckString(const std::string & str);
+#endif
 
-private:
-    // ASCII lookup functions
-    static char ToAscii(char ch);
-    static char ToAscii(const std::string & str)
-        { return str.empty() ? '-' : ToAscii(str.at(0)); }
 };
 
 
@@ -264,9 +266,8 @@ Square::SetText(const std::string & text)
         m_text = text;
     else
     {
-        CheckString(text);
-        m_text = text;
-        MakeUpper(m_text);
+        PuzCheckString(text);
+        m_text = ToUpper(text);
     }
 }
 
@@ -283,7 +284,7 @@ inline
 void
 Square::SetSolution(const std::string & solution)
 {
-    SetSolution(solution, ToAscii(solution));
+    SetSolution(solution, ToPlain(solution));
 }
 
 
@@ -291,21 +292,22 @@ inline
 void
 Square::SetSolutionRebus(const std::string & rebus)
 {
+    if (rebus.empty())
+        throw InvalidString();
     if (IsSymbol(rebus))
     {
-        SetSolutionSymbol(static_cast<unsigned short>(rebus.at(1)));
+        SetSolutionSymbol(static_cast<unsigned char>(rebus.at(1)));
     }
     else
     {
-        CheckString(rebus);
-        m_solution = rebus;
-        MakeUpper(m_solution);
+        PuzCheckString(rebus);
+        m_solution = ToUpper(rebus);
     }
 }
 
 inline
 void
-Square::SetSolutionSymbol(unsigned short symbol)
+Square::SetSolutionSymbol(unsigned char symbol)
 {
     m_solution = "[ ]";
     m_solution.at(1) = static_cast<char>(symbol);
@@ -316,7 +318,7 @@ Square::SetSolutionSymbol(unsigned short symbol)
 
 inline
 bool
-Square::Check(bool checkBlank)  const
+Square::Check(bool checkBlank, bool strictRebus)  const
 {
     assert(! m_solution.empty());
     if (IsBlack())
@@ -324,7 +326,7 @@ Square::Check(bool checkBlank)  const
     if (IsBlank())
         return ! checkBlank;
 
-    if (HasTextRebus())
+    if (strictRebus || HasTextRebus())
         return m_solution == m_text;
     else
         return GetPlainText() == GetPlainSolution();
@@ -340,15 +342,18 @@ inline
 bool
 Square::HasTextRebus() const
 {
-    return m_text.length() > 1;
+    const size_t len = m_text.length();
+    return len > 1 || (len > 0 && m_text.at(0) != GetPlainText());
 }
 
 
 inline
 bool
 Square::HasSolutionRebus() const
-{//fix
-    return m_solution.length() > 1 || m_solution.at(0) != GetPlainSolution();
+{
+    assert(! m_solution.empty());
+    const size_t len = m_solution.length();
+    return len > 1 || (len > 0 && m_solution.at(0) != GetPlainSolution());
 }
 
 
@@ -370,25 +375,23 @@ Square::HasSolutionSymbol() const
 
 
 inline
-unsigned short
+unsigned char
 Square::GetTextSymbol() const
 {
     if (! HasTextSymbol())
         throw NoSymbol();
-    return static_cast<unsigned short>(m_text.at(1));
+    return static_cast<unsigned char>(m_text.at(1));
 }
 
 
 inline
-unsigned short
+unsigned char
 Square::GetSolutionSymbol() const
 {
     if (! HasSolutionSymbol())
         throw NoSymbol();
-    return static_cast<unsigned short>(m_solution.at(1));
+    return static_cast<unsigned char>(m_solution.at(1));
 }
-
-
 
 
 
@@ -405,6 +408,7 @@ Square::IsValidString(const std::string & str)
     return true;
 }
 
+#ifdef PUZ_CHECK_STRINGS
 inline
 void
 Square::CheckString(const std::string & str)
@@ -414,6 +418,7 @@ Square::CheckString(const std::string & str)
     if (! IsValidString(str))
         throw InvalidString();
 }
+#endif // PUZ_CHECK_STRINGS
 
 inline
 bool
@@ -424,7 +429,19 @@ Square::IsSymbol(const std::string & str)
         && str[2] == ']';
 }
 
+inline
+std::string
+Square::ToUpper(const std::string & str)
+{
+    std::string ret = str;
+    std::string::iterator it;
+    for (it = ret.begin(); it != ret.end(); ++it)
+        *it = ToUpper(*it);
+    return ret;
+}
 
 } // namespace puz
+
+#undef PuzCheckString
 
 #endif // PUZ_SQUARE_H

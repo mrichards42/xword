@@ -486,24 +486,19 @@ Grid::DoCountClues(size_t * across, size_t * down) const
 
 
 
-std::vector<Square *>
-Grid::CheckGrid(bool checkBlank)
+void
+Grid::CheckGrid(std::vector<Square *> * incorrect, bool checkBlank, bool strictRebus)
 {
-    std::vector<Square *> incorrect;
-
     Square * square;
     for (square = First(); square != NULL; square = square->Next())
-        if (! square->Check(checkBlank))
-            incorrect.push_back(square);
-
-    return incorrect;
+        if (! square->Check(checkBlank, strictRebus))
+            incorrect->push_back(square);
 }
 
-
-std::vector<Square *>
-Grid::CheckWord(Square * start, Square * end, bool checkBlank)
+void
+Grid::CheckWord(std::vector<Square *> * incorrect,
+                Square * start, Square * end, bool checkBlank, bool strictRebus)
 {
-    std::vector<Square *> incorrect;
     GridDirection direction;
     FindDirection increment;
 
@@ -531,11 +526,9 @@ Grid::CheckWord(Square * start, Square * end, bool checkBlank)
          square != end;
          square = square->Next(direction, increment))
     {
-        if (! square->Check(checkBlank))
-            incorrect.push_back(square);
+        if (! square->Check(checkBlank, strictRebus))
+            incorrect->push_back(square);
     }
-
-    return incorrect;
 }
 
 

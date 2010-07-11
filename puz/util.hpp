@@ -24,18 +24,6 @@
 
 namespace puz {
 
-inline void MakeUpper(std::string & str)
-{
-    for (std::string::iterator it = str.begin(); it != str.end(); ++it)
-        *it = toupper(*it);
-}
-
-inline void MakeLower(std::string & str)
-{
-    for (std::string::iterator it = str.begin(); it != str.end(); ++it)
-        *it = tolower(*it);
-}
-
 inline std::string GetExtension(const std::string & filename)
 {
     // Find the last dot
@@ -47,7 +35,11 @@ inline std::string GetExtension(const std::string & filename)
     const size_t dirsep_index = filename.find_last_of("/\\");
     if (dirsep_index != std::string::npos && index < dirsep_index)
         return "";
-    return filename.substr(index+1);
+    // Return a lower-cased string.
+    std::string ret = filename.substr(index+1);
+    for (std::string::iterator it = ret.begin(); it != ret.end(); ++it)
+        *it = tolower(*it);
+    return ret;
 }
 
 
