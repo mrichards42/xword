@@ -17,6 +17,7 @@
 
 
 #include "Preferences.hpp"
+#include "../MyFrame.hpp"
 #include "../CluePanel.hpp"
 #include "../CluePrompt.hpp"
 #include "../XGridCtrl.hpp"
@@ -93,6 +94,11 @@ void
 PreferencesDialog::OnCheckWhileTyping(wxCommandEvent & evt)
 {
     AddRemoveGridFlag(evt, CHECK_WHILE_TYPING);
+}
+
+void PreferencesDialog::OnStrictRebus(wxCommandEvent & evt)
+{
+    AddRemoveGridFlag(evt, STRICT_REBUS);
 }
 
 
@@ -186,53 +192,60 @@ PreferencesDialog::OnPromptTextColor(wxColourPickerEvent & evt)
 
 // Clues List
 //-----------
+#define SetClueListColor(func)                  \
+    m_frame->m_across->func(evt.GetColour());   \
+    m_frame->m_down  ->func(evt.GetColour());   \
+    evt.Skip() // Force a semicolor
+
 void
 PreferencesDialog::OnClueBackgroundColor(wxColourPickerEvent & evt)
 {
-    SetClueListColor(evt, &CluePanel::SetBackgroundColour);
+    SetClueListColor(SetBackgroundColour);
 }
 
 void
 PreferencesDialog::OnClueTextColor(wxColourPickerEvent & evt)
 {
-    SetClueListColor(evt, &CluePanel::SetForegroundColour);
+    SetClueListColor(SetForegroundColour);
 }
 
 void
 PreferencesDialog::OnSelectedClueBackgroundColor(wxColourPickerEvent & evt)
 {
-    SetClueListColor(evt, &CluePanel::SetSelectionBackground);
+    SetClueListColor(SetSelectionBackground);
 }
 
 void
 PreferencesDialog::OnSelectedClueTextColor(wxColourPickerEvent & evt)
 {
-    SetClueListColor(evt, &CluePanel::SetSelectionForeground);
+    SetClueListColor(SetSelectionForeground);
 }
 
 void
 PreferencesDialog::OnCrossingClueBackgroundColor(wxColourPickerEvent & evt)
 {
-    SetClueListColor(evt, &CluePanel::SetCrossingBackground);
+    SetClueListColor(SetCrossingBackground);
 }
 
 void
 PreferencesDialog::OnCrossingClueTextColor(wxColourPickerEvent & evt)
 {
-    SetClueListColor(evt, &CluePanel::SetCrossingForeground);
+    SetClueListColor(SetCrossingForeground);
 }
 
 void
 PreferencesDialog::OnClueHeadingTextColor(wxColourPickerEvent & evt)
 {
-    SetClueListColor(evt, &CluePanel::SetHeadingForeground);
+    SetClueListColor(SetHeadingForeground);
 }
 
 void
 PreferencesDialog::OnClueHeadingBackgroundColor(wxColourPickerEvent & evt)
 {
-    SetClueListColor(evt, &CluePanel::SetHeadingBackground);
+    SetClueListColor(SetHeadingBackground);
 }
+
+#undef SetClueListColor
 
 
 //------------------------------------------------------------------------------
@@ -326,6 +339,13 @@ PreferencesDialog::OnNumberScale(wxSpinEvent & evt)
     evt.Skip();
 }
 
+void PreferencesDialog::OnLineThickness(wxSpinEvent & evt)
+{
+    m_frame->m_XGridCtrl->SetBorderSize(evt.GetPosition());
+    m_frame->m_XGridCtrl->Refresh();
+    evt.Skip();
+}
+
 
 //------------------------------------------------------------------------------
 // Printing
@@ -377,6 +397,7 @@ PreferencesDialog::LoadConfig()
     m_pauseOnSwitch   ->SetSelection(HasFlag(gridStyle, PAUSE_ON_SWITCH));
     m_moveOnRightClick->SetValue(HasFlag(gridStyle, MOVE_ON_RIGHT_CLICK));
     m_checkWhileTyping->SetValue(HasFlag(gridStyle, CHECK_WHILE_TYPING));
+    m_strictRebus->SetValue(HasFlag(gridStyle, STRICT_REBUS));
 
 
     // Colors
@@ -412,6 +433,7 @@ PreferencesDialog::LoadConfig()
     m_cluePromptFormat->ChangeValue(m_frame->m_cluePrompt->GetDisplayFormat());
     m_letterScale->SetValue(m_frame->m_XGridCtrl->GetLetterScale() * 100);
     m_numberScale->SetValue(m_frame->m_XGridCtrl->GetNumberScale() * 100);
+    m_lineThickness->SetValue(m_frame->m_XGridCtrl->GetBorderSize());
 
     // Printing
     ConfigManager & config = wxGetApp().GetConfigManager();

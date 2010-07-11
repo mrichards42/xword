@@ -26,6 +26,7 @@
 #include <wx/fontpicker.h>
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
+#include <wx/gbsizer.h>
 #include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/button.h>
@@ -33,6 +34,7 @@
 #include <wx/listctrl.h>
 #include <wx/radiobut.h>
 #include <wx/filepicker.h>
+#include <wx/scrolwin.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -54,12 +56,12 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxRadioBox* m_pauseOnSwitch;
 		wxCheckBox* m_moveOnRightClick;
 		wxCheckBox* m_checkWhileTyping;
+		wxCheckBox* m_strictRebus;
 		wxStaticBoxSizer* sbSizer36;
 		wxColourPickerCtrl* m_penColor;
 		wxColourPickerCtrl* m_selectedLetterColor;
 		wxColourPickerCtrl* m_selectedWordColor;
 		wxColourPickerCtrl* m_gridSelectionColor;
-		wxColourPickerCtrl* m_pencilColor;
 		wxColourPickerCtrl* m_gridBackgroundColor;
 		wxColourPickerCtrl* m_whiteSquareColor;
 		wxColourPickerCtrl* m_blackSquareColor;
@@ -79,21 +81,10 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxFontPickerCtrl* m_clueFont;
 		wxFontPickerCtrl* m_clueHeadingFont;
 		wxPanel* miscPanel;
-		wxStaticText* m_staticText23;
 		wxTextCtrl* m_cluePromptFormat;
-		wxStaticText* m_staticText32;
-		wxStaticText* m_staticText33;
-		wxStaticText* m_staticText36;
-		wxStaticText* m_staticText37;
-		wxStaticText* m_staticText34;
-		wxStaticText* m_staticText35;
-		wxStaticText* m_staticText38;
-		wxStaticText* m_staticText39;
-		wxStaticText* m_staticText330;
 		wxSpinCtrl* m_letterScale;
-		wxStaticText* m_staticText331;
 		wxSpinCtrl* m_numberScale;
-		wxStaticText* m_staticText341;
+		wxSpinCtrl* m_lineThickness;
 		wxPanel* printPanel;
 		wxCheckBox* m_printCustomFonts;
 		wxFontPickerCtrl* m_printGridLetterFont;
@@ -105,43 +96,43 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxPanel* m_printBlackSquarePreview;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnInit( wxInitDialogEvent& event ) { event.Skip(); }
-		virtual void OnAfterLetter( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnBlankOnDirection( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnBlankOnNewWord( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPauseOnSwitch( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMoveOnRightClick( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCheckWhileTyping( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPenColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnSelectedLetterColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnSelectedWordColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnGridSelectionColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnPencilColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnGridBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnWhiteSquareColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnBlackSquareColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnPromptTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnPromptBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnClueTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnSelectedClueTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnSelectedClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnCrossingClueTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnCrossingClueBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnClueHeadingTextColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnClueHeadingBackgroundColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnGridLetterFont( wxFontPickerEvent& event ) { event.Skip(); }
-		virtual void OnGridNumberFont( wxFontPickerEvent& event ) { event.Skip(); }
-		virtual void OnCluePromptFont( wxFontPickerEvent& event ) { event.Skip(); }
-		virtual void OnClueFont( wxFontPickerEvent& event ) { event.Skip(); }
-		virtual void OnClueHeadingFont( wxFontPickerEvent& event ) { event.Skip(); }
-		virtual void OnCluePromptFormat( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLetterScale( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnNumberScale( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnPrintCustomFonts( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPrintBlackSquareBrightness( wxScrollEvent& event ) { event.Skip(); }
-		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnInit( wxInitDialogEvent& event ) = 0;
+		virtual void OnAfterLetter( wxCommandEvent& event ) = 0;
+		virtual void OnBlankOnDirection( wxCommandEvent& event ) = 0;
+		virtual void OnBlankOnNewWord( wxCommandEvent& event ) = 0;
+		virtual void OnPauseOnSwitch( wxCommandEvent& event ) = 0;
+		virtual void OnMoveOnRightClick( wxCommandEvent& event ) = 0;
+		virtual void OnCheckWhileTyping( wxCommandEvent& event ) = 0;
+		virtual void OnStrictRebus( wxCommandEvent& event ) = 0;
+		virtual void OnPenColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnSelectedLetterColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnSelectedWordColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnGridSelectionColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnGridBackgroundColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnWhiteSquareColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnBlackSquareColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnPromptTextColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnPromptBackgroundColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnClueTextColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnClueBackgroundColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnSelectedClueTextColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnSelectedClueBackgroundColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnCrossingClueTextColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnCrossingClueBackgroundColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnClueHeadingTextColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnClueHeadingBackgroundColor( wxColourPickerEvent& event ) = 0;
+		virtual void OnGridLetterFont( wxFontPickerEvent& event ) = 0;
+		virtual void OnGridNumberFont( wxFontPickerEvent& event ) = 0;
+		virtual void OnCluePromptFont( wxFontPickerEvent& event ) = 0;
+		virtual void OnClueFont( wxFontPickerEvent& event ) = 0;
+		virtual void OnClueHeadingFont( wxFontPickerEvent& event ) = 0;
+		virtual void OnCluePromptFormat( wxCommandEvent& event ) = 0;
+		virtual void OnLetterScale( wxSpinEvent& event ) = 0;
+		virtual void OnNumberScale( wxSpinEvent& event ) = 0;
+		virtual void OnLineThickness( wxSpinEvent& event ) = 0;
+		virtual void OnPrintCustomFonts( wxCommandEvent& event ) = 0;
+		virtual void OnPrintBlackSquareBrightness( wxScrollEvent& event ) = 0;
+		virtual void OnOK( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -207,6 +198,25 @@ class LicenseDialog : public wxDialog
 		
 		LicenseDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("XWord License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 371,262 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~LicenseDialog();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxFB_CharactersPanel
+///////////////////////////////////////////////////////////////////////////////
+class wxFB_CharactersPanel : public wxPanel 
+{
+	private:
+	
+	protected:
+	
+	public:
+		wxScrolledWindow* m_scroller;
+		wxPanel* m_panel;
+		wxGridSizer* m_sizer;
+		
+		wxFB_CharactersPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		~wxFB_CharactersPanel();
 	
 };
 

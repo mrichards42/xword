@@ -72,6 +72,9 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_checkWhileTyping = new wxCheckBox( solvePanel, wxID_ANY, wxT("Check solution while typing"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer41->Add( m_checkWhileTyping, 0, wxALL, 5 );
 	
+	m_strictRebus = new wxCheckBox( solvePanel, wxID_ANY, wxT("Strict rebus checking"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer41->Add( m_strictRebus, 0, wxALL, 5 );
+	
 	bSizer5->Add( sbSizer41, 0, wxALL|wxEXPAND, 5 );
 	
 	bSizer3->Add( bSizer5, 1, wxALL|wxEXPAND, 5 );
@@ -126,18 +129,6 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_staticText114 = new wxStaticText( colorPanel, wxID_ANY, wxT("Multi-square selection"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText114->Wrap( -1 );
 	fgSizer3->Add( m_staticText114, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_pencilColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	m_pencilColor->Hide();
-	
-	fgSizer3->Add( m_pencilColor, 0, 0, 5 );
-	
-	wxStaticText* m_staticText13;
-	m_staticText13 = new wxStaticText( colorPanel, wxID_ANY, wxT("Pencil"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText13->Wrap( -1 );
-	m_staticText13->Hide();
-	
-	fgSizer3->Add( m_staticText13, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	m_gridBackgroundColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
 	fgSizer3->Add( m_gridBackgroundColor, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -392,6 +383,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	fgSizer1->SetFlexibleDirection( wxBOTH );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxStaticText* m_staticText23;
 	m_staticText23 = new wxStaticText( miscPanel, wxID_ANY, wxT("Format:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText23->Wrap( -1 );
 	fgSizer1->Add( m_staticText23, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -411,35 +403,43 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	fgSizer2->SetFlexibleDirection( wxBOTH );
 	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxStaticText* m_staticText32;
 	m_staticText32 = new wxStaticText( miscPanel, wxID_ANY, wxT("%T"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText32->Wrap( -1 );
 	fgSizer2->Add( m_staticText32, 0, wxALL, 5 );
 	
-	m_staticText33 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue Text"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* m_staticText33;
+	m_staticText33 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue text"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText33->Wrap( -1 );
 	fgSizer2->Add( m_staticText33, 0, wxALL, 5 );
 	
+	wxStaticText* m_staticText36;
 	m_staticText36 = new wxStaticText( miscPanel, wxID_ANY, wxT("%D"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText36->Wrap( -1 );
 	fgSizer2->Add( m_staticText36, 0, wxALL, 5 );
 	
-	m_staticText37 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue Direction (Across or Down)"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* m_staticText37;
+	m_staticText37 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue direction (Across or Down)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText37->Wrap( -1 );
 	fgSizer2->Add( m_staticText37, 0, wxALL, 5 );
 	
+	wxStaticText* m_staticText34;
 	m_staticText34 = new wxStaticText( miscPanel, wxID_ANY, wxT("%N"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText34->Wrap( -1 );
 	fgSizer2->Add( m_staticText34, 0, wxALL, 5 );
 	
-	m_staticText35 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue Number"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* m_staticText35;
+	m_staticText35 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue number"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText35->Wrap( -1 );
 	fgSizer2->Add( m_staticText35, 0, wxALL, 5 );
 	
+	wxStaticText* m_staticText38;
 	m_staticText38 = new wxStaticText( miscPanel, wxID_ANY, wxT("%d"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText38->Wrap( -1 );
 	fgSizer2->Add( m_staticText38, 0, wxALL, 5 );
 	
-	m_staticText39 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue Direction (A or D)"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* m_staticText39;
+	m_staticText39 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue direction (A or D)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText39->Wrap( -1 );
 	fgSizer2->Add( m_staticText39, 0, wxALL, 5 );
 	
@@ -452,32 +452,43 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	wxStaticBoxSizer* sbSizer191;
 	sbSizer191 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("Grid tweaks") ), wxVERTICAL );
 	
-	wxFlexGridSizer* fgSizer11;
-	fgSizer11 = new wxFlexGridSizer( 2, 2, 3, 8 );
-	fgSizer11->SetFlexibleDirection( wxBOTH );
-	fgSizer11->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxGridBagSizer* gbSizer1;
+	gbSizer1 = new wxGridBagSizer( 3, 8 );
+	gbSizer1->SetFlexibleDirection( wxBOTH );
+	gbSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxStaticText* m_staticText330;
 	m_staticText330 = new wxStaticText( miscPanel, wxID_ANY, wxT("Percent of square for text:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText330->Wrap( -1 );
-	fgSizer11->Add( m_staticText330, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	gbSizer1->Add( m_staticText330, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_letterScale = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 5, 95, 42 );
-	fgSizer11->Add( m_letterScale, 0, 0, 5 );
+	gbSizer1->Add( m_letterScale, wxGBPosition( 0, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
 	
+	wxStaticText* m_staticText331;
 	m_staticText331 = new wxStaticText( miscPanel, wxID_ANY, wxT("Percent of square for clue number:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText331->Wrap( -1 );
-	fgSizer11->Add( m_staticText331, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	gbSizer1->Add( m_staticText331, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_numberScale = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 5, 95, 75 );
-	fgSizer11->Add( m_numberScale, 0, 0, 5 );
+	gbSizer1->Add( m_numberScale, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
 	
-	sbSizer191->Add( fgSizer11, 1, wxEXPAND|wxALL, 5 );
-	
+	wxStaticText* m_staticText341;
 	m_staticText341 = new wxStaticText( miscPanel, wxID_ANY, wxT("Note: these numbers do not have to add up to 100%"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText341->Wrap( -1 );
 	m_staticText341->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 90, false, wxEmptyString ) );
 	
-	sbSizer191->Add( m_staticText341, 0, wxALL, 5 );
+	gbSizer1->Add( m_staticText341, wxGBPosition( 2, 0 ), wxGBSpan( 1, 2 ), wxALIGN_CENTER_VERTICAL|wxBOTTOM, 10 );
+	
+	wxStaticText* m_staticText41;
+	m_staticText41 = new wxStaticText( miscPanel, wxID_ANY, wxT("Line thickness:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText41->Wrap( -1 );
+	gbSizer1->Add( m_staticText41, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_lineThickness = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 10, 1 );
+	gbSizer1->Add( m_lineThickness, wxGBPosition( 3, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
+	
+	sbSizer191->Add( gbSizer1, 1, wxEXPAND|wxALL, 5 );
 	
 	bSizer42->Add( sbSizer191, 0, wxEXPAND|wxALL, 10 );
 	
@@ -593,7 +604,6 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	sizer->Fit( this );
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( wxFB_PreferencesDialog::OnClose ) );
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
 	m_afterLetter->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( wxFB_PreferencesDialog::OnAfterLetter ), NULL, this );
 	m_blankOnDirection->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnBlankOnDirection ), NULL, this );
@@ -601,11 +611,11 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_pauseOnSwitch->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPauseOnSwitch ), NULL, this );
 	m_moveOnRightClick->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnMoveOnRightClick ), NULL, this );
 	m_checkWhileTyping->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCheckWhileTyping ), NULL, this );
+	m_strictRebus->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnStrictRebus ), NULL, this );
 	m_penColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPenColor ), NULL, this );
 	m_selectedLetterColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedLetterColor ), NULL, this );
 	m_selectedWordColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedWordColor ), NULL, this );
 	m_gridSelectionColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnGridSelectionColor ), NULL, this );
-	m_pencilColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPencilColor ), NULL, this );
 	m_gridBackgroundColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnGridBackgroundColor ), NULL, this );
 	m_whiteSquareColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnWhiteSquareColor ), NULL, this );
 	m_blackSquareColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnBlackSquareColor ), NULL, this );
@@ -627,6 +637,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_cluePromptFormat->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCluePromptFormat ), NULL, this );
 	m_letterScale->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLetterScale ), NULL, this );
 	m_numberScale->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnNumberScale ), NULL, this );
+	m_lineThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLineThickness ), NULL, this );
 	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
 	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
 	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
@@ -643,7 +654,6 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 wxFB_PreferencesDialog::~wxFB_PreferencesDialog()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( wxFB_PreferencesDialog::OnClose ) );
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
 	m_afterLetter->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( wxFB_PreferencesDialog::OnAfterLetter ), NULL, this );
 	m_blankOnDirection->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnBlankOnDirection ), NULL, this );
@@ -651,11 +661,11 @@ wxFB_PreferencesDialog::~wxFB_PreferencesDialog()
 	m_pauseOnSwitch->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPauseOnSwitch ), NULL, this );
 	m_moveOnRightClick->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnMoveOnRightClick ), NULL, this );
 	m_checkWhileTyping->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCheckWhileTyping ), NULL, this );
+	m_strictRebus->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnStrictRebus ), NULL, this );
 	m_penColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPenColor ), NULL, this );
 	m_selectedLetterColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedLetterColor ), NULL, this );
 	m_selectedWordColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedWordColor ), NULL, this );
 	m_gridSelectionColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnGridSelectionColor ), NULL, this );
-	m_pencilColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPencilColor ), NULL, this );
 	m_gridBackgroundColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnGridBackgroundColor ), NULL, this );
 	m_whiteSquareColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnWhiteSquareColor ), NULL, this );
 	m_blackSquareColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnBlackSquareColor ), NULL, this );
@@ -677,6 +687,7 @@ wxFB_PreferencesDialog::~wxFB_PreferencesDialog()
 	m_cluePromptFormat->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCluePromptFormat ), NULL, this );
 	m_letterScale->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLetterScale ), NULL, this );
 	m_numberScale->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnNumberScale ), NULL, this );
+	m_lineThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLineThickness ), NULL, this );
 	m_printCustomFonts->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
 	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
 	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
@@ -849,5 +860,39 @@ LicenseDialog::LicenseDialog( wxWindow* parent, wxWindowID id, const wxString& t
 }
 
 LicenseDialog::~LicenseDialog()
+{
+}
+
+wxFB_CharactersPanel::wxFB_CharactersPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxVERTICAL );
+	
+	m_scroller = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL );
+	m_scroller->SetScrollRate( 0, 10 );
+	wxBoxSizer* bSizer241;
+	bSizer241 = new wxBoxSizer( wxVERTICAL );
+	
+	m_panel = new wxPanel( m_scroller, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panel->SetBackgroundColour( wxColour( 0, 0, 0 ) );
+	
+	m_sizer = new wxGridSizer( 0, 8, 1, 1 );
+	
+	m_panel->SetSizer( m_sizer );
+	m_panel->Layout();
+	m_sizer->Fit( m_panel );
+	bSizer241->Add( m_panel, 0, 0, 5 );
+	
+	m_scroller->SetSizer( bSizer241 );
+	m_scroller->Layout();
+	bSizer241->Fit( m_scroller );
+	bSizer24->Add( m_scroller, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( bSizer24 );
+	this->Layout();
+	bSizer24->Fit( this );
+}
+
+wxFB_CharactersPanel::~wxFB_CharactersPanel()
 {
 }
