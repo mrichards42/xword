@@ -54,7 +54,7 @@ public:
 protected:
     void OnSelect(wxCommandEvent & evt)
     {
-        m_frame->LoadLayoutString(m_layouts[evt.GetSelection()], true);
+        m_frame->LoadPerspective(m_layouts[evt.GetSelection()]);
     }
 
     // Keep a pointer to the frame so we can dynamically update it.
