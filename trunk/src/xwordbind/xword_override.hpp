@@ -4,6 +4,82 @@
 // MyFrame overrides
 //-----------------------------------------------------------------------------
 
+%override wxLua_MyFrame_LoadPuzzle
+//     bool LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
+static int LUACALL wxLua_MyFrame_LoadPuzzle(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // const wxString filename
+    const wxString filename = wxlua_getwxStringtype(L, 2);
+
+    if (lua_gettop(L) < 3)
+    {
+        // call LoadPuzzle
+        bool returns = self->LoadPuzzle(filename);
+        lua_pushboolean(L, returns);
+        return 1;
+    }
+    else
+    {
+        // Create a FileHandlerDesc
+        luaL_checktype(L, 3, LUA_TFUNCTION);
+
+        // Push the function for luapuz_Load_Puzzle.
+        lua_pushvalue(L, 3);
+
+        // Create the puz::Puzzle file handler
+        puz::Puzzle::FileHandlerDesc desc;
+        desc.data = L;
+        desc.handler = luapuz_Load_Puzzle;
+
+        bool returns = self->LoadPuzzle(filename, &desc);
+        lua_pushboolean(L, returns);
+        return 1;
+    }
+}
+%end
+
+
+%override wxLua_MyFrame_SavePuzzle
+//     bool SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
+static int LUACALL wxLua_MyFrame_SavePuzzle(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // const wxString filename
+    const wxString filename = wxlua_getwxStringtype(L, 2);
+
+    if (lua_gettop(L) < 3)
+    {
+        // call LoadPuzzle
+        bool returns = self->SavePuzzle(filename);
+        lua_pushboolean(L, returns);
+        return 1;
+    }
+    else
+    {
+        // Create a FileHandlerDesc
+        luaL_checktype(L, 3, LUA_TFUNCTION);
+
+        // Push the function for luapuz_Save_Puzzle.
+        lua_pushvalue(L, 3);
+
+        // Create the puz::Puzzle file handler
+        puz::Puzzle::FileHandlerDesc desc;
+        desc.data = L;
+        desc.handler = luapuz_Save_Puzzle;
+
+        bool returns = self->SavePuzzle(filename, &desc);
+        lua_pushboolean(L, returns);
+        return 1;
+    }
+}
+%end
+
+
 %override wxLua_MyFrame_GetPuzzle
 // puz::Puzzle & GetPuzzle()
 static int LUACALL wxLua_MyFrame_GetPuzzle(lua_State *L)
@@ -180,17 +256,6 @@ int wxLua_function_GetFrame(lua_State *L)
     else
         wxluaT_pushuserdatatype(L, frame, wxluatype_MyFrame);
     return 1; // One object on the stack for lua.
-}
-%end
-
-
-
-%override wxLua_function_IsPortable
-// bool MyApp::IsPortable()
-int wxLua_function_IsPortable(lua_State *L)
-{
-    lua_pushboolean(L, wxGetApp().IsPortable());
-    return 1;
 }
 %end
 

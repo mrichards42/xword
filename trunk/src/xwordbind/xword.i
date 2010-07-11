@@ -10,6 +10,8 @@
 %include "../App.hpp"
 %include "../paths.hpp"
 %include "../../lua/luapuz/bind/luapuz.hpp"
+%include "../../lua/luapuz/bind/luapuz_puz_Puzzle_helpers.hpp"
+%include "../../lua/wxbind/include/wxaui_bind.h"
 
 //----------------------------------------------------------------------------
 // Gui stuff
@@ -27,14 +29,18 @@
     void ShowCopyright()
     void ShowNotes()
 
-    bool LoadPuzzle(const wxString & filename)
-    bool SavePuzzle(wxString filename)
+    // %override bool LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL)
+    int LoadPuzzle()
+    // %override bool SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL)
+    int SavePuzzle()
+
     // Return true = puzzle is closed
     bool ClosePuzzle(bool prompt = true)
     void CheckPuzzle()
 
     void ShowPane(const wxString & name, bool show = true);
     void HidePane(const wxString & name)
+    void AddPane(wxWindow * window, const wxAuiPaneInfo & info)
 
 
     void SetStatus(const wxString & text)
@@ -76,10 +82,3 @@
 // %override MyFrame * GetFrame()
 %function MyFrame * GetFrame()
 
-// %override bool MyApp::IsPortable()
-%function bool IsPortable()
-
-%function wxString GetUserDataDir()
-%function wxString GetConfigDir()
-%function wxString GetScriptsDir()
-%function wxString GetImagesDir()

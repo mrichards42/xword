@@ -27,6 +27,27 @@
 // Lua MetaTable Tag for Class 'MyFrame'
 int wxluatype_MyFrame = WXLUA_TUNKNOWN;
 
+#if wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_AddPane[] = { &wxluatype_MyFrame, &wxluatype_wxWindow, &wxluatype_wxAuiPaneInfo, NULL };
+static int LUACALL wxLua_MyFrame_AddPane(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_AddPane[1] = {{ wxLua_MyFrame_AddPane, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_MyFrame_AddPane }};
+//     void AddPane(wxWindow * window, const wxAuiPaneInfo & info)
+static int LUACALL wxLua_MyFrame_AddPane(lua_State *L)
+{
+    // const wxAuiPaneInfo info
+    const wxAuiPaneInfo * info = (const wxAuiPaneInfo *)wxluaT_getuserdatatype(L, 3, wxluatype_wxAuiPaneInfo);
+    // wxWindow window
+    wxWindow * window = (wxWindow *)wxluaT_getuserdatatype(L, 2, wxluatype_wxWindow);
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+    // call AddPane
+    self->AddPane(window, *info);
+
+    return 0;
+}
+
+#endif // wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI
+
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_CheckPuzzle[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_CheckPuzzle(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_CheckPuzzle[1] = {{ wxLua_MyFrame_CheckPuzzle, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_CheckPuzzle }};
@@ -227,23 +248,45 @@ static int LUACALL wxLua_MyFrame_IsTimerRunning(lua_State *L)
     return 1;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_LoadPuzzle[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_LoadPuzzle[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_LoadPuzzle(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_LoadPuzzle[1] = {{ wxLua_MyFrame_LoadPuzzle, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_LoadPuzzle }};
-//     bool LoadPuzzle(const wxString & filename)
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_LoadPuzzle[1] = {{ wxLua_MyFrame_LoadPuzzle, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_LoadPuzzle }};
+// %override wxLua_MyFrame_LoadPuzzle
+//     bool LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
 static int LUACALL wxLua_MyFrame_LoadPuzzle(lua_State *L)
 {
-    // const wxString filename
-    const wxString filename = wxlua_getwxStringtype(L, 2);
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
-    // call LoadPuzzle
-    bool returns = (self->LoadPuzzle(filename));
-    // push the result flag
-    lua_pushboolean(L, returns);
 
-    return 1;
+    // const wxString filename
+    const wxString filename = wxlua_getwxStringtype(L, 2);
+
+    if (lua_gettop(L) < 3)
+    {
+        // call LoadPuzzle
+        bool returns = self->LoadPuzzle(filename);
+        lua_pushboolean(L, returns);
+        return 1;
+    }
+    else
+    {
+        // Create a FileHandlerDesc
+        luaL_checktype(L, 3, LUA_TFUNCTION);
+
+        // Push the function for luapuz_Load_Puzzle.
+        lua_pushvalue(L, 3);
+
+        // Create the puz::Puzzle file handler
+        puz::Puzzle::FileHandlerDesc desc;
+        desc.data = L;
+        desc.handler = luapuz_Load_Puzzle;
+
+        bool returns = self->LoadPuzzle(filename, &desc);
+        lua_pushboolean(L, returns);
+        return 1;
+    }
 }
+
 
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_ResetTimer[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_ResetTimer(lua_State *L);
@@ -259,23 +302,45 @@ static int LUACALL wxLua_MyFrame_ResetTimer(lua_State *L)
     return 0;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SavePuzzle[] = { &wxluatype_MyFrame, &wxluatype_TSTRING, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SavePuzzle[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_SavePuzzle(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SavePuzzle[1] = {{ wxLua_MyFrame_SavePuzzle, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_MyFrame_SavePuzzle }};
-//     bool SavePuzzle(wxString filename)
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_SavePuzzle[1] = {{ wxLua_MyFrame_SavePuzzle, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_SavePuzzle }};
+// %override wxLua_MyFrame_SavePuzzle
+//     bool SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
 static int LUACALL wxLua_MyFrame_SavePuzzle(lua_State *L)
 {
-    // wxString filename
-    wxString filename = wxlua_getwxStringtype(L, 2);
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
-    // call SavePuzzle
-    bool returns = (self->SavePuzzle(filename));
-    // push the result flag
-    lua_pushboolean(L, returns);
 
-    return 1;
+    // const wxString filename
+    const wxString filename = wxlua_getwxStringtype(L, 2);
+
+    if (lua_gettop(L) < 3)
+    {
+        // call LoadPuzzle
+        bool returns = self->SavePuzzle(filename);
+        lua_pushboolean(L, returns);
+        return 1;
+    }
+    else
+    {
+        // Create a FileHandlerDesc
+        luaL_checktype(L, 3, LUA_TFUNCTION);
+
+        // Push the function for luapuz_Save_Puzzle.
+        lua_pushvalue(L, 3);
+
+        // Create the puz::Puzzle file handler
+        puz::Puzzle::FileHandlerDesc desc;
+        desc.data = L;
+        desc.handler = luapuz_Save_Puzzle;
+
+        bool returns = self->SavePuzzle(filename, &desc);
+        lua_pushboolean(L, returns);
+        return 1;
+    }
 }
+
 
 static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_SetFocusedDirection[] = { &wxluatype_MyFrame, NULL };
 static int LUACALL wxLua_MyFrame_SetFocusedDirection(lua_State *L);
@@ -524,6 +589,10 @@ static int LUACALL wxLua_MyFrame_ToggleTimer(lua_State *L)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod MyFrame_methods[] = {
+#if wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI
+    { "AddPane", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_AddPane, 1, NULL },
+#endif // wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI
+
     { "CheckPuzzle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_CheckPuzzle, 1, NULL },
     { "ClosePuzzle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ClosePuzzle, 1, NULL },
     { "GetFocusedClue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_GetFocusedClue, 1, NULL },
@@ -633,18 +702,6 @@ wxLuaBindObject* wxLuaGetObjectList_xword(size_t &count)
 // wxLuaGetFunctionList_xword() is called to register global functions
 // ---------------------------------------------------------------------------
 
-// %function wxString GetConfigDir()
-static int LUACALL wxLua_function_GetConfigDir(lua_State *L)
-{
-    // call GetConfigDir
-    wxString returns = (GetConfigDir());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetConfigDir[1] = {{ wxLua_function_GetConfigDir, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
-
 // %override wxLua_function_GetFrame
 // MyFrame * GetFrame()
 // This is a lua-only function (it can't be accessed through the XWord C++ API)
@@ -667,52 +724,6 @@ int wxLua_function_GetFrame(lua_State *L)
 
 static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetFrame[1] = {{ wxLua_function_GetFrame, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
 
-// %function wxString GetImagesDir()
-static int LUACALL wxLua_function_GetImagesDir(lua_State *L)
-{
-    // call GetImagesDir
-    wxString returns = (GetImagesDir());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetImagesDir[1] = {{ wxLua_function_GetImagesDir, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
-
-// %function wxString GetScriptsDir()
-static int LUACALL wxLua_function_GetScriptsDir(lua_State *L)
-{
-    // call GetScriptsDir
-    wxString returns = (GetScriptsDir());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetScriptsDir[1] = {{ wxLua_function_GetScriptsDir, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
-
-// %function wxString GetUserDataDir()
-static int LUACALL wxLua_function_GetUserDataDir(lua_State *L)
-{
-    // call GetUserDataDir
-    wxString returns = (GetUserDataDir());
-    // push the result string
-    xword_pushwxString(L, returns);
-
-    return 1;
-}
-static wxLuaBindCFunc s_wxluafunc_wxLua_function_GetUserDataDir[1] = {{ wxLua_function_GetUserDataDir, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
-
-// %override wxLua_function_IsPortable
-// bool MyApp::IsPortable()
-int wxLua_function_IsPortable(lua_State *L)
-{
-    lua_pushboolean(L, wxGetApp().IsPortable());
-    return 1;
-}
-
-static wxLuaBindCFunc s_wxluafunc_wxLua_function_IsPortable[1] = {{ wxLua_function_IsPortable, WXLUAMETHOD_CFUNCTION, 0, 0, g_wxluaargtypeArray_None }};
-
 // ---------------------------------------------------------------------------
 // wxLuaGetFunctionList_xword() is called to register global functions
 // ---------------------------------------------------------------------------
@@ -721,12 +732,7 @@ wxLuaBindMethod* wxLuaGetFunctionList_xword(size_t &count)
 {
     static wxLuaBindMethod functionList[] =
     {
-        { "GetConfigDir", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetConfigDir, 1, NULL },
         { "GetFrame", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetFrame, 1, NULL },
-        { "GetImagesDir", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetImagesDir, 1, NULL },
-        { "GetScriptsDir", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetScriptsDir, 1, NULL },
-        { "GetUserDataDir", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_GetUserDataDir, 1, NULL },
-        { "IsPortable", WXLUAMETHOD_CFUNCTION, s_wxluafunc_wxLua_function_IsPortable, 1, NULL },
 
         { 0, 0, 0, 0 }, 
     };
