@@ -118,7 +118,7 @@ const wxArrayString & GetLuaPathList()
         pathList.push_back(scripts + sep() + _T("?.lua"));
         pathList.push_back(scripts + sep() + _T("?") + sep() + _T("init.lua"));
         pathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?.lua"));
-        pathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?") + sep() + _T(".lua"));
+        pathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?") + sep() + _T("init.lua"));
     }
     return pathList;
 }
