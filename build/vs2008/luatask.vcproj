@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="luatask"
-	ProjectGUID="{5EC590C1-AA8E-5547-84F9-CEE16B30CB4A}"
+	ProjectGUID="{7DE406A1-673D-9948-B0E6-597B5B3AB850}"
 	RootNamespace="luatask"
 	Keyword="Win32Proj"
 	>
@@ -16,9 +16,9 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="..\..\bin\Debug\scripts\libs"
-			IntermediateDirectory="obj\Debug\luatask"
+			Name="Release|Win32"
+			OutputDirectory="..\..\bin\Release\scripts\libs"
+			IntermediateDirectory="obj\Release\luatask"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -39,24 +39,23 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
 				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
-				PreprocessorDefinitions="LUA_LIB;LUATASK_API=__declspec(dllexport);TASK_EXPORTS;NATV_WIN32;WIN32;_WINDOWS;_USRDLL;LUA_BUILD_AS_DLL;DEBUG;_DEBUG;LUA_USE_APICHECK"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;LUA_LIB;_USRDLL;LUA_BUILD_AS_DLL;LUATASK_API=__declspec(dllexport);TASK_EXPORTS;NATV_WIN32"
+				StringPooling="true"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\task.pdb"
-				DebugInformationFormat="4"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="LUA_LIB;LUATASK_API=__declspec(dllexport);TASK_EXPORTS;NATV_WIN32;WIN32;_WINDOWS;_USRDLL;LUA_BUILD_AS_DLL;DEBUG;_DEBUG;LUA_USE_APICHECK"
+				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;LUA_LIB;_USRDLL;LUA_BUILD_AS_DLL;LUATASK_API=__declspec(dllexport);TASK_EXPORTS;NATV_WIN32"
 				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
 			/>
 			<Tool
@@ -64,14 +63,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\bin\Debug\lua5.1.lib"
+				AdditionalDependencies="..\..\bin\Release\lua5.1.lib winmm.lib"
 				OutputFile="$(OutDir)\task.dll"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
-				GenerateDebugInformation="true"
-				ProgramDataBaseFileName="$(OutDir)\task.pdb"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\bin\Release;..\..\lib\Release"
+				GenerateDebugInformation="false"
 				SubSystem="2"
-				ImportLibrary="..\..\bin\Debug\scripts\libs\task.lib"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				ImportLibrary="..\..\bin\Release\scripts\libs\task.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -100,9 +100,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="..\..\bin\Release\scripts\libs"
-			IntermediateDirectory="obj\Release\luatask"
+			Name="Debug|Win32"
+			OutputDirectory="..\..\bin\Debug\scripts\libs"
+			IntermediateDirectory="obj\Debug\luatask"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -123,23 +123,24 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="0"
 				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
-				PreprocessorDefinitions="LUA_LIB;LUATASK_API=__declspec(dllexport);TASK_EXPORTS;NATV_WIN32;WIN32;_WINDOWS;_USRDLL;LUA_BUILD_AS_DLL;NDEBUG"
-				StringPooling="true"
-				RuntimeLibrary="2"
+				PreprocessorDefinitions="DEBUG;_DEBUG;WIN32;_WINDOWS;LUA_LIB;_USRDLL;LUA_BUILD_AS_DLL;LUA_USE_APICHECK;LUATASK_API=__declspec(dllexport);TASK_EXPORTS;NATV_WIN32"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\task.pdb"
-				DebugInformationFormat="0"
+				DebugInformationFormat="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="LUA_LIB;LUATASK_API=__declspec(dllexport);TASK_EXPORTS;NATV_WIN32;WIN32;_WINDOWS;_USRDLL;LUA_BUILD_AS_DLL;NDEBUG"
+				PreprocessorDefinitions="DEBUG;_DEBUG;WIN32;_WINDOWS;LUA_LIB;_USRDLL;LUA_BUILD_AS_DLL;LUA_USE_APICHECK;LUATASK_API=__declspec(dllexport);TASK_EXPORTS;NATV_WIN32"
 				AdditionalIncludeDirectories="..\..\lua\lua;..\..\lua\lua\include"
 			/>
 			<Tool
@@ -147,15 +148,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\bin\Release\lua5.1.lib"
+				AdditionalDependencies="..\..\bin\Debug\lua5.1.lib winmm.lib"
 				OutputFile="$(OutDir)\task.dll"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
-				GenerateDebugInformation="false"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\bin\Debug;..\..\lib\Debug"
+				GenerateDebugInformation="true"
+				ProgramDataBaseFileName="$(OutDir)\task.pdb"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="..\..\bin\Release\scripts\libs\task.lib"
+				ImportLibrary="..\..\bin\Debug\scripts\libs\task.lib"
 				TargetMachine="1"
 			/>
 			<Tool
