@@ -27,7 +27,7 @@ class WXDLLIMPEXP_WXLUA wxLuaWinDestroyCallback;
 // String functions - convert between Lua (ansi string) and wxString (encoded)
 // ----------------------------------------------------------------------------
 
-#define WXLUA_USE_WXSTR_CONVCURRENT 1
+#define WXLUA_USE_WXSTR_CONVCURRENT 0
 
 // Convert a 8-bit ANSI C Lua String into a wxString
 inline WXDLLIMPEXP_WXLUA wxString lua2wx(const char* luastr)
