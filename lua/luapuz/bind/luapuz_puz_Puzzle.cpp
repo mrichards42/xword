@@ -15,6 +15,7 @@ extern "C" {
 
 #include "luapuz_puz_Puzzle_helpers.hpp"
 #include "luapuz_puz_Puzzle.hpp"
+#include "luapuz_puz.hpp"
 #include "luapuz_puz_Grid.hpp"
 // ---------------------------------------------------------------------------
 // class Puzzle
@@ -59,6 +60,9 @@ int Puzzle_gc(lua_State * L)
     luapuz_untrack_object(L, ud->puzzle);
     if (ud->should_gc)
     {
+        // If the user calls Puzzle:__gc() before this object
+        // is garbage collected, we might try to delete ud->puzzle twice.
+        ud->should_gc = false;
         delete ud->puzzle;
 #ifdef LUAPUZ_DEBUG
         std::cout << "and deleting data" << std::endl;
@@ -84,8 +88,8 @@ int Puzzle_tostring(lua_State * L)
 // Puzzle functions
 //----------------
 // Puzzle()
-// Puzzle(const std::string & filename)
-// Puzzle(const std::string & filename, const FileHandlerDesc * desc)
+// Puzzle(const puz::string_t & filename)
+// Puzzle(const puz::string_t & filename, const FileHandlerDesc * desc)
 int Puzzle_Puzzle(lua_State * L)
 {
     try {
@@ -95,7 +99,7 @@ int Puzzle_Puzzle(lua_State * L)
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
         {
-            const std::string filename = luapuz_checkStdString(L, 2);
+            const puz::string_t filename = luapuz_checkstring_t(L, 2);
             luaL_checktype(L, 3, LUA_TFUNCTION);
 
             // Push the function for luapuz_Load_Puzzle.
@@ -111,7 +115,7 @@ int Puzzle_Puzzle(lua_State * L)
         }
         else if (argCount >= 1)
         {
-            std::string filename = luapuz_checkStdString(L, 2);
+            puz::string_t filename = luapuz_checkstring_t(L, 2);
             returns = new puz::Puzzle(filename);
         }
         else if (argCount >= 0)
@@ -138,12 +142,12 @@ int Puzzle_Puzzle(lua_State * L)
     lua_error(L); // We should have returned by now
     return 0;
 }
-// void Load(const std::string & filename)
-// void Load(const std::string & filename, FileHandlerDesc * desc)
+// void Load(const puz::string_t & filename)
+// void Load(const puz::string_t & filename, FileHandlerDesc * desc)
 int Puzzle_Load(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    const std::string filename = luapuz_checkStdString(L, 2);
+    const puz::string_t filename = luapuz_checkstring_t(L, 2);
     try {
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
@@ -182,12 +186,12 @@ int Puzzle_Load(lua_State * L)
     }
     lua_error(L); // We should have returned by now
     return 0;
-}// void Save(const std::string & filename)
-// void Save(const std::string & filename, FileHandlerDesc * desc)
+}// void Save(const puz::string_t & filename)
+// void Save(const puz::string_t & filename, FileHandlerDesc * desc)
 int Puzzle_Save(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string filename = luapuz_checkStdString(L, 2);
+    puz::string_t filename = luapuz_checkstring_t(L, 2);
     try {
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
@@ -227,18 +231,18 @@ int Puzzle_Save(lua_State * L)
     lua_error(L); // We should have returned by now
     return 0;
 }
-// static bool CanLoad(std::string filename)
+// static bool CanLoad(puz::string_t filename)
 static int Puzzle_CanLoad(lua_State * L)
 {
-    std::string filename = luapuz_checkStdString(L, 1);
+    puz::string_t filename = luapuz_checkstring_t(L, 1);
     bool returns = puz::Puzzle::CanLoad(filename);
     lua_pushboolean(L, returns);
     return 1;
 }
-// static bool CanSave(std::string filename)
+// static bool CanSave(puz::string_t filename)
 static int Puzzle_CanSave(lua_State * L)
 {
-    std::string filename = luapuz_checkStdString(L, 1);
+    puz::string_t filename = luapuz_checkstring_t(L, 1);
     bool returns = puz::Puzzle::CanSave(filename);
     lua_pushboolean(L, returns);
     return 1;
@@ -282,51 +286,65 @@ static int Puzzle_SetOk(lua_State * L)
     puzzle->SetOk(ok);
     return 0;
 }
-// std::string GetAuthor()
+// void TestOk()
+static int Puzzle_TestOk(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    try {
+        puzzle->TestOk();
+        return 0;
+    }
+    catch (...) {
+        luapuz_handleExceptions(L);
+    }
+    lua_error(L); // We should have returned by now
+    return 0;
+}
+// puz::string_t GetAuthor()
 static int Puzzle_GetAuthor(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string returns = puzzle->GetAuthor();
-    luapuz_pushStdString(L, returns);
+    puz::string_t returns = puzzle->GetAuthor();
+    luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetAuthor(std::string author)
+// void SetAuthor(puz::string_t author)
 static int Puzzle_SetAuthor(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string author = luapuz_checkStdString(L, 2);
+    puz::string_t author = luapuz_checkstring_t(L, 2);
     puzzle->SetAuthor(author);
     return 0;
 }
-// std::string GetTitle()
+// puz::string_t GetTitle()
 static int Puzzle_GetTitle(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string returns = puzzle->GetTitle();
-    luapuz_pushStdString(L, returns);
+    puz::string_t returns = puzzle->GetTitle();
+    luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetTitle(std::string title)
+// void SetTitle(puz::string_t title)
 static int Puzzle_SetTitle(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string title = luapuz_checkStdString(L, 2);
+    puz::string_t title = luapuz_checkstring_t(L, 2);
     puzzle->SetTitle(title);
     return 0;
 }
-// std::string GetCopyright()
+// puz::string_t GetCopyright()
 static int Puzzle_GetCopyright(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string returns = puzzle->GetCopyright();
-    luapuz_pushStdString(L, returns);
+    puz::string_t returns = puzzle->GetCopyright();
+    luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetCopyright(std::string copyright)
+// void SetCopyright(puz::string_t copyright)
 static int Puzzle_SetCopyright(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string copyright = luapuz_checkStdString(L, 2);
+    puz::string_t copyright = luapuz_checkstring_t(L, 2);
     puzzle->SetCopyright(copyright);
     return 0;
 }
@@ -378,19 +396,19 @@ static int Puzzle_SetTimerRunning(lua_State * L)
     puzzle->SetTimerRunning(running);
     return 0;
 }
-// std::string GetNotes()
+// puz::string_t GetNotes()
 static int Puzzle_GetNotes(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string returns = puzzle->GetNotes();
-    luapuz_pushStdString(L, returns);
+    puz::string_t returns = puzzle->GetNotes();
+    luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetNotes(std::string notes)
+// void SetNotes(puz::string_t notes)
 static int Puzzle_SetNotes(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    std::string notes = luapuz_checkStdString(L, 2);
+    puz::string_t notes = luapuz_checkstring_t(L, 2);
     puzzle->SetNotes(notes);
     return 0;
 }
@@ -398,7 +416,7 @@ static int Puzzle_SetNotes(lua_State * L)
 static int Puzzle_GetAcross(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::Puzzle::ClueList * returns = &puzzle->GetAcross();
+    puz::ClueList * returns = &puzzle->GetAcross();
     luapuz_pushClueList(L, returns);
     return 1;
 }
@@ -406,33 +424,47 @@ static int Puzzle_GetAcross(lua_State * L)
 static int Puzzle_GetDown(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::Puzzle::ClueList * returns = &puzzle->GetDown();
+    puz::ClueList * returns = &puzzle->GetDown();
     luapuz_pushClueList(L, returns);
     return 1;
 }
-// void SetAcross(puz::Puzzle::ClueList & cluelist)
+// void SetAcross(puz::ClueList & cluelist)
 static int Puzzle_SetAcross(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::Puzzle::ClueList cluelist;
+    puz::ClueList cluelist;
     luapuz_checkClueList(L, 2, &cluelist);
     puzzle->SetAcross(cluelist);
     return 0;
 }
-// void SetDown(puz::Puzzle::ClueList & cluelist)
+// void SetDown(puz::ClueList & cluelist)
 static int Puzzle_SetDown(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::Puzzle::ClueList cluelist;
+    puz::ClueList cluelist;
     luapuz_checkClueList(L, 2, &cluelist);
     puzzle->SetDown(cluelist);
     return 0;
 }
-// void RenumberClues()
-static int Puzzle_RenumberClues(lua_State * L)
+// void NumberClues()
+static int Puzzle_NumberClues(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puzzle->RenumberClues();
+    try {
+        puzzle->NumberClues();
+        return 0;
+    }
+    catch (...) {
+        luapuz_handleExceptions(L);
+    }
+    lua_error(L); // We should have returned by now
+    return 0;
+}
+// void NumberGrid()
+static int Puzzle_NumberGrid(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puzzle->NumberGrid();
     return 0;
 }
 static const luaL_reg Puzzlelib[] = {
@@ -445,6 +477,7 @@ static const luaL_reg Puzzlelib[] = {
     {"IsScrambled", Puzzle_IsScrambled},
     {"IsOk", Puzzle_IsOk},
     {"SetOk", Puzzle_SetOk},
+    {"TestOk", Puzzle_TestOk},
     {"GetAuthor", Puzzle_GetAuthor},
     {"SetAuthor", Puzzle_SetAuthor},
     {"GetTitle", Puzzle_GetTitle},
@@ -463,59 +496,8 @@ static const luaL_reg Puzzlelib[] = {
     {"GetDown", Puzzle_GetDown},
     {"SetAcross", Puzzle_SetAcross},
     {"SetDown", Puzzle_SetDown},
-    {"RenumberClues", Puzzle_RenumberClues},
-    {NULL, NULL}
-};
-
-
-// typedef ClueList
-//------------
-
-void luapuz_checkClueList(lua_State * L, int index, puz::Puzzle::ClueList * clues)
-{
-    luaL_checktype(L, index, LUA_TTABLE);
-
-    clues->clear();
-
-    // Iterate the table
-    lua_pushnil(L);  /* first key */
-    while (lua_next(L, index) != 0)
-    {
-        // key is index -2
-        // value is index -1
-        int number = luapuz_checkuint(L, -2);
-        std::string text = luapuz_checkStdString(L, -1);
-        clues->push_back(puz::Puzzle::Clue(number, text));
-
-        /* removes 'value'; keeps 'key' for next iteration */
-        lua_pop(L, 1);
-    }
-
-    // Sort the clues, because there is no guarantee that the lua table is
-    // sorted.
-    std::sort(clues->begin(), clues->end());
-}
-
-int luapuz_pushClueList(lua_State * L, puz::Puzzle::ClueList * clues)
-{
-    // The clue table
-    lua_newtable(L);
-
-    for (puz::Puzzle::ClueList::iterator it = clues->begin();
-         it != clues->end();
-         ++it)
-    {
-        // t[number] = text
-        luapuz_pushStdString(L, it->Text());
-        lua_rawseti(L, -2, it->Number());
-    }
-
-    return 1;
-}
-
-const luaL_reg staticPuzzlelib[] = {
-    {"CanLoad", Puzzle_CanLoad},
-    {"CanSave", Puzzle_CanSave},
+    {"NumberClues", Puzzle_NumberClues},
+    {"NumberGrid", Puzzle_NumberGrid},
     {NULL, NULL}
 };
 
@@ -528,19 +510,12 @@ const luaL_reg classPuzzlelib[] = {
 };
 
 void luapuz_openPuzzlelib (lua_State *L) {
+    // The Puzzle table, and the metatable for Puzzle objects
     luaL_newmetatable(L, Puzzle_meta);
 
     // register metatable functions
     luaL_register(L, NULL, Puzzlelib);
     luaL_register(L, NULL, classPuzzlelib);
-
-    // remove metatable from stack
-    lua_pop(L, 1);
-
-    // puz.Puzzle table
-    lua_newtable(L);
-    luaL_register(L, NULL, staticPuzzlelib);
-    luaL_register(L, NULL, Puzzlelib);
     // Register constructor
     luapuz_registerConstructor(L, Puzzle_Puzzle);
 

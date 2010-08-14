@@ -122,9 +122,9 @@ local types = {
         query = bind.prefix.."_ischar",
         luatype = "LUA_TSTRING"
     },
-    ["std::string"] = {
-        get  = bind.prefix.."_checkStdString",
-        push = bind.prefix.."_pushStdString",
+    ["puz::string_t"] = {
+        get  = bind.prefix.."_checkstring_t",
+        push = bind.prefix.."_pushstring_t",
         query = "lua_isstring",
         luatype = "LUA_TSTRING"
     },

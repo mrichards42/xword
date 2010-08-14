@@ -13,8 +13,8 @@ extern "C" {
 #include "../luapuz_functions.hpp"
 #include "../luapuz_tracking.hpp"
 
-#include "luapuz_puz.hpp"
 #include "luapuz_puz_Square.hpp"
+#include "luapuz_puz.hpp"
 #include "luapuz_std.hpp"
 #include "luapuz_puz_Grid.hpp"
 // ---------------------------------------------------------------------------
@@ -60,6 +60,9 @@ int Grid_gc(lua_State * L)
     luapuz_untrack_object(L, ud->grid);
     if (ud->should_gc)
     {
+        // If the user calls Grid:__gc() before this object
+        // is garbage collected, we might try to delete ud->grid twice.
+        ud->should_gc = false;
         delete ud->grid;
 #ifdef LUAPUZ_DEBUG
         std::cout << "and deleting data" << std::endl;
@@ -166,25 +169,12 @@ static int Grid_Grid(lua_State * L)
     luapuz_newGrid(L, returns);
     return 1;
 }
-// bool SetupGrid(puz::Grid::GridState state = puz::Grid::GRID_ALL)
-static int Grid_SetupGrid(lua_State * L)
+// void NumberGrid()
+static int Grid_NumberGrid(lua_State * L)
 {
     puz::Grid * grid = luapuz_checkGrid(L, 1);
-    int argCount = lua_gettop(L);
-    puz::Grid::GridState state = (argCount >= 2 ? luapuz_checkGridState(L, 2) : puz::Grid::GRID_ALL);
-    bool returns = grid->SetupGrid(state);
-    lua_pushboolean(L, returns);
-    return 1;
-}
-// bool IsGridSetup(puz::Grid::GridState state = puz::Grid::GRID_ALL)
-static int Grid_IsGridSetup(lua_State * L)
-{
-    puz::Grid * grid = luapuz_checkGrid(L, 1);
-    int argCount = lua_gettop(L);
-    puz::Grid::GridState state = (argCount >= 2 ? luapuz_checkGridState(L, 2) : puz::Grid::GRID_ALL);
-    bool returns = grid->IsGridSetup(state);
-    lua_pushboolean(L, returns);
-    return 1;
+    grid->NumberGrid();
+    return 0;
 }
 // void SetSize(size_t width, size_t height)
 static int Grid_SetSize(lua_State * L)
@@ -255,22 +245,6 @@ static int Grid_Last(lua_State * L)
 {
     puz::Grid * grid = luapuz_checkGrid(L, 1);
     puz::Square * returns = grid->Last();
-    luapuz_pushSquare(L, returns);
-    return 1;
-}
-// Square * FirstWhite()
-static int Grid_FirstWhite(lua_State * L)
-{
-    puz::Grid * grid = luapuz_checkGrid(L, 1);
-    puz::Square * returns = grid->FirstWhite();
-    luapuz_pushSquare(L, returns);
-    return 1;
-}
-// Square * LastWhite()
-static int Grid_LastWhite(lua_State * L)
-{
-    puz::Grid * grid = luapuz_checkGrid(L, 1);
-    puz::Square * returns = grid->LastWhite();
     luapuz_pushSquare(L, returns);
     return 1;
 }
@@ -400,23 +374,6 @@ static int Grid_IsBetween(lua_State * L)
     lua_pushboolean(L, returns);
     return 1;
 }
-// size_t across, size_t down = CountClues()
-static int Grid_CountClues(lua_State * L)
-{
-    puz::Grid * grid = luapuz_checkGrid(L, 1);
-    size_t across, down;
-    try {
-        grid->CountClues(&across, &down);
-        lua_pushnumber(L, across);
-        lua_pushnumber(L, down);
-        return 2;
-    }
-    catch (...) {
-        luapuz_handleExceptions(L);
-    }
-    lua_error(L); // We should have returned by now
-    return 0;
-}
 // { puz::Square*, ... } CheckGrid(bool checkBlank = false, bool strictRebus = false)
 static int Grid_CheckGrid(lua_State * L)
 {
@@ -486,28 +443,65 @@ struct luapuz_FindSquare_Struct
 };
 
 
+// FindSquare overloads:
+//----------------------
 // puz::Square * FindSquare(puz::Square * start, function findFunc,
-//                          puz::GridDirection direction,
+//                          puz::GridDirection direction = puz::ACROSS,
 //                          puz::FindDirection increment = puz::NEXT,
-//                          bool skipBlack = false, bool wrapLines = false)
+//                          unsigned int options = puz::FIND_IN_GRID)
+//
+// puz::Square * FindSquare(function findFunc,
+//                          puz::GridDirection direction,
+//                          puz::FindDirection increment,
+//                          unsigned int options = puz::FIND_IN_GRID)
+//
+// puz::Square * FindSquare(function findFunc, unsigned int options = puz::FIND_IN_GRID)
+//
 static int Grid_FindSquare(lua_State * L)
 {
     puz::Grid * grid = luapuz_checkGrid(L, 1);
     int argCount = lua_gettop(L);
-    puz::Square * start = luapuz_checkSquare(L, 2);
-    luaL_checktype(L, 3, LUA_TFUNCTION);
-    puz::GridDirection direction = luapuz_checkGridDirection(L, 4);
-    puz::FindDirection increment = (argCount >= 5 ? luapuz_checkFindDirection(L, 5) : puz::NEXT);
-    bool skipBlack = (argCount >= 6 ? luapuz_checkboolean(L, 6) : false);
-    bool wrapLines = (argCount >= 7 ? luapuz_checkboolean(L, 7) : false);
 
-    // Push the function on the stack for luapuz_FindSquare_Struct
-    lua_pushvalue(L, 3);
-    luapuz_FindSquare_Struct func(L);
+    puz::Square * returns;
 
-    puz::Square * returns = grid->FindSquare(start, func,
-                                             direction, increment,
-                                             skipBlack, wrapLines);
+    if (luapuz_isSquare(L, 2))  // First overload
+    {
+        puz::Square * start = luapuz_checkSquare(L, 2);
+        luaL_checktype(L, 3, LUA_TFUNCTION);
+        puz::GridDirection direction = (argCount >= 4 ? luapuz_checkGridDirection(L, 4) : puz::ACROSS);
+        puz::FindDirection increment = (argCount >= 5 ? luapuz_checkFindDirection(L, 5) : puz::NEXT);
+        unsigned int options = (argCount >= 6 ? luapuz_checkuint(L, 6) : puz::FIND_IN_GRID);
+
+        // Push the function on the stack for luapuz_FindSquare_Struct
+        lua_pushvalue(L, 3);
+        luapuz_FindSquare_Struct func(L);
+
+        returns = grid->FindSquare(start, func, direction, increment, options);
+    }
+    else if (argCount >= 4)  // Second overload
+    {
+        luaL_checktype(L, 2, LUA_TFUNCTION);
+        puz::GridDirection direction = luapuz_checkGridDirection(L, 3);
+        puz::FindDirection increment = luapuz_checkFindDirection(L, 4);
+        unsigned int options = (argCount >= 5 ? luapuz_checkuint(L, 5) : puz::FIND_IN_GRID);
+
+        // Push the function on the stack for luapuz_FindSquare_Struct
+        lua_pushvalue(L, 2);
+        luapuz_FindSquare_Struct func(L);
+
+        returns = grid->FindSquare(func, direction, increment, options);
+    }
+    else  // Third overload
+    {
+        luaL_checktype(L, 2, LUA_TFUNCTION);
+        unsigned int options = (argCount >= 3 ? luapuz_checkuint(L, 3) : puz::FIND_IN_GRID);
+
+        // Push the function on the stack for luapuz_FindSquare_Struct
+        lua_pushvalue(L, 2);
+        luapuz_FindSquare_Struct func(L);
+
+        returns = grid->FindSquare(func, options);
+    }
 
     luapuz_pushSquare(L, returns);
     return 1;
@@ -515,8 +509,7 @@ static int Grid_FindSquare(lua_State * L)
 static const luaL_reg Gridlib[] = {
     {"_index", Grid__index},
     {"_newindex", Grid__newindex},
-    {"SetupGrid", Grid_SetupGrid},
-    {"IsGridSetup", Grid_IsGridSetup},
+    {"NumberGrid", Grid_NumberGrid},
     {"SetSize", Grid_SetSize},
     {"GetWidth", Grid_GetWidth},
     {"GetHeight", Grid_GetHeight},
@@ -526,8 +519,6 @@ static const luaL_reg Gridlib[] = {
     {"Clear", Grid_Clear},
     {"First", Grid_First},
     {"Last", Grid_Last},
-    {"FirstWhite", Grid_FirstWhite},
-    {"LastWhite", Grid_LastWhite},
     {"IsScrambled", Grid_IsScrambled},
     {"HasSolution", Grid_HasSolution},
     {"GetFlag", Grid_GetFlag},
@@ -543,30 +534,10 @@ static const luaL_reg Gridlib[] = {
     {"GetCksum", Grid_GetCksum},
     {"SetCksum", Grid_SetCksum},
     {"IsBetween", Grid_IsBetween},
-    {"CountClues", Grid_CountClues},
     {"CheckGrid", Grid_CheckGrid},
     {"CheckWord", Grid_CheckWord},
     {"CheckSquare", Grid_CheckSquare},
     {"FindSquare", Grid_FindSquare},
-    {NULL, NULL}
-};
-
-
-// enum GridState
-//------------
-
-const char * GridState_meta = "puz.Grid.GridState";
-
-const luapuz_enumReg GridState_reg[] = {
-    {"GRID_NONE", puz::Grid::GRID_NONE},
-    {"GRID_SIZE", puz::Grid::GRID_SIZE},
-    {"GRID_ITERATION", puz::Grid::GRID_ITERATION},
-    {"GRID_SOLUTION", puz::Grid::GRID_SOLUTION},
-    {"GRID_ALL", puz::Grid::GRID_ALL},
-    {NULL, NULL}
-};
-
-const luaL_reg staticGridlib[] = {
     {NULL, NULL}
 };
 
@@ -579,22 +550,14 @@ const luaL_reg classGridlib[] = {
 };
 
 void luapuz_openGridlib (lua_State *L) {
+    // The Grid table, and the metatable for Grid objects
     luaL_newmetatable(L, Grid_meta);
 
     // register metatable functions
     luaL_register(L, NULL, Gridlib);
     luaL_register(L, NULL, classGridlib);
-
-    // remove metatable from stack
-    lua_pop(L, 1);
-
-    // puz.Grid table
-    lua_newtable(L);
-    luaL_register(L, NULL, staticGridlib);
-    luaL_register(L, NULL, Gridlib);
     // Register constructor
     luapuz_registerConstructor(L, Grid_Grid);
-    luapuz_registerEnum(L, GridState_meta, GridState_reg);
 
     // puz.Grid = the table
     lua_setfield(L, -2, "Grid");

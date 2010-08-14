@@ -141,9 +141,9 @@ inline [type] * [checkfunc](lua_State * L, int index)
 
 
 // Check if this is the correct data type
-inline bool [queryfunc](lua_State *L, int index, const char *tname)
+inline bool [queryfunc](lua_State *L, int index)
 {
-    return [prefix]_isudata(L, index, tname);
+    return [prefix]_isudata(L, index, [meta]);
 }
 
 // Create a new userdata with actual data and push it on the stack.
@@ -216,6 +216,9 @@ int [name]_gc(lua_State * L)
     [prefix]_untrack_object(L, ud->[var]);
     if (ud->should_gc)
     {
+        // If the user calls [name]:__gc() before this object
+        // is garbage collected, we might try to delete ud->[var] twice.
+        ud->should_gc = false;
         delete ud->[var];
 #ifdef LUAPUZ_DEBUG
         std::cout << "and deleting data" << std::endl;
@@ -242,20 +245,8 @@ int [name]_tostring(lua_State * L)
 //----------------
 ]]))
 
-    -- Write functions and enumerations
+    -- Write functions and enumerations, and a registration table
     bind.base_mt.writecpp(self, f)
-
-    -- Write the registration table for static functions
-    f:write(self:fmt([[
-const luaL_reg static[lib][] = {
-]]))
-    for _, func in ipairs(self.funcs) do
-        if func.is_static then
-            f:write(func:fmt('    {"[luafunc]", [cfunc]},\n'))
-        end
-    end
-    f:write('    {NULL, NULL}\n')
-    f:write('};\n\n')
 
     -- Register the library
     f:write(self:fmt([[
@@ -268,19 +259,12 @@ const luaL_reg class[lib][] = {
 };
 
 void [openfunc] (lua_State *L) {
+    // The [name] table, and the metatable for [name] objects
     luaL_newmetatable(L, [meta]);
 
     // register metatable functions
     luaL_register(L, NULL, [lib]);
     luaL_register(L, NULL, class[lib]);
-
-    // remove metatable from stack
-    lua_pop(L, 1);
-
-    // [luatype] table
-    lua_newtable(L);
-    luaL_register(L, NULL, static[lib]);
-    luaL_register(L, NULL, [lib]);
 ]]))
     -- Register the constructor
     if self.constructor then

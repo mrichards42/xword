@@ -41,7 +41,6 @@ static const luaL_reg puzlib[] = {
 const char * GridDirection_meta = "puz.GridDirection";
 
 const luapuz_enumReg GridDirection_reg[] = {
-    {"NONE", puz::NONE},
     {"ACROSS", puz::ACROSS},
     {"DOWN", puz::DOWN},
     {NULL, NULL}
@@ -72,6 +71,7 @@ const luapuz_enumReg GextFlag_reg[] = {
     {"FLAG_X", puz::FLAG_X},
     {"FLAG_RED", puz::FLAG_RED},
     {"FLAG_CIRCLE", puz::FLAG_CIRCLE},
+    {"ACROSS_LITE_MASK", puz::ACROSS_LITE_MASK},
     {NULL, NULL}
 };
 
@@ -112,6 +112,110 @@ const luapuz_enumReg GridType_reg[] = {
     {NULL, NULL}
 };
 
+
+// enum FindOptions
+//------------
+
+const char * FindOptions_meta = "puz.FindOptions";
+
+const luapuz_enumReg FindOptions_reg[] = {
+    {"WRAP", puz::WRAP},
+    {"NO_WRAP", puz::NO_WRAP},
+    {"WHITE_SQUARES", puz::WHITE_SQUARES},
+    {"FIND_IN_GRID", puz::FIND_IN_GRID},
+    {"FIND_IN_WORD", puz::FIND_IN_WORD},
+    {NULL, NULL}
+};
+
+
+// typedef ClueList
+//------------
+
+void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * clues)
+{
+    luaL_checktype(L, index, LUA_TTABLE);
+
+    clues->clear();
+
+    // Iterate the table
+    lua_pushnil(L);  /* first key */
+    while (lua_next(L, index) != 0)
+    {
+        // Save the key for iteration . . .
+        // for some reason lua doesn't like me to use luaL_checkstring()
+        // on the key ? so make a copy here
+        lua_pushvalue(L, -2);
+        lua_insert(L, -3);
+
+        // key is index -2
+        // value is index -1
+        puz::string_t number = luapuz_checkstring_t(L, -2);
+        puz::string_t text;
+        if (lua_istable(L, -1))
+        {
+            // Look for data:
+
+            // number
+            lua_getfield(L, -1, "number");
+            if (! lua_isnil(L, -1))
+                number = luapuz_checkstring_t(L, -1);
+            lua_pop(L, 1);
+
+            // text
+            lua_getfield(L, -1, "text");
+            if (! lua_isnil(L, -1))
+                text = luapuz_checkstring_t(L, -1);
+            lua_pop(L, 1);
+        }
+        else if (lua_isstring(L, -1))
+        {
+            text = luapuz_checkstring_t(L, -1);
+        }
+        else
+        {
+            luaL_error(L, "table or string expected for clue; got %s", luaL_typename(L, -1));
+        }
+
+        clues->push_back(puz::Clue(number, text));
+
+        /* removes 'value'; keeps 'key' for next iteration */
+        lua_pop(L, 1);
+        // Remove key as well, since we made a copy
+        lua_pop(L, 1);
+    }
+
+    // Sort the clues, because there is no guarantee that the lua table is
+    // sorted.
+    std::sort(clues->begin(), clues->end());
+}
+
+int luapuz_pushClueList(lua_State * L, puz::ClueList * clues)
+{
+    // The clue table
+    lua_newtable(L);
+
+    int i = 1;
+    for (puz::ClueList::iterator it = clues->begin();
+         it != clues->end();
+         ++it)
+    {
+        // t[i] = { number = number, text = text, square = square }
+        lua_pushnumber(L, i++);
+
+        lua_newtable(L);
+
+        luapuz_pushstring_t(L, it->GetNumber());
+        lua_setfield(L, -2, "number");
+
+        luapuz_pushstring_t(L, it->GetText());
+        lua_setfield(L, -2, "text");
+
+        lua_settable(L, -3);
+    }
+
+    return 1;
+}
+
 void luapuz_openpuzlib (lua_State *L) {
     // register functions
     luaL_register(L, "puz", puzlib);
@@ -121,6 +225,7 @@ void luapuz_openpuzlib (lua_State *L) {
     luapuz_registerEnum(L, CheckTest_meta, CheckTest_reg);
     luapuz_registerEnum(L, GridFlag_meta, GridFlag_reg);
     luapuz_registerEnum(L, GridType_meta, GridType_reg);
+    luapuz_registerEnum(L, FindOptions_meta, FindOptions_reg);
     luapuz_openSquarelib(L);
     luapuz_openGridlib(L);
     luapuz_openPuzzlelib(L);

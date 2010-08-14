@@ -18,13 +18,22 @@ project "luapuz"
     includedirs { "../.." }
     links { "puz" }
 
-        configuration "windows"
-            defines {
-                "PUZ_API=__declspec(dllimport)",
-                "LUAPUZ_API=__declspec(dllexport)",
-            }
+    configuration "windows"
+        defines {
+            "PUZ_API=__declspec(dllimport)",
+            "LUAPUZ_API=__declspec(dllexport)",
+        }
 
-        configuration "linux"
-            defines { [[PUZ_API=""]] }
-            links { "dl" }
+    -- Disable some warnings
+    configuration "vs*"
+        buildoptions {
+            "/wd4800", -- implicit conversion to bool
+            "/wd4244", -- conversion: possible loss of data
+            "/wd4251", -- class needs dll-interface
+        }
+
+
+    configuration "linux"
+        defines { [[PUZ_API=""]] }
+        links { "dl" }
 

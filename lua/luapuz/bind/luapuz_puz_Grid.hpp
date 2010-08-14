@@ -54,9 +54,9 @@ inline puz::Grid * luapuz_checkGrid(lua_State * L, int index)
 
 
 // Check if this is the correct data type
-inline bool luapuz_isGrid(lua_State *L, int index, const char *tname)
+inline bool luapuz_isGrid(lua_State *L, int index)
 {
-    return luapuz_isudata(L, index, tname);
+    return luapuz_isudata(L, index, Grid_meta);
 }
 
 // Create a new userdata with actual data and push it on the stack.
@@ -73,27 +73,6 @@ inline void luapuz_pushGrid(lua_State * L, puz::Grid * grid, bool should_gc = fa
         luapuz_newGrid(L, grid, should_gc);
 }
 
-
-
-// enum GridState
-//------------
-
-LUAPUZ_API extern const char * GridState_meta;
-
-inline puz::Grid::GridState luapuz_checkGridState(lua_State * L, int index)
-{
-    return static_cast<puz::Grid::GridState>(luapuz_checkEnum(L, index, GridState_meta));
-}
-
-inline void luapuz_pushGridState(lua_State * L, puz::Grid::GridState gridstate)
-{
-    lua_pushnumber(L, gridstate);
-}
-
-inline bool luapuz_isGridState(lua_State * L, int index)
-{
-    return luapuz_isEnum(L, index, GridState_meta);
-}
 
 void luapuz_openGridlib (lua_State *L);
 #endif // luapuz_puz_Grid_hpp
