@@ -4,6 +4,9 @@ _toupper = windll.user32.CharUpperA
 _isalnum = windll.user32.IsCharAlphaNumericA
 
 
+blankSquare = ' '
+blackSquare = '.'
+
 # Make the keys and values numeric or strings
 def fixdict(d):
     for k,v in d.items():
@@ -21,6 +24,14 @@ def fixdict(d):
         d[ik] = iv
 
 special_chars = {
+    '-':blankSquare,
+    blackSquare:blackSquare,
+    '[':blankSquare,
+}
+
+fixdict(special_chars)
+
+symbols = {
     # Symbols
     '#':'H',
     '$':'D',
@@ -30,14 +41,11 @@ special_chars = {
     '?':'Q',
     '@':'A',
 
-    # Others
-    '-':'-',
-    ' ':'-',
-    '.':'.',
-    '[':'-',
+    ' ':blankSquare,
 }
 
-fixdict(special_chars)
+fixdict(symbols)
+symbols.update(special_chars)
 
 plain_chars = {
     # Numbers
@@ -52,6 +60,7 @@ plain_chars = {
     '8':'E',
     '9':'N',
 
+    0xa0:' ', # Non-breaking space
     # Windows encoded characters
     0x83:'F', # Small slanted f
     # 0x8a, 0x8c, 0x93, 0x9f are capitals
@@ -105,11 +114,16 @@ for k,v in plain_chars.items():
 
 fixdict(plain_chars)
 
-plain_chars.update(special_chars)
-    
+plain_chars.update(symbols)
+
+
+def conv_upper(n):
+    if n in special_chars:
+        return 0
+    return _toupper(n)
 
 # Other conversions
-def _plain(n):
+def conv_plain(n):
     if n in plain_chars:
         return plain_chars[n]
     else:
@@ -120,7 +134,7 @@ def maketable(translate = lambda x: x):
     r = [ [ None for i in xrange(16) ] for j in xrange(16) ]
     for n in xrange(256):
         ch = 0
-        if n in special_chars or _isalnum(n):
+        if n in symbols or _isalnum(n):
             ch = translate(n)
             if 0 < ch < 128:
                 ch = "'%c'" % ch
@@ -135,7 +149,7 @@ def maketable(translate = lambda x: x):
 # print a table for a C header file
 import sys
 def printtable(t, name, write = sys.stdout.write):
-    write('const unsigned char %s [] = {\n' % name)
+    write('static unsigned char %s [] = {\n' % name)
     hchars = '0123456789abcdef'
     # Write the heading /*    0   1 ... */
     write('/*     ')
@@ -193,18 +207,24 @@ def main():
 // @ = A[t]
 
 // '[' number ']' is used to indicate a webdings symbol; these are replaced
-// by a blank ('-') in the user grid.
+// by a blank in the user grid.
 
-// '.' indicates a black square.
+// '"""+blankSquare+"""' indicates a blank square.
+// '"""+blackSquare+"""' indicates a black square.
 
 // All other characters are invalid
 """)
 
-    f.write("\n\n")
-    printtable(maketable(_toupper), 'upperCase', f.write)
+    f.write("""
+char * Square::Blank   = \""""+blankSquare+"""\";
+char * Square::Black   = \""""+blackSquare+"""\";
+""")
 
     f.write("\n\n")
-    printtable(maketable(_plain), 'ascii', f.write)
+    printtable(maketable(conv_upper), 'gridChars', f.write)
+
+    f.write("\n\n")
+    printtable(maketable(conv_plain), 'ascii', f.write)
     f.close()
 
 if __name__ == "__main__":

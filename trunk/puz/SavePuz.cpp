@@ -16,30 +16,65 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "Puzzle.hpp"
+#include "puzstring.hpp"
 #include "Checksummer.hpp"
 #include "StreamWrapper.hpp"
+#include "util.hpp"
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <map>
 
 namespace puz {
 
-const int SAVE_VERSION = 13;
-const char * SAVE_VERSION_STRING = "1.3\0";
+static const int SAVE_VERSION = 13;
+static const char * SAVE_VERSION_STRING = "1.3\0";
 
-void SaveSections(Puzzle * puz, ostream_wrapper & f);
+static void SaveSections(Puzzle * puz, ostream_wrapper & f);
 
-void SavePuz(Puzzle * puz, std::ostream & stream)
+void SavePuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
 {
-    ostream_wrapper f(stream);
+    // Make sure we can actually save this puzzle
+    // Conditions:
+    //    * No blank solutions
+    //    * All squares that are at the start
+    //      of a word must have a clue
+    //    * Only flags that work with Across Lite
+    //        * No colored squares
+    //        * No missing squares
+
+    for (const Square * square = puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (square->IsSolutionBlank() ||
+            square->GetFlag() & ~ ACROSS_LITE_MASK ||
+            (square->GetWordStart(ACROSS) == square &&
+                square->GetWordEnd(ACROSS) != square &&
+                ! square->HasClue(ACROSS)) ||
+            (square->GetWordStart(DOWN) == square &&
+                square->GetWordEnd(DOWN) != square &&
+                ! square->HasClue(DOWN)))
+        {
+            throw ConversionError();
+        }
+    }
 
     // Checksums
     unsigned short c_cib;
     unsigned short c_primary;
     unsigned char c_masked[8];
 
+    // This will check to make sure we have no formatted clues or notes.
     Checksummer cksum(*puz, SAVE_VERSION);
     cksum.GetChecksums(&c_cib, &c_primary, c_masked);
+
+    const std::vector<std::string> & clues = cksum.GetClues();
+
+    std::ofstream stream(filename.c_str(), std::ios::out | std::ios::binary);
+    if (stream.fail())
+        throw FatalFileError(std::string("Unable to open file: ") + encode_utf8(filename));
+    ostream_wrapper f(stream);
 
     // Header
     f.Write(c_primary);
@@ -55,54 +90,35 @@ void SavePuz(Puzzle * puz, std::ostream & stream)
     f.Put(puz->m_grid.GetWidth());
     f.Put(puz->m_grid.GetHeight());
 
-    std::vector<std::string> clues;
-    puz->GetClueList(&clues);
     f.Write(clues.size());
 
     f.Write(puz->m_grid.GetType());
     f.Write(puz->m_grid.GetFlag());
 
     // Puzzle data
-    std::string grid;
-    std::string solution;
-    for (Square * square = puz->m_grid.First();
-         square != NULL;
-         square = square->Next())
-    {
-        if (puz->m_grid.IsDiagramless() && square->IsBlack())
-        {
-            grid.push_back(':');
-            solution.push_back(':');
-        }
-        else
-        {
-            grid.push_back(square->GetPlainText());
-            solution.push_back(square->GetPlainSolution());
-        }
-    }
-    f.Write(solution);
-    f.Write(grid);
-    f.WriteNulTerminated(puz->m_title);
-    f.WriteNulTerminated(puz->m_author);
-    f.WriteNulTerminated(puz->m_copyright);
+    f.Write(cksum.GetSolution()); // Checksummer has already calculated
+    f.Write(cksum.GetGridText()); // these, so we'll reused them.
+    f.WriteNulTerminated(encode_puz(puz->m_title));
+    f.WriteNulTerminated(encode_puz(puz->m_author));
+    f.WriteNulTerminated(encode_puz(puz->m_copyright));
 
-    std::vector<std::string>::iterator it;
+    std::vector<std::string>::const_iterator it;
     for (it = clues.begin(); it != clues.end(); ++it)
         f.WriteNulTerminated(*it);
 
-    f.WriteNulTerminated(puz->m_notes);
+    f.WriteNulTerminated(cksum.GetNotes());
 
     SaveSections(puz, f);
 }
 
 
-void WriteGEXT(Puzzle * puz, ostream_wrapper & f);
-void WriteLTIM(Puzzle * puz, ostream_wrapper & f);
-void WriteRUSR(Puzzle * puz, ostream_wrapper & f);
-void WriteSolutionRebus(Puzzle * puz, ostream_wrapper & f);
-void WriteSection(ostream_wrapper & f,
-                  const std::string & name,
-                  const std::string & data);
+static void WriteGEXT(Puzzle * puz, ostream_wrapper & f);
+static void WriteLTIM(Puzzle * puz, ostream_wrapper & f);
+static void WriteRUSR(Puzzle * puz, ostream_wrapper & f);
+static void WriteSolutionRebus(Puzzle * puz, ostream_wrapper & f);
+static void WriteSection(ostream_wrapper & f,
+                         const std::string & name,
+                         const std::string & data);
 
 void SaveSections(Puzzle * puz, ostream_wrapper & f)
 {
@@ -144,7 +160,7 @@ void WriteGEXT(Puzzle * puz, ostream_wrapper & f)
          square != NULL;
          square = square->Next())
     {
-        const char flag = square->GetFlag();
+        const char flag = square->GetFlag() & ACROSS_LITE_MASK;
         data.push_back(flag);
         if (! hasData && flag != 0)
             hasData = true;
@@ -175,7 +191,7 @@ void WriteRUSR(Puzzle * puz, ostream_wrapper & f)
     {
         if (square->HasTextRebus())
         {
-            data.append(square->GetText());
+            data.append(encode_puz(square->GetText()));
             if (! hasData)
                 hasData = true;
         }
@@ -189,7 +205,7 @@ void WriteRUSR(Puzzle * puz, ostream_wrapper & f)
 
 void WriteSolutionRebus(Puzzle * puz, ostream_wrapper & f)
 {
-    std::map<std::string, unsigned char> tableMap;
+    std::map<string_t, unsigned char> tableMap;
     std::string rebus;
     std::ostringstream table; // Write this as we go
     bool rebusHasData = false;
@@ -219,7 +235,7 @@ void WriteSolutionRebus(Puzzle * puz, ostream_wrapper & f)
             rebusHasData = true;
 
         // See if this rebus entry is already in the table.
-        std::map<std::string, unsigned char>::iterator table_it;
+        std::map<string_t, unsigned char>::iterator table_it;
         table_it = tableMap.find(square->GetSolution());
 
         if (table_it != tableMap.end())
@@ -240,7 +256,7 @@ void WriteSolutionRebus(Puzzle * puz, ostream_wrapper & f)
             table << static_cast<unsigned short>(index);
             table.width(1);
             table << ':';
-            table << square->GetSolution();
+            table << encode_puz(square->GetSolution());
             table << ';';
 
             ++index;
@@ -254,7 +270,5 @@ void WriteSolutionRebus(Puzzle * puz, ostream_wrapper & f)
         WriteSection(f, "RTBL", table.str());
     }
 }
-
-
 
 } // namespace puz

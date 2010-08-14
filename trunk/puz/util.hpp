@@ -20,28 +20,18 @@
 
 // Miscellaneous utility functions
 
-#include <string>
+#include "puzstring.hpp"
+#include <vector>
 
 namespace puz {
 
-inline std::string GetExtension(const std::string & filename)
-{
-    // Find the last dot
-    const size_t index = filename.find_last_of('.');
-    // No extenion if there was not a match
-    if (index == std::string::npos)
-        return "";
-    // No extension if the match occurred before the last directory separator
-    const size_t dirsep_index = filename.find_last_of("/\\");
-    if (dirsep_index != std::string::npos && index < dirsep_index)
-        return "";
-    // Return a lower-cased string.
-    std::string ret = filename.substr(index+1);
-    for (std::string::iterator it = ret.begin(); it != ret.end(); ++it)
-        *it = tolower(*it);
-    return ret;
-}
+class Puzzle;
 
+// String functions
+string_t GetExtension(const string_t & filename);
+
+string_t ToString(int number);
+int ToInt(const string_t & str);
 
 } // namespace puz
 

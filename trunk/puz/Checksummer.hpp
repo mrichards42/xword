@@ -20,13 +20,15 @@
 #define PUZ_CHECK_SUMMER_H
 
 #include "Puzzle.hpp"
-#include <string>
+#include "puzstring.hpp"
 
 namespace puz {
 
 class PUZ_API Checksummer
 {
+    typedef std::vector<std::string> cluelist_t;
 public:
+    Checksummer() : m_version(13) {}
     explicit Checksummer(const Puzzle & puz, unsigned short version = 13);
 
     // Usually these are the only two functions you need to call
@@ -38,8 +40,8 @@ public:
                        unsigned short primary,
                        const unsigned char masked []);
 
-    // Set the members
-    //----------------
+    // Get / Set the members
+    //----------------------
 
     // Use these functions to replace one of the items set by the constructor
     // taking a Puzzle, or after constructing the Checksummer without a Puzzle.
@@ -55,15 +57,17 @@ public:
 
     void SetSolution  (const std::string & solution) { m_solution = solution; }
     void SetGridText  (const std::string & text)     { m_gridText = text; }
+    const std::string & GetSolution() const { return m_solution; }
+    const std::string & GetGridText() const { return m_gridText; }
 
     void SetTitle     (const std::string & title)     { m_title     = title; }
     void SetAuthor    (const std::string & author)    { m_author    = author; }
     void SetCopyright (const std::string & copyright) { m_copyright = copyright; }
-    void SetNotes     (const std::string & notes)     { m_notes     = notes; }    
-    void SetClues     (const std::vector<std::string> & clues)
+    void SetNotes     (const std::string & notes)     { m_notes     = notes; }
+    void SetClues     (const cluelist_t & clues)
     {
         m_clues.clear();
-        for (std::vector<std::string>::const_iterator it = clues.begin();
+        for (cluelist_t::const_iterator it = clues.begin();
              it != clues.end();
              ++it)
         {
@@ -71,6 +75,9 @@ public:
         }
         SetClueLength(m_clues.size());
     }
+
+    const std::string & GetNotes() const { return m_notes; }
+    const cluelist_t & GetClues() const { return m_clues; }
 
     void SetVersion   (unsigned short version)     { m_version   = version; }
 
@@ -104,6 +111,7 @@ private:
 
 
 private:
+    // Checksummer works with 8-bit strings.
     unsigned char m_cib[8];
     std::string m_solution;
     std::string m_gridText;
@@ -111,7 +119,7 @@ private:
     std::string m_author;
     std::string m_copyright;
     std::string m_notes;
-    std::vector<std::string> m_clues;
+    cluelist_t m_clues;
     unsigned short m_version;
 };
 

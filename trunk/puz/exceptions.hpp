@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,6 +20,8 @@
 
 #include <stdexcept>
 #include <string>
+
+// Exceptions work with 8-bit strings
 
 namespace puz {
 
@@ -45,10 +47,11 @@ public:
     virtual const char * what() const { return message.c_str(); }
 };
 
-// Square text exceptions
+// String exceptions
 PUZ_EXCEPTION(InvalidString, Exception, "Invalid string");
 PUZ_EXCEPTION(LongString, InvalidString, "Overlong string");
 PUZ_EXCEPTION(NoSymbol, Exception, "Square does not have a symbol");
+PUZ_EXCEPTION(InvalidEncoding, InvalidString, "Invalid encoding");
 
 // Grid exceptions
 PUZ_EXCEPTION(InvalidGrid, Exception, "Grid must be larger than 0 x 0");
@@ -56,10 +59,12 @@ PUZ_EXCEPTION(NoWord, Exception, "Start and end squares are not aligned");
 
 // Clue exceptions
 PUZ_EXCEPTION(InvalidClues, Exception, "Clues do not match the grid");
+PUZ_EXCEPTION(NoClues,      Exception, "Unknown clue direction");
 
 // Loading / saving errors
 PUZ_EXCEPTION(FileError, Exception, "Unknown file error");
 PUZ_EXCEPTION(FatalFileError, FileError, "Unknown fatal file error");
+PUZ_EXCEPTION(ConversionError, FileError, "Puzzle cannot be fully represented in this file format");
 
 PUZ_EXCEPTION(HeaderError, FatalFileError, "Unknown file header error");
 PUZ_EXCEPTION(VersionError, HeaderError, "Unreadable file version");

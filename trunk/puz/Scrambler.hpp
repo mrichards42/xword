@@ -19,6 +19,7 @@
 #ifndef PUZ_SCRAMBLER_H
 #define PUZ_SCRAMBLER_H
 
+// Scrambler uses 8-bit strings
 #include <string>
 
 namespace puz {

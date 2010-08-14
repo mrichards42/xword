@@ -20,20 +20,13 @@
 #define PUZ_SQUARE_H
 
 #include <cassert>
-#include <string>
+#include "puzstring.hpp"
 #include "exceptions.hpp"
 #include "util.hpp"
 
 namespace puz {
 
 const int REBUS_ENTRY_LENGTH = 8;
-
-//#define PUZ_CHECK_STRINGS
-#ifdef PUZ_CHECK_STRINGS
-#   define PuzCheckString(str) Square::CheckString(str)
-#else
-#   define PuzCheckString
-#endif
 
 // GEXT flags
 enum GextFlag
@@ -43,7 +36,17 @@ enum GextFlag
     FLAG_BLACK  = 0x10,
     FLAG_X      = 0x20,
     FLAG_RED    = 0x40,
-    FLAG_CIRCLE = 0x80
+    FLAG_CIRCLE = 0x80,
+
+    ACROSS_LITE_MASK = FLAG_CLEAR |
+                       FLAG_PENCIL |
+                       FLAG_BLACK |
+                       FLAG_X |
+                       FLAG_RED |
+                       FLAG_CIRCLE,
+
+    FLAG_COLOR = 0x100,
+    FLAG_MISSING = 0x200
 };
 
 
@@ -58,7 +61,6 @@ enum FindDirection
 // Grid directions
 enum GridDirection
 {
-    NONE =- 1,
     ACROSS = 0,
     DOWN
 };
@@ -67,7 +69,6 @@ enum GridDirection
 inline GridDirection
 SwapDirection(GridDirection dir)
 {
-    assert(dir != NONE);
     return dir == ACROSS ? DOWN : ACROSS;
 }
 
@@ -92,9 +93,8 @@ class PUZ_API Square
 
 private:
     // Squares can only be created by a grid.
-    explicit Square(Grid * grid = NULL);
+    Square();
     Square(const Square & other);
-    Grid * m_grid;
 
 public:
     Square & operator=(const Square & other);
@@ -107,22 +107,23 @@ public:
 
     // General information
     //--------------------
-    bool IsOk()         const { return ! m_solution.empty(); }
-    bool IsWhite()      const { return ! IsBlack(); }
-    bool IsBlack()      const { return m_solution == "."; }
-    bool IsBlank()      const { return m_text.empty(); }
-
+    bool IsSolutionBlank() const { return m_solution == Blank; }
+    bool IsWhite()         const { return ! IsBlack() && ! IsMissing(); }
+    bool IsBlack()         const { return m_solution == Black; }
+    bool IsBlank()         const { return m_text == Blank; }
 
     // Text
     //-----
-    const std::string & GetText()     const { return m_text; }
-    const std::string & GetSolution() const { return m_solution; }
 
-    void SetText    (const std::string & text);
-    void SetSolution(const std::string & solution);
-    void SetSolution(const std::string & solution, char plain);
+    // Text and Solution are guaranteed not to be empty.
+    const string_t & GetText()     const { return m_text; }
+    const string_t & GetSolution() const { return m_solution; }
+
+    void SetText    (const string_t & text);
+    void SetSolution(const string_t & solution);
+    void SetSolution(const string_t & solution, char plain);
     void SetPlainSolution(char plain); // Leave solution rebus unchanged
-    void SetSolutionRebus(const std::string & rebus); // Leave plain solution unchanged
+    void SetSolutionRebus(const string_t & rebus); // Leave plain solution unchanged
     void SetSolutionSymbol(unsigned char symbol); // Must set plain solution separately
 
     bool Check(bool checkBlank = false, bool strictRebus = false) const;
@@ -135,50 +136,69 @@ public:
     bool HasTextSymbol()     const;
     bool HasSolutionSymbol() const;
 
-    unsigned char GetTextSymbol()      const;
-    unsigned char GetSolutionSymbol()  const;
+    char_t GetTextSymbol()      const;
+    char_t GetSolutionSymbol()  const;
 
     // Character lookup functions
-    static bool IsValidChar(char ch);
-    static bool IsValidString(const std::string & str);
-    static bool IsSymbol(const std::string & str);
-    static unsigned char ToUpper(unsigned char ch);
-    static std::string ToUpper(const std::string & str);
-    static unsigned char ToPlain(unsigned char ch);
-    static unsigned char ToPlain(const std::string & str)
-        { return str.empty() ? '-' : ToPlain(str.at(0)); }
+    static bool IsValidChar(int ch);
+    static bool IsValidString(const string_t & str);
+    static bool IsSymbol(const string_t & str);
+    static char_t ToGrid(int ch);
+    static string_t ToGrid(const string_t & str);
+    static char ToPlain(int ch);
+    static char ToPlain(const string_t & str);
+
+    // Solutions with special meaning
+    static char_t * Blank;
+    static char_t * Black;
 
     // Clue
     //-----
-    short GetNumber() const { return m_number; }
-    bool HasClue(GridDirection dir = NONE) const
-       { return dir == NONE
-                    ? HasClue(ACROSS) || HasClue(DOWN)
-                    : GetWordStart(dir) == this; }
+    bool HasNumber() const                  { return ! m_number.empty(); }
+    const string_t & GetNumber() const      { return m_number; }
+    void SetNumber(const string_t & number) { m_number = number; }
+    void SetNumber(int number)              { m_number = ToString(number); }
 
+    // Clue
+    //-----
+    bool HasClue() const { return HasClue(ACROSS) || HasClue(DOWN); }
+    bool HasClue(GridDirection dir) const        { return m_hasClue[dir]; }
+    void SetClue(GridDirection dir, bool clue) { m_hasClue[dir] = clue; }
+    // Is this square is a position that would usually have a clue ?
+    bool WantsClue() const { return WantsClue(ACROSS) || WantsClue(DOWN); }
+    bool WantsClue(GridDirection dir) const;
 
     // Flag (GEXT)
     //------------
-    void   SetFlag     (unsigned char flag)       { m_flag = flag; }
-    void   AddFlag     (unsigned char flag)       { m_flag |=   flag; }
-    void   RemoveFlag  (unsigned char flag)       { m_flag &= ~ flag; }
-    void   ToggleFlag  (unsigned char flag)
+    void         SetFlag (unsigned int flag) { m_flag = flag; }
+    unsigned int GetFlag() const             { return m_flag; }
+    bool         HasFlag(unsigned int flag) const
+        { return (m_flag & flag) != 0; }
+
+    void   AddFlag     (unsigned int flag, bool doit = true)
     {
-        if (HasFlag(flag))
-            RemoveFlag(flag);
-        else
-            AddFlag(flag);
+        doit ? m_flag |= flag : m_flag &= ~ flag;
+    }
+    void   RemoveFlag  (unsigned int flag) { AddFlag(flag, false); }
+    void   ToggleFlag  (unsigned int flag)
+    {
+        AddFlag(flag, ! HasFlag(flag));
     }
 
-    unsigned char GetFlag()          const { return m_flag; }
-    bool HasFlag(unsigned char flag) const { return (m_flag & flag) != 0; }
+    bool HasCircle() const { return HasFlag(FLAG_CIRCLE); }
+    void SetCircle(bool doit = true) { AddFlag(FLAG_CIRCLE, doit); }
 
-    void ReplaceFlag (unsigned char flag1, unsigned char flag2)
-    {
-        RemoveFlag(flag1);
-        AddFlag(flag2);
-    }
+    bool IsMissing() const { return HasFlag(FLAG_MISSING); }
+    void SetMissing(bool doit = true) { AddFlag(FLAG_MISSING, doit); }
 
+    bool HasColor() const { return HasFlag(FLAG_COLOR); }
+    void SetColor(unsigned char red, unsigned char green, unsigned char blue);
+    void RemoveColor();
+
+    // Color (public so we don't need a GetColor)
+    unsigned char m_red;
+    unsigned char m_green;
+    unsigned char m_blue;
 
     // Linked-list
     //------------
@@ -186,14 +206,13 @@ public:
         { return m_next[dir][inc]; }
     Square * Prev(GridDirection dir = ACROSS, FindDirection inc = NEXT)
         { return m_next[dir][1 - inc]; }
-    Square * GetWordStart(GridDirection dir)
-        { return m_wordStart[dir]; }
-    Square * GetWordEnd(GridDirection dir)
-        { return m_wordEnd[dir]; }
+    Square * GetWordStart(GridDirection dir);
+    Square * GetWordEnd(GridDirection dir);
+
+    bool HasWord(GridDirection dir) const;
 
     bool IsLast(GridDirection dir, FindDirection inc = NEXT) const
-        { return m_isLast [dir][inc]; }
-
+        { return m_isLast[dir][inc]; }
     bool IsFirst(GridDirection dir, FindDirection inc = NEXT) const
         { return IsLast(dir, inc == NEXT ? PREV : NEXT); }
 
@@ -202,10 +221,8 @@ public:
         { return m_next[dir][inc]; }
     const Square * Prev(GridDirection dir = ACROSS, FindDirection inc = NEXT) const
         { return m_next[dir][inc == NEXT ? PREV : NEXT]; }
-    const Square * GetWordStart(GridDirection dir) const
-        { return m_wordStart[dir]; }
-    const Square * GetWordEnd(GridDirection dir) const
-        { return m_wordEnd[dir]; }
+    const Square * GetWordStart(GridDirection dir) const;
+    const Square * GetWordEnd(GridDirection dir) const;
 
 
 protected:
@@ -214,15 +231,16 @@ protected:
     int m_row;
 
     // Text
-    std::string m_solution;
-    std::string m_text;
+    string_t m_solution;
+    string_t m_text;
     char m_asciiSolution;
 
-    // Clue number
-    short m_number;
+    // Clue
+    string_t m_number;
+    bool m_hasClue[2]; // [across / down]
 
     // Flag (GEXT)
-    unsigned char m_flag;
+    unsigned int m_flag;
 
     // Linked-list
     //------------
@@ -236,212 +254,9 @@ protected:
 
     bool m_isLast[2][2];   // [ across / down ] [ prev / next ]
 
-    Square * m_wordStart[2];  // [ across / down ]
-    Square * m_wordEnd  [2];  // [ across / down ]
-
-#ifdef PUZ_CHECK_STRINGS
-    // Throw an exception if we get a bad string
-    void CheckString(const std::string & str);
-#endif
-
+    mutable Square * m_wordStart[2];  // [ across / down ]
+    mutable Square * m_wordEnd  [2];  // [ across / down ]
 };
-
-
-
-//------------------------------------------------------------------------------
-// Inline functions
-//------------------------------------------------------------------------------
-
-
-
-//------------------------------------------------------------------------------
-// Square text and solution
-//------------------------------------------------------------------------------
-
-inline
-void
-Square::SetText(const std::string & text)
-{
-    if (IsSymbol(text))
-        m_text = text;
-    else
-    {
-        PuzCheckString(text);
-        m_text = ToUpper(text);
-    }
-}
-
-
-inline
-void
-Square::SetSolution(const std::string & solution, char plain)
-{
-    SetSolutionRebus(solution);
-    SetPlainSolution(plain);
-}
-
-inline
-void
-Square::SetSolution(const std::string & solution)
-{
-    SetSolution(solution, ToPlain(solution));
-}
-
-
-inline
-void
-Square::SetSolutionRebus(const std::string & rebus)
-{
-    if (rebus.empty())
-        throw InvalidString();
-    if (IsSymbol(rebus))
-    {
-        SetSolutionSymbol(static_cast<unsigned char>(rebus.at(1)));
-    }
-    else
-    {
-        PuzCheckString(rebus);
-        m_solution = ToUpper(rebus);
-    }
-}
-
-inline
-void
-Square::SetSolutionSymbol(unsigned char symbol)
-{
-    m_solution = "[ ]";
-    m_solution.at(1) = static_cast<char>(symbol);
-}
-
-
-
-
-inline
-bool
-Square::Check(bool checkBlank, bool strictRebus)  const
-{
-    assert(! m_solution.empty());
-    if (IsBlack())
-        return true;
-    if (IsBlank())
-        return ! checkBlank;
-
-    if (strictRebus || HasTextRebus())
-        return m_solution == m_text;
-    else
-        return GetPlainText() == GetPlainSolution();
-}
-
-
-
-
-// Information about text and solution
-//------------------------------------
-
-inline
-bool
-Square::HasTextRebus() const
-{
-    const size_t len = m_text.length();
-    return len > 1 || (len > 0 && m_text.at(0) != GetPlainText());
-}
-
-
-inline
-bool
-Square::HasSolutionRebus() const
-{
-    assert(! m_solution.empty());
-    const size_t len = m_solution.length();
-    return len > 1 || (len > 0 && m_solution.at(0) != GetPlainSolution());
-}
-
-
-inline
-bool
-Square::HasTextSymbol() const
-{
-    return IsSymbol(m_text);
-}
-
-
-inline
-bool
-Square::HasSolutionSymbol() const
-{
-    assert(! m_solution.empty());
-    return IsSymbol(m_solution);
-}
-
-
-inline
-unsigned char
-Square::GetTextSymbol() const
-{
-    if (! HasTextSymbol())
-        throw NoSymbol();
-    return static_cast<unsigned char>(m_text.at(1));
-}
-
-
-inline
-unsigned char
-Square::GetSolutionSymbol() const
-{
-    if (! HasSolutionSymbol())
-        throw NoSymbol();
-    return static_cast<unsigned char>(m_solution.at(1));
-}
-
-
-
-
-inline
-bool
-Square::IsValidString(const std::string & str)
-{
-    if (str == "." || str.empty())
-        return true;
-    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
-        if (! IsValidChar(*it) || *it == '.')
-            return false;
-    return true;
-}
-
-#ifdef PUZ_CHECK_STRINGS
-inline
-void
-Square::CheckString(const std::string & str)
-{
-    if (str.length() > REBUS_ENTRY_LENGTH)
-        throw LongString("Blah");
-    if (! IsValidString(str))
-        throw InvalidString();
-}
-#endif // PUZ_CHECK_STRINGS
-
-inline
-bool
-Square::IsSymbol(const std::string & str)
-{
-    return str.length() == 3
-        && str[0] == '['
-        && str[2] == ']';
-}
-
-inline
-std::string
-Square::ToUpper(const std::string & str)
-{
-    std::string ret = str;
-    std::string::iterator it;
-    for (it = ret.begin(); it != ret.end(); ++it)
-        *it = ToUpper(*it);
-    return ret;
-}
-
 } // namespace puz
-
-#undef PuzCheckString
 
 #endif // PUZ_SQUARE_H

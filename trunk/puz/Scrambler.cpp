@@ -18,9 +18,9 @@
 
 #include "Scrambler.hpp"
 #include "Grid.hpp"
+#include "Checksummer.hpp"
 #include <string>
 #include <ctime>
-#include "Checksummer.hpp"
 #include <cassert>
 
 namespace puz {
@@ -110,7 +110,7 @@ Scrambler::ScrambleSolution(unsigned short key_int)
 
         // Make sure we preserve any rebus in the solution
         if (! square->HasSolutionRebus())
-            square->SetSolution(std::string(1, *it));
+            square->SetSolution(decode_puz(std::string(1, *it)));
         else
             square->SetPlainSolution(*it);
         ++it;
@@ -267,7 +267,7 @@ Scrambler::UnscrambleSolution(unsigned short key_int)
 
         // Preserve any rebus in the solution
         if (! square->HasSolutionRebus())
-            square->SetSolution(std::string(1, *it));
+            square->SetSolution(decode_puz(std::string(1, *it)));
         else
             square->SetPlainSolution(*it);
         ++it;
@@ -347,7 +347,7 @@ Scrambler::GetSolutionDown()
 
     std::string ret;
 
-    for (Square * square = m_grid.First();
+    for (const Square * square = m_grid.First();
          square != NULL;
          square = square->Next(DOWN))
     {
@@ -367,7 +367,7 @@ Scrambler::GetUserGridDown()
 
     std::string ret;
 
-    for (Square * square = m_grid.First();
+    for (const Square * square = m_grid.First();
          square != NULL;
          square = square->Next(DOWN))
     {

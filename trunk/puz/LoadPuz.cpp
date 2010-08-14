@@ -17,17 +17,23 @@
 
 #include "Puzzle.hpp"
 #include "Checksummer.hpp"
+#include "puzstring.hpp"
+#include "util.hpp"
 #include "StreamWrapper.hpp"
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <map>
 
 namespace puz {
 
-void LoadSections(Puzzle * puz, istream_wrapper & f);
+static void LoadSections(Puzzle * puz, istream_wrapper & f);
 
-void LoadPuz(Puzzle * puz, std::istream & stream)
+void LoadPuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
 {
+    std::ifstream stream(filename.c_str(), std::ios::in | std::ios::binary);
+    if (stream.fail())
+        throw FatalFileError(std::string("Unable to open file: ") + encode_utf8(filename));
     istream_wrapper f(stream);
 
     const unsigned short c_primary = f.ReadShort();
@@ -57,10 +63,10 @@ void LoadPuz(Puzzle * puz, std::istream & stream)
     const unsigned short grid_type = f.ReadShort();
     const unsigned short grid_flag = f.ReadShort();
 
-    puz->m_grid.SetSize(width, height);
-    puz->m_grid.SetCksum(c_grid);
-    puz->m_grid.SetType(grid_type);
-    puz->m_grid.SetFlag(grid_flag);
+    puz->GetGrid().SetSize(width, height);
+    puz->GetGrid().SetCksum(c_grid);
+    puz->GetGrid().SetType(grid_type);
+    puz->GetGrid().SetFlag(grid_flag);
 
     // Read user text and solution
     std::string solution = f.ReadString(width * height);
@@ -69,81 +75,89 @@ void LoadPuz(Puzzle * puz, std::istream & stream)
     // Set the grid's solution and text
     std::string::iterator sol_it  = solution.begin();
     std::string::iterator text_it = text.begin();
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
         // Solution
-        if (*sol_it == ':' && puz->m_grid.IsDiagramless())
-        {
-            square->SetSolution(".");
-        }
+        if (*sol_it == '.' || *sol_it == ':' && puz->m_grid.IsDiagramless())
+            square->SetSolution(puz::Square::Black);
+        else if (*sol_it == '-')
+            square->SetSolution(puz::Square::Blank);
         else
-        {
-            square->SetSolution(std::string(1, *sol_it));
-        }
+            square->SetSolution(decode_puz(std::string(1, *sol_it)));
         ++sol_it;
 
         // Text
-        if (*text_it == ':' && puz->m_grid.IsDiagramless())
-        {
-            square->SetText(".");
-        }
-        else if (*text_it == '-')
-        {
-            square->SetText("");
-        }
+        if (square->IsBlack() || *text_it == ':' && puz->m_grid.IsDiagramless())
+            square->SetText(puz::Square::Black);
+        else if (*text_it == '-' || *text_it == 0)
+            square->SetText(puz::Square::Blank);
         else
-        {
-            square->SetText(std::string(1, *text_it));
+            square->SetText(decode_puz(std::string(1, *text_it)));
             if (islower(*text_it))
                 square->AddFlag(FLAG_PENCIL);
-        }
         ++text_it;
     }
     assert(sol_it == solution.end() && text_it == text.end());
 
-    puz->m_grid.SetupGrid();
-
     // General puzzle info
-    puz->m_title     = f.ReadString();
-    puz->m_author    = f.ReadString();
-    puz->m_copyright = f.ReadString();
+    puz->SetTitle(decode_puz(f.ReadString()));
+    puz->SetAuthor(decode_puz(f.ReadString()));
+    puz->SetCopyright(decode_puz(f.ReadString()));
 
     // Clues
-    std::vector<std::string> clues;
+    std::vector<string_t> clues;
+    clues.reserve(num_clues);
+    // Save unaltered clues for the checksums
+    std::vector<std::string> cksum_clues;
+    cksum_clues.reserve(num_clues);
     for (size_t i = 0; i < num_clues; ++i)
-        clues.push_back(f.ReadString());
+    {
+        cksum_clues.push_back(f.ReadString());
+        clues.push_back(decode_puz(cksum_clues.back()));
+    }
 
-    puz->SetClueList(clues);
+    puz->SetAllClues(clues);
 
     // Notes
-    puz->m_notes = f.ReadString();
+    std::string notes = f.ReadString();
+    puz->SetNotes(decode_puz(notes));
 
     puz->SetOk(true);
 
     // Try to load the extra sections (i.e. GEXT, LTIM, etc).
-    try
-    {
+    try {
         LoadSections(puz, f);
     }
-    catch (SectionError & err)
-    {
+    catch (SectionError & err) {
         puz->SetError(err.what());
     }
-    catch (std::ios::failure &)
-    {
+    catch (std::ios::failure &) {
         puz->SetError("EOF in a section");
         // No error; we just won't process all the sections
     }
 
     // Test the checksums
-    Checksummer cksum(*puz, version);
+    Checksummer cksum;
+    cksum.SetVersion(version);
+    cksum.SetAuthor(encode_puz(puz->GetAuthor()));
+    cksum.SetTitle(encode_puz(puz->GetTitle()));
+    cksum.SetCopyright(encode_puz(puz->GetCopyright()));
+
+    // Use clues and notes from the actual file because the Puzzle methods unescape XML chars.
+    cksum.SetClues(cksum_clues);
+    cksum.SetNotes(notes);
 
     // Use the grid and solution from the actual file, because Across Lite
     // doesn't save rebus solutions correctly all the time.
     cksum.SetSolution(solution);
     cksum.SetGridText(text);
+
+    cksum.SetWidth(puz->GetGrid().GetWidth());
+    cksum.SetHeight(puz->GetGrid().GetHeight());
+    cksum.SetGridType(puz->GetGrid().GetType());
+    cksum.SetGridFlag(puz->GetGrid().GetFlag());
 
     // We're going to test both 1.3 and 1.2 as versions because some files
     // with notepads don't have the correct version . . .
@@ -165,16 +179,16 @@ void LoadPuz(Puzzle * puz, std::istream & stream)
 // Load the sections
 //------------------------------------------------------------------------------
 
-void LoadGEXT(Puzzle * puz, const std::string & data);
-void UnLoadGEXT(Puzzle * puz);
-void LoadLTIM(Puzzle * puz, const std::string & data);
-void UnLoadLTIM(Puzzle * puz);
-void LoadRUSR(Puzzle * puz, const std::string & data);
-void UnLoadRUSR(Puzzle * puz);
-void LoadSolutionRebus(Puzzle * puz,
-                       const std::string & table,
-                       const std::string & grid);
-void UnLoadSolutionRebus(Puzzle * puz);
+static void LoadGEXT(Puzzle * puz, const std::string & data);
+static void UnLoadGEXT(Puzzle * puz);
+static void LoadLTIM(Puzzle * puz, const std::string & data);
+static void UnLoadLTIM(Puzzle * puz);
+static void LoadRUSR(Puzzle * puz, const std::string & data);
+static void UnLoadRUSR(Puzzle * puz);
+static void LoadSolutionRebus(Puzzle * puz,
+                              const std::string & table,
+                              const std::string & grid);
+static void UnLoadSolutionRebus(Puzzle * puz);
 
 #define LOAD_SECTION(name)                              \
     data = sections[#name];                             \
@@ -369,7 +383,7 @@ void LoadRUSR(Puzzle * puz, const std::string & data)
 
         try
         {
-            square->SetText(str);
+            square->SetText(decode_puz(str));
         }
         catch (InvalidString &)
         {
@@ -455,7 +469,7 @@ void LoadSolutionRebus(Puzzle * puz,
                 throw SectionError("Invalid value in GRBS section");
 
             // Don't overwrite the plain solution
-            square->SetSolutionRebus(it->second);
+            square->SetSolutionRebus(decode_puz(it->second));
         }
     }
     if (! grid_stream.CheckEof())
@@ -468,7 +482,7 @@ void UnLoadSolutionRebus(Puzzle * puz)
          square != NULL;
          square = square->Next())
     {
-        square->SetSolutionRebus(std::string(1, square->GetPlainSolution()));
+        square->SetSolutionRebus(string_t(1, char_t(square->GetPlainSolution())));
     }
 }
 

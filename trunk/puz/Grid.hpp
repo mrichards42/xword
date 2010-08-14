@@ -20,7 +20,6 @@
 #define PUZ_GRID_H
 
 #include <vector>
-#include <string>
 #include "Square.hpp"
 
 namespace puz {
@@ -44,17 +43,22 @@ enum GridType
 
 
 // Parameters for FindSquare
-const bool NO_WRAP_LINES = false;
-const bool WRAP_LINES    = true;
+enum FindOptions
+{
+    WRAP          = 0,
+    NO_WRAP       = 0x01,
+    WHITE_SQUARES = 0x02,
 
-const bool SKIP_BLACK_SQUARES    = true;
-const bool NO_SKIP_BLACK_SQUARES = false;
+    FIND_IN_GRID  = WRAP,
+    FIND_IN_WORD  = NO_WRAP | WHITE_SQUARES,
+};
 
 // Macro to simplify GetX() functions
 #define GET_FUNCTION(type, name, member)         \
     const type name() const { return member; }   \
           type name()       { return member; }   \
 
+// This class helps Square hide its constructors
 class GridSquare
 {
 public:
@@ -82,31 +86,11 @@ public:
     //------
     // Fills in Square Next / Prev, etc.  Called automatically from SetSize.
     void SetupIteration();
-    // Setup numbers, etc.  This must be called after the solution is filled.
-    void SetupSolution();
 
-    // Ensure that the grid is setup in this order:
-    //    SetSize
-    //    SetupIteration
-    //    Solution
-    enum GridState
-    {
-        GRID_NONE = 0,
-        GRID_SIZE,
-        GRID_ITERATION,
-        GRID_SOLUTION,
-        GRID_ALL = GRID_SOLUTION
-    };
-protected:
-    GridState m_gridState;
+    // Algorithmically determine grid numbers
+    void NumberGrid();
+
 public:
-    // Return true on success (we can at least report success for
-    // a const overload).
-    bool SetupGrid(GridState state = GRID_ALL);
-    bool IsGridSetup(GridState state = GRID_ALL) const
-        { return state <= m_gridState; }
-    bool SetupGrid(GridState state = GRID_ALL) const
-        { return IsGridSetup(state); }
 
     // Size
     //-----
@@ -122,8 +106,6 @@ public:
 
     GET_FUNCTION( Square *, First,      m_first)
     GET_FUNCTION( Square *, Last,       m_last)
-    GET_FUNCTION( Square *, FirstWhite, m_firstWhite)
-    GET_FUNCTION( Square *, LastWhite,  m_lastWhite)
 
     // Access to squares provided as (x,y):
     // i.e. square "b4" is At(1, 3)
@@ -139,20 +121,29 @@ public:
     //    bool Function(const Square *)
     template<typename T>
     Square * FindSquare(Square * start,
-                         T findFunc,
-                         GridDirection direction,
-                         FindDirection increment = NEXT,
-                         bool skipBlack = NO_SKIP_BLACK_SQUARES,
-                         bool wrapLines = NO_WRAP_LINES);
+                        T findFunc,
+                        GridDirection direction = ACROSS,
+                        FindDirection increment = NEXT,
+                        unsigned int options = FIND_IN_GRID);
+
+    // FindSquare starting from the first square
+    template<typename T>
+    Square * FindSquare(T findFunc,
+                        GridDirection direction,
+                        FindDirection increment,
+                        unsigned int options = FIND_IN_GRID);
+
+    // Find any square
+    template<typename T>
+    Square * FindSquare(T findFunc, unsigned int options = FIND_IN_GRID);
 
     // Search starting from the next square
     template<typename T>
     Square * FindNextSquare(Square * start,
-                             T findFunc,
-                             GridDirection direction,
-                             FindDirection increment = NEXT,
-                             bool skipBlack = NO_SKIP_BLACK_SQUARES,
-                             bool wrapLines = NO_WRAP_LINES);
+                            T findFunc,
+                            GridDirection direction = ACROSS,
+                            FindDirection increment = NEXT,
+                            unsigned int options = FIND_IN_GRID);
 
     // Flags
     bool IsScrambled() const { return (m_flag & FLAG_SCRAMBLED) != 0; }
@@ -179,11 +170,6 @@ public:
                    const Square * start,
                    const Square * end) const;
 
-    // These are necessary for the SetupGrid() const overload
-    void CountClues(size_t * across, size_t * down);
-    void CountClues(size_t * across, size_t * down) const;
-
-
     // Check functions
     //----------------
     void CheckGrid(std::vector<Square *> * incorrect,
@@ -197,13 +183,6 @@ public:
                                             bool strictRebus = false) const
         { return square.Check(checkBlank, strictRebus); }
 
-
-    // These all operate with ASCII
-    // delim is a delimiter between lines
-    std::string GetGridSolution(const std::string & delim = "") const;
-    std::string GetGridText    (const std::string & delim = "") const;
-    std::string GetGext        (const std::string & delim = "") const;
-
 protected:
     typedef std::vector< std::vector< GridSquare > > Grid_t;
     Grid_t m_vector;
@@ -211,8 +190,6 @@ protected:
     size_t m_width, m_height;
     Square * m_first;
     Square * m_last;
-    Square * m_firstWhite;
-    Square * m_lastWhite;
 
     short m_type;
     short m_flag;
@@ -220,9 +197,6 @@ protected:
     // These are used for grid scrambling
     unsigned short m_key;
     unsigned short m_cksum;
-
-    // Used with CountClues() const-overloading
-    void DoCountClues(size_t * across, size_t * down) const;
 };
 
 
@@ -238,10 +212,7 @@ Grid::Clear()
     m_cksum = 0;
     m_first = NULL;
     m_last = NULL;
-    m_firstWhite = NULL;
-    m_lastWhite = NULL;
     SetSize(0,0);
-    m_gridState = GRID_NONE;
 }
 
 
@@ -257,32 +228,48 @@ Grid::IsBetween(const Square * square,
 template <typename T>
 Square *
 Grid::FindSquare(Square * start,
-                  T findFunc,
-                  GridDirection direction,
-                  FindDirection increment,
-                  bool skipBlack,
-                  bool wrapLines)
+                 T findFunc,
+                 GridDirection direction,
+                 FindDirection increment,
+                 unsigned int options)
 {
-    if (start == NULL)
-        return NULL;
+    const bool only_whites = (options & WHITE_SQUARES) != 0;
+    const bool wrap = (options & NO_WRAP) == 0;
 
     for (Square * square = start;
          square != NULL;
          square = square->Next(direction, increment))
     {
-        if (! skipBlack && square->IsBlack())
+        if (only_whites && ! square->IsWhite())
             break;
 
         if (findFunc(square))
             return square;
 
-        if (! wrapLines && square->IsLast(direction, increment))
+        if (! wrap && square->IsLast(direction, increment))
             break;
     }
 
     return NULL;
 }
 
+template<typename T>
+Square *
+Grid::FindSquare(T findFunc,
+                 GridDirection direction,
+                 FindDirection increment,
+                 unsigned int options)
+{
+    return FindSquare(First(), findFunc, direction, increment, options);
+}
+
+
+template<typename T>
+Square *
+Grid::FindSquare(T findFunc, unsigned int options)                 
+{
+    return FindSquare(First(), findFunc, ACROSS, NEXT, options);
+}
 
 
 template <typename T>
@@ -291,46 +278,18 @@ Grid::FindNextSquare(Square * start,
                       T findFunc,
                       GridDirection direction,
                       FindDirection increment,
-                      bool skipBlack,
-                      bool wrapLines)
+                      unsigned int options)
 {
-    if (start == NULL || (! wrapLines && start->IsLast(direction, increment)) )
-        return NULL;
+    if (start == NULL ||
+        ((options & NO_WRAP)
+          && start->IsLast(direction, increment)) )
+            return NULL;
 
     return FindSquare(start->Next(direction, increment),
                       findFunc,
-                      direction,
-                      increment,
-                      skipBlack,
-                      wrapLines);
+                      direction, increment,
+                      options);
 }
-
-
-
-// Functions / functors for FindSquare
-PUZ_API bool FIND_WHITE_SQUARE (const Square * square);
-PUZ_API bool FIND_BLACK_SQUARE (const Square * square);
-PUZ_API bool FIND_BLANK_SQUARE (const Square * square);
-
-struct PUZ_API FIND_WORD
-{
-    FIND_WORD(GridDirection direction, const Square * square);
-    bool operator() (const Square * square);
-private:
-    GridDirection m_direction;
-    const Square *  m_wordStart;
-};
-
-// This looks for square->number, so in order to use it we must give
-//    this struct and FindSquare a square at the start of a word
-struct PUZ_API FIND_CLUE
-{
-    FIND_CLUE(GridDirection direction, const Square * square);
-    bool operator() (const Square * square);
-private:
-    GridDirection m_direction;
-    unsigned int m_number;
-};
 
 } // namespace puz
 
