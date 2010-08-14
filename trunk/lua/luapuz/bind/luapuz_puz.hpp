@@ -21,6 +21,8 @@ extern "C" {
 // ---------------------------------------------------------------------------
 
 #include "puz/Grid.hpp"
+#include <algorithm>
+#include "puz/Clue.hpp"
 #include "puz/Square.hpp"
 
 // enum GridDirection
@@ -147,6 +149,35 @@ inline bool luapuz_isGridType(lua_State * L, int index)
 {
     return luapuz_isEnum(L, index, GridType_meta);
 }
+
+
+// enum FindOptions
+//------------
+
+LUAPUZ_API extern const char * FindOptions_meta;
+
+inline puz::FindOptions luapuz_checkFindOptions(lua_State * L, int index)
+{
+    return static_cast<puz::FindOptions>(luapuz_checkEnum(L, index, FindOptions_meta));
+}
+
+inline void luapuz_pushFindOptions(lua_State * L, puz::FindOptions findoptions)
+{
+    lua_pushnumber(L, findoptions);
+}
+
+inline bool luapuz_isFindOptions(lua_State * L, int index)
+{
+    return luapuz_isEnum(L, index, FindOptions_meta);
+}
+
+
+// typedef ClueList
+//-------------
+
+LUAPUZ_API void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * cluelist);
+
+LUAPUZ_API int luapuz_pushClueList(lua_State * L, puz::ClueList * cluelist);
 
 void luapuz_openpuzlib (lua_State *L);
 #endif // luapuz_puz_hpp

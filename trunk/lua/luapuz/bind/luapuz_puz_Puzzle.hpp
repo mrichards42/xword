@@ -21,7 +21,6 @@ extern "C" {
 // ---------------------------------------------------------------------------
 
 #include "puz/Puzzle.hpp"
-#include <algorithm>
 
 LUAPUZ_API extern const char * Puzzle_meta;
 
@@ -55,9 +54,9 @@ inline puz::Puzzle * luapuz_checkPuzzle(lua_State * L, int index)
 
 
 // Check if this is the correct data type
-inline bool luapuz_isPuzzle(lua_State *L, int index, const char *tname)
+inline bool luapuz_isPuzzle(lua_State *L, int index)
 {
-    return luapuz_isudata(L, index, tname);
+    return luapuz_isudata(L, index, Puzzle_meta);
 }
 
 // Create a new userdata with actual data and push it on the stack.
@@ -74,14 +73,6 @@ inline void luapuz_pushPuzzle(lua_State * L, puz::Puzzle * puzzle, bool should_g
         luapuz_newPuzzle(L, puzzle, should_gc);
 }
 
-
-
-// typedef ClueList
-//-------------
-
-LUAPUZ_API void luapuz_checkClueList(lua_State * L, int index, puz::Puzzle::ClueList * cluelist);
-
-LUAPUZ_API int luapuz_pushClueList(lua_State * L, puz::Puzzle::ClueList * cluelist);
 
 void luapuz_openPuzzlelib (lua_State *L);
 #endif // luapuz_puz_Puzzle_hpp

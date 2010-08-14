@@ -54,9 +54,9 @@ inline puz::Square * luapuz_checkSquare(lua_State * L, int index)
 
 
 // Check if this is the correct data type
-inline bool luapuz_isSquare(lua_State *L, int index, const char *tname)
+inline bool luapuz_isSquare(lua_State *L, int index)
 {
-    return luapuz_isudata(L, index, tname);
+    return luapuz_isudata(L, index, Square_meta);
 }
 
 // Create a new userdata with actual data and push it on the stack.

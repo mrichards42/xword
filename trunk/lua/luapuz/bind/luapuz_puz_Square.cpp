@@ -58,6 +58,9 @@ int Square_gc(lua_State * L)
     luapuz_untrack_object(L, ud->square);
     if (ud->should_gc)
     {
+        // If the user calls Square:__gc() before this object
+        // is garbage collected, we might try to delete ud->square twice.
+        ud->should_gc = false;
         delete ud->square;
 #ifdef LUAPUZ_DEBUG
         std::cout << "and deleting data" << std::endl;
@@ -122,11 +125,11 @@ static int Square_IsFirst(lua_State * L)
     lua_pushboolean(L, returns);
     return 1;
 }
-// bool IsOk()
-static int Square_IsOk(lua_State * L)
+// bool IsSolutionBlank()
+static int Square_IsSolutionBlank(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    bool returns = square->IsOk();
+    bool returns = square->IsSolutionBlank();
     lua_pushboolean(L, returns);
     return 1;
 }
@@ -154,12 +157,12 @@ static int Square_IsBlank(lua_State * L)
     lua_pushboolean(L, returns);
     return 1;
 }
-// std::string GetText()
+// puz::string_t GetText()
 static int Square_GetText(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    std::string returns = square->GetText();
-    luapuz_pushStdString(L, returns);
+    puz::string_t returns = square->GetText();
+    luapuz_pushstring_t(L, returns);
     return 1;
 }
 // char GetPlainText()
@@ -170,11 +173,11 @@ static int Square_GetPlainText(lua_State * L)
     luapuz_pushchar(L, returns);
     return 1;
 }
-// unsigned char GetTextSymbol()
+// int GetTextSymbol()
 static int Square_GetTextSymbol(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char returns;
+    int returns;
     try {
         returns = square->GetTextSymbol();
         lua_pushnumber(L, returns);
@@ -186,11 +189,11 @@ static int Square_GetTextSymbol(lua_State * L)
     lua_error(L); // We should have returned by now
     return 0;
 }
-// void SetText(std::string text)
+// void SetText(puz::string_t text)
 static int Square_SetText(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    std::string text = luapuz_checkStdString(L, 2);
+    puz::string_t text = luapuz_checkstring_t(L, 2);
     try {
         square->SetText(text);
         return 0;
@@ -217,12 +220,12 @@ static int Square_HasTextSymbol(lua_State * L)
     lua_pushboolean(L, returns);
     return 1;
 }
-// std::string GetSolution()
+// puz::string_t GetSolution()
 static int Square_GetSolution(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    std::string returns = square->GetSolution();
-    luapuz_pushStdString(L, returns);
+    puz::string_t returns = square->GetSolution();
+    luapuz_pushstring_t(L, returns);
     return 1;
 }
 // char GetPlainSolution()
@@ -233,11 +236,11 @@ static int Square_GetPlainSolution(lua_State * L)
     luapuz_pushchar(L, returns);
     return 1;
 }
-// unsigned char GetSolutionSymbol()
+// int GetSolutionSymbol()
 static int Square_GetSolutionSymbol(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char returns;
+    int returns;
     try {
         returns = square->GetSolutionSymbol();
         lua_pushnumber(L, returns);
@@ -249,11 +252,11 @@ static int Square_GetSolutionSymbol(lua_State * L)
     lua_error(L); // We should have returned by now
     return 0;
 }
-// void SetSolution(std::string solution)
+// void SetSolution(puz::string_t solution)
 static int Square_SetSolution1(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    std::string solution = luapuz_checkStdString(L, 2);
+    puz::string_t solution = luapuz_checkstring_t(L, 2);
     try {
         square->SetSolution(solution);
         return 0;
@@ -264,11 +267,11 @@ static int Square_SetSolution1(lua_State * L)
     lua_error(L); // We should have returned by now
     return 0;
 }
-// void SetSolution(std::string solution, char plain)
+// void SetSolution(puz::string_t solution, char plain)
 static int Square_SetSolution2(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    std::string solution = luapuz_checkStdString(L, 2);
+    puz::string_t solution = luapuz_checkstring_t(L, 2);
     char plain = luapuz_checkchar(L, 3);
     try {
         square->SetSolution(solution, plain);
@@ -309,11 +312,11 @@ static int Square_SetPlainSolution(lua_State * L)
     square->SetPlainSolution(plain);
     return 0;
 }
-// void SetSolutionRebus(std::string rebus)
+// void SetSolutionRebus(puz::string_t rebus)
 static int Square_SetSolutionRebus(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    std::string rebus = luapuz_checkStdString(L, 2);
+    puz::string_t rebus = luapuz_checkstring_t(L, 2);
     try {
         square->SetSolutionRebus(rebus);
         return 0;
@@ -324,11 +327,11 @@ static int Square_SetSolutionRebus(lua_State * L)
     lua_error(L); // We should have returned by now
     return 0;
 }
-// void SetSolutionSymbol(unsigned char symbol)
+// void SetSolutionSymbol(int symbol)
 static int Square_SetSolutionSymbol(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char symbol = luapuz_checkuint(L, 2);
+    int symbol = luaL_checknumber(L, 2);
     try {
         square->SetSolutionSymbol(symbol);
         return 0;
@@ -366,80 +369,200 @@ static int Square_Check(lua_State * L)
     lua_pushboolean(L, returns);
     return 1;
 }
-// short GetNumber()
-static int Square_GetNumber(lua_State * L)
+// bool HasNumber()
+static int Square_HasNumber(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    short returns = square->GetNumber();
-    lua_pushnumber(L, returns);
-    return 1;
-}
-// bool HasClue(puz::GridDirection dir = puz::NONE)
-static int Square_HasClue(lua_State * L)
-{
-    puz::Square * square = luapuz_checkSquare(L, 1);
-    int argCount = lua_gettop(L);
-    puz::GridDirection dir = (argCount >= 2 ? luapuz_checkGridDirection(L, 2) : puz::NONE);
-    bool returns = square->HasClue(dir);
+    bool returns = square->HasNumber();
     lua_pushboolean(L, returns);
     return 1;
 }
-// void SetFlag(unsigned char flag)
+// puz::string_t GetNumber()
+static int Square_GetNumber(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    puz::string_t returns = square->GetNumber();
+    luapuz_pushstring_t(L, returns);
+    return 1;
+}
+// void SetNumber(puz::string_t number)
+static int Square_SetNumber1(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    puz::string_t number = luapuz_checkstring_t(L, 2);
+    square->SetNumber(number);
+    return 0;
+}
+// void SetNumber(int number)
+static int Square_SetNumber2(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    int number = luaL_checknumber(L, 2);
+    square->SetNumber(number);
+    return 0;
+}
+// SetNumber overload resolution
+static int Square_SetNumber(lua_State * L)
+{
+
+    luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L) - 1;
+    if (argCount >= 1)
+    {
+        // Argument 1
+        switch(lua_type(L, 2)) {
+            case LUA_TSTRING:
+                // Only one function
+                return Square_SetNumber1(L);
+            break;
+            case LUA_TNUMBER:
+                // Only one function
+                return Square_SetNumber2(L);
+            break;
+        }
+    }
+    // Else we didn't find a function
+    luaL_error(L, "Unable to find overload");
+    return 0;
+}
+
+// bool HasClue()
+// bool HasClue(puz::GridDirection dir)
+static int Square_HasClue(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns;
+    int argCount = lua_gettop(L);
+    if (argCount >= 2)
+    {
+        puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
+        returns = square->HasClue(dir);
+    }
+    else
+    {
+        returns = square->HasClue();
+    }
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// void SetClue(puz::GridDirection dir, bool clue = true)
+static int Square_SetClue(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L);
+    puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
+    bool clue = (argCount >= 3 ? luapuz_checkboolean(L, 3) : true);
+    square->SetClue(dir, clue);
+    return 0;
+}
+// void SetFlag(unsigned short flag)
 static int Square_SetFlag(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char flag = luapuz_checkuint(L, 2);
+    unsigned short flag = luapuz_checkuint(L, 2);
     square->SetFlag(flag);
     return 0;
 }
-// void AddFlag(unsigned char flag)
+// void AddFlag(unsigned short flag, bool doit = true)
 static int Square_AddFlag(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char flag = luapuz_checkuint(L, 2);
-    square->AddFlag(flag);
+    int argCount = lua_gettop(L);
+    unsigned short flag = luapuz_checkuint(L, 2);
+    bool doit = (argCount >= 3 ? luapuz_checkboolean(L, 3) : true);
+    square->AddFlag(flag, doit);
     return 0;
 }
-// void RemoveFlag(unsigned char flag)
+// void RemoveFlag(unsigned short flag)
 static int Square_RemoveFlag(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char flag = luapuz_checkuint(L, 2);
+    unsigned short flag = luapuz_checkuint(L, 2);
     square->RemoveFlag(flag);
     return 0;
 }
-// void ToggleFlag(unsigned char flag)
+// void ToggleFlag(unsigned short flag)
 static int Square_ToggleFlag(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char flag = luapuz_checkuint(L, 2);
+    unsigned short flag = luapuz_checkuint(L, 2);
     square->ToggleFlag(flag);
     return 0;
 }
-// unsigned char GetFlag()
+// unsigned short GetFlag()
 static int Square_GetFlag(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char returns = square->GetFlag();
+    unsigned short returns = square->GetFlag();
     lua_pushnumber(L, returns);
     return 1;
 }
-// bool HasFlag(unsigned char flag)
+// bool HasFlag(unsigned short flag)
 static int Square_HasFlag(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char flag = luapuz_checkuint(L, 2);
+    unsigned short flag = luapuz_checkuint(L, 2);
     bool returns = square->HasFlag(flag);
     lua_pushboolean(L, returns);
     return 1;
 }
-// void ReplaceFlag(unsigned char flag1, unsigned char flag2)
-static int Square_ReplaceFlag(lua_State * L)
+// bool HasCircle()
+static int Square_HasCircle(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    unsigned char flag1 = luapuz_checkuint(L, 2);
-    unsigned char flag2 = luapuz_checkuint(L, 3);
-    square->ReplaceFlag(flag1, flag2);
+    bool returns = square->HasCircle();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// void SetCircle(bool doit = true)
+static int Square_SetCircle(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L);
+    bool doit = (argCount >= 2 ? luapuz_checkboolean(L, 2) : true);
+    square->SetCircle(doit);
+    return 0;
+}
+// bool IsMissing()
+static int Square_IsMissing(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->IsMissing();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// void SetMissing(bool doit = true)
+static int Square_SetMissing(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L);
+    bool doit = (argCount >= 2 ? luapuz_checkboolean(L, 2) : true);
+    square->SetMissing(doit);
+    return 0;
+}
+// bool HasColor()
+static int Square_HasColor(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->HasColor();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// void SetColor(unsigned char red, unsigned char green, unsigned char blue)
+static int Square_SetColor(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    unsigned char red = luapuz_checkuint(L, 2);
+    unsigned char green = luapuz_checkuint(L, 3);
+    unsigned char blue = luapuz_checkuint(L, 4);
+    square->SetColor(red, green, blue);
+    return 0;
+}
+// void RemoveColor()
+static int Square_RemoveColor(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    square->RemoveColor();
     return 0;
 }
 // Square * Next(puz::GridDirection dir = puz::ACROSS, puz::FindDirection inc = puz::NEXT)
@@ -482,26 +605,27 @@ static int Square_GetWordEnd(lua_State * L)
     luapuz_pushSquare(L, returns);
     return 1;
 }
-// static bool IsValidString(std::string str)
+// bool HasWord(puz::GridDirection dir)
+static int Square_HasWord(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
+    bool returns = square->HasWord(dir);
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// static bool IsValidString(puz::string_t str)
 static int Square_IsValidString(lua_State * L)
 {
-    std::string str = luapuz_checkStdString(L, 1);
+    puz::string_t str = luapuz_checkstring_t(L, 1);
     bool returns = puz::Square::IsValidString(str);
     lua_pushboolean(L, returns);
     return 1;
 }
-// static bool IsValidChar(char ch)
-static int Square_IsValidChar(lua_State * L)
-{
-    char ch = luapuz_checkchar(L, 1);
-    bool returns = puz::Square::IsValidChar(ch);
-    lua_pushboolean(L, returns);
-    return 1;
-}
-// static bool IsSymbol(std::string str)
+// static bool IsSymbol(puz::string_t str)
 static int Square_IsSymbol(lua_State * L)
 {
-    std::string str = luapuz_checkStdString(L, 1);
+    puz::string_t str = luapuz_checkstring_t(L, 1);
     bool returns = puz::Square::IsSymbol(str);
     lua_pushboolean(L, returns);
     return 1;
@@ -511,7 +635,7 @@ static const luaL_reg Squarelib[] = {
     {"GetRow", Square_GetRow},
     {"IsLast", Square_IsLast},
     {"IsFirst", Square_IsFirst},
-    {"IsOk", Square_IsOk},
+    {"IsSolutionBlank", Square_IsSolutionBlank},
     {"IsWhite", Square_IsWhite},
     {"IsBlack", Square_IsBlack},
     {"IsBlank", Square_IsBlank},
@@ -531,28 +655,30 @@ static const luaL_reg Squarelib[] = {
     {"HasSolutionRebus", Square_HasSolutionRebus},
     {"HasSolutionSymbol", Square_HasSolutionSymbol},
     {"Check", Square_Check},
+    {"HasNumber", Square_HasNumber},
     {"GetNumber", Square_GetNumber},
+    {"SetNumber", Square_SetNumber},
     {"HasClue", Square_HasClue},
+    {"SetClue", Square_SetClue},
     {"SetFlag", Square_SetFlag},
     {"AddFlag", Square_AddFlag},
     {"RemoveFlag", Square_RemoveFlag},
     {"ToggleFlag", Square_ToggleFlag},
     {"GetFlag", Square_GetFlag},
     {"HasFlag", Square_HasFlag},
-    {"ReplaceFlag", Square_ReplaceFlag},
+    {"HasCircle", Square_HasCircle},
+    {"SetCircle", Square_SetCircle},
+    {"IsMissing", Square_IsMissing},
+    {"SetMissing", Square_SetMissing},
+    {"HasColor", Square_HasColor},
+    {"SetColor", Square_SetColor},
+    {"RemoveColor", Square_RemoveColor},
     {"Next", Square_Next},
     {"Prev", Square_Prev},
     {"GetWordStart", Square_GetWordStart},
     {"GetWordEnd", Square_GetWordEnd},
+    {"HasWord", Square_HasWord},
     {"IsValidString", Square_IsValidString},
-    {"IsValidChar", Square_IsValidChar},
-    {"IsSymbol", Square_IsSymbol},
-    {NULL, NULL}
-};
-
-const luaL_reg staticSquarelib[] = {
-    {"IsValidString", Square_IsValidString},
-    {"IsValidChar", Square_IsValidChar},
     {"IsSymbol", Square_IsSymbol},
     {NULL, NULL}
 };
@@ -566,19 +692,12 @@ const luaL_reg classSquarelib[] = {
 };
 
 void luapuz_openSquarelib (lua_State *L) {
+    // The Square table, and the metatable for Square objects
     luaL_newmetatable(L, Square_meta);
 
     // register metatable functions
     luaL_register(L, NULL, Squarelib);
     luaL_register(L, NULL, classSquarelib);
-
-    // remove metatable from stack
-    lua_pop(L, 1);
-
-    // puz.Square table
-    lua_newtable(L);
-    luaL_register(L, NULL, staticSquarelib);
-    luaL_register(L, NULL, Squarelib);
 
     // puz.Square = the table
     lua_setfield(L, -2, "Square");

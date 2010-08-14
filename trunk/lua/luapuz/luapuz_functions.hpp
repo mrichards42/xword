@@ -10,6 +10,23 @@ extern "C" {
 #include <string>
 #include <iostream>
 #include "puz/exceptions.hpp"
+#include "puz/puzstring.hpp"
+
+
+// Exceptions
+static void luapuz_handleExceptions(lua_State * L)
+{
+    try {
+        throw;
+    }
+    catch (std::exception & err) {
+        lua_pushstring(L, err.what());
+    }
+    catch (...) {
+        lua_pushstring(L, "Unknown error");
+    }
+}
+
 
 // stronger type checking
 static bool luapuz_isstring(lua_State * L, int index, bool strong = false)
@@ -38,16 +55,32 @@ static bool luapuz_isnumberstrong(lua_State * L, int index)
     return luapuz_isnumber(L, index, true);
 }
 
-
-// std::string
-static void luapuz_pushStdString(lua_State * L, const std::string & str)
+// puz::string_t
+static void luapuz_pushstring_t(lua_State * L, const puz::string_t & str)
 {
-    lua_pushstring(L, str.c_str());
+    try
+    {
+        lua_pushstring(L, puz::encode_utf8(str).c_str());
+        return;
+    }
+    catch (...)
+    {
+        luapuz_handleExceptions(L);
+    }
+    lua_error(L);
 }
 
-static std::string luapuz_checkStdString(lua_State * L, int index)
+static puz::string_t luapuz_checkstring_t(lua_State * L, int index)
 {
-    return std::string(luaL_checkstring(L, index));
+    try
+    {
+        return puz::decode_utf8(luaL_checkstring(L, index));
+    }
+    catch (...)
+    {
+        luapuz_handleExceptions(L);
+    }
+    lua_error(L);
 }
 
 
@@ -154,22 +187,6 @@ static void luapuz_registerConstructor(lua_State * L, lua_CFunction func)
     // set the metatable
     lua_setmetatable(L, -2);
 }
-
-
-// Exceptions
-static void luapuz_handleExceptions(lua_State * L)
-{
-    try {
-        throw;
-    }
-    catch (std::exception & err) {
-        lua_pushstring(L, err.what());
-    }
-    catch (...) {
-        lua_pushstring(L, "Unknown error");
-    }
-}
-
 
 
 
