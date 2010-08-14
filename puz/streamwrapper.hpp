@@ -64,7 +64,7 @@ public:
     std::string ReadString(int length)
     {
         std::string str;
-        if (length != -1)
+        if (length >= 0)
         {
             str.reserve(length);
             for (size_t i = 0; i < length; ++i)

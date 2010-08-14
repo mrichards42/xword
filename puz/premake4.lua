@@ -5,17 +5,13 @@ project "puz"
     kind "SharedLib"
     language "C++"
     files {
-        "Checksummer.*",
-        "exceptions.*",
-        "Grid.*",
-        "LoadPuz.*",
-        "Puzzle.*",
-        "SavePuz.*",
-        "Scrambler.*",
-        "Square.*",
-        "streamwraper.*",
-        "util.*",
+        "*.hpp",
+        "*.cpp"
     }
+
+    includedirs { "../expat/lib" }
+
+    links { "expat" }
 
     configuration "windows"
         defines {
@@ -31,4 +27,5 @@ project "puz"
     configuration "vs*"
         buildoptions {
             "/wd4251", -- DLL Exports
+            "/wd4275", -- DLL Exports
         }

@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,10 +19,10 @@
 #ifndef PUZ_PUZZLE_H
 #define PUZ_PUZZLE_H
 
-#include <string>
-#include <vector>
 #include "Grid.hpp"
-#include <iostream>
+#include "Clue.hpp"
+#include "puzstring.hpp"
+#include <vector>
 
 namespace puz {
 
@@ -30,8 +30,6 @@ class PUZ_API Puzzle
 {
 public:
     struct PUZ_API FileHandlerDesc;
-    class PUZ_API Clue;
-    class PUZ_API ClueList;
 
     explicit Puzzle()
         : m_time(0),
@@ -40,7 +38,7 @@ public:
           m_isOk(false)
     {}
 
-    explicit Puzzle(const std::string & filename,
+    explicit Puzzle(const string_t & filename,
                     const FileHandlerDesc * desc = NULL)
         : m_time(0),
           m_isTimerRunning(false),
@@ -52,17 +50,19 @@ public:
 
     ~Puzzle() {}
 
-    void Load(const std::string & filename, const FileHandlerDesc * handler = NULL);
-    void Save(const std::string & filename, const FileHandlerDesc * handler = NULL);
+    void Load(const string_t & filename,
+              const FileHandlerDesc * handler = NULL);
+    void Save(const string_t & filename,
+              const FileHandlerDesc * handler = NULL);
 
     void Clear();
     bool IsOk()        const { return m_isOk; }
-    void SetOk(bool doit=true) { m_isOk = doit; }
+    void SetOk(bool ok=true) { m_isOk = ok; }
     bool IsScrambled() const { return m_grid.IsScrambled(); }
     short GetVersion() const { return m_version; }
 
     // Verify that the puzzle is valid and raise an exception if it is not.
-    void TestOk() const;
+    void TestOk();
 
     // Getter / Setters
     //-----------------
@@ -72,18 +72,19 @@ public:
     bool IsTimerRunning() const { return m_isTimerRunning; }
     void SetTimerRunning(bool doit) { m_isTimerRunning = doit; }
 
-    const std::string & GetTitle() const { return m_title; }
-    void SetTitle(const std::string & title) { m_title = title; }
+    const string_t & GetTitle() const { return m_title; }
+    void SetTitle(const string_t & title) { m_title = title; }
 
-    const std::string & GetAuthor() const { return m_author; }
-    void SetAuthor(const std::string & author) { m_author = author; }
+    const string_t & GetAuthor() const { return m_author; }
+    void SetAuthor(const string_t & author) { m_author = author; }
 
-    const std::string & GetCopyright() const { return m_copyright; }
-    void SetCopyright(const std::string & copyright) { m_copyright = copyright; }
+    const string_t & GetCopyright() const { return m_copyright; }
+    void SetCopyright(const string_t & copyright) { m_copyright = copyright; }
 
-    const std::string & GetNotes() const { return m_notes; }
-    void SetNotes(const std::string & notes) { m_notes = notes; }
+    const string_t & GetNotes() const { return m_notes; }
+    void SetNotes(const string_t & notes) { SetFormatted(m_notes, notes); }
 
+    // errors are 8-bit strings
     const std::string & GetError() const { return m_lastError; }
     void SetError(const std::string & err) { m_lastError = err; }
     void ClearError() { m_lastError.clear(); }
@@ -91,82 +92,33 @@ public:
 
     // Clues
     //------
-    ClueList & GetAcross() { return m_across; }
-    void SetAcross(const ClueList & across) { m_across = across; }
+    const ClueList & GetAcross() const { return m_clues.GetAcross(); }
+          ClueList & GetAcross()       { return m_clues.GetAcross(); }
+    void SetAcross(const ClueList & across) { m_clues.GetAcross() = across; }
 
-    ClueList & GetDown() { return m_down; }
-    void SetDown(const ClueList & down) { m_down = down; }
+    const ClueList & GetDown() const { return m_clues.GetDown(); }
+          ClueList & GetDown()       { return m_clues.GetDown(); }
+    void SetDown(const ClueList & down) { m_clues.GetDown() = down; }
 
-    // All clues in order
-    void GetClueList(std::vector<std::string> * clues) const;
-    // The non-const version attempts to setup the grid if it is not already setup.
-    void GetClueList(std::vector<std::string> * clues);
+    const ClueList & GetClues(const string_t & direction) const
+        { return m_clues.GetClues(direction); }
+    ClueList & GetClues(const string_t & direction)
+          { return m_clues.GetClues(direction); }
 
-    void SetClueList(const std::vector<std::string> & clues);
-
-    // Call this after SetAcross / SetDown if you are unable to determine the clue numbers
-    void RenumberClues();
-
-    Grid & GetGrid() { return m_grid; }
+    // Grid
+    // ----
+    const Grid & GetGrid() const { return m_grid; }
+          Grid & GetGrid()       { return m_grid; }
     void SetGrid(const Grid & grid) { m_grid = grid; }
 
-
-    //--------------------------------------------------------------------
-    // Clue and ClueList
-    //--------------------------------------------------------------------
-    // This makes access to the clues nicer:
-    class PUZ_API Clue
-    {
-    public:
-        explicit Clue(int num=-1, const std::string & str="")
-            : m_num(num), m_str(str)
-        {}
-
-        const std::string & Text()   const { return m_str; }
-              std::string & Text()         { return m_str; }
-              int        Number() const { return m_num; }
-
-        int m_num;
-        std::string m_str;
-        bool operator==(const Puzzle::Clue & other) const
-            { return other.m_num == m_num && other.m_str == m_str; }
-
-        // This makes sorting a lot easier
-        bool operator<(const Puzzle::Clue & other) const
-            { return m_num < other.m_num; }
-    };
-
-
-    class PUZ_API ClueList : public std::vector<Puzzle::Clue>
-    {
-        typedef std::vector<Puzzle::Clue> _base;
-    public:
-        // Basic constructor
-        Puzzle::ClueList() : _base() {}
-
-        // Clue finding
-        //-------------
-        const_iterator
-        Find(int num) const
-        {
-            const_iterator it;
-            for (it = begin(); it != end(); ++it)
-                if (it->Number() == num)
-                    break;
-            return it;
-        }
-
-        iterator
-        Find(int num)
-        {
-            iterator it;
-            for (it = begin(); it != end(); ++it)
-                if (it->Number() == num)
-                    break;
-            return it;
-        }
-    };
-
+    // Grid / clue numbering algorithm
+    //--------------------------------
+    // Assumes that Across and Down are in order but not numbered.
+    void NumberClues();
+    // Assumes that there are no preexisting clues and writes the clues
+    // in "Across Lite" order given a vector of clues.
+    void SetAllClues(const std::vector<string_t> & clues);
+    void NumberGrid();
 
     // -------------------------------------------------------------------
     // Members
@@ -174,16 +126,14 @@ public:
     int m_time;
     bool m_isTimerRunning;
 
-    std::string m_title;
-    std::string m_author;
-    std::string m_copyright;
-    std::string m_notes;
+    string_t m_title;
+    string_t m_author;
+    string_t m_copyright;
+    string_t m_notes;
 
-    ClueList m_across;
-    ClueList m_down;
+    Clues m_clues;
 
     Grid m_grid;
-
 
     // Extra unknown sections for persistence between load and save
     struct PUZ_API section;
@@ -192,9 +142,7 @@ public:
     // -------------------------------------------------------------------
     // Load / Save
     // -------------------------------------------------------------------
-    typedef void (*FileHandler)(Puzzle *, const std::string &, void *);
-    typedef void (*CppLoadHandler)(Puzzle *, std::istream &);
-    typedef void (*CppSaveHandler)(Puzzle *, std::ostream &);
+    typedef void (*FileHandler)(Puzzle *, const string_t &, void *);
 
     // The load and save functions are passed a void pointer with whatever
     // data the handler needs. This is kind of hackish and mostly just
@@ -202,33 +150,33 @@ public:
     struct PUZ_API FileHandlerDesc
     {
         FileHandler handler;
-        const char * ext;
-        const char * desc;
+        const char_t * ext;
+        const char_t * desc;
         void * data;
     };
 
     static const FileHandlerDesc sm_loadHandlers[];
     static const FileHandlerDesc sm_saveHandlers[];
 
-    static bool CanLoad(const std::string & filename);
-    static bool CanSave(const std::string & filename);
+    static bool CanLoad(const string_t & filename);
+    static bool CanSave(const string_t & filename);
 
-    static const FileHandlerDesc * FindLoadHandler(const std::string & ext);
-    static const FileHandlerDesc * FindSaveHandler(const std::string & ext);
+    static const FileHandlerDesc * FindLoadHandler(const string_t & ext);
+    static const FileHandlerDesc * FindSaveHandler(const string_t & ext);
 
 protected:
     bool m_isOk;
     short m_version;
 
-    // Const / non-const helpers
-    void DoGetClueList(std::vector<std::string> * clues) const;
-
 private:
     std::string m_lastError;
+
+    void TestClueList(const string_t & direction);
 };
 
 
 
+// Sections use 8-bit strings
 struct PUZ_API Puzzle::section
 {
     section(const std::string & a_name, const std::string & a_data)
@@ -245,8 +193,7 @@ Puzzle::Clear()
 {
     m_isOk = false;
     m_grid.Clear();
-    m_across.clear();
-    m_down.clear();
+    m_clues.clear();
     m_title.clear();
     m_author.clear();
     m_copyright.clear();

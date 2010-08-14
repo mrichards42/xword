@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,23 +18,28 @@
 
 #include "Puzzle.hpp"
 #include "util.hpp"
-#include <fstream>
 #include <iostream>
-#include <algorithm>
-
-// Load Handlers
-#include "LoadPuz.hpp"
-// Save Handlers
-#include "SavePuz.hpp"
-
 
 namespace puz {
+
+void HandleExceptions(Puzzle * puz)
+{
+    try
+    {
+        throw;
+    }
+    catch (std::ios::failure &)
+    {
+        throw FatalFileError("Unexpected end of file");
+    }
+    // Everything else falls through
+}
 
 // -----------------------------------------------------------------------
 // Load functions
 // -----------------------------------------------------------------------
 void
-Puzzle::Load(const std::string & filename, const FileHandlerDesc * desc)
+Puzzle::Load(const string_t & filename, const FileHandlerDesc * desc)
 {
     if (! desc)
         desc = FindLoadHandler(GetExtension(filename));
@@ -44,11 +49,13 @@ Puzzle::Load(const std::string & filename, const FileHandlerDesc * desc)
         throw MissingHandler();
 
     Clear();
-    desc->handler(this, filename, desc->data);
-
-#ifndef NDEBUG
-    TestOk();
-#endif NDEBUG
+    try {
+        desc->handler(this, filename.c_str(), desc->data);
+        TestOk();
+    }
+    catch (...) {
+        HandleExceptions(this);
+    }
 }
 
 
@@ -56,7 +63,7 @@ Puzzle::Load(const std::string & filename, const FileHandlerDesc * desc)
 // Save functions
 // -----------------------------------------------------------------------
 void
-Puzzle::Save(const std::string & filename, const FileHandlerDesc * desc)
+Puzzle::Save(const string_t & filename, const FileHandlerDesc * desc)
 {
     if (! desc)
         desc = FindSaveHandler(GetExtension(filename));
@@ -65,155 +72,183 @@ Puzzle::Save(const std::string & filename, const FileHandlerDesc * desc)
     if (! desc)
         throw MissingHandler();
 
-    // Make sure the grid has clue numbers assigned, etc.
-    m_grid.SetupGrid();
-
-#ifndef NDEBUG
     TestOk();
-#endif
 
     desc->handler(this, filename, desc->data);
 }
 
 
-
 // -----------------------------------------------------------------------
-// Clue functions
+// Grid numbering
 // -----------------------------------------------------------------------
-void
-Puzzle::GetClueList(std::vector<std::string> * clues)
+
+// Number the grid and clues
+void Puzzle::NumberClues()
 {
-    // Make sure the grid has clue numbers assigned, etc.
-    m_grid.SetupGrid();
-    DoGetClueList(clues);
-}
+    NumberGrid();
 
-void
-Puzzle::GetClueList(std::vector<std::string> * clues) const
-{
-    // Make sure the grid has clue numbers assigned, etc.
-    m_grid.SetupGrid();
-    DoGetClueList(clues);
-}
+    ClueList::iterator across = GetAcross().begin();
+    ClueList::iterator down   = GetDown().begin();
 
-
-void
-Puzzle::DoGetClueList(std::vector<std::string> * clues) const
-{
-    // Assemble the clues list from across and down
-    Puzzle::ClueList::const_iterator across_it = m_across.begin();
-    Puzzle::ClueList::const_iterator down_it   = m_down.begin();
-
-    clues->clear();
-    for (const Square * square = m_grid.First();
-         square != NULL;
-         square = square->Next())
-    {
-        if (square->HasClue(ACROSS))
-        {
-            clues->push_back(across_it->Text());
-            ++across_it;
-        }
-        if (square->HasClue(DOWN))
-        {
-            clues->push_back(down_it->Text());
-            ++down_it;
-        }
-    }
-    assert(across_it == m_across.end() && down_it == m_down.end());
-}
-
-
-void
-Puzzle::SetClueList(const std::vector<std::string> & clues)
-{
-    // Make sure the grid has clue numbers assigned, etc.
-    m_grid.SetupGrid();
-
-    // Write across and down clues from the clue list
-    m_across.clear();
-    m_down.clear();
-    std::vector<std::string>::const_iterator it = clues.begin();
+    ClueList::iterator across_end = GetAcross().end();
+    ClueList::iterator down_end   = GetDown().end();
 
     for (Square * square = m_grid.First();
          square != NULL;
          square = square->Next())
     {
+        if (! square->IsWhite())
+            continue;
+
         if (square->HasClue(ACROSS))
         {
-            if (it == clues.end())
+            if (across == across_end)
                 throw InvalidClues();
-            m_across.push_back(Clue(square->GetNumber(), *it++));
+            across->SetNumber(square->GetNumber());
+            ++across;
         }
+
         if (square->HasClue(DOWN))
         {
-            if (it == clues.end())
+            if (down == down_end)
                 throw InvalidClues();
-            m_down.push_back(Clue(square->GetNumber(), *it++));
+            down->SetNumber(square->GetNumber());
+            ++down;
         }
     }
-    if (it != clues.end())
+    if (across != across_end || down != down_end)
+        throw InvalidClues();
+
+}
+
+void Puzzle::SetAllClues(const std::vector<string_t> & clues)
+{
+    NumberGrid();
+
+    ClueList & across = GetAcross();
+    ClueList & down = GetDown();
+    across.clear();
+    down.clear();
+
+    std::vector<string_t>::const_iterator clue_it = clues.begin();
+    std::vector<string_t>::const_iterator clue_end = clues.end();
+
+    for (Square * square = m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (! square->IsWhite())
+            continue;
+
+        if (square->HasClue(ACROSS))
+        {
+            if (clue_it == clue_end)
+                throw InvalidClues();
+            across.push_back(Clue(square->GetNumber(), *clue_it));
+            ++clue_it;
+        }
+
+        if (square->HasClue(DOWN))
+        {
+            if (clue_it == clue_end)
+                throw InvalidClues();
+            down.push_back(Clue(square->GetNumber(), *clue_it));
+            ++clue_it;
+        }
+    }
+    if (clue_it != clue_end)
         throw InvalidClues();
 }
 
-
-void
-Puzzle::RenumberClues()
+void Puzzle::NumberGrid()
 {
-    // Make sure the grid has clue numbers assigned, etc.
-    m_grid.SetupGrid();
-
-    Puzzle::ClueList::iterator across_it = m_across.begin();
-    Puzzle::ClueList::iterator down_it   = m_down.begin();
-
-    for (Square * square = m_grid.First();
-         square != NULL;
-         square = square->Next())
-    {
-        if (square->HasClue(ACROSS))
-        {
-            across_it->m_num = square->GetNumber();
-            ++across_it;
-        }
-        if (square->HasClue(DOWN))
-        {
-            down_it->m_num = square->GetNumber();
-            ++down_it;
-        }
-    }
+    m_grid.NumberGrid();
 }
-
 
 //------------------------------------------------------------------------------
 // Error checking
 //------------------------------------------------------------------------------
-void
-Puzzle::TestOk() const
+
+// Helper for FindSquare() in TestClueList
+struct FIND_CLUE
 {
-    // Make sure all squares have a solution
-    for (const Square * square = m_grid.First();
+    FIND_CLUE(string_t num_, GridDirection dir_)
+        : num(num_), dir(dir_)
+    {
+        assert(! num.empty());
+    }
+    string_t num;
+    GridDirection dir;
+
+    bool operator()(const Square * square)
+    {
+        return square->GetNumber() == num &&
+               square->HasClue(dir);
+    }
+};
+
+void Puzzle::TestClueList(const string_t & direction)
+{
+    const ClueList & clues = GetClues(direction);
+    GridDirection dir;
+    bool has_dir = true;
+    if (&clues == &GetAcross())
+        dir = ACROSS;
+    else if (&clues == &GetDown())
+        dir = DOWN;
+    else
+        has_dir = false;
+
+    ClueList::const_iterator it;
+    for (it = clues.begin(); it != clues.end(); ++it)
+    {
+        if (it->GetNumber().empty())
+            throw InvalidClues("All clues must have a number");
+        if (! has_dir)
+            continue;
+        Square * square = m_grid.FindSquare(FIND_CLUE(it->GetNumber(), dir));
+        if (! square)
+            throw InvalidClues("All clues must have a square");
+    }
+}
+
+void
+Puzzle::TestOk()
+{
+    m_isOk = false;
+    // Make sure there is a grid
+    if (m_grid.GetWidth() == 0 || m_grid.GetHeight() == 0)
+        throw InvalidGrid();
+
+    // All squares do not need to have a solution
+
+    // Make sure that all clues can find a square.
+    TestClueList(puzT("Across"));
+    TestClueList(puzT("Down"));
+    Clues::cluemap_t::const_iterator it;
+    for (it = m_clues.m_otherClues.begin();
+         it != m_clues.m_otherClues.begin();
+         ++it)
+    {
+        TestClueList(it->first);
+    }
+
+    // Make sure that all numbered squares have a clue
+    for (Square * square = m_grid.First();
          square != NULL;
          square = square->Next())
     {
-        if (square->GetSolution().empty() || square->GetPlainSolution() == 0)
-            throw InvalidGrid("All squares must have a solution");
+        if (square->HasNumber())
+        {
+            if (square->HasClue(puz::ACROSS) &&
+                GetAcross().Find(square->GetNumber()) == GetAcross().end())
+                    throw InvalidGrid("All numbered squares must have a clue");
+            if (square->HasClue(puz::DOWN) &&
+                GetDown().Find(square->GetNumber()) == GetDown().end())
+                    throw InvalidGrid("All numbered squares must have a clue");
+        }
     }
-
-    // Make sure we have the correct number of clues
-    size_t expected_across, expected_down;
-    m_grid.CountClues(&expected_across, &expected_down);
-
-    size_t across_clues = m_across.size();
-    if (across_clues < expected_across)
-        throw puz::InvalidClues("Missing across clues");
-    if (across_clues > expected_across)
-        throw puz::InvalidClues("Extra across clues");
-
-    size_t down_clues = m_down.size();
-    if (down_clues < expected_down)
-        throw puz::InvalidClues("Missing down clues");
-    if (down_clues > expected_down)
-        throw puz::InvalidClues("Extra down clues");
+    m_isOk = true;
 }
 
 //------------------------------------------------------------------------------
@@ -221,14 +256,14 @@ Puzzle::TestOk() const
 //------------------------------------------------------------------------------
 
 bool
-Puzzle::CanLoad(const std::string & filename)
+Puzzle::CanLoad(const string_t & filename)
 {
     return FindLoadHandler(GetExtension(filename)) != NULL;
 }
 
 
 bool
-Puzzle::CanSave(const std::string & filename)
+Puzzle::CanSave(const string_t & filename)
 {
     return FindSaveHandler(GetExtension(filename)) != NULL;
 }
@@ -237,7 +272,7 @@ Puzzle::CanSave(const std::string & filename)
 
 // Helper for find functions
 const Puzzle::FileHandlerDesc *
-FindHandler(const Puzzle::FileHandlerDesc * start, const std::string & ext)
+FindHandler(const Puzzle::FileHandlerDesc * start, const string_t & ext)
 {
     for (const Puzzle::FileHandlerDesc * d = start; d->ext != NULL; ++d)
         if (ext == d->ext)
@@ -246,87 +281,39 @@ FindHandler(const Puzzle::FileHandlerDesc * start, const std::string & ext)
 }
 
 const Puzzle::FileHandlerDesc *
-Puzzle::FindLoadHandler(const std::string & ext)
+Puzzle::FindLoadHandler(const string_t & ext)
 {
     return FindHandler(sm_loadHandlers, ext);
 }
 
 
 const Puzzle::FileHandlerDesc *
-Puzzle::FindSaveHandler(const std::string & ext)
+Puzzle::FindSaveHandler(const string_t & ext)
 {
     return FindHandler(sm_saveHandlers, ext);
 }
 
 
 // -----------------------------------------------------------------------
-// C++ load and save handlers
+// Load and save handlers
 // -----------------------------------------------------------------------
 
-void HandleExceptions(Puzzle * puz)
-{
-    try
-    {
-        throw;
-    }
-    catch (DataError & e)
-    {
-        puz->SetError(e.what());
-    }
-    catch (std::ios::failure &)
-    {
-        throw FatalFileError("Unexpected end of file");
-    }
-    // Everything else falls through
-}
-
-
-void CppLoad(Puzzle * puz, const std::string & filename, void * function)
-{
-    std::ifstream stream(filename.c_str(), std::ios::in | std::ios::binary);
-    if (stream.fail())
-        throw FatalFileError(std::string("Unable to open file: ") + filename);
-    try
-    {
-        (*(puz::Puzzle::CppLoadHandler)(function))(puz, stream);
-    }
-    catch (...)
-    {
-        HandleExceptions(puz);
-    }
-    puz->SetOk(true);
-}
-
-
-void CppSave(Puzzle * puz, const std::string & filename, void * function)
-{
-    std::ofstream stream(filename.c_str(), std::ios::out | std::ios::binary);
-    if (stream.fail())
-    {
-        remove(filename.c_str());
-        throw FatalFileError(std::string("Unable to open file: ") + filename);
-    }
-    try
-    {
-        (*(puz::Puzzle::CppSaveHandler)(function))(puz, stream);
-    }
-    catch (...)
-    {
-        // An exception thrown while saving means that the resulting
-        // file is unusable, so just delete it here.
-        remove(filename.c_str());
-        HandleExceptions(puz);
-    }
-}
-
+// Load Handlers
+extern void LoadPuz(Puzzle * puz, const string_t & filename, void *);
+extern void LoadXPF(Puzzle * puz, const string_t & filename, void *);
 
 const Puzzle::FileHandlerDesc Puzzle::sm_loadHandlers[] = {
-    { CppLoad, "puz", "Across Lite", LoadPuz },
+    { LoadPuz, puzT("puz"), puzT("Across Lite"), NULL },
+    { LoadXPF, puzT("xml"), puzT("XPF"), NULL },
     { NULL, NULL, NULL }
 };
 
+
+// Save Handlers
+extern void SavePuz(Puzzle * puz, const string_t & filename, void *);
+
 const Puzzle::FileHandlerDesc Puzzle::sm_saveHandlers[] = {
-    { CppSave, "puz", "Across Lite", SavePuz },
+    { SavePuz, puzT("puz"), puzT("Across Lite"), NULL },
     { NULL, NULL, NULL }
 };
 

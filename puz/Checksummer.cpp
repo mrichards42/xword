@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,20 +17,76 @@
 
 #include "Checksummer.hpp"
 #include <iostream>
+#include <cassert>
+#include "puzstring.hpp"
 
 namespace puz {
 
+// Return clues in order
+static void GetClueList(const Puzzle & puz, std::vector<std::string> * clues)
+{
+    // Assemble the clues list from across and down
+    ClueList::const_iterator across_it = puz.GetAcross().begin();
+    ClueList::const_iterator down_it   = puz.GetDown().begin();
+
+    clues->clear();
+    for (const Square * square = puz.GetGrid().First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (square->HasClue(ACROSS))
+        {
+            clues->push_back(GetPuzText(across_it->GetText()));
+            ++across_it;
+        }
+        if (square->HasClue(DOWN))
+        {
+            clues->push_back(GetPuzText(down_it->GetText()));
+            ++down_it;
+        }
+    }
+    assert(across_it == puz.GetAcross().end() && down_it == puz.GetDown().end());
+}
+
 Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
-    : m_solution (puz.m_grid.GetGridSolution()),
-      m_gridText (puz.m_grid.GetGridText()),
-      m_title    (puz.m_title),
-      m_author   (puz.m_author),
-      m_copyright(puz.m_copyright),
-      m_notes    (puz.m_notes),
+    : m_title    (encode_puz(puz.GetTitle())),
+      m_author   (encode_puz(puz.GetAuthor())),
+      m_copyright(encode_puz(puz.GetCopyright())),
+      m_notes    (GetPuzText(puz.GetNotes())),
       m_version  (version)
 {
-    std::vector<std::string> clues;
-    puz.GetClueList(&clues);
+    // Solution and Text
+    m_solution.reserve(puz.m_grid.GetWidth() * puz.m_grid.GetHeight());
+    m_gridText.reserve(puz.m_grid.GetWidth() * puz.m_grid.GetHeight());
+    for (const Square * square = puz.m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (square->IsBlack())
+        {
+            if (puz.m_grid.IsDiagramless())
+            {
+                m_solution.push_back(':');
+                m_gridText.push_back(':');
+            }
+            else
+            {
+                m_solution.push_back('.');
+                m_gridText.push_back('.');
+            }
+        }
+        else
+        {
+            m_solution.push_back(square->GetPlainSolution());
+            char plain = square->GetPlainText();
+            m_gridText.push_back(square->IsBlank() || plain == 0
+                                    ? '-'
+                                    : plain);
+        }
+    }
+
+    cluelist_t clues;
+    GetClueList(puz, &clues);
     SetClues(clues);
 
     // Setup CIB manually
@@ -146,7 +202,7 @@ Checksummer::GetChecksums(unsigned short * cib,
                                  m_copyright.size() + 1,
                                  c_primary);
 
-    for (std::vector<std::string>::const_iterator it = m_clues.begin();
+    for (cluelist_t::const_iterator it = m_clues.begin();
          it != m_clues.end();
          ++it)
     {
@@ -177,7 +233,7 @@ Checksummer::GetChecksums(unsigned short * cib,
                               m_copyright.size() + 1,
                               c_part);
 
-    for (std::vector<std::string>::const_iterator it = m_clues.begin();
+    for (cluelist_t::const_iterator it = m_clues.begin();
          it != m_clues.end();
          ++it)
     {
