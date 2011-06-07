@@ -91,6 +91,9 @@ static void xword_setup_lua(wxLuaState & lua)
     lua_pushboolean(L, wxGetApp().IsPortable());
     lua_setfield(L, -2, "isportable");
 
+    lua_pushstring(L, wx2lua(XWORD_VERSION_STRING));
+    lua_setfield(L, -2, "version");
+
     lua_pop(L, 1);
 
     /*
