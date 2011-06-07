@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,41 +22,52 @@
 #include <vector>
 #include <map>
 #include "puzstring.hpp"
+#include "Word.hpp"
 #include <cassert>
 
 namespace puz {
 
-// A clue, with a number and text pointer.
+class ClueList;
+
+// A clue, with a number, text, enumeration, and pointer to a word.
 // The clue number is stored as a string, and can be any text.
 class PUZ_API Clue
 {
+    friend class ClueList;
 public:
-    explicit Clue(const string_t & _number = puzT(""),
-                  const string_t & _text = puzT(""))
+    explicit Clue(const string_t & num_ = puzT(""),
+                  const string_t & text_ = puzT(""),
+                  Word * word_ = NULL)
+        : word(word_)
     {
-        SetNumber(_number);
-        SetText(_text);
+        SetNumber(num_);
+        SetText(text_);
     }
 
-    explicit Clue(int _number,
-                  const string_t & _text = puzT(""))
+    explicit Clue(int num_,
+                  const string_t & text_ = puzT(""),
+                  Word * word_ = NULL)
+        : word(word_)
     {
-        SetNumber(_number);
-        SetText(_text);
+        SetNumber(num_);
+        SetText(text_);
     }
 
-    void SetText  (const string_t & _text);
-    void SetNumber(const string_t & _number);
-    void SetNumber(int _number);
+    // The clue owns the enumeration
+    ~Clue() {}
 
-    const string_t & GetText()   const { return text; }
+    void SetText  (const string_t & text_);
+    void SetNumber(const string_t & num_);
+    void SetNumber(int num_);
+    void SetWord(Word * word_) { word = word_; }
+
+    const string_t & GetText() const { return text; }
     const string_t & GetNumber() const { return number; }
+    Word * GetWord() { return word; }
+    const Word * GetWord() const { return word; }
 
     // -1 if this is an invalid number.
     int GetInt() const { return m_int; }
-
-    bool operator==(const Clue & other) const
-        { return other.number == number && other.text == text; }
 
     // This makes sorting a lot easier
     bool operator<(const Clue & other) const
@@ -67,6 +78,7 @@ public:
 
     string_t number;
     string_t text;
+    Word * word;
 
 protected:
     int m_int;
@@ -78,50 +90,58 @@ class PUZ_API ClueList : public std::vector<Clue>
 {
 public:
     // Basic constructor
-    ClueList() : std::vector<Clue>() {}
+    explicit ClueList(const string_t & title = puzT("")) : m_title(title) {}
+
+    const string_t & GetTitle() const { return m_title; }
+    void SetTitle(const string_t & title) { m_title = title; }
 
     // Find by clue number (string)
-    const_iterator Find(const string_t & number) const;
-    iterator Find(const string_t & number);
+    const Clue * Find(const string_t & number) const;
+    Clue * Find(const string_t & number);
 
     // Find by clue number (int)
-    const_iterator Find(int num) const;
-    iterator Find(int num);
+    const Clue * Find(int num) const;
+    Clue * Find(int num);
+
+    // Find by square
+    const Clue * Find(const puz::Square * square) const;
+    Clue * Find(const puz::Square * square);
+
+    // Find by word
+    const Clue * Find(const puz::Word * word) const;
+    Clue * Find(const puz::Word * word);
+
+protected:
+    string_t m_title;
 };
 
 
-class Puzzle; // friend
-
 // This class holds all of the clues
-class PUZ_API Clues
+class PUZ_API Clues : public std::map<string_t, ClueList>
 {
-    friend class Puzzle;
 public:
     Clues() {}
 
-    const ClueList & GetAcross() const { return m_across; }
-          ClueList & GetAcross()       { return m_across; }
-    const ClueList & GetDown()   const { return m_down; }
-          ClueList & GetDown()         { return m_down; }
+    const ClueList & GetAcross() const { return GetClueList(puzT("Across")); }
+          ClueList & GetAcross()       { return GetClueList(puzT("Across")); }
+    const ClueList & GetDown()   const { return GetClueList(puzT("Down")); }
+          ClueList & GetDown()         { return GetClueList(puzT("Down")); }
 
-    ClueList & GetClues(const string_t & direction);
-    const ClueList & GetClues(const string_t & direction) const;
-    bool HasClues(const string_t & direction) const;
+    ClueList & GetClueList(const string_t & direction);
+    const ClueList & GetClueList(const string_t & direction) const;
 
-    void clear()
+    bool HasClueList(const string_t & direction) const;
+
+    ClueList & operator[](const string_t & direction);
+
+    ClueList & SetClueList(const string_t & direction, const ClueList & cluelist)
     {
-        m_across.clear();
-        m_down.clear();
-        m_otherClues.clear();
+        operator[](direction) = cluelist;
+        ClueList & ret = operator[](direction);
+        if (ret.GetTitle().empty())
+            ret.SetTitle(direction);
+        return ret;
     }
-
-protected:
-    ClueList m_across;
-    ClueList m_down;
-
-    // This holds nonstandard clues, e.g. "Diagonal"
-    typedef std::map<string_t, ClueList> cluemap_t;
-    cluemap_t m_otherClues;
 };
 
 } // namespace puz

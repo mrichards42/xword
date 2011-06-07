@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,24 +15,28 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef PUZ_UTIL_H
-#define PUZ_UTIL_H
+#ifndef PUZ_FORMAT_IPUZ_H
+#define PUZ_FORMAT_IPUZ_H
 
-// Miscellaneous utility functions
-
-#include "puzstring.hpp"
-#include <vector>
+#include "Puzzle.hpp"
+#include <string>
+#include "parse/json.hpp"
 
 namespace puz {
+    namespace json {
+    class Value;
+}
 
-class Puzzle;
+class ipuzData : public Puzzle::FormatData
+{
+public:
+    ipuzData(json::Value * root = NULL) : root(root) {}
+    ~ipuzData() { delete root; }
+    json::Value * root;
+};
 
-// String functions
-string_t GetExtension(const string_t & filename);
-
-string_t ToString(int number);
-int ToInt(const string_t & str);
+void LoadIpuz(Puzzle * puz, const std::string & filename, void * /* dummy */);
 
 } // namespace puz
 
-#endif // PUZ_UTIL_H
+#endif // PUZ_FORMAT_IPUZ_H

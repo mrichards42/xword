@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,8 +21,11 @@
 
 #include "Grid.hpp"
 #include "Clue.hpp"
+#include "Word.hpp"
 #include "puzstring.hpp"
 #include <vector>
+#include <cassert>
+#include <memory>
 
 namespace puz {
 
@@ -35,24 +38,27 @@ public:
         : m_time(0),
           m_isTimerRunning(false),
           m_version(13),
-          m_isOk(false)
+          m_isOk(false),
+          m_formatData(NULL)
     {}
 
-    explicit Puzzle(const string_t & filename,
+    explicit Puzzle(const std::string & filename,
                     const FileHandlerDesc * desc = NULL)
         : m_time(0),
           m_isTimerRunning(false),
           m_version(13),
-          m_isOk(false)
+          m_isOk(false),
+          m_formatData(NULL)
     {
         Load(filename, desc);
     }
 
     ~Puzzle() {}
 
-    void Load(const string_t & filename,
+    void Load(const std::string & filename,
               const FileHandlerDesc * handler = NULL);
-    void Save(const string_t & filename,
+
+    void Save(const std::string & filename,
               const FileHandlerDesc * handler = NULL);
 
     void Clear();
@@ -82,28 +88,51 @@ public:
     void SetCopyright(const string_t & copyright) { m_copyright = copyright; }
 
     const string_t & GetNotes() const { return m_notes; }
-    void SetNotes(const string_t & notes) { SetFormatted(m_notes, notes); }
+    void SetNotes(const string_t & notes) { m_notes = notes; }
 
-    // errors are 8-bit strings
-    const std::string & GetError() const { return m_lastError; }
-    void SetError(const std::string & err) { m_lastError = err; }
-    void ClearError() { m_lastError.clear(); }
-    bool HasError() const { return ! m_lastError.empty(); }
+    // Words
+    const Word * FindWord(const puz::Square * square) const;
+          Word * FindWord(const puz::Square * square);
+    const Word * FindWord(const puz::Square * square, short direction) const;
+          Word * FindWord(const puz::Square * square, short direction);
+
+    Word MakeWord(int x1, int y1, int x2, int y2);
+    Word MakeWord(const Square * start, const Square * end)
+    {
+        return MakeWord(start->GetCol(), start->GetRow(),
+                        end->GetCol(), end->GetRow());
+    }
+    Word * AddWord(int x1, int y1, int x2, int y2)
+        { return AddWord(MakeWord(x1, y1, x2, y2)); }
+    Word * AddWord(const Square * start, const Square * end)
+        { return AddWord(MakeWord(start, end)); }
+    Word * AddWord(const Word & word)
+        { m_words.push_back(word); return &m_words.back(); }
+
+    const WordList & GetWords() const { return m_words; }
+          WordList & GetWords() { return m_words; }
 
     // Clues
     //------
-    const ClueList & GetAcross() const { return m_clues.GetAcross(); }
-          ClueList & GetAcross()       { return m_clues.GetAcross(); }
-    void SetAcross(const ClueList & across) { m_clues.GetAcross() = across; }
+    // Set Square::HasClue(dir) for each numbered clue in the given direction.
+    const Clues & GetClues() const { return m_clues; }
+          Clues & GetClues()       { return m_clues; }
 
-    const ClueList & GetDown() const { return m_clues.GetDown(); }
-          ClueList & GetDown()       { return m_clues.GetDown(); }
-    void SetDown(const ClueList & down) { m_clues.GetDown() = down; }
+    const Clue * FindClue(const puz::Square * square) const;
+          Clue * FindClue(const puz::Square * square);
+    const Clue * FindClue(const puz::Word * word) const;
+          Clue * FindClue(const puz::Word * word);
 
-    const ClueList & GetClues(const string_t & direction) const
-        { return m_clues.GetClues(direction); }
-    ClueList & GetClues(const string_t & direction)
-          { return m_clues.GetClues(direction); }
+    bool HasClueList(const string_t & direction) const
+        { return m_clues.HasClueList(direction); }
+
+    const ClueList & GetClueList(const string_t & direction) const
+        { return m_clues.GetClueList(direction); }
+    ClueList & GetClueList(const string_t & direction)
+          { return m_clues.GetClueList(direction); }
+
+    ClueList & SetClueList(const string_t & direction, const ClueList & clues)
+          { return m_clues.SetClueList(direction, clues); }
 
     // Grid
     // ----
@@ -111,14 +140,20 @@ public:
           Grid & GetGrid()       { return m_grid; }
     void SetGrid(const Grid & grid) { m_grid = grid; }
 
-    // Grid / clue numbering algorithm
-    //--------------------------------
-    // Assumes that Across and Down are in order but not numbered.
-    void NumberClues();
-    // Assumes that there are no preexisting clues and writes the clues
-    // in "Across Lite" order given a vector of clues.
-    void SetAllClues(const std::vector<string_t> & clues);
+    // Grid / clue / word numbering algorithms
+    //----------------------------------------
     void NumberGrid();
+    // NumberClues assumes that Across and Down are in order but not numbered.
+    void NumberClues();
+    // GenerateWords requires that all clues are "Across", "Down", or "Diagonal",
+    // and all clue numbers have a matching square number
+    void GenerateWords();
+    // Writes the clues in "Across Lite" order given a vector of clues.
+    void SetAllClues(const std::vector<string_t> & clues);
+    // Was this puzzle set up with NumberGrid and NumberClues?
+    // Clues may only be "Across" and "Down", words must start and end
+    // where they are expected to, and there must be no unclued words.
+    bool UsesNumberAlgorithm() const;
 
     // -------------------------------------------------------------------
     // Members
@@ -132,17 +167,14 @@ public:
     string_t m_notes;
 
     Clues m_clues;
-
     Grid m_grid;
+    WordList m_words;
 
-    // Extra unknown sections for persistence between load and save
-    struct PUZ_API section;
-    std::vector<section> m_extraSections;
 
     // -------------------------------------------------------------------
     // Load / Save
     // -------------------------------------------------------------------
-    typedef void (*FileHandler)(Puzzle *, const string_t &, void *);
+    typedef void (*FileHandler)(Puzzle *, const std::string &, void *);
 
     // The load and save functions are passed a void pointer with whatever
     // data the handler needs. This is kind of hackish and mostly just
@@ -150,7 +182,7 @@ public:
     struct PUZ_API FileHandlerDesc
     {
         FileHandler handler;
-        const char_t * ext;
+        const char * ext;
         const char_t * desc;
         void * data;
     };
@@ -158,32 +190,39 @@ public:
     static const FileHandlerDesc sm_loadHandlers[];
     static const FileHandlerDesc sm_saveHandlers[];
 
-    static bool CanLoad(const string_t & filename);
-    static bool CanSave(const string_t & filename);
+    static bool CanLoad(const std::string & filename);
+    static bool CanSave(const std::string & filename);
 
-    static const FileHandlerDesc * FindLoadHandler(const string_t & ext);
-    static const FileHandlerDesc * FindSaveHandler(const string_t & ext);
+    static const FileHandlerDesc * FindLoadHandler(const std::string & ext);
+    static const FileHandlerDesc * FindSaveHandler(const std::string & ext);
+
+    // Load/save data
+    // This class should be derived from to implement a puzzle format-specific
+    // userdata that can be used to save unknown sections.
+    class FormatData
+    {
+    public:
+        FormatData() {}
+        virtual ~FormatData() {}
+    };
+
+    void SetFormatData(FormatData * data)
+    {
+        assert(! m_formatData.get());
+        m_formatData.reset(data);
+    }
+
+    FormatData * GetFormatData() { return m_formatData.get(); }
+
 
 protected:
     bool m_isOk;
     short m_version;
+    std::auto_ptr<FormatData> m_formatData;
 
 private:
-    std::string m_lastError;
-
     void TestClueList(const string_t & direction);
-};
-
-
-
-// Sections use 8-bit strings
-struct PUZ_API Puzzle::section
-{
-    section(const std::string & a_name, const std::string & a_data)
-        : name(a_name), data(a_data)
-    {}
-    std::string name;
-    std::string data;
+    void DoLoad(const std::string & filename, const FileHandlerDesc * desc);
 };
 
 
@@ -194,13 +233,13 @@ Puzzle::Clear()
     m_isOk = false;
     m_grid.Clear();
     m_clues.clear();
+    m_words.clear();
     m_title.clear();
     m_author.clear();
     m_copyright.clear();
     m_notes.clear();
     m_time = 0;
     m_isTimerRunning = false;
-    m_extraSections.clear();
 }
 
 } // namespace puz

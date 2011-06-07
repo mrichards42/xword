@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -54,8 +54,13 @@ PUZ_EXCEPTION(NoSymbol, Exception, "Square does not have a symbol");
 PUZ_EXCEPTION(InvalidEncoding, InvalidString, "Invalid encoding");
 
 // Grid exceptions
+PUZ_EXCEPTION(InvalidDirection, Exception, "Direction expected to be Across or Down");
 PUZ_EXCEPTION(InvalidGrid, Exception, "Grid must be larger than 0 x 0");
+PUZ_EXCEPTION(InvalidGridCell, Exception, "Unknown error parsing grid cell.");
 PUZ_EXCEPTION(NoWord, Exception, "Start and end squares are not aligned");
+
+// Word exceptions
+PUZ_EXCEPTION(InvalidWord, Exception, "Words must be vertical, horizontal, or diagonal");
 
 // Clue exceptions
 PUZ_EXCEPTION(InvalidClues, Exception, "Clues do not match the grid");

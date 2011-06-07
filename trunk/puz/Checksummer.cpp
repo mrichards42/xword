@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,26 +26,27 @@ namespace puz {
 static void GetClueList(const Puzzle & puz, std::vector<std::string> * clues)
 {
     // Assemble the clues list from across and down
-    ClueList::const_iterator across_it = puz.GetAcross().begin();
-    ClueList::const_iterator down_it   = puz.GetDown().begin();
+    ClueList::const_iterator across_it = puz.GetClueList(puzT("Across")).begin();
+    ClueList::const_iterator down_it   = puz.GetClueList(puzT("Down")).begin();
 
     clues->clear();
     for (const Square * square = puz.GetGrid().First();
          square != NULL;
          square = square->Next())
     {
-        if (square->HasClue(ACROSS))
+        if (square->SolutionWantsClue(ACROSS))
         {
             clues->push_back(GetPuzText(across_it->GetText()));
             ++across_it;
         }
-        if (square->HasClue(DOWN))
+        if (square->SolutionWantsClue(DOWN))
         {
             clues->push_back(GetPuzText(down_it->GetText()));
             ++down_it;
         }
     }
-    assert(across_it == puz.GetAcross().end() && down_it == puz.GetDown().end());
+    assert(across_it == puz.GetClueList(puzT("Across")).end() &&
+           down_it == puz.GetClueList(puzT("Down")).end());
 }
 
 Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
@@ -62,22 +63,22 @@ Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
          square != NULL;
          square = square->Next())
     {
+        if (square->IsSolutionBlack())
+        {
+            if (puz.GetGrid().IsDiagramless())
+                m_solution.push_back(':');
+            else
+                m_solution.push_back('.');
+        }
+        else
+            m_solution.push_back(square->GetPlainSolution());
+
         if (square->IsBlack())
         {
-            if (puz.m_grid.IsDiagramless())
-            {
-                m_solution.push_back(':');
-                m_gridText.push_back(':');
-            }
-            else
-            {
-                m_solution.push_back('.');
-                m_gridText.push_back('.');
-            }
+            m_gridText.push_back('.');
         }
         else
         {
-            m_solution.push_back(square->GetPlainSolution());
             char plain = square->GetPlainText();
             m_gridText.push_back(square->IsBlank() || plain == 0
                                     ? '-'

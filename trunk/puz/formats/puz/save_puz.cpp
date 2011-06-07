@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,11 +15,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "puz.hpp"
+
 #include "Puzzle.hpp"
 #include "puzstring.hpp"
 #include "Checksummer.hpp"
-#include "StreamWrapper.hpp"
-#include "util.hpp"
+#include "utils/streamwrapper.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -32,7 +33,7 @@ static const char * SAVE_VERSION_STRING = "1.3\0";
 
 static void SaveSections(Puzzle * puz, ostream_wrapper & f);
 
-void SavePuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
+void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 {
     // Make sure we can actually save this puzzle
     // Conditions:
@@ -43,18 +44,15 @@ void SavePuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
     //        * No colored squares
     //        * No missing squares
 
+    if (! puz->UsesNumberAlgorithm())
+        throw ConversionError("This puzzle uses features not supported in a .puz file.");
+
     for (const Square * square = puz->m_grid.First();
          square != NULL;
          square = square->Next())
     {
         if (square->IsSolutionBlank() ||
-            square->GetFlag() & ~ ACROSS_LITE_MASK ||
-            (square->GetWordStart(ACROSS) == square &&
-                square->GetWordEnd(ACROSS) != square &&
-                ! square->HasClue(ACROSS)) ||
-            (square->GetWordStart(DOWN) == square &&
-                square->GetWordEnd(DOWN) != square &&
-                ! square->HasClue(DOWN)))
+            square->GetFlag() & ~ ACROSS_LITE_MASK)
         {
             throw ConversionError();
         }
@@ -73,7 +71,7 @@ void SavePuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
 
     std::ofstream stream(filename.c_str(), std::ios::out | std::ios::binary);
     if (stream.fail())
-        throw FatalFileError(std::string("Unable to open file: ") + encode_utf8(filename));
+        throw FatalFileError(std::string("Unable to open file: ") + filename);
     ostream_wrapper f(stream);
 
     // Header
@@ -128,14 +126,17 @@ void SaveSections(Puzzle * puz, ostream_wrapper & f)
     WriteSolutionRebus(puz, f);
 
     // Write the unknown sections
-    std::vector<Puzzle::section>::iterator it;
-    for (it  = puz->m_extraSections.begin();
-         it != puz->m_extraSections.end();
-         ++it)
+    PuzData * data = dynamic_cast<PuzData *>(puz->GetFormatData());
+    if (data)
     {
-        WriteSection(f, it->name, it->data);
+        std::vector< std::pair<std::string, std::string> >::iterator it;
+        for (it  = data->extraSections.begin();
+             it != data->extraSections.end();
+             ++it)
+        {
+            WriteSection(f, it->first, it->second);
+        }
     }
-
 }
 
 
