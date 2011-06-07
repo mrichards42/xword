@@ -73,13 +73,13 @@ MyPrintout::ReadConfig()
 {
     ConfigManager & config = wxGetApp().GetConfigManager();
 
-    /*
     // Fonts config
-    if (config.ReadBool(_T("/Printing/Fonts/useCustomFonts")))
+
+    if (config.Printing.Fonts.useCustomFonts())
     {
-        m_drawer.SetNumberFont(config.ReadFont(_T("/Printing/Fonts/gridNumberFont")));
-        m_drawer.SetLetterFont(config.ReadFont(_T("/Printing/Fonts/gridLetterFont")));
-        m_clueFont = config.ReadFont(_T("/Printing/Fonts/clueFont"));
+        m_drawer.SetNumberFont(config.Printing.Fonts.gridNumberFont());
+        m_drawer.SetLetterFont(config.Printing.Fonts.gridLetterFont());
+        m_clueFont = config.Printing.Fonts.clueFont();
     }
     else
     {
@@ -87,18 +87,16 @@ MyPrintout::ReadConfig()
         m_drawer.SetLetterFont(m_frame->m_XGridCtrl->GetLetterFont());
         m_clueFont = m_frame->m_clues.begin()->second->GetFont();
     }
-    m_drawer.SetNumberScale(config.ReadLong(_T("/Grid/numberScale")) / 100.);
-    m_drawer.SetLetterScale(config.ReadLong(_T("/Grid/letterScale")) / 100.);
+    m_drawer.SetNumberScale(config.Grid.numberScale() / 100.);
+    m_drawer.SetLetterScale(config.Grid.letterScale() / 100.);
 
     SetupFonts();
 
     // Grid config
-    config.SetPath(_T("/Printing"));
-    m_gridAlign  = config.ReadLong(_T("gridAlignment"));
+    m_gridAlign  = config.Printing.gridAlignment();
 
-    const long brightness = config.ReadLong(_T("blackSquareBrightness"));
+    const long brightness = config.Printing.blackSquareBrightness();
     m_drawer.SetBlackSquareColor(wxColour(brightness, brightness, brightness));
-    */
 }
 
 
