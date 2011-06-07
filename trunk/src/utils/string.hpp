@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,21 +19,40 @@
 #define UTILS_STRING_H
 
 #include <wx/string.h>
-#include <string>
+#include <wx/strconv.h>
+#include "puz/puzstring.hpp"
 
-// wxString and std::string conversions
-
-static std::string wx2puz(const wxString & str)
+inline std::string wx2file(const wxString & str)
 {
-    // Convert using windows encoding.
-    return std::string(str.mb_str(wxCSConv(wxFONTENCODING_CP1252)));
+    return std::string(str.mb_str(*wxConvFileName));
 }
 
-static wxString puz2wx(const std::string & str)
+// wxString and puz::string_t conversions
+
+#if PUZ_UNICODE
+
+inline puz::string_t wx2puz(const wxString & str)
 {
-    // Convert using windows encoding.
-    return wxString(str.c_str(), wxCSConv(wxFONTENCODING_CP1252));
+    return str.c_str();
 }
 
+inline wxString puz2wx(const puz::string_t & str)
+{
+    return str.c_str();
+}
+
+#else
+
+inline puz::string_t wx2puz(const wxString & str)
+{
+    return puz::string_t(str.mb_str(wxConvUTF8));
+}
+
+inline wxString puz2wx(const puz::string_t & str)
+{
+    return wxString(str.c_str(), wxConvUTF8);
+}
+
+#endif // PUZ_UNICODE
 
 #endif // UTILS_STRING_H

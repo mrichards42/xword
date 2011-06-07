@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -117,8 +117,10 @@ const wxArrayString & GetLuaPathList()
         wxString scripts = GetScriptsDir();
         pathList.push_back(scripts + sep() + _T("?.lua"));
         pathList.push_back(scripts + sep() + _T("?") + sep() + _T("init.lua"));
+        pathList.push_back(scripts + sep() + _T("?") + sep() + _T("?.lua"));
         pathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?.lua"));
         pathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?") + sep() + _T("init.lua"));
+        pathList.push_back(scripts + sep() + _T("libs") + sep() + _T("?") + sep() + _T("?.lua"));
     }
     return pathList;
 }
@@ -217,6 +219,13 @@ bool FindLuaScript(const wxString & name, wxString * result)
     }
     *result = error;
     return false;
+}
+
+wxString GetLuaLogFilename()
+{
+    return GetUserDataDir() +
+           wxFileName::GetPathSeparator() +
+           _T("lualog.txt");
 }
 
 #endif // XWORD_USE_LUA

@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -81,7 +81,7 @@ protected:
 
     void DrawText();
     void LayoutColumns();
-    void DrawClue(const puz::Puzzle::Clue & clue, int * x, int * y);
+    void DrawClue(const puz::Clue & clue, int * x, int * y);
     void DrawTextLine(const wxString & text,
                       int * x, int * y,
                       int * width=NULL, int * height=NULL);
