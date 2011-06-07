@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,367 +24,24 @@
 #include "../widgets/SizedText.hpp"
 #include "../App.hpp" // For the ConfigManager
 
-PreferencesDialog::PreferencesDialog(MyFrame * frame)
-    : wxFB_PreferencesDialog(frame, wxID_ANY),
-      m_frame(frame)
+PreferencesDialog::PreferencesDialog(wxWindow * parent)
+    : wxFB_PreferencesDialog(parent, wxID_ANY)
 {}
 
-
 //------------------------------------------------------------------------------
-// Grid Style
-//------------------------------------------------------------------------------
-
-// Helpers
-void
-PreferencesDialog::AddRemoveGridFlag(wxCommandEvent & evt, int flag)
-{
-    int style = m_frame->m_XGridCtrl->GetGridStyle();
-    if (evt.IsChecked())
-        style = AddFlag(style, flag);
-    else
-        style = RemoveFlag(style, flag);
-    m_frame->m_XGridCtrl->SetGridStyle(style);
-    evt.Skip();
-}
-
-
-void
-PreferencesDialog::OnAfterLetter(wxCommandEvent & evt)
-{
-    const int selection = evt.GetInt();
-    int style = m_frame->m_XGridCtrl->GetGridStyle();
-    if (selection == 0)
-        style = RemoveFlag(style, MOVE_AFTER_LETTER | MOVE_TO_NEXT_BLANK);
-    else if (selection == 1)
-        style = AddFlag( RemoveFlag(style, MOVE_TO_NEXT_BLANK), MOVE_AFTER_LETTER);
-    else
-    {
-        wxASSERT(selection == 2);
-        style = AddFlag(style, MOVE_AFTER_LETTER | MOVE_TO_NEXT_BLANK);
-    }
-    m_frame->m_XGridCtrl->SetGridStyle(style);
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnBlankOnDirection(wxCommandEvent & evt)
-{
-    AddRemoveGridFlag(evt, BLANK_ON_DIRECTION);
-}
-
-void
-PreferencesDialog::OnBlankOnNewWord(wxCommandEvent & evt)
-{
-    AddRemoveGridFlag(evt, BLANK_ON_NEW_WORD);
-}
-
-void
-PreferencesDialog::OnPauseOnSwitch(wxCommandEvent & evt)
-{
-    AddRemoveGridFlag(evt, PAUSE_ON_SWITCH);
-}
-
-void
-PreferencesDialog::OnMoveOnRightClick(wxCommandEvent & evt)
-{
-    AddRemoveGridFlag(evt, MOVE_ON_RIGHT_CLICK);
-}
-
-void
-PreferencesDialog::OnCheckWhileTyping(wxCommandEvent & evt)
-{
-    AddRemoveGridFlag(evt, CHECK_WHILE_TYPING);
-}
-
-void PreferencesDialog::OnStrictRebus(wxCommandEvent & evt)
-{
-    AddRemoveGridFlag(evt, STRICT_REBUS);
-}
-
-
-//------------------------------------------------------------------------------
-// Colors
-//------------------------------------------------------------------------------
-
-// Grid
-//-----
-void
-PreferencesDialog::OnPenColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetPenColor(evt.GetColour());
-    evt.Skip();
-}
-
-/*
-void
-PreferencesDialog::OnPencilColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetPencilColor(evt.GetColour());
-    evt.Skip();
-}
-*/
-
-void
-PreferencesDialog::OnSelectedLetterColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetFocusedLetterColor(evt.GetColour());
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnSelectedWordColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetFocusedWordColor(evt.GetColour());
-    evt.Skip();
-}
-
-
-
-void
-PreferencesDialog::OnGridBackgroundColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetBackgroundColour(evt.GetColour());
-    m_frame->m_XGridCtrl->Refresh();
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnWhiteSquareColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetWhiteSquareColor(evt.GetColour());
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnBlackSquareColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetBlackSquareColor(evt.GetColour());
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnGridSelectionColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetSelectionColor(evt.GetColour());
-    evt.Skip();
-}
-
-
-
-// Clue Prompt
-//------------
-void
-PreferencesDialog::OnPromptBackgroundColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_cluePrompt->SetBackgroundColour(evt.GetColour());
-    m_frame->m_cluePrompt->Refresh();
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnPromptTextColor(wxColourPickerEvent & evt)
-{
-    m_frame->m_cluePrompt->SetForegroundColour(evt.GetColour());
-    m_frame->m_cluePrompt->Refresh();
-    evt.Skip();
-}
-
-
-// Clues List
-//-----------
-#define SetClueListColor(func)                  \
-    m_frame->m_across->func(evt.GetColour());   \
-    m_frame->m_down  ->func(evt.GetColour());   \
-    evt.Skip() // Force a semicolor
-
-void
-PreferencesDialog::OnClueBackgroundColor(wxColourPickerEvent & evt)
-{
-    SetClueListColor(SetBackgroundColour);
-}
-
-void
-PreferencesDialog::OnClueTextColor(wxColourPickerEvent & evt)
-{
-    SetClueListColor(SetForegroundColour);
-}
-
-void
-PreferencesDialog::OnSelectedClueBackgroundColor(wxColourPickerEvent & evt)
-{
-    SetClueListColor(SetSelectionBackground);
-}
-
-void
-PreferencesDialog::OnSelectedClueTextColor(wxColourPickerEvent & evt)
-{
-    SetClueListColor(SetSelectionForeground);
-}
-
-void
-PreferencesDialog::OnCrossingClueBackgroundColor(wxColourPickerEvent & evt)
-{
-    SetClueListColor(SetCrossingBackground);
-}
-
-void
-PreferencesDialog::OnCrossingClueTextColor(wxColourPickerEvent & evt)
-{
-    SetClueListColor(SetCrossingForeground);
-}
-
-void
-PreferencesDialog::OnClueHeadingTextColor(wxColourPickerEvent & evt)
-{
-    SetClueListColor(SetHeadingForeground);
-}
-
-void
-PreferencesDialog::OnClueHeadingBackgroundColor(wxColourPickerEvent & evt)
-{
-    SetClueListColor(SetHeadingBackground);
-}
-
-#undef SetClueListColor
-
-
-//------------------------------------------------------------------------------
-// Fonts
-//------------------------------------------------------------------------------
-
-void
-PreferencesDialog::OnGridLetterFont(wxFontPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetLetterFont(evt.GetFont());
-    m_frame->m_XGridCtrl->Refresh();
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnGridNumberFont(wxFontPickerEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetNumberFont(evt.GetFont());
-    m_frame->m_XGridCtrl->Refresh();
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnCluePromptFont(wxFontPickerEvent & evt)
-{
-    m_frame->m_cluePrompt->SetFont(evt.GetFont());
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnClueFont(wxFontPickerEvent & evt)
-{
-    m_frame->m_across->SetFont(evt.GetFont());
-    m_frame->m_down->SetFont(evt.GetFont());
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnClueHeadingFont(wxFontPickerEvent & evt)
-{
-    m_frame->m_across->SetHeadingFont(evt.GetFont());
-    m_frame->m_down->SetHeadingFont(evt.GetFont());
-    evt.Skip();
-}
-
-
-//------------------------------------------------------------------------------
-// Misc
-//------------------------------------------------------------------------------
-
-void
-PreferencesDialog::OnCluePromptFormat(wxCommandEvent & evt)
-{
-    m_frame->m_cluePrompt->SetDisplayFormat(m_cluePromptFormat->GetValue());
-
-    // Refresh the text
-    if (m_frame->m_XGridCtrl->GetDirection() == puz::ACROSS)
-    {
-        m_frame->m_cluePrompt->SetClue(
-            m_frame->m_across->GetClueNumber(),
-            puz::ACROSS,
-            m_frame->m_across->GetClueText()
-        );
-    }
-    else
-    {
-        m_frame->m_cluePrompt->SetClue(
-            m_frame->m_down->GetClueNumber(),
-            puz::DOWN,
-            m_frame->m_down->GetClueText()
-        );
-    }
-
-    evt.Skip();
-}
-
-
-void
-PreferencesDialog::OnLetterScale(wxSpinEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetLetterScale(evt.GetPosition() / 100.);
-    m_frame->m_XGridCtrl->Refresh();
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnNumberScale(wxSpinEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetNumberScale(evt.GetPosition() / 100.);
-    m_frame->m_XGridCtrl->Refresh();
-    evt.Skip();
-}
-
-void PreferencesDialog::OnLineThickness(wxSpinEvent & evt)
-{
-    m_frame->m_XGridCtrl->SetBorderSize(evt.GetPosition());
-    m_frame->m_XGridCtrl->Refresh();
-    evt.Skip();
-}
-
-
-//------------------------------------------------------------------------------
-// Printing
-//------------------------------------------------------------------------------
-
-void
-PreferencesDialog::OnPrintBlackSquareBrightness(wxScrollEvent & evt)
-{
-    const int brightness = m_printBlackSquareBrightness->GetValue();
-    m_printBlackSquarePreview->SetBackgroundColour(
-        wxColour(brightness, brightness, brightness)
-    );
-    m_printBlackSquarePreview->Refresh();
-    evt.Skip();
-}
-
-void
-PreferencesDialog::OnPrintCustomFonts(wxCommandEvent & evt)
-{
-    m_printGridLetterFont->Enable(evt.IsChecked());
-    m_printGridNumberFont->Enable(evt.IsChecked());
-    m_printClueFont->Enable(evt.IsChecked());
-    evt.Skip();
-}
-
-
-//------------------------------------------------------------------------------
-// Load / save config
+// Load config
 //------------------------------------------------------------------------------
 
 void
 PreferencesDialog::LoadConfig()
 {
     // Grid Style
-    const int gridStyle = m_frame->m_XGridCtrl->GetGridStyle();
+    ConfigManager & config = wxGetApp().GetConfigManager();
+    const int gridStyle = config.Grid.style();
 
-    if (HasFlag(gridStyle, MOVE_AFTER_LETTER))
+    if (gridStyle & MOVE_AFTER_LETTER)
     {
-        if (HasFlag(gridStyle, MOVE_TO_NEXT_BLANK))
+        if (gridStyle & MOVE_TO_NEXT_BLANK)
             m_afterLetter->SetSelection(2);
         else
             m_afterLetter->SetSelection(1);
@@ -392,60 +49,57 @@ PreferencesDialog::LoadConfig()
     else
         m_afterLetter->SetSelection(0);
 
-    m_blankOnDirection->SetValue(HasFlag(gridStyle, BLANK_ON_DIRECTION));
-    m_blankOnNewWord  ->SetValue(HasFlag(gridStyle, BLANK_ON_NEW_WORD));
-    m_pauseOnSwitch   ->SetSelection(HasFlag(gridStyle, PAUSE_ON_SWITCH));
-    m_moveOnRightClick->SetValue(HasFlag(gridStyle, MOVE_ON_RIGHT_CLICK));
-    m_checkWhileTyping->SetValue(HasFlag(gridStyle, CHECK_WHILE_TYPING));
-    m_strictRebus->SetValue(HasFlag(gridStyle, STRICT_REBUS));
-
+    m_blankOnDirection->SetValue((gridStyle & BLANK_ON_DIRECTION) != 0);
+    m_blankOnNewWord  ->SetValue((gridStyle & BLANK_ON_NEW_WORD) != 0);
+    m_pauseOnSwitch   ->SetSelection((gridStyle & PAUSE_ON_SWITCH) != 0);
+    m_moveOnRightClick->SetValue((gridStyle & MOVE_ON_RIGHT_CLICK) != 0);
+    m_checkWhileTyping->SetValue((gridStyle & CHECK_WHILE_TYPING) != 0);
+    m_strictRebus->SetValue((gridStyle & STRICT_REBUS) != 0);
 
     // Colors
-    m_selectedLetterColor->SetColour(m_frame->m_XGridCtrl->GetFocusedLetterColor());
-    m_selectedWordColor  ->SetColour(m_frame->m_XGridCtrl->GetFocusedWordColor());
-    m_penColor           ->SetColour(m_frame->m_XGridCtrl->GetPenColor());
-    //m_pencilColor        ->SetColour(m_frame->m_XGridCtrl->GetPencilColor());
-    m_gridBackgroundColor->SetColour(m_frame->m_XGridCtrl->GetBackgroundColour());
-    m_whiteSquareColor   ->SetColour(m_frame->m_XGridCtrl->GetWhiteSquareColor());
-    m_blackSquareColor   ->SetColour(m_frame->m_XGridCtrl->GetBlackSquareColor());
-    m_gridSelectionColor ->SetColour(m_frame->m_XGridCtrl->GetSelectionColor());
+    m_selectedLetterColor->SetColour(config.Grid.focusedLetterColor());
+    m_selectedWordColor  ->SetColour(config.Grid.focusedWordColor());
+    m_penColor           ->SetColour(config.Grid.penColor());
+    //m_pencilColor        ->SetColour(config.Grid.pcencilColor());
+    m_gridBackgroundColor->SetColour(config.Grid.backgroundColor());
+    m_whiteSquareColor   ->SetColour(config.Grid.whiteSquareColor());
+    m_blackSquareColor   ->SetColour(config.Grid.blackSquareColor());
+    m_gridSelectionColor ->SetColour(config.Grid.selectionColor());
 
-    m_cluePromptBackground->SetColour(m_frame->m_cluePrompt->GetBackgroundColour());
-    m_cluePromptText      ->SetColour(m_frame->m_cluePrompt->GetForegroundColour());
+    m_cluePromptBackground->SetColour(config.CluePrompt.backgroundColor());
+    m_cluePromptText      ->SetColour(config.CluePrompt.foregroundColor());
 
-    m_clueBackground        ->SetColour(m_frame->m_across->GetBackgroundColour());
-    m_clueText              ->SetColour(m_frame->m_across->GetForegroundColour());
-    m_selectedClueBackground->SetColour(m_frame->m_across->GetSelectionBackground());
-    m_selectedClueText      ->SetColour(m_frame->m_across->GetSelectionForeground());
-    m_crossingClueBackground->SetColour(m_frame->m_across->GetCrossingBackground());
-    m_crossingClueText      ->SetColour(m_frame->m_across->GetCrossingForeground());
-    m_clueHeadingBackground  ->SetColour(m_frame->m_across->GetHeadingBackground());
-    m_clueHeadingText       ->SetColour(m_frame->m_across->GetHeadingForeground());
+    m_clueBackground        ->SetColour(config.Clue.listBackgroundColor());
+    m_clueText              ->SetColour(config.Clue.listForegroundColor());
+    m_selectedClueBackground->SetColour(config.Clue.selectedBackgroundColor());
+    m_selectedClueText      ->SetColour(config.Clue.selectedForegroundColor());
+    m_crossingClueBackground->SetColour(config.Clue.crossingBackgroundColor());
+    m_crossingClueText      ->SetColour(config.Clue.crossingForegroundColor());
+    m_clueHeadingBackground  ->SetColour(config.Clue.headingBackgroundColor());
+    m_clueHeadingText       ->SetColour(config.Clue.headingForegroundColor());
 
     // Fonts
-    m_gridLetterFont->SetSelectedFont(m_frame->m_XGridCtrl->GetLetterFont());
-    m_gridNumberFont->SetSelectedFont(m_frame->m_XGridCtrl->GetNumberFont());
-    m_clueFont      ->SetSelectedFont(m_frame->m_across->GetFont());
-    m_cluePromptFont->SetSelectedFont(m_frame->m_cluePrompt->GetFont());
-    m_clueHeadingFont->SetSelectedFont(m_frame->m_across->GetHeadingFont());
+    m_gridLetterFont->SetSelectedFont(config.Grid.letterFont());
+    m_gridNumberFont->SetSelectedFont(config.Grid.numberFont());
+    m_clueFont      ->SetSelectedFont(config.Clue.font());
+    m_clueHeadingFont->SetSelectedFont(config.Clue.headingFont());
+    m_cluePromptFont->SetSelectedFont(config.CluePrompt.font());
 
     // Misc
-    m_cluePromptFormat->ChangeValue(m_frame->m_cluePrompt->GetDisplayFormat());
-    m_letterScale->SetValue(m_frame->m_XGridCtrl->GetLetterScale() * 100);
-    m_numberScale->SetValue(m_frame->m_XGridCtrl->GetNumberScale() * 100);
-    m_lineThickness->SetValue(m_frame->m_XGridCtrl->GetBorderSize());
+    m_cluePromptFormat->ChangeValue(config.CluePrompt.displayFormat());
+    m_letterScale->SetValue(config.Grid.letterScale());
+    m_numberScale->SetValue(config.Grid.numberScale());
+    m_lineThickness->SetValue(config.Grid.lineThickness());
 
     // Printing
-    ConfigManager & config = wxGetApp().GetConfigManager();
-    config.SetPath(_T("/Printing"));
-    const long brightness = config.ReadLong(_T("blackSquareBrightness"));
+    ConfigManager::Printing_t & printing = config.Printing;
+    const long brightness = printing.blackSquareBrightness();
     m_printBlackSquareBrightness->SetValue(brightness);
     m_printBlackSquarePreview->SetBackgroundColour(
         wxColour(brightness, brightness, brightness));
 
     // Print grid alignment
-    const long alignment = config.ReadLong(_T("gridAlignment"));
-    switch (alignment)
+    switch (printing.gridAlignment())
     {
         case wxALIGN_TOP | wxALIGN_LEFT:
             m_printGridAlignment->SetSelection(0);
@@ -465,49 +119,111 @@ PreferencesDialog::LoadConfig()
     }
 
     // Print fonts
-    config.SetPath(_T("/Printing/Fonts"));
-    m_printGridLetterFont->SetSelectedFont (config.ReadFont(_T("gridLetterFont")));
-    m_printGridNumberFont->SetSelectedFont (config.ReadFont(_T("gridNumberFont")));
-    m_printClueFont      ->SetSelectedFont (config.ReadFont(_T("clueFont")));
+    m_printGridLetterFont->SetSelectedFont(printing.Fonts.gridLetterFont());
+    m_printGridNumberFont->SetSelectedFont(printing.Fonts.gridNumberFont());
+    m_printClueFont      ->SetSelectedFont(printing.Fonts.clueFont());
 
-    const bool customFonts = config.ReadBool(_T("useCustomFonts"));
+    const bool customFonts = printing.Fonts.useCustomFonts();
     m_printCustomFonts   ->SetValue(customFonts);
     m_printGridLetterFont->Enable(customFonts);
     m_printGridNumberFont->Enable(customFonts);
     m_printClueFont->Enable(customFonts);
 }
 
+void
+PreferencesDialog::OnPrintCustomFonts(wxCommandEvent & evt)
+{
+    const bool customFonts = evt.IsChecked();
+    m_printGridLetterFont->Enable(customFonts);
+    m_printGridNumberFont->Enable(customFonts);
+    m_printClueFont->Enable(customFonts);
+}
 
+//------------------------------------------------------------------------------
+// Save config
+//------------------------------------------------------------------------------
 
-// This should only write to the config for values that are not representable
-// in the GUI.  Those that are representable in the GUI should have their states
-// changed as soon as the controls were changed in the dialog.  It is the frame's
-// responsibility to manage writing the GUI configuration.
 void
 PreferencesDialog::SaveConfig()
 {
     ConfigManager & config = wxGetApp().GetConfigManager();
+    config.AutoUpdate(true);
+
+    long gridStyle = 0;
+    switch (m_afterLetter->GetSelection())
+    {
+    case 2:
+        gridStyle |= MOVE_TO_NEXT_BLANK;
+        // Fallthrough
+    case 1:
+        gridStyle |= MOVE_AFTER_LETTER;
+    }
+
+    if (m_blankOnDirection->GetValue())
+        gridStyle |= BLANK_ON_DIRECTION;
+    if (m_blankOnNewWord->GetValue())
+        gridStyle |= BLANK_ON_NEW_WORD;
+    if(m_pauseOnSwitch->GetSelection() == 1)
+        gridStyle |= PAUSE_ON_SWITCH;
+    if (m_moveOnRightClick->GetValue())
+        gridStyle |= MOVE_ON_RIGHT_CLICK;
+    if (m_checkWhileTyping->GetValue())
+        gridStyle |= CHECK_WHILE_TYPING;
+    if (m_strictRebus->GetValue())
+        gridStyle |= STRICT_REBUS;
+
+    config.Grid.style = gridStyle;
+
+    // Colors
+    config.Grid.focusedLetterColor = m_selectedLetterColor->GetColour();
+    config.Grid.focusedWordColor = m_selectedWordColor->GetColour();
+    config.Grid.penColor = m_penColor->GetColour();
+    //config.Grid.pencilColor = m_pencilColor->GetColour();
+    config.Grid.backgroundColor = m_gridBackgroundColor->GetColour();
+    config.Grid.whiteSquareColor = m_whiteSquareColor->GetColour();
+    config.Grid.blackSquareColor = m_blackSquareColor->GetColour();
+    config.Grid.selectionColor = m_gridSelectionColor->GetColour();
+
+    config.CluePrompt.backgroundColor = m_cluePromptBackground->GetColour();
+    config.CluePrompt.foregroundColor = m_cluePromptText->GetColour();
+
+    config.Clue.listBackgroundColor = m_clueBackground->GetColour();
+    config.Clue.listForegroundColor = m_clueText->GetColour();
+    config.Clue.selectedBackgroundColor = m_selectedClueBackground->GetColour();
+    config.Clue.selectedForegroundColor = m_selectedClueText->GetColour();
+    config.Clue.crossingBackgroundColor = m_crossingClueBackground->GetColour();
+    config.Clue.crossingForegroundColor = m_crossingClueText->GetColour();
+    config.Clue.headingBackgroundColor = m_clueHeadingBackground->GetColour();
+    config.Clue.headingForegroundColor = m_clueHeadingText->GetColour();
+
+    // Fonts
+    config.Grid.letterFont = m_gridLetterFont->GetSelectedFont();
+    config.Grid.numberFont = m_gridNumberFont->GetSelectedFont();
+    config.Clue.font = m_clueFont->GetSelectedFont();
+    config.Clue.headingFont = m_clueHeadingFont->GetSelectedFont();
+    config.CluePrompt.font = m_cluePromptFont->GetSelectedFont();
+
+    // Misc
+    config.CluePrompt.displayFormat = m_cluePromptFormat->GetValue();
+    config.Grid.letterScale = m_letterScale->GetValue();
+    config.Grid.numberScale = m_numberScale->GetValue();
+    config.Grid.lineThickness = m_lineThickness->GetValue();
 
     // Printing settings
     //------------------
-    config.SetPath(_T("/Printing"));
-    config.WriteLong(_T("blackSquareBrightness"),
-                      m_printBlackSquareBrightness->GetValue());
+    ConfigManager::Printing_t & printing = config.Printing;
+    printing.blackSquareBrightness = m_printBlackSquareBrightness->GetValue();
 
     // The alignment options
     long alignments[] = { wxALIGN_TOP | wxALIGN_LEFT,
                           wxALIGN_TOP | wxALIGN_RIGHT,
                           wxALIGN_BOTTOM | wxALIGN_LEFT,
                           wxALIGN_BOTTOM | wxALIGN_RIGHT };
-    config.WriteLong(_T("gridAlignment"),
-                     alignments[m_printGridAlignment->GetSelection()]);
+    printing.gridAlignment = alignments[m_printGridAlignment->GetSelection()];
 
-    config.SetPath(_T("/Printing/Fonts"));
-    config.WriteBool(_T("useCustomFonts"), m_printCustomFonts->IsChecked());
-    config.WriteFont(_T("gridLetterFont"),
-                     m_printGridLetterFont->GetSelectedFont());
-    config.WriteFont(_T("gridNumberFont"),
-                     m_printGridNumberFont->GetSelectedFont());
-    config.WriteFont(_T("clueFont"),
-                     m_printClueFont->GetSelectedFont());
+    // Fonts
+    printing.Fonts.useCustomFonts = m_printCustomFonts->IsChecked();
+    printing.Fonts.gridLetterFont = m_printGridLetterFont->GetSelectedFont();
+    printing.Fonts.gridNumberFont = m_printGridNumberFont->GetSelectedFont();
+    printing.Fonts.clueFont = m_printClueFont->GetSelectedFont();
 }

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec 17 2009)
+// C++ code generated with wxFormBuilder (version Mar 22 2011)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -413,16 +413,6 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_staticText33->Wrap( -1 );
 	fgSizer2->Add( m_staticText33, 0, wxALL, 5 );
 	
-	wxStaticText* m_staticText36;
-	m_staticText36 = new wxStaticText( miscPanel, wxID_ANY, wxT("%D"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText36->Wrap( -1 );
-	fgSizer2->Add( m_staticText36, 0, wxALL, 5 );
-	
-	wxStaticText* m_staticText37;
-	m_staticText37 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue direction (Across or Down)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText37->Wrap( -1 );
-	fgSizer2->Add( m_staticText37, 0, wxALL, 5 );
-	
 	wxStaticText* m_staticText34;
 	m_staticText34 = new wxStaticText( miscPanel, wxID_ANY, wxT("%N"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText34->Wrap( -1 );
@@ -432,16 +422,6 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_staticText35 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue number"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText35->Wrap( -1 );
 	fgSizer2->Add( m_staticText35, 0, wxALL, 5 );
-	
-	wxStaticText* m_staticText38;
-	m_staticText38 = new wxStaticText( miscPanel, wxID_ANY, wxT("%d"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText38->Wrap( -1 );
-	fgSizer2->Add( m_staticText38, 0, wxALL, 5 );
-	
-	wxStaticText* m_staticText39;
-	m_staticText39 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue direction (A or D)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText39->Wrap( -1 );
-	fgSizer2->Add( m_staticText39, 0, wxALL, 5 );
 	
 	sbSizer12->Add( fgSizer2, 1, wxEXPAND, 5 );
 	
@@ -552,7 +532,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	wxString m_printGridAlignmentChoices[] = { wxT("Top left"), wxT("Top right"), wxT("Bottom left"), wxT("Bottom right") };
 	int m_printGridAlignmentNChoices = sizeof( m_printGridAlignmentChoices ) / sizeof( wxString );
 	m_printGridAlignment = new wxRadioBox( printPanel, wxID_ANY, wxT("Grid alignment"), wxDefaultPosition, wxDefaultSize, m_printGridAlignmentNChoices, m_printGridAlignmentChoices, 2, wxRA_SPECIFY_COLS );
-	m_printGridAlignment->SetSelection( 1 );
+	m_printGridAlignment->SetSelection( 0 );
 	bSizer58->Add( m_printGridAlignment, 0, wxALL|wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer19;
@@ -594,6 +574,8 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_buttons = new wxStdDialogButtonSizer();
 	m_buttonsOK = new wxButton( this, wxID_OK );
 	m_buttons->AddButton( m_buttonsOK );
+	m_buttonsApply = new wxButton( this, wxID_APPLY );
+	m_buttons->AddButton( m_buttonsApply );
 	m_buttonsCancel = new wxButton( this, wxID_CANCEL );
 	m_buttons->AddButton( m_buttonsCancel );
 	m_buttons->Realize();
@@ -605,49 +587,8 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	
 	// Connect Events
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
-	m_afterLetter->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( wxFB_PreferencesDialog::OnAfterLetter ), NULL, this );
-	m_blankOnDirection->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnBlankOnDirection ), NULL, this );
-	m_blankOnNewWord->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnBlankOnNewWord ), NULL, this );
-	m_pauseOnSwitch->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPauseOnSwitch ), NULL, this );
-	m_moveOnRightClick->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnMoveOnRightClick ), NULL, this );
-	m_checkWhileTyping->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCheckWhileTyping ), NULL, this );
-	m_strictRebus->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnStrictRebus ), NULL, this );
-	m_penColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPenColor ), NULL, this );
-	m_selectedLetterColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedLetterColor ), NULL, this );
-	m_selectedWordColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedWordColor ), NULL, this );
-	m_gridSelectionColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnGridSelectionColor ), NULL, this );
-	m_gridBackgroundColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnGridBackgroundColor ), NULL, this );
-	m_whiteSquareColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnWhiteSquareColor ), NULL, this );
-	m_blackSquareColor->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnBlackSquareColor ), NULL, this );
-	m_cluePromptText->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPromptTextColor ), NULL, this );
-	m_cluePromptBackground->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPromptBackgroundColor ), NULL, this );
-	m_clueText->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnClueTextColor ), NULL, this );
-	m_clueBackground->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnClueBackgroundColor ), NULL, this );
-	m_selectedClueText->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedClueTextColor ), NULL, this );
-	m_selectedClueBackground->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedClueBackgroundColor ), NULL, this );
-	m_crossingClueText->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnCrossingClueTextColor ), NULL, this );
-	m_crossingClueBackground->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnCrossingClueBackgroundColor ), NULL, this );
-	m_clueHeadingText->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnClueHeadingTextColor ), NULL, this );
-	m_clueHeadingBackground->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnClueHeadingBackgroundColor ), NULL, this );
-	m_gridLetterFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnGridLetterFont ), NULL, this );
-	m_gridNumberFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnGridNumberFont ), NULL, this );
-	m_cluePromptFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnCluePromptFont ), NULL, this );
-	m_clueFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnClueFont ), NULL, this );
-	m_clueHeadingFont->Connect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnClueHeadingFont ), NULL, this );
-	m_cluePromptFormat->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCluePromptFormat ), NULL, this );
-	m_letterScale->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLetterScale ), NULL, this );
-	m_numberScale->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnNumberScale ), NULL, this );
-	m_lineThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLineThickness ), NULL, this );
 	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
+	m_buttonsApply->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnApply ), NULL, this );
 	m_buttonsOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnOK ), NULL, this );
 }
 
@@ -655,49 +596,8 @@ wxFB_PreferencesDialog::~wxFB_PreferencesDialog()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
-	m_afterLetter->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( wxFB_PreferencesDialog::OnAfterLetter ), NULL, this );
-	m_blankOnDirection->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnBlankOnDirection ), NULL, this );
-	m_blankOnNewWord->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnBlankOnNewWord ), NULL, this );
-	m_pauseOnSwitch->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPauseOnSwitch ), NULL, this );
-	m_moveOnRightClick->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnMoveOnRightClick ), NULL, this );
-	m_checkWhileTyping->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCheckWhileTyping ), NULL, this );
-	m_strictRebus->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnStrictRebus ), NULL, this );
-	m_penColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPenColor ), NULL, this );
-	m_selectedLetterColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedLetterColor ), NULL, this );
-	m_selectedWordColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedWordColor ), NULL, this );
-	m_gridSelectionColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnGridSelectionColor ), NULL, this );
-	m_gridBackgroundColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnGridBackgroundColor ), NULL, this );
-	m_whiteSquareColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnWhiteSquareColor ), NULL, this );
-	m_blackSquareColor->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnBlackSquareColor ), NULL, this );
-	m_cluePromptText->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPromptTextColor ), NULL, this );
-	m_cluePromptBackground->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnPromptBackgroundColor ), NULL, this );
-	m_clueText->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnClueTextColor ), NULL, this );
-	m_clueBackground->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnClueBackgroundColor ), NULL, this );
-	m_selectedClueText->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedClueTextColor ), NULL, this );
-	m_selectedClueBackground->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnSelectedClueBackgroundColor ), NULL, this );
-	m_crossingClueText->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnCrossingClueTextColor ), NULL, this );
-	m_crossingClueBackground->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnCrossingClueBackgroundColor ), NULL, this );
-	m_clueHeadingText->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnClueHeadingTextColor ), NULL, this );
-	m_clueHeadingBackground->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( wxFB_PreferencesDialog::OnClueHeadingBackgroundColor ), NULL, this );
-	m_gridLetterFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnGridLetterFont ), NULL, this );
-	m_gridNumberFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnGridNumberFont ), NULL, this );
-	m_cluePromptFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnCluePromptFont ), NULL, this );
-	m_clueFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnClueFont ), NULL, this );
-	m_clueHeadingFont->Disconnect( wxEVT_COMMAND_FONTPICKER_CHANGED, wxFontPickerEventHandler( wxFB_PreferencesDialog::OnClueHeadingFont ), NULL, this );
-	m_cluePromptFormat->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( wxFB_PreferencesDialog::OnCluePromptFormat ), NULL, this );
-	m_letterScale->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLetterScale ), NULL, this );
-	m_numberScale->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnNumberScale ), NULL, this );
-	m_lineThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( wxFB_PreferencesDialog::OnLineThickness ), NULL, this );
 	m_printCustomFonts->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( wxFB_PreferencesDialog::OnPrintBlackSquareBrightness ), NULL, this );
+	m_buttonsApply->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnApply ), NULL, this );
 	m_buttonsOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnOK ), NULL, this );
 	
 }

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec 17 2009)
+// C++ code generated with wxFormBuilder (version Mar 22 2011)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -46,6 +46,7 @@ class wxFB_PreferencesDialog : public wxDialog
 	private:
 		wxStdDialogButtonSizer* m_buttons;
 		wxButton* m_buttonsOK;
+		wxButton* m_buttonsApply;
 		wxButton* m_buttonsCancel;
 	
 	protected:
@@ -97,47 +98,14 @@ class wxFB_PreferencesDialog : public wxDialog
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnInit( wxInitDialogEvent& event ) = 0;
-		virtual void OnAfterLetter( wxCommandEvent& event ) = 0;
-		virtual void OnBlankOnDirection( wxCommandEvent& event ) = 0;
-		virtual void OnBlankOnNewWord( wxCommandEvent& event ) = 0;
-		virtual void OnPauseOnSwitch( wxCommandEvent& event ) = 0;
-		virtual void OnMoveOnRightClick( wxCommandEvent& event ) = 0;
-		virtual void OnCheckWhileTyping( wxCommandEvent& event ) = 0;
-		virtual void OnStrictRebus( wxCommandEvent& event ) = 0;
-		virtual void OnPenColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnSelectedLetterColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnSelectedWordColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnGridSelectionColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnGridBackgroundColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnWhiteSquareColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnBlackSquareColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnPromptTextColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnPromptBackgroundColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnClueTextColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnClueBackgroundColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnSelectedClueTextColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnSelectedClueBackgroundColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnCrossingClueTextColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnCrossingClueBackgroundColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnClueHeadingTextColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnClueHeadingBackgroundColor( wxColourPickerEvent& event ) = 0;
-		virtual void OnGridLetterFont( wxFontPickerEvent& event ) = 0;
-		virtual void OnGridNumberFont( wxFontPickerEvent& event ) = 0;
-		virtual void OnCluePromptFont( wxFontPickerEvent& event ) = 0;
-		virtual void OnClueFont( wxFontPickerEvent& event ) = 0;
-		virtual void OnClueHeadingFont( wxFontPickerEvent& event ) = 0;
-		virtual void OnCluePromptFormat( wxCommandEvent& event ) = 0;
-		virtual void OnLetterScale( wxSpinEvent& event ) = 0;
-		virtual void OnNumberScale( wxSpinEvent& event ) = 0;
-		virtual void OnLineThickness( wxSpinEvent& event ) = 0;
 		virtual void OnPrintCustomFonts( wxCommandEvent& event ) = 0;
-		virtual void OnPrintBlackSquareBrightness( wxScrollEvent& event ) = 0;
+		virtual void OnApply( wxCommandEvent& event ) = 0;
 		virtual void OnOK( wxCommandEvent& event ) = 0;
 		
 	
 	public:
 		
-		wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~wxFB_PreferencesDialog();
 	
 };
@@ -177,7 +145,7 @@ class wxFB_ConvertDialog : public wxDialog
 	
 	public:
 		
-		wxFB_ConvertDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Convert"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		wxFB_ConvertDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Convert"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~wxFB_ConvertDialog();
 	
 };
@@ -196,7 +164,7 @@ class LicenseDialog : public wxDialog
 	public:
 		wxTextCtrl* m_textCtrl;
 		
-		LicenseDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("XWord License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 371,262 ), long style = wxDEFAULT_DIALOG_STYLE );
+		LicenseDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("XWord License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 371,262 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~LicenseDialog();
 	
 };
@@ -215,7 +183,7 @@ class wxFB_CharactersPanel : public wxPanel
 		wxPanel* m_panel;
 		wxGridSizer* m_sizer;
 		
-		wxFB_CharactersPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		wxFB_CharactersPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~wxFB_CharactersPanel();
 	
 };
