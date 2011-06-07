@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -714,7 +714,7 @@ MyAuiManager::GetPaneByCaption(const wxString & caption)
 wxString
 MyAuiManager::SavePerspective()
 {
-    // This section is nearly vertabim wxAuiManager::SavePerspective()
+    // This section is almost the same as wxAuiManager::SavePerspective()
     wxString result;
     result.Alloc(500);
     result = wxT("layout2|");
@@ -726,6 +726,12 @@ MyAuiManager::SavePerspective()
         if (! IsPrivatePane(pane)) // Don't save our tabs
             result += SavePaneInfo(pane)+wxT("|");
     }
+
+    // Save the cached panes
+    std::map<wxString, CachedPane>::iterator it;
+    for (it = m_paneCache.begin(); it != m_paneCache.end(); ++it)
+        result += it->second.perspective + wxT("|");
+
     int dock_i, dock_count = m_docks.GetCount();
     for (dock_i = 0; dock_i < dock_count; ++dock_i)
     {
@@ -792,7 +798,7 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
     while (tok.HasMoreTokens())
     {
         wxString info_str = tok.GetNextToken();
-        // __tab(direction)=paneName;paneName;paneName|
+        // __tab(direction)=paneName;paneName;paneName;...|
         if (info_str.StartsWith(_T("__tab")))
         {
             // Parse the tab string.
@@ -910,8 +916,8 @@ MyAuiManager::HasCachedPane(const wxString & name)
 
 // AddPane checks the pane cache and loads whatever it finds in the cache.
 // AddPane also adds the pane to our managed menu.
-// DetachPane removes the context window from the pane and removes the pane
-// from our managed menu.
+// DetachPane removes the context window from the pane, removes the pane
+// from our managed menu, and adds the pane to the cache.
 
 bool
 MyAuiManager::AddPane(wxWindow * window, const wxAuiPaneInfo & pane_info)
@@ -927,6 +933,9 @@ MyAuiManager::AddPane(wxWindow * window, const wxAuiPaneInfo & pane_info)
         {
             wxAuiPaneInfo cached_pane;
             LoadPaneInfo(cache.perspective, cached_pane);
+            // Copy over the caption.
+            if (! pane_info.caption.IsEmpty())
+                cached_pane.caption = pane_info.caption;
             // Try the cached pane, then the supplied pane if that
             // doesn't work.
             if (! wxAuiManager::AddPane(window, cached_pane))
@@ -972,6 +981,8 @@ MyAuiManager::DetachPane(wxWindow * window)
         RemoveContextWindow(pane);
         if (m_menu)
             RemoveFromMenu(pane);
+        // Add this to the cache
+        m_paneCache[pane.name].perspective = SavePaneInfo(pane);
     }
     if (! wxAuiManager::DetachPane(window))
         return false;
@@ -981,6 +992,71 @@ MyAuiManager::DetachPane(wxWindow * window)
 
 // Update
 //-------
+
+// Make all panes in the given list the same size, assuming that all panes
+// are in docks of the same direction.
+// Docks that only contain panes in the list are made the same size.
+// Panes in the same dock are given the same proportion.
+void
+MyAuiManager::ConstrainPanes(std::list<wxAuiPaneInfo *> & panes)
+{
+    // Map docks to the pane they contain
+    typedef std::list<wxAuiPaneInfo *> pane_list_t;
+    typedef std::map<wxAuiDockInfo *, pane_list_t> clue_map_t;
+    clue_map_t clue_docks;
+    // This is the sum of the average size of a pane in the each dock
+    // with only clue panes.  Thus, when adjusting the individual dock sizes,
+    // we will set dock_size = avg_dock_size * panes_in_this_dock
+    int total_dock_size = 0;
+    int dock_count = 0;
+    {
+        pane_list_t::iterator it;
+        for (it = panes.begin(); it != panes.end(); ++it)
+        {
+            wxAuiPaneInfo * pane = *it;
+            wxAuiDockInfo & dock = FindDock(*pane);
+            pane_list_t & list = clue_docks[&dock];
+            list.push_back(pane);
+            // If all the panes in this dock are ClueLists, add the
+            // size of this dock to the total
+            if (list.size() == dock.panes.Count())
+            {
+                total_dock_size += (dock.size / list.size());
+                ++dock_count;
+            }
+        }
+    }
+
+    // Adjust the dock size for docks with only ClueLists
+    if (dock_count > 1)
+    {
+        clue_map_t::iterator it;
+        int average_dock_size = total_dock_size / dock_count;
+        for (it = clue_docks.begin(); it != clue_docks.end(); ++it)
+        {
+            if (it->first->panes.Count() == it->second.size())
+                it->first->size = average_dock_size * it->second.size();
+        }
+    }
+
+    // Adjust the proportion of panes in the docks
+    clue_map_t::iterator it;
+    for (it = clue_docks.begin(); it != clue_docks.end(); ++it)
+    {
+        const int pane_count = it->second.size();
+        if (pane_count < 2)
+            continue;
+        pane_list_t::iterator pane;
+        // Calculate the average proportion
+        int total_proportion = 0;
+        for (pane = it->second.begin(); pane != it->second.end(); ++pane)
+            total_proportion += (*pane)->dock_proportion;
+        // Set the average proportion
+        int average_proportion = total_proportion / pane_count;
+        for (pane = it->second.begin(); pane != it->second.end(); ++pane)
+            (*pane)->dock_proportion = average_proportion;
+    }
+}
 
 void
 MyAuiManager::Update()
@@ -1010,47 +1086,29 @@ MyAuiManager::Update()
         }
     }
 
-
-    // Force Across and Down panes to be the same size
-    wxAuiPaneInfo & across = GetPane(_T("Across"));
-    wxAuiPaneInfo & down   = GetPane(_T("Down"));
-    if (across.IsDocked() && down.IsDocked())
+    // Force Clue panes to be the same size
+    // This used to only work on Across and Down panes, which was much
+    // simpler.
+    std::list<wxAuiPaneInfo *> horizontal_clue_panes;
+    std::list<wxAuiPaneInfo *> vertical_clue_panes;
+    for (size_t i = 0; i < m_panes.Count(); ++i)
     {
-        // If our panes are in the same dock, make their
-        // proportions the same.
-        if (across.dock_layer == down.dock_layer &&
-            across.dock_direction == down.dock_direction &&
-            across.dock_row == down.dock_row)
+        wxAuiPaneInfo & pane = m_panes.Item(i);
+        if (pane.name.StartsWith(_T("ClueList")))
         {
-            if (across.dock_proportion != down.dock_proportion)
+            if (pane.dock_direction == wxAUI_DOCK_TOP ||
+                pane.dock_direction == wxAUI_DOCK_BOTTOM)
             {
-                across.dock_proportion = down.dock_proportion =
-                        (across.dock_proportion + down.dock_proportion) / 2;
+                horizontal_clue_panes.push_back(&pane);
             }
-        }
-        // If they are in separate docks, but both docks only have one pane
-        // and are in the same oritentation, make the docks the same size.
-        else
-        {
-            const bool acrossHorizontal =
-                    across.dock_direction == wxAUI_DOCK_TOP ||
-                    across.dock_direction == wxAUI_DOCK_BOTTOM;
-            const bool downHorizontal =
-                    down.dock_direction == wxAUI_DOCK_TOP ||
-                    down.dock_direction == wxAUI_DOCK_BOTTOM;
-            if (acrossHorizontal == downHorizontal)
+            else
             {
-                wxAuiDockInfo & aDock = FindDock(across);
-                wxAuiDockInfo & dDock = FindDock(down);
-                if (aDock.panes.Count() == 1 &&
-                    dDock.panes.Count() == 1 &&
-                    aDock.size != dDock.size)
-                {
-                    aDock.size = dDock.size = (aDock.size + dDock.size) / 2;
-                }
+                vertical_clue_panes.push_back(&pane);
             }
         }
     }
+    ConstrainPanes(horizontal_clue_panes);
+    ConstrainPanes(vertical_clue_panes);
 
     wxAuiManager::Update();
 }
@@ -1437,7 +1495,7 @@ MyAuiManager::OnContextMenuClick(wxCommandEvent & evt)
             break;
 
         default:
-            wxFAIL_MSG(_T("Unknown Context menu button"));
+            // The "title" button was clicked.
             break;
     }
 }
@@ -1492,6 +1550,8 @@ MyAuiManager::OnContextMenu(wxContextMenuEvent &evt)
         wxAuiPaneInfo & pane = HitTestPane(pos.x, pos.y);
         if (pane.IsOk())
             ShowContextMenu(pane);
+        else
+            evt.Skip();
     }
     else
     {
@@ -1501,7 +1561,10 @@ MyAuiManager::OnContextMenu(wxContextMenuEvent &evt)
         {
             // Top of the window hierarchy
             if (! window)
+            {
+                evt.Skip();
                 return;
+            }
             // The window we've been looking for
             if (m_contextWindows.find(window) != m_contextWindows.end())
                 break;
@@ -1510,6 +1573,8 @@ MyAuiManager::OnContextMenu(wxContextMenuEvent &evt)
         wxAuiPaneInfo & pane = *m_contextWindows[window];
         if (pane.IsOk())
             ShowContextMenu(pane);
+        else
+            evt.Skip();
     }
 }
 
