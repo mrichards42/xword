@@ -124,7 +124,7 @@ local function _new_fs(archive)
             local last_read = stream:LastRead()
             table.insert(t, buf:sub(0, last_read))
         until last_read < 1024
-        -- wxWidgets says that I own this pointer, but wxLua thinks otherwise
+        f:delete()
         return table.concat(t)
     end
 
@@ -138,6 +138,7 @@ local function _new_fs(archive)
         local ret = out:IsOk()
         out:Close()
         out:delete()
+        f:delete()
         return ret
     end
 
@@ -252,6 +253,11 @@ function P.install_package(filename)
         fs:delete()
         return nil, err
     end
+
+    -- Make sure that the package doesn't require a newer version of xword
+    assert(not P.is_newer(pkg.requires, xword.version),
+           "This package requires a newer version of XWord.")
+
 
     -- Try to uninstall the package (but leave the config dir alone, and don't
     -- uninstall on restart)

@@ -1,41 +1,17 @@
-require 'xword.pkgmgr'
+P = require 'xword.pkgmgr'
 require 'xword.pkgmgr.updater'
 
+require 'serialize'
 require 'luacurl'
 
-require 'serialize'
-
-local P = xword.pkgmgr
-
 -- Args
-local packagesURL, updates_filename = unpack(arg)
-
--- Load the cached update file
-local updates = serialize.loadfile(updates_filename) or {}
+local packages_url, updates_filename = unpack(arg)
 
 -- cURL Callbacks
-local remote_version
 -- Write to a table
 local function write_to_table(t)
-    local has_first_line = false
     return function(str, length)
         table.insert(t, str)
-        if not has_first_line then
-            local end_of_line = str:match("(.-)[\n\r\l]")
-            if end_of_line then 
-                has_first_line = true
-                -- Get the version from the first line
-                remote_version = table.concat(t, "", 1, #t-1)..end_of_line
-                -- Version is a string "-- version x.y.z.r"
-                remote_version = remote_version:match("-- *version *([%d%.]+)")
-                -- Check to see if this is a new file
-                if remote_version and updates.version then
-                    if not P.is_newer(remote_version, updates.version) then
-                        return 0 -- Abort download; we already have a file
-                    end
-                end
-            end
-        end
         return length -- Return length to continue download
     end
 end
@@ -52,7 +28,7 @@ end
 local t = {}
 
 local c = curl.easy_init()
-c:setopt(curl.OPT_URL, packagesURL)
+c:setopt(curl.OPT_URL, packages_url)
 c:setopt(curl.OPT_FOLLOWLOCATION, 1)
 c:setopt(curl.OPT_WRITEFUNCTION, write_to_table(t))
 c:setopt(curl.OPT_PROGRESSFUNCTION, progress_func)
@@ -60,8 +36,9 @@ c:setopt(curl.OPT_NOPROGRESS, 0)
 
 local rc, err = c:perform()
 
--- Load the remote updates
-local remote_updates = serialize.loadstring(table.concat(t))
+-- Load the remote and local updates
+local remote_updates = serialize.loadstring(table.concat(t)) or {}
+local updates = serialize.loadfile(updates_filename) or {}
 
 -- Replace packages in updates with packages from remoted_updates, copying
 -- "ignored" from packages in updates
@@ -77,6 +54,13 @@ for _, pkg in ipairs(remote_updates or {}) do
     if local_pkg then
         pkg.ignored = local_pkg.ignored
     end
+end
+
+-- Copy ignored only if this is an xword version that we have already seen.
+if updates.xword and remote_updates.xword
+    and updates.xword.version == remote_updates.xword.version
+then
+    remote_updates.xword.ignored = updates.xword.ignored
 end
 
 -- Save the updates to file

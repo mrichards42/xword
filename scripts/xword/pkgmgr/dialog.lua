@@ -1,8 +1,3 @@
--- TODO:
--- Make sure packages require the correct version of XWord
--- Load xword.info and set xword.version to the version in this file.
--- Figure out a mechanism for updating XWord itself.
-
 local tablex = require 'pl.tablex'
 local join = require 'xword.pkgmgr.join'
 local serialize = require 'serialize'
@@ -447,13 +442,31 @@ function P.PackageDialog()
     end
 
     -- Load updates and available packages
-    function dlg:RefreshUpdates()
+    function dlg:RefreshUpdates(check_xword)
         -- Make new_packages and update_packages table, with packages that
         -- have not been installed, and packages that could be updated.
         -- If the version of the package in the updates table has already been
         -- seen by the user and was not updated, it should have already been
         -- marked with ignored = true.
         local updates = serialize.loadfile(P.updater.updates_filename) or {}
+        -- Check to see if there is an update for XWord first
+        if check_xword and updates.xword -- don't check ignored here
+            and P.is_newer(updates.xword.version, xword.version)
+        then
+            if xword.Prompt(
+                "There is a new version of XWord available (version %s).\n"
+                .."Would you like to go to the download page?",
+                updates.xword.version
+            ) then
+                dlg:Close()
+                wx.wxLaunchDefaultBrowser(updates.xword.download)
+                return
+            else
+                updates.xword.ignored = true
+                serialize.pdump(updates, P.updater.updates_filename)
+            end
+        end
+
         local new_packages = {}
         local update_packages = {}
         for _, pkg in ipairs(updates) do
@@ -464,14 +477,16 @@ function P.PackageDialog()
                     break
                 end
             end
-            if not local_pkg then
-                pkg.localversion = "New"
-                table.insert(new_packages, pkg)
-            elseif P.is_newer(pkg.version, local_pkg.version)
-                    and not local_pkg.installed and local_pkg.enabled ~= false
-            then
-                pkg.localversion = local_pkg.version
-                table.insert(update_packages, pkg)
+            if not P.is_newer(pkg.requires, xword.version) then
+                if not local_pkg then
+                    pkg.localversion = "New"
+                    table.insert(new_packages, pkg)
+                elseif P.is_newer(pkg.version, local_pkg.version)
+                        and not local_pkg.installed and local_pkg.enabled ~= false
+                then
+                    pkg.localversion = local_pkg.version
+                    table.insert(update_packages, pkg)
+                end
             end
         end
         self.updates:SetData(update_packages)
@@ -489,7 +504,7 @@ function P.PackageDialog()
     local checkbutton = wx.wxButton(dlg, wx.wxID_ANY, "Check for updates")
     checkbutton:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
         P.updater.CheckForUpdates(function ()
-            dlg:RefreshUpdates()
+            dlg:RefreshUpdates(true) -- Check for XWord update
             local selection = notebook:GetSelection()
             if selection ~= 1 and selection ~= 2 then
                 notebook:SetSelection(1)

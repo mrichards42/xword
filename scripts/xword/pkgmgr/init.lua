@@ -96,15 +96,35 @@ local function init()
             dlg:ShowModal()
         end
 
-        -- Load the updates file and compare it with the installed packages
-        local updates = serialize.loadfile(P.updater.updates_filename)
+        local updates = serialize.loadfile(P.updater.updates_filename) or {}
+
+        -- Check to see if there is an update to XWord first
+        if updates.xword and not updates.xword.ignored
+            and P.is_newer(updates.xword.version, xword.version)
+        then
+            if xword.Prompt(
+                "There is a new version of XWord available (version %s).\n"
+                .."Would you like to go to the download page?",
+                updates.xword.version
+            ) then
+                wx.wxLaunchDefaultBrowser(updates.xword.download)
+                return
+            else
+                updates.xword.ignored = true
+                serialize.pdump(updates, P.updater.updates_filename)
+            end
+        end
+
+        -- Compare the updated packages with the installed packages
         local packages = P.load_packages_info()
         for _, pkg in ipairs(updates) do
             if not pkg.ignored then
                 for _, p in ipairs(packages) do
                     if p.name == pkg.name then
                         -- We have at least one update, so show the dialog
-                        if P.is_newer(pkg.version, p.version) then
+                        if P.is_newer(pkg.version, p.version)
+                           and not P.is_newer(pkg.requires, xword.version)
+                        then
                             do_update()
                             break
                         end
