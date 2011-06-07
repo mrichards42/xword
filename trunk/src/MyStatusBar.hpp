@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -36,16 +36,20 @@ public:
     ~MyStatusBar() {}
 
     void SetAlert(const wxString & text, const wxColour & fgColor = *wxBLACK, const wxColour & bgColor = wxNullColour);
-    void SetStatus(const wxString & text) { SetStatusText(text, 0); }
-    void SetTime(int time) { SetStatusText( wxTimeSpan::Seconds(time).Format(), 2); }
+    void SetStatus(const wxString & text);
+#ifdef XWORD_USE_LUA
+    void SetLuaErrors(int num);
+#endif
+    void SetTime(int time);
 
 private:
     void OnSize(wxSizeEvent & WXUNUSED(evt));
-    void OnAlertClick(wxMouseEvent & evt);
-
-    void WrapAlert(int width = -1);
 
     SizedText * m_alert;
+    void OnAlertClick(wxMouseEvent & evt);
+    void WrapAlert(int width = -1);
+
+    void OnDoubleClick(wxMouseEvent & evt);
 
     DECLARE_EVENT_TABLE()
 };
