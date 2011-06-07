@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,7 +21,9 @@
 
 #include <wx/event.h>
 #include <wx/gdicmn.h>  // wxPoint
-#include "puz/Square.hpp" // puz::GridDirection
+#include "../puz/Clue.hpp"
+#include "../puz/Word.hpp"
+#include "../puz/Square.hpp"
 
 class wxPuzEvent
     : public wxCommandEvent
@@ -29,32 +31,22 @@ class wxPuzEvent
 public:
     wxPuzEvent(wxEventType commandType = wxEVT_NULL, int id = 0);
 
-    // accessors
-    int                GetAcrossClue() const { return m_acrossClue; }
-    int                GetDownClue()   const { return m_downClue; }
-    const wxString &   GetClueText()   const { return m_clueText; }
-    puz::GridDirection GetDirection()  const { return m_direction; }
-    int GetClueNumber(puz::GridDirection dir) const
-        { return dir == puz::ACROSS ? m_acrossClue : m_downClue; }
-    int GetClueNumber() const
-        { return GetClueNumber(m_direction); }
+    puz::Clue * GetClue() { return m_clue; }
+    puz::Word * GetWord() { return m_word; }
+    puz::Square * GetSquare() { return m_square; }
 
-    void SetAcrossClue(int num)                { m_acrossClue = num; }
-    void SetDownClue  (int num)                { m_downClue   = num; }
-    void SetClueText  (const wxString & text)  { m_clueText   = text; }
-    void SetDirection (puz::GridDirection dir) { m_direction  = dir; }
-    void SetClueNumber(puz::GridDirection dir, int num)
-        { dir == puz::ACROSS ? m_acrossClue = num : m_downClue = num; }
+    void SetClue(puz::Clue * clue) { m_clue = clue; }
+    void SetWord(puz::Word * word) { m_word = word; }
+    void SetSquare(puz::Square * square) { m_square = square; }
 
     // required for sending with wxPostEvent()
     wxEvent *Clone(void) const { return new wxPuzEvent(*this); }
 
 
 private:
-    int m_acrossClue;
-    int m_downClue;
-    wxString m_clueText;
-    puz::GridDirection m_direction;
+    puz::Clue * m_clue;
+    puz::Word * m_word;
+    puz::Square * m_square;
 };
 
 

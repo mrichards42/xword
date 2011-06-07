@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -47,9 +47,12 @@
 #include "CluePrompt.hpp"
 #include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
+#include <wx/html/htmlwin.h>
 
 #ifdef XWORD_USE_LUA
 #   include "xwordlua.hpp"
+    // This is for luapuz_Load_Puzzle
+#   include "../lua/luapuz/bind/luapuz_puz_Puzzle_helpers.hpp"
 #endif // XWORD_USE_LUA
 
 // For the scrambling dialogs
@@ -141,6 +144,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
     EVT_ACTIVATE       (                      MyFrame::OnActivate)
     EVT_CLOSE          (                      MyFrame::OnClose)
+
+    EVT_HTML_LINK_CLICKED(wxID_ANY,           MyFrame::OnLinkClicked)
 
     EVT_AUI_PANE_CLOSE (                      MyFrame::OnPaneClose)
 
@@ -316,8 +321,37 @@ public:
             m_frame->RunLuaScript(filenames.Item(0));
         // Otherwise try to open as a puzzle
         else
-#endif
+        {
+            // Try to load the dropped puzzle using import.load from lua.
+
+            lua_State * L = m_frame->GetwxLuaState().GetLuaState();
+
+            // Push import.load function for luapuz_Load_Puzzle.
+            lua_getglobal(L, "import");
+            if (! lua_istable(L, -1))
+                lua_pop(L, 1);
+            else
+            {
+                lua_getfield(L, -1, "load");
+                if (! lua_isfunction(L, -1))
+                    lua_pop(L, 1);
+                else
+                {
+                    // Create the puz::Puzzle file handler
+                    puz::Puzzle::FileHandlerDesc desc;
+                    desc.data = L;
+                    desc.handler = luapuz_Load_Puzzle;
+
+                    m_frame->LoadPuzzle(filenames.Item(0), &desc);
+
+                    lua_pop(L, 2);
+                    return true;
+                }
+            }
             m_frame->LoadPuzzle(filenames.Item(0));
+        }
+#endif
+        m_frame->LoadPuzzle(filenames.Item(0));
         return true;
     }
 
@@ -338,12 +372,13 @@ MyFrame::MyFrame()
       m_charactersPanel(NULL),
       m_mgr(this),
       m_isIdleConnected(false)
-{
+{ 
 #ifdef __WXDEBUG__
     // Debug window
     wxTextCtrl * logctrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString,
                                           wxDefaultPosition, wxDefaultSize,
                                           wxTE_MULTILINE);
+    logctrl->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, _T("Consolas")));
     new wxLogChain(new wxLogTextCtrl(logctrl));
     m_mgr.AddPane(logctrl,
                   wxAuiPaneInfo()
@@ -417,11 +452,15 @@ MyFrame::~MyFrame()
 wxString
 MyFrame::GetLoadTypeString()
 {
-    return _T("Across Lite Format (*.puz)|*.puz")
+    return _T("Supported Types (*.puz;*.xml;*.ipuz;*.jpz)|*.puz;*.xml;*.ipuz;*.jpz")
            _T("|")
-           _T("Plain Text Format (*.txt)|*.txt")
+           _T("Across Lite Format (*.puz)|*.puz")
            _T("|")
-           _T("Supported Types (*.puz;*.txt)|*.puz;*.txt")
+           _T("XPF (*.xml)|*.xml")
+           _T("|")
+           _T("JPZ (*.jpz)|*.jpz")
+           _T("|")
+           _T("ipuz (*.ipuz)|*.ipuz")
            _T("|")
            _T("All Files (*.*)|*.*");
 }
@@ -429,7 +468,9 @@ MyFrame::GetLoadTypeString()
 wxString
 MyFrame::GetSaveTypeString()
 {
-    return _T("Across Lite Format (*.puz)|*.puz");
+    return _T("Across Lite Format (*.puz)|*.puz")
+           _T("|")
+           _T("XPF (*.xml)|*.xml");
 }
 
 
@@ -444,11 +485,11 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     try
     {
         m_isModified = false;
-        m_puz.Load(wx2puz(filename), handler);
+        m_puz.Load(wx2file(filename), handler);
     }
     catch (puz::ChecksumError &)
     {
-        m_puz.SetOk(XWordPrompt(MSG_CORRUPT_PUZ));
+        m_puz.SetOk(XWordPrompt(this, MSG_CORRUPT_PUZ));
     }
     catch (...)
     {
@@ -462,12 +503,12 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     m_filename = filename;
 
     if (m_puz.IsOk())
-    {
-        SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
-                                   m_filename.c_str(),
-                                   sw.Time()));
         m_XGridCtrl->SetFocus();
-    }
+
+    if (m_puz.IsOk())
+        SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
+                                   filename.c_str(),
+                                   sw.Time()));
     else
         SetStatus(_T("No file loaded"));
 
@@ -478,7 +519,8 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
 bool
 MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
 {
-    m_puz.m_notes = wx2puz(m_notes->GetValue());
+    // We can't save notes now that notes are XHTML.
+    //m_puz.m_notes = wx2puz(m_notes->GetValue());
     m_puz.m_time = m_time;
     m_puz.m_isTimerRunning = IsTimerRunning();
 
@@ -498,7 +540,7 @@ MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
 
     try
     {
-        m_puz.Save(wx2puz(fn), handler);
+        m_puz.Save(wx2file(fn), handler);
         m_filename = fn;
         m_isModified = false;
 
@@ -527,16 +569,15 @@ MyFrame::HandlePuzException()
     }
     catch (puz::Exception & err)
     {
-        XWordMessage(MSG_PUZ_ERROR, puz2wx(err.what()).c_str());
+        XWordMessage(this, MSG_PUZ_ERROR, puz2wx(puz::decode_utf8(err.what())).c_str());
     }
     catch (std::exception & err)
     {
-
-        XWordMessage(MSG_STD_EXCEPTION, err.what());
+        XWordMessage(this, MSG_STD_EXCEPTION, puz2wx(puz::decode_utf8(err.what())).c_str());
     }
     catch (...)
     {
-        XWordMessage(MSG_UNKNOWN_ERROR);
+        XWordMessage(this, MSG_UNKNOWN_ERROR);
     }
 }
 
@@ -550,7 +591,7 @@ MyFrame::ClosePuzzle(bool prompt)
 
     if (prompt && m_isModified)
     {
-        int ret = XWordMessage(MSG_SAVE_PUZ);
+        int ret = XWordMessage(this, MSG_SAVE_PUZ);
 
         if (ret == wxCANCEL)
             return false;
@@ -570,6 +611,7 @@ MyFrame::ClosePuzzle(bool prompt)
 void
 MyFrame::ShowPuzzle()
 {
+    Freeze();
     // If there is no puzzle, display a blank frame
     if (! m_puz.IsOk())
         m_puz.Clear();
@@ -578,7 +620,6 @@ MyFrame::ShowPuzzle()
     EnableSaveAs();
     if (m_puz.IsOk())
     {
-        SetStatus(m_filename);
         EnableTools(true);
     }
     else
@@ -600,19 +641,18 @@ MyFrame::ShowPuzzle()
     SetTime(m_puz.m_time);
     if (m_puz.m_isTimerRunning)
         StartTimer();
+
+    Thaw();
 }
 
 void
 MyFrame::ShowGrid()
 {
     if (! m_puz.IsOk())
-        m_XGridCtrl->SetGrid(NULL);
+        m_XGridCtrl->SetPuzzle(NULL);
     else
     {
-        // Make sure the grid has clue numbers assigned, etc.
-        m_puz.m_grid.SetupGrid();
-
-        m_XGridCtrl->SetGrid(&m_puz.m_grid);
+        m_XGridCtrl->SetPuzzle(&m_puz);
 
         const bool scrambled = m_puz.IsScrambled();
         // Enable / disable scrambling tools
@@ -621,7 +661,7 @@ MyFrame::ShowGrid()
         EnableCheck(! scrambled);
         EnableReveal(! scrambled);
 
-        m_XGridCtrl->SetFocusedClue(1, puz::ACROSS);
+        m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite());
 
         // Inform user if puzzle is already completed
         CheckPuzzle();
@@ -635,8 +675,99 @@ MyFrame::ShowGrid()
 void
 MyFrame::ShowClues()
 {
-    m_across->SetClueList(m_puz.m_across);
-    m_down  ->SetClueList(m_puz.m_down);
+    // Remove the old clue lists from m_clues, but keep the windows alive
+    std::map<wxString, CluePanel *> old_panels; // AUI_name = CluePanel *
+    {
+        std::map<wxString, CluePanel *>::iterator it;
+        for (it = m_clues.begin(); it != m_clues.end(); ++it)
+        {
+            wxAuiPaneInfo & info = m_mgr.FindPane(it->second);
+            old_panels[info.name] = it->second;
+        }
+        m_clues.clear();
+    }
+
+    // For each of the clue lists that we need, change the AUI caption of
+    // an existing pane and replace the clue list contents.
+    // If we have more clue lists than panels, create new panels.
+    // If we have more panels than clue lists, destroy some panels.
+
+    wxAuiPaneInfo baseInfo;
+    baseInfo.CaptionVisible(false)
+            .PinButton()
+            .CloseButton()
+            .MinSize(15,15);
+
+    {
+        // AUI names for the clue lists are as follows:
+        //  Across -> "Cluelist1"
+        //  Down -> "ClueList2"
+        //  Others -> "ClueList([1 or 3]..n)"
+        //  if both Across and Down are present, other clue lists start at 3
+        //  otherwise all clue lists start from 1
+        int cluelist_id = 1; // Starting ClueList ID
+        if (m_puz.HasClueList(puzT("Across")))
+        {
+            cluelist_id = 2;
+            if (m_puz.HasClueList(puzT("Down")))
+                cluelist_id = 3;
+        }
+
+        puz::Clues::iterator it;
+        for (it = m_puz.GetClues().begin() ; it != m_puz.GetClues().end(); ++it)
+        {
+            wxString label = puz2wx(it->first);
+            // Name the pane
+            wxString id;
+            if (label == _T("Across"))
+                id = _T("ClueList1");
+            else if (label == _T("Down"))
+                id = _T("ClueList2");
+            else
+                id = wxString::Format(_T("ClueList%d"), cluelist_id++);
+
+            // Find the pane
+            wxAuiPaneInfo & info = m_mgr.GetPane(id);
+            CluePanel * clues = NULL;
+            if (info.IsOk())
+            {
+                // This pane exists, change it
+                info.Caption(label);
+                clues = old_panels[id];
+                old_panels.erase(id);
+            }
+            else
+            {
+                // This pane doesn't exist, add it.
+                clues = new CluePanel(this, wxID_ANY);
+                m_mgr.AddPane(clues,
+                              wxAuiPaneInfo(baseInfo)
+                              .BestSize(300,-1)
+                              .Float()
+                              .Caption(label)
+                              .Name(id) );
+            }
+            // Set the heading and clue list for the panel
+            clues->SetHeading(label);
+            clues->SetClueList(&it->second);
+            m_clues[label] = clues;
+            m_mgr.SetContextWindow(m_mgr.GetPane(clues), clues->m_heading);
+        }
+    }
+
+    // Delete and detach the left over CLuePanels
+    {
+        std::map<wxString, CluePanel *>::iterator it;
+        for (it = old_panels.begin(); it != old_panels.end(); ++it)
+        {
+            m_mgr.DetachPane(it->second);
+            it->second->Destroy();
+        }
+    }
+
+    // Update the UI
+    UpdateCluePanelConfig();
+    m_mgr.Update();
 }
 
 
@@ -675,9 +806,9 @@ MyFrame::ShowCopyright()
 void
 MyFrame::ShowNotes()
 {
-    m_notes->ChangeValue(puz2wx(m_puz.m_notes));
+    m_notes->SetPage(puz2wx(m_puz.GetNotes()));
     // Set the notes bitmap depending on whether there are notes or not
-    if (m_puz.m_notes.empty())
+    if (m_puz.GetNotes().empty())
         m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
     else
         m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes_new"));
@@ -718,20 +849,12 @@ MyFrame::CreateWindows()
 {
     m_XGridCtrl = new XGridCtrl(this);
 
-    m_across = new CluePanel(this, wxID_ANY, _T("Across"), puz::ACROSS);
-    m_down   = new CluePanel(this, wxID_ANY, _T("Down"),   puz::DOWN);
-
     m_title      = new SizedText (this, wxID_ANY);
     m_author     = new SizedText (this, wxID_ANY);
     m_copyright  = new SizedText (this, wxID_ANY);
     m_cluePrompt = new CluePrompt (this, wxID_ANY);
-    m_cluePrompt->SetAlign(wxALIGN_CENTER);
 
-    m_notes      = new wxTextCtrl(this, wxID_ANY,
-                                  wxEmptyString,
-                                  wxDefaultPosition,
-                                  wxDefaultSize,
-                                  wxTE_MULTILINE);
+    m_notes      = new wxHtmlWindow(this, wxID_ANY);
 
     if (m_toolMgr.GetIconLocation() != wxEmptyString)
     {
@@ -981,24 +1104,6 @@ MyFrame::ManageWindows()
                       .Name(_T("Tools")));
 #endif // USE_AUI_TOOLBAR
 
-    m_mgr.AddPane(m_across,
-                  wxAuiPaneInfo(baseInfo)
-                  .BestSize(300,-1)
-                  .Layer(4)
-                  .Left()
-                  .Caption(_T("Across"))
-                  .Name(_T("Across")) );
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_across), m_across->m_heading);
-
-    m_mgr.AddPane(m_down,
-                  wxAuiPaneInfo(baseInfo)
-                  .BestSize(300,-1)
-                  .Layer(4)
-                  .Left()
-                  .Caption(_T("Down"))
-                  .Name(_T("Down")) );
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_down), m_down->m_heading);
-
     m_mgr.AddPane(m_title,
                   wxAuiPaneInfo(baseInfo)
                   .Layer(3)
@@ -1063,7 +1168,7 @@ MyFrame::SetupToolManager()
     }
     else
     {
-        XWordErrorMessage(_T("Cannot find images directory:\n%s"), imagesdir.c_str());
+        XWordErrorMessage(this, _T("Cannot find images directory:\n%s"), imagesdir.c_str());
         m_toolMgr.SetIconLocation(_T(""));
     }
 }
@@ -1172,111 +1277,40 @@ MyFrame::LoadConfig()
     ConfigManager & config = wxGetApp().GetConfigManager();
     // Window size and position
     //-------------------------
-    config.SetPath(_T("/Window"));
-    if (config.ReadBool(_T("maximized")))
-    {
+    if (config.Window.maximized())
         Maximize();
-    }
     else
-    {
-        SetSize( config.ReadLong(_T("left")),
-                 config.ReadLong(_T("top")),
-                 config.ReadLong(_T("width")),
-                 config.ReadLong(_T("height")) );
-    }
-
+        SetSize( config.Window.left(), config.Window.top(),
+                 config.Window.width(), config.Window.height() );
 
     // Grid
     //-----
-    config.SetPath(_T("/Grid"));
-
-    if (config.ReadBool(_T("fit")))
+    if (config.Grid.fit())
     {
         m_toolMgr.Check(wxID_ZOOM_FIT);
         m_XGridCtrl->FitGrid();
     }
-    m_XGridCtrl->SetGridStyle(config.ReadLong(_T("style")) );
 
-    m_XGridCtrl->SetLetterFont(config.ReadFont(_T("letterFont")) );
-    m_XGridCtrl->SetNumberFont(config.ReadFont(_T("numberFont")) );
-
-    m_XGridCtrl->SetBorderSize(config.ReadLong(_T("lineThickness")));
-
-    m_XGridCtrl->SetFocusedLetterColor(
-        config.ReadColor(_T("focusedLetterColor")) );
-    m_XGridCtrl->SetFocusedWordColor(
-        config.ReadColor(_T("focusedWordColor")) );
-    m_XGridCtrl->SetBackgroundColour(
-        config.ReadColor(_T("backgroundColor")) );
-    m_XGridCtrl->SetWhiteSquareColor(
-        config.ReadColor(_T("whiteSquareColor")) );
-    m_XGridCtrl->SetBlackSquareColor(
-        config.ReadColor(_T("blackSquareColor")) );
-    m_XGridCtrl->SetSelectionColor(
-        config.ReadColor(_T("selectionColor")) );
-    m_XGridCtrl->SetPenColor(
-        config.ReadColor(_T("penColor")) );
-    m_XGridCtrl->SetPencilColor(
-        config.ReadColor(_T("pencilColor")) );
-    m_XGridCtrl->SetNumberScale(
-        config.ReadLong(_T("numberScale")) / 100. );
-    m_XGridCtrl->SetLetterScale(
-        config.ReadLong(_T("letterScale")) / 100. );
-
-    // Clue Boxes
-    //-----------
-    config.SetPath(_T("/Clue"));
-
-    for (CluePanel * panel = m_across; ; panel = m_down)
-    {
-        panel->SetFont(config.ReadFont(_T("font")));
-        panel->SetMargins(config.ReadPoint(_T("spacing")));
-
-        panel->SetForegroundColour(
-            config.ReadColor(_T("listForegroundColor")) );
-        panel->SetBackgroundColour(
-            config.ReadColor(_T("listBackgroundColor")) );
-        panel->SetSelectionForeground(
-            config.ReadColor(_T("selectedForegroundColor")) );
-        panel->SetSelectionBackground(
-            config.ReadColor(_T("selectedBackgroundColor")) );
-        panel->SetCrossingForeground(
-            config.ReadColor(_T("crossingForegroundColor")) );
-        panel->SetCrossingBackground(
-            config.ReadColor(_T("crossingBackgroundColor")) );
-
-        panel->SetHeadingFont(config.ReadFont(_T("headingFont")));
-        panel->SetHeadingForeground(
-            config.ReadColor(_T("headingForegroundColor")) );
-        panel->SetHeadingBackground(
-            config.ReadColor(_T("headingBackgroundColor")) );
-
-        if (panel == m_down)
-            break;
-    }
-
-    // Clue Prompt
-    //------------
-    config.SetPath(_T("/Clue Prompt"));
-    m_cluePrompt->SetFont(config.ReadFont(_T("font")));
-    m_cluePrompt->SetBackgroundColour(config.ReadColor(_T("backgroundColor")));
-    m_cluePrompt->SetForegroundColour(config.ReadColor(_T("foregroundColor")));
-    m_cluePrompt->SetDisplayFormat(config.ReadString(_T("displayFormat")));
 
     // Printing
-    //---------
-    config.SetPath(_T("/Printing"));
-    g_printData->SetPaperId(static_cast<wxPaperSize>(config.ReadLong(_T("paperID"))));
-    g_printData->SetOrientation(config.ReadLong(_T("orientation")));
+    ConfigManager::Printing_t & print = config.Printing;
+    g_printData->SetPaperId(static_cast<wxPaperSize>(print.paperID()));
+    g_printData->SetOrientation(print.orientation());
     g_pageSetupData->SetPaperId(g_printData->GetPaperId());
 
-    config.SetPath(_T("/Printing/Margins"));
-    g_pageSetupData->SetMarginTopLeft(wxPoint(config.ReadLong(_T("left")),
-                                              config.ReadLong(_T("top"))));
-    g_pageSetupData->SetMarginBottomRight(wxPoint(config.ReadLong(_T("right")),
-                                                  config.ReadLong(_T("bottom"))));
+    ConfigManager::Printing_t::Margins_t & margins = print.Margins;
+    g_pageSetupData->SetMarginTopLeft(wxPoint(margins.left(), margins.top()));
+    g_pageSetupData->SetMarginBottomRight(wxPoint(margins.right(),
+                                                  margins.bottom()));
 
-    config.SetPath(_T("/"));
+    // Update the config of our controls
+    config.Update();
+}
+
+void
+MyFrame::UpdateCluePanelConfig()
+{
+    wxGetApp().GetConfigManager().Clue.Update();
 }
 
 
@@ -1284,11 +1318,10 @@ void
 MyFrame::SaveConfig()
 {
     ConfigManager & config = wxGetApp().GetConfigManager();
+    config.AutoUpdate(false);
 
     // Window settings
     //----------------
-    config.SetPath(_T("/Window"));
-
     // Only save window position if it is not maximized
     if (! IsMaximized())
     {
@@ -1301,91 +1334,17 @@ MyFrame::SaveConfig()
         if (h < 200) h = 500;
         if (x < 0 || x >= wxSystemSettings::GetMetric(wxSYS_SCREEN_X)) x = 20;
         if (y < 0 || y >= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)) y = 20;
-        config.WriteLong(_T("width"),     w);
-        config.WriteLong(_T("height"),    h);
-        config.WriteLong(_T("top"),       y);
-        config.WriteLong(_T("left"),      x);
+        config.Window.width = w;
+        config.Window.height = h;
+        config.Window.top = y;
+        config.Window.left = x;
     }
-    config.WriteBool(_T("maximized"), IsMaximized());
+    config.Window.maximized = IsMaximized();
 
-
-    // Grid Settings
-    //--------------
-    config.SetPath(_T("/Grid"));
-
-    config.WriteLong(_T("style"), m_XGridCtrl->GetGridStyle());
-    config.WriteBool(_T("fit"),   m_toolMgr.IsChecked(wxID_ZOOM_FIT));
-    config.WriteFont(_T("letterFont"),  m_XGridCtrl->GetLetterFont());
-    config.WriteFont(_T("numberFont"),  m_XGridCtrl->GetNumberFont());
-    config.WriteLong(_T("lineThickness"), m_XGridCtrl->GetBorderSize());
-
-    config.WriteColor(_T("backgroundColor"),    m_XGridCtrl->GetBackgroundColour());
-    config.WriteColor(_T("selectionColor"),     m_XGridCtrl->GetSelectionColor());
-    config.WriteColor(_T("focusedLetterColor"), m_XGridCtrl->GetFocusedLetterColor());
-    config.WriteColor(_T("focusedWordColor"),   m_XGridCtrl->GetFocusedWordColor());
-    config.WriteColor(_T("whiteSquareColor"),   m_XGridCtrl->GetWhiteSquareColor());
-    config.WriteColor(_T("blackSquareColor"),   m_XGridCtrl->GetBlackSquareColor());
-    config.WriteColor(_T("penColor"),           m_XGridCtrl->GetPenColor());
-    config.WriteColor(_T("pencilColor"),        m_XGridCtrl->GetPencilColor());
-    config.WriteLong(_T("numberScale"),         m_XGridCtrl->GetNumberScale() * 100);
-    config.WriteLong(_T("letterScale"),         m_XGridCtrl->GetLetterScale() * 100);
-
-
-    // Clue Panel
-    //-----------
-    config.SetPath(_T("/Clue"));
-
-    config.WriteFont(_T("font"), m_across->GetFont());
-    config.WritePoint(_T("spacing"), m_across->GetMargins());
-
-    config.WriteColor(_T("listForegroundColor"),
-        m_across->GetForegroundColour() );
-    config.WriteColor(_T("listBackgroundColor"),
-        m_across->GetBackgroundColour() );
-
-    config.WriteColor(_T("selectedForegroundColor"),
-        m_across->GetSelectionForeground() );
-    config.WriteColor(_T("selectedBackgroundColor"),
-        m_across->GetSelectionBackground() );
-
-    config.WriteColor(_T("crossingForegroundColor"),
-        m_across->GetCrossingForeground() );
-    config.WriteColor(_T("crossingBackgroundColor"),
-        m_across->GetCrossingBackground() );
-
-    config.WriteFont(_T("headingFont"), m_across->GetHeadingFont());
-    config.WriteColor(_T("headingForegroundColor"),
-        m_across->GetHeadingForeground() );
-    config.WriteColor(_T("headingBackgroundColor"),
-        m_across->GetHeadingBackground() );
-
-    // Clue Prompt
-    //------------
-    config.SetPath(_T("/Clue Prompt"));
-
-    config.WriteFont(_T("font"), m_cluePrompt->GetFont());
-
-    config.WriteColor(_T("foregroundColor"),
-                      m_cluePrompt->GetForegroundColour());
-
-    config.WriteColor(_T("backgroundColor"),
-                      m_cluePrompt->GetBackgroundColour());
-
-    config.WriteString(_T("displayFormat"), m_cluePrompt->GetDisplayFormat());
-
-    // Layout
-    SaveLayout(_T("(Previous)"));
-
-    // Printing
-    //---------
-    config.SetPath(_T("/Printing"));
-    config.WriteLong(_T("paperID"), g_pageSetupData->GetPaperId());
-    config.WriteLong(_T("orientation"), g_printData->GetOrientation());
-    config.SetPath(_T("/Printing/Margins"));
-    config.WriteLong(_T("left"), g_pageSetupData->GetMarginTopLeft().x);
-    config.WriteLong(_T("right"), g_pageSetupData->GetMarginBottomRight().x);
-    config.WriteLong(_T("top"), g_pageSetupData->GetMarginTopLeft().y);
-    config.WriteLong(_T("bottom"), g_pageSetupData->GetMarginBottomRight().y);
+    config.AutoUpdate(true);
+    // The rest of the config has only changed if the user used the
+    // preferences dialog, in which case the prefs dialog has already
+    // written the rest of the config settings.
 }
 
 
@@ -1402,52 +1361,39 @@ MyFrame::GetFocusedSquare()
         return m_XGridCtrl->GetFocusedSquare();
 }
 
+
 puz::Square *
 MyFrame::SetFocusedSquare(puz::Square * square)
 {
     if (m_XGridCtrl->IsEmpty())
         return false;
     else
-        // TODO:These function names should really be consistent
-        return m_XGridCtrl->SetSquareFocus(square);
+        return m_XGridCtrl->SetFocusedSquare(square);
 }
 
-void
-MyFrame::GetFocusedWord(puz::Square ** start, puz::Square ** end)
+puz::Word *
+MyFrame::GetFocusedWord()
 {
-    if (m_XGridCtrl->IsEmpty())
-    {
-        *start = NULL;
-        *end = NULL;
-    }
-    else
-        m_XGridCtrl->GetFocusedWord(start, end);
+    return m_XGridCtrl->GetFocusedWord();
 }
 
-puz::GridDirection
+short
 MyFrame::GetFocusedDirection() const
 {
     return m_XGridCtrl->GetDirection();
 }
 
 void
-MyFrame::SetFocusedDirection(puz::GridDirection direction)
+MyFrame::SetFocusedDirection(short direction)
 {
-    m_XGridCtrl->SetDirection(direction);
+    // TODO: remove this or fix SetDirection
+    //m_XGridCtrl->SetDirection(direction);
 }
 
-const puz::Puzzle::Clue *
+puz::Clue *
 MyFrame::GetFocusedClue()
 {
-    puz::Square * start;
-    puz::Square * end;
-    GetFocusedWord(&start, &end);
-    if (start == NULL)
-        return NULL;
-    else if (GetFocusedDirection() == puz::ACROSS)
-        return &*m_puz.GetAcross().Find(start->GetNumber());
-    else
-        return &*m_puz.GetDown().Find(start->GetNumber());
+    return m_puz.FindClue(GetFocusedWord());
 }
 
 bool
@@ -1550,7 +1496,7 @@ MyFrame::OnCheckLetter(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnRevealGrid(wxCommandEvent & WXUNUSED(evt))
 {
-    if (XWordPrompt(MSG_REVEAL_ALL))
+    if (XWordPrompt(this, MSG_REVEAL_ALL))
         m_XGridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL);
 }
 
@@ -1606,7 +1552,7 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 
     if (m_XGridCtrl->GetGrid()->ScrambleSolution(key))
     {
-        XWordMessage(MSG_SCRAMBLE, m_XGridCtrl->GetGrid()->GetKey());
+        XWordMessage(this, MSG_SCRAMBLE, m_XGridCtrl->GetGrid()->GetKey());
 
         m_XGridCtrl->RecheckGrid();
         CheckPuzzle();
@@ -1648,7 +1594,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 
     if (m_XGridCtrl->UnscrambleSolution(key))
     {
-        XWordMessage(MSG_UNSCRAMBLE);
+        XWordMessage(this, MSG_UNSCRAMBLE);
 
         CheckPuzzle();
 
@@ -1660,7 +1606,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
     }
     else
     {
-        XWordMessage(MSG_WRONG_KEY);
+        XWordMessage(this, MSG_WRONG_KEY);
     }
 }
 
@@ -1902,16 +1848,15 @@ MyFrame::OnLuaScript(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnLuaPrint(wxLuaEvent & evt)
 {
-    // Escape % to %% for printing
-    wxLogDebug(_T("%s"), evt.GetString());
+    wxLogDebug(_T("%s"), evt.GetString().c_str());
 }
-
 
 void
 MyFrame::OnLuaError(wxLuaEvent & evt)
 {
-    // Escape % to %% for printing
-    XWordErrorMessage(_T("%s"), evt.GetString());
+    wxLogDebug(_T("(error) %s"), evt.GetString().c_str());
+    // Write to the log file
+    wxGetApp().LogLuaMessage(_T("(error) ") + evt.GetString());
 }
 
 #endif // XWORD_USE_LUA
@@ -1921,27 +1866,9 @@ MyFrame::OnLuaError(wxLuaEvent & evt)
 void
 MyFrame::OnPreferences(wxCommandEvent & WXUNUSED(evt))
 {
-    SaveConfig();
     if (m_preferencesDialog == NULL)
-    {
         m_preferencesDialog = new PreferencesDialog(this);
-        m_preferencesDialog->Connect(
-            wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED,
-            wxCommandEventHandler(MyFrame::OnPreferencesDialogCancel),
-            NULL, this);
-    }
     m_preferencesDialog->Show();
-}
-
-
-void
-MyFrame::OnPreferencesDialogCancel(wxCommandEvent & evt)
-{
-    // Reload the config from the previously saved config
-    LoadConfig();
-    Refresh();
-
-    evt.Skip();
 }
 
 
@@ -1994,6 +1921,7 @@ MyFrame::OnLicense(wxCommandEvent & WXUNUSED(evt))
 // Printing events
 //------------------------------------------------------------------------------
 // Most of this is only slightly adapted from the wxWidgets printing sample.
+// TODO: The printing framework needs a lot of work.
 
 void
 MyFrame::OnPageSetup(wxCommandEvent & WXUNUSED(evt))
@@ -2059,45 +1987,59 @@ MyFrame::OnPrint(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnGridFocus(wxPuzEvent & evt)
 {
-    // Update everything
-
-    if (evt.GetDirection() == puz::ACROSS)
-    {
-        m_across->SetClueNumber(evt.GetAcrossClue(), CluePanel::FOCUSED);
-        m_down  ->SetClueNumber(evt.GetDownClue(), CluePanel::CROSSING);
-        m_cluePrompt->SetClue(evt.GetAcrossClue(), puz::ACROSS,
-                              m_across->GetClueText());
-    }
-    else
-    {
-        m_across->SetClueNumber(evt.GetAcrossClue(), CluePanel::CROSSING);
-        m_down  ->SetClueNumber(evt.GetDownClue(), CluePanel::FOCUSED);
-        m_cluePrompt->SetClue(evt.GetDownClue(), puz::DOWN,
-                              m_down->GetClueText());
-    }
+    // Update clue lists and clue prompt
+    UpdateClues();
 }
 
 
 void
 MyFrame::OnClueFocus(wxPuzEvent & evt)
 {
-    m_XGridCtrl->ChangeFocusedClue(evt.GetClueNumber(), evt.GetDirection());
-
-    m_cluePrompt->SetClue(evt.GetClueNumber(), evt.GetDirection(),
-                          evt.GetClueText());
-
-    const puz::Square * crossingStart = m_XGridCtrl->GetFocusedSquare()
-        ->GetWordStart(evt.GetDirection() == puz::ACROSS ? puz::DOWN : puz::ACROSS);
-    const int crossingClue = (crossingStart == NULL ?
-                               0 :
-                               crossingStart->GetNumber());
-
-    if (evt.GetDirection() == puz::ACROSS)
-        m_down->  SetClueNumber(crossingClue, CluePanel::CROSSING);
-    else
-        m_across->SetClueNumber(crossingClue, CluePanel::CROSSING);
+    puz::Clue * focusedClue = evt.GetClue();
+    m_XGridCtrl->ChangeFocusedWord(focusedClue->GetWord());
+    UpdateClues();
 }
 
+void
+MyFrame::UpdateClues()
+{
+    const puz::Square * focusedSquare = GetFocusedSquare();
+    const puz::Word * focusedWord = GetFocusedWord();
+    const puz::Clue * focusedClue = NULL;
+    puz::Clues::const_iterator it;
+    for (it = m_puz.GetClues().begin(); it != m_puz.GetClues().end(); ++it)
+    {
+        const puz::ClueList & cluelist = it->second;
+        if (focusedClue == NULL)
+        {
+            // Look for focusedWord in this clue list; if it is not in the list,
+            // look for a word with focusedSquare.
+            const puz::Clue * foundClue = NULL;
+            puz::ClueList::const_iterator clues_it;
+            for (clues_it = cluelist.begin(); clues_it != cluelist.end(); ++clues_it)
+            {
+                const puz::Clue * clue = &*clues_it;
+                const puz::Word * word = clue->GetWord();
+                if (word == focusedWord)
+                {
+                    m_clues[puz2wx(it->first)]->SetClue(clue, CluePanel::FOCUSED);
+                    focusedClue = clue;
+                    break;
+                }
+                else if (foundClue == NULL)
+                    if (word->Contains(focusedSquare))
+                        foundClue = clue;
+            }
+            if (! focusedClue)
+                m_clues[puz2wx(it->first)]->SetClue(foundClue, CluePanel::CROSSING);
+        }
+        else // We have already set focusedClue, so this will be a crossing clue.
+        {
+            m_clues[puz2wx(it->first)]->SetClue(cluelist.Find(focusedSquare), CluePanel::CROSSING);
+        }
+    }
+    m_cluePrompt->SetClue(focusedClue);
+}
 
 void
 MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
@@ -2183,11 +2125,27 @@ MyFrame::OnClose(wxCloseEvent & evt)
 {
     if (ClosePuzzle() || ! evt.CanVeto())
     {
+        SaveLayout(_T("(Previous)"));
+        SaveConfig();
+        // Hide all the top level windows
+        wxWindowList::iterator it;
+        wxWindowList::iterator begin = wxTopLevelWindows.begin();
+        wxWindowList::iterator end   = wxTopLevelWindows.end();
+        for (it = begin; it != end; ++it)
+            (*it)->Hide();
+
 #ifdef XWORD_USE_LUA
         LuaUninit();
+        // Check to see if we have lua messages
+        if (wxGetApp().HasLuaLog())
+        {
+            XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename());
+        #ifdef __WXDEBUG__
+            wxGetApp().m_luaLog->Close();
+            wxShell(wxString::Format(_T("\"%s\""), GetLuaLogFilename().c_str()));
+        #endif // __WXDEBUG__
+        }
 #endif
-        SaveConfig();
-        Hide();
         Destroy();
         return;
     }
@@ -2197,6 +2155,12 @@ MyFrame::OnClose(wxCloseEvent & evt)
     }
 }
 
+
+void
+MyFrame::OnLinkClicked(wxHtmlLinkEvent & evt)
+{
+    wxLaunchDefaultBrowser(evt.GetLinkInfo().GetHref());
+}
 
 
 //------------------------------------------------------------------------------
@@ -2365,20 +2329,6 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
 
         if (square->IsLast(puz::ACROSS))
             str << _T("\n");
-    }
-
-    str << _T("\n");
-
-    str << _T("Unrecognized sections:") <<_T("\n");
-
-    std::vector<puz::Puzzle::section>::iterator it;
-    for (it  = m_puz.m_extraSections.begin();
-         it != m_puz.m_extraSections.end();
-         ++it)
-    {
-        str << puz2wx(it->name)
-            << wxString::Format(_T("  (length = %d)"), it->data.size())
-            << _T("\n");
     }
 
     ShowDebugDialog(_T("Current puzzle status"), str);

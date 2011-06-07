@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -25,8 +25,7 @@ DEFINE_EVENT_TYPE( wxEVT_PUZ_LETTER )
 wxPuzEvent::wxPuzEvent(wxEventType evtType, int id)
     : wxCommandEvent(evtType, id)
 {
-    m_direction  = puz::ACROSS;
-    m_acrossClue = 0;
-    m_downClue   = 0;
-    m_clueText   = _T("");
+    m_clue = NULL;
+    m_square = NULL;
+    m_word = NULL;
 }

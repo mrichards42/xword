@@ -80,6 +80,85 @@ static int LUACALL wxLua_MyFrame_SavePuzzle(lua_State *L)
 %end
 
 
+
+%override wxLua_MyFrame_ShowPuzzle
+//     void ShowPuzzle()
+static int LUACALL wxLua_MyFrame_ShowPuzzle(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // Check the puzzle
+    if (self->GetPuzzle().IsOk())
+    {
+        try {
+            self->GetPuzzle().TestOk();
+        }
+        catch(...) {
+            self->GetPuzzle().SetOk(false);
+        }
+    }
+
+
+    // call ShowPuzzle
+    self->ShowPuzzle();
+
+    return 0;
+}
+%end
+
+
+%override wxLua_MyFrame_ShowGrid
+//     void ShowGrid()
+static int LUACALL wxLua_MyFrame_ShowGrid(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // Check the puzzle
+    if (self->GetPuzzle().IsOk())
+    {
+        try {
+            self->GetPuzzle().TestOk();
+            // call ShowGrid
+            self->ShowGrid();
+        }
+        catch(...) {
+            self->GetPuzzle().SetOk(false);
+        }
+    }
+    return 0;
+}
+%end
+
+
+
+%override wxLua_MyFrame_ShowClues
+//     void ShowClues()
+static int LUACALL wxLua_MyFrame_ShowClues(lua_State *L)
+{
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // Check the puzzle
+    if (self->GetPuzzle().IsOk())
+    {
+        try {
+            self->GetPuzzle().TestOk();
+            // call ShowClues
+            self->ShowClues();
+        }
+        catch(...) {
+            self->GetPuzzle().SetOk(false);
+        }
+    }
+    return 0;
+}
+%end
+
+
+
+
 %override wxLua_MyFrame_GetPuzzle
 // puz::Puzzle & GetPuzzle()
 static int LUACALL wxLua_MyFrame_GetPuzzle(lua_State *L)
@@ -101,7 +180,7 @@ static int LUACALL wxLua_MyFrame_GetFocusedSquare(lua_State *L)
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
-    puz::Square * returns = self->GetFocusedSquare();
+    puz::Square * returns = const_cast<puz::Square *>(self->GetFocusedSquare());
     luapuz_pushSquare(L, returns);
     return 1;
 }
@@ -115,7 +194,7 @@ static int LUACALL wxLua_MyFrame_SetFocusedSquare(lua_State *L)
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
     puz::Square * square = luapuz_checkSquare(L, 2);
-    puz::Square * returns = self->SetFocusedSquare(square);
+    puz::Square * returns = const_cast<puz::Square *>(self->SetFocusedSquare(square));
     luapuz_pushSquare(L, returns);
     return 1;
 }
@@ -130,8 +209,8 @@ static int LUACALL wxLua_MyFrame_GetFocusedDirection(lua_State *L)
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
-    puz::GridDirection returns = self->GetFocusedDirection();
-    luapuz_pushGridDirection(L, returns);
+    short returns = self->GetFocusedDirection();
+    lua_pushnumber(L, returns);
     return 1;
 }
 %end
@@ -167,19 +246,17 @@ static int LUACALL wxLua_MyFrame_SetSquareText(lua_State *L)
 
 %override wxLua_MyFrame_GetFocusedWord
 // %override [Lua table] MyFrame::GetFocusedWord()
-// void GetFocusedWord(puz::Square * start, puz::Square * end)
+// puz::Word * GetFocusedWord()
 static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L)
 {
     // get this
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
     // call GetFocusedWord
-    puz::Square * start;
-    puz::Square * end;
-    self->GetFocusedWord(&start, &end);
+    const puz::Word * word = self->GetFocusedWord();
 
     // Return nil if there is no focused word
-    if (start == NULL || end == NULL)
+    if (word == NULL)
     {
         lua_pushnil(L);
         return 1;
@@ -190,12 +267,11 @@ static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L)
     lua_newtable(L);
 
     int i = 1; // lua indicies start with 1 not 0
-    puz::GridDirection dir = self->GetFocusedDirection();
-    end = end->Next(dir); // This has to be one past the last square.
-    for (puz::Square * square = start; square != end; square = square->Next(dir))
+    puz::Word::const_iterator it;
+    for (it = word->begin(); it != word->end(); ++it)
     {
         lua_pushnumber(L, i++);
-        luapuz_pushSquare(L, square);
+        luapuz_pushSquare(L, *it);
         // t[i] = square
         lua_settable(L, -3); // -3 = third from the top of the stack
     }
@@ -213,7 +289,7 @@ static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L)
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
     // call GetFocusedClue
-    const puz::Puzzle::Clue * clue =  self->GetFocusedClue();
+    const puz::Clue * clue =  self->GetFocusedClue();
 
     // Return two nils if there is no focused clue
     if (clue == NULL)
@@ -224,8 +300,8 @@ static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L)
     }
 
     // Return a pair (number, text)
-    lua_pushnumber(L, clue->Number());
-    lua_pushstring(L, clue->Text().c_str());
+    lua_pushnumber(L, clue->GetInt());
+    luapuz_pushstring_t(L, clue->GetText());
     return 2;
 }
 %end
@@ -259,3 +335,12 @@ int wxLua_function_GetFrame(lua_State *L)
 }
 %end
 
+%override wxLua_function_logerror
+// void logerror(const wxString & msg)
+// This is a lua-only function (it can't be accessed through the XWord C++ API)
+int wxLua_function_logerror(lua_State *L)
+{
+    wxGetApp().LogLuaMessage(wxlua_getwxStringtype(L, 1));
+    return 0;
+}
+%end

@@ -20,9 +20,16 @@
 %class MyFrame, wxFrame
     // %override puz::Puzzle & GetPuzzle()
     int GetPuzzle()
+    const wxString & GetFilename()
+    void SetFilename(const wxString & filename)
 
+    // Override so that Puzzle::TestOk is called first
+    // %override void ShowPuzzle()
     void ShowPuzzle()
+    // %override void ShowGrid()
     void ShowGrid()
+    // %override void ShowClues()
+
     void ShowClues()
     void ShowTitle()
     void ShowAuthor()
@@ -73,7 +80,7 @@
 
 
     // %override number, text MyFrame::GetFocusedClue()
-    // const puz::Puzzle::Clue * MyFrame::GetFocusedClue()
+    // const puz::Clue * MyFrame::GetFocusedClue()
     int GetFocusedClue()
 
 %endclass
@@ -82,3 +89,5 @@
 // %override MyFrame * GetFrame()
 %function MyFrame * GetFrame()
 
+// %override void logerror()
+%function void logerror()

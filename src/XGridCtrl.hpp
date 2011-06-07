@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
 #endif
 
 #include "puz/Grid.hpp"
+#include "puz/Word.hpp"
 #include "XGridDrawer.hpp"
 
 
@@ -71,13 +72,17 @@ enum GridStyle
 };
 
 
-
+// Forward declarations
+namespace puz {
+    class Puzzle;
+}
 extern const wxChar * XGridCtrlNameStr;
 
 class GridRebusHandler;
 class GridSelectionHandler;
 class GridSelectionEvent;
 class GridCheckSelectionClass;
+class ConfigManager;
 
 class XGridCtrl
     : public wxScrolledWindow
@@ -105,31 +110,33 @@ public:
                       wxWindowID id = -1,
                       const wxPoint & pos = wxDefaultPosition,
                       const wxSize & size = wxDefaultSize,
-                      puz::Grid * grid = NULL,
+                      puz::Puzzle * puz = NULL,
                       long style = DEFAULT_GRID_STYLE
                                  | wxVSCROLL | wxHSCROLL,
                       const wxString & name = XGridCtrlNameStr)
     {
         Init();
-        Create(parent, id, pos, size, grid, style, name);
+        Create(parent, id, pos, size, puz, style, name);
     }
 
     bool Create(wxWindow * parent,
                 wxWindowID id = -1,
                 const wxPoint & pos = wxDefaultPosition,
                 const wxSize & size = wxDefaultSize,
-                puz::Grid * grid = NULL,
+                puz::Puzzle * puz = NULL,
                 long style = DEFAULT_GRID_STYLE
                            | wxVSCROLL | wxHSCROLL,
                 const wxString & name = XGridCtrlNameStr);
 
     ~XGridCtrl();
 
+    void UpdateConfig(ConfigManager & config);
+
     void SetPaused(bool pause = true) { m_isPaused = pause; Refresh(); }
 
     void SetFocus() { SetFocusIgnoringChildren(); }
 
-    void SetGrid(puz::Grid * grid);
+    void SetPuzzle(puz::Puzzle * puz);
           puz::Grid * GetGrid()       { return m_grid; }
     const puz::Grid * GetGrid() const { return m_grid; }
     bool IsEmpty() const { return m_grid == NULL || m_grid->IsEmpty(); }
@@ -137,28 +144,43 @@ public:
     void RecheckGrid();
     bool UnscrambleSolution(unsigned short key);
 
-    // Will trigger an event
-    puz::Square * SetSquareFocus(puz::Square * square, puz::GridDirection direction);
-    puz::Square * SetSquareFocus(puz::Square * square = NULL)
-        { return SetSquareFocus(square, m_direction); }
+    // Set* functions trigger an event.
+    // Change* functions do not trigger an event
+    // Essentially this is SetFocusedSquare([square, ][word, ][direction])
+    puz::Square * SetFocusedSquare(puz::Square * square,
+                                   puz::Word * word,
+                                   short direction);
+    puz::Square * SetFocusedSquare(puz::Square * square, short direction)
+        { return SetFocusedSquare(square, NULL, direction); }
+    puz::Square * SetFocusedSquare(puz::Square * square = NULL, puz::Word * word = NULL)
+        { return SetFocusedSquare(square, word, m_focusedDirection); }
 
-    void SetDirection(puz::GridDirection direction) { SetSquareFocus(NULL, direction); }
-    puz::GridDirection GetDirection() const { return m_direction; }
+    puz::Square * ChangeFocusedSquare(puz::Square * square,
+                                      puz::Word * word,
+                                      short direction);
+    puz::Square * ChangeFocusedSquare(puz::Square * square, short direction)
+        { return ChangeFocusedSquare(square, NULL, direction); }
+    puz::Square * ChangeFocusedSquare(puz::Square * square = NULL, puz::Word * word = NULL)
+        { return ChangeFocusedSquare(square, word, m_focusedDirection); }
 
-    void SetFocusedClue   (int cluenum, puz::GridDirection direction)
-        { ChangeFocusedClue(cluenum, direction); SetSquareFocus(); }
-    void ChangeFocusedClue(int cluenum, puz::GridDirection direction);
+    void SendEvent();
 
-    // Will not trigger an event
-    puz::Square * ChangeSquareFocus(puz::Square * square, puz::GridDirection direction);
-    puz::Square * ChangeSquareFocus(puz::Square * square = NULL)
-        { return ChangeSquareFocus(square, m_direction); }
+    short GetDirection() const;
 
-    void ChangeDirection(puz::GridDirection direction) { ChangeSquareFocus(NULL, direction); }
-    void ChangeDirection() { ChangeDirection(m_direction == puz::ACROSS ? puz::DOWN : puz::ACROSS); }
+    void SetFocusedWord(puz::Word * word, short direction)
+        { ChangeFocusedWord(word, direction); SendEvent(); }
+    void SetFocusedWord(puz::Word * word) { SetFocusedWord(word, m_focusedDirection); }
 
-    void RefreshSquare(wxDC & dc, puz::Square & square)  { DrawSquare(dc, square); }
-    void RefreshSquare(puz::Square & square)
+    void ChangeFocusedWord(puz::Word * word, short direction);
+    void ChangeFocusedWord(puz::Word * word) { ChangeFocusedWord(word, m_focusedDirection); }
+
+    void SetFocusedDirection(short direction)
+        { ChangeFocusedDirection(direction); SendEvent(); }
+    void ChangeFocusedDirection(short direction) { ChangeFocusedSquare(NULL, direction); }
+
+    // Drawing functions
+    void RefreshSquare(wxDC & dc, const puz::Square & square)  { DrawSquare(dc, square); }
+    void RefreshSquare(const puz::Square & square)
         { wxClientDC dc(this); DoPrepareDC(dc); RefreshSquare(dc, square); }
 
     void RefreshSquare() { wxASSERT(m_focusedSquare != NULL); RefreshSquare(*m_focusedSquare); }
@@ -167,20 +189,22 @@ public:
     {
         wxClientDC dc(this);
         DoPrepareDC(dc);
-        wxASSERT(m_focusedStart != NULL && m_focusedEnd != NULL);
-        for (puz::Square * square = m_focusedStart;
-             square != m_focusedEnd->Next(m_direction);
-             square = square->Next(m_direction))
-        {
-            DrawSquare(dc, *square);
-        }
+        puz::Word::const_iterator it;
+        for (it = m_focusedWord->begin(); it != m_focusedWord->end(); ++it)
+            DrawSquare(dc, **it);
     }
 
     bool SetSquareText(puz::Square & square, const wxString & text = _T(""));
 
-    puz::Square * GetFocusedSquare() { return m_focusedSquare; }
-    void GetFocusedWord(puz::Square ** start, puz::Square ** end)
-        { *start = m_focusedStart; * end = m_focusedEnd; }
+    const puz::Square * GetFocusedSquare() const { return m_focusedSquare; }
+          puz::Square * GetFocusedSquare()       { return m_focusedSquare; }
+    const puz::Word * GetFocusedWord() const { return m_focusedWord; }
+          puz::Word * GetFocusedWord()       { return m_focusedWord; }
+
+    const puz::Square * FirstWhite() const;
+          puz::Square * FirstWhite();
+    const puz::Square * LastWhite() const;
+          puz::Square * LastWhite();
 
     // Create this class to start a selection and call a function afterward
     void StartSelection(wxObjectEventFunction func, wxEvtHandler * evtSink = NULL);
@@ -241,8 +265,8 @@ public:
 
     void SetBoxSize(int size)         { m_drawer.SetBoxSize(size); Scale(); }
     void SetBorderSize(int size)      { m_drawer.SetBorderSize(size); Scale(); }
-    void SetLetterScale(double scale) { m_drawer.SetLetterScale(scale); }
-    void SetNumberScale(double scale) { m_drawer.SetNumberScale(scale); }
+    void SetLetterScale(long scale)   { m_drawer.SetLetterScale(scale / 100.); }
+    void SetNumberScale(long scale)   { m_drawer.SetNumberScale(scale / 100.); }
 
     // Zooming
     void FitGrid(bool fit = true)
@@ -280,23 +304,7 @@ public:
     bool IsCorrect();
 
 
-    puz::Square * GetClueNumber     (int num);
-
-    template <typename T>
-    puz::Square * FindSquare(puz::Square * start,
-                             T type,
-                             puz::GridDirection direction,
-                             puz::FindDirection increment = puz::NEXT,
-                             bool skipBlack = puz::NO_SKIP_BLACK_SQUARES,
-                             bool wrapLines = puz::NO_WRAP_LINES);
-
-    template <typename T>
-    puz::Square * FindNextSquare(puz::Square * start,
-                                 T type,
-                                 puz::GridDirection direction,
-                                 puz::FindDirection increment = puz::NEXT,
-                                 bool skipBlack = puz::NO_SKIP_BLACK_SQUARES,
-                                 bool wrapLines = puz::NO_WRAP_LINES);
+    puz::Square * GetClueNumber     (const wxString & num);
 
     bool IsFocusedLetter(const puz::Square & square);
     bool IsFocusedWord  (const puz::Square & square);
@@ -350,20 +358,23 @@ protected:
     bool m_isPaused;            // Trigger a "Paused" message?
 
     // Pointer to puzzle data
+    puz::Puzzle * m_puz;
     puz::Grid * m_grid;
 
-    // Focused square/word
+    // Focused info
     puz::Square * m_focusedSquare;
-    puz::Square * m_focusedStart;
-    puz::Square * m_focusedEnd;
+    puz::Word * m_focusedWord;
+    short m_focusedDirection;
+    void RecalcDirection();
+    // Make sure that we have a focused word, even if we have to invent one.
+    void DoSetFocusedWord(puz:: Word * word, short direction);
+    void DoSetFocusedWord(puz:: Word * word) { DoSetFocusedWord(word, m_focusedDirection); }
+    bool m_ownsFocusedWord;
     // A selection block (NULL if there is no selection)
     puz::Square * m_selectionStart;
     puz::Square * m_selectionEnd;
     bool m_isSelecting;
     void EndSelection(bool success = true);
-
-    // Focused direction
-    puz::GridDirection m_direction;
 
     // For counting missing/blank squares
     int m_blankSquares;
@@ -387,15 +398,15 @@ private:
     void OnKeyDown     (wxKeyEvent & evt);
     void OnChar        (wxKeyEvent & evt);
 
-    void OnLetter      (wxChar key, int mod);
+    void OnLetter       (wxChar key, int mod);
     void MoveAfterLetter();
-    void OnArrow       (puz::GridDirection arrowDirection, puz::FindDirection increment, int mod);
-    void OnTab         (int mod);
-    void OnHome        (int mod);
-    void OnEnd         (int mod);
-    void OnBackspace   (int mod);
-    void OnDelete      (int mod);
-    void OnInsert      (int mod);
+    void OnArrow        (puz::GridDirection arrowDirection, int mod);
+    void OnTab          (int mod);
+    void OnHome         (int mod);
+    void OnEnd          (int mod);
+    void OnBackspace    (int mod);
+    void OnDelete       (int mod);
+    void OnInsert       (int mod);
 
     DECLARE_EVENT_TABLE()
     DECLARE_NO_COPY_CLASS(XGridCtrl)
@@ -444,7 +455,7 @@ XGridCtrl::IsFocusedLetter(const puz::Square & square)
 inline bool
 XGridCtrl::IsFocusedWord(const puz::Square & square)
 {
-    return m_grid->IsBetween(&square, m_focusedStart, m_focusedEnd);
+    return m_focusedWord && m_focusedWord->Contains(&square);
 }
 
 inline bool
@@ -454,39 +465,5 @@ XGridCtrl::IsSelected(const puz::Square & square)
     return m_grid->IsBetween(&square, m_selectionStart, m_selectionEnd);
 }
 
-
-
-
-
-
-
-template <typename T>
-inline
-puz::Square *
-XGridCtrl::FindSquare(puz::Square * start,
-                      T type,
-                      puz::GridDirection direction,
-                      puz::FindDirection increment,
-                      bool skipBlack,
-                      bool wrapLines)
-{
-    return m_grid->FindSquare(start, type, direction, increment,
-                              skipBlack, wrapLines);
-}
-
-
-template <typename T>
-inline
-puz::Square *
-XGridCtrl::FindNextSquare(puz::Square * start,
-                          T type,
-                          puz::GridDirection direction,
-                          puz::FindDirection increment,
-                          bool skipBlack,
-                          bool wrapLines)
-{
-    return m_grid->FindNextSquare(start, type, direction, increment,
-                                  skipBlack, wrapLines);
-}
 
 #endif // MY_GRID_H

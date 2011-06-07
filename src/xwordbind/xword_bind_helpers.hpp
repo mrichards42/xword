@@ -11,7 +11,7 @@
 // XWord wxString conversion
 //----------------------------------------------------------------------------
 
-#define _XWORD_STRING_CONV wxCSConv(wxFONTENCODING_CP1252)
+#define _XWORD_STRING_CONV wxConvUTF8
 
 
 void xword_pushwxString(lua_State *L, const wxString & str)

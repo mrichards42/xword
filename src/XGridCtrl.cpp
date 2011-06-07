@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,8 +24,11 @@
 #include "XGridDrawer.hpp"
 #include "messages.hpp"
 #include "SelectionEvent.hpp"
+#include "App.hpp"
+#include "config.hpp"
 #include "utils/string.hpp"
 #include "utils/timeit.hpp"
+#include "puz/Puzzle.hpp"
 
 // This class will take over the XGridCtrl's event processing
 // for rebus entries.  It must be created on the heap, and it
@@ -76,6 +79,66 @@ private:
 
 
 //------------------------------------------------------------------------------
+// Functions / functors for FindSquare
+//------------------------------------------------------------------------------
+using puz::FIND_WHITE_SQUARE;
+using puz::FIND_BLANK_SQUARE;
+
+// This looks for square->number, so in order to use it we must give
+//    this struct and Find*Next*Square a square at the start of a word
+struct FIND_NEW_CLUE
+{
+    FIND_NEW_CLUE(puz::GridDirection direction, const puz::Square * square)
+        : m_direction(direction),
+          m_number(square->GetNumber())
+    {
+    }
+
+    bool operator() (const puz::Square * square)
+    {
+        if (! square->IsWhite())
+            return false;
+        // The standard idea of where to stop:
+        // The square has a clue and number that does not match the
+        // given number
+        if (square->HasNumber())
+        {
+            return square->GetNumber() != m_number;
+        }
+        // The square wants a clue in this direction
+        else if (square->WantsClue(m_direction))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    puz::GridDirection m_direction;
+    puz::string_t m_number;
+};
+
+
+puz::Square * XGridCtrl::FirstWhite()
+{
+    return m_grid->FindSquare(FIND_WHITE_SQUARE);
+}
+
+const puz::Square * XGridCtrl::FirstWhite() const
+{
+    return m_grid->FindSquare(FIND_WHITE_SQUARE);
+}
+
+puz::Square * XGridCtrl::LastWhite()
+{
+    return m_grid->FindSquare(m_grid->Last(), FIND_WHITE_SQUARE, puz::LEFT);
+}
+
+const puz::Square * XGridCtrl::LastWhite() const
+{
+    return m_grid->FindSquare(m_grid->Last(), FIND_WHITE_SQUARE, puz::LEFT);
+}
+
+//------------------------------------------------------------------------------
 // XGridCtrl implementation
 //------------------------------------------------------------------------------
 
@@ -105,7 +168,7 @@ SetIfExists(puz::Square * &current, puz::Square * test)
 }
 
 
-inline puz::Square *
+puz::Square *
 EitherOr(puz::Square * current, puz::Square * test)
 {
     if (test != NULL)
@@ -123,14 +186,13 @@ void XGridCtrl::Init()
     m_grid = NULL;
 
     m_focusedSquare = NULL;
-    m_focusedStart = NULL;
-    m_focusedEnd = NULL;
+    m_focusedWord = NULL;
+    m_ownsFocusedWord = false;
+    m_focusedDirection = puz::ACROSS;
 
     m_selectionStart = NULL;
     m_selectionEnd = NULL;
     m_isSelecting = false;
-
-    m_direction = puz::ACROSS;
 
     m_isPaused = false;
     m_fit = true;
@@ -145,6 +207,24 @@ void XGridCtrl::Init()
     m_areEventsConnected = false;
 
     // m_rect is already equal to wxRect(0,0,0,0) from its constructor
+
+    // Config
+    ConfigManager::Grid_t & grid = wxGetApp().GetConfigManager().Grid;
+
+    grid.style.AddCallback(this, &XGridCtrl::SetGridStyle);
+    grid.letterFont.AddCallback(this, &XGridCtrl::SetLetterFont);
+    grid.numberFont.AddCallback(this, &XGridCtrl::SetNumberFont);
+    grid.lineThickness.AddCallback(this, &XGridCtrl::SetBorderSize);
+    grid.focusedLetterColor.AddCallback(this, &XGridCtrl::SetFocusedLetterColor);
+    grid.focusedWordColor.AddCallback(this, &XGridCtrl::SetFocusedWordColor);
+    grid.backgroundColor.AddCallback(this, &XGridCtrl::SetBackgroundColour);
+    grid.whiteSquareColor.AddCallback(this, &XGridCtrl::SetWhiteSquareColor);
+    grid.blackSquareColor.AddCallback(this, &XGridCtrl::SetBlackSquareColor);
+    grid.selectionColor.AddCallback(this, &XGridCtrl::SetSelectionColor);
+    grid.penColor.AddCallback(this, &XGridCtrl::SetPenColor);
+    grid.pencilColor.AddCallback(this, &XGridCtrl::SetPencilColor);
+    grid.numberScale.AddCallback(this, &XGridCtrl::SetNumberScale);
+    grid.letterScale.AddCallback(this, &XGridCtrl::SetLetterScale);
 }
 
 
@@ -153,7 +233,7 @@ XGridCtrl::Create(wxWindow * parent,
                   wxWindowID id,
                   const wxPoint & pos,
                   const wxSize & size,
-                  puz::Grid * grid,
+                  puz::Puzzle * puz,
                   long style,
                   const wxString & name)
 {
@@ -165,7 +245,7 @@ XGridCtrl::Create(wxWindow * parent,
     // (XGridDrawer would use GetTextExtent on a not yet created window)
     m_drawer.SetWindow(this);
 
-    SetGrid(grid);
+    SetPuzzle(puz);
 
     SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
@@ -187,39 +267,65 @@ XGridCtrl::Create(wxWindow * parent,
 
 XGridCtrl::~XGridCtrl()
 {
+    if (m_ownsFocusedWord)
+        delete m_focusedWord;
+    wxGetApp().GetConfigManager().RemoveCallbacks(this);
+}
+
+void XGridCtrl::UpdateConfig(ConfigManager & config)
+{
+    /*
+    SetGridStyle(config.ReadLong(_T("style")) );
+
+    SetLetterFont(config.ReadFont(_T("letterFont")) );
+    SetNumberFont(config.ReadFont(_T("numberFont")) );
+
+    SetBorderSize(config.ReadLong(_T("lineThickness")));
+
+    SetFocusedLetterColor(config.ReadColor(_T("focusedLetterColor")));
+    SetFocusedWordColor(config.ReadColor(_T("focusedWordColor")));
+    SetBackgroundColour(config.ReadColor(_T("backgroundColor")));
+    SetWhiteSquareColor(config.ReadColor(_T("whiteSquareColor")));
+    SetBlackSquareColor(config.ReadColor(_T("blackSquareColor")));
+    SetSelectionColor(config.ReadColor(_T("selectionColor")));
+    SetPenColor(config.ReadColor(_T("penColor")));
+    SetPencilColor(config.ReadColor(_T("pencilColor")));
+    SetNumberScale(config.ReadLong(_T("numberScale")) / 100.);
+    SetLetterScale(config.ReadLong(_T("letterScale")) / 100.);
+    */
 }
 
 
-
 void
-XGridCtrl::SetGrid(puz::Grid * grid)
+XGridCtrl::SetPuzzle(puz::Puzzle * puz)
 {
-    if (grid == NULL)
+    m_puz = puz;
+    if (m_ownsFocusedWord)
+        delete m_focusedWord;
+    if (puz == NULL)
     {
         m_grid = NULL;
         m_incorrectSquares = 0;
         m_blankSquares = 0;
-        m_direction = puz::ACROSS;
         m_focusedSquare = NULL;
-        m_focusedStart = NULL;
-        m_focusedEnd = NULL;
+        m_focusedWord = NULL;
+        m_ownsFocusedWord = false;
 
         DisconnectEvents();
     }
     else
     {
-        m_grid = grid;
+        m_grid = &puz->GetGrid();
 
         RecheckGrid();
-
-        m_direction     = puz::ACROSS;
-        m_focusedSquare = m_grid->FirstWhite();
-        m_focusedStart  = m_focusedSquare->GetWordStart(m_direction);
-        m_focusedEnd    = m_focusedSquare->GetWordEnd  (m_direction);
+        m_focusedSquare = FirstWhite();
+        m_focusedWord = NULL;
+        m_focusedDirection = puz::ACROSS;
+        m_ownsFocusedWord = m_grid->IsDiagramless();
 
         ConnectEvents();
     }
-    m_drawer.SetGrid(grid);
+    m_drawer.SetPuzzle(puz);
     Scale();
 }
 
@@ -314,12 +420,6 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
         //return;
     }
 
-    // Draw black as crossword background
-    dc.SetBrush(wxBrush(GetBlackSquareColor()));
-    dc.SetPen  (wxPen(GetBlackSquareColor()));
-
-    dc.DrawRectangle(m_drawer.GetRect());
-
     puz::Square * square;
 
     // If we don't have an update region, redraw all squares
@@ -380,8 +480,8 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
 void
 XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & color)
 {
-    // Don't draw black squares
-    if (square.IsBlack())
+    // Don't draw missing squares
+    if (square.IsMissing())
         return;
 
     // If the user has pressed <insert> we are in rebus mode.  The focused square
@@ -390,14 +490,18 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
     //    - The number
     //    - The incorrect/revealed indicator
     //    - The X.
-    const bool drawOutline = m_wantsRebus && IsFocusedLetter(square);
+    const bool drawOutline = IsFocusedLetter(square) &&
+                                (m_wantsRebus || square.IsBlack());
     if (drawOutline)
     {
         m_drawer.AddFlag(XGridDrawer::DRAW_OUTLINE);
         m_drawer.RemoveFlag(XGridDrawer::DRAW_FLAG | XGridDrawer::DRAW_NUMBER);
     }
 
-    m_drawer.DrawSquare(dc, square, color, GetPenColor());
+    if (color == wxNullColour)
+        m_drawer.DrawSquare(dc, square);
+    else
+        m_drawer.DrawSquare(dc, square, color, GetPenColor());
 
     // Reset the drawing mode
     if (drawOutline)
@@ -420,137 +524,186 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
 // Focus functions
 //-------------------------------------------------------
 puz::Square *
-XGridCtrl::ChangeSquareFocus(puz::Square * square, puz::GridDirection direction)
+XGridCtrl::ChangeFocusedSquare(puz::Square * square,
+                               puz::Word * word,
+                               short direction)
 {
     wxASSERT(m_focusedSquare != NULL || square != NULL);
+    if (square == NULL)
+        square = m_focusedSquare;
 
+    // If there is no word in the given direction and there is one
+    // in the opposite direction, switch the direction.
+    if (! word
+        && ! square->HasWord(static_cast<puz::GridDirection>(direction))
+        && ! m_puz->FindWord(square, direction))
+    {
+        puz::GridDirection newdir
+            = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
+        if (square->HasWord(newdir))
+            direction = newdir;
+        else
+        {
+            word = m_puz->FindWord(square, newdir);
+            if (word)
+                direction = newdir;
+        }
+    }
     // Save old state
     //-------------------
-    puz::Square * oldFocused = m_focusedSquare;
-    puz::Square * oldStart;
-    puz::Square * oldEnd;
-    if (oldFocused == NULL)
-    {
-        oldStart = NULL;
-        oldEnd   = NULL;
-    }
+    puz::Square * oldSquare = m_focusedSquare;
+    puz::Word * oldWord;
+    if (oldSquare == NULL)
+        oldWord = NULL;
     else
-    {
-        oldStart = oldFocused->GetWordStart(m_direction);
-        oldEnd   = oldFocused->GetWordEnd(m_direction);
-    }
+        oldWord = m_focusedWord;
 
-    puz::GridDirection oldDirection = m_direction;
+    wxClientDC dc(this); DoPrepareDC(dc);
+
+    // If this was an invented focused word, it will be deleted before
+    // we have a chance to redraw.  We need to redraw it now.
+    if (m_ownsFocusedWord && oldWord)
+    {
+        puz::Word::const_iterator it;
+        for (it = oldWord->begin(); it != oldWord->end(); ++it)
+            DrawSquare(dc, **it, wxNullColour);
+    }
 
     // Set new state
-    //-------------------
-    m_direction = direction;
-    if (square != NULL)
-        m_focusedSquare = square;
-    // else m_focusedSquare stays the same
-
-    // If there is no word for this direction, try the other direction
-    if (m_focusedSquare->GetWordStart(m_direction) == NULL)
-        m_direction = puz::SwapDirection(m_direction);
-
-    m_focusedStart  = m_focusedSquare->GetWordStart(m_direction);
-    m_focusedEnd    = m_focusedSquare->GetWordEnd  (m_direction);
-
-    wxASSERT(m_focusedStart != NULL && m_focusedEnd != NULL);
+    //--------------
+    m_focusedSquare = square;
+    DoSetFocusedWord(word, direction);
+    wxASSERT(m_focusedWord != NULL);
 
     MakeVisible(*m_focusedSquare);
 
-    // Redraw
-    wxClientDC dc(this); DoPrepareDC(dc);
-
-    // If the old and new focused words are the same, only redraw two squares
-    if (m_focusedStart == oldStart && m_focusedEnd == oldEnd)
+    if (oldWord == m_focusedWord)
     {
-        DrawSquare(dc, *oldFocused, GetFocusedWordColor());
+        if (oldSquare != m_focusedSquare && oldSquare)
+            DrawSquare(dc, *oldSquare, GetFocusedWordColor());
+        // Always redraw the newly focused square.
+        DrawSquare(dc, *m_focusedSquare, GetFocusedLetterColor());
     }
-    // Otherwise redraw both words
     else
     {
-        // Only draw old squares if there was a focused word to begin with
-        if (oldFocused != NULL)
-            for (square = oldStart;
-                 square != NULL;
-                 square = square->Next(oldDirection))
-            {
-                DrawSquare(dc, *square, GetWhiteSquareColor());
-                if (square == oldEnd)
-                    break;
-            }
-        // Draw new word
-        for (square = m_focusedStart;
-             square != NULL;
-             square = square->Next(m_direction))
+        // Draw the old word
+        if (oldWord)
         {
-            DrawSquare(dc, *square, GetFocusedWordColor());
-            if (square == m_focusedEnd)
-                break;
+            puz::Word::const_iterator it;
+            for (it = oldWord->begin(); it != oldWord->end(); ++it)
+                DrawSquare(dc, **it, wxNullColour);
+        }
+        else if (oldSquare)
+            DrawSquare(dc, *oldSquare, wxNullColour);
+
+        // Draw the new focused word
+        if (m_focusedWord)
+        {
+            puz::Word::const_iterator it;
+            for (it = m_focusedWord->begin(); it != m_focusedWord->end(); ++it)
+                DrawSquare(dc, **it);
         }
     }
 
-    // Draw the square with focus
-    DrawSquare(dc, *m_focusedSquare, GetFocusedLetterColor());
-
-    // Always keep focus here
-    //wxScrolledWindow::SetFocus();
-
-    // return whatever square now has focus
+    RecalcDirection();
     return m_focusedSquare;
 }
 
 
 puz::Square *
-XGridCtrl::SetSquareFocus(puz::Square * square, puz::GridDirection direction)
+XGridCtrl::SetFocusedSquare(puz::Square * square,
+                            puz::Word * word,
+                            short direction)
 {
-    square = ChangeSquareFocus(square, direction);
+    ChangeFocusedSquare(square, word, direction);
+    SendEvent();
+    return m_focusedSquare;
+}
 
+void
+XGridCtrl::SendEvent()
+{
     wxPuzEvent evt(wxEVT_PUZ_GRID_FOCUS, GetId());
-
-    // Check for across clue
-    puz::Square * start = square->GetWordStart(puz::ACROSS);
-    if (start == NULL)
-        evt.SetAcrossClue(0);
-    else
-        evt.SetAcrossClue(start->GetNumber());
-
-    // Check for down clue
-    start = square->GetWordStart(puz::DOWN);
-    if (start == NULL)
-        evt.SetDownClue(0);
-    else
-        evt.SetDownClue(start->GetNumber());
-
-    // One of the two needs to be set
-    wxASSERT(evt.GetAcrossClue() != 0 || evt.GetDownClue() != 0);
-
-    evt.SetDirection(m_direction);
-    evt.SetString(puz2wx(square->GetText()));
+    evt.SetSquare(m_focusedSquare);
+    evt.SetWord(m_focusedWord);
     GetEventHandler()->ProcessEvent(evt);
-
-    return square;
 }
 
 
 void
-XGridCtrl::ChangeFocusedClue(int cluenum, puz::GridDirection direction)
+XGridCtrl::ChangeFocusedWord(puz::Word * word, short direction)
 {
-    puz::Square * square = GetClueNumber(cluenum);
-    if (square == NULL)
-        return;
-
+    wxASSERT(word != NULL);
+    puz::Square * square = word->front();
     if (HasStyle(BLANK_ON_NEW_WORD))
-        SetIfExists(square,
-                    FindSquare(square->GetWordStart(direction),
-                               std::mem_fun(&puz::Square::IsBlank),
-                               direction) );
-
-    ChangeSquareFocus(square, direction);
+        SetIfExists(square, word->FindSquare(FIND_BLANK_SQUARE));
+    ChangeFocusedSquare(square, word, direction);
 }
 
+void
+XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
+{
+    if (m_grid->IsDiagramless())
+    {
+        assert(m_ownsFocusedWord);
+        delete m_focusedWord;
+        if (m_focusedSquare->IsBlack())
+        {
+            m_focusedWord = new puz::Word(m_puz->MakeWord(
+                m_focusedSquare, m_focusedSquare
+            ));
+        }
+        else
+        {
+            puz::GridDirection dir = puz::IsHorizontal(direction)
+                                        ? puz::ACROSS : puz::DOWN;
+            m_focusedWord = new puz::Word(m_puz->MakeWord(
+                m_focusedSquare->GetWordStart(dir),
+                m_focusedSquare->GetWordEnd(dir)
+            ));
+        }
+        return;
+    }
+
+    // If these words are going to be the same, return now
+    if (m_focusedWord != NULL
+        && (word == m_focusedWord
+            || (word == NULL
+                && puz::AreInLine(m_focusedDirection, direction)
+                && m_focusedWord->Contains(m_focusedSquare))))
+    {
+        return;
+    }
+    if (m_ownsFocusedWord)
+    {
+        delete m_focusedWord;
+        m_ownsFocusedWord = false;
+    }
+    if (word == NULL)
+    {
+        word = m_puz->FindWord(m_focusedSquare, direction);
+        if (word == NULL)
+        {
+            if (puz::IsDiagonal(direction))
+            {
+                direction = m_focusedDirection;
+                word = m_puz->FindWord(m_focusedSquare, m_focusedDirection);
+            }
+            if (word == NULL)
+            {
+                // Create a word
+                puz::GridDirection dir = puz::IsHorizontal(direction)
+                                            ? puz::ACROSS : puz::DOWN;
+                word = new puz::Word(m_puz->MakeWord(
+                    m_focusedSquare->GetWordStart(dir),
+                    m_focusedSquare->GetWordEnd(dir)
+                ));
+                m_ownsFocusedWord = true;
+            }
+        }
+    }
+    m_focusedWord = word;
+}
 
 void
 XGridCtrl::MakeVisible(const puz::Square & square)
@@ -605,23 +758,29 @@ bool
 XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
 {
     // Not allowed to overwrite revealed letters
-    if (square.HasFlag(puz::FLAG_RED))
+    if (square.HasFlag(puz::FLAG_REVEALED))
         return false;
 
     // Adjust blank and incorrect counts each time a letter is changed
     // The logic is a little confusing at first, but it's correct
     const int correctBefore = square.Check(puz::NO_CHECK_BLANK, HasStyle(STRICT_REBUS));
-    const int blankBefore   = square.IsBlank();
+    const int blankBefore   = square.IsBlank() && ! square.IsSolutionBlank();
+    // renumber the grid if the square is changing from black to white or vice-versa
+    const bool numberGrid = GetGrid()->IsDiagramless() &&
+                            (text == puz2wx(puz::Square::Black) != (square.IsBlack()));
 
     // This could throw an exception if text is longer than
     // 8 characeters, so try this first.
     square.SetText(wx2puz(text));
 
     if (square.HasFlag(puz::FLAG_X))
-        square.ReplaceFlag(puz::FLAG_X, puz::FLAG_BLACK);
+    {
+        square.AddFlag(puz::FLAG_BLACK);
+        square.RemoveFlag(puz::FLAG_X);
+    }
 
-    const int correctAfter = square.Check();
-    const int blankAfter   = square.IsBlank();
+    const int correctAfter = square.Check(puz::NO_CHECK_BLANK, HasStyle(STRICT_REBUS));
+    const int blankAfter   = square.IsBlank() && ! square.IsSolutionBlank();
 
     m_blankSquares     += blankAfter   - blankBefore;
     m_incorrectSquares -= correctAfter - correctBefore;
@@ -636,6 +795,12 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
         wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
         evt.SetString(text);
         GetEventHandler()->ProcessEvent(evt);
+    }
+
+    if (numberGrid)
+    {
+        GetGrid()->NumberGrid();
+        Refresh();
     }
 
     return true;
@@ -784,9 +949,7 @@ XGridCtrl::CheckWord(int options)
 
     const bool checkBlank = (options & CHECK_ALL) != 0;
     std::vector<puz::Square *> incorrect;
-    m_grid->CheckWord( &incorrect,
-                       m_focusedSquare->GetWordStart(m_direction),
-                       m_focusedSquare->GetWordEnd  (m_direction),
+    m_grid->CheckWord( &incorrect, m_focusedWord,
                        checkBlank,
                        HasStyle(STRICT_REBUS));
 
@@ -817,7 +980,7 @@ XGridCtrl::PostCheck(std::vector<puz::Square *> & incorrect, int options)
 {
     if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
     {
-        XWordMessage( MSG_NO_INCORRECT );
+        XWordMessage(this, MSG_NO_INCORRECT);
         return;
     }
 
@@ -832,7 +995,7 @@ XGridCtrl::PostCheck(std::vector<puz::Square *> & incorrect, int options)
         {
             SetSquareText(*square, puz2wx(square->GetSolution()));
             square->RemoveFlag(puz::FLAG_BLACK | puz::FLAG_X);
-            square->AddFlag(puz::FLAG_RED);
+            square->AddFlag(puz::FLAG_REVEALED);
         }
         else
         {
@@ -969,8 +1132,8 @@ XGridCtrl::OnLeftDown(wxMouseEvent & evt)
 
     wxPoint pt = evt.GetPosition();
     puz::Square * square = HitTest(pt.x, pt.y);
-    if (square != NULL && square->IsWhite())
-        SetSquareFocus(square, m_direction);
+    if (square != NULL && (square->IsWhite() || GetGrid()->IsDiagramless()))
+        SetFocusedSquare(square);
 
     // Make sure to skip this event or we don't get keyboard focus!
     evt.Skip();
@@ -987,9 +1150,11 @@ XGridCtrl::OnRightDown(wxMouseEvent & evt)
         wxPoint pt = evt.GetPosition();
         square = HitTest(pt.x, pt.y);
     }
-    if (square != NULL && square->IsWhite())
-        SetSquareFocus(square, puz::SwapDirection(m_direction));
-
+    if (square != NULL && (square->IsWhite() || GetGrid()->IsDiagramless()))
+    {
+        // Swap the direction (across/down)
+        SetFocusedSquare(square, puz::IsVertical(m_focusedDirection) ? puz::ACROSS : puz::DOWN);
+    }
     // Kill the event.
 }
 
@@ -1013,33 +1178,67 @@ XGridCtrl::OnKeyDown(wxKeyEvent & evt)
     const int key = evt.GetKeyCode();
     const int mod = evt.GetModifiers();
 
-    if      (key == WXK_LEFT  || key == WXK_NUMPAD_LEFT)     /* Left      */
-        OnArrow(puz::ACROSS, puz::PREV, mod);
-    else if (key == WXK_RIGHT || key == WXK_NUMPAD_RIGHT)    /* Right     */
-        OnArrow(puz::ACROSS, puz::NEXT, mod);
-    else if (key == WXK_UP    || key == WXK_NUMPAD_UP)       /* Up        */
-        OnArrow(puz::DOWN,   puz::PREV, mod);
-    else if (key == WXK_DOWN  || key == WXK_NUMPAD_DOWN)     /* Down      */
-        OnArrow(puz::DOWN,   puz::NEXT, mod);
-    else if (key == WXK_HOME  || key == WXK_NUMPAD_HOME)     /* Home      */
+    switch(key)
+    {
+    // Directional keys
+    case WXK_LEFT:
+    case WXK_NUMPAD_LEFT:
+        OnArrow(puz::LEFT, mod);
+        break;
+    case WXK_RIGHT:
+    case WXK_NUMPAD_RIGHT:
+        OnArrow(puz::RIGHT, mod);
+        break;
+    case WXK_UP:
+    case WXK_NUMPAD_UP:
+        OnArrow(puz::UP,    mod);
+        break;
+    case WXK_DOWN:
+    case WXK_NUMPAD_DOWN:
+        OnArrow(puz::DOWN,  mod);
+        break;
+
+    // Diagonals
+    case WXK_NUMPAD_HOME:
+        OnArrow(puz::DIAGONAL_NW,  mod);
+        break;
+    case WXK_NUMPAD_END:
+        OnArrow(puz::DIAGONAL_SW,  mod);
+        break;
+    case WXK_NUMPAD_PAGEUP:
+        OnArrow(puz::DIAGONAL_NE,  mod);
+        break;
+    case WXK_NUMPAD_PAGEDOWN:
+        OnArrow(puz::DIAGONAL_SE,  mod);
+        break;
+
+    // Other keys
+    case WXK_HOME:
         OnHome(mod);
-    else if (key == WXK_END   || key == WXK_NUMPAD_END)      /* End       */
+        break;
+    case WXK_END:
         OnEnd(mod);
-    else if (key == WXK_TAB   || key == WXK_NUMPAD_TAB ||    /* Tab       */
-             key == WXK_RETURN || key == WXK_NUMPAD_ENTER)   /* Enter     */
+        break;
+    case WXK_TAB:
+    case WXK_NUMPAD_TAB:
+    case WXK_RETURN:
+    case WXK_NUMPAD_ENTER:
         OnTab(mod);
-    else if (key == WXK_BACK)                                /* Backspace */
+        break;
+    case WXK_BACK:
         OnBackspace(mod);
-    else if (key == WXK_DELETE || key == WXK_NUMPAD_DELETE)  /* Delete    */
+        break;
+    case WXK_DELETE:
+    case WXK_NUMPAD_DELETE:
         OnDelete(mod);
-    else if (key == WXK_INSERT || key == WXK_NUMPAD_INSERT)  /* Insert    */
-    {
+        break;
+    case WXK_INSERT:
+    case WXK_NUMPAD_INSERT:
         OnInsert(mod);
-        return; // Don't skip this event.
-    }
-    else
-    {
+        break;
+    default:
         evt.Skip();
+        break;
     }
 }
 
@@ -1058,6 +1257,14 @@ XGridCtrl::OnChar(wxKeyEvent & evt)
         GetFocusedSquare()->ToggleFlag(puz::FLAG_CIRCLE);
         RefreshSquare();
     }
+    else if (GetGrid()->IsDiagramless() && key == _T('.'))
+    {
+        if (GetFocusedSquare()->IsBlack())
+            SetSquareText(*GetFocusedSquare(), _T(""));
+        else
+            SetSquareText(*GetFocusedSquare(), puz2wx(puz::Square::Black));
+        MoveAfterLetter();
+    }
     else if (IsValidChar(key))
     {
         OnLetter(key, mod);
@@ -1071,22 +1278,20 @@ XGridCtrl::OnLetter(wxChar key, int mod)
 {
     wxASSERT(IsValidChar(key));
     wxASSERT(! IsEmpty());
-    wxASSERT(m_focusedSquare->GetWordStart(m_direction)->GetNumber() != 0);
 
     if (! (mod == wxMOD_NONE || mod == wxMOD_SHIFT))
         return;
 
-    puz::Square & square = *GetFocusedSquare();
     wxASSERT(! m_wantsRebus);
 
     if (static_cast<int>(key) == WXK_SPACE)
-        SetSquareText(square, _T(""));
+        SetSquareText(*m_focusedSquare, _T(""));
     else
-        SetSquareText(square, key);
+        SetSquareText(*m_focusedSquare, key);
 
     // Space bar always moves forward one square
     if (static_cast<int>(key) == WXK_SPACE)
-        SetSquareFocus(FindNextSquare(m_focusedSquare, std::mem_fun(&puz::Square::IsWhite), m_direction));
+        SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE));
     else
         MoveAfterLetter();
 }
@@ -1101,109 +1306,133 @@ XGridCtrl::MoveAfterLetter()
     {
         if (HasStyle(MOVE_TO_NEXT_BLANK))
         {
-            newSquare = FindNextSquare(m_focusedSquare,
-                                      std::mem_fun(&puz::Square::IsBlank),
-                                      m_direction,
-                                      puz::NEXT);
+            newSquare = m_focusedWord->FindNextSquare(
+                m_focusedSquare, FIND_BLANK_SQUARE
+            );
             // Last blank in the word: jump to the first blank if it exists
             if (newSquare == NULL)
             {
-                newSquare = FindSquare(m_focusedSquare->GetWordStart(m_direction),
-                                       std::mem_fun(&puz::Square::IsBlank),
-                                       m_direction,
-                                       puz::NEXT);
+                newSquare = m_focusedWord->FindSquare(FIND_BLANK_SQUARE);
             }
         }
         // Either the user wants "move to next letter", or there are no more blanks in the
         // word.  Move to the next letter if it exists
         if (newSquare == NULL)
         {
-            newSquare = FindNextSquare(m_focusedSquare,
-                                       std::mem_fun(&puz::Square::IsWhite),
-                                       m_direction,
-                                       puz::NEXT);
+            newSquare = m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE);
             // if newSquare == NULL (possibly again), it's the last square in the word,
             // and the focus won't change.
         }
     }
 
-    SetSquareFocus(newSquare, m_direction);
+    SetFocusedSquare(newSquare);
 }
 
 
-
 void
-XGridCtrl::OnArrow(puz::GridDirection arrowDirection, puz::FindDirection increment, int mod)
+XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
 {
     wxASSERT(! IsEmpty());
-    puz::Square * newSquare = NULL;
-
-    // If there is no word in the arrowDirection, treat it as if shift
-    // were pressed.
-    if (m_focusedSquare->GetWordStart(arrowDirection) == NULL)
-        mod = wxMOD_SHIFT;
-
-    if (mod == wxMOD_SHIFT)
+    if (mod != wxMOD_SHIFT || IsDiagonal(arrowDirection))
     {
-        if (m_direction == arrowDirection)
+        if (! GetGrid()->IsDiagramless())
         {
-            newSquare =
-                FindNextSquare(m_focusedSquare,
-                               puz::FIND_WORD(arrowDirection, m_focusedSquare),
-                               arrowDirection,
-                               increment,
-                               puz::SKIP_BLACK_SQUARES,
-                               puz::WRAP_LINES);
-
-            if (newSquare != NULL)
-                newSquare = newSquare->GetWordStart(arrowDirection);
+            if (HasStyle(PAUSE_ON_SWITCH) && m_focusedSquare->IsBlank())
+            {
+                // Check to see if there *is* a word in arrowDirection.
+                puz::Word * word = m_puz->FindWord(m_focusedSquare, arrowDirection);
+                if (word && word != m_focusedWord)
+                {
+                    SetFocusedSquare(m_focusedSquare, word, arrowDirection);
+                    return;
+                }
+                // Check to see if there *should be* a (non-diagonal) word
+                // in arrowDirection.
+                if (! AreInLine(arrowDirection, m_focusedDirection)
+                    && ! IsDiagonal(arrowDirection)
+                    && m_focusedSquare->HasWord(arrowDirection))
+                {
+                    SetFocusedSquare(m_focusedSquare, NULL, arrowDirection);
+                    return;
+                }
+            }
+            // Find the next white square in the arrow direction
+            SetFocusedSquare(
+                m_grid->FindNextSquare(
+                    m_focusedSquare, FIND_WHITE_SQUARE,
+                    arrowDirection, puz::NO_WRAP
+                ),
+                NULL, arrowDirection
+            );
         }
-        else
+        else // diagramless
         {
-            newSquare =
-                FindNextSquare(m_focusedSquare,
-                               std::mem_fun(&puz::Square::IsWhite),
-                               arrowDirection,
-                               increment,
-                               puz::SKIP_BLACK_SQUARES);
+            if (! m_focusedSquare->IsLast(arrowDirection))
+                SetFocusedSquare(m_focusedSquare->Next(arrowDirection));
         }
-
-        // Test BLANK_ON_NEW_WORD
-        const bool isNewWord = newSquare != NULL &&
-               newSquare->      GetWordStart(m_direction) !=
-               m_focusedSquare->GetWordStart(m_direction);
-
-        if (HasStyle(BLANK_ON_NEW_WORD) && isNewWord)
-        {
-            SetIfExists(newSquare,
-                FindSquare(newSquare->GetWordStart(m_direction),
-                           std::mem_fun(&puz::Square::IsBlank),
-                           m_direction,
-                           puz::NEXT));
-        }
-
-        SetSquareFocus(newSquare, m_direction);
     }
-    else // Shift is not pressed
+    else // Shift
     {
-        if (m_direction != arrowDirection
-            && HasStyle(PAUSE_ON_SWITCH)
-            && m_focusedSquare->IsBlank())
+        puz::GridDirection focusedDirection = 
+            static_cast<puz::GridDirection>(m_focusedDirection);
+        puz::Square * newSquare = NULL;
+        puz::Word * word = NULL;
+        if (AreInLine(m_focusedDirection, arrowDirection))
         {
-            SetSquareFocus(m_focusedSquare, puz::SwapDirection(m_direction));
-            return;
+            // Move to the next word in the arrow direction
+            for (newSquare = m_focusedSquare;
+                 newSquare;
+                 newSquare = newSquare->Next(arrowDirection))
+            {
+                word = m_puz->FindWord(newSquare, m_focusedDirection);
+                if (word)
+                {
+                    if (word != m_focusedWord)
+                        break;
+                    else
+                        word = NULL;
+                }
+                else if (newSquare->HasWord(focusedDirection)
+                          && newSquare->GetSolutionWordStart(focusedDirection)
+                                != m_focusedWord->front())
+                {
+                    break;
+                }
+            }
+            // Find the first square in the word
+            if (newSquare)
+            {
+                if (word)
+                    newSquare = word->front();
+                else
+                    newSquare = newSquare->GetSolutionWordStart(focusedDirection);
+            }
         }
         else
         {
-            newSquare =
-                FindNextSquare(m_focusedSquare,
-                               std::mem_fun(&puz::Square::IsWhite),
-                               arrowDirection,
-                               increment,
-                               puz::SKIP_BLACK_SQUARES);
+            // Move to the next white square in the arrow direction
+            newSquare = m_grid->FindNextSquare(
+                m_focusedSquare,
+                FIND_WHITE_SQUARE,
+                arrowDirection,
+                puz::NO_WRAP
+            );
         }
-
-        SetSquareFocus(newSquare, arrowDirection);
+        if (newSquare && HasStyle(BLANK_ON_NEW_WORD))
+        {
+            if (word)
+                SetIfExists(newSquare, word->FindSquare(FIND_BLANK_SQUARE));
+            else
+                SetIfExists(newSquare,
+                    m_grid->FindSquare(
+                        newSquare->GetSolutionWordStart(focusedDirection),
+                        FIND_BLANK_SQUARE,
+                        focusedDirection,
+                        puz::FIND_IN_WORD
+                    )
+                );
+        }
+        SetFocusedSquare(newSquare, word);
     }
 }
 
@@ -1213,15 +1442,10 @@ void
 XGridCtrl::OnBackspace(int WXUNUSED(mod))
 {
     wxASSERT(! IsEmpty());
-    puz::Square & square = *m_focusedSquare;
-
-    SetSquareText(square, _T(""));
-
-    SetSquareFocus(FindNextSquare(m_focusedSquare,
-                                  std::mem_fun(&puz::Square::IsWhite),
-                                  m_direction,
-                                  puz::PREV),
-                   m_direction);
+    SetSquareText(*m_focusedSquare, _T(""));
+    SetFocusedSquare(m_focusedWord->FindNextSquare(
+        m_focusedSquare, FIND_WHITE_SQUARE, puz::PREV
+    ));
 }
 
 
@@ -1230,11 +1454,8 @@ void
 XGridCtrl::OnDelete(int WXUNUSED(mod))
 {
     wxASSERT(! IsEmpty());
-    puz::Square & square = *m_focusedSquare;
-
-    SetSquareText(square, _T(""));
-
-    SetSquareFocus(m_focusedSquare, m_direction);
+    SetSquareText(*m_focusedSquare, _T(""));
+    SetFocusedSquare();
 }
 
 
@@ -1246,22 +1467,21 @@ XGridCtrl::OnHome(int mod)
     // Shift key is used in Across Lite instead of the usual ctrl / command
     if (mod == wxMOD_CMD || mod == wxMOD_SHIFT)
     {
-        puz::Square * newSquare = m_grid->FirstWhite();
+        puz::Square * newSquare = FirstWhite();
+        puz::Word * word = m_puz->FindWord(newSquare);
         if (HasStyle(BLANK_ON_NEW_WORD))
         {
-            SetSquareFocus( EitherOr(newSquare,
-                                     FindSquare(newSquare,
-                                                std::mem_fun(&puz::Square::IsBlank),
-                                                m_direction)),
-                             m_direction );
+            SetFocusedSquare( EitherOr(newSquare,
+                                       word->FindSquare(newSquare,
+                                                        FIND_BLANK_SQUARE)));
         }
         else
         {
-            SetSquareFocus(newSquare, m_direction);
+            SetFocusedSquare(newSquare);
         }
     }
     else
-        SetSquareFocus(m_focusedSquare->GetWordStart(m_direction), m_direction);
+        SetFocusedSquare(m_focusedWord->front());
 }
 
 
@@ -1272,9 +1492,9 @@ XGridCtrl::OnEnd(int mod)
     wxASSERT(! IsEmpty());
     // Shift key is used in Across Lite instead of the usual ctrl / command
     if (mod == wxMOD_CMD || mod == wxMOD_SHIFT)
-        SetSquareFocus(m_grid->LastWhite(), m_direction);
+        SetFocusedSquare(LastWhite());
     else
-        SetSquareFocus(m_focusedSquare->GetWordEnd(m_direction), m_direction);
+        SetFocusedSquare(m_focusedWord->back());
 }
 
 
@@ -1314,66 +1534,65 @@ XGridCtrl::OnTab(int mod)
 {
     wxASSERT(! IsEmpty());
     puz::Square * newSquare = NULL;
-    puz::GridDirection newDir = m_direction;
-    if (mod == wxMOD_SHIFT)
+    // Move to the next clue in the current clue list
+    if (m_ownsFocusedWord) // Implies that there is no clue.
     {
-        newSquare =
-            FindNextSquare(m_focusedStart,
-                           puz::FIND_CLUE(m_direction, m_focusedStart),
-                           puz::ACROSS,
-                           puz::PREV,
-                           puz::SKIP_BLACK_SQUARES,
-                           puz::WRAP_LINES);
-
-        if (newSquare == NULL) // We're at the start of the grid
+        // Find the next clue
+        OnArrow(mod != wxMOD_SHIFT ? puz::ACROSS : puz::LEFT, wxMOD_SHIFT);
+        return;
+    }
+    // Otherwise find the clue in one of the clue lists.
+    puz::Clues & clues = m_puz->GetClues();
+    puz::Clues::iterator clues_it;
+    for (clues_it = clues.begin(); clues_it != clues.end(); ++clues_it)
+    {
+        puz::ClueList & cluelist = clues_it->second;
+        puz::ClueList::iterator it;
+        for (it = cluelist.begin(); it != cluelist.end(); ++it)
+            if (it->GetWord() == m_focusedWord)
+                break;
+        if (it != cluelist.end()) // We found our clue
         {
-            // Find the last clue (different depending on direction)
-            newDir = puz::SwapDirection(newDir);
-            newSquare =
-                FindNextSquare(m_grid->LastWhite(),
-                               puz::FIND_CLUE(newDir, m_grid->FirstWhite()),
-                               puz::ACROSS,
-                               puz::PREV,
-                               puz::SKIP_BLACK_SQUARES,
-                               puz::WRAP_LINES);
+            if (mod != wxMOD_SHIFT)
+            {
+                // Move to the next clue
+                ++it;
+                if (it == cluelist.end())
+                {
+                    // If we're at the end of this list, try the next list
+                    ++clues_it;
+                     // If we're at the end, go to the first clue
+                    if (clues_it == clues.end())
+                        clues_it = clues.begin();
+                    SetFocusedWord(clues_it->second.front().GetWord());
+                }
+                else
+                {
+                    SetFocusedWord(it->GetWord());
+                }
+            }
+            else // Shift
+            {
+                // Move to the previous clue
+                // If we're at the beginning of this list, try the previous
+                if (it == cluelist.begin())
+                {
+                    // If we're at the beginning, go to the last clue
+                    if (clues_it == clues.begin())
+                        clues_it = clues.end(); // One past the end
+                    // Find the previous clue list
+                    --clues_it;
+                    SetFocusedWord(clues_it->second.back().GetWord());
+                }
+                else
+                {
+                    --it;
+                    SetFocusedWord(it->GetWord());
+                }
+            }
         }
     }
-    else
-    {
-        newSquare =
-            FindNextSquare(m_focusedStart,
-                           puz::FIND_CLUE(m_direction, m_focusedStart),
-                           puz::ACROSS,
-                           puz::NEXT,
-                           puz::SKIP_BLACK_SQUARES,
-                           puz::WRAP_LINES);
-
-        if (newSquare == NULL) // We're at the end of the grid
-        {
-            newDir = puz::SwapDirection(newDir);
-            newSquare = FindSquare(m_grid->FirstWhite(),
-                                   std::bind2nd(std::mem_fun(&puz::Square::HasClue),
-                                                newDir),
-                                   puz::ACROSS,
-                                   puz::NEXT,
-                                   puz::SKIP_BLACK_SQUARES,
-                                   puz::WRAP_LINES);
-        }
-    }
-    newSquare = newSquare->GetWordStart(newDir);
-
-    const bool isNewWord =
-        newSquare->GetWordStart(newDir)
-            != m_focusedSquare->GetWordStart(m_direction);
-
-    if (HasStyle(BLANK_ON_NEW_WORD) &&  isNewWord)
-        SetIfExists( newSquare,
-                     FindSquare(newSquare,
-                                std::mem_fun(&puz::Square::IsBlank),
-                                newDir,
-                                puz::NEXT) );
-
-    SetSquareFocus(newSquare, newDir);
+    // TODO: Blank on new word
 }
 
 
@@ -1436,28 +1655,51 @@ XGridCtrl::GetSquareColor(const puz::Square & square)
     else if (IsFocusedWord(square))
         return GetFocusedWordColor();
     else
-        return GetWhiteSquareColor();
+        return wxNullColour; // XGridDrawer will decide
 }
 
 
 
 
 puz::Square *
-XGridCtrl::GetClueNumber(int num)
+XGridCtrl::GetClueNumber(const wxString & num)
 {
     wxASSERT(! IsEmpty());
-    wxASSERT(m_grid->FirstWhite() != NULL);
-    for (puz::Square * square = m_grid->FirstWhite();
+    wxASSERT(FirstWhite() != NULL);
+    const puz::string_t number = wx2puz(num);
+    for (puz::Square * square = FirstWhite();
          square != NULL;
          square = square->Next())
     {
-        if (square->GetNumber() == num)
+        if (square->GetNumber() == number)
             return square;
     }
     return NULL;
 }
 
 
+short
+XGridCtrl::GetDirection() const
+{
+    return m_focusedDirection;
+}
+
+void
+XGridCtrl::RecalcDirection()
+{
+    const puz::Square * square1 = m_focusedSquare;
+    const puz::Square * square2 = m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE);
+    if (! square2 || square2 == square1)
+    {
+        // If this is the end of the word, measure the angle between
+        // the previous square and this square
+        square2 = m_focusedSquare;
+        square1 = m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE, puz::PREV);
+    }
+    if (square1 && square2)
+        m_focusedDirection = puz::GetDirection(*square1, *square2);
+    // Else focused direction doesn't change.
+}
 
 
 

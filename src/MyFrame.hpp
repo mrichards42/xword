@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -40,12 +40,14 @@ class CluePanel;
 class LayoutDialog;
 class PreferencesDialog;
 class CharactersPanel;
+class wxHtmlWindow;
+class wxHtmlLinkEvent;
 
 class MyPrintout;
+class ConfigManager;
 
 #include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
-
 
 #include "utils/ToolManager.hpp"
 
@@ -70,6 +72,7 @@ class MyFrame : public wxFrame
     friend class PreferencesDialog;
     friend class CharactersDialog;
     friend class MyPrintout;
+    friend class ConfigManager;
 public:
     MyFrame();
     ~MyFrame();
@@ -94,6 +97,8 @@ public:
     void ShowNotes();
 
     puz::Puzzle & GetPuzzle() { return m_puz; }
+    const wxString & GetFilename() const { return m_filename; }
+    void SetFilename(const wxString & filename) { m_filename = filename; }
 
     // Window Management
     //-----------
@@ -127,16 +132,20 @@ public:
     // Access to the grid
     //-------------------
     puz::Square * GetFocusedSquare();
-    puz::Square * SetFocusedSquare(puz::Square * square);
-    void GetFocusedWord(puz::Square ** start, puz::Square ** end);
-    puz::GridDirection GetFocusedDirection() const;
-    void SetFocusedDirection(puz::GridDirection direction);
-    const puz::Puzzle::Clue * GetFocusedClue();
-    bool SetSquareText(puz::Square * square, const wxString & text = _T(""));
+    puz::Word * GetFocusedWord();
+    puz::Clue * GetFocusedClue();
+    short GetFocusedDirection() const;
 
+    puz::Square * SetFocusedSquare(puz::Square * square);
+    void SetFocusedWord(puz::Word * word);
+    void SetFocusedClue(puz::Clue * clue);
+    void SetFocusedDirection(short direction);
+    bool SetSquareText(puz::Square * square, const wxString & text = _T(""));
+#ifdef XWORD_USE_LUA
     // Lua
     void RunLuaScript(const wxString & filename);
-
+    wxLuaState & GetwxLuaState() { return m_lua; }
+#endif // XWORD_USE_LUA
 private:
     // Windows
     //--------
@@ -152,16 +161,13 @@ private:
 
     XGridCtrl *  m_XGridCtrl;
 
-    CluePanel *  m_down;
-    CluePanel *  m_across;
-    CluePanel * GetCrossingClues();
-    CluePanel * GetFocusedClues();
+    std::map<wxString, CluePanel *> m_clues;
 
     SizedText *  m_title;
     SizedText *  m_author;
     SizedText *  m_copyright;
     CluePrompt *  m_cluePrompt;
-    wxTextCtrl * m_notes;
+    wxHtmlWindow * m_notes;
 
 #ifdef USE_AUI_TOOLBAR
     wxAuiToolBar * m_toolbar;
@@ -221,6 +227,7 @@ private:
     // Config
     //-------
     void LoadConfig();
+    void UpdateCluePanelConfig();
     void SaveConfig();
 
     wxFileConfig * GetConfig();
@@ -287,7 +294,6 @@ private:
 
     // Preferences
     void OnPreferences(wxCommandEvent & WXUNUSED(evt));
-    void OnPreferencesDialogCancel(wxCommandEvent & evt);
 
     // Printing
     void OnPageSetup(wxCommandEvent & WXUNUSED(evt));
@@ -303,6 +309,7 @@ private:
     void OnGridFocus  (wxPuzEvent & evt);
     void OnGridLetter (wxPuzEvent & evt);
     void OnClueFocus  (wxPuzEvent & evt);
+    void UpdateClues();
 
 
     // Frame events
@@ -311,14 +318,16 @@ private:
     void SetFocusOnIdle(wxIdleEvent & evt);
     bool m_isIdleConnected;
     void OnClose       (wxCloseEvent & evt);
+    void OnLinkClicked (wxHtmlLinkEvent & evt);
 
 #ifdef XWORD_USE_LUA
     void OnLuaScript  (wxCommandEvent & WXUNUSED(evt));
-    void OnLuaPrint   (wxLuaEvent & evt);
-    void OnLuaError   (wxLuaEvent & evt);
     wxLuaState m_lua;
     void LuaInit();
     void LuaUninit();
+    // Logging
+    void OnLuaPrint   (wxLuaEvent & evt);
+    void OnLuaError   (wxLuaEvent & evt);
 #endif // XWORD_USE_LUA
 
 private:
@@ -342,25 +351,6 @@ private:
 //------------------------------------------------------------------------------
 // Inline Functions
 //------------------------------------------------------------------------------
-
-inline
-CluePanel *
-MyFrame::GetFocusedClues()
-{
-    return (m_XGridCtrl->GetDirection() == puz::ACROSS ?
-             m_across :
-             m_down);
-}
-
-inline
-CluePanel *
-MyFrame::GetCrossingClues()
-{
-    return (m_XGridCtrl->GetDirection() == puz::DOWN ?
-             m_across :
-             m_down);
-}
-
 
 // Config
 //-------
