@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -32,16 +32,19 @@
 #    include <wx/wx.h>
 #endif
 
-#include "widgets/odlistbox.hpp"
 #include "puz/Puzzle.hpp"
 
 extern const wxChar* ClueListBoxNameStr;
 
+class CluePanel;
+#include "widgets/htmlcluelist.hpp"
+
 class ClueListBox
-    : public wxOwnerDrawnListBox<puz::Puzzle::Clue>
+    : public HtmlClueListBox
 {
+    friend class CluePanel;
 public:
-    typedef wxOwnerDrawnListBox<puz::Puzzle::Clue> parent_t;
+    typedef HtmlClueListBox parent_t;
 
     ClueListBox() { Init(); }
 
@@ -51,19 +54,27 @@ public:
         Create(parent, id);
     }
 
-    bool Create(wxWindow * parent, wxWindowID id);
-
     virtual ~ClueListBox() {}
 
-    void SetClueList(const container_t clues)
+    void SetClueList(puz::ClueList * clues);
+    void ClearClueList();
+
+    puz::Clue * GetClue()
     {
-        Freeze();
-        Clear();
-        Thaw();
-        Append(clues);
+        int selection = GetSelection();
+        try
+        {
+            if (m_clues && selection != wxNOT_FOUND)
+                return &m_clues->at(selection);
+        }
+        catch(std::out_of_range &)
+        {
+            // Pass
+        }
+        return NULL;
     }
 
-    void SetClueNumber(unsigned int number);
+    bool SetClue(const puz::Clue * clue);
 
     bool SetFont(const wxFont & font);
     bool SetBackgroundColour(const wxColour & color);
@@ -72,67 +83,86 @@ public:
     void SetSelectionForeground(const wxColour & color);
 
 protected:
-    void Init() { SetMargins(5, 5); m_numWidth = -1; }
-
-    // Drawing functions
-    void    OnDrawBackground(wxDC & dc, const wxRect & rect, size_t n) const;
-    void    OnDrawItem      (wxDC & dc, const wxRect & rect, size_t n) const;
-    wxCoord OnMeasureItem   (size_t n) const;
-
-    // Cache to save us from wrapping every time
-    mutable std::vector<wxString> m_cachedClues;
-    mutable std::vector<int> m_numWidths;
-
-    int FindClue(unsigned int number) const;
-
-    void CalculateNumberWidth();
-    int  m_numWidth;
-
-
-    // Update the number widths and decide if the cache needs to be invalidated.
-    virtual void OnUpdateCount()
+    puz::ClueList * m_clues;
+    wxColour m_selectionForeground;
+    virtual wxColour GetSelectedTextColour(const wxColour& colFg) const
     {
-        CalculateNumberWidth();
-        parent_t::OnUpdateCount();
+        return m_selectionForeground;
     }
+
+    void Init()
+    {
+        m_clues = NULL;
+        m_numberWidth = -1;
+    }
+
+    int GetNumberWidth() const;
+    mutable int m_numberWidth;
+
+    virtual wxString OnGetItem(size_t n) const;
+
+    int FindClue(const puz::Clue * clue) const;
 
     // Reset the current selection on left clicks so that an select event is
     // always fired.
     void OnLeftDown(wxMouseEvent & evt);
 
-    DECLARE_CACHED_ITEM_2(m_cachedClues, wxEmptyString,
-                          m_numWidths, -1,
-                          parent_t)
+    // Veto this event and refresh the ctrl if our list doesn't contain this item.
+    void OnSelection(wxCommandEvent & evt);
 
+    void InvalidateCache()
+    {
+        m_numberWidth = -1;
+        SetItemCount(m_clues ? m_clues->size() : 0);
+    }
+
+    DECLARE_EVENT_TABLE()
     DECLARE_NO_COPY_CLASS(ClueListBox)
     DECLARE_DYNAMIC_CLASS(ClueListBox)
 };
 
+// Inline functions
+
+inline void ClueListBox::SetClueList(puz::ClueList * clues)
+{
+    m_clues = clues;
+    InvalidateCache();
+    SetItemCount(m_clues->size());
+    RefreshAll();
+}
+
+inline void ClueListBox::ClearClueList()
+{
+    m_clues = NULL;
+    InvalidateCache();
+    SetItemCount(0);
+    RefreshAll();
+}
 
 inline bool
 ClueListBox::SetFont(const wxFont & font)
 {
     const bool ret = parent_t::SetFont(font);
     InvalidateCache();
-    Refresh();
+    RefreshAll();
     return ret;
 }
 
 inline bool
 ClueListBox::SetBackgroundColour(const wxColour & color)
 {
-    InvalidateCache();
     const bool ret = parent_t::SetBackgroundColour(color);
-    Refresh();
+    InvalidateCache();
+    RefreshAll();
     return ret;
 }
 
 inline bool
 ClueListBox::SetForegroundColour(const wxColour & color)
 {
-    InvalidateCache();
     const bool ret = parent_t::SetForegroundColour(color);
-    Refresh();
+    InvalidateCache();
+    RefreshAll();
     return ret;
 }
 
@@ -148,12 +178,11 @@ ClueListBox::SetSelectionBackground(const wxColour & color)
 inline void
 ClueListBox::SetSelectionForeground(const wxColour & color)
 {
-    parent_t::SetSelectionForeground(color);
+    m_selectionForeground = color;
     const int selection = GetSelection();
     if (selection != wxNOT_FOUND)
         RefreshLine(selection);
 }
-
 
 
 #endif // CLUE_LIST_BOX_H

@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,55 +15,49 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
+#include <algorithm>
 #include "ClueListBox.hpp"
 //#include "PuzEvent.hpp"
 #include "utils/wrap.hpp"
 #include <wx/tokenzr.h>
 #include "utils/string.hpp"
 
+BEGIN_EVENT_TABLE(ClueListBox, HtmlClueListBox)
+    EVT_LEFT_DOWN         (          ClueListBox::OnLeftDown)
+    EVT_LISTBOX           (wxID_ANY, ClueListBox::OnSelection)
+    EVT_LISTBOX_DCLICK    (wxID_ANY, ClueListBox::OnSelection)
+END_EVENT_TABLE()
+
 const wxChar* ClueListBoxNameStr = _T("ClueListBox");
 
-IMPLEMENT_DYNAMIC_CLASS(ClueListBox, wxOwnerDrawnListBox<puz::Puzzle::Clue>)
+IMPLEMENT_DYNAMIC_CLASS(ClueListBox, HtmlClueListBox)
 
 
-bool
-ClueListBox::Create(wxWindow * parent, wxWindowID id)
+bool ClueListBox::SetClue(const puz::Clue * clue)
 {
-    if (! parent_t::Create(parent, id))
-        return false;
-
-    // Connect the single event here so we don't need the event macros
-    wxCachedVListBox::Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(ClueListBox::OnLeftDown));
-
-    return true;
-}
-
-
-void
-ClueListBox::SetClueNumber(unsigned int number)
-{
-    int index = FindClue(number);
-    wxASSERT(index != wxNOT_FOUND || number == 0);
+    int index = FindClue(clue);
+    // This doesn't work for diagramless puzzles
+    // wxASSERT(index != wxNOT_FOUND || number == _T(""));
     SetSelection(index);
     if (index != wxNOT_FOUND)
     {
         RefreshLine(index);
-        //Update(); // We shouldn't really need this
+        return true;
     }
+    else
+        return false;
 }
 
 
-
-int
-ClueListBox::FindClue(unsigned int number) const
+int ClueListBox::FindClue(const puz::Clue * clue) const
 {
-    unsigned int num = 0;
-    for (container_t::const_iterator it = m_items.begin();
-         it != m_items.end();
-         ++it)
+    if (! m_clues || ! clue)
+        return wxNOT_FOUND;
+    int num = 0;
+    puz::ClueList::const_iterator it;
+    for (it = m_clues->begin(); it != m_clues->end(); ++it)
     {
-        if (it->Number() == number)
+        if (&*it == clue)
             return num;
         ++num;
     }
@@ -72,110 +66,42 @@ ClueListBox::FindClue(unsigned int number) const
 
 
 //------------------------------------------------------------------------------
-// Drawing functions
+// OnGetItem
 //------------------------------------------------------------------------------
 
-void
-ClueListBox::OnDrawBackground(wxDC & dc, const wxRect & rect, size_t n) const
+int ClueListBox::GetNumberWidth() const
 {
-    if (IsSelected(n))
-        dc.SetBackground(GetSelectionBackground());
-    else
-        dc.SetBackground(GetBackgroundColour());
-
-    dc.Clear();
+    if (m_numberWidth == -1)
+    {
+        wxClientDC dc(wxConstCast(this, ClueListBox));
+        dc.SetFont(GetFont());
+        m_numberWidth = 0;
+        puz::ClueList::const_iterator it;
+        for (it = m_clues->begin(); it != m_clues->end(); ++it)
+            m_numberWidth = std::max(m_numberWidth,
+                                     dc.GetTextExtent(puz2wx(it->GetNumber())+_T(".")).GetWidth());
+        m_numberWidth = m_numberWidth * 1.2;
+    }
+    return m_numberWidth;
 }
 
-
-void
-ClueListBox::OnDrawItem(wxDC & dc, const wxRect & rect, size_t n) const
+wxString ClueListBox::OnGetItem(size_t n) const
 {
-    wxRect numRect(rect);
-    numRect.SetWidth(m_numWidth);
-
-    wxRect textRect(rect);
-    textRect.SetX(numRect.GetRight() + GetMargins().x);
-    textRect.SetWidth(rect.width - GetMargins().x);
-
-    // Get fonts and colors
-    dc.SetFont(GetFont());
-
-    if (IsSelected(n))
-        dc.SetTextForeground(GetSelectionForeground());
-    else
-        dc.SetTextForeground(GetForegroundColour());
-
-    puz::Puzzle::Clue clue = GetItem(n);
-
-    dc.DrawLabel(wxString::Format(_T("%d."), clue.Number()), numRect, wxALIGN_RIGHT|wxALIGN_TOP);
-
-    const wxString & clueText = m_cachedClues.at(n);
-    // The clue text could be empty if we loaded a corrupted puzzle and the user OK'd the action.
-    if (! clueText.empty())
-        dc.DrawLabel(clueText, textRect);
-#if __WXDEBUG__
-    else
-        wxLogDebug(_T("Clue text is empty (clue number %d)!"), n);
-#endif // __WXDEBUG__
-
-    //dc.DrawLine(textRect.x, textRect.y, textRect.x + textRect.width, textRect.y + textRect.height);
-}
-
-
-
-wxCoord
-ClueListBox::OnMeasureItem(size_t n) const
-{
-    puz::Puzzle::Clue clue = GetItem(n);
-
-    // Cache the wrapped clue's text if it isn't already
-    if (m_cachedClues.at(n).empty())
-    {
-        int maxWidth;
-        GetClientSize(&maxWidth, NULL);
-        m_cachedClues.at(n) = Wrap(this, puz2wx(clue.Text()),
-                                   maxWidth - m_numWidth - GetMargins().x);
-    }
-
-    int height = 0;
-    const wxArrayString lines = wxStringTokenize(m_cachedClues.at(n), _T("\n"));
-    for (wxArrayString::const_iterator it = lines.begin();
-         it != lines.end();
-         ++it)
-    {
-        int lineHeight;
-        GetTextExtent(*it, NULL, &lineHeight);
-        height += lineHeight;
-    }
-
-    return std::max(height, GetCharHeight());
-}
-
-
-void
-ClueListBox::CalculateNumberWidth()
-{
-    // Calculate the max width, filling in missing values
-    int max_width = 0;
-    container_t::iterator item_it = m_items.begin();
-    std::vector<int>::iterator it, end;
-    for (it = m_numWidths.begin(), end = m_numWidths.end(); it != end; ++it)
-    {
-        int & width = *it;
-        // If there is no width for this item, calculate it
-        if (width == -1)
-            GetTextExtent(wxString::Format(_T("%d."), item_it->Number()), &width, NULL, NULL, NULL);
-        if (width > max_width)
-            max_width = width;
-        ++item_it;
-    }
-
-    // Test to see if the cache needs to be invalidated
-    if (max_width != m_numWidth)
-    {
-        m_numWidth = max_width;
-        InvalidateCache();
-    }
+    if (! m_clues)
+        return wxEmptyString;
+    const size_t count = m_clues->size();
+    if (count <= n)
+        return wxEmptyString;
+    return wxString::Format(
+        _T("<table border=0 cellspacing=0 cellpadding=0><tr>")
+            _T("<td align=right valign=top width=%d>%s.</td>")
+            _T("<td width=5></td>")
+            _T("<td align=left valign=top>%s</td>")
+        _T("</tr></table>"),
+        GetNumberWidth(),
+        puz2wx((*m_clues)[n].GetNumber()).c_str(),
+        puz2wx((*m_clues)[n].GetText()).c_str()
+    );
 }
 
 
@@ -190,9 +116,23 @@ ClueListBox::CalculateNumberWidth()
 // is fired every time an item is clicked.  This allows the color change to
 // work correctly -- otherwise if the crossing clue were clicked, no event
 // would be fired, since the selection didn't change.
-void
-ClueListBox::OnLeftDown(wxMouseEvent & evt)
+void ClueListBox::OnLeftDown(wxMouseEvent & evt)
 {
     DoSetCurrent(wxNOT_FOUND);
     evt.Skip();
+}
+
+
+void ClueListBox::OnSelection(wxCommandEvent & evt)
+{
+    const int count = m_clues->size();
+    if (count <= evt.GetSelection())
+    {
+        InvalidateCache();
+        RefreshAll();
+    }
+    else
+    {
+        evt.Skip();
+    }
 }
