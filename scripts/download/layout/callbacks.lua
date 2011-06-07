@@ -22,34 +22,9 @@ end
 function layout.downloadAll(condition)
     local condition = condition or function() return true end
     return function()
-        for _, dl in ipairs(P.dlg.alldownloads) do
+        for _, dl in ipairs(P.dlg.downloads) do
             if condition(dl) then startDownload(dl) end
         end
     end
 end
 
-
--- Download all puzzles on a given date that meet a condition
-function layout.downloadAllDates(target_date, condition)
-    local condition = condition or function() return true end
-    return function ()
-        for name, dates in pairs(P.dlg.downloads) do
-            for dl_date, dl in pairs(dates) do
-                if target_date == dl_date then
-                    if condition(dl) then startDownload(dl) end
-                end
-            end
-        end
-    end
-end
-
-
--- Download all available puzzles from a given source that meet a condition
-function layout.downloadAllPuzzles(target_label, condition)
-    local condition = condition or function() return true end
-    return function ()
-        for _, dl in pairs(P.dlg.downloads[target_label]) do
-            if condition(dl) then startDownload(dl) end
-        end
-    end
-end

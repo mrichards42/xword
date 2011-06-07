@@ -27,22 +27,19 @@ Each entry in the sources table should consist of the following:
 ]]
 
 require 'luacurl'
+local join = require 'pl.path'.join
 
 if not download then download = {} end
 
-function download.getBasename(source, date)
+function download.getSourceBasename(source, date)
     return source.prefix .. date:fmt(download.puzformat)
 end
 
-function download.getFilename(source, date)
-    return download.localfolder .. '/' ..
-           download.getBasename(source, date) .. '.' .. source.ext
+function download.getSourceFilename(source, date)
+    return join(download.localfolder,
+                download.getSourceBasename(source, date)..'.'..source.ext)
 end
 
-function download.getPuzFile(source, date)
-    return download.localfolder .. '/' ..
-           download.getBasename(source, date) .. '.' .. 'puz'
-end
 
 download.sources = 
 {
@@ -61,10 +58,11 @@ download.sources =
 
     {
         display = "CrosSynergy",
-        url = "http://www.chron.com/apps/games/xword/puzzles/cs%y%m%d.puz",
+        url = "http://www.washingtonpost.com/r/WashingtonPost/Content/Puzzles/Daily/cs%y%m%d.jpz",
         prefix = "cs",
-        ext = "puz",
+        ext = "jpz",
         days = { true, true, true, true, true, true, true },
+        format = "JPZ",
     },
 
     {
@@ -73,7 +71,7 @@ download.sources =
         prefix = "nd",
         ext = "xml",
         days = { true, true, true, true, true, true, true },
-        format = 'XML (uclick)',
+        format = 'UClick XML',
     },
 
     {
@@ -82,7 +80,7 @@ download.sources =
         prefix = "lat",
         ext = "xml",
         days = { true, true, true, true, true, true, true },
-        format = 'XML (uclick)',
+        format = 'UClick XML',
     },
 
     {
@@ -91,7 +89,7 @@ download.sources =
         prefix = "usa",
         ext = "xml",
         days = { true, true, true, true, true, false, false },
-        format = 'XML (uclick)',
+        format = 'UClick XML',
     },
 
     {
@@ -100,7 +98,7 @@ download.sources =
         prefix = "univ",
         ext = "xml",
         days = { true, true, true, true, true, true, true },
-        format = 'XML (uclick)',
+        format = 'UClick XML',
     },
 
     {
@@ -109,6 +107,7 @@ download.sources =
         prefix = "tausig",
         ext = "puz",
         days = { false, false, false, false, true, false, false },
+        format = "Across Lite",
     },
 
     {
@@ -117,6 +116,7 @@ download.sources =
         prefix = "av",
         ext = "puz",
         days = { false, false, true, false, false, false, false },
+        format = "Across Lite",
     },
 
     {
@@ -125,6 +125,7 @@ download.sources =
         prefix = "jones",
         ext = "puz",
         days = { false, false, false, true, false, false, false },
+        format = "Across Lite",
     },
 
     {
@@ -133,6 +134,7 @@ download.sources =
         prefix = "wsj",
         ext = "puz",
         days = { false, false, false, false, true, false, false },
+        format = "Across Lite",
     },
 
     {
@@ -141,6 +143,7 @@ download.sources =
         prefix = "bg",
         ext = "puz",
         days = { false, false, false, false, false, false, true },
+        format = "Across Lite",
     },
 
     {
@@ -149,5 +152,6 @@ download.sources =
         prefix = "pi",
         ext = "puz",
         days = { false, false, false, false, false, false, true },
+        format = "Across Lite",
     },
 }

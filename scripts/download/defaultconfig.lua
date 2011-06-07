@@ -3,7 +3,7 @@
 if not download then download = {} end
 
 -- Download output folder (created if it doesn't exist)
-download.localfolder = xword.GetUserDataDir().."/puzzles"
+download.localfolder = xword.userdatadir.."/puzzles"
 
 -- strftime format for column headers in the download dialog
 download.dateformat = "%a, %b %d"
