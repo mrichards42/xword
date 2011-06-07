@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -82,7 +82,7 @@ Grid::Grid(const Grid & other)
       m_last(NULL)
 {
     // Re-set up the grid.  This ensures that the Square linked
-    // list pointerspointers (m_next) refer to valid Squares.
+    // list pointers (m_next) refer to valid Squares.
     SetupIteration();
 }
 
@@ -124,7 +124,7 @@ Grid::SetupIteration()
 {
     // Fill in Square members:
     //   - Row and Col
-    //   - Next and Prev
+    //   - Next
     //-------------------------------------------------------------------
     for (size_t row = 0; row < GetHeight(); ++row)
     {
@@ -139,10 +139,7 @@ Grid::SetupIteration()
             {
                 m_first = &square;
                 m_last = &square;
-                square.m_next[ACROSS][PREV] =
-                square.m_next[DOWN]  [PREV] =
-                square.m_next[ACROSS][NEXT] =
-                square.m_next[DOWN]  [NEXT] = NULL;
+                square.m_next.clear();
             }
             else if (GetHeight() == 1)
             {
@@ -151,13 +148,18 @@ Grid::SetupIteration()
                 else if (col == LastCol())
                     m_last = &square;
 
-                square.m_next[DOWN]  [PREV] =
-                square.m_next[ACROSS][PREV] =
+                square.m_next[UP] =
+                square.m_next[LEFT] =
                     col == 0 ? NULL : &At(col - 1, row);
 
-                square.m_next[DOWN]  [NEXT] =
-                square.m_next[ACROSS][NEXT] =
+                square.m_next[DOWN] =
+                square.m_next[RIGHT] =
                     col == LastCol() ? NULL : &At(col + 1, row);
+
+                square.m_next[DIAGONAL_SE] =
+                square.m_next[DIAGONAL_SW] =
+                square.m_next[DIAGONAL_NW] =
+                square.m_next[DIAGONAL_NE] = NULL;
             }
             else if (GetWidth() == 1)
             {
@@ -166,13 +168,18 @@ Grid::SetupIteration()
                 else if (row == LastRow())
                     m_last = &square;
 
-                square.m_next[DOWN]  [PREV] =
-                square.m_next[ACROSS][PREV] =
+                square.m_next[UP] =
+                square.m_next[LEFT] =
                     row == 0 ? NULL : &At(col, row - 1);
 
-                square.m_next[DOWN]  [NEXT] =
-                square.m_next[ACROSS][NEXT] =
+                square.m_next[DOWN] =
+                square.m_next[RIGHT] =
                     row == LastRow() ? NULL : &At(col, row + 1);
+
+                square.m_next[DIAGONAL_SE] =
+                square.m_next[DIAGONAL_SW] =
+                square.m_next[DIAGONAL_NW] =
+                square.m_next[DIAGONAL_NE] = NULL;
             }
             // From here on out we have a normal grid (width and height > 1)
 
@@ -180,50 +187,58 @@ Grid::SetupIteration()
             else if (row == 0 && col == 0)
             {
                 m_first = &square;
-                square.m_next[ACROSS][PREV] = NULL;
-                square.m_next[DOWN]  [PREV] = NULL;
-                square.m_next[ACROSS][NEXT] = &At(col + 1, row);
-                square.m_next[DOWN]  [NEXT] = &At(col,     row + 1);
+                square.m_next[UP]    = NULL;
+                square.m_next[LEFT]  = NULL;
+                square.m_next[DOWN]  = &At(col, row + 1);
+                square.m_next[RIGHT] = &At(col + 1, row);
+                square.m_next[DIAGONAL_SE] = &At(col + 1, row + 1);
+                square.m_next[DIAGONAL_SW] =
+                square.m_next[DIAGONAL_NW] =
+                square.m_next[DIAGONAL_NE] = NULL;
             }
             else if (row == LastRow() && col == LastCol())
             {
                 m_last = &square;
-                square.m_next[DOWN]  [PREV] = &At(col,     row - 1);
-                square.m_next[ACROSS][PREV] = &At(col - 1, row);
-                square.m_next[DOWN]  [NEXT] = NULL;
-                square.m_next[ACROSS][NEXT] = NULL;
+                square.m_next[UP]    = &At(col, row - 1);
+                square.m_next[LEFT]  = &At(col - 1, row);
+                square.m_next[DOWN]  = NULL;
+                square.m_next[RIGHT] = NULL;
+                square.m_next[DIAGONAL_NW] = &At(col - 1, row - 1);
+                square.m_next[DIAGONAL_SE] =
+                square.m_next[DIAGONAL_SW] =
+                square.m_next[DIAGONAL_NE] = NULL;
             }
 
             // Otherwise next and previous squares will wrap rows and cols,
             // so we can iterate the entire grid.
             else
             {
-                square.m_next[DOWN][PREV] = 
+                square.m_next[UP] = 
                     row > 0 ? 
                         &At(col,     row - 1)
                       : &At(col - 1, LastRow());
 
-                square.m_next[DOWN][NEXT] =
+                square.m_next[DOWN] =
                     row < LastRow() ? 
                         &At(col,     row + 1)
                       : &At(col + 1, 0);
 
-                square.m_next[ACROSS][PREV] =
+                square.m_next[LEFT] =
                     col > 0 ? 
                         &At(col - 1,   row)
                       : &At(LastCol(), row - 1);
 
-                square.m_next[ACROSS][NEXT] =
+                square.m_next[RIGHT] =
                     col < LastCol() ?
                         &At(col + 1, row)
                       : &At(0,       row + 1);
-            }
 
-            // End of col/rows:
-            square.m_isLast[ACROSS][NEXT] =  col == LastCol();
-            square.m_isLast[DOWN]  [NEXT] =  row == LastRow();
-            square.m_isLast[ACROSS][PREV] =  col == 0;
-            square.m_isLast[DOWN]  [PREV] =  row == 0;
+                // Diagonal next is always NULL on the edge of the grid.
+                square.m_next[DIAGONAL_NE] = AtNULL(col + 1, row - 1);
+                square.m_next[DIAGONAL_NW] = AtNULL(col - 1, row - 1);
+                square.m_next[DIAGONAL_SW] = AtNULL(col - 1, row + 1);
+                square.m_next[DIAGONAL_SE] = AtNULL(col + 1, row + 1);
+            }
         }
     }
     if (GetWidth() == 0 || GetHeight() == 0)
@@ -246,15 +261,12 @@ void Grid::NumberGrid()
          square != NULL;
          square = square->Next())
     {
-        square->SetClue(ACROSS, square->WantsClue(ACROSS));
-        square->SetClue(DOWN,   square->WantsClue(DOWN));
-        if (square->HasClue())
+        if (square->WantsClue())
             square->SetNumber(clueNumber++);
         else
             square->SetNumber(puzT(""));
     }
 }
-
 
 bool
 Grid::ScrambleSolution(unsigned short key)
@@ -291,37 +303,16 @@ Grid::CheckGrid(std::vector<Square *> * incorrect, bool checkBlank, bool strictR
 
 void
 Grid::CheckWord(std::vector<Square *> * incorrect,
-                Square * start, Square * end, bool checkBlank, bool strictRebus)
+                const Word * word, bool checkBlank, bool strictRebus)
 {
-    GridDirection direction;
-    FindDirection increment;
-
-    // Find the iteration direction and increment
-    int row_dif = end->GetRow() - start->GetRow();
-    int col_dif = end->GetCol() - start->GetCol();
-
-    if (row_dif == 0)
-    {
-        if (col_dif == 0)
-            throw NoWord();
-        direction = ACROSS;
-        increment = col_dif < 0 ? PREV : NEXT;
-    }
-    else if (col_dif == 0)
-    {
-        direction = DOWN;
-        increment = row_dif < 0 ? PREV : NEXT;
-    }
-    else
+    if (! word)
         throw NoWord();
-
-    end = end->Next(direction, increment);
-    for (Square * square = start;
-         square != end;
-         square = square->Next(direction, increment))
+    Word::const_iterator it;
+    for (it = word->begin(); it != word->end(); ++it)
     {
+        const Square * square = (*it);
         if (! square->Check(checkBlank, strictRebus))
-            incorrect->push_back(square);
+            incorrect->push_back(&At(square->GetCol(), square->GetRow()));
     }
 }
 

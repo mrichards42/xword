@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,9 +20,9 @@
 #define PUZ_SQUARE_H
 
 #include <cassert>
+#include <cmath>
 #include "puzstring.hpp"
 #include "exceptions.hpp"
-#include "util.hpp"
 
 namespace puz {
 
@@ -35,14 +35,14 @@ enum GextFlag
     FLAG_PENCIL = 0x08,
     FLAG_BLACK  = 0x10,
     FLAG_X      = 0x20,
-    FLAG_RED    = 0x40,
+    FLAG_REVEALED    = 0x40,
     FLAG_CIRCLE = 0x80,
 
     ACROSS_LITE_MASK = FLAG_CLEAR |
                        FLAG_PENCIL |
                        FLAG_BLACK |
                        FLAG_X |
-                       FLAG_RED |
+                       FLAG_REVEALED |
                        FLAG_CIRCLE,
 
     FLAG_COLOR = 0x100,
@@ -58,19 +58,67 @@ enum FindDirection
 };
 
 
-// Grid directions
+// Grid directions, in angles
 enum GridDirection
 {
     ACROSS = 0,
-    DOWN
+    DOWN   = 270,
+
+    UP     = 90,
+    LEFT   = 180,
+    RIGHT  = ACROSS,
+
+    NORTH = UP,
+    SOUTH = DOWN,
+    EAST  = RIGHT,
+    WEST  = LEFT,
+
+    DIAGONAL_NE = 45,
+    DIAGONAL_NW = 135,
+    DIAGONAL_SW = 225,
+    DIAGONAL_SE = 315
 };
 
-// Facilitate swapping across and down
+// GridDirection functions
 inline GridDirection
-SwapDirection(GridDirection dir)
+ConstrainDirection(unsigned short dir)
 {
-    return dir == ACROSS ? DOWN : ACROSS;
+    // Make the direction fit into the GridDirection enum.
+    return GridDirection(((dir % 360) / 45) * 45);
 }
+
+inline unsigned short
+InvertDirection(unsigned short dir)
+{
+    return (dir + 180) % 360;
+}
+
+inline bool
+IsHorizontal(unsigned short dir)
+{
+    return dir == LEFT || dir == RIGHT;
+}
+
+inline bool
+IsVertical(unsigned short dir)
+{
+    return dir == UP || dir == DOWN;
+}
+
+inline bool
+IsDiagonal(unsigned short dir)
+{
+    return (dir % 90) != 0;
+}
+
+// This used to be called "IsSameDirection", which is
+// misleading, but this name is just awkward
+inline bool
+AreInLine(unsigned short dir1, unsigned short dir2)
+{
+    return dir1 == dir2 || dir1 == InvertDirection(dir2);
+}
+
 
 // Used with Check()
 enum CheckTest
@@ -107,10 +155,17 @@ public:
 
     // General information
     //--------------------
-    bool IsSolutionBlank() const { return m_solution == Blank; }
+    // These are defined in terms of text, not solution.
+    // This makes certain things easier for diagramless puzzles.
+    // If the puzzle is not diagramless, SetSolution(Square::Black)
+    // also calls SetText(Square::Black) for consistency.
     bool IsWhite()         const { return ! IsBlack() && ! IsMissing(); }
-    bool IsBlack()         const { return m_solution == Black; }
+    bool IsBlack()         const { return m_text == Black; }
     bool IsBlank()         const { return m_text == Blank; }
+    // Corresponding functions for the solution
+    bool IsSolutionWhite() const { return ! IsSolutionBlack() &&! IsMissing(); }
+    bool IsSolutionBlack() const { return m_solution == Black; }
+    bool IsSolutionBlank() const { return m_solution == Blank; }
 
     // Text
     //-----
@@ -125,6 +180,8 @@ public:
     void SetPlainSolution(char plain); // Leave solution rebus unchanged
     void SetSolutionRebus(const string_t & rebus); // Leave plain solution unchanged
     void SetSolutionSymbol(unsigned char symbol); // Must set plain solution separately
+
+    void SetBlack() { SetSolution(Black); }
 
     bool Check(bool checkBlank = false, bool strictRebus = false) const;
 
@@ -161,15 +218,15 @@ public:
 
     // Clue
     //-----
-    bool HasClue() const { return HasClue(ACROSS) || HasClue(DOWN); }
-    bool HasClue(GridDirection dir) const        { return m_hasClue[dir]; }
-    void SetClue(GridDirection dir, bool clue) { m_hasClue[dir] = clue; }
     // Is this square is a position that would usually have a clue ?
     bool WantsClue() const { return WantsClue(ACROSS) || WantsClue(DOWN); }
     bool WantsClue(GridDirection dir) const;
+    bool SolutionWantsClue(GridDirection dir) const;
+    bool SolutionWantsClue() const
+        { return SolutionWantsClue(ACROSS) || SolutionWantsClue(DOWN); }
 
-    // Flag (GEXT)
-    //------------
+    // Flags
+    //------
     void         SetFlag (unsigned int flag) { m_flag = flag; }
     unsigned int GetFlag() const             { return m_flag; }
     bool         HasFlag(unsigned int flag) const
@@ -193,6 +250,10 @@ public:
 
     bool HasColor() const { return HasFlag(FLAG_COLOR); }
     void SetColor(unsigned char red, unsigned char green, unsigned char blue);
+    void SetColor(const string_t & hexcolor); // XXX or XXXXXX (# is optional)
+    string_t GetHtmlColor() const;
+    void SetHighlight(bool doit = true);
+    bool HasHighlight() const;
     void RemoveColor();
 
     // Color (public so we don't need a GetColor)
@@ -202,28 +263,58 @@ public:
 
     // Linked-list
     //------------
-    Square * Next(GridDirection dir = ACROSS, FindDirection inc = NEXT)
-        { return m_next[dir][inc]; }
-    Square * Prev(GridDirection dir = ACROSS, FindDirection inc = NEXT)
-        { return m_next[dir][1 - inc]; }
-    Square * GetWordStart(GridDirection dir);
-    Square * GetWordEnd(GridDirection dir);
+    Square * Next(GridDirection dir = ACROSS) { return m_next[dir]; }
+    Square * Prev(GridDirection dir = ACROSS) { return m_next[(GridDirection)InvertDirection(dir)]; }
 
-    bool HasWord(GridDirection dir) const;
-
-    bool IsLast(GridDirection dir, FindDirection inc = NEXT) const
-        { return m_isLast[dir][inc]; }
-    bool IsFirst(GridDirection dir, FindDirection inc = NEXT) const
-        { return IsLast(dir, inc == NEXT ? PREV : NEXT); }
+    bool IsLast(GridDirection dir) const
+    {
+        const Square * next = m_next[dir];
+        if (! next)
+            return true;
+        switch(dir)
+        {
+            case LEFT:
+            case RIGHT:
+                return next->GetRow() != GetRow();
+            case UP:
+            case DOWN:
+                return next->GetCol() != GetCol();
+            case DIAGONAL_SE:
+                return next->GetCol() != GetCol() + 1 || next->GetRow() != GetRow() + 1;
+            case DIAGONAL_SW:
+                return next->GetCol() != GetCol() - 1 || next->GetRow() != GetRow() + 1;
+            case DIAGONAL_NW:
+                return next->GetCol() != GetCol() - 1 || next->GetRow() != GetRow() - 1;
+            case DIAGONAL_NE:
+                return next->GetCol() != GetCol() + 1 || next->GetRow() != GetRow() - 1;
+            default:
+                assert(false);
+                return true;
+        }
+    }
+    bool IsFirst(GridDirection dir) const { return IsLast((GridDirection)InvertDirection(dir)); }
 
     // Const overloads
-    const Square * Next(GridDirection dir = ACROSS, FindDirection inc = NEXT) const
-        { return m_next[dir][inc]; }
-    const Square * Prev(GridDirection dir = ACROSS, FindDirection inc = NEXT) const
-        { return m_next[dir][inc == NEXT ? PREV : NEXT]; }
-    const Square * GetWordStart(GridDirection dir) const;
-    const Square * GetWordEnd(GridDirection dir) const;
+    const Square * Next(GridDirection dir = ACROSS) const
+        { return m_next[dir]; }
+    const Square * Prev(GridDirection dir = ACROSS) const
+        { return m_next[(GridDirection)InvertDirection(dir)]; }
 
+    // These should not be used to actually find the word . . . they calculate
+    // the word start and end using FindWordBoundary.
+    const Square * Square::GetWordStart(GridDirection dir) const;
+    const Square * Square::GetWordEnd(GridDirection dir) const;
+    const Square * Square::GetSolutionWordStart(GridDirection dir) const;
+    const Square * Square::GetSolutionWordEnd(GridDirection dir) const;
+    Square * Square::GetWordStart(GridDirection dir);
+    Square * Square::GetWordEnd(GridDirection dir);
+    Square * Square::GetSolutionWordStart(GridDirection dir);
+    Square * Square::GetSolutionWordEnd(GridDirection dir);
+    static const Square * FindWordBoundary(const Square * square, GridDirection dir);
+    static const Square * FindSolutionWordBoundary(const Square * square, GridDirection dir);
+    static Square * FindWordBoundary(Square * square, GridDirection dir);
+    static Square * FindSolutionWordBoundary(Square * square, GridDirection dir);
+    bool Square::HasWord(GridDirection dir) const;
 
 protected:
     // Location information
@@ -237,7 +328,6 @@ protected:
 
     // Clue
     string_t m_number;
-    bool m_hasClue[2]; // [across / down]
 
     // Flag (GEXT)
     unsigned int m_flag;
@@ -250,13 +340,33 @@ protected:
     // This makes searching the grid ~20x faster, because there are no calls
     // to Grid::At().
 
-    Square * m_next[2][2];  // [ across / down ] [ prev / next ]
-
-    bool m_isLast[2][2];   // [ across / down ] [ prev / next ]
-
-    mutable Square * m_wordStart[2];  // [ across / down ]
-    mutable Square * m_wordEnd  [2];  // [ across / down ]
+    class SquareDirectionMap
+    {
+    public:
+        Square * m_map[8]; // [ E, NE, N, NW, W, SW, S, SE]
+        Square * & operator[](GridDirection dir) { return m_map[dir / 45]; }
+        Square * const & operator[](GridDirection dir) const { return m_map[dir / 45]; }
+        void clear()
+        {
+            m_map[0] = m_map[1] = m_map[2] = m_map[3] =
+            m_map[4] = m_map[5] = m_map[6] = m_map[7] = NULL;
+        }
+    } m_next;
 };
+
+// Return the direction (angle) between two squares
+static const double PI = std::atan(1.0)*4;
+inline unsigned short GetDirection(const Square & first, const Square & second)
+{
+    // Note that the y coords are reversed, because our grid coordinate system
+    // is also reversed.
+    double radians = std::atan2(
+        double(first.GetRow() - second.GetRow()), // y1 - y2
+        double(second.GetCol() - first.GetCol())  // x2 - x1
+    );
+    return (unsigned short)((radians * 180. / PI) + 360) % 360;
+}
+
 } // namespace puz
 
 #endif // PUZ_SQUARE_H

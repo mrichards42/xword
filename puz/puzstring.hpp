@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -45,6 +45,13 @@ namespace puz {
     #ifndef puzT
         #define puzT(str) L ## str
     #endif
+
+    // Insert a string into a std::ostream
+    inline std::ostream &
+    operator<<(std::ostream & stream, const string_t & str)
+    {
+        return (stream << encode_utf8(str));
+    }
 #else
     // Strings are stored as utf-8
     typedef char char_t;
@@ -69,13 +76,16 @@ PUZ_API string_t decode_puz(const std::string & str);
 string_t Trim(const string_t & str, const string_t & chars);
 inline string_t TrimWhitespace(const string_t & str) { return Trim(str,  puzT("\n\f\r \t")); }
 
-void EscapeXML(string_t & str);
-void UnescapeXML(string_t & str);
-bool IsFormatted(const std::string & str); // Is this valid XML?
+std::string GetExtension(const std::string & filename);
 
-void SetFormatted(string_t & str, const string_t & other);
-string_t GetFormatted(const string_t & str);
+string_t ToString(int number);
+int ToInt(const string_t & str);
+
+string_t escape_xml(const string_t & str);
+string_t unescape_xml(const string_t & str);
+
 std::string GetPuzText(const string_t & str);
+
 
 } // namespace puz
 

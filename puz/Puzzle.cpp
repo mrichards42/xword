@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,8 +17,13 @@
 
 
 #include "Puzzle.hpp"
-#include "util.hpp"
 #include <iostream>
+
+// Format handlers
+#include "formats/jpz/jpz.hpp"
+#include "formats/ipuz/ipuz.hpp"
+#include "formats/xpf/xpf.hpp"
+#include "formats/puz/puz.hpp"
 
 namespace puz {
 
@@ -39,22 +44,65 @@ void HandleExceptions(Puzzle * puz)
 // Load functions
 // -----------------------------------------------------------------------
 void
-Puzzle::Load(const string_t & filename, const FileHandlerDesc * desc)
+Puzzle::DoLoad(const std::string & filename, const FileHandlerDesc * desc)
 {
-    if (! desc)
-        desc = FindLoadHandler(GetExtension(filename));
-
-    ClearError();
-    if (! desc)
-        throw MissingHandler();
-
+    // The loading happens here, to prevent excessive recursion in Puzzle::Load
     Clear();
     try {
         desc->handler(this, filename.c_str(), desc->data);
+        if (m_words.empty())
+            GenerateWords();
         TestOk();
     }
     catch (...) {
+        // If the load function allocated a new FormatData, delete it.
+        m_formatData.reset();
         HandleExceptions(this);
+    }
+}
+
+void
+Puzzle::Load(const std::string & filename, const FileHandlerDesc * desc)
+{
+    m_formatData.reset();
+    if (desc)
+    {
+        DoLoad(filename, desc);
+    }
+    else // ! desc, Try all the handlers
+    {
+        // Prefer the handler with the correct extension
+        const FileHandlerDesc * expected
+            = FindLoadHandler(GetExtension(filename));
+        // Save the error from the expected type
+        Exception error;
+        if (expected)
+        {
+            try {
+                DoLoad(filename, expected);
+                return;
+            }
+            catch (Exception & e) {
+                error = e;
+            }
+        }
+        // Try all the handlers
+        for (desc = &sm_loadHandlers[0]; desc->handler != NULL; ++desc)
+        {
+            if (desc == expected) // We've already tried the expected handler
+                continue;
+            try {
+                DoLoad(filename, desc);
+                return;
+            }
+            catch (Exception &) {
+                // Do nothing
+            }
+        }
+        if (expected)
+            throw error;
+        else
+            throw MissingHandler();
     }
 }
 
@@ -63,12 +111,11 @@ Puzzle::Load(const string_t & filename, const FileHandlerDesc * desc)
 // Save functions
 // -----------------------------------------------------------------------
 void
-Puzzle::Save(const string_t & filename, const FileHandlerDesc * desc)
+Puzzle::Save(const std::string & filename, const FileHandlerDesc * desc)
 {
     if (! desc)
         desc = FindSaveHandler(GetExtension(filename));
 
-    ClearError();
     if (! desc)
         throw MissingHandler();
 
@@ -82,82 +129,136 @@ Puzzle::Save(const string_t & filename, const FileHandlerDesc * desc)
 // Grid numbering
 // -----------------------------------------------------------------------
 
-// Number the grid and clues
 void Puzzle::NumberClues()
 {
-    NumberGrid();
+    ClueList & across_clues = GetClueList(puzT("Across"));
+    ClueList & down_clues = GetClueList(puzT("Down"));
 
-    ClueList::iterator across = GetAcross().begin();
-    ClueList::iterator down   = GetDown().begin();
+    ClueList::iterator across = across_clues.begin();
+    ClueList::iterator down   = down_clues.begin();
 
-    ClueList::iterator across_end = GetAcross().end();
-    ClueList::iterator down_end   = GetDown().end();
+    ClueList::iterator across_end = across_clues.end();
+    ClueList::iterator down_end   = down_clues.end();
 
+    // Number the clues based on the grid solution
+    int clueNumber = 1;
     for (Square * square = m_grid.First();
          square != NULL;
          square = square->Next())
     {
-        if (! square->IsWhite())
+        if (! square->IsSolutionWhite())
             continue;
 
-        if (square->HasClue(ACROSS))
+        const bool wantsAcross = square->SolutionWantsClue(ACROSS);
+        const bool wantsDown   = square->SolutionWantsClue(DOWN);
+
+        if (wantsAcross)
         {
             if (across == across_end)
                 throw InvalidClues();
-            across->SetNumber(square->GetNumber());
+            across->SetNumber(clueNumber);
             ++across;
         }
 
-        if (square->HasClue(DOWN))
+        if (wantsDown)
         {
             if (down == down_end)
                 throw InvalidClues();
-            down->SetNumber(square->GetNumber());
+            down->SetNumber(clueNumber);
             ++down;
         }
+
+        if (wantsAcross || wantsDown)
+            ++clueNumber;
     }
     if (across != across_end || down != down_end)
         throw InvalidClues();
 
 }
 
+template <typename T> int sign(T val)
+{
+    return (val > T(0)) - (val < T(0));
+}
+
+Word
+Puzzle::MakeWord(int x1, int y1, int x2, int y2)
+{
+    // We can only add words with this method that are
+    // vertical, horizontal, or diagonal (no funny circular clues, etc.)
+    int dx = (x2 - x1);
+    int dy = (y2 - y1);
+    if (! (dx == 0 || dy == 0 || abs(dx) == abs(dy)))
+        throw InvalidWord();
+    // dx and dy should never be 0, or we'll have either an infinite loop
+    // or a loop that doesn't run at all
+    dx = dx >= 0 ? 1 : -1;
+    dy = dy >= 0 ? 1 : -1;
+    x2 += dx; // make these one past the end
+    y2 += dy;
+    Word word;
+    for (int x = x1; x != x2; x += dx)
+        for (int y = y1; y != y2; y += dx)
+        {
+            try 
+            {
+                word.push_back(&(m_grid.At(x, y)));
+            }
+            catch(std::out_of_range &)
+            {
+                throw InvalidWord("Grid cell out of range");
+            }
+        }
+    return word;
+}
+
+// Number the grid, set the clues, and create words
 void Puzzle::SetAllClues(const std::vector<string_t> & clues)
 {
     NumberGrid();
 
-    ClueList & across = GetAcross();
-    ClueList & down = GetDown();
-    across.clear();
-    down.clear();
+    ClueList & across = SetClueList(puzT("Across"), ClueList());
+    ClueList & down   = SetClueList(puzT("Down"), ClueList());
+    m_words.clear();
 
     std::vector<string_t>::const_iterator clue_it = clues.begin();
     std::vector<string_t>::const_iterator clue_end = clues.end();
 
+    // Number the clues based on the grid solution
+    int clueNumber = 1;
     for (Square * square = m_grid.First();
          square != NULL;
          square = square->Next())
     {
-        if (! square->IsWhite())
+        if (! square->IsSolutionWhite())
             continue;
 
-        if (square->HasClue(ACROSS))
+        const bool wantsAcross = square->SolutionWantsClue(ACROSS);
+        const bool wantsDown   = square->SolutionWantsClue(DOWN);
+
+        if (wantsAcross)
         {
             if (clue_it == clue_end)
                 throw InvalidClues();
-            across.push_back(Clue(square->GetNumber(), *clue_it));
+            across.push_back(Clue(clueNumber, *clue_it));
             ++clue_it;
         }
 
-        if (square->HasClue(DOWN))
+        if (wantsDown)
         {
             if (clue_it == clue_end)
                 throw InvalidClues();
-            down.push_back(Clue(square->GetNumber(), *clue_it));
+            down.push_back(Clue(clueNumber, *clue_it));
             ++clue_it;
         }
+
+        if (wantsAcross || wantsDown)
+            ++clueNumber;
     }
+
     if (clue_it != clue_end)
         throw InvalidClues();
+    GenerateWords();
 }
 
 void Puzzle::NumberGrid()
@@ -165,51 +266,200 @@ void Puzzle::NumberGrid()
     m_grid.NumberGrid();
 }
 
-//------------------------------------------------------------------------------
-// Error checking
-//------------------------------------------------------------------------------
-
-// Helper for FindSquare() in TestClueList
-struct FIND_CLUE
+void Puzzle::GenerateWords()
 {
-    FIND_CLUE(string_t num_, GridDirection dir_)
-        : num(num_), dir(dir_)
-    {
-        assert(! num.empty());
-    }
-    string_t num;
+    m_words.clear();
+    Clues::iterator cluelist_it;
     GridDirection dir;
-
-    bool operator()(const Square * square)
+    for (cluelist_it = m_clues.begin(); cluelist_it != m_clues.end(); ++cluelist_it)
     {
-        return square->GetNumber() == num &&
-               square->HasClue(dir);
+        ClueList & cluelist = cluelist_it->second;
+        if (cluelist_it->first == puzT("Across"))
+            dir = ACROSS;
+        else if (cluelist_it->first == puzT("Down"))
+            dir = DOWN;
+        else if (cluelist_it->first == puzT("Diagonal"))
+            dir = DIAGONAL_SE;
+        else
+            throw InvalidClues();
+        ClueList::iterator it;
+        for (it = cluelist.begin(); it != cluelist.end(); ++it)
+        {
+            // Find the square with this clue number.
+            const Square * start = m_grid.FindSquare(FIND_CLUE_NUMBER(it->GetNumber()));
+            if (! start)
+                throw InvalidClues("All clues must have a word");
+            const Square * end = start->GetSolutionWordEnd(dir);
+            if (! end)
+                throw InvalidClues("All clues must have a word");
+            Word * word = AddWord(start, end);
+            it->SetWord(word);
+        }
     }
-};
+}
+
+
+bool Puzzle::UsesNumberAlgorithm() const
+{
+    if (! (HasClueList(puzT("Across")) && HasClueList(puzT("Down"))))
+        return false;
+    if (GetClues().size() != 2)
+        return false;
+
+    const ClueList & across_clues = GetClueList(puzT("Across"));
+    const ClueList & down_clues = GetClueList(puzT("Down"));
+
+    ClueList::const_iterator across = across_clues.begin();
+    ClueList::const_iterator down   = down_clues.begin();
+
+    ClueList::const_iterator across_end = across_clues.end();
+    ClueList::const_iterator down_end   = down_clues.end();
+
+    // Try to number the clues based on the grid solution
+    int clueNumber = 1;
+    for (const Square * square = m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (! square->IsSolutionWhite())
+            continue;
+
+        const bool wantsAcross = square->SolutionWantsClue(ACROSS);
+        const bool wantsDown   = square->SolutionWantsClue(DOWN);
+
+        if (wantsAcross)
+        {
+            if (across == across_end || 
+                ToInt(across->GetNumber()) != clueNumber)
+                return false;
+            ++across;
+        }
+
+        if (wantsDown)
+        {
+            if (down == down_end || 
+                ToInt(down->GetNumber()) != clueNumber)
+                return false;
+            ++down;
+        }
+
+        if (wantsAcross || wantsDown)
+            ++clueNumber;
+    }
+    if (across != across_end || down != down_end)
+        return false;
+    return true;
+}
+
+
+//------------------------------------------------------------------------------
+// Find functions
+//------------------------------------------------------------------------------
+const Word *
+Puzzle::FindWord(const puz::Square * square) const
+{
+    WordList::const_iterator it;
+    for (it = m_words.begin(); it != m_words.end(); ++it)
+    {
+        const Word & word = *it;
+        if (word.Contains(square))
+            return &word;
+    }
+    return NULL;
+}
+
+const Word *
+Puzzle::FindWord(const puz::Square * square, short direction) const
+{
+    short inverseDirection = InvertDirection(direction);
+    WordList::const_iterator it;
+    // Prefer words in exactly the specified direction.
+    // If we can't find any of those, return a word in the inverse
+    // direction.
+    const Word * inverseWord = NULL;
+    for (it = m_words.begin(); it != m_words.end(); ++it)
+    {
+        const Word & word = *it;
+        short wordDirection = word.GetDirection();
+        if (word.Contains(square))
+        {
+            if (wordDirection == direction)
+                return &word;
+            else if (wordDirection == inverseDirection)
+                inverseWord = &word;
+        }
+    }
+    return inverseWord;
+}
+
+const Clue *
+Puzzle::FindClue(const puz::Square * square) const
+{
+    Clues::const_iterator it;
+    for (it = m_clues.begin(); it != m_clues.end(); ++it)
+    {
+        const Clue * clue = it->second.Find(square);
+        if (clue)
+            return clue;
+    }
+    return NULL;
+}
+
+const Clue *
+Puzzle::FindClue(const puz::Word * word) const
+{
+    Clues::const_iterator it;
+    for (it = m_clues.begin(); it != m_clues.end(); ++it)
+    {
+        const Clue * clue = it->second.Find(word);
+        if (clue)
+            return clue;
+    }
+    return NULL;
+}
+
+
+Word *
+Puzzle::FindWord(const puz::Square * square)
+{
+    return const_cast<Word *>(const_cast<const Puzzle *>(this)
+        ->FindWord(square));
+}
+
+Word *
+Puzzle::FindWord(const puz::Square * square, short direction)
+{
+    return const_cast<Word *>(const_cast<const Puzzle *>(this)
+            ->FindWord(square, direction));
+}
+
+Clue *
+Puzzle::FindClue(const puz::Square * square)
+{
+    return const_cast<Clue *>(const_cast<const Puzzle *>(this)
+        ->FindClue(square));
+}
+
+Clue *
+Puzzle::FindClue(const puz::Word * word)
+{
+    return const_cast<Clue *>(const_cast<const Puzzle *>(this)
+        ->FindClue(word));
+}
+
+
+//------------------------------------------------------------------------------
+// Puzzle validation
+//------------------------------------------------------------------------------
+
 
 void Puzzle::TestClueList(const string_t & direction)
 {
-    const ClueList & clues = GetClues(direction);
-    GridDirection dir;
-    bool has_dir = true;
-    if (&clues == &GetAcross())
-        dir = ACROSS;
-    else if (&clues == &GetDown())
-        dir = DOWN;
-    else
-        has_dir = false;
-
+    const ClueList & clues = GetClueList(direction);
     ClueList::const_iterator it;
     for (it = clues.begin(); it != clues.end(); ++it)
-    {
-        if (it->GetNumber().empty())
-            throw InvalidClues("All clues must have a number");
-        if (! has_dir)
-            continue;
-        Square * square = m_grid.FindSquare(FIND_CLUE(it->GetNumber(), dir));
-        if (! square)
-            throw InvalidClues("All clues must have a square");
-    }
+        if (it->GetWord() == NULL)
+            throw InvalidClues("All clues must have a word.");
 }
 
 void
@@ -220,50 +470,41 @@ Puzzle::TestOk()
     if (m_grid.GetWidth() == 0 || m_grid.GetHeight() == 0)
         throw InvalidGrid();
 
-    // All squares do not need to have a solution
-
-    // Make sure that all clues can find a square.
-    TestClueList(puzT("Across"));
-    TestClueList(puzT("Down"));
-    Clues::cluemap_t::const_iterator it;
-    for (it = m_clues.m_otherClues.begin();
-         it != m_clues.m_otherClues.begin();
-         ++it)
+    // Make sure that all clues have words.
     {
-        TestClueList(it->first);
+        Clues::const_iterator it;
+        for (it = m_clues.begin(); it != m_clues.end(); ++it)
+            TestClueList(it->first);
     }
 
-    // Make sure that all numbered squares have a clue
-    for (Square * square = m_grid.First();
-         square != NULL;
-         square = square->Next())
+    // Make sure that no words cross missing squares.
     {
-        if (square->HasNumber())
+        WordList::const_iterator it;
+        for (it = m_words.begin(); it != m_words.end(); ++it)
         {
-            if (square->HasClue(puz::ACROSS) &&
-                GetAcross().Find(square->GetNumber()) == GetAcross().end())
-                    throw InvalidGrid("All numbered squares must have a clue");
-            if (square->HasClue(puz::DOWN) &&
-                GetDown().Find(square->GetNumber()) == GetDown().end())
-                    throw InvalidGrid("All numbered squares must have a clue");
+            Word::const_iterator word_it;
+            for (word_it = it->begin(); word_it != it->end(); ++word_it)
+                if ((*word_it)->IsMissing())
+                    throw InvalidWord("Words cannot contain missing squares.");
         }
     }
+
     m_isOk = true;
 }
 
 //------------------------------------------------------------------------------
-// Static functions (load/save handlers)
+// Static functions (load/save handlers)`
 //------------------------------------------------------------------------------
 
 bool
-Puzzle::CanLoad(const string_t & filename)
+Puzzle::CanLoad(const std::string & filename)
 {
     return FindLoadHandler(GetExtension(filename)) != NULL;
 }
 
 
 bool
-Puzzle::CanSave(const string_t & filename)
+Puzzle::CanSave(const std::string & filename)
 {
     return FindSaveHandler(GetExtension(filename)) != NULL;
 }
@@ -272,7 +513,7 @@ Puzzle::CanSave(const string_t & filename)
 
 // Helper for find functions
 const Puzzle::FileHandlerDesc *
-FindHandler(const Puzzle::FileHandlerDesc * start, const string_t & ext)
+FindHandler(const Puzzle::FileHandlerDesc * start, const std::string & ext)
 {
     for (const Puzzle::FileHandlerDesc * d = start; d->ext != NULL; ++d)
         if (ext == d->ext)
@@ -281,14 +522,14 @@ FindHandler(const Puzzle::FileHandlerDesc * start, const string_t & ext)
 }
 
 const Puzzle::FileHandlerDesc *
-Puzzle::FindLoadHandler(const string_t & ext)
+Puzzle::FindLoadHandler(const std::string & ext)
 {
     return FindHandler(sm_loadHandlers, ext);
 }
 
 
 const Puzzle::FileHandlerDesc *
-Puzzle::FindSaveHandler(const string_t & ext)
+Puzzle::FindSaveHandler(const std::string & ext)
 {
     return FindHandler(sm_saveHandlers, ext);
 }
@@ -298,22 +539,18 @@ Puzzle::FindSaveHandler(const string_t & ext)
 // Load and save handlers
 // -----------------------------------------------------------------------
 
-// Load Handlers
-extern void LoadPuz(Puzzle * puz, const string_t & filename, void *);
-extern void LoadXPF(Puzzle * puz, const string_t & filename, void *);
-
+// Load handlers
 const Puzzle::FileHandlerDesc Puzzle::sm_loadHandlers[] = {
-    { LoadPuz, puzT("puz"), puzT("Across Lite"), NULL },
-    { LoadXPF, puzT("xml"), puzT("XPF"), NULL },
+    { LoadPuz, "puz", puzT("Across Lite"), NULL },
+    { LoadXPF, "xml", puzT("XPF"), NULL },
+    { LoadJpz, "jpz", puzT("jpuz"), NULL },
+    { LoadIpuz,"ipuz", puzT("ipuz"), NULL },
     { NULL, NULL, NULL }
 };
 
-
-// Save Handlers
-extern void SavePuz(Puzzle * puz, const string_t & filename, void *);
-
 const Puzzle::FileHandlerDesc Puzzle::sm_saveHandlers[] = {
-    { SavePuz, puzT("puz"), puzT("Across Lite"), NULL },
+    { SavePuz, "puz", puzT("Across Lite"), NULL },
+    { SaveXPF, "xml", puzT("XPF"), NULL },
     { NULL, NULL, NULL }
 };
 

@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2010 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,7 +19,9 @@
 #include "puzstring.hpp"
 #include "exceptions.hpp"
 #include <algorithm>
-#include <expat.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cassert>
 #include <set>
 
 namespace puz {
@@ -252,47 +254,60 @@ string_t Trim(const string_t & str, const string_t & chars)
 }
 
 
+
+std::string GetExtension(const std::string & filename)
+{
+    // Find the last dot
+    const size_t index = filename.find_last_of('.');
+    // No extenion if there was not a match
+    if (index == std::string::npos)
+        return "";
+    // No extension if the match occurred before the last directory separator
+    const size_t dirsep_index = filename.find_last_of("/\\");
+    if (dirsep_index != std::string::npos && index < dirsep_index)
+        return "";
+    // Return a lower-cased string.
+    std::string ret = filename.substr(index+1);
+    for (std::string::iterator it = ret.begin(); it != ret.end(); ++it)
+        *it = tolower(*it);
+    return ret;
+}
+
+
+string_t ToString(int number)
+{
+    char_t buf[6];
+    // Truncate the number if it will not fit into buf
+    if (number > 99999)
+        number = 99999;
+#if PUZ_UNICODE
+    swprintf(buf, 6, L"%d", number);
+#else
+    sprintf(buf, 6, "%d", number);
+#endif
+    return string_t(buf);
+}
+
+int ToInt(const string_t & str)
+{
+    if (str.empty())
+        return -1;
+    // Return -1 if the number isn't a valid character
+    int n = 0;
+    string_t::const_iterator begin = str.begin();
+    string_t::const_iterator end   = str.end();
+    for (string_t::const_iterator it = begin; it != end; ++it)
+    {
+        if (! isdigit(*it))
+            return -1;
+        n = n * 10 + *it - 48; // ASCII 48 is '0'
+    }
+    return n;
+}
+
 //----------------------------------------------------------------------------
 // Convert between formatted / unformatted
 //----------------------------------------------------------------------------
-
-void SetFormatted(string_t & str, const string_t & other)
-{
-    str = other;
-    // Are there any XML characters, and is this valid XML?
-    if (str.find_first_of(puzT("<>")) != string_t::npos)
-    {
-        if (! IsFormatted(encode_utf8(other)))
-            EscapeXML(str);
-        // Do nothing
-    }
-    // Other characters that are escaped using EscapeXML.
-    else if (str.find_first_of(puzT("&\n")) != string_t::npos)
-    {
-        EscapeXML(str);
-    }
-}
-
-
-string_t GetFormatted(const string_t & str)
-{
-    // Are there any XML characters
-    if (str.find_first_of(puzT("<>")) != string_t::npos)
-        return str;
-    // Are there any escaped characters?
-    else if (str.find_first_of(puzT("&")) != string_t::npos)
-    {
-        string_t ret = str;
-        UnescapeXML(ret);
-        return ret;
-    }
-    else
-    {
-        return str;
-    }
-}
-
-
 static size_t GetBrTag(const string_t & str, size_t index);
 
 // Puz can take anything that is unformatted, or only
@@ -316,20 +331,15 @@ static bool IsOkForPuz(const string_t & str)
 std::string GetPuzText(const string_t & str)
 {
     if (! IsOkForPuz(str))
-    {
-        // Check to see if our < > is only in a <br /> tag.
         throw ConversionError("Puz format does not support XHTML formatting.");
-    }
-    string_t ret = str;
-    UnescapeXML(ret);
-    return encode_puz(ret);
+    return encode_puz(unescape_xml(str));
 }
 
 //----------------------------------------------------------------------------
 // Escape / unescape XML
 //----------------------------------------------------------------------------
 
-void EscapeXML(string_t & str)
+string_t escape_xml(const string_t & str)
 {
     // Replace & with &amp;
     // Replace < with &lt;
@@ -338,7 +348,7 @@ void EscapeXML(string_t & str)
     size_t start = 0;
     size_t index = str.find_first_of(puzT("&<>\r\n"), start);
     if (index == string_t::npos)
-        return; // Shortcut if we don't have anything to replace.
+        return str; // Shortcut if we don't have anything to replace.
     string_t ret;
     ret.reserve(int(str.size() * 1.2));
     while (index != string_t::npos)
@@ -367,7 +377,7 @@ void EscapeXML(string_t & str)
         index = str.find_first_of(puzT("&<>\r\n"), start);
     }
     ret.append(str.substr(start));
-    str.assign(ret);
+    return ret;
 }
 
 
@@ -387,7 +397,7 @@ size_t GetBrTag(const string_t & str, size_t index)
 }
 
 
-void UnescapeXML(string_t & str)
+string_t unescape_xml(const string_t & str)
 {
     // Replace &amp; with &
     // Replace &lt; with <
@@ -396,7 +406,7 @@ void UnescapeXML(string_t & str)
     size_t start = 0;
     size_t index = str.find_first_of(puzT("<&"), start);
     if (index == string_t::npos)
-        return; // Shortcut if we don't have anything to replace.
+        return str; // Shortcut if we don't have anything to replace.
     string_t ret;
     ret.reserve(int(str.size() * 1.2));
     while (index != string_t::npos)
@@ -434,6 +444,7 @@ void UnescapeXML(string_t & str)
                 size_t semi = str.find(puzT(';'), index);
                 if (semi != string_t::npos)
                 {
+                    ++index;
                     string_t substr = str.substr(index, semi - index);
                     if (substr == puzT("amp"))
                         ret.append(puzT("&"));
@@ -453,86 +464,7 @@ void UnescapeXML(string_t & str)
         index = str.find_first_of(puzT("<&"), start);
     }
     ret.append(str.substr(start));
-    str.assign(ret);
-}
-
-
-// ---------------------------------------------------------------------------
-// IsFormatted: Checks XML validity, and checks tags against a list
-// ---------------------------------------------------------------------------
-
-// The comparison function (case-insensitive)
-typedef bool (*allowedElements_key_cmp)(const std::string &, const std::string &);
-static bool allowedElements_cmp(const std::string & a, const std::string & b)
-{
-    return stricmp(a.c_str(), b.c_str()) < 0;
-}
-
-// The elements we can handle
-static std::string elems[] = {
-    "a",
-    "b",
-    "br",
-    "center",
-    "code",
-    "em",
-    "font",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "i",
-    "p",
-    "pre",
-    "small",
-    "strike",
-    "strong",
-    "sub",
-    "sup",
-    "tt",
-    "u",
-};
-
-// This messy bit here sets the comparison function and initializes
-// the set with the above array.
-static std::set<std::string, allowedElements_key_cmp>
-    allowedElements(elems + 0,
-                    elems + sizeof(elems) / sizeof(std::string),
-                    allowedElements_cmp);
-
-static void XMLCALL CheckElement(void *, const XML_Char * name, const XML_Char **)
-{
-    // Check to see if this is an allowed element, throw an exception
-    // if not
-    if (allowedElements.find(name) == allowedElements.end())
-        throw std::exception();
-}
-
-
-bool IsFormatted(const std::string & str)
-{
-    XML_Parser p = XML_ParserCreate("UTF-8");
-    XML_SetStartElementHandler(p, CheckElement);
-    try
-    {
-        // Feed expat a dummy root node, because XML requires
-        // some kind of root element.
-        if (! XML_Parse(p, "<p>", 3, false))
-            throw std::exception();
-        if (! XML_Parse(p, str.c_str(), str.size(), false))
-            throw std::exception();
-        if (! XML_Parse(p, "</p>", 4, true))
-            throw std::exception();
-    }
-    catch (...)
-    {
-        XML_ParserFree(p);
-        return false;
-    }
-    XML_ParserFree(p);
-    return true;
+    return ret;
 }
 
 

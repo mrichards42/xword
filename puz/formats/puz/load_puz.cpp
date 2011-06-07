@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,25 +15,27 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "puz.hpp"
+
 #include "Puzzle.hpp"
 #include "Checksummer.hpp"
 #include "puzstring.hpp"
-#include "util.hpp"
-#include "StreamWrapper.hpp"
+#include "utils/streamwrapper.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include <map>
 
 namespace puz {
 
 static void LoadSections(Puzzle * puz, istream_wrapper & f);
 
-void LoadPuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
+void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 {
     std::ifstream stream(filename.c_str(), std::ios::in | std::ios::binary);
     if (stream.fail())
-        throw FatalFileError(std::string("Unable to open file: ") + encode_utf8(filename));
+        throw FatalFileError(std::string("Unable to open file: ") + filename);
     istream_wrapper f(stream);
 
     const unsigned short c_primary = f.ReadShort();
@@ -63,10 +65,10 @@ void LoadPuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
     const unsigned short grid_type = f.ReadShort();
     const unsigned short grid_flag = f.ReadShort();
 
-    puz->GetGrid().SetSize(width, height);
     puz->GetGrid().SetCksum(c_grid);
     puz->GetGrid().SetType(grid_type);
     puz->GetGrid().SetFlag(grid_flag);
+    puz->GetGrid().SetSize(width, height);
 
     // Read user text and solution
     std::string solution = f.ReadString(width * height);
@@ -89,17 +91,28 @@ void LoadPuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
         ++sol_it;
 
         // Text
-        if (square->IsBlack() || *text_it == ':' && puz->m_grid.IsDiagramless())
+        if (square->IsBlack() && ! puz->m_grid.IsDiagramless())
             square->SetText(puz::Square::Black);
         else if (*text_it == '-' || *text_it == 0)
             square->SetText(puz::Square::Blank);
+        else if (puz->m_grid.IsDiagramless() && (*text_it == '.' || *text_it == ':'))
+        {
+            // Black squares in a diagramless puzzle.
+            if (*text_it == '.')
+                square->SetText(puz::Square::Black);
+            else if (*text_it == ':')
+                square->SetText(puz::Square::Blank);
+        }
         else
+        {
             square->SetText(decode_puz(std::string(1, *text_it)));
             if (islower(*text_it))
                 square->AddFlag(FLAG_PENCIL);
+        }
         ++text_it;
     }
     assert(sol_it == solution.end() && text_it == text.end());
+    puz->NumberGrid();
 
     // General puzzle info
     puz->SetTitle(decode_puz(f.ReadString()));
@@ -115,63 +128,22 @@ void LoadPuz(Puzzle * puz, const string_t & filename, void * /* dummy */)
     for (size_t i = 0; i < num_clues; ++i)
     {
         cksum_clues.push_back(f.ReadString());
-        clues.push_back(decode_puz(cksum_clues.back()));
+        clues.push_back(escape_xml(decode_puz(cksum_clues.back())));
     }
 
     puz->SetAllClues(clues);
 
     // Notes
     std::string notes = f.ReadString();
-    puz->SetNotes(decode_puz(notes));
+    puz->SetNotes(escape_xml(decode_puz(notes)));
 
     puz->SetOk(true);
 
     // Try to load the extra sections (i.e. GEXT, LTIM, etc).
-    try {
-        LoadSections(puz, f);
-    }
-    catch (SectionError & err) {
-        puz->SetError(err.what());
-    }
-    catch (std::ios::failure &) {
-        puz->SetError("EOF in a section");
-        // No error; we just won't process all the sections
-    }
+    LoadSections(puz, f);
 
-    // Test the checksums
-    Checksummer cksum;
-    cksum.SetVersion(version);
-    cksum.SetAuthor(encode_puz(puz->GetAuthor()));
-    cksum.SetTitle(encode_puz(puz->GetTitle()));
-    cksum.SetCopyright(encode_puz(puz->GetCopyright()));
-
-    // Use clues and notes from the actual file because the Puzzle methods unescape XML chars.
-    cksum.SetClues(cksum_clues);
-    cksum.SetNotes(notes);
-
-    // Use the grid and solution from the actual file, because Across Lite
-    // doesn't save rebus solutions correctly all the time.
-    cksum.SetSolution(solution);
-    cksum.SetGridText(text);
-
-    cksum.SetWidth(puz->GetGrid().GetWidth());
-    cksum.SetHeight(puz->GetGrid().GetHeight());
-    cksum.SetGridType(puz->GetGrid().GetType());
-    cksum.SetGridFlag(puz->GetGrid().GetFlag());
-
-    // We're going to test both 1.3 and 1.2 as versions because some files
-    // with notepads don't have the correct version . . .
-    if (! cksum.TestChecksums(c_cib, c_primary, c_masked))
-    {
-        if (! puz->m_notes.empty())
-        {
-            cksum.SetVersion( (version == 13 ? 12 : 13) );
-            if (! cksum.TestChecksums(c_cib, c_primary, c_masked))
-                throw ChecksumError();
-        }
-        else
-            throw ChecksumError();
-    }
+    // Don't even bother with the checksums, since we check the validity
+    // of the puzzle anyways
 }
 
 
@@ -197,12 +169,7 @@ static void UnLoadSolutionRebus(Puzzle * puz);
         try {                                           \
             Load##name(puz, data);                      \
         }                                               \
-        catch (std::exception & err) {                  \
-            puz->SetError(err.what());                  \
-            UnLoad##name(puz);                          \
-        }                                               \
         catch (...) {                                   \
-            puz->SetError("Unknown section error");     \
             UnLoad##name(puz);                          \
         }                                               \
     }                                                   \
@@ -242,20 +209,13 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
 
             // Test the checksum
             if (c_section != Checksummer::cksum_region(data, 0))
-            {
-                puz->SetError(std::string("Bad checksum in puz section: ") + title);
-                // This is not an exception, we just won't process the section
-                continue;
-            }
+                continue; // Skip this section.
 
             sections[title] = data;
         }
     }
-    catch(std::ios::failure &) {
-        if (title.empty() || title.at(0) == 0)
-            puz->SetError("EOF in a puz section");
-        else
-            puz->SetError(std::string("EOF in puz section: ") + title);
+    catch(...) {
+        // Don't process sections with errors
     }
 
     // Fill in the puzzle data
@@ -285,12 +245,12 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
         sections.erase("RTBL");
 
     // Add the remaining unknown sections
-    for (std::map<std::string, std::string>::iterator it = sections.begin();
-         it != sections.end();
-         ++it)
-    {
-        puz->m_extraSections.push_back(Puzzle::section(it->first, it->second));
-    }
+    // If an exception is throw, Puzzle::LoadPuzzle will clean up this pointer
+    PuzData * extra = new PuzData;
+    puz->SetFormatData(extra);
+    std::map<std::string, std::string>::iterator it;
+    for (it = sections.begin(); it != sections.end(); ++it)
+        extra->extraSections.push_back(*it);
 }
 
 #undef LOAD_SECTION

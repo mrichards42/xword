@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -42,23 +42,7 @@ Square::Square()
     SetSolution(puzT(""));
 
     // These will be filled in by the grid
-    m_next[ACROSS][PREV] = NULL;
-    m_next[ACROSS][NEXT] = NULL;
-    m_next[DOWN]  [PREV] = NULL;
-    m_next[DOWN]  [NEXT] = NULL;
-
-    m_isLast[ACROSS][PREV] = false;
-    m_isLast[ACROSS][NEXT] = false;
-    m_isLast[DOWN]  [PREV] = false;
-    m_isLast[DOWN]  [NEXT] = false;
-
-    m_wordStart[ACROSS] = NULL;
-    m_wordEnd  [ACROSS] = NULL;
-    m_wordStart[DOWN]   = NULL;
-    m_wordEnd  [DOWN]   = NULL;
-
-    m_hasClue[ACROSS] = false;
-    m_hasClue[DOWN]   = false;
+    m_next.clear();
 }
 
 // Copy constructor
@@ -78,23 +62,7 @@ Square::Square(const Square & other)
       m_green(other.m_green),
       m_blue(other.m_blue)
 {
-    m_next[ACROSS][PREV] = NULL;
-    m_next[ACROSS][NEXT] = NULL;
-    m_next[DOWN]  [PREV] = NULL;
-    m_next[DOWN]  [NEXT] = NULL;
-
-    m_isLast[ACROSS][PREV] = false;
-    m_isLast[ACROSS][NEXT] = false;
-    m_isLast[DOWN]  [PREV] = false;
-    m_isLast[DOWN]  [NEXT] = false;
-
-    m_wordStart[ACROSS] = NULL;
-    m_wordEnd  [ACROSS] = NULL;
-    m_wordStart[DOWN]   = NULL;
-    m_wordEnd  [DOWN]   = NULL;
-
-    m_hasClue[ACROSS] = other.m_hasClue[ACROSS];
-    m_hasClue[DOWN]   = other.m_hasClue[DOWN];
+    m_next = SquareDirectionMap(m_next);
 }
 
 // Since all constructors are private, only a grid can create squares.
@@ -102,12 +70,6 @@ Square::Square(const Square & other)
 //     grid1.At(col, row) = grid2.At(col, row);
 // In order to preserve iteration, we need to prevent grid information
 // from being copied.
-//
-// Word start and end can be preserved if we are copying white square
-// to white square or black square to black square.
-// Otherwise we need reset word start/end (for every square in the word,
-// start to end).
-// This could be a somewhat expensive operation.
 Square & Square::operator=(const Square & other)
 {
     m_asciiSolution = other.m_asciiSolution;
@@ -120,34 +82,14 @@ Square & Square::operator=(const Square & other)
     m_blue = other.m_blue;
 
     m_number = other.m_number;
-    m_hasClue[ACROSS] = other.m_hasClue[ACROSS];
-    m_hasClue[DOWN] = other.m_hasClue[DOWN];
 
     // Don't copy grid information
-
-    // Reset word and clue info if needed (for all squares in the word).
-    if (IsWhite() != other.IsWhite())
-    {
-        // Words ACROSS and DOWN (a little convoluted, yes)
-        for (GridDirection dir = ACROSS; ; dir = DOWN)
-        {
-            Square * end = GetWordEnd(dir);
-            for (Square * square = GetWordStart(dir);
-                 square != end; square = square->Next())
-            {
-                square->m_wordStart[dir] =
-                square->m_wordEnd[dir] = NULL;
-            }
-            if (dir == DOWN)
-                break;
-        }
-    }
 
     return *this;
 }
 
 
-// Character tables and the definition of Square::Blank
+// Character tables and the definition of Square::Blank and Square::Black
 #include "char_tables.hpp"
 
 //------------------------------------------------------------------------------
@@ -228,19 +170,9 @@ bool Square::IsValidString(const string_t & str)
 }
 
 //------------------------------------------------------------------------------
-// Clue
-//------------------------------------------------------------------------------
-bool Square::WantsClue(GridDirection dir) const
-{
-    return IsWhite() &&
-           GetWordStart(dir) == this &&
-           GetWordEnd  (dir) != this;
-}
-
-//------------------------------------------------------------------------------
 // Word start and end
 //------------------------------------------------------------------------------
-static Square * FindWord(Square * square, GridDirection dir, FindDirection inc)
+const Square * Square::FindWordBoundary(const Square * square, GridDirection dir)
 {
     // Only white squares have a word
     if (! square->IsWhite())
@@ -251,39 +183,85 @@ static Square * FindWord(Square * square, GridDirection dir, FindDirection inc)
     {
         // Not a white square (one past the end)
         if (! square->IsWhite())
-            return square->Prev(dir, inc);
+            return square->Prev(dir);
         // Edge of the grid
-        if (square->IsLast(dir, inc))
+        if (square->IsLast(dir))
             return square;
-        square = square->Next(dir, inc);
+        square = square->Next(dir);
     }
 }
 
-
-Square * Square::GetWordStart(GridDirection dir)
+const Square * Square::FindSolutionWordBoundary(const Square * square, GridDirection dir)
 {
-    if (m_wordStart[dir] == NULL && IsWhite())
-        m_wordStart[dir] = FindWord(this, dir, PREV);
-    return m_wordStart[dir];
+    // Only white squares have a word
+    if (! square->IsSolutionWhite())
+        return NULL;
+
+    // Iterate until the grid edge or a black/missing square.
+    for (;;)
+    {
+        // Not a white square (one past the end)
+        if (! square->IsSolutionWhite())
+            return square->Prev(dir);
+        // Edge of the grid
+        if (square->IsLast(dir))
+            return square;
+        square = square->Next(dir);
+    }
 }
 
 const Square * Square::GetWordStart(GridDirection dir) const 
 {
-    return const_cast<Square *>(this)->GetWordStart(dir);
-}
-
-
-Square * Square::GetWordEnd(GridDirection dir)
-{
-    if (m_wordEnd[dir] == NULL && IsWhite())
-        m_wordEnd[dir] = FindWord(this, dir, NEXT);
-    return m_wordEnd[dir];
+    return FindWordBoundary(this, (GridDirection)InvertDirection(dir));
 }
 
 const Square * Square::GetWordEnd(GridDirection dir) const
 {
-    return const_cast<Square *>(this)->GetWordEnd(dir);
+    return FindWordBoundary(this, dir);
 }
+
+const Square * Square::GetSolutionWordStart(GridDirection dir) const 
+{
+    return FindSolutionWordBoundary(this, (GridDirection)InvertDirection(dir));
+}
+
+const Square * Square::GetSolutionWordEnd(GridDirection dir) const
+{
+    return FindSolutionWordBoundary(this, dir);
+}
+
+Square *
+Square::FindWordBoundary(Square * square, GridDirection dir)
+{
+    return const_cast<Square *>(FindWordBoundary(const_cast<const Square *>(square), dir));
+}
+
+Square *
+Square::FindSolutionWordBoundary(Square * square, GridDirection dir)
+{
+    return const_cast<Square *>(FindSolutionWordBoundary(const_cast<const Square *>(square), dir));
+}
+
+Square * Square::GetWordStart(GridDirection dir)
+{
+    return FindWordBoundary(this, (GridDirection)InvertDirection(dir));
+}
+
+Square * Square::GetWordEnd(GridDirection dir)
+{
+    return FindWordBoundary(this, dir);
+}
+
+Square * Square::GetSolutionWordStart(GridDirection dir)
+{
+    return FindSolutionWordBoundary(this, (GridDirection)InvertDirection(dir));
+}
+
+Square * Square::GetSolutionWordEnd(GridDirection dir)
+{
+    return FindSolutionWordBoundary(this, dir);
+}
+
 
 bool Square::HasWord(GridDirection dir) const
 {
@@ -291,6 +269,23 @@ bool Square::HasWord(GridDirection dir) const
     const Square * end = GetWordEnd(dir);
     return start && end && start != end;
 }
+
+
+//------------------------------------------------------------------------------
+// Clue
+//------------------------------------------------------------------------------
+bool Square::WantsClue(GridDirection dir) const
+{
+    return GetWordStart(dir) == this &&
+           GetWordEnd  (dir) != this;
+}
+
+bool Square::SolutionWantsClue(GridDirection dir) const
+{
+    return GetSolutionWordStart(dir) == this &&
+           GetSolutionWordEnd(dir) != this; // Word end
+}
+
 
 
 //------------------------------------------------------------------------------
@@ -305,6 +300,65 @@ void Square::SetColor(unsigned char red, unsigned char green, unsigned char blue
         RemoveFlag(FLAG_COLOR);
     else
         AddFlag(FLAG_COLOR);
+}
+
+
+static unsigned char ParseHex(char_t hi, char_t lo)
+{
+    if (! isxdigit(hi) || ! isxdigit(lo))
+        throw Exception("Invalid color string");
+    unsigned char b1 = isdigit(hi) ? hi - 48 : toupper(hi) - 65 + 10;
+    unsigned char b2 = isdigit(lo) ? lo - 48 : toupper(lo) - 65 + 10;
+    return (b1 << 4) + b2;
+}
+
+void Square::SetColor(const string_t & hexcolor)
+{
+    size_t len = hexcolor.size();
+    if (len > 0 && hexcolor[0] == puzT('#'))
+    {
+        SetColor(hexcolor.substr(1));
+        return;
+    }
+    try {
+        if (len == 3)
+            SetColor(ParseHex(hexcolor[1], hexcolor[1]),
+                     ParseHex(hexcolor[2], hexcolor[2]),
+                     ParseHex(hexcolor[3], hexcolor[3]));
+        else if (len == 6)
+            SetColor(ParseHex(hexcolor[1], hexcolor[2]),
+                     ParseHex(hexcolor[3], hexcolor[4]),
+                     ParseHex(hexcolor[5], hexcolor[6]));
+    }
+    catch (Exception &) {
+        // Don't set the color if we can't parse the hex value
+    }
+}
+
+static const char_t hexDigits [] = puzT("0123456789abcdef");
+
+string_t Square::GetHtmlColor() const
+{
+    char_t ret[] = {
+        puzT('#'),
+        hexDigits[m_red & 0xf0 >> 4],
+        hexDigits[m_red & 0x0f],
+        hexDigits[m_green & 0xf0 >> 4],
+        hexDigits[m_green & 0x0f],
+        hexDigits[m_blue & 0xf0 >> 4],
+        hexDigits[m_blue & 0x0f],
+    };
+    return string_t(ret, 7);
+}
+
+void Square::SetHighlight(bool doit)
+{
+    doit ? SetColor(192, 192, 192) : RemoveColor();
+}
+
+bool Square::HasHighlight() const
+{
+    return m_red == 192 && m_blue == 192 && m_green == 192;
 }
 
 void Square::RemoveColor()
@@ -331,14 +385,16 @@ void Square::SetText(const string_t & text)
 
 void Square::SetSolution(const string_t & solution)
 {
-    SetSolution(solution, ToPlain(solution));
+    if (solution == Black)
+        SetText(Black);
+    SetSolutionRebus(solution);
+    m_asciiSolution = ToPlain(solution);
 }
 
 void Square::SetSolution(const string_t & solution, char plain)
 {
     SetSolutionRebus(solution);
-    if (plain != 0)
-        SetPlainSolution(plain);
+    SetPlainSolution(plain);
 }
 
 void Square::SetPlainSolution(char solution)
@@ -415,8 +471,8 @@ char_t Square::GetSolutionSymbol() const
 
 bool Square::Check(bool checkBlank, bool strictRebus)  const
 {
-    if (IsBlack())
-        return true;
+    // Black squares should be checked as well (for diagramless)
+
     if (IsBlank() && ! IsSolutionBlank())
         return ! checkBlank;
 

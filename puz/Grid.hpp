@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 
 #include <vector>
 #include "Square.hpp"
+#include "Word.hpp"
 
 namespace puz {
 
@@ -114,6 +115,18 @@ public:
     Square & At(size_t col, size_t row)
         { return m_vector.at(row).at(col).m_square; }
 
+    const Square * AtNULL(int col, int row) const
+    {
+        if (col < 0 || col > LastCol() || row < 0 || row > LastRow())
+            return NULL;
+        return &m_vector[row][col].m_square;
+    }
+    Square * AtNULL(int col, int row)
+    {
+        if (col < 0 || col > LastCol() || row < 0 || row > LastRow())
+            return NULL;
+        return &m_vector[row][col].m_square;
+    }
 
     // Searching
     //----------
@@ -123,14 +136,12 @@ public:
     Square * FindSquare(Square * start,
                         T findFunc,
                         GridDirection direction = ACROSS,
-                        FindDirection increment = NEXT,
                         unsigned int options = FIND_IN_GRID);
 
     // FindSquare starting from the first square
     template<typename T>
     Square * FindSquare(T findFunc,
                         GridDirection direction,
-                        FindDirection increment,
                         unsigned int options = FIND_IN_GRID);
 
     // Find any square
@@ -142,8 +153,34 @@ public:
     Square * FindNextSquare(Square * start,
                             T findFunc,
                             GridDirection direction = ACROSS,
-                            FindDirection increment = NEXT,
                             unsigned int options = FIND_IN_GRID);
+
+
+
+    // Const overloads
+    template<typename T>
+    const Square * FindSquare(const Square * start,
+                              T findFunc,
+                              GridDirection direction = ACROSS,
+                              unsigned int options = FIND_IN_GRID) const;
+
+    template<typename T>
+    const Square * FindSquare(T findFunc,
+                              GridDirection direction,
+                              unsigned int options = FIND_IN_GRID) const;
+
+    // Find any square
+    template<typename T>
+    const Square * FindSquare(T findFunc,
+                              unsigned int options = FIND_IN_GRID) const;
+
+    // Search starting from the next square
+    template<typename T>
+    const Square * FindNextSquare(const Square * start,
+                                  T findFunc,
+                                  GridDirection direction = ACROSS,
+                                  unsigned int options = FIND_IN_GRID) const;
+
 
     // Flags
     bool IsScrambled() const { return (m_flag & FLAG_SCRAMBLED) != 0; }
@@ -176,7 +213,7 @@ public:
                    bool checkBlank = false,
                    bool strictRebus = false);
     void CheckWord(std::vector<Square *> * incorrect,
-                   Square * start, Square * end,
+                   const Word * word,
                    bool checkBlank = false,
                    bool strictRebus = false);
     bool CheckSquare(const Square & square, bool checkBlank = false,
@@ -225,12 +262,45 @@ Grid::IsBetween(const Square * square,
         && square->m_row >= start->m_row && square->m_row <= end->m_row;
 }
 
+
+// Functions/functors for FindSquare
+
+static bool FIND_WHITE_SQUARE (const Square * square)
+{
+    return square->IsWhite();
+}
+
+static bool FIND_BLANK_SQUARE (const Square * square)
+{
+    return square->IsBlank();
+}
+
+static bool FIND_BLACK_SQUARE (const Square * square)
+{
+    return square->IsBlack();
+}
+
+struct FIND_CLUE_NUMBER
+{
+    FIND_CLUE_NUMBER(const string_t & number)
+        : m_number(number)
+    {
+    }
+
+    bool operator() (const puz::Square * square)
+    {
+        return square->GetNumber() == m_number;
+    }
+
+    string_t m_number;
+};
+
+
 template <typename T>
 Square *
 Grid::FindSquare(Square * start,
                  T findFunc,
                  GridDirection direction,
-                 FindDirection increment,
                  unsigned int options)
 {
     const bool only_whites = (options & WHITE_SQUARES) != 0;
@@ -238,7 +308,7 @@ Grid::FindSquare(Square * start,
 
     for (Square * square = start;
          square != NULL;
-         square = square->Next(direction, increment))
+         square = square->Next(direction))
     {
         if (only_whites && ! square->IsWhite())
             break;
@@ -246,7 +316,7 @@ Grid::FindSquare(Square * start,
         if (findFunc(square))
             return square;
 
-        if (! wrap && square->IsLast(direction, increment))
+        if (! wrap && square->IsLast(direction))
             break;
     }
 
@@ -257,10 +327,9 @@ template<typename T>
 Square *
 Grid::FindSquare(T findFunc,
                  GridDirection direction,
-                 FindDirection increment,
                  unsigned int options)
 {
-    return FindSquare(First(), findFunc, direction, increment, options);
+    return FindSquare(First(), findFunc, direction, options);
 }
 
 
@@ -268,7 +337,7 @@ template<typename T>
 Square *
 Grid::FindSquare(T findFunc, unsigned int options)                 
 {
-    return FindSquare(First(), findFunc, ACROSS, NEXT, options);
+    return FindSquare(First(), findFunc, ACROSS, options);
 }
 
 
@@ -277,18 +346,61 @@ Square *
 Grid::FindNextSquare(Square * start,
                       T findFunc,
                       GridDirection direction,
-                      FindDirection increment,
                       unsigned int options)
 {
     if (start == NULL ||
         ((options & NO_WRAP)
-          && start->IsLast(direction, increment)) )
+          && start->IsLast(direction)) )
             return NULL;
 
-    return FindSquare(start->Next(direction, increment),
+    return FindSquare(start->Next(direction),
                       findFunc,
-                      direction, increment,
+                      direction,
                       options);
+}
+
+
+
+
+// Const overloads
+template <typename T>
+const Square *
+Grid::FindSquare(const Square * start,
+                 T findFunc,
+                 GridDirection direction,
+                 unsigned int options) const
+{
+    return const_cast<Grid*>(this)->
+        FindSquare(const_cast<Square*>(start), findFunc, direction, options);
+}
+
+template<typename T>
+const Square *
+Grid::FindSquare(T findFunc,
+                 GridDirection direction,
+                 unsigned int options) const
+{
+    return FindSquare(First(), findFunc, direction, options);
+}
+
+
+template<typename T>
+const Square *
+Grid::FindSquare(T findFunc, unsigned int options) const
+{
+    return FindSquare(First(), findFunc, ACROSS, options);
+}
+
+
+template <typename T>
+const Square *
+Grid::FindNextSquare(const Square * start,
+                      T findFunc,
+                      GridDirection direction,
+                      unsigned int options) const
+{
+    return const_cast<Grid*>(this)->
+        FindNextSquare(const_cast<Square*>(square), findFunc, direction, options);
 }
 
 } // namespace puz
