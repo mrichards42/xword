@@ -3,27 +3,33 @@
 --     Standard XWord message boxes
 -- ============================================================================
 
+if xword.logerror then
+    local logerror = xword.logerror
+    function xword.logerror(msg, ...)
+        logerror(string.format(msg, ...))
+    end
+end
+
 if wx then
-    function xword.Message(message)
+    function xword.Message(message, ...)
         wx.wxMessageBox(
-            message,
+            string.format(message, ...),
             "XWord Message",
             wx.wxOK + wx.wxICON_INFORMATION
         )
     end
 
-
-    function xword.Prompt(message)
+    function xword.Prompt(message, ...)
         return wx.wxMessageBox(
-            message,
+            string.format(message, ...),
             "XWord Message",
             wx.wxYES_NO + wx.wxICON_QUESTION
         ) == wx.wxYES
     end
 
-    function xword.Error(message)
+    function xword.Error(message, ...)
         wx.wxMessageBox(
-            message,
+            string.format(message, ...),
             "XWord Error",
             wx.wxOK + wx.wxICON_ERROR
         )
