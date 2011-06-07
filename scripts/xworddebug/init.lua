@@ -87,6 +87,7 @@ local function init()
     require 'xworddebug.database'
     require 'xworddebug.html'
     require 'xworddebug.test_files'
+    require 'xworddebug.gen_packages'
 
     -- This is always last
     require 'xworddebug.interp'
