@@ -28,14 +28,4 @@ local function WikipediaSearch()
     wx.wxLaunchDefaultBrowser(makeURL(pattern))
 end
 
-local function init()
-    xword.frame:AddMenuItem({'Tools'}, 'Search Wikipedia',
-        function(evt)
-            -- Can't do anything unless we have a puzzle
-            if not xword.HasPuzzle() then return end
-            WikipediaSearch()
-        end
-    )
-end
-
-init()
+search.addEntry('Wikipedia', WikipediaSearch)

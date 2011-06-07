@@ -10,11 +10,20 @@
 --      xword.frame.Puzzle / xword.frame:GetPuzzle()
 -- Both approaches are demonstrated here.
 
+local tablex = require 'pl.tablex'
+
 local function SwapAcrossDown(p)
+    -- Check to see if we can swap the grid
+    if p.Grid:IsDiagramless() then
+        xword.Message("Can't swap a diagramless puzzle.")
+    elseif not p:UsesNumberAlgorithm() then
+        xword.Message("Can't swap a puzzle with unclued squares.")
+    end
+
     -- Swap the clues
     -- --------------
-    local across = {}
-    local down = {}
+    local across = puz.ClueList()
+    local down = puz.ClueList()
 
     -- Make a local copy because GetAcross / GetDown creates a lua table each
     -- time it is called.
@@ -34,11 +43,11 @@ local function SwapAcrossDown(p)
     while(square) do
         -- Down clues will become across clues
         if square:HasClue(puz.DOWN) then
-            across[clueNumber] = oldDown[square.Number]
+            across:Insert(clueNumber, oldDown:Find(square.Number))
         end
         -- Across clues will become down clues
         if square:HasClue(puz.ACROSS) then
-            down[clueNumber] = oldAcross[square.Number]
+            down:Insert(clueNumber, oldAcross:Find(square.Number))
         end
         -- Next clue number
         if square:HasClue() then clueNumber = clueNumber + 1 end
@@ -48,6 +57,7 @@ local function SwapAcrossDown(p)
 
     p.Across = across
     p.Down = down
+
 
     -- Swap the grid
     -- -------------
@@ -69,6 +79,11 @@ local function SwapAcrossDown(p)
     -- Set the puzzle's grid.  The puzzle now has ownership of the grid.
     -- lua will not garbage collect the grid's userdata.
     p.Grid = newGrid
+
+    p:NumberGrid()
+    p:NumberClues()
+
+    xword.frame:ShowPuzzle(p)
 end
 
 
@@ -101,5 +116,8 @@ local function init()
     )
 end
 
+function uninit()
+    xword.frame:RemoveMenuItem("Tools", "Swap Across and Down")
+end
 
-init()
+return { init, uninit }
