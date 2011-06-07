@@ -65,6 +65,7 @@ project "XWord"
     -- Disable some warnings
     configuration "vs*"
         buildoptions {
+            "/wd4800", -- implicit conversion to bool
             "/wd4251", -- DLL Exports
         }
     -- --------------------------------------------------------------------
