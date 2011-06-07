@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -37,10 +37,6 @@ const int MIN_POINT_SIZE = 6;
 // Minimum before a new grid size is tried
 const int MIN_GOOD_POINT_SIZE = 8;
 
-wxString FormatNumber(int num)
-{
-    return wxString::Format(_T("%d."), num);
-}
 
 // Thrown when the text runs off the page.
 class FontSizeError
@@ -59,7 +55,7 @@ MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, int numPages)
     : wxPrintout(puz2wx(puz->m_title)),
       m_frame(frame),
       m_puz(puz),
-      m_drawer(&puz->m_grid),
+      m_drawer(puz),
       m_numPages(numPages)
 {
     // Don't draw any grid text, incorrect / revealed triangles, Xs for
@@ -77,19 +73,19 @@ MyPrintout::ReadConfig()
 {
     ConfigManager & config = wxGetApp().GetConfigManager();
 
+    /*
     // Fonts config
-    config.SetPath(_T("/Printing/Fonts"));
-    if (config.ReadBool(_T("useCustomFonts")))
+    if (config.ReadBool(_T("/Printing/Fonts/useCustomFonts")))
     {
-        m_drawer.SetNumberFont(config.ReadFont(_T("gridNumberFont")));
-        m_drawer.SetLetterFont(config.ReadFont(_T("gridLetterFont")));
-        m_clueFont = config.ReadFont(_T("clueFont"));
+        m_drawer.SetNumberFont(config.ReadFont(_T("/Printing/Fonts/gridNumberFont")));
+        m_drawer.SetLetterFont(config.ReadFont(_T("/Printing/Fonts/gridLetterFont")));
+        m_clueFont = config.ReadFont(_T("/Printing/Fonts/clueFont"));
     }
     else
     {
         m_drawer.SetNumberFont(m_frame->m_XGridCtrl->GetNumberFont());
         m_drawer.SetLetterFont(m_frame->m_XGridCtrl->GetLetterFont());
-        m_clueFont = m_frame->m_across->GetFont();
+        m_clueFont = m_frame->m_clues.begin()->second->GetFont();
     }
     m_drawer.SetNumberScale(config.ReadLong(_T("/Grid/numberScale")) / 100.);
     m_drawer.SetLetterScale(config.ReadLong(_T("/Grid/letterScale")) / 100.);
@@ -102,6 +98,7 @@ MyPrintout::ReadConfig()
 
     const long brightness = config.ReadLong(_T("blackSquareBrightness"));
     m_drawer.SetBlackSquareColor(wxColour(brightness, brightness, brightness));
+    */
 }
 
 
@@ -357,20 +354,21 @@ MyPrintout::DrawText()
     DrawTextLine(WrapText(puz2wx(m_puz->m_author), m_columnWidth), &x, &y);
 
     // Draw clue lists
-    const wxString heading_list[2] = { _T("ACROSS"), _T("DOWN") };
-    const puz::Puzzle::ClueList * clue_list[2] = { &m_puz->m_across, &m_puz->m_down };
-    for (int i = 0; i < 2; ++i)
+    puz::Clues::const_iterator clues_it;
+    for (clues_it = m_puz->GetClues().begin();
+         clues_it != m_puz->GetClues().end();
+         ++clues_it)
     {
-        // Add some space above ACROSS and DOWN clues.
+        // Add some space above clues.
         y += CLUE_HEADING_PADDING;
 
         // Draw the heading
         dc->SetFont(m_headingFont);
-        DrawTextLine(WrapText(heading_list[i], m_columnWidth), &x, &y);
+        DrawTextLine(WrapText(puz2wx(clues_it->first), m_columnWidth), &x, &y);
 
         // Draw the clues
-        for (puz::Puzzle::ClueList::const_iterator it = clue_list[i]->begin();
-             it != clue_list[i]->end();
+        for (puz::ClueList::const_iterator it = clues_it->second.begin();
+             it != clues_it->second.end();
              ++it)
         {
             DrawClue(*it, &x, &y);
@@ -393,13 +391,22 @@ MyPrintout::LayoutColumns()
     wxDC * dc = GetDC();
     SaveUserScale();
     // Measure the width of the largest clue number
-    const int max_clue_number = std::max(m_puz->m_across.back().Number(),
-                                         m_puz->m_down  .back().Number());
+    m_numberWidth = 0;
     dc->SetFont(m_numberFont);
-    if (max_clue_number >= 100)
-        dc->GetTextExtent(FormatNumber(999), &m_numberWidth, NULL);
-    else
-        dc->GetTextExtent(FormatNumber(99),  &m_numberWidth, NULL);
+    puz::Clues::const_iterator clues_it;
+    for (clues_it = m_puz->GetClues().begin();
+         clues_it != m_puz->GetClues().end();
+         ++clues_it)
+    {
+        puz::ClueList::const_iterator it;
+        for (it = clues_it->second.begin(); it != clues_it->second.end(); ++it)
+        {
+            int width;
+            dc->GetTextExtent(it->GetNumber(), &width, NULL);
+            if (width > m_numberWidth)
+                m_numberWidth = width;
+        }
+    }
     RestoreUserScale();
 
     // The portion of the column that is taken up by clue text.
@@ -409,7 +416,7 @@ MyPrintout::LayoutColumns()
 
 
 void
-MyPrintout::DrawClue(const puz::Puzzle::Clue & clue, int * x, int * y)
+MyPrintout::DrawClue(const puz::Clue & clue, int * x, int * y)
 {
     // Draw clue text
 
@@ -421,14 +428,14 @@ MyPrintout::DrawClue(const puz::Puzzle::Clue & clue, int * x, int * y)
     *x += m_numberWidth + NUMBER_PADDING;
     dc->SetFont(m_clueFont);
     int height;
-    DrawTextLine(WrapText(puz2wx(clue.Text()), m_clueWidth), x, y, NULL, &height);
+    DrawTextLine(WrapText(puz2wx(clue.GetText()), m_clueWidth), x, y, NULL, &height);
     *x -= m_numberWidth + NUMBER_PADDING;
 
     if (m_isDrawing)
     {
         // Draw clue number
         dc->SetFont(m_numberFont);
-        dc->DrawLabel(FormatNumber(clue.Number()),
+        dc->DrawLabel(clue.GetNumber(),
                       wxRect(*x, *y - height, m_numberWidth, dc->GetCharHeight()),
                       wxALIGN_RIGHT);
     }

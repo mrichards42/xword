@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -143,43 +143,40 @@ wxCOMPILE_TIME_ASSERT(sizeof(messageTable) / sizeof(MessageDesc) == MSG_TOTAL_ME
         const wxString strname = wxString::FormatV(format, argptr);  \
         va_end(argptr);
 
-int XWordMessage(XWordMessageId id, ...)
+int XWordMessage(wxWindow * parent, XWordMessageId id, ...)
 {
     const MessageDesc & desc = messageTable[id];
     _FORMAT_MESSAGE(id, desc.message, message);
-    return wxMessageBox(message, desc.title, desc.flags);
+    return wxMessageBox(message, desc.title, desc.flags, parent);
 }
 
-int XWordMessage(const wxChar * fmt, ...)
+int XWordMessage(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    return wxMessageBox(message, messageTitle, messageFlags);
+    return wxMessageBox(message, messageTitle, messageFlags, parent);
 }
 
 
-bool XWordPrompt(XWordMessageId id, ...)
+bool XWordPrompt(wxWindow * parent, XWordMessageId id, ...)
 {
     const MessageDesc & desc = messageTable[id];
-    // I think this function should work with the variable arguments
-    // as is . . . not entirely sure though.
     _FORMAT_MESSAGE(id, desc.message, message);
-    const int ret = wxMessageBox(message, desc.title, desc.flags);
+    const int ret = wxMessageBox(message, desc.title, desc.flags, parent);
     return (ret == wxYES || ret == wxOK);
 }
 
-bool XWordPrompt(const wxChar * fmt, ...)
+bool XWordPrompt(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    const int ret = wxMessageBox(message, questionTitle, questionFlags);
+    const int ret = wxMessageBox(message, questionTitle, questionFlags, parent);
     return (ret == wxYES || ret == wxOK);
 }
 
 
-int XWordErrorMessage(const wxChar * fmt, ...)
+int XWordErrorMessage(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    return wxMessageBox(message, errorTitle, errorFlags);
+    return wxMessageBox(message, errorTitle, errorFlags, parent);
 }
-
 
 #undef _FORMAT_MESSAGE

@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,6 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "XGridDrawer.hpp"
+#include "puz/Puzzle.hpp"
 #include "puz/Grid.hpp"
 #include "puz/Square.hpp"
 #include <wx/fontenum.h> // wxFontEnumerator to test for Webdings
@@ -26,31 +27,33 @@
 const int MAX_POINT_SIZE = 150;
 const int MIN_POINT_SIZE = 2;
 
-XGridDrawer::XGridDrawer(puz::Grid * grid)
-    : m_grid(grid),
-      m_dc(NULL),
+XGridDrawer::XGridDrawer(puz::Puzzle * puz)
+    : m_dc(NULL),
       m_status(INVALID_MEASURER)
 {
     Init();
+    SetPuzzle(puz);
 }
 
-XGridDrawer::XGridDrawer(wxDC * dc, puz::Grid * grid)
-    : m_grid(grid)
+XGridDrawer::XGridDrawer(wxDC * dc, puz::Puzzle * puz)
 {
     SetDC(dc);
     Init();
+    SetPuzzle(puz);
 }
 
-XGridDrawer::XGridDrawer(wxWindow * window, puz::Grid * grid)
-    : m_grid(grid)
+XGridDrawer::XGridDrawer(wxWindow * window, puz::Puzzle * puz)
 {
     SetWindow(window);
     Init();
+    SetPuzzle(puz);
 }
 
 void
 XGridDrawer::Init()
 {
+    m_puz = NULL;
+
     m_boxSize = 20;
     m_borderSize = 1;
 
@@ -85,6 +88,18 @@ XGridDrawer::Init()
     m_drawOptions = DRAW_ALL;
 
     UpdateGridSize();
+}
+
+puz::Grid * XGridDrawer::GetGrid()
+{
+    wxASSERT(m_puz);
+    return &m_puz->GetGrid();
+}
+
+const puz::Grid * XGridDrawer::GetGrid() const
+{
+    wxASSERT(m_puz);
+    return &m_puz->GetGrid();
 }
 
 //-----------------------------------------------------------------------------
@@ -129,14 +144,14 @@ XGridDrawer::GetTextExtent(const wxString & string, int* w, int* h,
 wxSize
 XGridDrawer::GetBestSize() const
 {
-    if (m_grid == NULL || m_grid->IsEmpty())
+    if (m_puz == NULL || GetGrid()->IsEmpty())
         return wxDefaultSize;
 
-    return wxSize( m_grid->GetWidth()
+    return wxSize( GetGrid()->GetWidth()
                    * (m_boxSize + m_borderSize)
                    + m_borderSize,
 
-                   m_grid->GetHeight()
+                   GetGrid()->GetHeight()
                    * (m_boxSize + m_borderSize)
                    + m_borderSize );
 }
@@ -145,14 +160,14 @@ XGridDrawer::GetBestSize() const
 void
 XGridDrawer::UpdateGridSize()
 {
-    if (m_grid == NULL)
+    if (m_puz == NULL)
         return;
     // Update width and height of grid
-    m_rect.SetWidth ( m_grid->GetWidth()
+    m_rect.SetWidth ( GetGrid()->GetWidth()
                       * (m_boxSize + m_borderSize)
                       + m_borderSize );
 
-    m_rect.SetHeight( m_grid->GetHeight()
+    m_rect.SetHeight( GetGrid()->GetHeight()
                       * (m_boxSize + m_borderSize)
                       + m_borderSize );
 
@@ -177,28 +192,28 @@ XGridDrawer::UpdateGridSize()
 
 
 bool
-XGridDrawer::SetMaxSize(int max_width, int max_height)
+XGridDrawer::SetMaxSize(size_t max_width, size_t max_height)
 {
     m_maxWidth = max_width;
     m_maxHeight = max_height;
 
-    if (m_grid == NULL)
+    if (m_puz == NULL)
         return false;
 
     // If the window is too small to fit the grid, catch it here
-    if (m_maxWidth  < (m_grid->GetWidth()  + 1) * m_borderSize
-     || m_maxHeight < (m_grid->GetHeight() + 1) * m_borderSize)
+    if (m_maxWidth  < (GetGrid()->GetWidth()  + 1) * m_borderSize
+     || m_maxHeight < (GetGrid()->GetHeight() + 1) * m_borderSize)
     {
         return false;
     }
 
     const size_t width =
-        (m_maxWidth  - (m_grid->GetWidth() + 1)  * m_borderSize)
-        / m_grid->GetWidth();
+        (m_maxWidth  - (GetGrid()->GetWidth() + 1)  * m_borderSize)
+        / GetGrid()->GetWidth();
 
     const size_t height =
-        (m_maxHeight - (m_grid->GetHeight() + 1) * m_borderSize)
-        / m_grid->GetHeight();
+        (m_maxHeight - (GetGrid()->GetHeight() + 1) * m_borderSize)
+        / GetGrid()->GetHeight();
 
     SetBoxSize(std::min(width, height));
     return true;
@@ -367,10 +382,7 @@ XGridDrawer::SetNumberFont(const wxFont & font)
 void
 XGridDrawer::DrawSquare(wxDC & dc, const puz::Square & square)
 {
-    if (square.IsWhite())
-        DrawSquare(dc, square, GetWhiteSquareColor(), GetPenColor());
-    else
-        DrawSquare(dc, square, GetBlackSquareColor(), GetPenColor());
+    DrawSquare(dc, square, GetSquareColor(square), GetPenColor());
 }
 
 void
@@ -379,6 +391,9 @@ XGridDrawer::DrawSquare(wxDC & adc,
                            const wxColour & bgColor,
                            const wxColour & textColor)
 {
+    if (square.IsMissing())
+        return;
+
     // The order of drawing is important to make sure that we don't draw over
     // the more important parts of a square:
     // 1. The background
@@ -401,7 +416,19 @@ XGridDrawer::DrawSquare(wxDC & adc,
     const int x = m_rect.x + m_borderSize + square.GetCol() * GetSquareSize();
     const int y = m_rect.y + m_borderSize + square.GetRow() * GetSquareSize();
 
-    // Draw the outline with a white background
+    // Draw the square using the square's own background color,
+    // and Black as the pen
+
+    wxPen borderPen(GetBlackSquareColor(), m_borderSize);
+    borderPen.SetJoin(wxJOIN_MITER);
+    dc.SetPen(borderPen);
+    dc.SetBrush(wxBrush(GetSquareColor(square)));
+    const int offset = m_borderSize / 2;
+    dc.DrawRectangle(x - m_borderSize + offset,
+                     y - m_borderSize + offset,
+                     m_boxSize + m_borderSize + 1,
+                     m_boxSize + m_borderSize + 1);
+    // Draw the outline with a clear background
     if (HasFlag(DRAW_OUTLINE))
     {
         const int outlineSize = std::max(m_boxSize / 15, 1);
@@ -409,10 +436,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
         wxPen outlinePen(bgColor, outlineSize * 2);
         outlinePen.SetJoin(wxJOIN_MITER);
 
-        if (square.IsWhite())
-            dc.SetBrush(wxBrush(GetWhiteSquareColor()));
-        else
-            dc.SetBrush(wxBrush(GetBlackSquareColor()));
+        dc.SetBrush(*wxTRANSPARENT_BRUSH);
 
         dc.SetPen(outlinePen);
         dc.DrawRectangle(x + outlineSize,
@@ -429,9 +453,9 @@ XGridDrawer::DrawSquare(wxDC & adc,
     }
 
     // Draw square's flag (top right)
-    if (HasFlag(DRAW_FLAG) && square.HasFlag(puz::FLAG_RED | puz::FLAG_BLACK))
+    if (HasFlag(DRAW_FLAG) && square.HasFlag(puz::FLAG_REVEALED | puz::FLAG_BLACK))
     {
-        if (square.HasFlag(puz::FLAG_RED))
+        if (square.HasFlag(puz::FLAG_REVEALED))
         {
             dc.SetBrush(*wxRED_BRUSH);
             dc.SetPen(*wxRED_PEN);
@@ -456,28 +480,38 @@ XGridDrawer::DrawSquare(wxDC & adc,
         dc.DrawEllipse(x, y, m_boxSize, m_boxSize);
     }
 
-    dc.SetTextForeground(textColor);
-
     // Draw square's number (top left).
-    if (HasFlag(DRAW_NUMBER) && square.GetNumber() != 0)
+    if (HasFlag(DRAW_NUMBER) && square.HasNumber())
     {
+        dc.SetTextForeground(textColor);
+        // If we have a diagramless grid and the square's number is
+        // somehow broken, draw the number in red.
+        if (GetGrid()->IsDiagramless())
+        {
+            if ( (square.WantsClue(puz::ACROSS) &&
+                    m_puz->GetClueList(puzT("Across")).Find(square.GetNumber()) == NULL) ||
+                 (square.WantsClue(puz::DOWN) &&
+                    m_puz->GetClueList(puzT("Across")).Find(square.GetNumber()) == NULL) )
+            {
+                dc.SetTextForeground(*wxRED);
+            }
+        }
         // Set a solid text background so it will draw over any circles.
         if (! HasFlag(DRAW_OUTLINE))
             dc.SetTextBackground(bgColor);
         else if (square.IsWhite())
             dc.SetTextBackground(GetWhiteSquareColor());
-        else
-            dc.SetTextBackground(GetBlackSquareColor());
         dc.SetBackgroundMode(wxSOLID);
 
         dc.SetFont(m_numberFont);
-        dc.DrawText(wxString::Format(_T("%d"), square.GetNumber()), x+1, y);
+        dc.DrawText(puz2wx(square.GetNumber()), x+1, y);
         dc.SetBackgroundMode(wxTRANSPARENT);
     }
 
     // Draw square's text (bottom and center to avoid conflicts with numbers)
     if (HasFlag(DRAW_TEXT) && ! square.IsBlank())
     {
+        dc.SetTextForeground(textColor);
         wxString text;
         bool isSymbol = false;
         // User Text
@@ -552,19 +586,31 @@ XGridDrawer::DrawSquare(wxDC & adc,
 void
 XGridDrawer::DrawGrid(wxDC & dc)
 {
-    if (m_grid == NULL || m_grid->IsEmpty())
+    if (m_puz == NULL || GetGrid()->IsEmpty())
         return;
 
-    // Draw black as crossword background
-    dc.SetBrush(wxBrush(*wxBLACK));
-    dc.SetPen  (wxPen(*wxBLACK));
-
-    dc.DrawRectangle(m_rect);
-
-    for (puz::Square * square = m_grid->First();
+    for (puz::Square * square = GetGrid()->First();
          square != NULL;
          square = square->Next())
     {
             DrawSquare(dc, *square);
     }
+}
+
+
+wxColour
+XGridDrawer::GetSquareColor(const puz::Square & square) const
+{
+    if (square.IsWhite())
+    {
+        if (square.HasColor())
+            return wxColor(square.m_red, square.m_green, square.m_blue);
+        else
+            return GetWhiteSquareColor();
+    }
+    else if (square.IsBlack())
+    {
+        return GetBlackSquareColor();
+    }
+    return wxNullColour;
 }

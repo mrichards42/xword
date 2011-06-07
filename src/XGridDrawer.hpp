@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,6 +29,7 @@
 namespace puz {
     class Grid;
     class Square;
+    class Puzzle;
 }
 
 //=============================================================================
@@ -42,9 +43,9 @@ namespace puz {
 class XGridDrawer
 {
 public:
-    XGridDrawer(puz::Grid * grid = NULL);
-    XGridDrawer(wxDC * dc, puz::Grid * grid = NULL);
-    XGridDrawer(wxWindow * window, puz::Grid * grid = NULL);
+    XGridDrawer(puz::Puzzle * puz = NULL);
+    XGridDrawer(wxDC * dc, puz::Puzzle * puz = NULL);
+    XGridDrawer(wxWindow * window, puz::Puzzle * puz = NULL);
 
     void SetDC(wxDC * dc);
     void SetWindow(wxWindow * window);
@@ -73,7 +74,7 @@ public:
     int    GetLetterHeight() const { return m_boxSize * m_letterScale; }
 
     bool SetMaxSize(const wxSize & size) { return SetMaxSize(size.x, size.y); }
-    bool SetMaxSize(int max_width, int max_height);
+    bool SetMaxSize(size_t max_width, size_t max_height);
     void SetAlign(long align) { m_align = align; UpdateGridSize(); }
     void SetBoxSize(int size);
     void SetBorderSize(int size);
@@ -91,6 +92,7 @@ public:
 
     // Colors
     //-------
+    wxColour GetSquareColor(const puz::Square & square) const;
     const wxColour & GetWhiteSquareColor() const { return m_whiteSquareColor; }
     const wxColour & GetBlackSquareColor() const { return m_blackSquareColor; }
     const wxColour & GetPenColor()         const { return m_penColor; }
@@ -132,9 +134,11 @@ public:
 
     // Grid
     //------
-    puz::Grid * GetGrid() { return m_grid; }
-    const puz::Grid * GetGrid() const { return m_grid; }
-    void SetGrid(puz::Grid * grid) { m_grid = grid; UpdateGridSize(); }
+    puz::Puzzle * GetPuzzle() { return m_puz; }
+    const puz::Puzzle * GetPuzzle() const { return m_puz; }
+    puz::Grid * GetGrid();
+    const puz::Grid * GetGrid() const;
+    void SetPuzzle(puz::Puzzle * puz) { m_puz = puz; UpdateGridSize(); }
 
     void DrawSquare(wxDC & dc, const puz::Square & square,
                     const wxColour & bgColor,
@@ -167,6 +171,8 @@ private:
                        wxFont* font = NULL) const;
 
     puz::Grid * m_grid;
+    puz::Puzzle * m_puz;
+
     // Size
     long m_align;
     int m_boxSize;
@@ -174,8 +180,8 @@ private:
     double m_numberScale;
     double m_letterScale;
     wxRect m_rect;
-    int m_maxWidth;
-    int m_maxHeight;
+    size_t m_maxWidth;
+    size_t m_maxHeight;
 
     void UpdateGridSize();
 

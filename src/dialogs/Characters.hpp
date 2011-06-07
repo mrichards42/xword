@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -38,11 +38,11 @@ class CharactersPanel
 {
 public:
     CharactersPanel(MyFrame * parent);
-    void AddCharacter(wxChar ch);
+    void AddCharacter(int ch);
 
 protected:
     MyFrame * m_frame;
-    int m_ctrlCount;
+    size_t m_ctrlCount;
 
     SizedText * NewStaticText(const wxString & label = _T(""), wxWindowID = wxID_ANY);
     void OnLeftDown(wxMouseEvent & evt);

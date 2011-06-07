@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 #include "../MyFrame.hpp"
 #include "puz/Square.hpp"
 #include "../widgets/SizedText.hpp"
-
+#include "../utils/string.hpp"
 
 CharactersPanel::CharactersPanel(MyFrame * frame)
     : wxFB_CharactersPanel(frame),
@@ -32,11 +32,10 @@ CharactersPanel::CharactersPanel(MyFrame * frame)
     font.SetPointSize(12);
     SetFont(font);
 
-    for (int ch = 1; ch < 256; ++ch)
+    for (int ch = 1; ch < 0xff; ++ch)
     {
-        if (ch != puz::Square::ToPlain(ch) &&
-            puz::Square::ToUpper(ch) == ch)
-                AddCharacter(static_cast<wxChar>(ch));
+        if (puz::Square::ToGrid(ch) == ch && puz::Square::ToPlain(ch) != ch)
+            AddCharacter(ch);
     }
     const int cols = static_cast<int>(sqrt(static_cast<double>(m_ctrlCount * 2)));
     m_sizer->SetCols(cols);
@@ -45,11 +44,12 @@ CharactersPanel::CharactersPanel(MyFrame * frame)
 
 
 void
-CharactersPanel::AddCharacter(wxChar ch)
+CharactersPanel::AddCharacter(int ch)
 {
     InvalidateBestSize();
 
-    SizedText * ctrl = NewStaticText(wxString(ch, 1), ch);
+    wxString str = static_cast<wxChar>(ch);
+    SizedText * ctrl = NewStaticText(str, ch);
     ctrl->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CharactersPanel::OnLeftDown), NULL, this);
     ctrl->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(CharactersPanel::OnMouseOver), NULL, this);
     ctrl->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CharactersPanel::OnMouseOut), NULL, this);
@@ -76,7 +76,6 @@ CharactersPanel::NewStaticText(const wxString & label, wxWindowID id)
 void
 CharactersPanel::OnLeftDown(wxMouseEvent & evt)
 {
-    wxLogDebug(_T("OnLeftDown: %d"), evt.GetId());
     puz::Square * square = m_frame->GetFocusedSquare();
     if (square)
         m_frame->SetSquareText(square, wxChar(evt.GetId()));
@@ -129,7 +128,7 @@ CharactersPanel::OnSize(wxSizeEvent & evt)
         m_sizer->SetCols(cols);
 
         // Pad out the rest of the grid with blank text
-        for (int i = 0; i < cols - m_ctrlCount % cols; ++i)
+        for (size_t i = 0; i < cols - m_ctrlCount % cols; ++i)
             NewStaticText();
 
         // *Absolutely* make sure we Fit() our panel before we do the layout,

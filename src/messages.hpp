@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -49,16 +49,16 @@ enum XWordMessageId
 
 // Return the raw return value of the wxMessagebox
 // (wxYES / wxNO / wxCANCEL / wxOK)
-int XWordMessage(XWordMessageId id, ...);
-int XWordMessage(const wxChar * fmt, ...);
+int XWordMessage(wxWindow * parent, XWordMessageId id, ...);
+int XWordMessage(wxWindow * parent, const wxChar * fmt, ...);
 
 // Return true if the wxMessageBox returns either wxYES or wxOK
-bool XWordPrompt(XWordMessageId id, ...);
-bool XWordPrompt(const wxChar * fmt, ...);
+bool XWordPrompt(wxWindow * parent, XWordMessageId id, ...);
+bool XWordPrompt(wxWindow * parent, const wxChar * fmt, ...);
 
 // Return the raw return value of the wxMessagebox
 // The return value is pretty much meaningless, since an error dialog
 // should only have an OK button anyways.
-int XWordErrorMessage(const wxChar * fmt, ...);
+int XWordErrorMessage(wxWindow * parent, const wxChar * fmt, ...);
 
 #endif // MY_MESSAGES_H
