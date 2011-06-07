@@ -23,6 +23,7 @@ require 'task'
 require 'wxtask.queue'
 require 'serialize'
 
+
 -- ============================================================================
 -- local functions and data
 -- ============================================================================
@@ -174,14 +175,20 @@ function task.receive(timeout, task_id)
     return msg, flags, rc
 end
 
--- Print all messages from a given queue
-function task.dump_queue(queue_id)
+
+function task.find_queue(queue_id)
+    return queues[find_name(queue_id)]
+end
+
+-- print all messages from a given queue
+function task.dump_queue(queue_id, print_func)
+    print_func = print_func or print
     task.flush_queues()
-    local queue = queues[find_name(queue_id)]
+    local queue = task.find_queue(queue_id)
     if not queue then return end
     for val in queue:iter() do
         local msg, flags, rc = unpack(val)
-        print(msg)
+        print_func(msg)
     end
     task.clear_queue(queue_id)
 end
@@ -223,7 +230,6 @@ end
 
 
 
-
 -- ============================================================================
 -- create thread function
 -- ============================================================================
@@ -242,17 +248,30 @@ end
 --         <li>String keys are available as global variables.</li>
 --     </ul>
 -- @return The task id.
-task.create = function(s, args)
+
+task.create = function(s, args, globals)
     local task_name = new_id()
     args = args or {}
+    globals = globals or {}
     assert(type(args) == "table", "args must be a table")
     s = s or ""
 
     local command = [[=
-        local success, err = pcall(function()
+        local success, err = xpcall(function()
+
         -- Set the package.paths
         package.path = arg[1]
         package.cpath = arg[2]
+
+        -- Add global variables
+        -- Deserialize the function arguments
+        local success, globals = pcall(loadstring(arg[4]))
+        for k,v in pairs(globals) do
+            -- Protect preexisting globals
+            if type(k) == "string" and not _G[k] then
+                _G[k] = v
+            end
+        end
 
         require "wxtask"
 
@@ -284,6 +303,7 @@ task.create = function(s, args)
                     break
                 else
                     table.insert(errors, func)
+                    func = nil
                 end
             end
 
@@ -303,7 +323,7 @@ task.create = function(s, args)
             if not func then error(err) end
 
             -- Deserialize the function arguments
-            local success, fargs = pcall(loadstring(arg[4]))
+            local success, fargs = pcall(loadstring(arg[5]))
 
             -- The arg variable is a global variable that was initialized when
             -- the currently executing function started.
@@ -311,31 +331,26 @@ task.create = function(s, args)
             -- function, because we can't call a string or file with arguments.
             arg = fargs
 
-            -- Add string keys to arg as global variables
-            for k,v in pairs(arg) do
-                -- Protect preexisting globals
-                if type(k) == "string" and not _G[k] then
-                    _G[k] = v
-                end
-            end
-
             -- Execute the script
             task.post(1, nil, task.START)
             func()
-            task.post(1, nil, task.END)
 
-        end)-- end of pcall function
+        end, -- end of xpcall function
+        -- Error handler
+        debug.traceback
+        )
 
         -- Report any errors
-        if not success then
+        if err then
             task.error(err)
         end
+        -- Make sure task.END is posted
+        task.post(1, nil, task.END)
         ]]
 
-    args[0] = s
     -- Create the task
     local id = task_create(command,
-                           {package.path, package.cpath, s, serialize(args)})
+                           {package.path, package.cpath, s, serialize(globals), serialize(args)})
     if id > 0 then
         register_name(id, task_name)
         return task_name
@@ -346,48 +361,65 @@ end
 
 
 -- ============================================================================
--- Frame closing
+-- Abort functions
 -- ============================================================================
 task.START = -100
 task.END   = -101
 task.ABORT = -102
 
 if task.id() == 1 then
+    -- Inject xword data into task.create
+    xword.task_exports = {
+        scriptsdir  = xword.scriptsdir,
+        imagesdir   = xword.imagesdir,
+        configdir   = xword.configdir,
+        userdatadir = xword.userdatadir,
+        isportable  = xword.isportable,
+    }
+
+    local task_create = task.create
+    function task.create(s, args, globals)
+        globals = globals or {}
+        globals.xword = xword.task_exports
+        return task_create(s, args, globals)
+    end
+
+    -- Abort tasks
     function task.abort(id)
         task.post(id, "", task.ABORT)
     end
 
-    local function cleanup()
-        local time = 0
-        local isMsgShown = false
+    local function abortTasks()
         while true do
-            if not isMsgShown and time > 2000 then
-                isMsgShown = true
-                if wx then
-                    wx.wxBusyInfo("Waiting for threads to complete...")
-                end
-            end
-            -- Give our threads some time to exit before we kill them.
-            if time > 5000 then break end
             local shouldBreak = true
+            -- Abort each thread
             for id, _ in pairs(task.list()) do
                 if id ~= 1 then
                     shouldBreak = false
-                    print("ABORTING THREAD:"..tostring(id))
                     task.abort(id)
                 end
             end
             -- Main thread is the only one left
             if shouldBreak then break end
             -- Wait a bit
-            print("SLEEPING 10")
             task.sleep(10)
-            time = time + 10
         end
-         -- VC thinks that messages left in the queues are memory leaks
+        -- Dump debug and error messages
         task.flush_queues()
+        local debug_queue = task.find_queue(task.DEBUG_QUEUE)
+        if debug_queue and debug_queue:length() > 0 then
+            print '===============    TASK DEBUG    ==============='
+            task.dump_queue(task.DEBUG_QUEUE)
+            print '===============  END TASK DEBUG  ==============='
+        end
+        local error_queue = task.find_queue(task.ERROR_QUEUE)
+        if error_queue and error_queue:length() > 0 then
+            xword.logerror '===============    TASK ERRORS   ==============='
+            task.dump_queue(task.ERROR_QUEUE, xword.logerror)
+            xword.logerror '===============  END TASK ERRORS ==============='
+        end
     end
-    xword.OnCleanup(cleanup)
+    xword.OnCleanup(abortTasks)
 else
     function task.checkAbort(timeout, cleanupFunc)
         local function doCheck(msg, flag, rc)
@@ -415,23 +447,44 @@ end
 
 -- ============================================================================
 -- wxWidgets event handling
+
+-- Essentially this implements a custom message loop that runs on EVT_IDLE.
+
+-- Tasks post their events to a global table that maps the task id to an event
+-- table.
+-- Anything can connect a function to a task event by supplying the task id,
+-- the custom event id, and a function.
+
+-- The easiest way to work with task events is by using task.handleEvents()
+-- which takes the task ID, a table mapping custom event ids to a list of
+-- functions, and an optional event handler parameter.
 -- ============================================================================
 
 if wx then
     task.evtHandlers = {}
+
+    -- For debug purposes, dump debug/error queues on idle.
+    if xword.frame then
+        xword.frame:Connect(wx.wxEVT_IDLE, function()
+            task.dump_queue(task.DEBUG_QUEUE)
+            task.dump_queue(task.ERROR_QUEUE)
+        end)
+    end
+
 
     -- Create a new event handler to process task events
     function task.newEvtHandler(window)
         local self = wx.wxEvtHandler()
         self.tasks = {}     -- wxtask ids
         self.callbacks = {} -- { [msgId] = {function(data, [id]), ...}, ... }
+        self.window = false
 
         local function idleEvent(evt)
             local nTasks = #self.tasks
 
             -- No more tasks, disconnect this event handler
             if nTasks == 0 then
-                print("Disconnect(wx.wxEVT_IDLE): "..tostring(self).." "..tostring(window))
+                --print("Disconnect(wx.wxEVT_IDLE): "..tostring(self).." "..tostring(self.window))
                 self:Disconnect(wx.wxEVT_IDLE)
             end
 
@@ -439,16 +492,17 @@ if wx then
             -- Iterate backwards so that we can remove dead tasks
             for i=nTasks,1,-1 do
                 local id = self.tasks[i]
-                local isRunning = task.isrunning(id)
                 local data, flag, rc = task.receive(0, id)
                 if rc == 0 then
                     local callbacks = self.callbacks[flag]
                     if callbacks then
                         for _, func in ipairs(callbacks) do
+                            ----print('callback: ', flag, func)
                             func(data)
                         end
                     end
                     if flag == task.END then
+                        --print 'task.END'
                         table.remove(self.tasks, i)
                     end
                 end
@@ -460,12 +514,22 @@ if wx then
             table.insert(self.tasks, id)
             -- If this is the first task, connect the idle event
             if #self.tasks == 1 then
-                print("Connect(wx.wxEVT_IDLE): "..tostring(self).." "..tostring(window))
+                --print("Connect(wx.wxEVT_IDLE): "..tostring(self).." "..tostring(self.window))
                 self:Connect(wx.wxEVT_IDLE, idleEvent)
             end
         end
 
+        function self.removeTask(id)
+            for i, task_id in pairs(self.tasks) do
+                if id == task_id then
+                    table.remove(self.tasks, i)
+                    break
+                end
+            end
+        end
+
         function self.addCallback(flag, func)
+            --print("addCallback: "..tostring(flag)..", "..tostring(func))
             local t = self.callbacks[flag]
             if not t then
                 t = {}
@@ -497,21 +561,29 @@ if wx then
         -- Make sure to use this instead of wxWindow::PushEventHandler()
         -- so that we can clean up after ourselves.
         function self.startEventHandling(window)
-            print("PushEventHandler: "..tostring(self).." "..tostring(window))
+            if self.window == window then
+                return
+            elseif self.window then
+                self.endEventHandling()
+            end
+            --print("PushEventHandler: "..tostring(self).." "..tostring(window))
             window:PushEventHandler(self)
             self.window = window
+            -- If our window is destroyed, endEventHandling
+            self:Connect(self.window:GetId(), wx.wxEVT_DESTROY, self.endEventHandling)
         end
 
         function self.endEventHandling()
-            print("RemoveEventHandler: "..tostring(self).." "..tostring(window))
+            --pcall(function() print("RemoveEventHandler: "..tostring(self).." "..self.name) end)
+            --print("RemoveEventHandler: "..tostring(self).." "..tostring(window))
             self.window:RemoveEventHandler(self)
             self.window = false
+            self:Disconnect(wx.wxEVT_IDLE)
+            self:Disconnect(wx.wxEVT_DESTROY)
         end
 
         if window then
             self.startEventHandling(window)
-        else
-            self.window = false
         end
 
         table.insert(task.evtHandlers, self)
@@ -526,29 +598,43 @@ if wx then
         window = window or wx.wxGetApp():GetTopWindow()
         local evtHandler = task.newEvtHandler(window)
 
-        -- Turn single callback functions into a table of callbacks, as
-        -- expected by our evtHandler
+        -- Destroy this evtHandler when the thread is complete
+        function evtHandler.OnEnd()
+            evtHandler.endEventHandling()
+            for i, handler in ipairs(task.evtHandlers) do
+                if handler == evtHandler then
+                    table.remove(task.evtHandlers, i)
+                    break
+                end
+            end
+            evtHandler = nil -- this is now garbage
+        end
+        -- This handler should always be the first for task.END
+        -- And don't destroy the window before task.END
+        evtHandler.addCallback(task.END, evtHandler.OnEnd)
+
+        -- Add the callbacks.
+        callbacks = callbacks or {}
         for evtid, funcs in pairs(callbacks) do
             if type(funcs) == "function" then
-                callbacks[evtid] = { funcs }
+                evtHandler.addCallback(evtid, funcs)
+            else
+                for _, func in ipairs(funcs) do
+                    evtHandler.addCallback(evtid, func)
+                end
             end
         end
-        evtHandler.callbacks = callbacks
-
-        -- Destroy this evtHandler when the thread is complete
-        evtHandler.addCallback(task.END, function()
-            evtHandler.endEventHandling()
-            evtHandler = nil
-        end)
 
         evtHandler.addTask(task_id)
+        return evtHandler
     end
 
     xword.OnCleanup(function()
         -- Remove all event handlers from their windows
         for _, handler in ipairs(task.evtHandlers) do
+            --print("Cleanup event handler: "..tostring(handler))
             if handler.window then
-                print("Removing event handler: "..tostring(handler).." from window: "..tostring(handler.window))
+                --print("Removing event handler: "..tostring(handler).." from window: "..tostring(handler.window))
                 handler.endEventHandling()
             end
         end
