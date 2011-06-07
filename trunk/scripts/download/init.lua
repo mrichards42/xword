@@ -1,10 +1,10 @@
 -- ============================================================================
 -- Puzzle download
---     A quite complicated XWord add-on that downloads puzzles from a variety
+--     A complex XWord add-on that downloads puzzles from a variety
 --     of sources.
 
 --     This add-on is implemented as a package and contains many files and even
---     a sub-project (layouts).
+--     sub-projects (layouts, images).
 --     Add-ons with multiple files must be placed into their own directory.
 --     An init.lua script is the only script that will be called to initialize
 --     the add-on.
@@ -14,20 +14,43 @@
 -- Create the download table
 download = {}
 
--- Add the download modules
-require 'download.defs'
-require 'download.dialog'
-require 'download.savestate'
-require 'download.index'
-
 -- ----------------------------------------------------------------------------
 -- Configuration
 -- ----------------------------------------------------------------------------
 require 'download.defaultconfig'
-pcall(dofile, xword.GetConfigDir()..'/download/config.lua') -- Use default config if this fails
+pcall(dofile, xword.configdir..'/download/config.lua') -- Use default config if this fails
 
 require 'download.defaultsources'
-pcall(dofile, xword.GetConfigDir()..'/download/sources.lua') -- Use default sources if this fails
+pcall(dofile, xword.configdir..'/download/sources.lua') -- Use default sources if this fails
+
+-- ----------------------------------------------------------------------------
+-- init / cleanup
+-- ----------------------------------------------------------------------------
+download.__init_funcs = {}
+function download.onInit(func)
+    table.insert(download.__init_funcs, func)
+end
+function download.doInit()
+    for _, func in ipairs(download.__init_funcs) do
+        func()
+    end
+end
+
+download.__close_funcs = {}
+function download.onClose(func)
+    table.insert(download.__close_funcs, func)
+end
+function download.doClose()
+    for _, func in ipairs(download.__close_funcs) do
+        func()
+    end
+    collectgarbage()
+end
+
+-- Add the download modules
+require 'download.messages'
+require 'download.dialog'
+require 'download.savestate'
 
 -- ----------------------------------------------------------------------------
 -- init
@@ -35,25 +58,19 @@ pcall(dofile, xword.GetConfigDir()..'/download/sources.lua') -- Use default sour
 
 local function init()
     -- Add the download menu item
-    local menuItem = xword.frame:AddMenuItem({'Tools'}, 'Download puzzles',
+    local menuItem = xword.frame:AddMenuItem({'Tools'}, 'Download puzzles\tCtrl+D',
         function(evt)
-            download.GetDialog():Show()
+            local dlg = download.GetDialog()
+            dlg:Raise()
+            dlg:Show()
         end
     )
-
-    -- Save configuration and sources when the frame closes
-    xword.frame:Connect(wx.wxEVT_CLOSE_WINDOW,
-        function(evt)
-            if download.database then
-                download.database.close()
-            end
-            download.savestate()
-            evt:Skip()
-        end
-    )
-
-    -- Start indexing downloaded puzzles
-    --download.index.start()
 end
 
-init()
+local function uninit()
+    xword.frame:RemoveMenuItem('Tools', 'Download puzzles')
+    -- Save configuration and sources
+    download.savestate()
+end
+
+return { init, uninit }

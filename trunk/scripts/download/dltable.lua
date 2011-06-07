@@ -10,26 +10,30 @@ require 'date'
 -- A download hash table
 -- dltable["sourcename"] = datetable
 local mt = {}
-mt.__index = mt
-function download.dltable()
-    return setmetatable({}, mt)
+
+-- Add source names on access if they do not exist
+function mt:__index(name)
+    local meta = getmetatable(self)
+    if rawget(meta, name) then
+        return rawget(meta, name)
+    end
+    self:addsource(name)
+    return rawget(self, name)
 end
 
--- Use this function to correctly add a new source table (as a datetable)
+-- Use this function to add a new source table (as a datetable)
 function mt:addsource(src)
     rawset(self, src, download.datetable())
 end
 
---[[
--- Force the user to use dltable:addsource, unless they are deleting the index
-function mt:__newindex(index, val)
-    if val then
-        error('use addsource')
-    else
-        rawset(index, obj, nil)
-    end
+-- dltable constructor
+function download.dltable()
+    return setmetatable({}, mt)
 end
-]]
+
+
+
+
 
 -- Convert date() <--> date().daynum
 local function from_date(d)
@@ -110,6 +114,5 @@ function download.datetable()
         end
     end
 
-    --d.datemap = datemap  -- for debug purposes
     return setmetatable(d, datemt)
 end

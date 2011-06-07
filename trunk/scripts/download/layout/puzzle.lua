@@ -1,39 +1,92 @@
 -- This should only be required as part of download.layout
 local P = download
 local layout = P.layout
+local numPuzzles = 7
 
-local function layoutByPuzzle()
-    local dlg = assert(P.dlg)
-    local panel = dlg.panel
+local function lastPuzzles(sources, start_date, weekday)
+    local panel = P.dlg.panel
 
-    -- Create the download ctrls
-    layout.createDownloadCtrls()
-    -- Clean up extraneous downloads
-    layout.cleanDownloadCtrls()
+    layout.filter.dateSpan = { days = numPuzzles }
+    layout.filter.DisplayDate(start_date:fmt("%m/%d/%Y"))
 
-    local today = layout.today()
+    -- ------------------------------------------------------------------------
+    -- Layout functions
+    -- ------------------------------------------------------------------------
+    local sizer = wx.wxGridBagSizer(5,10)
 
-    local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    for _, source in ipairs(P.sources) do
-        sizer:Add(layout.Header(panel, source.display),
-                  0, wx.wxEXPAND + wx.wxALL, 5)
+    local row, col = 0, 0
 
-        local dlSizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-
-        -- Add the actual download controls to the grid
-        for dl_date, dl in pairs(dlg.downloads[source.display]) do
-            local datesizer = wx.wxBoxSizer(wx.wxVERTICAL)
-                datesizer:Add(layout.Header(panel, dl_date:fmt(P.dateformat), dl_date == today),
-                              0, wx.wxEXPAND + wx.wxALL, 5)
-                datesizer:Add(dl.ctrl, 0, wx.wxEXPAND + wx.wxALL, 5)
-            dlSizer:Add(datesizer, 0, wx.wxEXPAND + wx.wxALL, 5)
+    local function AddLine()
+        if col ~= 0 then
+            row = row + 2
         end
-
-        sizer:Add(dlSizer, 0, wx.wxEXPAND + wx.wxALL, 5)
-        sizer:Add(wx.wxStaticLine(panel, wx.wxID_ANY),
-                  0, wx.wxEXPAND + wx.wxALL, 5)
+        sizer:Add(
+            wx.wxStaticLine(panel, wx.wxID_ANY),
+            wx.wxGBPosition(row, 0),
+            wx.wxGBSpan(1, numPuzzles+1),
+            wx.wxEXPAND
+        )
+        col = 0
+        row = row + 1
     end
-    dlg.panel:SetSizerAndFit(sizer)
+
+    local function AddSource(source)
+        if col ~= 0 then
+            AddLine()
+        end
+        sizer:Add(
+            layout.Header(panel, source.display),
+            wx.wxGBPosition(row, 0),
+            wx.wxGBSpan(2, 1),
+            wx.wxALIGN_CENTER_VERTICAL
+        )
+        col = 1
+    end
+
+    local function AddDownload(dl, d)
+        sizer:Add(
+            layout.Header(panel, d:fmt(P.dateformat)),
+            wx.wxGBPosition(row, col)
+        )
+        sizer:Add(
+            dl.ctrl,
+            wx.wxGBPosition(row+1, col),
+            wx.wxGBSpan(1,1),
+            wx.wxALIGN_CENTER
+        )
+        col = col + 1
+    end
+
+    -- ------------------------------------------------------------------------
+    -- Layout
+    -- ------------------------------------------------------------------------
+    AddLine()
+    for _, source in ipairs(sources) do
+        -- Does this source have any puzzles for the given weekday?
+        if weekday == 0 or source.days[weekday] then
+            AddSource(source)
+
+            -- Add the actual download controls to the grid
+            local d = start_date:copy()
+            for i=1,numPuzzles do
+                -- Find a date that matches weekday
+                while not source.days[d:getisoweekday()] or (weekday ~= 0 and d:getisoweekday() ~= weekday) do
+                    d:adddays(-1)
+                end
+                local dl = layout.createDownloadCtrl(panel, source, d)
+                AddDownload(dl, d)
+                d:adddays(-1)
+            end
+        end
+    end
+    AddLine()
+    panel:SetSizerAndFit(sizer)
 end
 
-layout.addLayout("By Puzzle", layoutByPuzzle)
+layout.addLayout{
+    "Last "..numPuzzles.." puzzles",
+    lastPuzzles,
+    puzzle=false,
+    date=true,
+    weekday=true,
+}

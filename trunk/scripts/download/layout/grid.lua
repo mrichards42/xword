@@ -2,43 +2,40 @@
 
 local P = download
 local layout = P.layout
+local isSwapped = false
 
-local function layoutGrid(start_date, direction)
-    local dlg = assert(P.dlg)
-    local panel = dlg.panel
-    local sizer = wx.wxGridBagSizer(5,5)
+local function layoutGrid(sources, end_date)
+    local panel = P.dlg.panel
 
-    assert(start_date)
-    local end_date = start_date:copy()
-    end_date:adddays(7)
-
-    layout.createDownloadCtrls(start_date, end_date)
+    -- Dates
+    local start_date = end_date:copy()
+    local f = layout.filter
+    f.dateSpan = { days = 7 }
+    layout.subtractDateSpan(start_date, f.dateSpan)
+    f.DisplayDate(string.format("%s - %s", start_date:fmt("%m/%d/%Y"), end_date:fmt("%m/%d/%Y")))
 
     -- ------------------------------------------------------------------------
     -- Layout functions
     -- ------------------------------------------------------------------------
 
-    -- Row and column indexes
-    local MISSING_SOURCES = #P.sources + 2
-    local MISSING_DATES   = 2 + (end_date-start_date):spandays()
-
     -- Allow orientation to be swapped
     local GBPosition, swap
-    if direction then
+    if isSwapped then
         GBPosition = function(row, col)
             return wx.wxGBPosition(row, col)
-        end
-        swap = function()
-            layout.setLayout(layoutGrid, start_date, false)
         end
     else
         GBPosition = function(col, row)
             return wx.wxGBPosition(row, col)
         end
-        swap = function()
-            layout.setLayout(layoutGrid, start_date, true)
-        end
     end
+
+    local function swap()
+        isSwapped = not isSwapped
+        layout.setLayout("Grid (weekly)")
+    end
+
+    local sizer = wx.wxGridBagSizer(5,5)
 
     -- Add a window to the sizer
     local function Add(window, position, span, align)
@@ -65,53 +62,41 @@ local function layoutGrid(start_date, direction)
     -- Swap orientation button
     AddButton('swap', {0, 0}, swap)
 
-    -- Dates (newest to oldest)
-    local d = end_date:copy()
+    -- Dates
+    local d = start_date:copy()
     local i = 1
-    while d >= start_date do
-        Add(layout.Header(panel, d:fmt(P.dateformat), i==1), {i, 0})
-
-        -- Missing puzzles for a given date
-        AddButton('download',
-                  {i, MISSING_SOURCES},
-                  layout.downloadAllDates(d:copy(), dlMissing))
+    while d <= end_date do
+        Add(layout.Header(panel, d:fmt(P.dateformat), d == end_date), {i, 0})
 
         -- Next iteration
-        d:adddays(-1)
+        d:adddays(1)
         i = i + 1
     end
 
-    -- Missing dates header
-    Add(layout.Header(panel, "Missing dates"), {MISSING_DATES, 0})
-
-    -- Missing puzzles header
-    Add(layout.Header(panel, "Missing sources"), {0, MISSING_SOURCES})
-
     -- Puzzles
-    for col, source in pairs(P.sources) do
+    local dls = layout.createDownloadCtrls(panel, sources, start_date, end_date)
+    for col, source in pairs(sources) do
         Add(layout.Header(panel, source.display), {0, col})
 
         -- Add the actual download controls to the grid
-        for dl_date, dl in pairs(dlg.downloads[source.display]) do
-            local row = (end_date - dl_date):spandays() + 1
+        for dl_date, dl in pairs(dls[source.display]) do
+            local row = (dl_date - start_date):spandays() + 1
             Add(dl.ctrl, {row, col})
         end
-
-        -- Missing puzzles for a given source
-        AddButton('download',
-                  {MISSING_DATES, col},
-                  layout.downloadAllPuzzles(source.display, dlMissing))
-
     end
 
-    -- All missing puzzles
-    AddButton('download',
-              {MISSING_DATES, MISSING_SOURCES},
-              layout.downloadAll(dlMissing))
+    panel:SetSizer(sizer)
 
-    dlg.panel:SetSizerAndFit(sizer)
+    return end_date
 end
 
-
-layout.addLayout("Grid", layoutGrid)
-layout.addLayout("Grid2", layoutGrid, true)
+layout.addLayout{
+    -- Name
+    "Grid (weekly)",
+    -- Function
+    layoutGrid,
+    -- Filter options
+    puzzle=false,
+    date=true,
+    weekday=false,
+}
