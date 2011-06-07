@@ -51,4 +51,9 @@ local function init()
     )
 end
 
-init()
+
+function uninit()
+    xword.frame:RemoveMenuItem("Tools", "Try A-Z")
+end
+
+return { init, uninit }
