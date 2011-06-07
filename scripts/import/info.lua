@@ -4,5 +4,6 @@ return {
     description = [[
 Import non-native puzzle types:
     * UClick XML
-]]
+]],
+    requires = '0.4'
 }
