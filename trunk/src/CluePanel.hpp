@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -59,55 +59,51 @@ public:
 
     CluePanel(wxWindow * parent,
               wxWindowID id,
-              const wxString & heading,
-              puz::GridDirection direction,
+              const wxString & heading = wxEmptyString,
               const wxPoint & pos = wxDefaultPosition,
               const wxSize & size = wxDefaultSize,
               long style = wxBORDER_NONE,
               const wxString & name = CluePanelNameStr)
     {
         Init();
-        Create(parent, id, heading, direction, pos, size, style, name);
+        Create(parent, id, heading, pos, size, style, name);
     }
 
-    virtual ~CluePanel() {}
+    virtual ~CluePanel();
 
 
     bool Create(wxWindow * parent,
                 wxWindowID id,
-                const wxString & heading,
-                puz::GridDirection direction,
+                const wxString & heading = wxEmptyString,
                 const wxPoint & pos = wxDefaultPosition,
                 const wxSize & size = wxDefaultSize,
                 long style = wxBORDER_NONE,
                 const wxString & name = CluePanelNameStr);
 
-
-    puz::GridDirection GetDirection() const { return m_direction; }
-
-
     // Access to the ClueListBox
     //--------------------------
-    void SetClueList(const ClueListBox::container_t & clues)
+    void SetClueList(puz::ClueList * clues)
         { m_clueList->SetClueList(clues); }
 
-    void SetClueNumber(unsigned int number, focusDirection focus)
+    void ClearClueList() { m_clueList->ClearClueList(); }
+
+    puz::Clue * GetClue() { return m_clueList->GetClue(); }
+
+    bool SetClue(const puz::Clue * clue, focusDirection focus)
     {
+        if (clue == GetClue() && focus == m_focusDirection)
+            return true;
         if (m_focusDirection != focus)
         {
             m_clueList->SetSelectionForeground(m_colors[focus][TEXT]);
             m_clueList->SetSelectionBackground(m_colors[focus][BACKGROUND]);
         }
-
         m_focusDirection = focus;
-        m_clueList->SetClueNumber(number);
+        return m_clueList->SetClue(clue);
     }
 
-    wxString GetClueText()   const
-        { return puz2wx(m_clueList->GetItem(m_clueList->GetSelection()).Text()); }
+    focusDirection GetDirection() const { return m_focusDirection; }
 
-    unsigned int    GetClueNumber()  const
-        { return m_clueList->GetItem(m_clueList->GetSelection()).Number(); }
 
     // List colors
     //------------
@@ -195,8 +191,16 @@ public:
 
     // Clue list heading
     //------------------
+    void SetHeading(const wxString & heading) { m_heading->SetLabel(heading); }
+    wxString GetHeading() const { m_heading->GetLabel(); }
     bool SetHeadingFont(const wxFont & font)
-        { return m_heading->SetFont(font); }
+    {
+        if (! m_heading->SetFont(font))
+            return false;
+        Layout();
+        m_heading->Refresh();
+        return true;
+    }
     wxFont GetHeadingFont() const
         { return m_heading->GetFont(); }
 
@@ -219,11 +223,10 @@ public:
         { return m_heading->GetBackgroundColour(); }
 
 private:
-    void Init() { m_heading = NULL; m_clueList = NULL; m_direction = puz::ACROSS; }
+    void Init() { m_heading = NULL; m_clueList = NULL; }
 
     wxStaticText * m_heading;
     ClueListBox * m_clueList;
-    puz::GridDirection m_direction;
     focusDirection m_focusDirection;
 
     // [ Focused / unfocused ][ text / background ]
