@@ -6,12 +6,21 @@
 -- * functions without upvalues
 -- * tables thereof. Tables can have shared part, but can't be recursive yet.
 -- Caveat: metatables and environments aren't saved.
+
+-- Additions for XWord:
+-- serialize is made into a table where the metamethod __call is the same
+-- as the original serialize function.
+--     serialize.pprint() is used for pretty-printing
+--     serialize.dump() is used for output to a file
+--     serialize.pdump() is used for output to a file (pretty printed)
+--     serialize.loadfile() safely loads a file
+--     serialize.loadstring() safely loads a string
 --------------------------------------------------------------------------------
 
+-- The original serialize function
 local no_identity = { number=1, boolean=1, string=1, ['nil']=1 }
 
-function serialize (x)
-   
+local function _serialize(x)   
    local gensym_max =  0  -- index of the gensym() symbol generator
    local seen_once  = { } -- element->true set of elements seen exactly once in the table
    local multiple   = { } -- element->varname set of elements seen more than once
@@ -161,15 +170,17 @@ function serialize (x)
 end
 
 
+-------------------------------------------------------------------------------
+-- Pretty-print function
+-------------------------------------------------------------------------------
+
 -- Pretty print a non-recursive table of number, string, or boolean values
 -- Returns a string
-function pprintTable(t, indent, prev_tables)
-    assert(type(t) == "table")
-    indent = indent or 0
-    prev_tables = prev_tables or {}
+local function _pprint(t, indent, prev_tables)
     prev_tables[t] = true
 
-    local function serializeKey(k)
+    -- Helper functions
+    local function _serialize_key(k)
         local tp = type(k)
         if tp == "string" then
             if k:match("[_%a][_%a%d]*") == k then
@@ -184,11 +195,12 @@ function pprintTable(t, indent, prev_tables)
         end
     end
 
-    local function serializeValue(v)
+    local function _serialize_value(v)
         local tp = type(v)
         if tp == "table" then
             if prev_tables[v] then error("Recursive table found: "..tostring(v)) end
-            return '\n'..pprintTable(v, indent + 1, prev_tables)
+            -- Remove the indent
+            return _pprint(v, indent + 1, prev_tables):match('^ *([^ ].*)$')
         elseif tp == "string" then
             return string.format("%q", v)
         elseif tp == "number" or tp == "boolean" then
@@ -198,18 +210,95 @@ function pprintTable(t, indent, prev_tables)
         end
     end
 
-    local ret = {}
-    table.insert(ret, string.rep(" ", 4*indent).."{")
-    local array_part = {}
-    for i,v in ipairs(t) do
-        array_part[i] = true
-        table.insert(ret, string.rep(" ", 4*(indent+1))..serializeValue(v)..',')
+    if type(t) ~= "table" then
+        return _serialize_value(t)
     end
+
+    local ret = {}
+    -- Write the array part
+    local array_part = {}
+    for i, v in ipairs(t) do
+        array_part[i] = true
+        table.insert(ret, _serialize_value(v)..',')
+    end
+    -- Write the hash part
     for k,v in pairs(t) do
         if not array_part[k] then
-            table.insert(ret, string.rep(" ", 4*(indent+1))..serializeKey(k)..' = '..serializeValue(v)..',')
+            table.insert(ret,
+                _serialize_key(k)..' = '..
+                    _serialize_value(v)..','
+            )
         end
     end
-    table.insert(ret, string.rep(" ", 4*indent).."}")
-    return table.concat(ret, "\n")
+
+    -- Get the length of the concatenated table
+    local len = 0
+    for _, s in ipairs(ret) do
+        len = len + #s
+    end
+
+    -- If the representation is too long, break it up with newlines
+    if len > 50 then
+        -- Indent each line
+        for i, s in ipairs(ret) do
+            ret[i] = string.rep(" ", 4*(indent+1))..s
+        end
+        -- Add the braces
+        table.insert(ret, 1, string.rep(" ", 4*indent).."{")
+        table.insert(ret, string.rep(" ", 4*indent).."}")
+
+        return table.concat(ret, "\n")
+    else
+        -- Add the braces
+        table.insert(ret, 1, string.rep(" ", 4*indent).."{")
+        table.insert(ret, "}")
+        return table.concat(ret, " ")
+    end
 end
+
+-------------------------------------------------------------------------------
+-- serialize table
+-------------------------------------------------------------------------------
+
+serialize = {}
+-- The serialize 'function'
+setmetatable(serialize, {
+    __call = function(self, obj)
+        return _serialize(obj)
+    end
+})
+
+-- pretty print
+function serialize.pprint(obj)
+    return _pprint(obj, 0, {})
+end
+
+-- dump serialized data to a file
+function serialize.dump(obj, filename)
+    local f = io.open(filename, 'wb')
+    if f then
+        f:write(serialize(obj))
+        f:close()
+        return true
+    end
+    return false
+end
+
+-- dump pretty-printed data to a file
+function serialize.pdump(obj, filename)
+    local f = io.open(filename, 'wb')
+    if f then
+        f:write("return ")
+        f:write(serialize.pprint(obj))
+        f:close()
+        return true
+    end
+    return false
+end
+
+-- load data from a file or string (safely)
+require 'safe_exec'
+serialize.loadfile = safe_dofile
+serialize.loadstring = safe_dostring
+
+return serialize
