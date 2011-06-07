@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,253 +18,396 @@
 #ifndef CONFIG_MGR_H
 #define CONFIG_MGR_H
 
-#include <wx/tokenzr.h>
-#include <wx/font.h>
-#include <wx/colour.h>
 #include <wx/config.h>
+#include <list>
 #include <map>
+#include <wx/event.h> // wxEvtHandler, wxWindowDestroyEvent
 
-// A class for representing default values.  Note that everything is
-// accessed and set by const reference so that macros can be used
-// to define the real classes later
-class ConfigDefault
+
+
+class ConfigManagerBase;
+
+// A single group in a path.
+// e.g. in the path "/LastRun/CalculatedValues/MaxValue"
+//    Each value separated by a "/" gets a group
+//    ( "", "LastRun", "CalculatedValues", "MaxValue" )
+// The "" is the base group, called m_group in ConfigManagerBase.
+// The last entry, "MaxValue" should be of type ConfigValue, and is
+//    responsible for getting and setting the config value.
+class ConfigGroup
 {
 public:
-    ConfigDefault() {}
-    virtual ~ConfigDefault() {}
-    virtual void SetData(const wxString & WXUNUSED(data))
-        { wxFAIL_MSG(_T("Not Implemented")); }
-    virtual void SetData(const bool & WXUNUSED(data))
-        { wxFAIL_MSG(_T("Not Implemented")); }
-    virtual void SetData(const double & WXUNUSED(data))
-        { wxFAIL_MSG(_T("Not Implemented")); }
-    virtual void SetData(const long & WXUNUSED(data))
-        { wxFAIL_MSG(_T("Not Implemented")); }
+    ConfigGroup(ConfigManagerBase * cfg)
+        : m_name(_T("")),
+          m_cfg(cfg)
+    {
+    }
 
-    virtual wxString GetString() const
-        { wxFAIL_MSG(_T("Not Implemented")); return wxEmptyString; }
-    virtual bool GetBool() const
-        { wxFAIL_MSG(_T("Not Implemented")); return false; }
-    virtual double GetDouble() const
-        { wxFAIL_MSG(_T("Not Implemented")); return 0; }
-    virtual long GetLong() const
-        { wxFAIL_MSG(_T("Not Implemented")); return 0; }
+    ConfigGroup(ConfigGroup * parent, const wxString & name)
+        : m_name(parent->m_name + _T("/") + name),
+          m_cfg(parent->m_cfg)
+    {
+        if (parent)
+            parent->m_children.push_back(this);
+    }
+
+    virtual void Update()
+    {
+        std::list<ConfigGroup *>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); ++it)
+            (*it)->Update();
+    }
+
+    virtual void RemoveCallbacks(wxWindow * win)
+    {
+        std::list<ConfigGroup *>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); ++it)
+            (*it)->RemoveCallbacks(win);
+    }
+
+    wxString m_name;
+    std::list<ConfigGroup *> m_children;
+    ConfigManagerBase * m_cfg;
 };
 
 
-// Macros for adding, reading, writing, and getting the default
-// for config items.
+/*  ***************************************************************************
+    The ConfigManager base class.
+    ***************************************************************************
 
-// Every type should have the following functions, where TYPE is
-// replaced by the type name:
-//     void Add      (const wxString & path, const TYPE & default);
-//     void AddTYPE  (const wxString & path, const TYPE & default);
-//     TYPE ReadTYPE (const wxString & path);
-//     bool Write    (const wxString & path, const TYPE & value);
-//     bool WriteTYPE(const wxString & path, const TYPE & value);
-//     void GetDefaultTYPE(const wxString & path) const;
-//
-// The WriteTYPE function should attempt to ASSERT that the path exists.
-// This makes sure that we are consistent with config item names throughout.
-//
+    To use ConfigManager, first call SetConfig() with a wxConfigBase pointer.
 
-#define CFG_TYPE(type, type_name)                                              \
-    /* The ConfigXXXX class */                                                 \
-    class Config ## type_name : public ConfigDefault                           \
-    {                                                                          \
-    public:                                                                    \
-        Config ## type_name(const type & data) { SetData(data); }              \
-                                                                               \
-        virtual void SetData(const type & data) { m_data = data; }             \
-        virtual type Get ## type_name() const { return m_data; }               \
-                                                                               \
-    protected:                                                                 \
-        type m_data;                                                           \
-    };                                                                         \
-                                                                               \
-    /* Add functions */                                                        \
-    void Add(const wxString & path, const type & default_value)                \
-    {                                                                          \
-        Add ## type_name(path, default_value);                                 \
-    }                                                                          \
-    void Add ## type_name(const wxString & path, const type & default_value)   \
-    {                                                                          \
-        m_items[AbsPath(path)] = new Config ## type_name(default_value);       \
-    }                                                                          \
-                                                                               \
-    /* Read function */                                                        \
-    type Read ## type_name(const wxString & path)                              \
-    {                                                                          \
-        wxASSERT(m_config != NULL);                                            \
-        type ret;                                                              \
-        if (m_config->Read(AbsPath(path), &ret))                               \
-            return ret;                                                        \
-        return GetDefault ## type_name(path);                                  \
-    }                                                                          \
-                                                                               \
-    /* Write functions */                                                      \
-    bool Write(const wxString & path, const type & value)                      \
-    {                                                                          \
-        return Write ## type_name(path, value);                                \
-    }                                                                          \
-    bool Write ## type_name(const wxString & path, const type & value)         \
-    {                                                                          \
-        wxASSERT(m_config != NULL);                                            \
-        wxASSERT(HasEntry(path));                                              \
-        return m_config->Write(AbsPath(path), value);                          \
-    }                                                                          \
-                                                                               \
-    /* GetDefault function */                                                  \
-    type GetDefault ## type_name(const wxString & path) const                  \
-    {                                                                          \
-        wxASSERT(HasEntry(path));                                              \
-        return m_items.find(AbsPath(path))->second->Get ## type_name();        \
-    }
+    ConfigManagerBase can be used as-is, by using the Get and Set functions:
+        T Get(wxString path, T default);
+        void Set(wxString path, T value);
 
-// Macro for types that aren't natively representable by a wxConfig.
-// Example functions that must be created for this macro:
-//     static wxFont   StringToFont(const wxString & str);
-//     static wxString FontToString(const wxFont & font);
+    However, the power in this class can be fully taken advantage of if
+    nested classes derived from ConfigGroup are used to create a hierarchy:
 
-// Note that these types will not have Write() and AddEntry() functions,
-// but only WriteTYPE() and AddTYPE() functions.
-#define CFG_CONVERTED_TYPE(type, type_name, conv_type)                         \
-                                                                               \
-    /* Add function */                                                         \
-    void Add ## type_name(const wxString & path,                               \
-                          const type & default_value)                          \
-    {                                                                          \
-        Add ## conv_type( path, type_name ## To ## conv_type(default_value) ); \
-    }                                                                          \
-                                                                               \
-    /* Read function */                                                        \
-    type Read ## type_name(const wxString & path)                              \
-    {                                                                          \
-        try                                                                    \
-        {                                                                      \
-            return conv_type ## To ## type_name( Read ## conv_type(path) );    \
-        }                                                                      \
-        catch (ConversionError)                                                \
-        {                                                                      \
-            return GetDefault ## type_name(path);                              \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    /* Write function */                                                       \
-    bool Write ## type_name(const wxString & path,                             \
-                            const type & value)                                \
-    {                                                                          \
-        return Write ## conv_type(path, type_name ## To ## conv_type(value) ); \
-    }                                                                          \
-                                                                               \
-    /* GetDefault function */                                                  \
-    /* If a ConversionError is thrown here we've done something wrong */       \
-    type GetDefault ## type_name(const wxString & path) const                  \
-    {                                                                          \
-        return conv_type ## To ## type_name( GetDefault ## conv_type(path) );  \
-    }                                                                          \
+    class ConfigManager : public ConfigManagerBase
+    {
+    public:
+        ConfigManager()
+            : MyGroup(&m_group) // Pass the pointer to our bas ConfigGroup
+        {}
 
+        class MyGroup : public ConfigGroup
+        {
+        public:
+            MyGroup(ConfigGroup * parent)
+                : ConfigGroup(parent),
+                  // ConfigValue(this, path, default_value)
+                  MyString(this, _T("StringPath"), _T("Default string")),
+                  MyLong(this, _T("LongPath"), 15),
+                  MyBool(this, _T("BoolPath"), false),
+                  MyDouble(this, _T("DoublePath"), 1.2),
+                  MyFont(this, _T("FontPath"), *wxSWISS_FONT)
+            {}
 
+            ConfigString MyString;
+            ConfigLong MyLong;
+            ConfigBool MyBool;
+            ConfigDouble MyDouble;
+            ConfigFont MyFont;
+        } Group;
+    };
 
-class ConfigManager
+    This class could be used as follows:
+        ConfigManager config;
+        wxString val = config.Group.MyString.Get();
+        config.Group.MyString.Set(_T("New Value"));
+
+    Alternatively, operators () and = can be used for Get and Set, respectively.
+        long val = config.Group.MyLong();
+        config.Group.MyLong = 100000L;
+
+    wxWindow-derived classes can attach callbacks that will be called when
+    a value is Set().
+        MyFrame * frame;
+        config.Group.MyBool.AddCallback(frame, &MyFrame::Maximize);
+        config.Group.MyBool.Set(true); // This calls MyFrame::Maximize
+
+    To disable this behavior, call AutoUpdate(false):
+        config.AutoUpdate(false);
+        config.Group.MyBool.Set(false); // This does not call MyFrame::Maximize
+
+    To force the callbacks to be called use Update()
+        config.Update(); // Calls all callbacks in the config hierarchy.
+*/
+
+class ConfigManagerBase
 {
 public:
-    explicit ConfigManager(wxConfigBase * config = NULL)
-        : m_config(config),
-          m_path(_T("/"))
-    { }
-
-    ~ConfigManager()
+    ConfigManagerBase()
+        : m_group(this),
+          m_config(NULL),
+          m_autoUpdate(true)
     {
-        for (std::map<wxString, ConfigDefault*>::iterator it = m_items.begin();
-             it != m_items.end();
-             ++it)
-        {
-            delete it->second;
-        }
     }
 
-    void SetConfig(wxConfigBase * config) { m_config = config; }
+    void SetConfig(wxConfigBase * cfg) { m_config = cfg; }
+    void AutoUpdate(bool doit) { m_autoUpdate = doit; }
+    bool AutoUpdate() const { return m_autoUpdate; }
 
-    void SetPath(const wxString & path) { m_path = AbsPath(path); }
-    const wxString & GetPath() const { return m_path; }
-    bool HasEntry(const wxString & path) const
-        { return m_items.find(AbsPath(path)) != m_items.end(); }
+protected:
+    // A little metaprogramming :)
 
-    // AddXXX, ReadXXX, WriteXXX, and GetDefaultXXX functions
-    CFG_TYPE(wxString,   String)
-    CFG_TYPE(bool,       Bool)
-    CFG_TYPE(double,     Double)
-    CFG_TYPE(long,       Long)
+    // For types natively supported by wxConfigBase (wxString, bool,
+    // long, double), this works transparently.
 
-    // Extra data types
-    //-----------------
+    // To define a type that must be adapted to one of the native types,
+    // do the following (examples for wxFont and wxColour are at the bottom
+    // of this document):
 
-    // Throw this when a conversion fails
-    // NB: Only throw during a "supported type to X" (e.g. StringToFont) conversion,
-    // not the other way around
-    class ConversionError {};
+    //  (1) Define an explicitly specialized struct AdaptedType<T> for your type
+    //      that defines a typedef for the basic type:
+    //          template <> struct AdaptedType<T> { typedef NATIVE_T type; }
+    template <typename T> struct AdaptedType { typedef T type; };
 
-    // GCC doesn't like the implementation of these static functions to be in
-    // the class declaration.
+    //  (2) Define two Convert<IN_T, OUT_T> functions to convert your type to
+    //      the native type, and the native type to your type:
+    //
+    //          template <> NATIVE_T Convert<T, NATIVE_T>(const T & )
+    //              { return your type converted to the native type; }
+    //
+    //          template <> T Convert<NATIVE_T, T>(const NATIVE_T & )
+    //              { return the native type converted to your type; }
 
-    // wxFont
-    static wxString FontToString(const wxFont & font)
-        { return font.GetNativeFontInfoUserDesc(); }
+    template <typename IN_T, typename OUT_T>
+    inline OUT_T Convert(const IN_T & val) { return val; }
 
-    static wxFont StringToFont(const wxString & str)
+public:
+    // Get and Set template functions.
+    // These functions use TMP described above to deduce the return type and
+    // the proper conversion (if any) using the value type to the function.
+
+    template <typename T>
+    inline T Get(const wxString & path, const T & default_val)
     {
-        wxFont ret;
-        ret.SetNativeFontInfoUserDesc(str);
-        return ret;
+        AdaptedType<T>::type ret;
+        if (m_config->Read(path, &ret))
+            return Convert<AdaptedType<T>::type, T>(ret);
+        return default_val;
     }
 
-    CFG_CONVERTED_TYPE(wxFont, Font, String);
-
-
-    // wxColour
-    static wxString ColorToString(const wxColour & color)
-        { return color.GetAsString(); }
-    static wxColour StringToColor(const wxString & str)
-        { return wxColour(str); }
-
-    CFG_CONVERTED_TYPE(wxColour, Color, String);
-
-
-    // wxPoint
-    static wxString PointToString(const wxPoint & pt)
-        { return wxString::Format(_T("%d, %d"), pt.x, pt.y); }
-
-    static wxPoint StringToPoint(const wxString & str)
+    template <typename T>
+    inline void Set(const wxString & path, const T & val)
     {
-        wxArrayString tokens = wxStringTokenize(str, _T(", "), wxTOKEN_STRTOK);
-        long x, y;
-        if (tokens.size() != 2 ||
-            ! (tokens[0].ToLong(&x) && tokens[1].ToLong(&y)) )
-        {
-            throw ConversionError();
-        }
-
-        return wxPoint(x, y);
+        m_config->Write(path, Convert<T, AdaptedType<T>::type>(val));
     }
 
-    CFG_CONVERTED_TYPE(wxPoint, Point, String);
+    inline void Update() { m_group.Update(); }
+    inline void RemoveCallbacks(wxWindow * win) { m_group.RemoveCallbacks(win); }
 
-
-private:
+protected:
     wxConfigBase * m_config;
-    wxString m_path;
-    wxString AbsPath(const wxString & name) const
-    {
-        if (name.StartsWith(_T("/")))
-            return name;
-        return m_path + _T("/") + name;
-    }
-
-    std::map<wxString, ConfigDefault*> m_items;
+    bool m_autoUpdate;
+    ConfigGroup m_group;
 };
 
-#undef CFG_TYPE
-#undef CFG_CONVERTED_TYPE
+
+/*  ***************************************************************************
+    The ConfigValue template class.
+    ***************************************************************************
+
+    Usage is described in ConfigManagerBase.
+    
+*/
+template <typename T>
+class ConfigValue
+    : public wxEvtHandler, // Needed for wxWindowDestroyEvent
+      public ConfigGroup
+{
+    // Callback class
+    class CallbackBase
+    {
+    public:
+        virtual ~CallbackBase() {}
+        inline virtual void Call(T) =0;
+    };
+
+    template<typename OBJ, typename FUNC>
+    class Callback : public CallbackBase
+    {
+    public:
+        Callback(OBJ * obj, FUNC func) : m_obj(obj), m_func(func) {}
+        inline virtual void Call(T val) { (m_obj->*m_func)(val); }
+        typename OBJ * m_obj;
+        typename FUNC m_func;
+    };
+
+public:
+    ConfigValue(ConfigGroup * parent,
+                const wxString & name,
+                T default_val)
+        : wxEvtHandler(),
+          ConfigGroup(parent, name),
+          m_default(default_val)
+    {
+    }
+
+    ~ConfigValue()
+    {
+        // Callback windows should remove themselves.
+        wxASSERT(m_callbacks.empty());
+        map_t::iterator it;
+        for (it = m_callbacks.begin(); it != m_callbacks.end(); ++it)
+            delete it->second;
+    }
+
+    // Get and set functions
+    inline T Get() { return GetConfig()->Get<T>(m_name, m_default); }
+
+    inline void Set(const T & val)
+    {
+        ConfigManagerBase * cfg = GetConfig();
+        cfg->Set<T>(m_name, val);
+        if (cfg->AutoUpdate())
+            Update(val);
+    }
+
+    // operators that substitute for Get and Set
+    inline T operator()() { return Get(); }
+    inline void operator=(const T & val) { Set(val); }
+
+
+    // Callback functions
+    template<typename OBJ, typename FUNC>
+    void AddCallback(OBJ * obj, FUNC func)
+    {
+        // Add a callback to the callbacks multimap.
+        wxWindow * win = static_cast<wxWindow*>(obj);
+        m_callbacks.insert(pair_t(win, new Callback<OBJ, FUNC>(obj, func)));
+    }
+
+    void RemoveCallbacks(wxWindow * win)
+    {
+        // Delete the callbacks and erase the map entries for this window.
+        std::pair<map_t::iterator, map_t::iterator> range =
+            m_callbacks.equal_range(win);
+        for (map_t::iterator it = range.first; it != range.second; ++it)
+            delete it->second;
+        m_callbacks.erase(range.first, range.second);
+    }
+
+    // Run the callbacks for this value
+    inline void Update() { Update(Get()); }
+    inline void Update(T val)
+    {
+        map_t::iterator it;
+        for (it = m_callbacks.begin(); it != m_callbacks.end(); ++it)
+            it->second->Call(val);
+    }
+
+protected:
+    ConfigManagerBase * GetConfig() { return m_cfg; }
+    typename T m_default;
+    typedef std::multimap<wxWindow *, CallbackBase*> map_t;
+    typedef std::pair<wxWindow *, CallbackBase*> pair_t;
+    map_t m_callbacks;
+};
+
+// -----------------------------------------------------------------------
+// Basic (unconverted) types
+// -----------------------------------------------------------------------
+typedef ConfigValue<wxString> ConfigString;
+typedef ConfigValue<bool>     ConfigBool;
+typedef ConfigValue<long>     ConfigLong;
+typedef ConfigValue<double>   ConfigDouble;
+
+// -----------------------------------------------------------------------
+// wxFont adapted type
+// -----------------------------------------------------------------------
+#include <wx/font.h>
+
+// Tell ConfigManagerBase that this should be converted to a wxString
+template<>
+struct ConfigManagerBase::AdaptedType<wxFont> { typedef wxString type; };
+
+// Font to String conversion
+template <>
+inline wxString
+ConfigManagerBase::Convert<wxFont, wxString>(const wxFont & font)
+{
+    return font.GetNativeFontInfoUserDesc();
+}
+
+// String to Font conversion
+template <>
+inline wxFont
+ConfigManagerBase::Convert<wxString, wxFont>(const wxString & str)
+{
+    wxFont font;
+    font.SetNativeFontInfoUserDesc(str);
+    return font;
+}
+
+// The ConfigValue typedef
+typedef ConfigValue<wxFont> ConfigFont;
+
+
+// -----------------------------------------------------------------------
+// wxColour adapted type
+// -----------------------------------------------------------------------
+#include <wx/colour.h>
+
+// The ConfigValue typedef
+typedef ConfigValue<wxColour> ConfigColor;
+
+// Tell ConfigManagerBase that this should be converted to a wxString
+template<>
+struct ConfigManagerBase::AdaptedType<wxColour> { typedef wxString type; };
+
+// Color to String conversion
+template <>
+inline wxString
+ConfigManagerBase::Convert<wxColour, wxString>(const wxColour & color)
+{
+    return color.GetAsString();
+}
+
+// String to Color conversion
+template <>
+inline wxColour
+ConfigManagerBase::Convert<wxString, wxColour>(const wxString & str)
+{
+    return wxColour(str);
+}
+
+// -----------------------------------------------------------------------
+// wxPoint adapted type
+// -----------------------------------------------------------------------
+#include <wx/gdicmn.h>
+#include <wx/tokenzr.h>
+// The ConfigValue typedef
+typedef ConfigValue<wxPoint> ConfigPoint;
+
+// Tell ConfigManagerBase that this should be converted to a wxString
+template<>
+struct ConfigManagerBase::AdaptedType<wxPoint> { typedef wxString type; };
+
+// Point to String conversion
+template <>
+inline wxString
+ConfigManagerBase::Convert<wxPoint, wxString>(const wxPoint & pt)
+{
+    return wxString::Format(_T("%d, %d"), pt.x, pt.y);
+}
+
+// String to Point conversion
+template <>
+inline wxPoint
+ConfigManagerBase::Convert<wxString, wxPoint>(const wxString & str)
+{
+    wxArrayString tokens = wxStringTokenize(str, _T(", "), wxTOKEN_STRTOK);
+    long x, y;
+    if (tokens.size() != 2 ||
+        ! (tokens[0].ToLong(&x) && tokens[1].ToLong(&y)) )
+    {
+        return wxPoint();
+    }
+
+    return wxPoint(x, y);
+}
 
 #endif // CONFIG_MGR_H

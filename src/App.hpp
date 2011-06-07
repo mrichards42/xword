@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,13 +24,15 @@
 #    include <wx/app.h>
 #endif
 
-#include "utils/ConfigManager.hpp"
+#include "config.hpp"
 
 class MyFrame;
 class wxPrintData;
 class wxPageSetupDialogData;
+
 #ifdef XWORD_USE_LUA
     class wxLuaEvent;
+    class wxFile;
 #endif
 
 // Global printing variables
@@ -57,6 +59,12 @@ public:
     // Portable mode
     bool IsPortable() { return m_isPortable; }
 
+    // Lua logging
+#ifdef XWORD_USE_LUA
+    bool LogLuaMessage(const wxString & msg);
+    bool HasLuaLog() const;
+#endif // XWORD_USE_LUA
+
 private:
     void OnActivate(wxActivateEvent & evt);
 
@@ -81,6 +89,8 @@ private:
     void RunLuaScript(const wxString & filename, int lastarg = -1);
     void OnLuaPrint(wxLuaEvent & evt);
     void OnLuaError(wxLuaEvent & evt);
+    wxFile * m_luaLog;
+    int m_luaMessages;
 #endif // XWORD_USE_LUA
 
     DECLARE_EVENT_TABLE()

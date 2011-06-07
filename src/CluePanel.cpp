@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 
 #include "CluePanel.hpp"
 #include "PuzEvent.hpp"
+#include "App.hpp"
 
 BEGIN_EVENT_TABLE(CluePanel, wxPanel)
     EVT_SIZE          (              CluePanel::OnSize)
@@ -33,7 +34,6 @@ bool
 CluePanel::Create(wxWindow* parent,
                   wxWindowID id,
                   const wxString & heading,
-                  puz::GridDirection direction,
                   const wxPoint & pos,
                   const wxSize & size,
                   long style,
@@ -42,7 +42,6 @@ CluePanel::Create(wxWindow* parent,
     if (! wxPanel::Create(parent, id, pos, size, style, name))
         return false;
 
-    m_direction = direction;
     m_focusDirection = CROSSING;
 
     // Create windows
@@ -55,24 +54,6 @@ CluePanel::Create(wxWindow* parent,
 
     m_clueList = new ClueListBox(this, wxID_ANY);
 
-    // Default fonts
-    m_heading->SetFont( wxFont(13, wxFONTFAMILY_SWISS,
-                                   wxFONTSTYLE_NORMAL,
-                                   wxFONTWEIGHT_NORMAL) );
-
-    // Default Colors
-    SetSelectionForeground(
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
-
-    SetSelectionBackground(
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
-
-    SetCrossingForeground(
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
-
-    SetCrossingBackground(
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
-
     // Layout
     wxSizer * sizer = new wxBoxSizer(wxVERTICAL);
         sizer->Add(m_heading,   0, wxEXPAND);
@@ -80,10 +61,46 @@ CluePanel::Create(wxWindow* parent,
     SetSizerAndFit(sizer);
     SetMinSize(m_heading->GetSize());
 
+    // Config
+    ConfigManager::Clue_t & clue = wxGetApp().GetConfigManager().Clue;
+
+    clue.font.AddCallback(this, &CluePanel::SetFont);
+    clue.spacing.AddCallback(this, &CluePanel::SetMargins);
+
+    clue.listForegroundColor.AddCallback(this,
+                                         &CluePanel::SetForegroundColour);
+
+    clue.listBackgroundColor.AddCallback(this,
+                                         &CluePanel::SetBackgroundColour);
+
+    clue.selectedForegroundColor.AddCallback(
+        this, &CluePanel::SetSelectionForeground);
+
+    clue.selectedBackgroundColor.AddCallback(
+        this, &CluePanel::SetSelectionBackground);
+
+    clue.crossingForegroundColor.AddCallback(
+        this, &CluePanel::SetCrossingForeground);
+
+    clue.crossingBackgroundColor.AddCallback(
+        this, &CluePanel::SetCrossingBackground);
+
+    clue.headingFont.AddCallback(this, &CluePanel::SetHeadingFont);
+
+    clue.headingForegroundColor.AddCallback(
+        this, &CluePanel::SetHeadingForeground);
+
+    clue.headingBackgroundColor.AddCallback(
+        this, &CluePanel::SetHeadingBackground);
+
     return true;
 }
 
 
+CluePanel::~CluePanel()
+{
+    wxGetApp().GetConfigManager().RemoveCallbacks(this);
+}
 
 
 void
@@ -96,10 +113,9 @@ CluePanel::OnClueSelect(wxCommandEvent & WXUNUSED(evt))
         m_focusDirection = FOCUSED;
     }
 
-    wxPuzEvent puzEvt   (wxEVT_PUZ_CLUE_FOCUS, GetId());
-    puzEvt.SetClueNumber(GetDirection(), GetClueNumber());
-    puzEvt.SetDirection (GetDirection());
-    puzEvt.SetClueText  (GetClueText());
+    wxPuzEvent puzEvt(wxEVT_PUZ_CLUE_FOCUS, GetId());
+    puzEvt.SetClue(GetClue());
+    puzEvt.SetWord(GetClue()->GetWord());
 
     ::wxPostEvent(GetEventHandler(), puzEvt);
 }

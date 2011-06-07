@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2009 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,12 +18,15 @@
 #include "App.hpp"
 #include <wx/cmdline.h>
 #include "MyFrame.hpp"
+#include "MyStatusBar.hpp"
 #include "paths.hpp"
 #include <wx/wfstream.h> // wxFileInputStream / wxFileOutputStream for config
 #include "messages.hpp"
 #include "utils/string.hpp"
+#include <wx/filename.h>
 
 #include <wx/log.h>
+#include <wx/file.h>
 
 #include <cstdlib> // srand()
 #include <ctime>   // time()
@@ -63,7 +66,6 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
     { wxCMD_LINE_NONE }
 };
 
-
 bool
 MyApp::OnInit()
 {
@@ -88,6 +90,9 @@ MyApp::OnInit()
     wxCmdLineParser cmd(cmdLineDesc, argc, argv);
 
 #ifdef XWORD_USE_LUA
+    m_luaLog = NULL;
+    m_luaMessages = 0;
+
     // Check to see if we are just running a lua script
 
     // Make sure that lua isn't allowed to call 
@@ -121,6 +126,16 @@ MyApp::OnInit()
     m_frame = new MyFrame();
 
     ReadCommandLine(cmd);
+
+    // Show the errors
+#ifdef XWORD_USE_LUA
+    if (m_frame)
+    {
+        MyStatusBar * status = dynamic_cast<MyStatusBar *>(m_frame->GetStatusBar());
+        if (status)
+            status->SetLuaErrors(m_luaMessages);
+    }
+#endif // XWORD_USE_LUA
     m_frame->Show();
 
     return true;
@@ -130,6 +145,15 @@ MyApp::OnInit()
 int
 MyApp::OnExit()
 {
+#ifdef XWORD_USE_LUA
+    // Clean up lua log file
+    if (m_luaLog)
+    {
+        m_luaLog->Close();
+        delete m_luaLog;
+    }
+#endif
+
     // Save config file
     wxFileName configFile(GetConfigFile());
     if (! configFile.DirExists())
@@ -149,7 +173,7 @@ MyApp::OnExit()
 }
 
 
-#if XWORD_USE_LUA
+#ifdef XWORD_USE_LUA
 
 MyApp::CmdLineScriptValue
 MyApp::CheckCommandLineForLua()
@@ -199,6 +223,37 @@ MyApp::CheckCommandLineForLua()
     return NO_SCRIPT;
 }
 
+
+bool MyApp::LogLuaMessage(const wxString & msg)
+{
+    if (! m_luaLog)
+        m_luaLog = new wxFile();
+    if (! m_luaLog->IsOpened())
+    {
+        if (! m_luaLog->Open(GetLuaLogFilename(), wxFile::write))
+            return false;
+        else
+            m_luaLog->Write(_T("Lua log for ") + wxDateTime::Now().FormatDate() + _T("\n") +
+                            _T("==========================================================\n"));
+        ++m_luaMessages;
+        if (m_frame)
+        {
+            MyStatusBar * status = dynamic_cast<MyStatusBar *>(m_frame->GetStatusBar());
+            if (status)
+                status->SetLuaErrors(m_luaMessages);
+        }
+    }
+    m_luaLog->Write(wxDateTime::Now().FormatTime());
+    m_luaLog->Write(_T(": "));
+    m_luaLog->Write(msg);
+    m_luaLog->Write(_T("\n"));
+    return true;
+}
+
+bool MyApp::HasLuaLog() const
+{
+    return m_luaLog != NULL && m_luaLog->IsOpened();
+}
 #endif // XWORD_USE_LUA
 
 
@@ -215,21 +270,23 @@ MyApp::ReadCommandLine(wxCmdLineParser & cmd)
         wxLogDebug(_T("Command count: %d"), param_count);
 
         // Open files
-        for (int i = 0; i < param_count; ++i)
+        for (unsigned int i = 0; i < param_count; ++i)
         {
             wxFileName fn(cmd.GetParam(i));
-            if (fn.FileExists() && puz::Puzzle::CanLoad(wx2puz(fn.GetFullPath())))
+            if (fn.FileExists() && puz::Puzzle::CanLoad(wx2file(fn.GetFullPath())))
             {
                 m_frame->LoadPuzzle(fn.GetFullPath());
             }
+#ifdef XWORD_USE_LUA
             else
             {
                 wxString result;
                 if (FindLuaScript(fn.GetFullPath(), &result))
                     m_frame->RunLuaScript(result);
                 else
-                    XWordErrorMessage(_T("%s"), result.c_str());
+                    XWordErrorMessage(NULL, _T("%s"), result.c_str());
             }
+#endif // XWORD_USE_LUA
         }
     }
 }
@@ -266,91 +323,7 @@ MyApp::SetupConfig()
     }
 
     // Setup our config manager
-    //-------------------------
     m_config.SetConfig(wxFileConfig::Get());
-
-    // Window size/position defaults
-    m_config.SetPath(_T("/Window"));
-    m_config.AddLong(_T("top"),       20);
-    m_config.AddLong(_T("left"),      20);
-    m_config.AddLong(_T("width"),     500);
-    m_config.AddLong(_T("height"),    500);
-    m_config.AddBool(_T("maximized"), false);
-
-    // Grid style, fonts, and colors
-    m_config.SetPath(_T("/Grid"));
-    m_config.AddBool(_T("fit"),       false);
-    m_config.AddLong(_T("style"),     DEFAULT_GRID_STYLE);
-    m_config.AddFont(_T("letterFont"),      *wxSWISS_FONT);
-    m_config.AddFont(_T("numberFont"),      *wxSWISS_FONT);
-    m_config.AddLong(_T("lineThickness"), 1);
-    m_config.AddColor(_T("backgroundColor"),
-        wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-    m_config.AddColor(_T("focusedLetterColor"),     *wxGREEN);
-    m_config.AddColor(_T("focusedWordColor"),       *wxLIGHT_GREY);
-    m_config.AddColor(_T("whiteSquareColor"),       *wxWHITE);
-    m_config.AddColor(_T("blackSquareColor"),       *wxBLACK);
-    m_config.AddColor(_T("selectionColor"),
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
-    m_config.AddColor(_T("penColor"),               *wxBLACK);
-    m_config.AddColor(_T("pencilColor"),            wxColor(200,200,200));
-    m_config.AddLong(_T("numberScale"),             42);
-    m_config.AddLong(_T("letterScale"),             75);
-
-    // Clue box
-    m_config.SetPath(_T("/Clue"));
-    m_config.AddFont(_T("font"),
-                     wxFont(12, wxFONTFAMILY_SWISS,
-                            wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-    m_config.AddPoint(_T("spacing"),    wxPoint(5, 5));
-
-    m_config.AddColor(_T("listForegroundColor"),        *wxBLACK);
-    m_config.AddColor(_T("listBackgroundColor"),        *wxWHITE);
-    m_config.AddColor(_T("selectedForegroundColor"),
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) );
-    m_config.AddColor(_T("selectedBackgroundColor"),
-        wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) );
-    m_config.AddColor(_T("crossingForegroundColor"),
-        m_config.GetDefaultColor(_T("selectedBackgroundColor")));
-    // Using the selected foreground color here can make the list look
-    // really ugly.  If, for example, the default selected text color
-    // is black, this would make the crossing clue's background color
-    // to default to black, which draws too much attention to that clue.
-    m_config.AddColor(_T("crossingBackgroundColor"),    *wxWHITE);
-
-    m_config.AddFont(_T("headingFont"),
-            wxFont(14, wxFONTFAMILY_SWISS,
-                   wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-    m_config.AddColor(_T("headingForegroundColor"),
-        wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT ) );
-    m_config.AddColor(_T("headingBackgroundColor"),
-        wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE ) );
-
-
-    // Clue prompt
-    m_config.SetPath(_T("/Clue Prompt"));
-    m_config.AddFont(_T("font"),      *wxSWISS_FONT);
-    m_config.AddColor(_T("foregroundColor"), *wxBLACK);
-    m_config.AddColor(_T("backgroundColor"), *wxWHITE);
-    m_config.AddString(_T("displayFormat"), _T("%N. %T"));
-
-
-    // Printing
-    m_config.SetPath(_T("/Printing"));
-    m_config.AddLong(_T("blackSquareBrightness"), 0);
-    m_config.AddLong(_T("gridAlignment"), wxALIGN_TOP | wxALIGN_RIGHT);
-    m_config.AddLong(_T("paperID"), wxPAPER_LETTER);
-    m_config.AddLong(_T("orientation"), wxPORTRAIT);
-    m_config.SetPath(_T("/Printing/Margins"));
-    m_config.AddLong(_T("left"), 15);
-    m_config.AddLong(_T("right"), 15);
-    m_config.AddLong(_T("top"), 15);
-    m_config.AddLong(_T("bottom"), 15);
-    m_config.SetPath(_T("/Printing/Fonts"));
-    m_config.AddBool(_T("useCustomFonts"), false);
-    m_config.AddFont(_T("gridLetterFont"), *wxSWISS_FONT);
-    m_config.AddFont(_T("gridNumberFont"), *wxSWISS_FONT);
-    m_config.AddFont(_T("clueFont"),       *wxSWISS_FONT);
 }
 
 
@@ -433,7 +406,7 @@ MyApp::RunLuaScript(const wxString & filename, int lastarg)
     wxString result;
     if (! FindLuaScript(filename, &result))
     {
-        XWordErrorMessage(_T("%s"), result.c_str());
+        XWordErrorMessage(NULL, _T("%s"), result.c_str());
         return;
     }
 
@@ -461,19 +434,14 @@ MyApp::RunLuaScript(const wxString & filename, int lastarg)
 void
 MyApp::OnLuaPrint(wxLuaEvent & evt)
 {
-    // Escape % to %% for printing
-    wxString msg = evt.GetString();
-    msg.Replace(_T("%"), _T("%%"));
-    wxLogDebug(msg);
+    wxLogDebug(_T("%s"), evt.GetString().c_str());
 }
 
 void
 MyApp::OnLuaError(wxLuaEvent & evt)
 {
     // Escape % to %% for printing
-    wxString msg = evt.GetString();
-    msg.Replace(_T("%"), _T("%%"));
-    XWordErrorMessage(msg);
+    LogLuaMessage(_T("(error) ") + evt.GetString());
 }
 
 #endif // XWORD_USE_LUA
