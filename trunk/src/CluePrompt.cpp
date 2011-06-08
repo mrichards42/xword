@@ -26,7 +26,7 @@
 #   include <wx/dcclient.h>
 #endif
 
-#include "utils/htmlparse.hpp"
+#include "html/parse.hpp"
 #include <wx/html/winpars.h>
 
 // this hack forces the linker to always link in m_* files

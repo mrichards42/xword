@@ -8,11 +8,7 @@ project "XWord"
     language "C++"
     files
     {
-        "*.hpp", "*.cpp", "*.h",
-        "widgets/*.hpp",   "widgets/*.cpp",   "widgets/*.h",
-        "utils/*.hpp",     "utils/*.cpp",     "utils/*.h",
-        "dialogs/*.hpp",   "dialogs/*.cpp",   "dialogs/*.h",
-        "xwordbind/*.hpp", "xwordbind/*.cpp", "xwordbind/*.h",
+        "**.hpp", "**.cpp", "**.h",
     }
 
     if USE_LUA then
