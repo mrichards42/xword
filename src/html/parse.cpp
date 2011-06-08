@@ -19,7 +19,7 @@
 // An HTML parser that respects text color (silly that the normal one
 // doesn't)
 
-#include "htmlparse.hpp"
+#include "parse.hpp"
 #include "wx/html/htmlwin.h"
 #include <wx/settings.h>
 

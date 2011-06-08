@@ -31,7 +31,7 @@
 #endif
 
 #include "htmlcluelist.hpp"
-#include "../utils/htmlparse.hpp"
+#include "../html/parse.hpp"
 
 #include <wx/html/htmlcell.h>
 #include <wx/html/winpars.h>
