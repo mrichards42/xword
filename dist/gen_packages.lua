@@ -1,19 +1,52 @@
-local serialize = require 'serialize'
+xword_version = "0.5"
+
 local lfs = require 'lfs'
+
+-- Save current directory and change package.path and package.cpath
+local currentdir = lfs.currentdir()
+lfs.chdir('../scripts')
+local scriptsdir = lfs.currentdir()
+lfs.chdir(currentdir)
+
+package.path = table.concat(
+    {
+        scriptsdir.."\\?.lua",
+        scriptsdir.."\\?\\init.lua",
+        scriptsdir.."\\?\\?.lua",
+        scriptsdir.."\\libs\\?.lua",
+        scriptsdir.."\\libs\\?\\init.lua",
+        scriptsdir.."\\libs\\?\\?.lua",
+    },
+    ';'
+)
+
+package.cpath = table.concat(
+    {
+        scriptsdir.."\\?.dll",
+        scriptsdir.."\\?51.dll",
+        scriptsdir.."\\libs\\?.dll",
+        scriptsdir.."\\libs\\?51.dll",
+    },
+    ';'
+)
+
+
+local serialize = require 'serialize'
 local join = require 'pl.path'.join
 local startswith = require 'pl.stringx'.startswith
 
 local function gen_packages(outdir)
-    -- Walk the xword.scriptsdir directory
+    -- Walk scriptsdir
     local packages = {
         xword = {
             name = "XWord",
-            version = xword.version,
+            version = xword_version,
             download = "blah",
         }
     }
-    for name in lfs.dir(xword.scriptsdir) do
-        local dirname = join(xword.scriptsdir, name)
+    lfs.mkdir(join(outdir, "_temp_packages"))
+    for name in lfs.dir(scriptsdir) do
+        local dirname = join(scriptsdir, name)
         if not startswith(name, '.') and name ~= 'xword' and name ~= 'libs'
             and lfs.attributes(dirname, 'mode') == 'directory'
         then
@@ -27,24 +60,24 @@ local function gen_packages(outdir)
                     -- create the scripts/packagename directory structure.
                     os.execute(string.format(
                         'xcopy /e "%s\\*.*" "%s\\"',
-                        join(xword.scriptsdir, name), join(xword.userdatadir, "_temp_packages", "scripts", name)
+                        join(scriptsdir, name), join(outdir, "_temp_packages", "scripts", name)
                     ))
                     os.execute(string.format(
                         'copy "%s" "%s\\"',
-                        join(xword.scriptsdir, name, 'info.lua'), join(xword.userdatadir, "_temp_packages")
+                        join(scriptsdir, name, 'info.lua'), join(outdir, "_temp_packages")
                     ))
                     -- Pack the file in a tar
                     local archive_name = join(outdir, name..'_'..info.version)
                     local rc = os.execute(string.format(
                         "%s a -r -x!.* %s.tar %s/*",
-                        join(xword.scriptsdir, 'xworddebug', '7za.exe'),
+                        '7za.exe',
                         archive_name,
-                        join(xword.userdatadir, "_temp_packages")
+                        join(outdir, "_temp_packages")
                     ))
                     -- Remove the temp directory
                     os.execute(string.format(
                         'rmdir /s /q "%s"',
-                        join(xword.userdatadir, "_temp_packages")
+                        join(outdir, "_temp_packages")
                     ))
                     if rc ~= 0 then
                         print("Error compressing files for package "..name)
@@ -52,7 +85,7 @@ local function gen_packages(outdir)
                         -- Zip the tar
                         local rc = os.execute(string.format(
                             "%s a %s.tar.gz %s.tar",
-                            join(xword.scriptsdir, 'xworddebug', '7za.exe'),
+                            '7za.exe',
                             archive_name,
                             archive_name
                         ))
@@ -77,24 +110,7 @@ local function gen_packages(outdir)
     print("Packages written to "..join(outdir, 'packages.lua'))
 end
 
-local function init()
-    xword.frame:AddMenuItem(
-        {'Debug'}, "Generate Package table and archives",
-        function(evt)
-            local dirname = wx.wxDirSelector(
-                "Select a directory for package output",
-                xword.userdatadir
-            )
-            if dirname and dirname ~= '' then
-                gen_packages(dirname)
-            end
-        end
-    )
-end
-
-if xword.frame then
-    init()
-else -- command line
-    lfs.mkdir([[D:\C++\xword\trunk\packages]])
-    gen_packages([[D:\C++\xword\trunk\packages]])
-end
+lfs.mkdir(join(lfs.currentdir(), 'packages'))
+gen_packages(join(lfs.currentdir(), 'packages'))
+print("Press any key to continue")
+io.read()
