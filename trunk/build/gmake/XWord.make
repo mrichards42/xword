@@ -68,7 +68,9 @@ OBJECTS := \
 	$(OBJDIR)/ClueListBox.o \
 	$(OBJDIR)/CluePanel.o \
 	$(OBJDIR)/CluePrompt.o \
+	$(OBJDIR)/config.o \
 	$(OBJDIR)/messages.o \
+	$(OBJDIR)/MyAuiMgr.o \
 	$(OBJDIR)/MyFrame.o \
 	$(OBJDIR)/MyStatusBar.o \
 	$(OBJDIR)/paths.o \
@@ -77,12 +79,16 @@ OBJECTS := \
 	$(OBJDIR)/SelectionEvent.o \
 	$(OBJDIR)/XGridCtrl.o \
 	$(OBJDIR)/XGridDrawer.o \
-	$(OBJDIR)/SizedText.o \
-	$(OBJDIR)/vlboxcache.o \
-	$(OBJDIR)/ToolInfo.o \
-	$(OBJDIR)/ToolManager.o \
+	$(OBJDIR)/Characters.o \
 	$(OBJDIR)/Preferences.o \
 	$(OBJDIR)/wxFB_Dialogs.o \
+	$(OBJDIR)/m_break.o \
+	$(OBJDIR)/parse.o \
+	$(OBJDIR)/render.o \
+	$(OBJDIR)/ToolInfo.o \
+	$(OBJDIR)/ToolManager.o \
+	$(OBJDIR)/htmlcluelist.o \
+	$(OBJDIR)/SizedText.o \
 	$(OBJDIR)/xword_bind.o \
 
 RESOURCES := \
@@ -154,7 +160,13 @@ $(OBJDIR)/CluePanel.o: ../../src/CluePanel.cpp
 $(OBJDIR)/CluePrompt.o: ../../src/CluePrompt.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+$(OBJDIR)/config.o: ../../src/config.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
 $(OBJDIR)/messages.o: ../../src/messages.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+$(OBJDIR)/MyAuiMgr.o: ../../src/MyAuiMgr.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
 $(OBJDIR)/MyFrame.o: ../../src/MyFrame.cpp
@@ -181,10 +193,22 @@ $(OBJDIR)/XGridCtrl.o: ../../src/XGridCtrl.cpp
 $(OBJDIR)/XGridDrawer.o: ../../src/XGridDrawer.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
-$(OBJDIR)/SizedText.o: ../../src/widgets/SizedText.cpp
+$(OBJDIR)/Characters.o: ../../src/dialogs/Characters.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
-$(OBJDIR)/vlboxcache.o: ../../src/widgets/vlboxcache.cpp
+$(OBJDIR)/Preferences.o: ../../src/dialogs/Preferences.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+$(OBJDIR)/wxFB_Dialogs.o: ../../src/dialogs/wxFB_Dialogs.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+$(OBJDIR)/m_break.o: ../../src/html/m_break.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+$(OBJDIR)/parse.o: ../../src/html/parse.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+$(OBJDIR)/render.o: ../../src/html/render.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
 $(OBJDIR)/ToolInfo.o: ../../src/utils/ToolInfo.cpp
@@ -193,10 +217,10 @@ $(OBJDIR)/ToolInfo.o: ../../src/utils/ToolInfo.cpp
 $(OBJDIR)/ToolManager.o: ../../src/utils/ToolManager.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
-$(OBJDIR)/Preferences.o: ../../src/dialogs/Preferences.cpp
+$(OBJDIR)/htmlcluelist.o: ../../src/widgets/htmlcluelist.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
-$(OBJDIR)/wxFB_Dialogs.o: ../../src/dialogs/wxFB_Dialogs.cpp
+$(OBJDIR)/SizedText.o: ../../src/widgets/SizedText.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
 $(OBJDIR)/xword_bind.o: ../../src/xwordbind/xword_bind.cpp

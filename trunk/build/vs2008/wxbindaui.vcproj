@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="wxbindaui"
-	ProjectGUID="{38F80279-E112-DD41-88B4-A0CAD3397C15}"
+	ProjectGUID="{1B9D8049-D6F4-8B45-B441-B919BC3A5D3A}"
 	RootNamespace="wxbindaui"
 	Keyword="Win32Proj"
 	>
