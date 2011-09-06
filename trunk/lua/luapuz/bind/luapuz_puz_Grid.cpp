@@ -13,8 +13,8 @@ extern "C" {
 #include "../luapuz_functions.hpp"
 #include "../luapuz_tracking.hpp"
 
-#include "luapuz_puz_Square.hpp"
 #include "luapuz_puz.hpp"
+#include "luapuz_puz_Square.hpp"
 #include "luapuz_std.hpp"
 #include "luapuz_puz_Grid.hpp"
 // ---------------------------------------------------------------------------
@@ -386,27 +386,6 @@ static int Grid_CheckGrid(lua_State * L)
     luapuz_pushSquareVector(L, &returns);
     return 1;
 }
-// { puz::Square*, ... } CheckWord(puz::Square * start, puz::Square * end, bool checkBlank = false, bool strictRebus = false)
-static int Grid_CheckWord(lua_State * L)
-{
-    puz::Grid * grid = luapuz_checkGrid(L, 1);
-    int argCount = lua_gettop(L);
-    puz::Square * start = luapuz_checkSquare(L, 2);
-    puz::Square * end = luapuz_checkSquare(L, 3);
-    bool checkBlank = (argCount >= 4 ? luapuz_checkboolean(L, 4) : false);
-    bool strictRebus = (argCount >= 5 ? luapuz_checkboolean(L, 5) : false);
-    try {
-        std::vector<puz::Square*> returns;
-        grid->CheckWord(&returns, start, end, checkBlank, strictRebus);
-        luapuz_pushSquareVector(L, &returns);
-        return 1;
-    }
-    catch (...) {
-        luapuz_handleExceptions(L);
-    }
-    lua_error(L); // We should have returned by now
-    return 0;
-}
 // bool CheckSquare(puz::Square & square, bool checkBlank = false, bool strictRebus = false)
 static int Grid_CheckSquare(lua_State * L)
 {
@@ -447,15 +426,11 @@ struct luapuz_FindSquare_Struct
 //----------------------
 // puz::Square * FindSquare(puz::Square * start, function findFunc,
 //                          puz::GridDirection direction = puz::ACROSS,
-//                          puz::FindDirection increment = puz::NEXT,
 //                          unsigned int options = puz::FIND_IN_GRID)
 //
 // puz::Square * FindSquare(function findFunc,
-//                          puz::GridDirection direction,
-//                          puz::FindDirection increment,
+//                          puz::GridDirection direction = puz::ACROSS,
 //                          unsigned int options = puz::FIND_IN_GRID)
-//
-// puz::Square * FindSquare(function findFunc, unsigned int options = puz::FIND_IN_GRID)
 //
 static int Grid_FindSquare(lua_State * L)
 {
@@ -469,38 +444,25 @@ static int Grid_FindSquare(lua_State * L)
         puz::Square * start = luapuz_checkSquare(L, 2);
         luaL_checktype(L, 3, LUA_TFUNCTION);
         puz::GridDirection direction = (argCount >= 4 ? luapuz_checkGridDirection(L, 4) : puz::ACROSS);
-        puz::FindDirection increment = (argCount >= 5 ? luapuz_checkFindDirection(L, 5) : puz::NEXT);
-        unsigned int options = (argCount >= 6 ? luapuz_checkuint(L, 6) : puz::FIND_IN_GRID);
+        unsigned int options = (argCount >= 5 ? luapuz_checkuint(L, 5) : puz::FIND_IN_GRID);
 
         // Push the function on the stack for luapuz_FindSquare_Struct
         lua_pushvalue(L, 3);
         luapuz_FindSquare_Struct func(L);
 
-        returns = grid->FindSquare(start, func, direction, increment, options);
+        returns = grid->FindSquare(start, func, direction, options);
     }
-    else if (argCount >= 4)  // Second overload
+    else  // Second overload
     {
         luaL_checktype(L, 2, LUA_TFUNCTION);
-        puz::GridDirection direction = luapuz_checkGridDirection(L, 3);
-        puz::FindDirection increment = luapuz_checkFindDirection(L, 4);
-        unsigned int options = (argCount >= 5 ? luapuz_checkuint(L, 5) : puz::FIND_IN_GRID);
+        puz::GridDirection direction = (argCount >= 3 ? luapuz_checkGridDirection(L, 3) : puz::ACROSS);
+        unsigned int options = (argCount >= 4 ? luapuz_checkuint(L, 4) : puz::FIND_IN_GRID);
 
         // Push the function on the stack for luapuz_FindSquare_Struct
         lua_pushvalue(L, 2);
         luapuz_FindSquare_Struct func(L);
 
-        returns = grid->FindSquare(func, direction, increment, options);
-    }
-    else  // Third overload
-    {
-        luaL_checktype(L, 2, LUA_TFUNCTION);
-        unsigned int options = (argCount >= 3 ? luapuz_checkuint(L, 3) : puz::FIND_IN_GRID);
-
-        // Push the function on the stack for luapuz_FindSquare_Struct
-        lua_pushvalue(L, 2);
-        luapuz_FindSquare_Struct func(L);
-
-        returns = grid->FindSquare(func, options);
+        returns = grid->FindSquare(func, direction, options);
     }
 
     luapuz_pushSquare(L, returns);
@@ -535,7 +497,6 @@ static const luaL_reg Gridlib[] = {
     {"SetCksum", Grid_SetCksum},
     {"IsBetween", Grid_IsBetween},
     {"CheckGrid", Grid_CheckGrid},
-    {"CheckWord", Grid_CheckWord},
     {"CheckSquare", Grid_CheckSquare},
     {"FindSquare", Grid_FindSquare},
     {NULL, NULL}

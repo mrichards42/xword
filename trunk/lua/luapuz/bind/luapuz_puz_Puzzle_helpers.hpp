@@ -18,7 +18,7 @@ extern "C" {
 // These expect the function to be on the stack.
 
 static void luapuz_LoadSave_Puzzle(puz::Puzzle * puz,
-                                   const puz::string_t & filename,
+                                   const std::string & filename,
                                    void * data)
 {
     // Cast to the correct type
@@ -29,7 +29,7 @@ static void luapuz_LoadSave_Puzzle(puz::Puzzle * puz,
     // Push the function with arguments
     lua_pushvalue(L, -1);
     luapuz_pushPuzzle(L, puz);
-    luapuz_pushstring_t(L, filename);
+    lua_pushstring(L, filename.c_str());
 
     // Call the function, check for errors.
     if (lua_pcall(L, 2, 0, 0) != 0)
@@ -44,7 +44,7 @@ static void luapuz_LoadSave_Puzzle(puz::Puzzle * puz,
 
 // Variations on LoadSave_Puzzle for error checking.
 static void luapuz_Load_Puzzle(puz::Puzzle * puz,
-                               const puz::string_t & filename,
+                               const std::string & filename,
                                void * data)
 {
     luapuz_LoadSave_Puzzle(puz, filename, data);
@@ -52,7 +52,7 @@ static void luapuz_Load_Puzzle(puz::Puzzle * puz,
 
 
 static void luapuz_Save_Puzzle(puz::Puzzle * puz,
-                               const puz::string_t & filename,
+                               const std::string & filename,
                                void * data)
 {
     luapuz_LoadSave_Puzzle(puz, filename, data);

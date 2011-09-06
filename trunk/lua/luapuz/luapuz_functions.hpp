@@ -81,6 +81,7 @@ static puz::string_t luapuz_checkstring_t(lua_State * L, int index)
         luapuz_handleExceptions(L);
     }
     lua_error(L);
+    return puzT(""); // This is just to stop the warnings.
 }
 
 

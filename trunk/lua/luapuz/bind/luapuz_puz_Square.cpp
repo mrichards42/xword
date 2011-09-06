@@ -103,36 +103,6 @@ static int Square_GetRow(lua_State * L)
     lua_pushnumber(L, returns);
     return 1;
 }
-// bool IsLast(puz::GridDirection dir, puz::FindDirection inc = puz::NEXT)
-static int Square_IsLast(lua_State * L)
-{
-    puz::Square * square = luapuz_checkSquare(L, 1);
-    int argCount = lua_gettop(L);
-    puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
-    puz::FindDirection inc = (argCount >= 3 ? luapuz_checkFindDirection(L, 3) : puz::NEXT);
-    bool returns = square->IsLast(dir, inc);
-    lua_pushboolean(L, returns);
-    return 1;
-}
-// bool IsFirst(puz::GridDirection dir, puz::FindDirection inc = puz::NEXT)
-static int Square_IsFirst(lua_State * L)
-{
-    puz::Square * square = luapuz_checkSquare(L, 1);
-    int argCount = lua_gettop(L);
-    puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
-    puz::FindDirection inc = (argCount >= 3 ? luapuz_checkFindDirection(L, 3) : puz::NEXT);
-    bool returns = square->IsFirst(dir, inc);
-    lua_pushboolean(L, returns);
-    return 1;
-}
-// bool IsSolutionBlank()
-static int Square_IsSolutionBlank(lua_State * L)
-{
-    puz::Square * square = luapuz_checkSquare(L, 1);
-    bool returns = square->IsSolutionBlank();
-    lua_pushboolean(L, returns);
-    return 1;
-}
 // bool IsWhite()
 static int Square_IsWhite(lua_State * L)
 {
@@ -154,6 +124,30 @@ static int Square_IsBlank(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     bool returns = square->IsBlank();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// bool IsSolutionWhite()
+static int Square_IsSolutionWhite(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->IsSolutionWhite();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// bool IsSolutionBlack()
+static int Square_IsSolutionBlack(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->IsSolutionBlack();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// bool IsSolutionBlank()
+static int Square_IsSolutionBlank(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->IsSolutionBlank();
     lua_pushboolean(L, returns);
     return 1;
 }
@@ -426,35 +420,82 @@ static int Square_SetNumber(lua_State * L)
     return 0;
 }
 
-// bool HasClue()
-// bool HasClue(puz::GridDirection dir)
-static int Square_HasClue(lua_State * L)
+// bool WantsClue()
+static int Square_WantsClue1(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    bool returns;
-    int argCount = lua_gettop(L);
-    if (argCount >= 2)
-    {
-        puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
-        returns = square->HasClue(dir);
-    }
-    else
-    {
-        returns = square->HasClue();
-    }
+    bool returns = square->WantsClue();
     lua_pushboolean(L, returns);
     return 1;
 }
-// void SetClue(puz::GridDirection dir, bool clue = true)
-static int Square_SetClue(lua_State * L)
+// bool WantsClue(puz::GridDirection dir)
+static int Square_WantsClue2(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
-    int argCount = lua_gettop(L);
     puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
-    bool clue = (argCount >= 3 ? luapuz_checkboolean(L, 3) : true);
-    square->SetClue(dir, clue);
+    bool returns = square->WantsClue(dir);
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// WantsClue overload resolution
+static int Square_WantsClue(lua_State * L)
+{
+
+    luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L) - 1;
+    if (argCount >= 1)
+    {
+        // Only one function
+        return Square_WantsClue2(L);
+    }
+    else if (argCount >= 0)
+    {
+        // Only one function
+        return Square_WantsClue1(L);
+    }
+    // Else we didn't find a function
+    luaL_error(L, "Unable to find overload");
     return 0;
 }
+
+// bool SolutionWantsClue()
+static int Square_SolutionWantsClue1(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->SolutionWantsClue();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// bool SolutionWantsClue(puz::GridDirection dir)
+static int Square_SolutionWantsClue2(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
+    bool returns = square->SolutionWantsClue(dir);
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// SolutionWantsClue overload resolution
+static int Square_SolutionWantsClue(lua_State * L)
+{
+
+    luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L) - 1;
+    if (argCount >= 1)
+    {
+        // Only one function
+        return Square_SolutionWantsClue2(L);
+    }
+    else if (argCount >= 0)
+    {
+        // Only one function
+        return Square_SolutionWantsClue1(L);
+    }
+    // Else we didn't find a function
+    luaL_error(L, "Unable to find overload");
+    return 0;
+}
+
 // void SetFlag(unsigned short flag)
 static int Square_SetFlag(lua_State * L)
 {
@@ -558,6 +599,14 @@ static int Square_SetColor(lua_State * L)
     square->SetColor(red, green, blue);
     return 0;
 }
+// puz::string_t GetHtmlColor()
+static int Square_GetHtmlColor(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    puz::string_t returns = square->GetHtmlColor();
+    luapuz_pushstring_t(L, returns);
+    return 1;
+}
 // void RemoveColor()
 static int Square_RemoveColor(lua_State * L)
 {
@@ -565,44 +614,59 @@ static int Square_RemoveColor(lua_State * L)
     square->RemoveColor();
     return 0;
 }
-// Square * Next(puz::GridDirection dir = puz::ACROSS, puz::FindDirection inc = puz::NEXT)
+// void SetHighlight(bool doit = true)
+static int Square_SetHighlight(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L);
+    bool doit = (argCount >= 2 ? luapuz_checkboolean(L, 2) : true);
+    square->SetHighlight(doit);
+    return 0;
+}
+// bool HasHighlight()
+static int Square_HasHighlight(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->HasHighlight();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// Square * Next(puz::GridDirection dir = puz::ACROSS)
 static int Square_Next(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     int argCount = lua_gettop(L);
     puz::GridDirection dir = (argCount >= 2 ? luapuz_checkGridDirection(L, 2) : puz::ACROSS);
-    puz::FindDirection inc = (argCount >= 3 ? luapuz_checkFindDirection(L, 3) : puz::NEXT);
-    puz::Square * returns = square->Next(dir, inc);
+    puz::Square * returns = square->Next(dir);
     luapuz_pushSquare(L, returns);
     return 1;
 }
-// Square * Prev(puz::GridDirection dir = puz::ACROSS, puz::FindDirection inc = puz::NEXT)
+// Square * Prev(puz::GridDirection dir = puz::ACROSS)
 static int Square_Prev(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     int argCount = lua_gettop(L);
     puz::GridDirection dir = (argCount >= 2 ? luapuz_checkGridDirection(L, 2) : puz::ACROSS);
-    puz::FindDirection inc = (argCount >= 3 ? luapuz_checkFindDirection(L, 3) : puz::NEXT);
-    puz::Square * returns = square->Prev(dir, inc);
+    puz::Square * returns = square->Prev(dir);
     luapuz_pushSquare(L, returns);
     return 1;
 }
-// Square * GetWordStart(puz::GridDirection dir)
-static int Square_GetWordStart(lua_State * L)
+// bool IsLast(puz::GridDirection dir)
+static int Square_IsLast(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
-    puz::Square * returns = square->GetWordStart(dir);
-    luapuz_pushSquare(L, returns);
+    bool returns = square->IsLast(dir);
+    lua_pushboolean(L, returns);
     return 1;
 }
-// Square * GetWordEnd(puz::GridDirection dir)
-static int Square_GetWordEnd(lua_State * L)
+// bool IsFirst(puz::GridDirection dir)
+static int Square_IsFirst(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     puz::GridDirection dir = luapuz_checkGridDirection(L, 2);
-    puz::Square * returns = square->GetWordEnd(dir);
-    luapuz_pushSquare(L, returns);
+    bool returns = square->IsFirst(dir);
+    lua_pushboolean(L, returns);
     return 1;
 }
 // bool HasWord(puz::GridDirection dir)
@@ -633,12 +697,12 @@ static int Square_IsSymbol(lua_State * L)
 static const luaL_reg Squarelib[] = {
     {"GetCol", Square_GetCol},
     {"GetRow", Square_GetRow},
-    {"IsLast", Square_IsLast},
-    {"IsFirst", Square_IsFirst},
-    {"IsSolutionBlank", Square_IsSolutionBlank},
     {"IsWhite", Square_IsWhite},
     {"IsBlack", Square_IsBlack},
     {"IsBlank", Square_IsBlank},
+    {"IsSolutionWhite", Square_IsSolutionWhite},
+    {"IsSolutionBlack", Square_IsSolutionBlack},
+    {"IsSolutionBlank", Square_IsSolutionBlank},
     {"GetText", Square_GetText},
     {"GetPlainText", Square_GetPlainText},
     {"GetTextSymbol", Square_GetTextSymbol},
@@ -658,8 +722,8 @@ static const luaL_reg Squarelib[] = {
     {"HasNumber", Square_HasNumber},
     {"GetNumber", Square_GetNumber},
     {"SetNumber", Square_SetNumber},
-    {"HasClue", Square_HasClue},
-    {"SetClue", Square_SetClue},
+    {"WantsClue", Square_WantsClue},
+    {"SolutionWantsClue", Square_SolutionWantsClue},
     {"SetFlag", Square_SetFlag},
     {"AddFlag", Square_AddFlag},
     {"RemoveFlag", Square_RemoveFlag},
@@ -672,11 +736,14 @@ static const luaL_reg Squarelib[] = {
     {"SetMissing", Square_SetMissing},
     {"HasColor", Square_HasColor},
     {"SetColor", Square_SetColor},
+    {"GetHtmlColor", Square_GetHtmlColor},
     {"RemoveColor", Square_RemoveColor},
+    {"SetHighlight", Square_SetHighlight},
+    {"HasHighlight", Square_HasHighlight},
     {"Next", Square_Next},
     {"Prev", Square_Prev},
-    {"GetWordStart", Square_GetWordStart},
-    {"GetWordEnd", Square_GetWordEnd},
+    {"IsLast", Square_IsLast},
+    {"IsFirst", Square_IsFirst},
     {"HasWord", Square_HasWord},
     {"IsValidString", Square_IsValidString},
     {"IsSymbol", Square_IsSymbol},
