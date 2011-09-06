@@ -12,23 +12,28 @@
 
 local tablex = require 'pl.tablex'
 
+local function findClueText(cluelist, number)
+    local idx, text = tablex.find_if(
+        cluelist,
+        function(clue)
+            if clue.number == number then
+                return clue.text
+            end
+        end)
+    return text
+end
+
 local function SwapAcrossDown(p)
-    -- Check to see if we can swap the grid
-    if p.Grid:IsDiagramless() then
-        xword.Message("Can't swap a diagramless puzzle.")
-    elseif not p:UsesNumberAlgorithm() then
-        xword.Message("Can't swap a puzzle with unclued squares.")
-    end
 
     -- Swap the clues
     -- --------------
-    local across = puz.ClueList()
-    local down = puz.ClueList()
+    local across = {}
+    local down = {}
 
-    -- Make a local copy because GetAcross / GetDown creates a lua table each
+    -- Make a local copy because GetClueList creates a lua table each
     -- time it is called.
-    local oldAcross = p:GetAcross()
-    local oldDown   = p:GetDown()
+    local oldAcross = p:GetClueList('Across')
+    local oldDown   = p:GetClueList('Down')
 
     -- Iterate the grid (downward), and look for all clue squares.
     -- These will all remain clue squares after the grid is swapped.
@@ -41,22 +46,27 @@ local function SwapAcrossDown(p)
     local square = p.Grid[{1, 1}]
 
     while(square) do
+        local nextNumber = false
         -- Down clues will become across clues
-        if square:HasClue(puz.DOWN) then
-            across:Insert(clueNumber, oldDown:Find(square.Number))
+        if square:WantsClue(puz.DOWN) then
+            table.insert(across, { number=clueNumber,
+                                   text=findClueText(oldDown, square.Number)})
+            nextNumber = true
         end
         -- Across clues will become down clues
-        if square:HasClue(puz.ACROSS) then
-            down:Insert(clueNumber, oldAcross:Find(square.Number))
+        if square:WantsClue(puz.ACROSS) then
+            table.insert(down, { number=clueNumber,
+                                 text=findClueText(oldAcross, square.Number)})
+            nextNumber = true
         end
         -- Next clue number
-        if square:HasClue() then clueNumber = clueNumber + 1 end
+        if nextNumber then clueNumber = clueNumber + 1 end
         -- Next square
         square = square:Next(puz.DOWN)
     end
 
-    p.Across = across
-    p.Down = down
+    p:SetClueList('Across', across)
+    p:SetClueList('Down', down)
 
 
     -- Swap the grid
@@ -73,14 +83,13 @@ local function SwapAcrossDown(p)
     -- Copy over metadata
     newGrid.Type = p.Grid.Type
     newGrid.Flag = p.Grid.Flag
-    newGrid.Cksum = p.Grid.Cksum
-    newGrid.Key = p.Grid.Key
 
     -- Set the puzzle's grid.  The puzzle now has ownership of the grid.
     -- lua will not garbage collect the grid's userdata.
     p.Grid = newGrid
 
     p:NumberGrid()
+    p:GenerateWords()
     p:NumberClues()
 
     xword.frame:ShowPuzzle(p)
@@ -96,6 +105,15 @@ local function init()
 
             local p = xword.frame.Puzzle
             local frame = xword.frame
+
+            -- Check to see if we can swap the grid
+            if p.Grid:IsDiagramless() then
+                xword.Message("Can't swap a diagramless puzzle.")
+                return
+            elseif not p:UsesNumberAlgorithm() then
+                xword.Message("Can't swap a puzzle with an irregular grid.")
+                return
+            end
 
             -- Save the current square and direction focus
             local square = frame:GetFocusedSquare()
