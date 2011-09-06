@@ -74,6 +74,7 @@ static void xword_setup_lua(wxLuaState & lua)
     //    imagesdir
     //    userdatadir
     //    isportable
+    //    firstrun
     lua_getglobal(L, "xword");
 
     lua_pushstring(L, wx2lua(GetConfigDir().c_str()));
@@ -93,6 +94,9 @@ static void xword_setup_lua(wxLuaState & lua)
 
     lua_pushstring(L, wx2lua(XWORD_VERSION_STRING));
     lua_setfield(L, -2, "version");
+
+    lua_pushboolean(L, wxGetApp().FirstRun());
+    lua_setfield(L, -2, "firstrun");
 
     lua_pop(L, 1);
 

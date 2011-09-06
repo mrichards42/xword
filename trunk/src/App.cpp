@@ -83,9 +83,12 @@ MyApp::OnInit()
     // "portable_mode_enabled" in the executable directory.
     // Portable mode can also be enabled via command line switches:
     // --portable OR -p
-    wxFileName portable(argv[0]);
-    portable.SetFullName(_T("portable_mode_enabled"));
-    m_isPortable = portable.FileExists();
+    wxFileName file_test(argv[0]);
+    file_test.SetFullName(_T("portable_mode_enabled"));
+    m_isPortable = file_test.FileExists();
+
+    // This will be set in SetupConfig()
+    m_firstRun = false;
 
     wxCmdLineParser cmd(cmdLineDesc, argc, argv);
 
@@ -322,8 +325,16 @@ MyApp::SetupConfig()
         wxFileConfig::Set( new wxFileConfig() );
     }
 
+    // First run
+    wxConfigBase * config = wxFileConfig::Get();
+    if (config->Read(_T("XWordVersion"), _T("None")) != XWORD_VERSION_STRING)
+    {
+        m_firstRun = true;
+        config->Write(_T("XWordVersion"), XWORD_VERSION_STRING);
+    }
+
     // Setup our config manager
-    m_config.SetConfig(wxFileConfig::Get());
+    m_config.SetConfig(config);
 }
 
 

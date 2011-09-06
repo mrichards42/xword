@@ -43,7 +43,7 @@ extern wxPageSetupDialogData* g_pageSetupData;
 #define XWORD_APP_NAME       _T("XWord")
 // Make sure this is made up of only numbers (for lua)
 #define XWORD_VERSION_STRING _T("0.5")
-#define XWORD_COPYRIGHT_STRING _T("(C) 2010 Mike Richards <mrichards42@gmx.com>")
+#define XWORD_COPYRIGHT_STRING _T("(C) 2011 Mike Richards <mrichards42@gmx.com>")
 
 class MyApp : public wxApp
 {
@@ -59,6 +59,9 @@ public:
 
     // Portable mode
     bool IsPortable() { return m_isPortable; }
+
+    // First run
+    bool FirstRun() { return m_firstRun; }
 
     // Lua logging
 #ifdef XWORD_USE_LUA
@@ -78,6 +81,8 @@ private:
 
     // Portable mode
     bool m_isPortable;
+    // First run
+    bool m_firstRun;
 
 #ifdef XWORD_USE_LUA
     enum CmdLineScriptValue {
