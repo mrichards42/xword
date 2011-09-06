@@ -20,9 +20,16 @@
 
 // Wrapper for minizip
 
-namespace unzip {
 
-#include "minizip/unzip.h"
+// ---------------------------------------------------------------------------
+// ZIP
+// ---------------------------------------------------------------------------
+
+#include "minizip/zip.h"
+#include <string>
+#include <cassert>
+
+namespace zip {
 
 class Archive;
 
@@ -30,7 +37,7 @@ class File
 {
     friend class Archive;
 public:
-    File(unzFile archive = NULL)
+    File(zipFile archive = NULL)
         : m_open(false)
     {
         SetArchive(archive);
@@ -38,67 +45,21 @@ public:
 
     ~File() { Close(); }
 
-    bool Open()
-    {
-        assert(! m_open);
-        m_open = true;
-        return unzOpenCurrentFile(m_archive) == UNZ_OK;
+    bool Open(const std::string & filename);
+    bool Close();
 
-    }
-
-    bool Close()
-    {
-        if (m_open)
-        {
-            m_open = false;
-            return unzCloseCurrentFile(m_archive) == UNZ_OK;
-        }
-        return false;
-    }
-
-    std::string GetName()
-    {
-        unz_file_info info;
-        char name[1024];
-        unzGetCurrentFileInfo(m_archive, &info, name, 1024, NULL, 0, NULL, 0);
-        return std::string(name);
-    }
-
-    bool First()
-    {
-        Close();
-        m_isOk = unzGoToFirstFile(m_archive) == UNZ_OK;
-        return m_isOk;
-    }
-
-    bool Next()
-    {
-        Close();
-        m_isOk = unzGoToNextFile(m_archive) == UNZ_OK;
-        return m_isOk;
-    }
-
-    int Read(void * buf, unsigned int len)
-    {
-        assert(m_open);
-        return unzReadCurrentFile(m_archive, buf, len);
-    }
+    int Write(const void * buf, unsigned int len);
 
     operator void * () const { return m_isOk ? m_archive : NULL; }
 
 protected:
-    unzFile m_archive;
+    zipFile m_archive;
     bool m_open;
     bool m_isOk;
 
-    void SetArchive(unzFile archive)
-    {
-        Close();
-        m_archive = archive;
-        m_isOk = false;
-        m_open = false;
-    }
+    void SetArchive(zipFile archive);
 };
+
 
 class Archive
 {
@@ -118,48 +79,88 @@ public:
 
     ~Archive() { Close(); }
 
-    bool Open(const std::string & filename)
+    bool Open(const std::string & filename);
+
+    // Open a file for writing in the zip archive
+    File & OpenFile(const std::string & filename);
+
+    bool Close();
+
+    operator void * () const { return m_isOk ? m_handle : NULL; }
+
+protected:
+    zipFile m_handle;
+    File m_currentFile;
+    bool m_isOk;
+};
+
+} // namespace zip
+
+// ---------------------------------------------------------------------------
+// UNZIP
+// ---------------------------------------------------------------------------
+
+#include "minizip/unzip.h"
+
+namespace unzip {
+
+class Archive;
+
+class File
+{
+    friend class Archive;
+public:
+    File(unzFile archive = NULL)
+        : m_open(false)
     {
-        Close();
-        m_handle = unzOpen(filename.c_str());
-        if (m_handle)
-        {
-            m_currentFile.SetArchive(m_handle);
-            m_isOk = true;
-            return true;
-        }
-        m_currentFile.SetArchive(NULL);
-        m_isOk = false;
-        return false;
+        SetArchive(archive);
     }
 
-    int GetFileCount()
+    ~File() { Close(); }
+
+    bool Open();
+    bool Close();
+    std::string GetName();
+
+    bool First();
+    bool Next();
+
+    int Read(void * buf, unsigned int len);
+
+    operator void * () const { return m_isOk ? m_archive : NULL; }
+
+protected:
+    unzFile m_archive;
+    bool m_open;
+    bool m_isOk;
+
+    void SetArchive(unzFile archive);
+};
+
+
+class Archive
+{
+    friend class File;
+public:
+    Archive()
+        : m_handle(NULL),
+          m_isOk(false)
+    {}
+
+    explicit Archive(const std::string & filename)
+        : m_handle(NULL),
+          m_isOk(false)
     {
-        unz_global_info info;
-        if (unzGetGlobalInfo(m_handle, &info) == UNZ_OK)
-            return info.number_entry;
-        return -1;
+        Open(filename);
     }
 
-    bool Close()
-    {
-        m_currentFile.SetArchive(NULL);
-        m_isOk = false;
-        if (m_handle)
-        {
-            int result = unzClose(m_handle);
-            m_handle = NULL;
-            return result == UNZ_OK;
-        }
-        return false;
-    }
+    ~Archive() { Close(); }
 
-    File & First()
-    {
-        m_currentFile.First();
-        assert(m_currentFile);
-        return m_currentFile;
-    }
+    bool Open(const std::string & filename);
+    int GetFileCount();
+    bool Close();
+
+    File & First();
 
     operator void * () const { return m_isOk ? m_handle : NULL; }
 
@@ -170,6 +171,7 @@ protected:
 };
 
 } // namespace unzip
+
 
 #endif // PUZ_MINIZIP_WRAPPER_H
 
