@@ -32,11 +32,11 @@ public:
     wxPuzEvent(wxEventType commandType = wxEVT_NULL, int id = 0);
 
     puz::Clue * GetClue() { return m_clue; }
-    puz::Word * GetWord() { return m_word; }
+    const puz::Word * GetWord() { return m_word; }
     puz::Square * GetSquare() { return m_square; }
 
     void SetClue(puz::Clue * clue) { m_clue = clue; }
-    void SetWord(puz::Word * word) { m_word = word; }
+    void SetWord(const puz::Word * word) { m_word = word; }
     void SetSquare(puz::Square * square) { m_square = square; }
 
     // required for sending with wxPostEvent()
@@ -45,7 +45,7 @@ public:
 
 private:
     puz::Clue * m_clue;
-    puz::Word * m_word;
+    const puz::Word * m_word;
     puz::Square * m_square;
 };
 

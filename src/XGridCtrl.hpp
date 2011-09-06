@@ -189,9 +189,9 @@ public:
     {
         wxClientDC dc(this);
         DoPrepareDC(dc);
-        puz::Word::const_iterator it;
+        puz::square_iterator it;
         for (it = m_focusedWord->begin(); it != m_focusedWord->end(); ++it)
-            DrawSquare(dc, **it);
+            DrawSquare(dc, *it);
     }
 
     bool SetSquareText(puz::Square & square, const wxString & text = _T(""));
