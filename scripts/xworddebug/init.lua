@@ -84,10 +84,9 @@ local function init()
     g = p.Grid
 
     require 'xworddebug.globals'
-    require 'xworddebug.database'
-    require 'xworddebug.html'
     require 'xworddebug.test_files'
     require 'xworddebug.gen_packages'
+    require 'xworddebug.html'
 
     -- This is always last
     require 'xworddebug.interp'

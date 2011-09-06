@@ -9,7 +9,7 @@ local function gen_packages(outdir)
         xword = {
             name = "XWord",
             version = xword.version,
-            
+            download = "blah",
         }
     }
     for name in lfs.dir(xword.scriptsdir) do
@@ -19,18 +19,32 @@ local function gen_packages(outdir)
         then
             local info = serialize.loadfile(join(dirname, 'info.lua'))
             if info then
-                if info.name and info.requires and info.version then
+                if info.name and info.requires and info.version and info.packagename then
                     -- Add info to the package table
-                    info.packagename = name
                     info.download = string.format("http://sourceforge.net/projects/wx-xword/files/lua/%s_%s.tar.gz", info.packagename, info.version)
                     table.insert(packages, info)
+                    -- Copy the files to a temp directory so that we can
+                    -- create the scripts/packagename directory structure.
+                    os.execute(string.format(
+                        'xcopy /e "%s\\*.*" "%s\\"',
+                        join(xword.scriptsdir, name), join(xword.userdatadir, "_temp_packages", "scripts", name)
+                    ))
+                    os.execute(string.format(
+                        'copy "%s" "%s\\"',
+                        join(xword.scriptsdir, name, 'info.lua'), join(xword.userdatadir, "_temp_packages")
+                    ))
                     -- Pack the file in a tar
                     local archive_name = join(outdir, name..'_'..info.version)
                     local rc = os.execute(string.format(
                         "%s a -r -x!.* %s.tar %s/*",
                         join(xword.scriptsdir, 'xworddebug', '7za.exe'),
                         archive_name,
-                        join(xword.scriptsdir, name)
+                        join(xword.userdatadir, "_temp_packages")
+                    ))
+                    -- Remove the temp directory
+                    os.execute(string.format(
+                        'rmdir /s /q "%s"',
+                        join(xword.userdatadir, "_temp_packages")
                     ))
                     if rc ~= 0 then
                         print("Error compressing files for package "..name)

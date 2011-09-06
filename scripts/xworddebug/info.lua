@@ -1,6 +1,7 @@
 return {
     name = "XWord Debug",
-    version = "0.4",
+    packagename = "xworddebug",
+    version = "0.5",
     description = "Debug and lua script development package for XWord.",
-    requires = "0.4"
+    requires = "0.5"
 }
