@@ -6427,6 +6427,7 @@ static int LUACALL wxLua_wxFileSystem_OpenFile(lua_State *L)
     wxFileSystem * self = (wxFileSystem *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFileSystem);
     // call OpenFile
     wxFSFile* returns = (wxFSFile*)self->OpenFile(location, flags);
+    wxluaO_addgcobject(L, returns);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFSFile);
 
