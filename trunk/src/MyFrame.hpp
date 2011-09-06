@@ -79,7 +79,8 @@ public:
 
     // XWord puzzle loading / saving
     //-----------
-    bool LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL);
+    bool LoadPuzzle(const wxString & filename);
+    bool LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler);
     bool SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL);
     bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
     void CheckPuzzle();
@@ -108,6 +109,7 @@ public:
 
     void SaveLayout      (const wxString & name);
     bool LoadLayout      (const wxString & name, bool update = true);
+    void RemoveLayout    (const wxString & name);
     bool LoadPerspective (const wxString & perspective, bool update = true);
 
     // Status bar
@@ -251,6 +253,7 @@ private:
     void OnSavePuzzle  (wxCommandEvent & WXUNUSED(evt));
     void OnSavePuzzleAs(wxCommandEvent & WXUNUSED(evt));
     void OnClosePuzzle (wxCommandEvent & WXUNUSED(evt))   { ClosePuzzle(true); }
+    void OnDeletePuzzle(wxCommandEvent & WXUNUSED(evt));
     void OnQuit        (wxCommandEvent & WXUNUSED(evt))   { Close(); }
 
     // Zoom
@@ -376,6 +379,11 @@ MyFrame::SaveLayout(const wxString & name)
                        m_mgr.SavePerspective());
 }
 
+inline void
+MyFrame::RemoveLayout(const wxString & name)
+{
+    GetConfig()->DeleteEntry(wxString::Format(_T("/Layouts/%s"), name.c_str()));
+}
 
 
 inline bool

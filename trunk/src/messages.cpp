@@ -91,6 +91,13 @@ const MessageDesc messageTable [] = {
         wxYES_NO | wxCANCEL | wxICON_QUESTION
     },
 
+    // MSG_DELETE_PUZ
+    {
+        _T("Delete this file?"),
+        questionTitle,
+        wxYES_NO | wxICON_QUESTION
+    },
+
     // MSG_REVEAL_ALL
     {
         _T("This will reveal the entire grid.  Continue?"),

@@ -32,6 +32,7 @@ enum XWordMessageId
     MSG_STD_EXCEPTION,
     MSG_UNKNOWN_ERROR,
     MSG_SAVE_PUZ,
+    MSG_DELETE_PUZ,
 
     // Check / reveal messages
     MSG_REVEAL_ALL,

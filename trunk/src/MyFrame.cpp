@@ -76,6 +76,7 @@ enum toolIds
     //wxID_SAVE,
     //wxID_SAVEAS,
     //wxID_CLOSE,
+    //wxID_DELETE,
 
     //wxID_EXIT,
 
@@ -175,6 +176,9 @@ MyFrame::ManageTools()
 
         { wxID_SAVEAS,      wxITEM_NORMAL, _T("&Save As..."),   _T("save"), NULL,
                      _handler(MyFrame::OnSavePuzzleAs) },
+
+        { wxID_DELETE,       wxITEM_NORMAL, _T("&Delete Puzzle"), _T("delete"), NULL,
+                     _handler(MyFrame::OnDeletePuzzle) },
 
         { wxID_CLOSE,       wxITEM_NORMAL, _T("&Close\tCtrl+W"), NULL, NULL,
                      _handler(MyFrame::OnClosePuzzle) },
@@ -321,37 +325,8 @@ public:
             m_frame->RunLuaScript(filenames.Item(0));
         // Otherwise try to open as a puzzle
         else
-        {
-            // Try to load the dropped puzzle using import.load from lua.
-
-            lua_State * L = m_frame->GetwxLuaState().GetLuaState();
-
-            // Push import.load function for luapuz_Load_Puzzle.
-            lua_getglobal(L, "import");
-            if (! lua_istable(L, -1))
-                lua_pop(L, 1);
-            else
-            {
-                lua_getfield(L, -1, "load");
-                if (! lua_isfunction(L, -1))
-                    lua_pop(L, 1);
-                else
-                {
-                    // Create the puz::Puzzle file handler
-                    puz::Puzzle::FileHandlerDesc desc;
-                    desc.data = L;
-                    desc.handler = luapuz_Load_Puzzle;
-
-                    m_frame->LoadPuzzle(filenames.Item(0), &desc);
-
-                    lua_pop(L, 2);
-                    return true;
-                }
-            }
-            m_frame->LoadPuzzle(filenames.Item(0));
-        }
 #endif
-        m_frame->LoadPuzzle(filenames.Item(0));
+            m_frame->LoadPuzzle(filenames.Item(0));
         return true;
     }
 
@@ -470,9 +445,45 @@ MyFrame::GetSaveTypeString()
 {
     return _T("Across Lite Format (*.puz)|*.puz")
            _T("|")
-           _T("XPF (*.xml)|*.xml");
+           _T("XPF (*.xml)|*.xml")
+           _T("|")
+           _T("JPZ (*.jpz)|*.jpz");
 }
 
+bool
+MyFrame::LoadPuzzle(const wxString & filename)
+{
+    // Load a puzzle without a handler
+#if XWORD_USE_LUA
+    // If we dont' have a handler, use import.load
+    lua_State * L = GetwxLuaState().GetLuaState();
+
+    // Push import.load function for luapuz_Load_Puzzle.
+    lua_getglobal(L, "import");
+    if (! lua_istable(L, -1))
+        lua_pop(L, 1);
+    else
+    {
+        lua_getfield(L, -1, "load");
+        if (! lua_isfunction(L, -1))
+            lua_pop(L, 1);
+        else
+        {
+            // Create the puz::Puzzle file handler
+            puz::Puzzle::FileHandlerDesc desc;
+            desc.data = L;
+            desc.handler = luapuz_Load_Puzzle;
+
+            bool ret = LoadPuzzle(filename, &desc);
+
+            lua_pop(L, 2);
+            return ret;
+        }
+    }
+#endif
+    // Otherwise, use the default behavior
+    return LoadPuzzle(filename, NULL);
+}
 
 bool
 MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
@@ -498,6 +509,8 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
         HandlePuzException();
     }
 
+    LoadLayout(_T("(Current)"), false);
+    RemoveLayout(_T("(Current)"));
     ShowPuzzle();
 
     m_filename = filename;
@@ -524,14 +537,18 @@ MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     m_puz.m_time = m_time;
     m_puz.m_isTimerRunning = IsTimerRunning();
 
-    wxString fn = filename;
+    std::string fn = puz::encode_utf8(wx2puz(filename));
+    if (! puz::Puzzle::CanSave(fn))
+        fn.clear();
+
     if (fn.empty())
-        fn = wxFileSelector(
-                 _T("Save Puzzle As"),
-                 wxEmptyString, wxEmptyString, _T("puz"),
-                 GetSaveTypeString(),
-                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT
-            );
+        fn = puz::encode_utf8(wx2puz(
+                wxFileSelector(
+                     _T("Save Puzzle As"),
+                     wxEmptyString, wxEmptyString, _T("puz"),
+                     GetSaveTypeString(),
+                     wxFD_SAVE | wxFD_OVERWRITE_PROMPT)
+            ));
 
     if (fn.empty())
         return false;
@@ -540,8 +557,8 @@ MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
 
     try
     {
-        m_puz.Save(wx2file(fn), handler);
-        m_filename = fn;
+        m_puz.Save(fn, handler);
+        m_filename = puz2wx(puz::decode_utf8(fn));
         m_isModified = false;
 
         // Reset save/save as flag
@@ -602,6 +619,11 @@ MyFrame::ClosePuzzle(bool prompt)
 
     SetStatus(_T("No file loaded"));
     m_puz.Clear();
+
+    // As hard as we try to save wxAUI pane info for clue lists, we can't
+    // save dock info, so we'll just save the current perspective here and
+    // then load the current perspective when we load a new puzzle.
+    SaveLayout(_T("(Current)"));
 
     ShowPuzzle();
     return true;
@@ -743,8 +765,9 @@ MyFrame::ShowClues()
                 m_mgr.AddPane(clues,
                               wxAuiPaneInfo(baseInfo)
                               .BestSize(300,-1)
-                              .Float()
                               .Caption(label)
+                              .Left()
+                              .Layer(50)
                               .Name(id) );
             }
             // Set the heading and clue list for the panel
@@ -909,6 +932,7 @@ MyFrame::CreateToolBar()
 
     m_toolMgr.Add(tb, wxID_OPEN);
     m_toolMgr.Add(tb, wxID_SAVE);
+    m_toolMgr.Add(tb, wxID_DELETE);
     tb->AddSeparator();
     m_toolMgr.Add(tb, wxID_ZOOM_IN);
     m_toolMgr.Add(tb, wxID_ZOOM_FIT);
@@ -945,6 +969,7 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, wxID_OPEN);
         m_toolMgr.Add(menu, wxID_SAVE);
         m_toolMgr.Add(menu, wxID_SAVEAS);
+        m_toolMgr.Add(menu, wxID_DELETE);
         m_toolMgr.Add(menu, wxID_CLOSE);
         menu->AppendSeparator();
         m_toolMgr.Add(menu, wxID_PREFERENCES);
@@ -1145,8 +1170,6 @@ MyFrame::ManageWindows()
                   .Hide()
                   .Caption(_T("Notes"))
                   .Name(_T("Notes")));
-
-    SaveLayout(_T("XWord Default"));
 }
 
 
@@ -1189,6 +1212,7 @@ MyFrame::EnableTools(bool enable)
     m_toolMgr.Enable(wxID_SAVE,    enable);
     m_toolMgr.Enable(wxID_SAVEAS, enable);
     m_toolMgr.Enable(wxID_CLOSE, enable);
+    m_toolMgr.Enable(wxID_DELETE, enable);
     m_toolMgr.Enable(ID_TIMER, enable);
     m_toolMgr.Enable(wxID_PREVIEW, enable);
     m_toolMgr.Enable(wxID_PRINT, enable);
@@ -1290,6 +1314,7 @@ MyFrame::LoadConfig()
         m_toolMgr.Check(wxID_ZOOM_FIT);
         m_XGridCtrl->FitGrid();
     }
+    m_XGridCtrl->SetBoxSize(config.Grid.boxSize());
 
 
     // Printing
@@ -1341,6 +1366,11 @@ MyFrame::SaveConfig()
     }
     config.Window.maximized = IsMaximized();
 
+    // Grid
+    //-----
+    config.Grid.boxSize = m_XGridCtrl->GetBoxSize();
+    config.Grid.fit = m_toolMgr.IsChecked(wxID_ZOOM_FIT);
+
     config.AutoUpdate(true);
     // The rest of the config has only changed if the user used the
     // preferences dialog, in which case the prefs dialog has already
@@ -1366,7 +1396,7 @@ puz::Square *
 MyFrame::SetFocusedSquare(puz::Square * square)
 {
     if (m_XGridCtrl->IsEmpty())
-        return false;
+        return NULL;
     else
         return m_XGridCtrl->SetFocusedSquare(square);
 }
@@ -1386,8 +1416,8 @@ MyFrame::GetFocusedDirection() const
 void
 MyFrame::SetFocusedDirection(short direction)
 {
-    // TODO: remove this or fix SetDirection
-    //m_XGridCtrl->SetDirection(direction);
+    if (! m_XGridCtrl->IsEmpty())
+        m_XGridCtrl->SetFocusedSquare(NULL, direction);
 }
 
 puz::Clue *
@@ -1439,6 +1469,13 @@ void
 MyFrame::OnSavePuzzle(wxCommandEvent & WXUNUSED(evt))
 {
     SavePuzzle(m_filename);
+}
+
+void
+MyFrame::OnDeletePuzzle(wxCommandEvent & WXUNUSED(evt))
+{
+    if (XWordPrompt(this, MSG_DELETE_PUZ) && ClosePuzzle(false))
+        wxRemoveFile(m_filename);
 }
 
 
@@ -1952,7 +1989,7 @@ MyFrame::OnPrintPreview(wxCommandEvent & WXUNUSED(evt))
     }
 
     wxPreviewFrame *frame = new wxPreviewFrame(preview, this,
-                                               _T("Demo Print Preview"));
+                                               _T("Print Preview"));
     frame->Centre();
     frame->Initialize();
     frame->Show();
