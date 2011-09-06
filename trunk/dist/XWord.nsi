@@ -28,7 +28,7 @@ SetCompressor lzma
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page
-!insertmacro MUI_PAGE_LICENSE "${XWORD_TRUNK}\build\gpl-3.0.rtf"
+!insertmacro MUI_PAGE_LICENSE "${XWORD_TRUNK}\dist\gpl-3.0.rtf"
 
 
 ; Portable page (custom)
@@ -194,7 +194,7 @@ Section "MainSection" SEC01
         ; Default layouts
         ; Skip this file if it already exists
         IfFileExists $CONFIGDIR\config.ini +2 0
-        File "${XWORD_TRUNK}\build\config.ini"
+        File "${XWORD_TRUNK}\dist\config.ini"
 
     SetOutPath "$SCRIPTSDIR"
 
