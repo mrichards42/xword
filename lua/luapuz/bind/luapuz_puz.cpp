@@ -21,16 +21,72 @@ extern "C" {
 #include "luapuz_puz_Puzzle.hpp"
 #include "luapuz_puz_Square.hpp"
 #include "luapuz_puz.hpp"
-// GridDirection SwapDirection(puz::GridDirection dir)
-static int puz_SwapDirection(lua_State * L)
+// GridDirection ConstrainDirection(unsigned short dir)
+static int puz_ConstrainDirection(lua_State * L)
 {
-    puz::GridDirection dir = luapuz_checkGridDirection(L, 1);
-    puz::GridDirection returns = SwapDirection(dir);
+    unsigned short dir = luapuz_checkuint(L, 1);
+    puz::GridDirection returns = puz::ConstrainDirection(dir);
     luapuz_pushGridDirection(L, returns);
     return 1;
 }
+// unsigned short InvertDirection(unsigned short dir)
+static int puz_InvertDirection(lua_State * L)
+{
+    unsigned short dir = luapuz_checkuint(L, 1);
+    unsigned short returns = puz::InvertDirection(dir);
+    lua_pushnumber(L, returns);
+    return 1;
+}
+// bool IsHorizontal(unsigned short dir)
+static int puz_IsHorizontal(lua_State * L)
+{
+    unsigned short dir = luapuz_checkuint(L, 1);
+    bool returns = puz::IsHorizontal(dir);
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// bool IsDiagonal(unsigned short dir)
+static int puz_IsDiagonal(lua_State * L)
+{
+    unsigned short dir = luapuz_checkuint(L, 1);
+    bool returns = puz::IsDiagonal(dir);
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// bool IsVertical(unsigned short dir)
+static int puz_IsVertical(lua_State * L)
+{
+    unsigned short dir = luapuz_checkuint(L, 1);
+    bool returns = puz::IsVertical(dir);
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// bool AreInLine(unsigned short dir1, unsigned short dir2)
+static int puz_AreInLine(lua_State * L)
+{
+    unsigned short dir1 = luapuz_checkuint(L, 1);
+    unsigned short dir2 = luapuz_checkuint(L, 2);
+    bool returns = puz::AreInLine(dir1, dir2);
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// unsigned short GetDirection(puz::Square & first, puz::Square & second)
+static int puz_GetDirection(lua_State * L)
+{
+    puz::Square * first = luapuz_checkSquare(L, 1);
+    puz::Square * second = luapuz_checkSquare(L, 2);
+    unsigned short returns = puz::GetDirection(*first, *second);
+    lua_pushnumber(L, returns);
+    return 1;
+}
 static const luaL_reg puzlib[] = {
-    {"SwapDirection", puz_SwapDirection},
+    {"ConstrainDirection", puz_ConstrainDirection},
+    {"InvertDirection", puz_InvertDirection},
+    {"IsHorizontal", puz_IsHorizontal},
+    {"IsDiagonal", puz_IsDiagonal},
+    {"IsVertical", puz_IsVertical},
+    {"AreInLine", puz_AreInLine},
+    {"GetDirection", puz_GetDirection},
     {NULL, NULL}
 };
 
@@ -43,6 +99,17 @@ const char * GridDirection_meta = "puz.GridDirection";
 const luapuz_enumReg GridDirection_reg[] = {
     {"ACROSS", puz::ACROSS},
     {"DOWN", puz::DOWN},
+    {"LEFT", puz::LEFT},
+    {"RIGHT", puz::RIGHT},
+    {"UP", puz::UP},
+    {"NORTH", puz::NORTH},
+    {"SOUTH", puz::SOUTH},
+    {"EAST", puz::EAST},
+    {"WEST", puz::WEST},
+    {"DIAGONAL_SE", puz::DIAGONAL_SE},
+    {"DIAGONAL_SW", puz::DIAGONAL_SW},
+    {"DIAGONAL_NE", puz::DIAGONAL_NE},
+    {"DIAGONAL_NW", puz::DIAGONAL_NW},
     {NULL, NULL}
 };
 
@@ -69,9 +136,11 @@ const luapuz_enumReg GextFlag_reg[] = {
     {"FLAG_PENCIL", puz::FLAG_PENCIL},
     {"FLAG_BLACK", puz::FLAG_BLACK},
     {"FLAG_X", puz::FLAG_X},
-    {"FLAG_RED", puz::FLAG_RED},
+    {"FLAG_REVEALED", puz::FLAG_REVEALED},
     {"FLAG_CIRCLE", puz::FLAG_CIRCLE},
     {"ACROSS_LITE_MASK", puz::ACROSS_LITE_MASK},
+    {"FLAG_COLOR", puz::FLAG_COLOR},
+    {"FLAG_MISSING", puz::FLAG_MISSING},
     {NULL, NULL}
 };
 
