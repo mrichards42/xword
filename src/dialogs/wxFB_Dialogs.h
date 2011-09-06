@@ -99,6 +99,7 @@ class wxFB_PreferencesDialog : public wxDialog
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnInit( wxInitDialogEvent& event ) = 0;
 		virtual void OnPrintCustomFonts( wxCommandEvent& event ) = 0;
+		virtual void OnBlackSquareBrightness( wxScrollEvent& event ) = 0;
 		virtual void OnApply( wxCommandEvent& event ) = 0;
 		virtual void OnOK( wxCommandEvent& event ) = 0;
 		
