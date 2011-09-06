@@ -5,6 +5,8 @@
 
 require 'wxtask'
 
+-- So this can be used in a thread
+if not download then download = {} end
 download.database = {}
 local database = download.database
 
@@ -32,13 +34,24 @@ database.dbfilename = join(xword.configdir, 'download', 'index.sqlite')
 
 -- Start a background thread if this is the main thread
 if task.id() == 1 then
+    -- maps basename to callback
+    local cache_callbacks = {}
+    local function on_cache_puzzle(record)
+        local callback = cache_callbacks[record.basename]
+        if callback then
+            callback(record)
+            cache_callbacks[record.basename] = nil
+        end
+    end
+
     function database.start_task()
         if database.is_task_running() then
             return
         end
         database.task_id = task.create(
-            'database.task',
-            { [[D:\C++\XWord\trunk\bin\Debug\puzzles]]} )
+            'download.database.task',
+            { download.localfolder } )
+        task.handleEvents(database.task_id, { [database.CACHE_PUZZLE] = on_cache_puzzle })
     end
 
     function database.end_task()
@@ -51,11 +64,10 @@ if task.id() == 1 then
         return database.task_id and task.isrunning(database.task_id)
     end
 
-    function database.cacheInBackground(filename, source, date)
+    function database.cacheInBackground(basename, callback)
         database.start_task()
-        task.post(database.task_id,
-                  {filename, source, date},
-                  database.CACHE_PUZZLE)
+        cache_callbacks[basename] = callback
+        task.post(database.task_id, basename, database.CACHE_PUZZLE)
     end
 
     -- Pause and resume the task so that we can do database transactions from
@@ -89,11 +101,10 @@ if task.id() == 1 then
             cleanup()
         end
     end
-
-    return database
-
 else
     function database.is_task_running()
         return false
     end
 end
+
+return database

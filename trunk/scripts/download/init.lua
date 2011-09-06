@@ -49,8 +49,10 @@ end
 
 -- Add the download modules
 require 'download.messages'
-require 'download.dialog'
-require 'download.savestate'
+if task.id() == 1 then
+    require 'download.dialog'
+    require 'download.savestate'
+end
 
 -- ----------------------------------------------------------------------------
 -- init

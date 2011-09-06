@@ -1,8 +1,9 @@
 require 'download.messages'
+pcall(require, 'import')
 
 -- Arguments to this file:
--- { url, filename, { [curl.OPT_NAME] = val, ... }, outputname, desc }
-local url, filename, curlopts, output, desc = unpack(arg)
+-- { url, filename, { [curl.OPT_NAME] = val, ... } }
+local url, filename, curlopts = unpack(arg)
 -- ----------------------------------------------------------------------------
 -- cURL Callbacks
 -- ----------------------------------------------------------------------------
@@ -31,52 +32,15 @@ end
 -- ---------------------------------------------------------------------------
 -- Puzzle conversion
 -- ---------------------------------------------------------------------------
-function convertPuzzle() -- arguments are upvalues (filename, output, desc)
+function convertPuzzle() -- the filename argument is an upvalue
     -- Load the puzzle then save it as a .puz file
     require 'luapuz'
-    require 'import'
-    local tablex = require 'pl.tablex'
-
-    local success, p, err
-    -- Try to load the puzzle as the given type
-    if desc then
-        local index = tablex.find_if(import.handlers,
-                                     function(h) return h.desc == desc end)
-        if index then
-            local load = import.handlers[index].load
-            success, p = pcall(puz.Puzzle, filename, load)
-            -- This is a native type
-            if success and load == puz.Puzzle.Load then
-                p:__gc()
-                return true
-            end
-        end
-    end
-
-    if not success then
-        err = p
-        -- Try to load by matching the extension with a known handler
-        success, p = pcall(puz.Puzzle, filename, import.load)
-        if not success and not err then
-            err = p
-        end
-    end
-
-    if not success then
-        err = p
-        return nil, (err or "Failed to open file: "..filename)
-    end
-
-    -- Save the file as a .puz
-    success, err = pcall(p.Save, p, output)
-    p:__gc()
-    if not success then
-        return nil, (err or "Failed to save file: "..output)
-    end
-
-    -- Remove the old file
-    if filename ~= output then
-        os.remove(filename)
+    -- Try to load the puzzle
+    local success, p = pcall(puz.Puzzle, filename)
+    if success then
+        p:__gc()
+    else
+        return nil, (p or "Failed to open file: "..filename)
     end
 
     return true
@@ -132,5 +96,4 @@ if f then
 end
 
 -- Thread is done, report errors if they exist
-
 task.post(1, err, download.DL_END)
