@@ -1,5 +1,5 @@
 -- ============================================================================
--- Try A-Z
+-- A-Z
 --     A simple XWord add-on that presents the current clue with the focused
 --     letter replaced by all possible letters.
 -- ============================================================================
@@ -31,7 +31,7 @@ local function TryAZ()
             table.insert(wordstable, word)
         end
     end
-    local sel = wx.wxGetSingleChoiceIndex(clue, 'Try A-Z', wordstable) + 1
+    local sel = wx.wxGetSingleChoiceIndex(clue, 'A-Z', wordstable) + 1
     if sel > 0 then
         local letter = order:sub(sel, sel)
         if letter ~= ' ' then
@@ -42,10 +42,14 @@ local function TryAZ()
 end
 
 local function init()
-    xword.frame:AddMenuItem({'Tools'}, 'Try A-Z',
+    xword.frame:AddMenuItem({'Tools'}, 'A-Z',
         function(evt)
             -- Can't do anything unless we have a puzzle
             if not xword.HasPuzzle() then return end
+            if (xword.frame.Puzzle.Grid.Type == puz.TYPE_DIAGRAMLESS) then
+                xword.Message("A-Z does not work on diagramless puzzles")
+                return
+            end
             TryAZ()
         end
     )
@@ -53,7 +57,7 @@ end
 
 
 function uninit()
-    xword.frame:RemoveMenuItem("Tools", "Try A-Z")
+    xword.frame:RemoveMenuItem("Tools", "A-Z")
 end
 
 return { init, uninit }
