@@ -35,6 +35,7 @@ end
 -- class {"name", header = "header" }
 function class(opts)
     if not opts then
+        print ("No class")
         bind.class = nil
         return
     end

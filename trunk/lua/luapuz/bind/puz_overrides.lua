@@ -5,8 +5,8 @@ overrides = {
 -- ===================================================================
 Puzzle_Puzzle = [[
 // Puzzle()
-// Puzzle(const puz::string_t & filename)
-// Puzzle(const puz::string_t & filename, const FileHandlerDesc * desc)
+// Puzzle(const std::string & filename)
+// Puzzle(const std::string & filename, const FileHandlerDesc * desc)
 int Puzzle_Puzzle(lua_State * L)
 {
     try {
@@ -16,7 +16,7 @@ int Puzzle_Puzzle(lua_State * L)
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
         {
-            const puz::string_t filename = luapuz_checkstring_t(L, 2);
+            const char * filename = luaL_checkstring(L, 2);
             luaL_checktype(L, 3, LUA_TFUNCTION);
 
             // Push the function for luapuz_Load_Puzzle.
@@ -32,7 +32,7 @@ int Puzzle_Puzzle(lua_State * L)
         }
         else if (argCount >= 1)
         {
-            puz::string_t filename = luapuz_checkstring_t(L, 2);
+            const char * filename = luaL_checkstring(L, 2);
             returns = new puz::Puzzle(filename);
         }
         else if (argCount >= 0)
@@ -41,17 +41,7 @@ int Puzzle_Puzzle(lua_State * L)
         }
 
         luapuz_newPuzzle(L, returns);
-
-        if (returns->HasError())
-        {
-            lua_pushstring(L, returns->GetError().c_str());
-            returns->ClearError();
-            return 2;
-        }
-        else
-        {
-            return 1;
-        }
+        return 1;
     }
     catch (...) {
         luapuz_handleExceptions(L);
@@ -63,12 +53,12 @@ int Puzzle_Puzzle(lua_State * L)
 
 
 Puzzle_Load = [[
-// void Load(const puz::string_t & filename)
-// void Load(const puz::string_t & filename, FileHandlerDesc * desc)
+// void Load(const std::string & filename)
+// void Load(const std::string & filename, FileHandlerDesc * desc)
 int Puzzle_Load(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    const puz::string_t filename = luapuz_checkstring_t(L, 2);
+    const char * filename = luaL_checkstring(L, 2);
     try {
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
@@ -90,17 +80,7 @@ int Puzzle_Load(lua_State * L)
         {
             puzzle->Load(filename);
         }
-
-        if (puzzle->HasError())
-        {
-            lua_pushstring(L, puzzle->GetError().c_str());
-            puzzle->ClearError();
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
     catch (...) {
         luapuz_handleExceptions(L);
@@ -110,12 +90,12 @@ int Puzzle_Load(lua_State * L)
 }]],
 
 Puzzle_Save = [[
-// void Save(const puz::string_t & filename)
-// void Save(const puz::string_t & filename, FileHandlerDesc * desc)
+// void Save(const std::string & filename)
+// void Save(const std::string & filename, FileHandlerDesc * desc)
 int Puzzle_Save(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::string_t filename = luapuz_checkstring_t(L, 2);
+    const char * filename = luaL_checkstring(L, 2);
     try {
         int argCount = lua_gettop(L) - 1;
         if (argCount >= 2)
@@ -137,17 +117,7 @@ int Puzzle_Save(lua_State * L)
         {
             puzzle->Save(filename);
         }
-
-        if (puzzle->HasError())
-        {
-            lua_pushstring(L, puzzle->GetError().c_str());
-            puzzle->ClearError();
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
     catch (...) {
         luapuz_handleExceptions(L);
@@ -353,15 +323,11 @@ struct luapuz_FindSquare_Struct
 //----------------------
 // puz::Square * FindSquare(puz::Square * start, function findFunc,
 //                          puz::GridDirection direction = puz::ACROSS,
-//                          puz::FindDirection increment = puz::NEXT,
 //                          unsigned int options = puz::FIND_IN_GRID)
 //
 // puz::Square * FindSquare(function findFunc,
-//                          puz::GridDirection direction,
-//                          puz::FindDirection increment,
+//                          puz::GridDirection direction = puz::ACROSS,
 //                          unsigned int options = puz::FIND_IN_GRID)
-//
-// puz::Square * FindSquare(function findFunc, unsigned int options = puz::FIND_IN_GRID)
 //
 static int Grid_FindSquare(lua_State * L)
 {
@@ -375,38 +341,25 @@ static int Grid_FindSquare(lua_State * L)
         puz::Square * start = luapuz_checkSquare(L, 2);
         luaL_checktype(L, 3, LUA_TFUNCTION);
         puz::GridDirection direction = (argCount >= 4 ? luapuz_checkGridDirection(L, 4) : puz::ACROSS);
-        puz::FindDirection increment = (argCount >= 5 ? luapuz_checkFindDirection(L, 5) : puz::NEXT);
-        unsigned int options = (argCount >= 6 ? luapuz_checkuint(L, 6) : puz::FIND_IN_GRID);
+        unsigned int options = (argCount >= 5 ? luapuz_checkuint(L, 5) : puz::FIND_IN_GRID);
 
         // Push the function on the stack for luapuz_FindSquare_Struct
         lua_pushvalue(L, 3);
         luapuz_FindSquare_Struct func(L);
 
-        returns = grid->FindSquare(start, func, direction, increment, options);
+        returns = grid->FindSquare(start, func, direction, options);
     }
-    else if (argCount >= 4)  // Second overload
+    else  // Second overload
     {
         luaL_checktype(L, 2, LUA_TFUNCTION);
-        puz::GridDirection direction = luapuz_checkGridDirection(L, 3);
-        puz::FindDirection increment = luapuz_checkFindDirection(L, 4);
-        unsigned int options = (argCount >= 5 ? luapuz_checkuint(L, 5) : puz::FIND_IN_GRID);
+        puz::GridDirection direction = (argCount >= 3 ? luapuz_checkGridDirection(L, 3) : puz::ACROSS);
+        unsigned int options = (argCount >= 4 ? luapuz_checkuint(L, 4) : puz::FIND_IN_GRID);
 
         // Push the function on the stack for luapuz_FindSquare_Struct
         lua_pushvalue(L, 2);
         luapuz_FindSquare_Struct func(L);
 
-        returns = grid->FindSquare(func, direction, increment, options);
-    }
-    else  // Third overload
-    {
-        luaL_checktype(L, 2, LUA_TFUNCTION);
-        unsigned int options = (argCount >= 3 ? luapuz_checkuint(L, 3) : puz::FIND_IN_GRID);
-
-        // Push the function on the stack for luapuz_FindSquare_Struct
-        lua_pushvalue(L, 2);
-        luapuz_FindSquare_Struct func(L);
-
-        returns = grid->FindSquare(func, options);
+        returns = grid->FindSquare(func, direction, options);
     }
 
     luapuz_pushSquare(L, returns);

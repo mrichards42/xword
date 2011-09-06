@@ -110,7 +110,7 @@ bind.global_namespace = mt:new(GLOBAL_NAME)
 bind.namespace = bind.global_namespace -- the current namespace
 
 local types = {
-    ["char *"] = {
+    ["const char *"] = {
         get  = "luaL_checkstring",
         push = "lua_pushstring",
         query = "lua_isstring",
