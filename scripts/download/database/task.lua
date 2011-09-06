@@ -1,3 +1,4 @@
+local download = require 'download'
 local database = require 'download.database'
 require 'lfs'
 
@@ -13,11 +14,7 @@ local function process_messages(timeout)
     local msg, flag, rc = task.receive(timeout or 0, 1)
     if rc ~= 0 then return end
     if flag == database.CACHE_PUZZLE then
-        if type(msg) == "table" then
-            database.cachePuzzle(unpack(msg))
-        else
-            database.cachePuzzle(msg)
-        end
+        task.post(1, database.cachePuzzle(msg), database.CACHE_PUZZLE)
     elseif flag == database.PAUSE then
         task.post(1, nil, database.PAUSE)
         isPaused = true

@@ -34,6 +34,7 @@ function P.open(dbfile)
         db:exec([[
             CREATE TABLE puz_index (
                 id         INTEGER PRIMARY KEY,
+                basename   VARCHAR,
                 filename   VARCHAR,
                 date       DATE,
                 source     VARCHAR,
@@ -116,8 +117,8 @@ setmetatable(stmts, mt)
 -- Select a record from the database
 -- ----------------------------------------------------------------------------
 
-stmts.__strings.select_filename =
-    "SELECT * FROM puz_index WHERE filename LIKE ?"
+stmts.__strings.select_basename =
+    "SELECT * FROM puz_index WHERE basename LIKE ?"
 stmts.__strings.select_name_date =
     "SELECT * FROM puz_index WHERE source = ? AND date = ?"
 stmts.__strings.select_id =
@@ -158,11 +159,11 @@ local function select_one(stmt, ...)
     return ret
 end
 
--- find(filename)
+-- find(basename)
 -- find(sourcename, date)
 function P.find(...)
     if #arg == 1 then
-        return select_all(stmts.select_filename, arg[1])
+        return select_all(stmts.select_basename, arg[1])
     elseif #arg == 2 then
         return select_all(stmts.select_name_date, arg[1], date_to_db(arg[2]))
     end
@@ -192,6 +193,7 @@ end
 stmts.__strings.insert = [[
     INSERT INTO puz_index VALUES (
         NULL,
+        :basename,
         :filename,
         :date,
         :source,
@@ -201,8 +203,8 @@ stmts.__strings.insert = [[
         :time );
 ]]
 
--- insert{filename = "filename", date = date(), source = "source" ...}
--- insert("filename", date(), "source", ...)
+-- insert{basename = "basename", date = date(), source = "source" ...}
+-- insert("basename", "filename", date(), "source", ...)
 function P.insert(...)
     if #arg == 1 then
         local options = arg[1]
@@ -223,8 +225,8 @@ end
 -- Update a record in the database
 -- ----------------------------------------------------------------------------
 
--- update{ filename = "filename", source = "source", ... }
--- Must supply either filename or source and date
+-- update{ basename = "basename", filename = "filename", source = "source", ... }
+-- Must supply either basename or source and date
 function P.update(options)
     local options = table_to_db(options)
 
@@ -232,18 +234,18 @@ function P.update(options)
     local where
     if options.id then
         where = "WHERE id = :id"
-    elseif options.filename then
-        where = "WHERE filename = :filename"
+    elseif options.basename then
+        where = "WHERE basename = :basename"
     elseif options.source and options.date then
         where = "WHERE source = :source AND date = :date"
-    else -- Can't update without filename or (source and date)
+    else -- Can't update without basename or (source and date)
         return
     end
 
     -- SET columns
     local set = {}
     for _, col in ipairs({
-        "filename", "date", "source", "modified", "started", "complete", "time"
+        "basename", "filename", "date", "source", "modified", "started", "complete", "time"
     }) do
         if options[col] then
             table.insert(set, string.format('%s = :%s', col, col))
@@ -265,8 +267,8 @@ end
 
 stmts.__strings.delete_id =
     "DELETE FROM puz_index WHERE id = ?"
-stmts.__strings.delete_filename =
-    "DELETE FROM puz_index WHERE filename = ?"
+stmts.__strings.delete_basename =
+    "DELETE FROM puz_index WHERE basename = ?"
 stmts.__strings.delete_name_date =
     "DELETE FROM puz_index WHERE source = ? AND date = ?"
 
@@ -277,12 +279,12 @@ local function delete_record(stmt, ...)
 end
 
 -- delete(id)
--- delete(filename)
+-- delete(basename)
 -- delete(sourcename, date)
 function P.delete(...)
     if #arg == 1 then
         if type(arg[1]) == 'string' then
-            return delete_record(stmts.delete_filename, arg[1])
+            return delete_record(stmts.delete_basename, arg[1])
         else
             return delete_record(stmts.delete_id, arg[1])
         end
@@ -301,9 +303,9 @@ local function align(str, n)
 end
 
 function P.list()
-    print(align('id', 5)..align('filename', 12)..align('date', 12)..align('source', 15)..align('modified', 12)..align('started', 10)..align('complete', 10)..align('time', 10))
+    print(align('id', 5)..align('basename', 12)..align('date', 12)..align('source', 15)..align('modified', 12)..align('started', 10)..align('complete', 10)..align('time', 10))
     print(string.rep('-',4)..' '..string.rep('-',11)..' '..string.rep('-',11)..' '..string.rep('-',14)..' '..string.rep('-',11)..' '..string.rep('-',9)..' '..string.rep('-',9)..' '..string.rep('-',9)..' ')
     for row in P.__db:nrows("SELECT * FROM puz_index") do
-        print(align(row.id, 5)..align(row.filename, 12)..align(row.date, 12)..align(row.source, 15)..align(row.modified, 12)..align(row.started, 10)..align(row.complete, 10)..align(row.time, 10))
+        print(align(row.id, 5)..align(row.basename, 12)..align(row.date, 12)..align(row.source, 15)..align(row.modified, 12)..align(row.started, 10)..align(row.complete, 10)..align(row.time, 10))
     end
 end

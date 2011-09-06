@@ -31,15 +31,15 @@ local join = require 'pl.path'.join
 
 if not download then download = {} end
 
-function download.getSourceBasename(source, date)
+function download.get_basename(source, date)
     return source.prefix .. date:fmt(download.puzformat)
 end
 
-function download.getSourceFilename(source, date)
+-- Return the filename to save the download to.
+function download.get_download_filename(source, date)
     return join(download.localfolder,
-                download.getSourceBasename(source, date)..'.'..source.ext)
+                download.get_basename(source, date)..'.'..source.ext)
 end
-
 
 download.sources = 
 {

@@ -10,6 +10,12 @@ local database = download.database
 -- ----------------------------------------------------------------------------
 -- Return started (bool), comlete (pct), time (secs)
 local function puzzleStats(filename)
+    -- If we can't save this format, assume that the user hasn't started
+    -- solving the puzzle
+    if not puz.Puzzle.CanSave(filename) then
+        return false, 0, 0
+    end
+
     local success, p = pcall(puz.Puzzle, filename)
     if not success then return end
     local blank = 0
@@ -45,14 +51,57 @@ end
 -- ----------------------------------------------------------------------------
 -- Cache a puzzle with the given filename
 -- ----------------------------------------------------------------------------
-function database.cachePuzzle(filename, source, date)
-    -- Check to see if the file exists
-    local attr = lfs.attributes(filename)
-    if not attr or attr.mode ~= 'file' then
-        return
+
+-- NB: These need to be updated every time we add a new file format.
+-- Ideally this would be taken care of in luapuz.
+local save_extensions = { 'puz', 'xpf', 'xml', 'jpz' }
+local load_extensions = { 'ipuz' }
+
+local function get_last_modified(basename)
+    -- Look for files that we can save (i.e. files that could be partially
+    -- solved), and find the most recently modified.
+    local base = path.join(download.localfolder, basename)
+    local last_attr = { modification = 0 }
+    local last_filename
+    for _, ext in ipairs(save_extensions) do
+        local attr = lfs.attributes(base..'.'..ext)
+        if attr and attr.modification > last_attr.modification then
+            last_filename = base..'.'..ext
+            last_attr = attr
+        end
+    end
+    return last_filename, last_attr
+end
+
+
+
+function database.cachePuzzle(basename)
+    local filename, attr = get_last_modified(basename)
+
+    if not filename then
+        local base = path.join(download.localfolder, basename)
+        -- Look for other puzzles that we can load but not save.
+        -- Assume that files we can load but not save have not been solved.
+        for _, ext in ipairs(load_extensions) do
+            local attr = lfs.attributes(base..'.'..ext)
+            if attr and attr.mode == 'file' then
+                -- Return empty stats
+                return {
+                    basename = basename,
+                    filename = base..'.'..ext,
+                    modified = attr.modification,
+                    started = false,
+                    complete = -1,
+                    time = -1,
+                }
+            end
+        end
     end
 
-    local basename = path.basename(filename)
+    -- Check to see if the file exists
+    if not attr or attr.mode ~= 'file' then
+        return { basename = basename }
+    end
 
     -- Retrieve the record from the database
     local record = database.find(basename)
@@ -66,19 +115,16 @@ function database.cachePuzzle(filename, source, date)
         return record
     end
 
-    --local source, d = findSource(basename)
-    --local display = source.display
-
     -- Try to load the puzzle
     local started, complete, time = puzzleStats(filename)
-    if started == nil then return end
+    if started == nil then
+        return { basename = basename }
+    end
 
     -- Do the caching
-    -- We aren't going to use the source and date columns in the database
     local stats = {
-        filename = basename,
-        source = source,
-        date = date,
+        basename = basename,
+        filename = filename,
         modified = attr.modification,
         started = started,
         complete = complete or -1,

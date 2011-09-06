@@ -11,12 +11,6 @@ require 'date'
 
 assert(download, 'Must load download package first')
 
--- Integration with 'import' plugin for converting downloaded puzzles
-if not xword.require 'import' then
-    import = {}
-    import.handlers = {}
-end
-
 -- Easier access to download package
 local P = download
 

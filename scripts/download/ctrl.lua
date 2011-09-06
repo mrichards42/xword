@@ -4,7 +4,6 @@
 --       ctrl        the wxPanel object
 --       url         the download url
 --       filename    the local filename
---       output      the local filename after conversion
 --       task_id     the id for the download thread (nil until the download
 --                   starts)
 --       callbacks   a table of callback functions to respond to messages
@@ -18,8 +17,7 @@
 --    download.DownloadCtrl() creates a new download panel and returns a table
 --    with the aforementioned keys.  Pass the function a parent wxWindow,
 --    a url, a filename, and an optional descriptive file type.  The file type
---    should be a type that the (separate) import add-on recognizes.  Omit the
---    file type if the file is a standard Across Lite .puz or .txt file.
+--    should be a type that the (separate) import add-on recognizes.
 -- ============================================================================
 
 require 'wxtask'
@@ -54,15 +52,8 @@ local P = download
 -- Utility functions
 -- ----------------------------------------------------------------------------
 
--- If there is no filename given, find a filename in the url.
--- If there is no filename in the url (i.e. http://www.example.com/),
--- use "index.html"
-local function getFilename(url, filename)
-    return filename or url:match('^.*/([^/]+)$') or 'index.html'
-end
-
 -- Copy a text to the clipboard
-local function copyText(text)
+local function copy_text(text)
     local clipBoard = wx.wxClipboard.Get()
     if clipBoard and clipBoard:Open() then
         clipBoard:SetData(wx.wxTextDataObject(text))
@@ -137,53 +128,18 @@ function P.DownloadCtrl(parent, source, d)
     -- Do we have a download for this date?
     if not source.days[d:getisoweekday()] then return nil end
 
-    dl.url = d:fmt(source.url)
-    dl.filename = P.getSourceFilename(source, d)
+    dl.url = d:fmt(source.url) -- remote url
+    dl.basename = P.get_basename(source, d)
+    dl.filename = P.get_download_filename(source, d) -- filename to save
     dl.format = source.format
     dl.curlopts = source.curlopts
 
     assert(dl.url and dl.filename)
 
-    -- ------------------------------------------------------------------------
-    -- Puzzle stats and output file name
-    -- ------------------------------------------------------------------------
-    dl.stats = {}
-    -- Get stats for filenames that match each extension
-    for _, ext in ipairs({'xpf', 'xml', 'puz'}) do
-        local filename = path.splitext(dl.filename)..'.'..ext
-        local stats = database.cachePuzzle(filename)
-        if stats then
-            table.insert(dl.stats, { filename=filename, stats=stats })
-        end
-    end
-    -- Sort by stats.started then stats.complete then stats.time
-    table.sort(
-        dl.stats,
-        function(t1, t2)
-            local s1 = t1.stats
-            local s2 = t2.stats
-            if s1.started then
-                if s2.started then
-                    if s1.complete == s2.complete then
-                        return s1.time > s2.time
-                    else
-                        return s1.complete > s2.complete
-                    end
-                else
-                    return true
-                end
-            else
-                return not s2.started
-            end
-        end
-    )
-    if #dl.stats == 0 then
+    -- Get stats for the puzzle
+    dl.stats = database.cachePuzzle(dl.basename)
+    if not dl.stats.filename then
         dl.stats = nil
-        dl.output = path.splitext(dl.filename)..'.'..
-                                (dl.format == "XPF" and 'xml' or 'puz')
-    else
-        dl.output = dl.stats[1].filename
-        dl.stats = dl.stats[1].stats
     end
     dl.hasstats = true
 
@@ -226,7 +182,7 @@ function P.DownloadCtrl(parent, source, d)
         end
     end
 
-    -- Change the bitmap and tooltip based on status of the output file
+    -- Change the bitmap and tooltip based on status of the downloaded file
     function ctrl.UpdateCtrl()
         ctrl.bmpindex = 0 -- not downloading
 
@@ -234,7 +190,7 @@ function P.DownloadCtrl(parent, source, d)
         -- For now, we're calling wxYield() after the creation of every
         -- downloadCtrl, so the length of time this takes shouldn't be
         -- an issue
-        if true and not dl.hasstats then
+        if not dl.hasstats then
             ctrl.bmp = bmps.status.unknown
             ctrl:SetToolTip('Querying...')
 
@@ -321,7 +277,10 @@ function P.DownloadCtrl(parent, source, d)
             if not dl.err then
                 dl.res = 0
                 if dl.openOnSuccess then
-                    xword.frame:LoadPuzzle(dl.output)
+                    xword.frame:LoadPuzzle(dl.filename)
+                else
+                    -- Cache the puzzle
+                    database.cacheInBackground(dl.basename)
                 end
                 dl.fileexists = true
             else
@@ -329,9 +288,6 @@ function P.DownloadCtrl(parent, source, d)
                 -- If the download didn't work, delete the file.
                 os.remove(dl.filename)
             end
-
-            -- Cache the puzzle
-            database.cacheInBackground(dl.output, dl.source)
 
             dl.openOnSuccess = nil
 
@@ -370,12 +326,14 @@ function P.DownloadCtrl(parent, source, d)
             end
 
             -- Try to open the file before downloading
-            if lfs.attributes(dl.output) then -- Does the file exist?
-                xword.frame:LoadPuzzle(dl.output)
-            else
-                dl.openOnSuccess = true
-                dl.start()
+            if lfs.attributes(dl.filename) then
+                if xword.frame:LoadPuzzle(dl.filename) then
+                    return
+                end
             end
+            -- If we can't open the file, download it
+            dl.openOnSuccess = true
+            dl.start()
         end
     )
 
@@ -389,11 +347,11 @@ function P.DownloadCtrl(parent, source, d)
             item = menu:Append(wx.wxID_ANY, "Copy URL")
             ctrl:Connect(item:GetId(),
                          wx.wxEVT_COMMAND_MENU_SELECTED,
-                         function (evt) copyText(dl.url) end)
+                         function (evt) copy_text(dl.url) end)
             item = menu:Append(wx.wxID_ANY, "Copy local filename")
             ctrl:Connect(item:GetId(),
                          wx.wxEVT_COMMAND_MENU_SELECTED,
-                         function (evt) copyText(dl.output) end)
+                         function (evt) copy_text(dl.filename) end)
             ctrl:PopupMenu(menu)
             menu:delete()
         end
@@ -414,15 +372,13 @@ function P.DownloadCtrl(parent, source, d)
 
         -- Delete the output files
         os.remove(dl.filename)
-        os.remove(dl.output)
 
         -- Start the download in a new thread      
         dl.task_id = task.create('download.task',
                                  { dl.url,
                                    dl.filename,
                                    dl.curlopts or {}, -- don't put a hole in this table
-                                   dl.output,
-                                   dl.format })
+                                 })
         local e = task.handleEvents(dl.task_id, dl.callbacks, dl.ctrl)
         e.name = dl.filename
 

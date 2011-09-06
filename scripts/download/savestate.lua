@@ -32,6 +32,9 @@ local function saveconfig()
     savevariable(f, 'download.dlgsize', download.dlgsize)
     f:write("\n\n")
     f:write("-- Dialog filter state\n")
+    if not download.filterState then
+        download.filterState = {}
+    end
     download.filterState.date = nil
     savevariable(f, 'download.filterState', download.filterState)
     f:write("\n\n")
