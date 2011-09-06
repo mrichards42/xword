@@ -82,6 +82,29 @@ Parser::GetAttribute(node & n, const char * name)
     return decode_utf8(n.attribute(name).value());
 }
 
+inline void SetText(node & node, const char * text)
+{
+    node.append_child(pugi::node_pcdata).set_value(text);
+}
+
+inline void SetText(node & node, const string_t & text)
+{
+    SetText(node, encode_utf8(text).c_str());
+}
+
+void SetInnerXML(node & node, const string_t & innerxml);
+
+inline void Append(node & node, const char * name, const char * value)
+{
+    SetText(node.append_child(name), value);
+}
+
+inline void Append(node & node, const char * name, const string_t & value)
+{
+    SetText(node.append_child(name), value);
+}
+
+
 } // namespace xml
 } // namespace puz
 

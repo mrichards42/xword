@@ -26,6 +26,8 @@ void Parser::LoadFromFilename(Puzzle * puz, const std::string & filename)
 {
     std::ifstream stream(filename.c_str(),
                          std::ios_base::binary | std::ios_base::in);
+    if (stream.fail())
+        throw FatalFileError(std::string("Unable to open file: ") + filename);
     LoadFromStream(puz, stream);
 }
 
@@ -88,6 +90,20 @@ string_t Parser::GetInnerXML(node & n)
     return decode_utf8(stream.str());
 }
 
+void SetInnerXML(node & node, const string_t & innerxml)
+{
+    // Parse the XML, and add it as a child.
+    // We need to add a dummy xml wrapper element so that plain text still
+    // parses.
+    pugi::xml_document doc;
+    std::string temp("<dummy>");
+    temp.append(encode_utf8(innerxml)).append("</dummy>");
+    pugi::xml_parse_result result = doc.load(temp.c_str());
+    if (! result)
+        SetText(node, innerxml);
+    else
+        node.append_copy(doc.first_child().first_child());
+}
 
 } // namespace xml
 } // namespace puz
