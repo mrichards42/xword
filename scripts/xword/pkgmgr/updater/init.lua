@@ -1,7 +1,9 @@
 require 'wxtask'
 require 'serialize'
 
+local dirname = require 'pl.path'.dirname
 local join = require 'pl.path'.join
+local makepath = require 'pl.dir'.makepath
 
 if not xword.pkgmgr then
     require 'xword.pkgmgr'
@@ -24,9 +26,10 @@ if task.id() == 1 then
     -- Check for an update.  Callback is called after the task executes
     local osname = wx.__WXMSW__ and 'windows' or wx.__WXMAC__ and 'mac' or 'linux'
     P.packages_url = "http://sourceforge.net/projects/wx-xword/files/packages_"..osname..".lua"
-    P.packages_url = [[file:///D:\C++\XWord\trunk\scripts\xword\pkgmgr\updater\dummydata.lua]]
 
     function P.CheckForUpdates(callback)
+        -- Make sure we have a directory for the updates file
+        makepath(dirname(P.updates_filename))
         task.handleEvents(
             task.create(join(xword.scriptsdir, 'xword', 'pkgmgr', 'updater', 'check_task.lua'),
                         { P.packages_url, P.updates_filename } ),

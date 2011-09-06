@@ -433,10 +433,10 @@ function P.PackageDialog()
         local uninstalled = serialize.loadfile(join(xword.userdatadir, 'pending_uninstall.lua')) or {}
         local installed = serialize.loadfile(join(xword.userdatadir, 'pending_install.lua')) or {}
         for packagename, value in pairs(uninstalled) do
-            self.packges[packagename].uninstalled = value
+            self.packages[packagename].uninstalled = value
         end
         for packagename, value in pairs(installed) do
-            self.packges[packagename].installed = value
+            self.packages[packagename].installed = value
         end
         self.scripts:SetData(self.packages)
     end
