@@ -14,7 +14,7 @@ end
 -- preserve the actual bytes in order to convert the string from UTF-8 later.
 local function unescape(str)
     -- Replace all %xx escapes with their value in hex
-    return str:gsub('%%..', function(escape)
+    local result, replacements = str:gsub('%%..', function(escape)
         local high = assert(hex_codes[escape:sub(2,2):lower()],
                             'Bad hex character: '..escape:sub(2,2))
 
@@ -23,6 +23,7 @@ local function unescape(str)
 
         return string.char(high * 16 + low)
     end)
+    return result
 end
 
 function import.UClick(p, filename)
@@ -87,9 +88,10 @@ function import.UClick(p, filename)
         square = square:Next(puz.ACROSS)
     end
     -- Set the clues
-    p.Across = across
-    p.Down   = down
-    p:RenumberClues()
+    p:SetClueList("Across", across)
+    p:SetClueList("Down", down)
+    p:NumberGrid()
+    p:NumberClues()
 end
 
 import.addHandler(import.UClick, "xml", "UClick XML")
