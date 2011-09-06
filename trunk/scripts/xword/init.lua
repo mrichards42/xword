@@ -4,7 +4,10 @@
 --     add-ons
 -- ============================================================================
 
+require 'luapuz'
+
 xword.frame = xword.GetFrame()
+
 -- Cleanup functions
 xword.cleanup = {}
 function xword.OnCleanup(func)

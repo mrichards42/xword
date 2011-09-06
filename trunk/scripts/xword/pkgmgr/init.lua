@@ -55,12 +55,12 @@ local function init()
     P.updater.CheckForUpdates(function()
 
         -- Show a hacked version of the package dialog
-        local function do_update()
+        local function do_update(message, pagenum)
             require 'xword.pkgmgr.dialog'
             local dlg = P.PackageDialog()
 
             -- Add a header to the dialog
-            local text = wx.wxStaticText(dlg, -1, "New updates are available:")
+            local text = wx.wxStaticText(dlg, -1, message)
             local bmp = wx.wxArtProvider.GetBitmap(
                 wx.wxART_INFORMATION, wx.wxART_MESSAGE_BOX, wx.wxDefaultSize
             )
@@ -91,7 +91,7 @@ local function init()
             end)
 
             -- Select the update page
-            dlg.notebook:SetSelection(1)
+            dlg.notebook:SetSelection(pagenum)
 
             dlg:ShowModal()
         end
@@ -115,8 +115,20 @@ local function init()
             end
         end
 
-        -- Compare the updated packages with the installed packages
         local packages = P.load_packages_info()
+
+        -- If this is the first run of this version of XWord, show available
+        -- packages.
+        if xword.firstrun then
+            for _, pkg in ipairs(updates) do
+                if not packages[pkg.packagename] then
+                    do_update("Addon packages are available:", 2)
+                    return
+                end
+            end
+        end
+
+        -- Compare the updated packages with the installed packages
         for _, pkg in ipairs(updates) do
             if not pkg.ignored then
                 for _, p in ipairs(packages) do
@@ -125,8 +137,8 @@ local function init()
                         if P.is_newer(pkg.version, p.version)
                            and not P.is_newer(pkg.requires, xword.version)
                         then
-                            do_update()
-                            break
+                            do_update("New updates are available:", 1)
+                            return
                         end
                     end
                 end

@@ -242,7 +242,7 @@ function P.install_package(filename)
         if not pkg then
             return nil, "info.lua file is unreadable."
         end
-        if not pkg.packagename then
+        if not pkg.name and pkg.version and pkg.requires and pkg.packagename then
             return nil, "info.lua file is invalid or incomplete."
         end
         return pkg
@@ -257,7 +257,6 @@ function P.install_package(filename)
     -- Make sure that the package doesn't require a newer version of xword
     assert(not P.is_newer(pkg.requires, xword.version),
            "This package requires a newer version of XWord.")
-
 
     -- Try to uninstall the package (but leave the config dir alone, and don't
     -- uninstall on restart)
@@ -306,9 +305,6 @@ function P.install_package(filename)
             fs:CopyDirectory(name, join(dir, pkgdir))
         end
     end
-
-    -- Copy the info.lua file
-    fs:CopyFile(join(fs.archive, 'info.lua'), join(xword.scriptsdir, pkgdir, 'info.lua'))
 
     fs:delete()
     return pkg.packagename
