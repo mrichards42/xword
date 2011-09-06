@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := XWord puz lua wxlua wxbindxrc wxbindxml wxbindnet wxbindhtml wxbindaui wxbindadv wxbindcore wxbindbase luatask lfs luacurl lsqlite3 luapuz
+PROJECTS := XWord puz expat yajl lua wxlua wxbindxrc wxbindxml wxbindnet wxbindhtml wxbindaui wxbindadv wxbindcore wxbindbase luatask lfs luacurl lsqlite3 luapuz
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -16,9 +16,17 @@ XWord: puz lua wxlua wxbindbase wxbindcore wxbindadv wxbindaui wxbindhtml wxbind
 	@echo ==== Building XWord ====
 	@${MAKE} --no-print-directory -C . -f XWord.make
 
-puz: 
+puz: yajl
 	@echo ==== Building puz ====
 	@${MAKE} --no-print-directory -C . -f puz.make
+
+expat: 
+	@echo ==== Building expat ====
+	@${MAKE} --no-print-directory -C . -f expat.make
+
+yajl: 
+	@echo ==== Building yajl ====
+	@${MAKE} --no-print-directory -C . -f yajl.make
 
 lua: 
 	@echo ==== Building lua ====
@@ -83,6 +91,8 @@ luapuz: lua puz
 clean:
 	@${MAKE} --no-print-directory -C . -f XWord.make clean
 	@${MAKE} --no-print-directory -C . -f puz.make clean
+	@${MAKE} --no-print-directory -C . -f expat.make clean
+	@${MAKE} --no-print-directory -C . -f yajl.make clean
 	@${MAKE} --no-print-directory -C . -f lua.make clean
 	@${MAKE} --no-print-directory -C . -f wxlua.make clean
 	@${MAKE} --no-print-directory -C . -f wxbindxrc.make clean
@@ -111,6 +121,8 @@ help:
 	@echo "   clean"
 	@echo "   XWord"
 	@echo "   puz"
+	@echo "   expat"
+	@echo "   yajl"
 	@echo "   lua"
 	@echo "   wxlua"
 	@echo "   wxbindxrc"
