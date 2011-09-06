@@ -20,7 +20,6 @@
 #include "Puzzle.hpp"
 #include "Clue.hpp"
 #include "puzstring.hpp"
-#include "parse/xml.hpp"
 #include "utils/minizip.hpp"
 #include <sstream>
 
@@ -210,21 +209,30 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 square->SetMissing(false);
                 square->SetSolution(GetAttribute(cell, "solution"));
                 square->SetText(GetAttribute(cell, "solve-state"));
+                square->SetNumber(GetAttribute(cell, "number"));
+                if (GetAttribute(cell, "background-shape") == puzT("circle"))
+                    square->SetCircle();
+                square->SetColor(GetAttribute(cell, "background-color"));
                 string_t status = GetAttribute(cell, "solve-status");
-                if (status == puzT("pencil"))
-                    square->AddFlag(FLAG_PENCIL);
+                if (GetAttribute(cell, "hint") == puzT("true"))
+                    square->SetText(square->GetSolution());
                 if (status == puzT("revealed"))
                 {
                     square->AddFlag(FLAG_REVEALED);
                     square->SetText(square->GetSolution());
                 }
-                if (GetAttribute(cell, "hint") == puzT("true"))
-                    square->SetText(square->GetSolution());
-                square->SetNumber(GetAttribute(cell, "number"));
-                if (GetAttribute(cell, "background-shape") == puzT("circle"))
-                    square->SetCircle();
-
-                square->SetColor(GetAttribute(cell, "background-color"));
+                else if (status == puzT("pencil"))
+                    square->AddFlag(FLAG_PENCIL);
+                // Extra square flags to keep track of incorrect letters
+                // This is nonstandard, but doesn't break Crossword Solver.
+                else if (status == puzT("incorrect"))
+                {
+                    square->AddFlag(FLAG_BLACK);
+                }
+                else if (status == puzT("x"))
+                {
+                    square->AddFlag(FLAG_X);
+                }
             }
         }
     }
@@ -283,10 +291,11 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 if (it == words.end())
                     throw FatalFileError("Each clue must have a word");
                 string_t text = GetInnerXML(clue);
+                // Format is added after the clue in parentheses
                 string_t format = GetAttribute(clue, "format");
-                string_t number = GetAttribute(clue, "number");
                 if (! format.empty())
                     text.append(puzT(" (")).append(format).append(puzT(")"));
+                string_t number = GetAttribute(clue, "number");
                 list.push_back(Clue(number, text, it->second));
             }
             puz->SetClueList(key, list);
@@ -302,7 +311,8 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
         );
     }
 
-    return false; // Delete the doc
+    puz->SetFormatData(new JpzData(&doc));
+    return true; // We own the doc
 }
 
 } // namespace puz

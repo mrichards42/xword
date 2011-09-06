@@ -18,28 +18,41 @@
 #ifndef PUZ_WORD_H
 #define PUZ_WORD_H
 
-#include <vector>
-#include <list>
 #include <algorithm>
 #include "puzstring.hpp"
 #include "Square.hpp"
+#include "iterator.hpp"
 
 namespace puz {
 
-class PUZ_API Word: public std::vector<Square *> {
+// Base class for words
+class PUZ_API Word
+{
 public:
-    bool Contains(const puz::Square * square) const
-    {
-        return std::find(begin(), end(), square) != end();
-    }
+    virtual bool Contains(const puz::Square *) const;
+    virtual short GetDirection() const;
 
-    short GetDirection() const
-    {
-        assert(! empty());
-        if (empty())
-            return ACROSS;
-        return puz::GetDirection(*front(), *back());
-    }
+    // Iterators
+    square_iterator begin();
+    square_iterator end();
+    const_square_iterator begin() const;
+    const_square_iterator end() const;
+
+    square_reverse_iterator rbegin();
+    square_reverse_iterator rend();
+    const_square_reverse_iterator rbegin() const;
+    const_square_reverse_iterator rend() const;
+
+    virtual Square * front()=0;
+    virtual Square * back()=0;
+    const Square * front() const;
+    const Square * back() const;
+
+protected:
+    virtual iterator_impl * new_iterator_impl(Square *)=0;
+    iterator_impl * new_iterator_impl(const Square *) const;
+
+public:
 
     // Searching
     //----------
@@ -60,9 +73,6 @@ public:
                                   T findFunc,
                                   FindDirection increment = NEXT) const;
 
-    template<typename T>
-    Square * FindSquare(iterator begin, iterator end, T findFunc);
-
     // non-const overloads
     template<typename T>
     Square * FindSquare(Square * start, T findFunc,
@@ -78,14 +88,33 @@ public:
                             FindDirection increment = NEXT);
 };
 
+// Specializations
+class PUZ_API StraightWord: public Word
+{
+public:
+    StraightWord() : m_front(NULL), m_back(NULL), m_direction(ACROSS) {}
+    StraightWord(Square * start, Square * end);
+
+    short GetDirection() const { return m_direction; }
+    virtual Square * front() { return m_front; }
+    virtual Square * back() { return m_back; }
+
+protected:
+    virtual iterator_impl * new_iterator_impl(Square *);
+
+    Square * m_front;
+    Square * m_back;
+    GridDirection m_direction;
+};
+
 
 template <typename IT, typename T>
 const Square *
 Word::FindSquare(IT begin, IT end, T findFunc) const
 {
     for (IT it = begin; it != end; ++it)
-        if (findFunc(*it))
-            return *it;
+        if (findFunc(&*it))
+            return &*it;
     return NULL;
 }
 
@@ -98,7 +127,7 @@ Word::FindSquare(const Square * start,
     if (increment == NEXT)
     {
         return FindSquare(
-            find(begin(), end(), start),
+            const_square_iterator(new_iterator_impl(start)),
             end(),
             findFunc
         );
@@ -106,7 +135,7 @@ Word::FindSquare(const Square * start,
     else
     {
         return FindSquare(
-            find(rbegin(), rend(), start),
+            const_square_reverse_iterator(new_iterator_impl(start)),
             rend(),
             findFunc
         );
@@ -133,8 +162,8 @@ Word::FindNextSquare(const Square * start,
 {
     if (increment == NEXT)
     {
-        const_iterator it = find(begin(), end(), start);
-        const_iterator end_ = end();
+        const_square_iterator it(new_iterator_impl(start));
+        const_square_iterator end_ = end();
         if (it == end_)
             return NULL;
         ++it;
@@ -142,8 +171,8 @@ Word::FindNextSquare(const Square * start,
     }
     else
     {
-        const_reverse_iterator it = find(rbegin(), rend(), start);
-        const_reverse_iterator end_ = rend();
+        const_square_reverse_iterator it(new_iterator_impl(start));
+        const_square_reverse_iterator end_ = rend();
         if (it == end_)
             return NULL;
         ++it;
@@ -188,12 +217,6 @@ Word::FindNextSquare(Square * start,
     ));
 }
 
-
-
-
-class PUZ_API WordList : public std::list<Word> {
-};
-
-}
+} // namespace puz
 
 #endif // PUZ_WORD_H

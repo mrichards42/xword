@@ -48,6 +48,7 @@
 //------------------------------------------------------------------------------
 
 #include "Grid.hpp"
+#include "iterator.hpp"
 #include "Scrambler.hpp"
 
 namespace puz {
@@ -307,12 +308,11 @@ Grid::CheckWord(std::vector<Square *> * incorrect,
 {
     if (! word)
         throw NoWord();
-    Word::const_iterator it;
+    const_square_iterator it;
     for (it = word->begin(); it != word->end(); ++it)
     {
-        const Square * square = (*it);
-        if (! square->Check(checkBlank, strictRebus))
-            incorrect->push_back(&At(square->GetCol(), square->GetRow()));
+        if (! it->Check(checkBlank, strictRebus))
+            incorrect->push_back(&At(it->GetCol(), it->GetRow()));
     }
 }
 

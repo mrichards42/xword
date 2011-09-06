@@ -20,10 +20,20 @@
 
 #include "Puzzle.hpp"
 #include <string>
+#include "parse/xml.hpp"
 
 namespace puz {
 
+class JpzData : public Puzzle::FormatData
+{
+public:
+    JpzData(xml::document * doc_) : doc(doc_) {}
+    ~JpzData() { delete doc; }
+    xml::document * doc;
+};
+
 void LoadJpz(Puzzle * puz, const std::string & filename, void * /* dummy */);
+void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */);
 
 } // namespace puz
 

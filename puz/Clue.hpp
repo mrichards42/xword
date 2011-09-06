@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 #include "puzstring.hpp"
 #include "Word.hpp"
 #include <cassert>
@@ -29,7 +30,7 @@ namespace puz {
 
 class ClueList;
 
-// A clue, with a number, text, enumeration, and pointer to a word.
+// A clue, with a number, text, and a word (auto_ptr.
 // The clue number is stored as a string, and can be any text.
 class PUZ_API Clue
 {
@@ -53,18 +54,22 @@ public:
         SetText(text_);
     }
 
-    // The clue owns the enumeration
-    ~Clue() {}
+    ~Clue() { if (word) delete word; }
 
     void SetText  (const string_t & text_);
     void SetNumber(const string_t & num_);
     void SetNumber(int num_);
-    void SetWord(Word * word_) { word = word_; }
+    void SetWord(Word * word_)
+    {
+        if (word && word != word_)
+            delete word;
+        word = word_;
+    }
 
     const string_t & GetText() const { return text; }
     const string_t & GetNumber() const { return number; }
-    Word * GetWord() { return word; }
     const Word * GetWord() const { return word; }
+    Word * GetWord() { return word; }
 
     // -1 if this is an invalid number.
     int GetInt() const { return m_int; }
@@ -131,6 +136,7 @@ public:
     const ClueList & GetClueList(const string_t & direction) const;
 
     bool HasClueList(const string_t & direction) const;
+    bool HasWords() const; // Do any clues have words?
 
     ClueList & operator[](const string_t & direction);
 

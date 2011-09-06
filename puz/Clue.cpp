@@ -162,6 +162,18 @@ bool Clues::HasClueList(const string_t & direction) const
     return find(direction) != end();
 }
 
+bool Clues::HasWords() const
+{
+    for (const_iterator it = begin(); it != end(); ++it)
+    {
+        ClueList::const_iterator clue;
+        for (clue = it->second.begin(); clue != it->second.end(); ++clue)
+            if (clue->GetWord() != NULL)
+                return true;
+    }
+    return false;
+}
+
 ClueList & Clues::operator[](const string_t & direction)
 {
     iterator it = find(direction);
