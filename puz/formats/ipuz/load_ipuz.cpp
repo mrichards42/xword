@@ -32,6 +32,8 @@ public:
 void LoadIpuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 {
     std::ifstream stream(filename.c_str());
+    if (stream.fail())
+        throw FatalFileError(std::string("Unable to open file: ") + filename);
     // Throw away "ipuz("
     char test[6];
     stream.read(test, 5);
@@ -178,6 +180,47 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
                 square.SetNumber(val);
         }
     });
+
+    // Solution
+    if (doc->Contains(puzT("solution")))
+    {
+        GRID_FOREACH(doc->GetArray(puzT("solution")),
+        {
+            if (! cell->IsNull())
+            {
+                string_t val;
+                if (! cell->IsMap())
+                    val = cell->AsString();
+                else
+                    val = cell->AsMap()->GetString(puzT("value"), empty_str);
+                if (val == block_str)
+                    square.SetSolution(square.Black);
+                else if (val != empty_str)
+                    square.SetSolution(val);
+            }
+        });
+    }
+
+    // User grid
+    if (doc->Contains(puzT("saved")))
+    {
+        GRID_FOREACH(doc->GetArray(puzT("saved")),
+        {
+            if (! cell->IsNull())
+            {
+                string_t val;
+                if (! cell->IsMap())
+                    val = cell->AsString();
+                else
+                    val = cell->AsMap()->GetString(puzT("value"), empty_str);
+                if (val == block_str)
+                    square.SetText(square.Black);
+                else if (val != empty_str)
+                    square.SetText(val);
+            }
+        });
+    }
+
 
     // Clues
     json::Map * cluelists = doc->GetMap(puzT("clues"));
