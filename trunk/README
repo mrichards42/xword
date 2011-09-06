@@ -5,31 +5,33 @@ XWord - A cross platform crossword solving program
 https://sourceforge.net/projects/wx-xword/
 
 XWord is a cross-platform crossword puzzle program designed to be highly
-configurable.  It reads and writes the Across Lite .puz file format, and reads
-the Across Lite plain text format (version 1 or 2).
+configurable.  It reads multiple puzzle file formats.
 
 Supported features:
-    - Solving of all American style and cryptic crosswords (except diagramless).
+    - Solving of all American style and cryptic crosswords.
+    - Partial support for solving diagramless puzzles.
     - Solving rebus puzzles.
+    - Support for reading number of puzzle formats:
+        - Across Lite
+        - XPF
+        - jpz
+        - ipuz
+    - Recovery of corrupted Across Lite .puz files.
     - A timer.
     - Checking and revealing letters.
-    - Scrambling and unscrambling puzzle solutions.
-    - Viewing and editing puzzle notes.
+    - Scrambling and unscrambling puzzle solutions (for Across Lite files).
+    - Viewing puzzle notes.
     - Zooming the grid in and out.
     - Rearranging the window layout.
     - Color, font, and solving behavior configuration.
-    - Batch conversion to and from .puz and .txt formats.
-    - Recovery of corrupted Across Lite .puz files.  If a .puz file is
-      corrupt in any way, XWord will alert the user and attempt to display
-      as much of the puzzle as possible (usually the entire puzzle is
-      recoverable).
     - Printing (not yet polished, and somewhat buggy: e.g. the page setup
       dialog doesn't always display the correct paper size)
 
+XWord is extensible via the lua scripting language.  A number of plugins are
+available.  See Tools > Plugin Manager.
+
 Rebus
 =====
-
-XWord can now be used to solve rebus puzzles.
 
 Key               Function
 -------------------------------------
@@ -60,51 +62,6 @@ program restart to take effect):
         This is slightly buggy, as setting an X padding to zero causes some of
         the clue numbers to get cut off.
 
-    - Grid line thickness
-        Accessed under [Grid] heading of config file (lineThickness)
-
-        Sets the thickness of lines between squares in the grid (in pixels)
-
-    - Printing support
-        Printing is not ready for a real release, but it can be enabled anyway
-        by adding "enablePrinting=1" under the [Printing] heading.
-
-
-
-Batch conversion
-================
-
-XWord can also be used to batch convert .txt formatted puzzles into .puz files
-(and vice-versa).  The convert dialog is located in the Tools menu.  Conversion
-can also be invoked at the command line (conversion still occurs using the
-gui).
-
-    -c --convert
-
-        Runs XWord in batch convert mode.  XWord will convert files using the
-        convert dialog.  When the user closes the dialog, XWord wil exit.
-        Other switches do nothing unless -c is specified.
-        With no other switches, convert files and place the output files in
-        the same directory.
-
-    -o  --output-files
-
-        If converting files, specify each output file after each input file:
-            xword -c -o in_file_1 out_file_1 in_file_2 out_file_2
-
-    -w  --overwrite
-
-        If output files exist, overwrite them instead of giving the output
-        a different file name.  If this switch is not specified and the output
-        file exists, XWord will add a number to the output file name.
-
-    -d  --directory=<output directory>
-
-        Place converted files in this directory.  Output files can be specified
-        as relative paths, in which case files will be made relative to this
-        directory.
-
-
 
 
 Building XWord
@@ -118,11 +75,21 @@ easy to fix.
 
 http://www.wxwidgets.org
 
+XWord uses a number of other statically or dynamically linked libraries. Most
+of these are supplied in the source distribution.  The external libraries
+you'll want are wxLua (required for buildling XWord with lua support) and
+cURL (if you want to build luacurl, which is needed for many of the lua
+scripts).
 
-Visual C++ and Code::Blocks project files are supplied in the source
-distribution.  The Code::Blocks file is intended to work only on Linux (i.e. it
-uses the wx-config program).
+XWord uses lua as a scripting extension language.  If you don't want to include
+lua, undefine XWORD_USE_LUA.  Odds are that there are a few modifications that
+will be needed for this option, though regenerating the makefiles using premake
+might be enough.
 
+
+Visual C++ project files and gnu makefules are supplied in the source
+distribution.  I haven't built XWord on linux in a while, so the makefiles
+probably don't work.
 
 XWord requires the following libraries in addition to the wxWidgets Base and
 Core libraries:
@@ -135,16 +102,11 @@ wxzlib
 Windows-specific building instructions
 ======================================
 
-The VC project file is set up to link to the MSVC runtime library *statically*
-(so that XWord can be run on Windows without needing to download any dlls).
+The VC project file is set up to link to the MSVC runtime library dynamically.
 You will either need to build the wxWidgets libraries so that they also link to
-the MSVC runtimes statically, or change the setting
+the MSVC runtimes dynamically (the default), or change the setting
 (Properties >> C/C++ >> Code Generation >> Runtime Library).
 
 The VC project file assumes that you have an environmental variable $(WXWIN)
 that points to the wxWidgets folder (with compiled Unicode and Unicode Debug
-libraries).  It also assumes that the user has added "$(WXWIN)\include" to the
-VC include directories list, and "$(WXWIN)\lib\vc_lib" to the library
-directories list (Both are found under Tools >> Options >> Projects and
-Solutions >> VC++ Directories).  You should be able to add those two
-directories to the project if you'd rather not add them as global VC settings.
+libraries).
