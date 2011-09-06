@@ -15,6 +15,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+// TODO:
+// If GetHTML() ever produces a string with no word line breaks, cache it, the
+//     font size, and the column size.  If subsequent requests are of the same
+//     or smaller font and the same or large column size, return the cached
+//     string instead of recreating it.
+// Have wxHtmlDCRenderer remember where it left off.  Render() returns the
+//     y-position of the first cell not rendered.  Change the default value of
+//     "from" to -1, which will mean "start from where we left off".
+// Work on multi-page printing.  If things don't fit at all after some
+//     threshold (which would be MIN_FONT_SIZE, MIN_BOX_SIZE), try again,
+//     but allow 2+ pages.  At the start of printing, setup the
+//     wxHtmlDCRenderer, and draw the text on subsequent calls of
+//     OnPrintPage(page_num).  If page_num != 1, don't move columns out of
+//     the way of the grid.
+//     The infrastructure for laying-out and drawing a page is in place, but it
+//     will take a little work to make it happy with more than one page.
+
+
 #include "printout.hpp"
 #include "puz/Puzzle.hpp"
 #include "App.hpp" // For the global print data pointers, and ConfigManager
@@ -25,47 +43,278 @@
 #include <wx/busyinfo.h>
 
 // Constants
-// The actual grid size will be GRID_SIZE - GRID_PADDING
-const double GRID_SIZE = 4. / 5.;
-const double GRID_PADDING = 0.005;
-const int NUMBER_PADDING = 1;
-const int COLUMN_PADDING = 0;
-const int LINE_PADDING = 0;
-const int CLUE_HEADING_PADDING = 5;
-// Absolute minimum
-const int MIN_POINT_SIZE = 6;
-// Minimum before a new grid size is tried
-const int MIN_GOOD_POINT_SIZE = 8;
+const double GRID_PADDING = 5;
+const double COLUMN_PADDING = 5;
+const int MIN_FONT_SIZE = 7;
+const int MAX_FONT_SIZE = 11;
+const double MIN_SQUARE_SIZE = 0.15; // In inches
+// These are "nice-looking" sizes, which factor into how well-proportioned
+// the layout is.
+const double GOOD_SQUARE_SIZE = 0.2;
+const int GOOD_FONT_SIZE = 10;
+
+//-----------------------------------------------------------------------------
+// HTML
+//-----------------------------------------------------------------------------
+// Most of this section is composed of various hacks to get wxHtmlDCRenderer
+// work well with column (=page) and line breaks.  The main class is very
+// useful in printing HTML in columns, but these hacks make the result
+// much nicer.
 
 
-// Thrown when the text runs off the page.
-class FontSizeError
+// A custom HTML parser that forces table cells to not break across pages.
+// The implementation of this (especially the part about preventing a page
+// break after the table header) is a terrible hack.
+class PrintHtmlWinParser : public wxHtmlWinParser
 {
-public:
-    FontSizeError() {}
+protected:
+    // We need to have control over the (singly) linked-list of child
+    // cells of the wxHtmltableCell.  In order to do this, we need a pointer
+    // to the first child cell.
+    wxHtmlContainerCell * m_firstTableCell;
+    wxHtmlContainerCell * m_table;
+
+    virtual void AddTag(const wxHtmlTag& tag)
+    {
+        // Setup (before the tag is parsed)
+        if (tag.GetName() == _T("TABLE"))
+        {
+            m_firstTableCell = NULL;
+            m_table = NULL;
+        }
+        else if (tag.GetName() == _T("TH"))
+        {
+            // The table is a child of the current container;
+            m_table = wxDynamicCast(GetContainer()->GetLastChild(), wxHtmlContainerCell);
+            // Add the first (empty) container cell
+            m_firstTableCell = new wxHtmlContainerCell(m_table);
+        }
+
+        // Parse the tag
+        wxHtmlWinParser::AddTag(tag);
+
+        // After the table is constructed, we can safely modify the order of
+        // cells.
+        if (tag.GetName() == _T("TABLE"))
+        {
+            // Remove the header and first table row (number and clue)
+            // and make them children of m_firstTableCell.  This will prevent
+            // the header from being separated from the first row.
+
+            // First child is m_firstTableCell; next is the header
+            wxHtmlCell * th = m_table->GetFirstChild()->GetNext();
+            wxHtmlCell * number = th->GetNext();
+            if (! number) return;
+            wxHtmlCell * clue = number->GetNext();
+            if (! clue) return;
+            // The cell after clue will be the second child of the table.
+            wxHtmlCell * secondRow = clue->GetNext();
+
+            // Unlink the cells
+            th->SetNext(NULL);
+            number->SetNext(NULL);
+            clue->SetNext(NULL);
+
+            // Add the cells to the first cell
+            m_firstTableCell->InsertCell(th);
+            m_firstTableCell->InsertCell(number);
+            m_firstTableCell->InsertCell(clue);
+
+            // Relink the first cell to secondRow
+            m_firstTableCell->SetNext(secondRow);
+
+            // m_firstTableCell doesn't have any size yet, but its children
+            // do, so calculate our own size.
+            m_firstTableCell->Layout(th->GetWidth());
+
+            // Loop through the table cells and prevent them from being
+            // broken across pages.
+            wxHtmlCell * td = m_table->GetFirstChild();
+            while (td)
+            {
+                td->SetCanLiveOnPagebreak(false);
+                td = td->GetNext();
+            }
+        }
+    }
 };
 
 
+// Allow word breaks in a long word by inserting the custom <wbr> tag.
+// This is a pretty hackish way to break up overly long words, but it's
+// better than having long words get cut off, or even worse, breaking the
+// entire layout because the font size required to print the word on one
+// line is to small.
+wxString BreakWord(wxDC * dc, const wxString & word, int maxWidth)
+{
+    int width;
+    // Shortcut if we don't need to break the word
+    dc->GetTextExtent(word, &width, NULL);
+    if (width <= maxWidth)
+        return word;
 
-//--------------------------------------------------------------------------------
+    wxString ret;
+    size_t start = 0;
+    size_t length = 1;
+    while (start + length < word.Length())
+    {
+        dc->GetTextExtent(word.substr(start, length), &width, NULL);
+        // Break if the current substring is too long
+        if (width > maxWidth && length > 1)
+        {
+            --length;
+            ret << word.substr(start, length) << _T("<wbr>");
+            start += length;
+            length = 0;
+        }
+        ++length;
+    }
+    ret.Append(word.substr(start, length));
+    return ret;
+}
+
+
+// Add <wbr> wherever it is needed in a line
+wxString BreakLine(wxDC * dc, const wxString & line, int width)
+{
+    wxString ret;
+    // Break up the line by whitespace
+    size_t start = 0;
+    for (;;)
+    {
+        size_t end = line.find_first_of(_T(" -\n\r\f"), start);
+        if (end == wxString::npos)
+        {
+            ret << BreakWord(dc, line.substr(start), width);
+            break;
+        }
+        else
+        {
+            ++end;
+            ret << BreakWord(dc, line.substr(start, end - start), width);
+            start = end;
+        }
+    }
+    return ret;
+}
+
+int GetFontSize(int base_size, int offset)
+{
+    // This is based on wxBuildFontSizes from src/html/winpars.cpp
+    // Each increment adjusts font size by a factor of 1.2, except font size
+    // -2.
+    if (offset <= -1)
+        return (base_size * 0.75);
+    else
+        return base_size * pow((double)1.2, offset);
+}
+
+void SetFontSize(wxDC * dc, int base_size, int offset)
+{
+    wxFont font = dc->GetFont();
+    font.SetPointSize(GetFontSize(base_size, offset));
+    dc->SetFont(font);
+}
+
+wxString
+MyPrintout::GetHTML()
+{
+    // We need to insert <wbr> wherever there could be a line break in
+    // our text string, therefore GetHTML() needs to be called every time
+    // we do a new layout.
+    wxDC * dc = GetDC();
+    // ** Make sure to set the font to the standard font before calling
+    // this function
+
+    // This will be used for measuring line breaks
+    int base_font_size = dc->GetFont().GetPointSize();
+
+    // Assemble the html
+    // This will contain the header stuff and then one long table for each
+    // clue list.
+    wxString html;
+
+    // Title
+    if (! m_puz->m_title.empty())
+    {
+        SetFontSize(dc, base_font_size, 2);
+        html << _T("<font size=\"+2\"><b>") 
+                    << BreakLine(dc, puz2wx(m_puz->m_title), m_columnWidth)
+                << _T("<b></font>")
+                << _T("<br>");
+    }
+    // Author
+    if (! m_puz->m_author.empty())
+    {
+        SetFontSize(dc, base_font_size, 1);
+        html << _T("<font size=\"+1\">")
+                << BreakLine(dc, puz2wx(m_puz->m_author), m_columnWidth)
+             << _T("</font>")
+             << _T("<br>");
+    }
+
+    SetFontSize(dc, base_font_size, 0);
+    // Clue lists
+    puz::Clues::const_iterator clues_it;
+    for (clues_it = m_puz->GetClues().begin();
+         clues_it != m_puz->GetClues().end();
+         ++clues_it)
+    {
+        // Table for clues
+        html << _T("<table cellspacing=0 cellpadding=1 border=0>");
+        // Heading
+        html << _T("<tr><th colspan=2 align=\"left\"><b>")
+                    << BreakLine(dc, puz2wx(clues_it->first), m_columnWidth)
+               << _T("</b></th></tr>");
+        puz::ClueList::const_iterator it;
+        for (it = clues_it->second.begin(); it != clues_it->second.end(); ++it)
+        {
+            html
+                << _T("<tr>")
+                    // Clue number
+                    << _T("<td align=\"right\" valign=\"top\"><b>")
+                        << puz2wx(it->GetNumber()) // Don't bother to break the number
+                    << _T(" </b></td>")
+                    // Clue text
+                    << _T("<td>")
+                        // Break the clue at .8 column width
+                        << BreakLine(dc, puz2wx(it->GetText()), m_columnWidth * 0.8)
+                    << _T("</td>")
+                << _T("</tr>");
+        }
+        html << _T("</table>");
+        // Add some space after the clue list
+        html << _T("<br><br>");
+    }
+    return html;
+}
+
+//-----------------------------------------------------------------------------
 // Setup functions
-//--------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, int numPages)
     : wxPrintout(puz2wx(puz->m_title)),
       m_frame(frame),
       m_puz(puz),
       m_drawer(puz),
-      m_numPages(numPages)
+      m_numPages(numPages),
+      m_isScaled(false)
 {
+    m_htmlRenderer = new MyHtmlDCRenderer(new PrintHtmlWinParser);
+
     // Don't draw any grid text, incorrect / revealed triangles, Xs for
     // incorrect answers, etc.
     m_drawer.SetFlags(XGridDrawer::DRAW_CIRCLE
                     | XGridDrawer::DRAW_NUMBER);
-
-    m_fontSizeDontCare = false;
-
+    // Since print DPI huge, set the number scale to something reasonable
+    m_drawer.SetNumberScale(0.25);
     ReadConfig();
+}
+
+MyPrintout::~MyPrintout()
+{
+    delete m_htmlRenderer;
 }
 
 void
@@ -90,8 +339,6 @@ MyPrintout::ReadConfig()
     m_drawer.SetNumberScale(config.Grid.numberScale() / 100.);
     m_drawer.SetLetterScale(config.Grid.letterScale() / 100.);
 
-    SetupFonts();
-
     // Grid config
     m_gridAlign  = config.Printing.gridAlignment();
 
@@ -101,21 +348,71 @@ MyPrintout::ReadConfig()
 
 
 void
-MyPrintout::SetupFonts()
+MyPrintout::SetPointSize(int pointSize)
 {
+    // This doesn't do anything since we're using HTML
+    /*
+    m_clueFont.SetPointSize(pointSize);
     m_numberFont = m_clueFont;
+    m_numberFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_headingFont = m_clueFont;
     m_headingFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_authorFont = m_clueFont;
     m_authorFont.SetPointSize(m_authorFont.GetPointSize() + 1);
     m_titleFont = m_authorFont;
     m_titleFont.SetWeight(wxFONTWEIGHT_BOLD);
+    */
 }
 
+//-----------------------------------------------------------------------------
+// Scaling functions
+//-----------------------------------------------------------------------------
+void MyPrintout::ScaleDC()
+{
+    // Get the logical pixels per inch of screen and printer
+    int ppiScreenX, ppiScreenY;
+    GetPPIScreen(&ppiScreenX, &ppiScreenY);
+    int ppiPrinterX, ppiPrinterY;
+    GetPPIPrinter(&ppiPrinterX, &ppiPrinterY);
 
-//--------------------------------------------------------------------------------
+    // This scales the DC so that the printout roughly represents the the screen
+    // scaling. The text point size _should_ be the right size but in fact is
+    // too small for some reason. This is a detail that will need to be
+    // addressed at some point but can be fudged for the moment.
+    float scale = (float)((float)ppiPrinterX/(float)ppiScreenX);
+
+    /* scale our PageSize and Margins to the "screen" */
+    int pageWidth, pageHeight;
+    int w, h;
+    GetDC()->GetSize(&w, &h);
+    GetPageSizePixels(&pageWidth, &pageHeight);
+
+
+    // If printer pageWidth == current DC width, then this doesn't change. But w
+    // might be the preview bitmap width, so scale down.
+    float overallScale = scale * (float)(w/(float)pageWidth);
+    GetDC()->SetUserScale(overallScale, overallScale);
+
+    // Set margins
+    float factor = (float)(ppiPrinterX/(scale*25.4));
+    wxPoint offset = g_pageSetupData->GetMarginTopLeft();
+    GetDC()->SetDeviceOrigin(offset.x * factor, offset.y * factor);
+
+    //MapScreenSizeToPageMargins(*g_pageSetupData);
+    m_isScaled = true;
+}
+
+void MyPrintout::UnscaleDC()
+{
+    wxDC * dc = GetDC();
+    dc->SetUserScale(1, 1);
+    dc->SetDeviceOrigin(0, 0);
+    m_isScaled = false;
+}
+
+//-----------------------------------------------------------------------------
 // Print framework functions
-//--------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool
 MyPrintout::HasPage(int pageNum)
 {
@@ -141,100 +438,227 @@ MyPrintout::GetPageInfo(int *minPage, int *maxPage, int *pageFrom, int *pageTo)
 bool
 MyPrintout::OnPrintPage(int pageNum)
 {
-    wxLogDebug(_T("Printing page %d"), pageNum);
-    m_drawer.SetDC(GetDC());
-    // Turn drawing on.
+    // m_gridScale, m_columns, and m_fontSize are set when we do the page
+    // layout (in OnPreparePrinting)
     m_isDrawing = true;
-
     LayoutGrid(m_gridScale);
     DrawGrid();
-    DrawText();
-    wxLogDebug(_T("Done printing page %d"), pageNum);
+    DrawText(m_columns, m_fontSize);
     return true;
 }
 
 void
 MyPrintout::OnPreparePrinting()
 {
-    wxLogDebug(_T("OnPreparePrinting"));
-    wxLogDebug(_T("DC Size: %d, %d"), GetDC()->GetSize().x, GetDC()->GetSize().y);
-    m_drawer.SetDC(GetDC());
+    m_isDrawing = false;
     LayoutPages();
 }
 
 
-//--------------------------------------------------------------------------------
-// Layout and drawing functions
-//--------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Full Page Layout
+//-----------------------------------------------------------------------------
 
-void
+bool
 MyPrintout::LayoutPages()
 {
     // Disable windows while laying out the page
     wxWindowDisabler disableAll;
     wxBusyInfo wait(_T("Please wait. Laying out page..."));
 
-    // Suppress drawing
-    m_isDrawing = false;
+    // Start with the preferred grid size and column layout.
+    // Try to layout the text wrapping around the grid.
+    // If the text doesn't fit, try a different column layout.
+    // If that doesn't work, try making the grid take up less space.
+    // If that doesn't work, try smaller point sizes.
 
-    // Make the borders bigger if we're actually printing, because the DPI of the printer
-    // is way higher.
-    if (IsPreview())
-        m_drawer.SetBorderSize(1);
-    else
-        m_drawer.SetBorderSize(3);
+    // The ideal layout is one where the grid and text have to compensate
+    // as little as possible.  spaceFilled will keep track of the amount of
+    // total grid and text.  Higher values mean that more space is taken up
+    // on the page.  gridWeight is grid_ratio - text_ratio, a measure of 
+    // how well-proportioned the page is.  Ideally this is 0.
+    // For our purposes, grid ratio will be defined as
+    // log(box_size / good_box_size) and text ratio as
+    // log(font_size / good_font_size)
+    double spaceFilled = 0;
+    double gridWeight = 0;
 
-    // Try successive column scales (1/x) after the font gets too small.
-    // Grid scale will be the entire page less the column scale.
-    // e.g. column scale of 4 = 1/4; the grid will take up 3/4 of the page
-    double colScales[] = { 4, 5, 6, 3 };
-    int i = 0;
-    const int startingFontSize = m_clueFont.GetPointSize();
+    // A structure to keep our best layout so far
+    struct _bestData {
+        double spaceFilled;
+        double gridWeight;
+        int fontSize;
+        int columns;
+        double gridScale;
+    } best;
+    best.fontSize = -1; // The invalid state
 
-    // Measure the grid and text.  If the text doesn't fit, catch the exception that should
-    // be thrown, and try a smaller font size or a different grid size.
-    for (;;)
+    // Set the min box size.
+    // I can't figure out how to reliably set min box size to an inch
+    // measurement, so this will have to do.
+    m_pageRect = GetLogicalPageMarginsRect(*g_pageSetupData);
+    int w, h;
+    GetPageSizeMM(&w, &h);
+    w -= (g_pageSetupData->GetMarginTopLeft().x + g_pageSetupData->GetMarginBottomRight().x);
+    double ppi = 25.4 * m_pageRect.width / w;
+    int minBoxSize = ppi * MIN_SQUARE_SIZE;
+    int goodBoxSize = ppi * GOOD_SQUARE_SIZE;
+
+    // Try columns in this order
+    int columns[] = { 4, 5, 6, 3 };
+
+    for (int pt = MAX_FONT_SIZE; pt >= MIN_FONT_SIZE; --pt)
     {
-        try
+        double textRatio = log((double)pt / (double)GOOD_FONT_SIZE);
+        // Columns that are all text
+        for (double textCols = 1.; textCols < 3; ++textCols)
         {
-            // Measure the grid
-            m_gridScale = 1 - (1. / colScales[i]);
-            LayoutGrid(m_gridScale);
-            DrawText();
-            break;
+            for (int i = 0; i < 4; ++i)
+            {
+                // The grid takes up all but on column.
+                m_gridScale = 1 - (textCols / columns[i]);
+                wxLogDebug(_T("Laying out cols=%d, pt=%d, grid=%g"), columns[i], pt, m_gridScale);
+                if (m_gridScale < .1)
+                    continue;
+
+                LayoutGrid(m_gridScale);
+                if (m_drawer.GetBoxSize() < minBoxSize)
+                    continue;
+                if (LayoutText(columns[i], pt))
+                {
+                    double gridRatio = log((double)m_drawer.GetBoxSize() / (double)goodBoxSize);
+                    spaceFilled = gridRatio + textRatio;
+                    gridWeight = gridRatio - textRatio;
+                    wxLogDebug(_T("space: %g, weight: %g"), spaceFilled, gridWeight);
+                    // See if this is a better layout than the previous best.
+                    // "Better" here means that the amount of space gained
+                    // is greater than the half the amount of proportion lost.
+                    if (best.fontSize == -1
+                        || (spaceFilled > best.spaceFilled
+                            && spaceFilled - best.spaceFilled >
+                                (abs(gridWeight) - abs(best.gridWeight)) / 2))
+                    {
+                        wxLogDebug(_T("(current best)"));
+                        best.gridWeight = gridWeight;
+                        best.spaceFilled = spaceFilled;
+                        best.gridScale = m_gridScale;
+                        best.fontSize = pt;
+                        best.columns = columns[i];
+                    }
+                }
+            }
         }
-        catch (FontSizeError&)
+        // The textRatio is going to be getting smaller, so if our
+        // best gridWeight is already > 0, the layout will never get
+        // better.
+        if (best.fontSize != -1 && best.gridWeight > 0)
+            break;
+    }
+    if (best.fontSize != -1)
+    {
+        m_gridScale = best.gridScale;
+        m_fontSize = best.fontSize;
+        m_columns = best.columns;
+        wxLogDebug(_T("Best layout with cols=%d, pt=%d, grid=%g, space=%g, weight=%g"), m_columns, m_fontSize, m_gridScale, best.spaceFilled, best.gridWeight);
+        return true;
+    }
+    else
+        return false;
+}
+
+
+//--------------------------------------------------------------------------------
+// Text Layout
+//--------------------------------------------------------------------------------
+
+bool
+MyPrintout::LayoutText(int columns, int fontSize)
+{
+    m_isDrawing = false;
+    return DrawText(columns, fontSize);
+}
+
+
+bool
+MyPrintout::DrawText(int columns, int fontSize)
+{
+    wxDC * dc = GetDC();
+    ScaleDC();
+    m_pageRect = GetLogicalPageMarginsRect(*g_pageSetupData);
+    // Figure out the column width
+    m_columnWidth = (m_pageRect.width - (COLUMN_PADDING * (columns - 1)))
+                        / (double)columns;
+
+    // Setup the HTML Renderer
+    m_htmlRenderer->SetDC(dc);
+    m_htmlRenderer->SetSize(m_columnWidth, 1000);
+    m_htmlRenderer->SetStandardFonts(fontSize);
+    dc->SetFont(m_clueFont);
+    m_htmlRenderer->SetHtmlText(GetHTML());
+
+    if (! m_isDrawing && m_htmlRenderer->GetTotalWidth() > m_columnWidth)
+        return false;
+
+    // Layout the text into columns
+    wxArrayInt breaks;
+    int x = m_pageRect.x;
+    int html_y = 0;
+    int html_height = m_htmlRenderer->GetTotalHeight();
+    while (html_y < html_height)
+    {
+        wxRect colRect(x, m_pageRect.y, m_columnWidth, m_pageRect.height);
+
+        // Make sure we're still on the page
+        if (! m_pageRect.Contains(x, m_pageRect.y))
+            return false;
+
+        // Make sure we don't start this column in the grid
+        if (m_gridRect.Contains(colRect.GetTopLeft()))
         {
-            wxTheApp->Yield();
-            // If we're at the smallest good looking font size, try the next grid size.
-            if (m_clueFont.GetPointSize() == MIN_GOOD_POINT_SIZE && i < 2)
-            {
-                wxLogDebug(_T("Hit min *good* font size"));
-                wxLogDebug(_T("Trying again with a different grid size"));
-                ++i; // Next grid size in the list
-                m_clueFont.SetPointSize(startingFontSize);
-                SetupFonts();
-            }
-            else if (m_clueFont.GetPointSize() <= MIN_POINT_SIZE)
-            {
-                wxLogDebug(_T("Ran out of size options!"));
-                return;
-            }
-            else
-            {
-                wxLogDebug(_T("Trying again with font size: %d"), m_clueFont.GetPointSize());
-                m_clueFont.SetPointSize(m_clueFont.GetPointSize() - 1);
-                SetupFonts();
-            }
+            colRect.y = m_gridRect.GetBottom() + GRID_PADDING;
+            colRect.SetBottom(m_pageRect.GetBottom());
+        }
+        // Make sure we don't overlap the grid
+        if (m_gridRect.Intersects(colRect)) // The column is too long
+        {
+            colRect.SetBottom(m_gridRect.GetTop() - GRID_PADDING);
+        }
+
+        // Draw the column
+        // wxWidgets docs haven't been updated.  This function is actually
+        // Render(int x, int y, wxArrayInt & pagebreaks,
+        //        int from = 0, bool dont_render = false, int to = INT_MAX)
+        m_htmlRenderer->SetSize(m_columnWidth, colRect.height);
+        html_y = m_htmlRenderer->Render(colRect.x, colRect.y, breaks, html_y, ! m_isDrawing);
+        // Move to the next column
+        x += m_columnWidth + COLUMN_PADDING;
+    }
+
+#if 0
+    // DEBUG: draw columns and page rect
+    if (m_isDrawing)
+    {
+        dc->SetPen(*wxRED_PEN);
+        dc->SetBrush(*wxTRANSPARENT_BRUSH);
+        dc->DrawRectangle(m_pageRect);
+        dc->SetPen(*wxGREY_PEN);
+        for (int i = 0; i < columns; ++i)
+        {
+            int x = m_pageRect.x + i * (m_columnWidth + COLUMN_PADDING);
+            dc->DrawLine(x, m_pageRect.y, x, m_pageRect.height + m_pageRect.y);
+            dc->DrawLine(x + m_columnWidth, m_pageRect.y, x + m_columnWidth, m_pageRect.height + m_pageRect.y);
         }
     }
-    wxLogDebug(_T("Done with layout"));
+#endif // 0 (debug drawing)
+    return true;
 }
 
 
 
 
-
+//--------------------------------------------------------------------------------
+// Grid Layout
+//--------------------------------------------------------------------------------
 
 void
 MyPrintout::LayoutGrid(double gridScale)
@@ -250,16 +674,23 @@ MyPrintout::LayoutGrid(double gridScale)
     // XGridDrawer ensures that all squares are the same size.
 
     wxDC * dc = GetDC();
-    dc->SetUserScale(1, 1);
-    dc->SetDeviceOrigin(0, 0);
+    m_drawer.SetDC(dc);
+
+    // Scale the DC for border calcluations
+    ScaleDC();
+    m_drawer.SetBorderSize(dc->LogicalToDeviceXRel(2));
+
+    // Unscale the DC for layout calculations
+    UnscaleDC();
+
     const wxRect pageRect = GetLogicalPageMarginsRect(*g_pageSetupData);
 
     // Calculate the grid width and height
     //------------------------------------
 
     // The most space we will allow the grid to take up
-    const double maGridWidth  = pageRect.width  * (gridScale - GRID_PADDING);
-    const double maGridHeight = pageRect.height * (gridScale - GRID_PADDING);
+    const double maGridWidth  = pageRect.width  * (gridScale);
+    const double maGridHeight = pageRect.height * (gridScale);
 
     // Calculate the size of each square
     const int borderSize = m_drawer.GetBorderSize();
@@ -282,15 +713,6 @@ MyPrintout::LayoutGrid(double gridScale)
     m_gridRect.width  = (boxSize + borderSize) * gridWidth  + borderSize;
     m_gridRect.height = (boxSize + borderSize) * gridHeight + borderSize;
 
-    // Setup the grid drawer with our calculated size
-    m_drawer.SetMaxSize(m_gridRect.width, m_gridRect.height);
-    m_drawer.SetAlign(m_gridAlign);
-
-    // Add padding to the bounding rect
-    const int padding = std::min(pageRect.width, pageRect.height) * GRID_PADDING;
-    m_gridRect.width  += padding;
-    m_gridRect.height += padding;
-
     // Align the grid
     //---------------
     m_gridRect.x = pageRect.x;
@@ -301,10 +723,12 @@ MyPrintout::LayoutGrid(double gridScale)
     if ((m_gridAlign & wxALIGN_BOTTOM) != 0)
         m_gridRect.y += pageRect.height - m_gridRect.height;
 
-    // Scale the DC.
-    MapScreenSizeToPageMargins(*g_pageSetupData);
+    m_drawer.SetAlign(m_gridAlign);
+    m_drawer.SetMaxSize(m_gridRect.GetSize());
 
-    // Adapt the grid rect to the user scale.
+    // Scale the DC so we can transform the gridRect dimensions to logical
+    // dimensions.
+    ScaleDC();
     m_gridRect.x      = dc->DeviceToLogicalX(m_gridRect.x);
     m_gridRect.y      = dc->DeviceToLogicalY(m_gridRect.y);
     m_gridRect.width  = dc->DeviceToLogicalXRel(m_gridRect.width);
@@ -315,234 +739,18 @@ MyPrintout::LayoutGrid(double gridScale)
 void
 MyPrintout::DrawGrid()
 {
+    m_drawer.SetDC(GetDC());
+    UnscaleDC();
+
     // This must be called after LayoutGrid().
 
     // Offset the origin to draw the grid at the right point
-    MapScreenSizeToPageMargins(*g_pageSetupData);
+    ScaleDC();
     wxDC * dc = GetDC();
     const int offsetX = dc->LogicalToDeviceX(m_gridRect.x);
     const int offsetY = dc->LogicalToDeviceY(m_gridRect.y);
-
-    dc->SetUserScale(1, 1);
+    UnscaleDC();
     dc->SetDeviceOrigin(offsetX, offsetY);
+
     m_drawer.DrawGrid(*dc);
-}
-
-
-
-void
-MyPrintout::DrawText()
-{
-    wxDC * dc = GetDC();
-
-    // Scale the DC.
-    MapScreenSizeToPageMargins(*g_pageSetupData);
-
-    m_pageRect = GetLogicalPageMarginsRect(*g_pageSetupData);
-    int x = m_pageRect.x;
-    int y = m_pageRect.y;
-
-    LayoutColumns();
-
-    // Title and author
-    dc->SetFont(m_titleFont);
-    DrawTextLine(WrapText(puz2wx(m_puz->m_title), m_columnWidth), &x, &y);
-
-    dc->SetFont(m_authorFont);
-    DrawTextLine(WrapText(puz2wx(m_puz->m_author), m_columnWidth), &x, &y);
-
-    // Draw clue lists
-    puz::Clues::const_iterator clues_it;
-    for (clues_it = m_puz->GetClues().begin();
-         clues_it != m_puz->GetClues().end();
-         ++clues_it)
-    {
-        // Add some space above clues.
-        y += CLUE_HEADING_PADDING;
-
-        // Draw the heading
-        dc->SetFont(m_headingFont);
-        DrawTextLine(WrapText(puz2wx(clues_it->first), m_columnWidth), &x, &y);
-
-        // Draw the clues
-        for (puz::ClueList::const_iterator it = clues_it->second.begin();
-             it != clues_it->second.end();
-             ++it)
-        {
-            DrawClue(*it, &x, &y);
-        }
-    }
-}
-
-void
-MyPrintout::LayoutColumns()
-{
-    m_pageRect = GetLogicalPageMarginsRect(*g_pageSetupData);
-
-    // A full column
-    m_columnWidth = m_pageRect.width
-                  - (m_gridRect.width - GRID_PADDING)
-                  - COLUMN_PADDING;
-
-
-    // Unscale the DC for measuring.
-    wxDC * dc = GetDC();
-    SaveUserScale();
-    // Measure the width of the largest clue number
-    m_numberWidth = 0;
-    dc->SetFont(m_numberFont);
-    puz::Clues::const_iterator clues_it;
-    for (clues_it = m_puz->GetClues().begin();
-         clues_it != m_puz->GetClues().end();
-         ++clues_it)
-    {
-        puz::ClueList::const_iterator it;
-        for (it = clues_it->second.begin(); it != clues_it->second.end(); ++it)
-        {
-            int width;
-            dc->GetTextExtent(it->GetNumber(), &width, NULL);
-            if (width > m_numberWidth)
-                m_numberWidth = width;
-        }
-    }
-    RestoreUserScale();
-
-    // The portion of the column that is taken up by clue text.
-    m_clueWidth = m_columnWidth - (m_numberWidth + NUMBER_PADDING);
-}
-
-
-
-void
-MyPrintout::DrawClue(const puz::Clue & clue, int * x, int * y)
-{
-    // Draw clue text
-
-    // Adjust x to account for the clue number width before drawing the clue
-    // text.  Return x to its previous position afterwards so that the clue
-    // number ends up in the right place.
-    wxDC * dc = GetDC();
-
-    *x += m_numberWidth + NUMBER_PADDING;
-    dc->SetFont(m_clueFont);
-    int height;
-    DrawTextLine(WrapText(puz2wx(clue.GetText()), m_clueWidth), x, y, NULL, &height);
-    *x -= m_numberWidth + NUMBER_PADDING;
-
-    if (m_isDrawing)
-    {
-        // Draw clue number
-        dc->SetFont(m_numberFont);
-        dc->DrawLabel(clue.GetNumber(),
-                      wxRect(*x, *y - height, m_numberWidth, dc->GetCharHeight()),
-                      wxALIGN_RIGHT);
-    }
-}
-
-
-
-// Column wrapping functions
-void
-MyPrintout::NewColumn(int * x, int * y)
-{
-    // Start a new column
-    *x += m_columnWidth + COLUMN_PADDING;
-    if (m_gridRect.Contains(*x, m_pageRect.GetTop()))
-        *y = m_gridRect.GetBottom();
-    else
-        *y = m_pageRect.GetTop();
-}
-
-void
-MyPrintout::AdjustColumn(int * x, int * y, int textWidth, int textHeight)
-{
-    // Decide if we need a new column.  If so, adjust x and y so that the
-    // next item is drawn at the start of a new column.
-
-    if (m_gridRect.Contains(*x, *y)
-        || m_gridRect.Contains(*x + textWidth, *y + textHeight))
-    {
-        // If there is still room under the grid, don't start a new
-        // column, just move y down.
-        if (m_gridRect.GetBottom() + textHeight < m_pageRect.GetBottom())
-            *y = m_gridRect.GetBottom();
-        else // Otherwise start a new column
-            NewColumn(x, y);
-    }
-    // If we're below the page, start a new column.
-    else if (*y + textHeight > m_pageRect.GetBottom())
-    {
-        NewColumn(x, y);
-    }
-}
-
-
-// This should throw an exception if the text runs off the page when we are
-// measuring.
-void
-MyPrintout::DrawTextLine(const wxString & text,
-                         int * x, int * y,
-                         int * width, int * height)
-{
-    // Measure the text, draw it, and move the x and y variables to the location
-    // that the next text line should be drawn.
-    // The caller must ensure that the text is wrapped.
-
-    int w, h;
-    MeasureText(text, &w, &h);
-    h += LINE_PADDING;
-
-    AdjustColumn(x, y, w, h);
-
-    const wxRect textRect(*x, *y, w, h);
-    if (m_isDrawing)
-        GetDC()->DrawLabel(text, textRect);
-    else if (! m_pageRect.Contains(textRect))
-        throw FontSizeError();
-
-    if (width != NULL)
-        *width = w;
-    if (height != NULL)
-        *height = h;
-
-    *y += h;
-}
-
-
-void
-MyPrintout::SaveUserScale()
-{
-    wxDC * dc = GetDC();
-    dc->GetUserScale(&m_scaleX, &m_scaleY);
-    dc->SetUserScale(1, 1);
-}
-
-void
-MyPrintout::RestoreUserScale()
-{
-    wxASSERT(m_scaleX != -1 && m_scaleY != -1);
-    GetDC()->SetUserScale(m_scaleX, m_scaleY);
-
-#ifdef __WXDEBUG__
-    // Set the scale variables to an invalid state.
-    m_scaleX = -1;
-    m_scaleY = -1;
-#endif // __WXDEBUG__
-}
-
-
-void
-MyPrintout::MeasureText(const wxString & text, int * width, int * height)
-{
-    // Unscale the DC for measuring.
-    SaveUserScale();
-    GetDC()->GetMultiLineTextExtent(text, width, height);
-    RestoreUserScale();
-}
-
-
-wxString
-MyPrintout::WrapText(const wxString & text, int maxWidth)
-{
-    return ::Wrap(GetDC(), text, maxWidth);
 }
