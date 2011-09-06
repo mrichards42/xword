@@ -112,45 +112,8 @@ function import.addHandler(loadfunc, ext, label)
                  { desc = label, ext = ext, load = loadfunc })
 end
 
-local tablex = require 'pl.tablex'
-local path = require 'pl.path'
--- Try all handlers on a puzzle.
-function import.load(p, filename)
-     -- Extension without the dot
-    local ext = path.extension(filename):lower():sub(2)
-
-    -- Try all handlers, but prefer those with a matching extension
-    local handlers = tablex.filter(import.handlers,
-                                   function (h) return h.ext == ext end)
-    table.insert(handlers, {}) -- this empty table will be used for Puzzle.Load()
-    tablex.insertvalues(
-        handlers,
-        tablex.filter(import.handlers,
-                      function (h) return h.ext ~= ext end)
-    )
-
-    local closest_err = '' -- Error from an extension that matches
-    for _, handler in ipairs(handlers) do
-        p:Clear()
-        local success, err
-        if handler.load then
-            success, err = pcall(handler.load, p, filename)
-        else
-            success, err = pcall(Puzzle.Load, p, filename)
-        end
-        if success then
-            return true
-        elseif handler.ext == ext then
-            closest_err = err
-        end
-    end
-    error(closest_err)
-end
-
 
 function import.init()
-    require('import.uclick')
-
     -- Add handlers to the menu
     if xword and xword.frame then
         for _, handler in ipairs(import.handlers) do
@@ -166,6 +129,74 @@ function import.uninit()
     fileMenu:Destroy(fileMenu:FindItemByPosition(index + 1))
     xword.frame:RemoveMenu('File', 'Import')
     importMenu = nil
+end
+
+-- Import the handlers
+require('import.uclick')
+
+-- ============================================================================
+-- Replace loading functions with import.load
+-- ============================================================================
+local puzzle_load = puz.Puzzle.Load
+local tablex = require 'pl.tablex'
+local path = require 'pl.path'
+-- Try all handlers on a puzzle.
+function import.load(p, filename)
+     -- Extension without the dot
+    local ext = path.extension(filename):lower():sub(2)
+
+    -- Try all handlers, but prefer those with a matching extension
+    local handlers = tablex.filter(import.handlers,
+                                   function (h) return h.ext == ext end)
+    table.insert(handlers, {load = puzzle_load})
+    tablex.insertvalues(
+        handlers,
+        tablex.filter(import.handlers,
+                      function (h) return h.ext ~= ext end)
+    )
+
+    local closest_err -- Error from an extension that matches
+    for _, handler in ipairs(handlers) do
+        p:Clear()
+        local success, err = pcall(handler.load, p, filename)
+        if success then
+            return true
+        elseif handler.ext == ext then
+            closest_err = err
+        end
+    end
+    error(closest_err or "Unknown file type")
+end
+
+
+-- Puzzle.Load
+puz.Puzzle.Load = import.load
+
+-- Puzzle constructor
+local puzzle_constructor = getmetatable(puz.Puzzle).__call
+getmetatable(puz.Puzzle).__call = function(p, filename, handler)
+    if filename then
+        return puzzle_constructor(p, filename, handler or import.load)
+    else
+        return puzzle_constructor(p)
+    end
+end
+
+-- Puzzle.CanLoad
+local canload = puz.Puzzle.CanLoad
+puz.Puzzle.CanLoad = function(filename)
+    if canload(filename) then
+        return true
+    else
+        -- Try custom extensions
+        local extension = path.extension(filename):sub(2):lower()
+        for _, desc in ipairs(import.handlers) do
+            if desc.ext == extension then
+                return true
+            end
+        end
+    end
+    return false
 end
 
 return import
