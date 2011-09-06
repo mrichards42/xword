@@ -26,7 +26,8 @@
 
 PreferencesDialog::PreferencesDialog(wxWindow * parent)
     : wxFB_PreferencesDialog(parent, wxID_ANY)
-{}
+{
+}
 
 //------------------------------------------------------------------------------
 // Load config
@@ -226,4 +227,13 @@ PreferencesDialog::SaveConfig()
     printing.Fonts.gridLetterFont = m_printGridLetterFont->GetSelectedFont();
     printing.Fonts.gridNumberFont = m_printGridNumberFont->GetSelectedFont();
     printing.Fonts.clueFont = m_printClueFont->GetSelectedFont();
+}
+
+
+void
+PreferencesDialog::OnBlackSquareBrightness(wxScrollEvent & evt)
+{
+    int value = evt.GetPosition();
+    m_printBlackSquarePreview->SetBackgroundColour(wxColour(value, value, value));
+    m_printBlackSquarePreview->Refresh();
 }

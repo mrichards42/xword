@@ -39,6 +39,8 @@ protected:
     virtual void OnApply(wxCommandEvent & evt)
         { SaveConfig(); GetParent()->Refresh(); evt.Skip(); }
     virtual void OnPrintCustomFonts(wxCommandEvent & evt);
+
+    virtual void OnBlackSquareBrightness(wxScrollEvent & evt);
 };
 
 

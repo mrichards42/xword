@@ -477,9 +477,6 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	bSizer42->Fit( miscPanel );
 	m_notebook->AddPage( miscPanel, wxT("Misc"), false );
 	printPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer56;
-	bSizer56 = new wxBoxSizer( wxVERTICAL );
-	
 	wxBoxSizer* bSizer371;
 	bSizer371 = new wxBoxSizer( wxVERTICAL );
 	
@@ -508,10 +505,10 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_printGridNumberFont->SetMaxPointSize( 100 ); 
 	fgSizer5->Add( m_printGridNumberFont, 0, 0, 5 );
 	
-	wxStaticText* m_printGridNumberFont;
-	m_printGridNumberFont = new wxStaticText( printPanel, wxID_ANY, wxT("Grid numbers (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_printGridNumberFont->Wrap( -1 );
-	fgSizer5->Add( m_printGridNumberFont, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	wxStaticText* m_printGridNumberFontLabel;
+	m_printGridNumberFontLabel = new wxStaticText( printPanel, wxID_ANY, wxT("Grid numbers (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_printGridNumberFontLabel->Wrap( -1 );
+	fgSizer5->Add( m_printGridNumberFontLabel, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_printClueFont = new wxFontPickerCtrl( printPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
 	m_printClueFont->SetMaxPointSize( 100 ); 
@@ -562,11 +559,9 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	
 	bSizer371->Add( bSizer58, 0, wxEXPAND, 5 );
 	
-	bSizer56->Add( bSizer371, 1, wxEXPAND|wxALL, 5 );
-	
-	printPanel->SetSizer( bSizer56 );
+	printPanel->SetSizer( bSizer371 );
 	printPanel->Layout();
-	bSizer56->Fit( printPanel );
+	bSizer371->Fit( printPanel );
 	m_notebook->AddPage( printPanel, wxT("Printing"), false );
 	
 	sizer->Add( m_notebook, 1, wxEXPAND | wxALL, 5 );
@@ -588,6 +583,15 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	// Connect Events
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
 	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
 	m_buttonsApply->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnApply ), NULL, this );
 	m_buttonsOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnOK ), NULL, this );
 }
@@ -597,6 +601,15 @@ wxFB_PreferencesDialog::~wxFB_PreferencesDialog()
 	// Disconnect Events
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
 	m_printCustomFonts->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
 	m_buttonsApply->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnApply ), NULL, this );
 	m_buttonsOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnOK ), NULL, this );
 	
