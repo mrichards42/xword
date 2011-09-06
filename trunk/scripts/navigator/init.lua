@@ -1,4 +1,3 @@
-xword.require 'import'
 local tablex = require 'pl.tablex'
 local path = require 'pl.path'
 local seq = require 'pl.seq'
@@ -44,9 +43,9 @@ local function load_first(file_iterator)
     -- Temp puzzle so that we can figure out the file that we should load
     local p = puz.Puzzle()
     for filename in file_iterator do
-        if pcall(import.load, p, filename) then
+        if puz.Puzzle.CanLoad(filename) and pcall(puz.Puzzle.Load, p, filename) then
             p:__gc()
-            xword.frame:LoadPuzzle(filename, import.load)
+            xword.frame:LoadPuzzle(filename)
             return
         end
     end
