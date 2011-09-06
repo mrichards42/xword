@@ -96,22 +96,6 @@ public:
     const Word * FindWord(const puz::Square * square, short direction) const;
           Word * FindWord(const puz::Square * square, short direction);
 
-    Word MakeWord(int x1, int y1, int x2, int y2);
-    Word MakeWord(const Square * start, const Square * end)
-    {
-        return MakeWord(start->GetCol(), start->GetRow(),
-                        end->GetCol(), end->GetRow());
-    }
-    Word * AddWord(int x1, int y1, int x2, int y2)
-        { return AddWord(MakeWord(x1, y1, x2, y2)); }
-    Word * AddWord(const Square * start, const Square * end)
-        { return AddWord(MakeWord(start, end)); }
-    Word * AddWord(const Word & word)
-        { m_words.push_back(word); return &m_words.back(); }
-
-    const WordList & GetWords() const { return m_words; }
-          WordList & GetWords() { return m_words; }
-
     // Clues
     //------
     // Set Square::HasClue(dir) for each numbered clue in the given direction.
@@ -168,8 +152,6 @@ public:
 
     Clues m_clues;
     Grid m_grid;
-    WordList m_words;
-
 
     // -------------------------------------------------------------------
     // Load / Save
@@ -233,7 +215,6 @@ Puzzle::Clear()
     m_isOk = false;
     m_grid.Clear();
     m_clues.clear();
-    m_words.clear();
     m_title.clear();
     m_author.clear();
     m_copyright.clear();
