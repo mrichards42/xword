@@ -24,6 +24,7 @@
 #endif
 
 #include <wx/print.h>
+#include "html/render.hpp" // Html text printing
 #include "XGridDrawer.hpp"
 #include "puz/Puzzle.hpp"
 
@@ -33,6 +34,7 @@ class MyPrintout : public wxPrintout
 {
 public:
     MyPrintout(MyFrame * frame, puz::Puzzle * puz, int numPages);
+    ~MyPrintout();
 
     bool HasPage(int pageNum);
     wxString GetTitle();
@@ -42,7 +44,11 @@ public:
 
 protected:
     void ReadConfig();
-    void LayoutPages();
+    bool LayoutPages();
+
+    wxString GetHTML();
+    MyHtmlDCRenderer * m_htmlRenderer;
+    wxString m_html;
 
     puz::Puzzle * m_puz;
     MyFrame * m_frame;
@@ -54,48 +60,45 @@ protected:
     wxFont m_headingFont;
     wxFont m_authorFont;
     wxFont m_titleFont;
-    bool m_fontSizeDontCare;
-
-    void SetupFonts();
+    void SetPointSize(int size);
 
     // Measuring / drawing member variables
     //-------------------------------------
     bool m_isDrawing;  // Are we drawing or just measuring?
     wxRect m_pageRect;
-
-    // Grid
-    XGridDrawer m_drawer;
-    double m_gridScale;
-    long m_gridAlign;
     wxRect m_gridRect;
-    int m_minBoxSize;
-
-    void LayoutGrid(double gridScale = 0.75);
-    void DrawGrid();
-
-    // Text
+    double m_gridScale;
     int m_columnWidth;
     int m_numberWidth;
     int m_clueWidth;
-    int m_minFontSize;
+    int m_columns;
+    int m_fontSize;
+    int m_x, m_y; // Current position for text
+    int m_w, m_h; // width and height of last-drawn text (set by DrawTextLine)
 
-    void DrawText();
-    void LayoutColumns();
-    void DrawClue(const puz::Clue & clue, int * x, int * y);
-    void DrawTextLine(const wxString & text,
-                      int * x, int * y,
-                      int * width=NULL, int * height=NULL);
-    wxString WrapText(const wxString & text, int maxWidth);
-    void AdjustColumn(int * x, int * y, int textWidth, int textHeight);
-    void NewColumn(int * x, int * y);
+    // Grid
+    XGridDrawer m_drawer;
+    long m_gridAlign;
 
-    // In order to get more accurate text measuring results, we have to do
-    // the measuring at the device scale, not the user scale.
-    double m_scaleX;
-    double m_scaleY;
-    void SaveUserScale();
-    void RestoreUserScale();
-    void MeasureText(const wxString & text, int * width, int * height);
+    void LayoutGrid(double gridScale);
+    void DrawGrid();
+
+    // Text
+    bool LayoutText(int columns, int fontSize);
+    bool DrawText(int columns, int fontSize);
+    int GetNumberWidth();
+    bool DrawTextLine(const wxString & text)
+        { return DrawTextLine(text, m_columnWidth); }
+    bool DrawTextLine(const wxString & text, int width);
+    bool DrawClue(const puz::Clue & clue);
+    bool AdjustColumn();
+    void NewColumn();
+
+    // Scaling
+    bool m_isScaled;
+    void ScaleDC();
+    void UnscaleDC();
+    bool IsScaled() const { return m_isScaled; }
 };
 
 #endif // MY_PRINTOUT_H
