@@ -24,26 +24,6 @@
 
 namespace puz {
 
-void SetText(xml::node & node, const char * text)
-{
-    node.append_child(pugi::node_pcdata).set_value(text);
-}
-
-void SetText(xml::node & node, const string_t & text)
-{
-    SetText(node, encode_utf8(text).c_str());
-}
-
-void Append(xml::node & node, const char * name, const char * value)
-{
-    SetText(node.append_child(name), value);
-}
-
-void Append(xml::node & node, const char * name, const string_t & value)
-{
-    SetText(node.append_child(name), value);
-}
-
 //-----------------------------------------------------------------------------
 // SaveXPF
 //-----------------------------------------------------------------------------
@@ -61,19 +41,19 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
     puzzles.append_attribute("Version") = "1.0";
     xml::node puzzle = puzzles.append_child("Puzzle");
     // Metadata
-    Append(puzzle, "Title", puz->GetTitle());
-    Append(puzzle, "Author", puz->GetAuthor());
-    Append(puzzle, "Copyright", puz->GetCopyright());
-    Append(puzzle, "Notepad", puz->GetNotes());
+    xml::Append(puzzle, "Title", puz->GetTitle());
+    xml::Append(puzzle, "Author", puz->GetAuthor());
+    xml::Append(puzzle, "Copyright", puz->GetCopyright());
+    xml::Append(puzzle, "Notepad", puz->GetNotes());
 
     // Grid
     if (grid.GetType() == TYPE_DIAGRAMLESS)
-        Append(puzzle, "Type", "diagramless");
+        xml::Append(puzzle, "Type", "diagramless");
 
     // Grid Size
     xml::node size = puzzle.append_child("Size");
-    Append(size, "Rows", puz::ToString(grid.GetHeight()));
-    Append(size, "Cols", puz::ToString(grid.GetWidth()));
+    xml::Append(size, "Rows", puz::ToString(grid.GetHeight()));
+    xml::Append(size, "Cols", puz::ToString(grid.GetWidth()));
 
     // Answers
     {
@@ -96,7 +76,7 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 row_text.append(1, square->GetPlainSolution());
             if (square->IsLast(ACROSS))
             {
-                SetText(row, row_text.c_str());
+                xml::SetText(row, row_text.c_str());
                 row_text.clear();
             }
         }
@@ -132,7 +112,7 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 entry.append_attribute("Col") = square->GetCol() + 1;
                 entry.append_attribute("Short") =
                     std::string(1, square->GetPlainSolution()).c_str();
-                SetText(entry, square->GetSolution());
+                xml::SetText(entry, square->GetSolution());
             }
         }
         if (rebus.empty())
@@ -151,9 +131,9 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 shade.append_attribute("Row") = square->GetRow() + 1;
                 shade.append_attribute("Col") = square->GetCol() + 1;
                 if (square->HasHighlight())
-                    SetText(shade, "gray");
+                    xml::SetText(shade, "gray");
                 else
-                    SetText(shade, square->GetHtmlColor());
+                    xml::SetText(shade, square->GetHtmlColor());
             }
         }
         if (shades.empty())
@@ -172,7 +152,7 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
             for (it = cluelist.begin(); it != cluelist.end(); ++it)
             {
                 xml::node clue = clues_node.append_child("Clue");
-                Word * word = it->GetWord();
+                const Word * word = it->GetWord();
                 switch (word->GetDirection())
                 {
                 case ACROSS:
@@ -191,7 +171,7 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 clue.append_attribute("Row") = word->front()->GetRow() + 1;
                 clue.append_attribute("Col") = word->front()->GetCol() + 1;
                 clue.append_attribute("Num") = encode_utf8(it->GetNumber()).c_str();
-                SetText(clue, it->GetText());
+                xml::SetInnerXML(clue, it->GetText());
             }
         }
     }
@@ -217,7 +197,7 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 row_text.append(1, square->GetPlainText());
             if (square->IsLast(ACROSS))
             {
-                SetText(row, row_text.c_str());
+                xml::SetText(row, row_text.c_str());
                 row_text.clear();
             }
         }
@@ -238,7 +218,7 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 entry.append_attribute("Col") = square->GetCol() + 1;
                 entry.append_attribute("Short") =
                     std::string(1, square->GetPlainText()).c_str();
-                SetText(entry, square->GetText());
+                xml::SetText(entry, square->GetText());
             }
         }
         if (rebus.empty())
