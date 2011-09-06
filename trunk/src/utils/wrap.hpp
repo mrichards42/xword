@@ -23,6 +23,35 @@
 #include <wx/tokenzr.h>
 #include <vector>
 
+// Break a word wherever necessary (this is for words that cant' be
+// conveniently broken at spaces or hyphens)
+template <class C>
+wxString
+BreakWord(C * measurer, const wxString & str, int maxWidth,
+          wxFont * font = NULL)
+{
+    wxString ret;
+    int width = 0;
+    size_t start = 0;
+    size_t length = 1;
+    while (start + length < str.Length())
+    {
+        measurer->GetTextExtent(str.substr(start, length), &width,
+                                NULL, NULL, NULL, font);
+        // Break if the current substring is too long
+        if (width > maxWidth && length > 1)
+        {
+            --length;
+            ret.Append(str.substr(start, length)).Append(_T("\n"));
+            start += length;
+            length = 0;
+        }
+        ++length;
+    }
+    ret.Append(str.substr(start, length));
+    return ret;
+}
+
 
 template <class C>
 wxString
@@ -61,6 +90,7 @@ Wrap(C * measurer, const wxString & str, int maxWidth,
                 ret.Append(prevDelim);
             ret.Append(_T("\n"));
             lineWidth = 0;
+
         }
         // We don't need to break the line.  Add the delimiter.
         else
@@ -70,8 +100,17 @@ Wrap(C * measurer, const wxString & str, int maxWidth,
             else if (prevDelim != _T('\0'))
                 ret.Append(_T(' '));
         }
-        lineWidth += width;
+        // If this single word is too long, break it wherever we can.
+        if (width > maxWidth)
+        {
+            word = BreakWord(measurer, word, maxWidth, font);
+            // Figure out the width of the last line that was broken.
+            size_t last = word.rfind(_T('\n'));
+            if (last != wxString::npos)
+                measurer->GetTextExtent(word.substr(last + 1), &width, NULL, NULL, NULL, font);
+        }
         ret.Append(word);
+        lineWidth += width;
         prevDelim = tok.GetLastDelimiter();
     }
     return ret;
