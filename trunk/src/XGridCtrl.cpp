@@ -564,9 +564,10 @@ XGridCtrl::ChangeFocusedSquare(puz::Square * square,
     // we have a chance to redraw.  We need to redraw it now.
     if (m_ownsFocusedWord && oldWord)
     {
-        puz::Word::const_iterator it;
+        puz::square_iterator it;
         for (it = oldWord->begin(); it != oldWord->end(); ++it)
-            DrawSquare(dc, **it, wxNullColour);
+            DrawSquare(dc, *it, wxNullColour);
+        oldWord = NULL;
     }
 
     // Set new state
@@ -589,9 +590,9 @@ XGridCtrl::ChangeFocusedSquare(puz::Square * square,
         // Draw the old word
         if (oldWord)
         {
-            puz::Word::const_iterator it;
+            puz::square_iterator it;
             for (it = oldWord->begin(); it != oldWord->end(); ++it)
-                DrawSquare(dc, **it, wxNullColour);
+                DrawSquare(dc, *it, wxNullColour);
         }
         else if (oldSquare)
             DrawSquare(dc, *oldSquare, wxNullColour);
@@ -599,9 +600,9 @@ XGridCtrl::ChangeFocusedSquare(puz::Square * square,
         // Draw the new focused word
         if (m_focusedWord)
         {
-            puz::Word::const_iterator it;
+            puz::square_iterator it;
             for (it = m_focusedWord->begin(); it != m_focusedWord->end(); ++it)
-                DrawSquare(dc, **it);
+                DrawSquare(dc, *it);
         }
     }
 
@@ -649,18 +650,18 @@ XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
         delete m_focusedWord;
         if (m_focusedSquare->IsBlack())
         {
-            m_focusedWord = new puz::Word(m_puz->MakeWord(
+            m_focusedWord = new puz::StraightWord(
                 m_focusedSquare, m_focusedSquare
-            ));
+            );
         }
         else
         {
             puz::GridDirection dir = puz::IsHorizontal(direction)
                                         ? puz::ACROSS : puz::DOWN;
-            m_focusedWord = new puz::Word(m_puz->MakeWord(
+            m_focusedWord = new puz::StraightWord(
                 m_focusedSquare->GetWordStart(dir),
                 m_focusedSquare->GetWordEnd(dir)
-            ));
+            );
         }
         return;
     }
@@ -694,10 +695,10 @@ XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
                 // Create a word
                 puz::GridDirection dir = puz::IsHorizontal(direction)
                                             ? puz::ACROSS : puz::DOWN;
-                word = new puz::Word(m_puz->MakeWord(
+                word = new puz::StraightWord(
                     m_focusedSquare->GetWordStart(dir),
                     m_focusedSquare->GetWordEnd(dir)
-                ));
+                );
                 m_ownsFocusedWord = true;
             }
         }

@@ -171,7 +171,7 @@ static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L)
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
     // call GetFocusedWord
-    const puz::Word * word = self->GetFocusedWord();
+    puz::Word * word = self->GetFocusedWord();
 
     // Return nil if there is no focused word
     if (word == NULL)
@@ -185,11 +185,11 @@ static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L)
     lua_newtable(L);
 
     int i = 1; // lua indicies start with 1 not 0
-    puz::Word::const_iterator it;
+    puz::square_iterator it;
     for (it = word->begin(); it != word->end(); ++it)
     {
         lua_pushnumber(L, i++);
-        luapuz_pushSquare(L, *it);
+        luapuz_pushSquare(L, &*it);
         // t[i] = square
         lua_settable(L, -3); // -3 = third from the top of the stack
     }
