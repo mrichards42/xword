@@ -40,7 +40,6 @@ public:
     Parser() {}
     virtual ~Parser() {}
 
-    virtual void LoadPuzzle(Puzzle * puz, const string_t & filename);
     virtual void LoadPuzzle(Puzzle * puz, std::istream & stream);
 
     // Override this to load the actual puzzle given a json::Value.
