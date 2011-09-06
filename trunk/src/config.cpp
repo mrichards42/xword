@@ -32,14 +32,15 @@ ConfigManager::Window_t::Window_t(ConfigGroup * parent)
 // Grid
 ConfigManager::Grid_t::Grid_t(ConfigGroup * parent)
     : ConfigGroup(parent, _T("Grid")),
-      fit(this, _T("fit"), false),
+      fit(this, _T("fit"), true),
+      boxSize(this, _T("boxSize"), 20),
       style(this, _T("style"), DEFAULT_GRID_STYLE),
       letterFont(this, _T("letterFont"), *wxSWISS_FONT),
       numberFont(this, _T("numberFont"), *wxSWISS_FONT),
       lineThickness(this, _T("lineThickness"), 1),
       backgroundColor(this, _T("backgroundColor"), wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW)),
       focusedLetterColor(this, _T("focusedLetterColor"), *wxGREEN),
-      focusedWordColor(this, _T("focusedWordColor"), *wxLIGHT_GREY),
+      focusedWordColor(this, _T("focusedWordColor"), wxColour(165, 218, 165)),
       whiteSquareColor(this, _T("whiteSquareColor"), *wxWHITE),
       blackSquareColor(this, _T("blackSquareColor"), *wxBLACK),
       selectionColor(this, _T("selectionColor"), wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT) ),

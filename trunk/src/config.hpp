@@ -49,6 +49,7 @@ public:
         Grid_t(ConfigGroup * parent);
 
         ConfigBool fit;
+        ConfigLong boxSize;
         ConfigLong style;
         ConfigFont letterFont;
         ConfigFont numberFont;
