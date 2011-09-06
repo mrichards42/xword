@@ -24,16 +24,16 @@ local function find_reference(clue)
     end
 end
 
--- Find a reference this clue in any other clue
+-- Find a reference to this clue in any other clue
 local function search_clues(number, direction)
     local pattern = number.."[- ]*"..(direction == puz.ACROSS and "across" or "down")
     local p = xword.frame.Puzzle
-    for _, clue in pairs(p.Across) do
+    for _, clue in pairs(p:GetClueList('Across')) do
         if clue.text:lower():match(pattern) then
             return clue.number, puz.ACROSS
         end
     end
-    for _, clue in pairs(p.Down) do
+    for _, clue in pairs(p:GetClueList('Down')) do
         if clue.text:lower():match(pattern) then
             return clue.number, puz.DOWN
         end
@@ -61,7 +61,7 @@ local function ClueJump()
     local grid = xword.frame.Puzzle.Grid
     local square = grid:FindSquare(
         function(s)
-            return s:HasClue(direction) and s:GetNumber() == number
+            return s:HasWord(direction) and s:GetNumber() == number
         end
     )
     if square then
