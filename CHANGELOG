@@ -1,4 +1,24 @@
-Version 0.4 (?/??/2010)
+Version 0.5 (???)
+    New Features
+    * Added a Delete Puzzle button
+    * Read/write support for XPF
+    * Read/write support for jpz
+    * Read support for ipuz
+    * Partial reading support for ipuz
+    * Script updater / package manager
+    * Puzzle navigator script
+
+    * Better printing layout (could still be better and faster)
+
+    * Support for more puzzle features:
+        * Diagonal clues
+        * Clues made up of arbitrary sets of squares
+        * Clues in the middle of words
+        * Empty squares
+        * Rebus entries with unlimited length
+
+
+Version 0.4 development
     New Features
     * Embedded lua for scripting.  Included scripts:
         * Puzzle downloading
@@ -29,11 +49,14 @@ Version 0.4 (?/??/2010)
     Misc
     * Revamped build system using premake4 to generate platform-specific
       project files and makefiles.
-      Projects for XCode 3, MSVC2006, and MSVC2008.
+      Projects for MSVC2006, and MSVC2008.
       Makefile for linux.
+    * Removed conversion dialog.
+
 
 Version 0.3.1 (12/11/2009)
     * Fixed "Move to next blank" bug (really, this time I mean it)
+
 
 Version 0.3 (12/11/2009)
     New Features
@@ -76,12 +99,14 @@ Version 0.3 (12/11/2009)
     * Changed the name of the "Options" dialog to "Preferences".
     * The default "crossing clue background color" is now white.
 
+
 Version 0.2.1 (bug fix) (10/14/2009)
     * Fixed timer starting/stopping issues when activating and deactivating
       XWord.
     * Notepad window can be closed.
     * The grid is replaced with a "(Paused)" message if the timer is running
       when XWord is deactivated.
+
 
 Version 0.2 (10/09/2009)
     * Rebus puzzles can now be solved!
