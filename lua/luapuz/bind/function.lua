@@ -11,7 +11,7 @@ function func(opts)
 
     -- Get the name
     local name = assert(opts[1], "Function without name")
-    print("New function: "..name)
+    print("New function: "..name, enclosing_obj.name)
     table.remove(opts, 1)
     opts.name = name
 
@@ -234,6 +234,8 @@ static int [cfunc](lua_State * L)
         else
             fstring = self:fmt("[namespace]::")
         end
+    else
+        fstring = self:fmt("[namespace]::")
     end
 
     fstring = fstring..string.format("%s(%s)",
