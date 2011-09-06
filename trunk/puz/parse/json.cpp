@@ -185,13 +185,9 @@ Value * ParseJSON(std::istream & stream)
     }
     yajl_free(p);
     // Release ownership of the root pointer and return it
+    if (! data.GetRoot())
+        throw FatalFileError("Unable to parse json file.");
     return data.ReleaseRoot();
-}
-
-void Parser::LoadPuzzle(Puzzle * puz, const string_t & filename)
-{
-    std::ifstream stream(filename.c_str());
-    LoadPuzzle(puz, stream);
 }
 
 void Parser::LoadPuzzle(Puzzle * puz, std::istream & stream)
