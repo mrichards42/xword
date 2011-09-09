@@ -95,7 +95,7 @@ const Clue * ClueList::Find(const puz::Word * word) const
 {
     const_iterator it;
     for (it = begin(); it != end(); ++it)
-        if (it->word == word)
+        if (&it->word == word)
             break;
     if (it == end())
         return NULL;
@@ -106,7 +106,7 @@ Clue * ClueList::Find(const puz::Word * word)
 {
     iterator it;
     for (it = begin(); it != end(); ++it)
-        if (it->word == word)
+        if (&it->word == word)
             break;
     if (it == end())
         return NULL;
@@ -118,7 +118,7 @@ const Clue * ClueList::Find(const puz::Square * square) const
 {
     const_iterator it;
     for (it = begin(); it != end(); ++it)
-        if (it->word->Contains(square))
+        if (it->word.Contains(square))
             break;
     if (it == end())
         return NULL;
@@ -129,7 +129,7 @@ Clue * ClueList::Find(const puz::Square * square)
 {
     iterator it;
     for (it = begin(); it != end(); ++it)
-        if (it->word->Contains(square))
+        if (it->word.Contains(square))
             break;
     if (it == end())
         return NULL;
@@ -168,10 +168,10 @@ bool Clues::HasWords() const
     {
         ClueList::const_iterator clue;
         for (clue = it->second.begin(); clue != it->second.end(); ++clue)
-            if (clue->GetWord() != NULL)
-                return true;
+            if (clue->GetWord().empty())
+                return false;
     }
-    return false;
+    return true;
 }
 
 ClueList & Clues::operator[](const string_t & direction)

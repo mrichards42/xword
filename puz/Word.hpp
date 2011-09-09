@@ -18,204 +18,118 @@
 #ifndef PUZ_WORD_H
 #define PUZ_WORD_H
 
-#include <algorithm>
+#include <memory>
 #include "puzstring.hpp"
 #include "Square.hpp"
 #include "iterator.hpp"
 
 namespace puz {
 
-// Base class for words
+class WordImpl;
+
+// A word
+// This is essentially a linked-list with an efficient implementation for
+// words that have squares in line.
 class PUZ_API Word
 {
 public:
-    virtual bool Contains(const puz::Square *) const;
-    virtual short GetDirection() const;
+    // Constructors
+    Word();
+    Word(Square * start, Square * end);
+    Word(const Word & other);
+    ~Word();
+
+    // Operators
+    Word & operator=(const Word & other);
+
+    bool Contains(const Square * square) const;
+    short GetDirection() const;
+    bool empty() const;
+
+    // Element access
+    Square * front() const;
+    Square * back() const;
+
+    void push_back(Square * square);
+    void push_front(Square * square);
+    void pop_back();
+    void pop_front();
 
     // Iterators
-    square_iterator begin();
-    square_iterator end();
-    const_square_iterator begin() const;
-    const_square_iterator end() const;
-
-    square_reverse_iterator rbegin();
-    square_reverse_iterator rend();
-    const_square_reverse_iterator rbegin() const;
-    const_square_reverse_iterator rend() const;
-
-    virtual Square * front()=0;
-    virtual Square * back()=0;
-    const Square * front() const;
-    const Square * back() const;
-
-protected:
-    virtual iterator_impl * new_iterator_impl(Square *)=0;
-    iterator_impl * new_iterator_impl(const Square *) const;
-
-public:
-
-    // Searching
-    //----------
-    // Accepts functions (or function-objects) that subscribe to the template:
-    //    bool Function(const Square *)
-    template<typename IT, typename T>
-    const Square * FindSquare(IT begin, IT end, T findFunc) const;
-
-    template<typename T>
-    const Square * FindSquare(const Square * start, T findFunc,
-                              FindDirection increment = NEXT) const;
-
-    template<typename T>
-    const Square * FindSquare(T findFunc, FindDirection increment = NEXT) const;
-
-    template<typename T>
-    const Square * FindNextSquare(const Square * start,
-                                  T findFunc,
-                                  FindDirection increment = NEXT) const;
-
-    // non-const overloads
-    template<typename T>
-    Square * FindSquare(Square * start, T findFunc,
-                        FindDirection increment = NEXT);
-
-    // FindSquare starting from the first square
-    template<typename T>
-    Square * FindSquare(T findFunc, FindDirection increment = NEXT);
-
-    // Search starting from the next square
-    template<typename T>
-    Square * FindNextSquare(Square * start, T findFunc,
-                            FindDirection increment = NEXT);
-};
-
-// Specializations
-class PUZ_API StraightWord: public Word
-{
-public:
-    StraightWord() : m_front(NULL), m_back(NULL), m_direction(ACROSS) {}
-    StraightWord(Square * start, Square * end);
-
-    short GetDirection() const { return m_direction; }
-    virtual Square * front() { return m_front; }
-    virtual Square * back() { return m_back; }
-
-protected:
-    virtual iterator_impl * new_iterator_impl(Square *);
-
-    Square * m_front;
-    Square * m_back;
-    GridDirection m_direction;
-};
+    square_iterator begin() const;
+    square_iterator end() const;
+    square_reverse_iterator rbegin() const;
+    square_reverse_iterator rend() const;
 
 
-template <typename IT, typename T>
-const Square *
-Word::FindSquare(IT begin, IT end, T findFunc) const
-{
-    for (IT it = begin; it != end; ++it)
-        if (findFunc(&*it))
-            return &*it;
-    return NULL;
-}
-
-template <typename T>
-const Square *
-Word::FindSquare(const Square * start,
-                 T findFunc,
-                 FindDirection increment) const
-{
-    if (increment == NEXT)
+    // Search functions
+    square_iterator find(Square * start)
     {
-        return FindSquare(
-            const_square_iterator(new_iterator_impl(start)),
-            end(),
-            findFunc
-        );
+        square_iterator it = begin();
+        square_iterator end_ = end();
+        while (it != end_ && it != start)
+            ++it;
+        return it;
     }
-    else
+
+    square_reverse_iterator rfind(Square * start)
     {
-        return FindSquare(
-            const_square_reverse_iterator(new_iterator_impl(start)),
-            rend(),
-            findFunc
-        );
+        square_reverse_iterator it = rbegin();
+        square_reverse_iterator end_ = rend();
+        while (it != end_ && it != start)
+            ++it;
+        return it;
     }
-}
 
 
-template<typename T>
-const Square *
-Word::FindSquare(T findFunc, FindDirection increment) const
-{
-    if (increment == NEXT)
+    template<typename IT, typename FUNC>
+    Square * FindSquare(IT begin, IT end, FUNC findFunc)
+    {
+        for (IT it = begin; it != end; ++it)
+            if (findFunc(&*it))
+                return &*it;
+        return NULL;
+    }
+
+    template<typename FUNC>
+    Square * FindSquare(FUNC findFunc)
+    {
         return FindSquare(begin(), end(), findFunc);
-    else
-        return FindSquare(rbegin(), rend(), findFunc);
-}
-
-
-template <typename T>
-const Square *
-Word::FindNextSquare(const Square * start,
-                     T findFunc,
-                     FindDirection increment) const
-{
-    if (increment == NEXT)
-    {
-        const_square_iterator it(new_iterator_impl(start));
-        const_square_iterator end_ = end();
-        if (it == end_)
-            return NULL;
-        ++it;
-        return FindSquare(it, end_, findFunc);
     }
-    else
+
+    template<typename FUNC>
+    Square * FindSquare(Square * start, FUNC findFunc)
     {
-        const_square_reverse_iterator it(new_iterator_impl(start));
-        const_square_reverse_iterator end_ = rend();
-        if (it == end_)
-            return NULL;
-        ++it;
-        return FindSquare(it, end_, findFunc);
+        return FindSquare(find(start), end(), findFunc);
     }
-}
 
+    template <typename FUNC>
+    Square * FindNextSquare(Square * start, FUNC findFunc,
+                            FindDirection direction = NEXT)
+    {
+        if (direction == NEXT)
+        {
+            square_iterator it = find(start);
+            square_iterator end_ = end();
+            if (it == end_)
+                return NULL;
+            ++it;
+            return FindSquare(it, end_, findFunc);
+        }
+        else
+        {
+            square_reverse_iterator it = rfind(start);
+            square_reverse_iterator end_ = rend();
+            if (it == end_)
+                return NULL;
+            ++it;
+            return FindSquare(it, end_, findFunc);
+        }
+    }
 
-
-
-// non-const overloads
-template <typename T>
-Square *
-Word::FindSquare(Square * start,
-                 T findFunc,
-                 FindDirection increment)
-{
-    return const_cast<Square *>(const_cast<const Word *>(this)->FindSquare(
-        start, findFunc, increment
-    ));
-}
-
-
-template<typename T>
-Square *
-Word::FindSquare(T findFunc, FindDirection increment)
-{
-    return const_cast<Square *>(const_cast<const Word *>(this)->FindSquare(
-        findFunc, increment
-    ));
-}
-
-
-template <typename T>
-Square *
-Word::FindNextSquare(Square * start,
-                     T findFunc,
-                     FindDirection increment)
-{
-    return const_cast<Square *>(const_cast<const Word *>(this)->FindNextSquare(
-        start, findFunc, increment
-    ));
-}
+protected:
+    std::auto_ptr<WordImpl> m_impl;
+};
 
 } // namespace puz
 

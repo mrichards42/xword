@@ -2033,7 +2033,7 @@ void
 MyFrame::OnClueFocus(wxPuzEvent & evt)
 {
     puz::Clue * focusedClue = evt.GetClue();
-    m_XGridCtrl->ChangeFocusedWord(focusedClue->GetWord());
+    m_XGridCtrl->ChangeFocusedWord(&focusedClue->GetWord());
     UpdateClues();
 }
 
@@ -2056,7 +2056,7 @@ MyFrame::UpdateClues()
             for (clues_it = cluelist.begin(); clues_it != cluelist.end(); ++clues_it)
             {
                 const puz::Clue * clue = &*clues_it;
-                const puz::Word * word = clue->GetWord();
+                const puz::Word * word = &clue->GetWord();
                 if (word == focusedWord)
                 {
                     m_clues[puz2wx(it->first)]->SetClue(clue, CluePanel::FOCUSED);
