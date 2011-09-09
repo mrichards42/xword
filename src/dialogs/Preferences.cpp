@@ -129,6 +129,9 @@ PreferencesDialog::LoadConfig()
     m_printGridLetterFont->Enable(customFonts);
     m_printGridNumberFont->Enable(customFonts);
     m_printClueFont->Enable(customFonts);
+
+    // Timer
+    m_startTimer->SetValue(config.Timer.autoStart());
 }
 
 void
@@ -227,6 +230,8 @@ PreferencesDialog::SaveConfig()
     printing.Fonts.gridLetterFont = m_printGridLetterFont->GetSelectedFont();
     printing.Fonts.gridNumberFont = m_printGridNumberFont->GetSelectedFont();
     printing.Fonts.clueFont = m_printClueFont->GetSelectedFont();
+
+    config.Timer.autoStart = m_startTimer->GetValue();
 }
 
 

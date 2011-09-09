@@ -108,3 +108,9 @@ ConfigManager::Printing_t::Fonts_t::Fonts_t(ConfigGroup * parent)
       gridNumberFont(this, _T("gridNumberFont"), *wxSWISS_FONT),
       clueFont(this, _T("clueFont"), *wxSWISS_FONT)
 {}
+
+// Timer
+ConfigManager::Timer_t::Timer_t(ConfigGroup * parent)
+    : ConfigGroup(parent, _T("Timer")),
+      autoStart(this, _T("autoStart"), false)
+{}

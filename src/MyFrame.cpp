@@ -343,6 +343,7 @@ MyFrame::MyFrame()
     : wxFrame(NULL, -1, XWORD_APP_NAME, wxDefaultPosition, wxSize(700,700)),
       m_timer(this),
       m_isTimerRunning(false),
+      m_autoStartTimer(false),
       m_preferencesDialog(NULL),
       m_charactersPanel(NULL),
       m_mgr(this),
@@ -408,6 +409,8 @@ MyFrame::MyFrame()
 
 MyFrame::~MyFrame()
 {
+    wxGetApp().GetConfigManager().RemoveCallbacks(this);
+
     // Let the App know we've been destroyed
     wxGetApp().m_frame = NULL;
 
@@ -516,14 +519,18 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     m_filename = filename;
 
     if (m_puz.IsOk())
+    {
         m_XGridCtrl->SetFocus();
-
-    if (m_puz.IsOk())
         SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
                                    filename.c_str(),
                                    sw.Time()));
+        if (m_autoStartTimer)
+            StartTimer();
+    }
     else
+    {
         SetStatus(_T("No file loaded"));
+    }
 
     return m_puz.IsOk();
 }
@@ -1328,6 +1335,7 @@ MyFrame::LoadConfig()
     g_pageSetupData->SetMarginBottomRight(wxPoint(margins.right(),
                                                   margins.bottom()));
 
+    config.Timer.autoStart.AddCallback(this, &MyFrame::SetAutoStartTimer);
     // Update the config of our controls
     config.Update();
 }

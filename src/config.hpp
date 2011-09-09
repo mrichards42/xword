@@ -28,7 +28,8 @@ public:
           Grid(&m_group),
           Clue(&m_group),
           CluePrompt(&m_group),
-          Printing(&m_group)
+          Printing(&m_group),
+          Timer(&m_group)
     {}
 
     // Frame position
@@ -131,6 +132,13 @@ public:
 
     } Printing;
 
+    // Timer
+    class Timer_t : public ConfigGroup {
+    public:
+        Timer_t(ConfigGroup * parent);
+
+        ConfigBool autoStart;
+    } Timer;
 };
 
 #endif // XWORD_CONFIG_H

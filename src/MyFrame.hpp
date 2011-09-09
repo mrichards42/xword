@@ -127,6 +127,8 @@ public:
     void StopTimer();
     void ToggleTimer()
         { if (IsTimerRunning()) StopTimer(); else StartTimer(); }
+    void SetAutoStartTimer(bool doit = true) { m_autoStartTimer = doit; }
+    bool AutoStartTimer() const { return m_autoStartTimer; }
 
     void OnAppDeactivate();
     void OnAppActivate();
@@ -218,6 +220,7 @@ private:
     wxTimer m_timer;
     int  m_time;
     bool m_isTimerRunning; // Used to start/stop timer on frame activate events.
+    bool m_autoStartTimer;
 
     // The XWord puzzle
     //-----------------
