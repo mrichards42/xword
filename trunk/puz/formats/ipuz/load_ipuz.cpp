@@ -173,7 +173,24 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
             if (! cell->IsMap())
                 val = cell->AsString();
             else
-                val = cell->AsMap()->GetString(puzT("cell"), empty_str);
+            {
+                json::Map * map = cell->AsMap();
+                val = map->GetString(puzT("cell"), empty_str);
+                if (map->Contains(puzT("style")))
+                {
+                    json::Value * v_style = map->Get(puzT("style"));
+                    if (v_style->IsMap())
+                    {
+                        json::Map * style = v_style->AsMap();
+                        if (style->GetString(puzT("shapebg"), puzT(""))
+                                == puzT("circle"))
+                            square.SetCircle();
+                        if (style->GetBool(puzT("highlight"), false))
+                            square.SetHighlight();
+                        // TODO: colors
+                    }
+                }
+            }
             if (val == block_str)
                 square.SetSolution(square.Black);
             else if (val != empty_str)
