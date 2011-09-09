@@ -155,6 +155,10 @@ class{"Square", header="puz/Square.hpp"}
     func{"IsValidString", static=true, returns="bool", arg("puz::string_t", "str")}
     func{"IsSymbol", static=true, returns="bool", arg("puz::string_t", "str")}
 
+    func{"IsBetween", returns="bool",
+                      arg("Square *", "start"),
+                      arg("Square *", "end")}
+
 class() -- no class
 func{"ConstrainDirection", returns="GridDirection",
                                 arg("unsigned short", "dir")}
@@ -204,11 +208,6 @@ class{"Grid", header="puz/Grid.hpp"}
 
     property{"unsigned short", "Key"}
     property{"unsigned short", "Cksum"}
-
-    func{"IsBetween", returns="bool",
-                      arg("Square *", "square"),
-                      arg("Square *", "start"),
-                      arg("Square *", "end")}
 
     func{"CheckGrid", returns="vector<puz::Square*>", override=overrides.Grid_CheckGrid}
     --func{"CheckWord", override=overrides.Grid_CheckWord}

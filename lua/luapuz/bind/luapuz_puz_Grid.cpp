@@ -363,17 +363,6 @@ static int Grid_SetCksum(lua_State * L)
     grid->SetCksum(cksum);
     return 0;
 }
-// bool IsBetween(puz::Square * square, puz::Square * start, puz::Square * end)
-static int Grid_IsBetween(lua_State * L)
-{
-    puz::Grid * grid = luapuz_checkGrid(L, 1);
-    puz::Square * square = luapuz_checkSquare(L, 2);
-    puz::Square * start = luapuz_checkSquare(L, 3);
-    puz::Square * end = luapuz_checkSquare(L, 4);
-    bool returns = grid->IsBetween(square, start, end);
-    lua_pushboolean(L, returns);
-    return 1;
-}
 // { puz::Square*, ... } CheckGrid(bool checkBlank = false, bool strictRebus = false)
 static int Grid_CheckGrid(lua_State * L)
 {
@@ -495,7 +484,6 @@ static const luaL_reg Gridlib[] = {
     {"SetKey", Grid_SetKey},
     {"GetCksum", Grid_GetCksum},
     {"SetCksum", Grid_SetCksum},
-    {"IsBetween", Grid_IsBetween},
     {"CheckGrid", Grid_CheckGrid},
     {"CheckSquare", Grid_CheckSquare},
     {"FindSquare", Grid_FindSquare},

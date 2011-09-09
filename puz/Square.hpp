@@ -316,6 +316,7 @@ public:
     static Square * FindSolutionWordBoundary(Square * square, GridDirection dir);
     bool Square::HasWord(GridDirection dir) const;
 
+    bool IsBetween(const Square * start, const Square * end) const;
 protected:
     // Location information
     int m_col;
