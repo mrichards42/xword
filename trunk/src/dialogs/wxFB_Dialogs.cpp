@@ -58,16 +58,8 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	wxBoxSizer* bSizer5;
 	bSizer5 = new wxBoxSizer( wxVERTICAL );
 	
-	wxStaticBoxSizer* sbSizer4;
-	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( solvePanel, wxID_ANY, wxT("Right mouse button") ), wxVERTICAL );
-	
-	m_moveOnRightClick = new wxCheckBox( solvePanel, wxID_ANY, wxT("Move to mouse position"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer4->Add( m_moveOnRightClick, 0, wxALL, 5 );
-	
-	bSizer5->Add( sbSizer4, 0, wxALL|wxEXPAND, 5 );
-	
 	wxStaticBoxSizer* sbSizer41;
-	sbSizer41 = new wxStaticBoxSizer( new wxStaticBox( solvePanel, wxID_ANY, wxT("Misc") ), wxVERTICAL );
+	sbSizer41 = new wxStaticBoxSizer( new wxStaticBox( solvePanel, wxID_ANY, wxT("Solution") ), wxVERTICAL );
 	
 	m_checkWhileTyping = new wxCheckBox( solvePanel, wxID_ANY, wxT("Check solution while typing"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer41->Add( m_checkWhileTyping, 0, wxALL, 5 );
@@ -76,6 +68,22 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	sbSizer41->Add( m_strictRebus, 0, wxALL, 5 );
 	
 	bSizer5->Add( sbSizer41, 0, wxALL|wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer4;
+	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( solvePanel, wxID_ANY, wxT("Right mouse button") ), wxVERTICAL );
+	
+	m_moveOnRightClick = new wxCheckBox( solvePanel, wxID_ANY, wxT("Move to mouse position"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer4->Add( m_moveOnRightClick, 0, wxALL, 5 );
+	
+	bSizer5->Add( sbSizer4, 0, wxALL|wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer411;
+	sbSizer411 = new wxStaticBoxSizer( new wxStaticBox( solvePanel, wxID_ANY, wxT("Timer") ), wxVERTICAL );
+	
+	m_startTimer = new wxCheckBox( solvePanel, wxID_ANY, wxT("Start when a puzzle is opened"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer411->Add( m_startTimer, 0, wxALL, 5 );
+	
+	bSizer5->Add( sbSizer411, 0, wxEXPAND|wxALL, 5 );
 	
 	bSizer3->Add( bSizer5, 1, wxALL|wxEXPAND, 5 );
 	

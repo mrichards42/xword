@@ -55,9 +55,10 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxCheckBox* m_blankOnDirection;
 		wxCheckBox* m_blankOnNewWord;
 		wxRadioBox* m_pauseOnSwitch;
-		wxCheckBox* m_moveOnRightClick;
 		wxCheckBox* m_checkWhileTyping;
 		wxCheckBox* m_strictRebus;
+		wxCheckBox* m_moveOnRightClick;
+		wxCheckBox* m_startTimer;
 		wxStaticBoxSizer* sbSizer36;
 		wxColourPickerCtrl* m_penColor;
 		wxColourPickerCtrl* m_selectedLetterColor;
