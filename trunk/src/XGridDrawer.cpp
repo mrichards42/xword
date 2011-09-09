@@ -488,10 +488,18 @@ XGridDrawer::DrawSquare(wxDC & adc,
         // somehow broken, draw the number in red.
         if (GetGrid()->IsDiagramless())
         {
-            if ( (square.WantsClue(puz::ACROSS) &&
-                    m_puz->GetClueList(puzT("Across")).Find(square.GetNumber()) == NULL) ||
-                 (square.WantsClue(puz::DOWN) &&
-                    m_puz->GetClueList(puzT("Across")).Find(square.GetNumber()) == NULL) )
+            try
+            {
+                if ( (square.WantsClue(puz::ACROSS) &&
+                        m_puz->GetClueList(puzT("Across")).Find(square.GetNumber()) == NULL) ||
+                     (square.WantsClue(puz::DOWN) &&
+                        m_puz->GetClueList(puzT("Down")).Find(square.GetNumber()) == NULL) )
+                {
+                    dc.SetTextForeground(*wxRED);
+                }
+            }
+            // In case we don't have "Across" or "Down" clues
+            catch (puz::NoClues &)
             {
                 dc.SetTextForeground(*wxRED);
             }
