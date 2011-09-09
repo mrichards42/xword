@@ -238,6 +238,17 @@ void Puzzle::NumberGrid()
 
 void Puzzle::GenerateWords()
 {
+    // Simulate numbering the grid (solution) so that we can generate words
+    std::vector<Square *> wordMap;
+    wordMap.push_back(NULL); // So that the vector is 1-based for clue numbers.
+    for (Square * square = m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (square->SolutionWantsClue())
+            wordMap.push_back(square);
+    }
+
     Clues::iterator cluelist_it;
     GridDirection dir;
     for (cluelist_it = m_clues.begin(); cluelist_it != m_clues.end(); ++cluelist_it)
@@ -255,7 +266,7 @@ void Puzzle::GenerateWords()
         for (it = cluelist.begin(); it != cluelist.end(); ++it)
         {
             // Find the square with this clue number.
-            Square * start = m_grid.FindSquare(FIND_CLUE_NUMBER(it->GetNumber()));
+            Square * start = wordMap.at(it->GetInt());
             if (! start)
                 throw InvalidClues("All clues must have a word");
             Square * end = start->GetSolutionWordEnd(dir);

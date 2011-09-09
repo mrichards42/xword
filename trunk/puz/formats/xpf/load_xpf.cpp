@@ -114,6 +114,8 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                         break;
                     case puzT('.'):
                         square->SetBlack();
+                        if (grid.IsDiagramless())
+                            square->SetText(puzT(""));
                         break;
                     default:
                         square->SetSolution(string_t(1, *it));
