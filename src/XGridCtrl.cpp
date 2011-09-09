@@ -316,6 +316,8 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
         m_focusedWord = NULL;
         m_focusedDirection = puz::ACROSS;
         m_ownsFocusedWord = m_grid->IsDiagramless();
+        if (m_grid->IsDiagramless())
+            GetGrid()->NumberGrid();
 
         ConnectEvents();
     }
