@@ -462,7 +462,7 @@ inline bool
 XGridCtrl::IsSelected(const puz::Square & square)
 {
     wxASSERT(HasSelection());
-    return m_grid->IsBetween(&square, m_selectionStart, m_selectionEnd);
+    return square.IsBetween(m_selectionStart, m_selectionEnd);
 }
 
 

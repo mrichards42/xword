@@ -115,7 +115,7 @@ CluePanel::OnClueSelect(wxCommandEvent & WXUNUSED(evt))
 
     wxPuzEvent puzEvt(wxEVT_PUZ_CLUE_FOCUS, GetId());
     puzEvt.SetClue(GetClue());
-    puzEvt.SetWord(GetClue()->GetWord());
+    puzEvt.SetWord(&GetClue()->GetWord());
 
     ::wxPostEvent(GetEventHandler(), puzEvt);
 }

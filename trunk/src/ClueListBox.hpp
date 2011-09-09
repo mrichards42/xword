@@ -65,7 +65,9 @@ public:
         try
         {
             if (m_clues && selection != wxNOT_FOUND)
+            {
                 return &m_clues->at(selection);
+            }
         }
         catch(std::out_of_range &)
         {

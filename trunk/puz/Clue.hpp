@@ -30,46 +30,52 @@ namespace puz {
 
 class ClueList;
 
-// A clue, with a number, text, and a word (auto_ptr.
+// A clue, with a number, text, and a word.
 // The clue number is stored as a string, and can be any text.
 class PUZ_API Clue
 {
     friend class ClueList;
 public:
     explicit Clue(const string_t & num_ = puzT(""),
-                  const string_t & text_ = puzT(""),
-                  Word * word_ = NULL)
+                  const string_t & text_ = puzT(""))
+    {
+        SetNumber(num_);
+        SetText(text_);
+    }
+
+    explicit Clue(const string_t & num_,
+                  const string_t & text_,
+                  Word word_)
         : word(word_)
+    {
+        SetNumber(num_);
+        SetText(text_);
+    }
+
+    explicit Clue(int num_, const string_t & text_ = puzT(""))
     {
         SetNumber(num_);
         SetText(text_);
     }
 
     explicit Clue(int num_,
-                  const string_t & text_ = puzT(""),
-                  Word * word_ = NULL)
+                  const string_t & text_,
+                  Word word_)
         : word(word_)
     {
         SetNumber(num_);
         SetText(text_);
     }
 
-    ~Clue() { if (word) delete word; }
-
     void SetText  (const string_t & text_);
     void SetNumber(const string_t & num_);
     void SetNumber(int num_);
-    void SetWord(Word * word_)
-    {
-        if (word && word != word_)
-            delete word;
-        word = word_;
-    }
+    void SetWord(const Word & word_) { word = word_; }
 
     const string_t & GetText() const { return text; }
     const string_t & GetNumber() const { return number; }
-    const Word * GetWord() const { return word; }
-    Word * GetWord() { return word; }
+    const Word & GetWord() const { return word; }
+    Word & GetWord() { return word; }
 
     // -1 if this is an invalid number.
     int GetInt() const { return m_int; }
@@ -83,12 +89,11 @@ public:
 
     string_t number;
     string_t text;
-    Word * word;
+    Word word;
 
 protected:
     int m_int;
 };
-
 
 
 class PUZ_API ClueList : public std::vector<Clue>
@@ -117,7 +122,7 @@ public:
     Clue * Find(const puz::Word * word);
 
 protected:
-    string_t m_title;
+    string_t m_title;;
 };
 
 

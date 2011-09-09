@@ -650,7 +650,7 @@ XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
         delete m_focusedWord;
         if (m_focusedSquare->IsBlack())
         {
-            m_focusedWord = new puz::StraightWord(
+            m_focusedWord = new puz::Word(
                 m_focusedSquare, m_focusedSquare
             );
         }
@@ -658,7 +658,7 @@ XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
         {
             puz::GridDirection dir = puz::IsHorizontal(direction)
                                         ? puz::ACROSS : puz::DOWN;
-            m_focusedWord = new puz::StraightWord(
+            m_focusedWord = new puz::Word(
                 m_focusedSquare->GetWordStart(dir),
                 m_focusedSquare->GetWordEnd(dir)
             );
@@ -695,7 +695,7 @@ XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
                 // Create a word
                 puz::GridDirection dir = puz::IsHorizontal(direction)
                                             ? puz::ACROSS : puz::DOWN;
-                word = new puz::StraightWord(
+                word = new puz::Word(
                     m_focusedSquare->GetWordStart(dir),
                     m_focusedSquare->GetWordEnd(dir)
                 );
@@ -1550,7 +1550,7 @@ XGridCtrl::OnTab(int mod)
         puz::ClueList & cluelist = clues_it->second;
         puz::ClueList::iterator it;
         for (it = cluelist.begin(); it != cluelist.end(); ++it)
-            if (it->GetWord() == m_focusedWord)
+            if (&it->GetWord() == m_focusedWord)
                 break;
         if (it != cluelist.end()) // We found our clue
         {
@@ -1565,11 +1565,11 @@ XGridCtrl::OnTab(int mod)
                      // If we're at the end, go to the first clue
                     if (clues_it == clues.end())
                         clues_it = clues.begin();
-                    SetFocusedWord(clues_it->second.front().GetWord());
+                    SetFocusedWord(&clues_it->second.front().GetWord());
                 }
                 else
                 {
-                    SetFocusedWord(it->GetWord());
+                    SetFocusedWord(&it->GetWord());
                 }
             }
             else // Shift
@@ -1583,12 +1583,12 @@ XGridCtrl::OnTab(int mod)
                         clues_it = clues.end(); // One past the end
                     // Find the previous clue list
                     --clues_it;
-                    SetFocusedWord(clues_it->second.back().GetWord());
+                    SetFocusedWord(&clues_it->second.back().GetWord());
                 }
                 else
                 {
                     --it;
-                    SetFocusedWord(it->GetWord());
+                    SetFocusedWord(&it->GetWord());
                 }
             }
         }
