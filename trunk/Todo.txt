@@ -1,20 +1,6 @@
 Todo:
 
-Add a pencil solving option.  Perhaps don't check penciled in squares.
-
-Options dialog:
-    Add a clue number color and font option (currently they're set to whatever
-    the pen is set to).
-
-Set a minimum zoom.
-
-Set a realistic minimum clue number font size.
-
 Stripping the (c) symbol when saving as text format doesn't work under Ubuntu.
-
-Add diagramless solving.  Allow black squares to be focused, and use the
-    spacebar to toggle black / white squares.
-
 
 Finish Printing
 

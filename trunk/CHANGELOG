@@ -1,22 +1,24 @@
-Version 0.5 (???)
+Version 0.5 (9/9/2011)
     New Features
+    * Added a preference to start the timer when a puzzle is opened
     * Added a Delete Puzzle button
     * Read/write support for XPF
     * Read/write support for jpz
-    * Read support for ipuz
-    * Partial reading support for ipuz
+    * Partial read support for ipuz
     * Script updater / package manager
-    * Puzzle navigator script
 
     * Better printing layout (could still be better and faster)
 
     * Support for more puzzle features:
         * Diagonal clues
         * Clues made up of arbitrary sets of squares
-        * Clues in the middle of words
         * Empty squares
         * Rebus entries with unlimited length
 
+    Bug Fixes
+    * Lua errors result in the script being disabled.
+    * Fixed problems with puzzles being wrongly reported
+      as incorrect.
 
 Version 0.4 development
     New Features
