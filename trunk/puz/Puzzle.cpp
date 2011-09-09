@@ -344,17 +344,19 @@ Puzzle::FindWord(const puz::Square * square, short direction) const
     Clues::const_iterator it;
     for (it = m_clues.begin(); it != m_clues.end(); ++it)
     {
-        const Clue * clue = it->second.Find(square);
-        if (! clue)
-            continue;
-        const Word * word = &clue->GetWord();
-        if (word->Contains(square))
+        const ClueList & cluelist = it->second;
+        ClueList::const_iterator clue;
+        for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
         {
-            short wordDirection = word->GetDirection();
-            if (wordDirection == direction)
-                return word;
-            else if (wordDirection == inverseDirection)
-                inverseWord = word;
+            const Word * word = &clue->GetWord();
+            if (word->Contains(square))
+            {
+                short wordDirection = word->GetDirection();
+                if (wordDirection == direction)
+                    return word;
+                else if (wordDirection == inverseDirection)
+                    inverseWord = word;
+            }
         }
     }
     return inverseWord;
