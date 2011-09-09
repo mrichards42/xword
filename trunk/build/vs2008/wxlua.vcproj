@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="wxlua"
-	ProjectGUID="{60E8F1BF-8294-DF45-95DF-A3C7EC6DBE19}"
+	ProjectGUID="{28D9B0E0-E866-464D-AE33-69009F4FBAEE}"
 	RootNamespace="wxlua"
 	Keyword="Win32Proj"
 	>

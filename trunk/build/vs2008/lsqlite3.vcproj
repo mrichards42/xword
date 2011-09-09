@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="lsqlite3"
-	ProjectGUID="{723E1030-3F11-4146-940C-1187253E623C}"
+	ProjectGUID="{0189AA27-5059-2B4B-B7D3-7F925E830C72}"
 	RootNamespace="lsqlite3"
 	Keyword="Win32Proj"
 	>

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="XWord"
-	ProjectGUID="{7BD59837-B0E5-8D42-8D99-299F8B612CDC}"
+	ProjectGUID="{619E7A42-B4AE-D941-B9FC-1AC4D0DA4ABA}"
 	RootNamespace="XWord"
 	Keyword="Win32Proj"
 	>

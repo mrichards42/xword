@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="wxbindxrc"
-	ProjectGUID="{2DB2C0E3-E963-8C4E-A63C-775B9B2543CF}"
+	ProjectGUID="{82215CE5-51AD-A446-A340-2C5831CA898C}"
 	RootNamespace="wxbindxrc"
 	Keyword="Win32Proj"
 	>
