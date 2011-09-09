@@ -199,9 +199,6 @@ void XGridCtrl::Init()
 
     m_lastBoxSize = UNDEFINED_BOX_SIZE;
 
-    m_incorrectSquares = 0;
-    m_blankSquares = 0;
-
     m_wantsRebus = false;
 
     m_areEventsConnected = false;
@@ -305,8 +302,6 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
     if (puz == NULL)
     {
         m_grid = NULL;
-        m_incorrectSquares = 0;
-        m_blankSquares = 0;
         m_focusedSquare = NULL;
         m_focusedWord = NULL;
         m_ownsFocusedWord = false;
@@ -317,7 +312,6 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
     {
         m_grid = &puz->GetGrid();
 
-        RecheckGrid();
         m_focusedSquare = FirstWhite();
         m_focusedWord = NULL;
         m_focusedDirection = puz::ACROSS;
@@ -329,30 +323,13 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
     Scale();
 }
 
-
-void
-XGridCtrl::RecheckGrid()
-{
-    wxASSERT(! IsEmpty());
-    std::vector<puz::Square *> incorrect;
-    m_grid->CheckGrid(&incorrect, puz::NO_CHECK_BLANK, HasStyle(STRICT_REBUS));
-
-    std::vector<puz::Square *> wrongOrBlank;
-    m_grid->CheckGrid(&wrongOrBlank, puz::CHECK_BLANK, HasStyle(STRICT_REBUS));
-
-    m_incorrectSquares = incorrect.size();
-    m_blankSquares     = wrongOrBlank.size() - incorrect.size();
-}
-
 bool
 XGridCtrl::UnscrambleSolution(unsigned short key)
 {
     const bool success = m_grid->UnscrambleSolution(key);
 
-    // We need to update the internal incorrect / blank square counts.
     if (success)
     {
-        RecheckGrid();
         // If we should have been checking while typing, go ahead and
         // check the whole grid now that it is possible.
         if (HasStyle(CHECK_WHILE_TYPING))
@@ -362,15 +339,27 @@ XGridCtrl::UnscrambleSolution(unsigned short key)
     return success;
 }
 
-bool
+CorrectStatus
 XGridCtrl::IsCorrect()
 {
+    bool strictRebus = HasStyle(STRICT_REBUS);
+    bool incorrect = false;
+    puz::Square * square;
+    for (square = m_grid->First(); square != NULL; square = square->Next())
+    {
+        if (square->IsBlank())
+            return INCOMPLETE_PUZZLE;
+        else if (! square->Check(puz::NO_CHECK_BLANK, strictRebus))
+            incorrect = true;
+    }
     // We *can* test scrambled puzzles!  Not sure why I didn't think of
     // this before.  (Inspired by Alex Boisvert:
     // http://alexboisvert.com/software.html#check)
-    return m_blankSquares == 0 &&
-        (m_incorrectSquares == 0 ||
-            (m_grid->IsScrambled() && m_grid->CheckScrambledGrid()));
+    if (incorrect
+        || (m_grid->IsScrambled() && ! m_grid->CheckScrambledGrid()))
+        return INCORRECT_PUZZLE;
+    else
+        return CORRECT_PUZZLE;
 }
 
 //-------------------------------------------------------
@@ -762,10 +751,6 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
     if (square.HasFlag(puz::FLAG_REVEALED))
         return false;
 
-    // Adjust blank and incorrect counts each time a letter is changed
-    // The logic is a little confusing at first, but it's correct
-    const int correctBefore = square.Check(puz::NO_CHECK_BLANK, HasStyle(STRICT_REBUS));
-    const int blankBefore   = square.IsBlank() && ! square.IsSolutionBlank();
     // renumber the grid if the square is changing from black to white or vice-versa
     const bool numberGrid = GetGrid()->IsDiagramless() &&
                             (text == puz2wx(puz::Square::Black) != (square.IsBlack()));
@@ -779,12 +764,6 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
         square.AddFlag(puz::FLAG_BLACK);
         square.RemoveFlag(puz::FLAG_X);
     }
-
-    const int correctAfter = square.Check(puz::NO_CHECK_BLANK, HasStyle(STRICT_REBUS));
-    const int blankAfter   = square.IsBlank() && ! square.IsSolutionBlank();
-
-    m_blankSquares     += blankAfter   - blankBefore;
-    m_incorrectSquares -= correctAfter - correctBefore;
 
     // Don't send letter updated events if the user is in the middle of entering
     // a rebus entry.
