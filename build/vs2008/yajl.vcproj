@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="yajl"
-	ProjectGUID="{D1351C3B-7744-4D42-BC56-CC8FF64618FF}"
+	ProjectGUID="{82294760-2F6F-8948-A99E-0CF1CB303EF8}"
 	RootNamespace="yajl"
 	Keyword="Win32Proj"
 	>

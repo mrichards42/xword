@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="luapuz"
-	ProjectGUID="{DD366908-4984-A743-9833-D5D3FAAC10A7}"
+	ProjectGUID="{58A05D68-BC6D-1443-AFA9-63008869868B}"
 	RootNamespace="luapuz"
 	Keyword="Win32Proj"
 	>
