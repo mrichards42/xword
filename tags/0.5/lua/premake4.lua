@@ -1,8 +1,0 @@
-include "lua"
-include "wxlua"
-include "wxbind"
-include "luatask"
-include "lfs"
-include "luacurl"
-include "lsqlite3"
-include "luapuz"
