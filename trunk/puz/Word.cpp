@@ -302,7 +302,7 @@ bool Word::empty() const { return front() == NULL; }
 
 // Element access
 Square * Word::front() const { return m_impl->front(); }
-Square * Word::back() const { return m_impl->front(); }
+Square * Word::back() const { return m_impl->back(); }
 
 // Try to push_back/front
 // If it doesn't work, convert to ListImpl, then do it.
