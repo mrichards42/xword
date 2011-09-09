@@ -140,7 +140,9 @@ Word make_word(Puzzle * puz, const string_t & x, const string_t & y)
     parse_range(y, &y1, &y2);
     if (y1 == -1 || y2 == -1)
         throw InvalidGridCell("Invalid cell range in word.");
-    return puz->MakeWord(x1-1, y1-1, x2-1, y2-1); // offsets are from 1
+    Grid & grid = puz->GetGrid();
+    // JPZ squares are 1-based.
+    return Word(&grid.At(x1-1, y1-1), &grid.At(x2-1, y2-1));
 }
 
 
@@ -238,39 +240,36 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     }
 
     // Words
-    std::map<string_t, Word *> words;
+    std::map<string_t, Word> words;
     {
-        xml::node word = RequireChild(crossword, "word");
-        for (; word; word = word.next_sibling("word"))
+        xml::node xmlword = RequireChild(crossword, "word");
+        for (; xmlword; xmlword = xmlword.next_sibling("word"))
         {
            // Look for a cell range
-            string_t x = GetAttribute(word, "x");
-            string_t y = GetAttribute(word, "y");
+            string_t x = GetAttribute(xmlword, "x");
+            string_t y = GetAttribute(xmlword, "y");
             // Ignore the delaration if X or Y is provided, but not both.
+            Word word;
             if (! x.empty() && ! y.empty())
-                puz->AddWord(make_word(puz, x, y));
-            else
-                puz->AddWord(Word());
-            string_t id = GetAttribute(word, "id");
+                word = make_word(puz, x, y);
+            string_t id = GetAttribute(xmlword, "id");
             if (id.empty())
                 throw FatalFileError("Each word must have an id");
-            // Add this word to the internal map of words.
-            Word & thisword = puz->GetWords().back();
-            words[id] = &thisword;
             // TODO: hidden
 
             // Word cells
-            xml::node cells = word.child("cells");
+            xml::node cells = xmlword.child("cells");
             for (; cells; cells = cells.next_sibling("cells"))
             {
                 // Make a word from this cell.
                 Word cell_word = make_word(puz, GetAttribute(cells, "x"),
                                                 GetAttribute(cells, "y"));
-                // Add it to the current word;
-                Word::iterator it;
+                square_iterator it;
                 for (it = cell_word.begin(); it != cell_word.end(); ++it)
-                    thisword.push_back(*it);
+                    word.push_back(&*it);
             }
+            // Add this word to the internal map of words.
+            words[id] = word;
         }
     }
 
@@ -286,7 +285,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             xml::node clue = RequireChild(clues, "clue");
             for (; clue; clue = clue.next_sibling("clue"))
             {
-                std::map<string_t, Word *>::iterator it;
+                std::map<string_t, Word>::iterator it;
                 it = words.find(GetAttribute(clue, "word"));
                 if (it == words.end())
                     throw FatalFileError("Each clue must have a word");

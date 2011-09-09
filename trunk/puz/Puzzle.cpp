@@ -20,7 +20,7 @@
 #include <iostream>
 
 // Format handlers
-//#include "formats/jpz/jpz.hpp"
+#include "formats/jpz/jpz.hpp"
 #include "formats/ipuz/ipuz.hpp"
 #include "formats/xpf/xpf.hpp"
 #include "formats/puz/puz.hpp"
@@ -261,7 +261,7 @@ void Puzzle::GenerateWords()
             Square * end = start->GetSolutionWordEnd(dir);
             if (! end)
                 throw InvalidClues("All clues must have a word");
-            it->SetWord(new StraightWord(start, end));
+            it->SetWord(Word(start, end));
         }
     }
 }
@@ -329,7 +329,7 @@ Puzzle::FindWord(const puz::Square * square) const
     const Clue * clue = FindClue(square);
     if (! clue)
         return NULL;
-    return clue->GetWord();
+    return &clue->GetWord();
 }
 
 const Word *
@@ -347,7 +347,7 @@ Puzzle::FindWord(const puz::Square * square, short direction) const
         const Clue * clue = it->second.Find(square);
         if (! clue)
             continue;
-        const Word * word = clue->GetWord();
+        const Word * word = &clue->GetWord();
         if (word->Contains(square))
         {
             short wordDirection = word->GetDirection();
@@ -427,12 +427,12 @@ void Puzzle::TestClueList(const string_t & direction)
     ClueList::const_iterator it;
     for (it = clues.begin(); it != clues.end(); ++it)
     {
-        const Word * word = it->GetWord();
-        if (word == NULL)
+        const Word & word = it->GetWord();
+        if (word.empty())
             throw InvalidClues("All clues must have a word.");
         // Make sure that no words cross missing squares.
-        const_square_iterator word_it;
-        for (word_it = word->begin(); word_it != word->end(); ++word_it)
+        square_iterator word_it;
+        for (word_it = word.begin(); word_it != word.end(); ++word_it)
             if (word_it->IsMissing())
                 throw InvalidWord("Words cannot contain missing squares.");
     }
@@ -508,7 +508,7 @@ const Puzzle::FileHandlerDesc Puzzle::sm_loadHandlers[] = {
     { LoadPuz, "puz", puzT("Across Lite"), NULL },
     { LoadTxt, "txt", puzT("Across Lite Text"), NULL },
     { LoadXPF, "xml", puzT("XPF"), NULL },
-    //{ LoadJpz, "jpz", puzT("jpuz"), NULL },
+    { LoadJpz, "jpz", puzT("jpuz"), NULL },
     { LoadIpuz,"ipuz", puzT("ipuz"), NULL },
     { NULL, NULL, NULL }
 };
@@ -516,7 +516,7 @@ const Puzzle::FileHandlerDesc Puzzle::sm_loadHandlers[] = {
 const Puzzle::FileHandlerDesc Puzzle::sm_saveHandlers[] = {
     { SavePuz, "puz", puzT("Across Lite"), NULL },
     { SaveXPF, "xml", puzT("XPF"), NULL },
-    //{ SaveJpz, "jpz", puzT("jpuz"), NULL },
+    { SaveJpz, "jpz", puzT("jpuz"), NULL },
     { NULL, NULL, NULL }
 };
 

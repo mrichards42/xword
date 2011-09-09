@@ -175,21 +175,27 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     // Words
     std::map<const Word *, int> wordMap; // Map words to ids
     {
-        const WordList & words = puz->GetWords();
-        WordList::const_iterator word;
         int id = 1;
-        for (word = words.begin(); word != words.end(); ++word)
+        Clues & clues = puz->GetClues();
+        Clues::iterator clues_it;
+        for (clues_it = clues.begin(); clues_it != clues.end(); ++clues_it)
         {
-            xml::node xmlword = crossword.append_child("word");
-            xmlword.append_attribute("id") = id;
-            wordMap[&*word] = id;
-            ++id;
-            Word::const_iterator it;
-            for (it = word->begin(); it != word->end(); ++it)
+            ClueList & cluelist = clues_it->second;
+            ClueList::iterator it;
+            for (it = cluelist.begin(); it != cluelist.end(); ++it)
             {
-                xml::node cell = xmlword.append_child("cells");
-                cell.append_attribute("x") = (*it)->GetCol() + 1;
-                cell.append_attribute("y") = (*it)->GetRow() + 1;
+                Word * word = &it->GetWord();
+                xml::node xmlword = crossword.append_child("word");
+                xmlword.append_attribute("id") = id;
+                wordMap[word] = id;
+                ++id;
+                square_iterator it;
+                for (it = word->begin(); it != word->end(); ++it)
+                {
+                    xml::node cell = xmlword.append_child("cells");
+                    cell.append_attribute("x") = it->GetCol() + 1;
+                    cell.append_attribute("y") = it->GetRow() + 1;
+                }
             }
         }
     }
@@ -210,7 +216,7 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 xml::node clue = xmlclues.append_child("clue");
                 clue.append_attribute("number") =
                     encode_utf8(it->GetNumber()).c_str();
-                clue.append_attribute("word") = wordMap[it->GetWord()];
+                clue.append_attribute("word") = wordMap[&it->GetWord()];
                 xml::SetInnerXML(clue, it->GetText());
             }
         }
