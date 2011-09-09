@@ -152,8 +152,8 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
             for (it = cluelist.begin(); it != cluelist.end(); ++it)
             {
                 xml::node clue = clues_node.append_child("Clue");
-                const Word * word = it->GetWord();
-                switch (word->GetDirection())
+                const Word & word = it->GetWord();
+                switch (word.GetDirection())
                 {
                 case ACROSS:
                     clue.append_attribute("Dir") = "Across";
@@ -168,8 +168,8 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                     throw ConversionError("XPF clues must be Across, Down, or Diagonal");
                     break;
                 }
-                clue.append_attribute("Row") = word->front()->GetRow() + 1;
-                clue.append_attribute("Col") = word->front()->GetCol() + 1;
+                clue.append_attribute("Row") = word.front()->GetRow() + 1;
+                clue.append_attribute("Col") = word.front()->GetCol() + 1;
                 clue.append_attribute("Num") = encode_utf8(it->GetNumber()).c_str();
                 xml::SetInnerXML(clue, it->GetText());
             }
