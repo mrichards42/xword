@@ -25,7 +25,7 @@ P.updates_filename = join(xword.configdir, 'updater', 'updates.lua')
 if task.id() == 1 then
     -- Check for an update.  Callback is called after the task executes
     local osname = wx.__WXMSW__ and 'windows' or wx.__WXMAC__ and 'mac' or 'linux'
-    P.packages_url = "http://sourceforge.net/projects/wx-xword/files/packages_"..osname..".lua"
+    P.packages_url = "http://sourceforge.net/projects/wx-xword/files/scripts/packages_"..osname..".lua"
 
     function P.CheckForUpdates(callback)
         -- Make sure we have a directory for the updates file
