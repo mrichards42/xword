@@ -841,24 +841,24 @@ MyFrame::ShowNotes()
 void
 MyFrame::CheckPuzzle()
 {
-    if (m_XGridCtrl->GetBlankCount() == 0)
+    switch(m_XGridCtrl->IsCorrect())
     {
-        if (m_XGridCtrl->IsCorrect())
-        {
+        case CORRECT_PUZZLE:
             StopTimer();
             m_status->SetAlert(_T("The puzzle is filled correctly!"),
                               *wxWHITE, *wxGREEN);
-        }
-        else
-        {
+            break;
+        case INCORRECT_PUZZLE:
             m_status->SetAlert(
                 _T("The puzzle is completely filled, ")
                 _T("but some letters are incorrect."),
                 *wxWHITE, *wxRED);
-        }
+            break;
+        default:
+        case INCOMPLETE_PUZZLE:
+            m_status->SetAlert(_T(""));
+            break;
     }
-    else
-        m_status->SetAlert(_T(""));
 }
 
 
@@ -1577,7 +1577,7 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
     int key = wxGetNumberFromUser(
                     _T("Enter a four-digit key"),
                     _T("Key (0 to generate automatically):"),
-                    _T("Scrambing solution"),
+                    _T("Scrambling solution"),
                     0,
                     0,
                     9999);
@@ -1591,7 +1591,6 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
     {
         XWordMessage(this, MSG_SCRAMBLE, m_XGridCtrl->GetGrid()->GetKey());
 
-        m_XGridCtrl->RecheckGrid();
         CheckPuzzle();
 
         m_toolMgr.Enable(ID_SCRAMBLE, false);

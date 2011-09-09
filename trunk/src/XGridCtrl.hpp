@@ -71,6 +71,13 @@ enum GridStyle
                     | STRICT_REBUS
 };
 
+enum CorrectStatus
+{
+    INCOMPLETE_PUZZLE,
+    INCORRECT_PUZZLE,
+    CORRECT_PUZZLE
+};
+
 
 // Forward declarations
 namespace puz {
@@ -141,7 +148,6 @@ public:
     const puz::Grid * GetGrid() const { return m_grid; }
     bool IsEmpty() const { return m_grid == NULL || m_grid->IsEmpty(); }
 
-    void RecheckGrid();
     bool UnscrambleSolution(unsigned short key);
 
     // Set* functions trigger an event.
@@ -299,10 +305,7 @@ public:
     const puz::Square & At(int col, int row) const { return m_grid->At(col, row); }
           puz::Square & At(int col, int row)       { return m_grid->At(col, row); }
 
-    int GetBlankCount()     const { return m_blankSquares; }
-    int GetIncorrectCount() const { return m_incorrectSquares; }
-    bool IsCorrect();
-
+    CorrectStatus IsCorrect();
 
     puz::Square * GetClueNumber     (const wxString & num);
 
@@ -375,10 +378,6 @@ protected:
     puz::Square * m_selectionEnd;
     bool m_isSelecting;
     void EndSelection(bool success = true);
-
-    // For counting missing/blank squares
-    int m_blankSquares;
-    int m_incorrectSquares;
 
     // Square colors
     wxColor m_colors[COLOR_COUNT];
