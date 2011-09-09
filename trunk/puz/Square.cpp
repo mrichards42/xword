@@ -489,4 +489,10 @@ bool Square::IsSymbol(const string_t & str)
         && str[2] == puzT(']');
 }
 
+bool Square::IsBetween(const Square * start, const Square * end) const
+{
+    return m_col >= start->m_col && m_col <= end->m_col
+        && m_row >= start->m_row && m_row <= end->m_row;
+}
+
 } // namespace puz

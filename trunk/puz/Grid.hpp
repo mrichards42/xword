@@ -42,7 +42,6 @@ enum GridType
     TYPE_DIAGRAMLESS = 0x0401
 };
 
-
 // Parameters for FindSquare
 enum FindOptions
 {
@@ -54,10 +53,6 @@ enum FindOptions
     FIND_IN_WORD  = NO_WRAP | WHITE_SQUARES,
 };
 
-// Macro to simplify GetX() functions
-#define GET_FUNCTION(type, name, member)         \
-    const type name() const { return member; }   \
-          type name()       { return member; }   \
 
 // This class helps Square hide its constructors
 class GridSquare
@@ -104,9 +99,10 @@ public:
     bool IsEmpty() const { return m_width == 0 || m_height == 0; }
     void Clear();
 
-
-    GET_FUNCTION( Square *, First,      m_first)
-    GET_FUNCTION( Square *, Last,       m_last)
+    Square * First() { return m_first; }
+    Square * Last() { return m_last; }
+    const Square * First() const { return m_first; }
+    const Square * Last() const { return m_last; }
 
     // Access to squares provided as (x,y):
     // i.e. square "b4" is At(1, 3)
@@ -203,10 +199,6 @@ public:
     void SetKey(unsigned short key) { m_key = key; }
     void SetCksum(unsigned short cksum) { m_cksum = cksum; }
 
-    bool IsBetween(const Square * square,
-                   const Square * start,
-                   const Square * end) const;
-
     // Check functions
     //----------------
     void CheckGrid(std::vector<Square *> * incorrect,
@@ -251,17 +243,6 @@ Grid::Clear()
     m_last = NULL;
     SetSize(0,0);
 }
-
-
-inline bool
-Grid::IsBetween(const Square * square,
-                 const Square * start,
-                 const Square * end) const
-{
-    return square->m_col >= start->m_col && square->m_col <= end->m_col
-        && square->m_row >= start->m_row && square->m_row <= end->m_row;
-}
-
 
 // Functions/functors for FindSquare
 

@@ -694,6 +694,16 @@ static int Square_IsSymbol(lua_State * L)
     lua_pushboolean(L, returns);
     return 1;
 }
+// bool IsBetween(puz::Square * start, puz::Square * end)
+static int Square_IsBetween(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    puz::Square * start = luapuz_checkSquare(L, 2);
+    puz::Square * end = luapuz_checkSquare(L, 3);
+    bool returns = square->IsBetween(start, end);
+    lua_pushboolean(L, returns);
+    return 1;
+}
 static const luaL_reg Squarelib[] = {
     {"GetCol", Square_GetCol},
     {"GetRow", Square_GetRow},
@@ -747,6 +757,7 @@ static const luaL_reg Squarelib[] = {
     {"HasWord", Square_HasWord},
     {"IsValidString", Square_IsValidString},
     {"IsSymbol", Square_IsSymbol},
+    {"IsBetween", Square_IsBetween},
     {NULL, NULL}
 };
 
