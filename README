@@ -11,11 +11,13 @@ Supported features:
     - Solving of all American style and cryptic crosswords.
     - Partial support for solving diagramless puzzles.
     - Solving rebus puzzles.
+    - Solving puzzles with a variety of tricks, e.g. diagonal clues, arbitrary
+      numbering schemes, shaded squares.
     - Support for reading number of puzzle formats:
         - Across Lite
         - XPF
         - jpz
-        - ipuz
+        - ipuz (partial)
     - Recovery of corrupted Across Lite .puz files.
     - A timer.
     - Checking and revealing letters.
@@ -24,8 +26,7 @@ Supported features:
     - Zooming the grid in and out.
     - Rearranging the window layout.
     - Color, font, and solving behavior configuration.
-    - Printing (not yet polished, and somewhat buggy: e.g. the page setup
-      dialog doesn't always display the correct paper size)
+    - Printing (not yet polished, and somewhat buggy)
 
 XWord is extensible via the lua scripting language.  A number of plugins are
 available.  See Tools > Plugin Manager.
@@ -42,6 +43,20 @@ Backspace         Remove letters from the end of the word.
 Ctrl + Delete     Remove all letters.
 Ctrl + Backspace  Remove all letters.
 
+
+Diagramless Puzzles
+===================
+XWord allows the user to solve diagramless puzzles similarly to normal puzzles
+with the exception that black squares are allowed to be selected. When
+selected, black squares are outlined in the focused square color.
+To make a white square black, type a period (".").  To make a black square
+white, type a period or enter another letter.
+
+XWord provides some guidance when solving diagramless puzzles: clue numbers
+in the grid are automatically calculated when a square is made black or white.
+Numbers in the grid that do not appear in the clue list are highlighted in red.
+Naturally, this automatic calculation of grid numbers only works if the puzzle
+follows the normal rules of numbering a grid.
 
 
 Configuration
