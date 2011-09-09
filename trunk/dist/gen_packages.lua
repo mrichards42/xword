@@ -54,7 +54,7 @@ local function gen_packages(outdir)
             if info then
                 if info.name and info.requires and info.version and info.packagename then
                     -- Add info to the package table
-                    info.download = string.format("http://sourceforge.net/projects/wx-xword/files/lua/%s_%s.tar.gz", info.packagename, info.version)
+                    info.download = string.format("http://sourceforge.net/projects/wx-xword/files/scripts/%s_%s.tar.gz", info.packagename, info.version)
                     table.insert(packages, info)
                     -- Copy the files to a temp directory so that we can
                     -- create the scripts/packagename directory structure.
