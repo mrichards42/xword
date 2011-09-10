@@ -1,0 +1,127 @@
+
+XWord - A cross platform crossword solving program
+==================================================
+
+https://sourceforge.net/projects/wx-xword/
+
+XWord is a cross-platform crossword puzzle program designed to be highly
+configurable.  It reads multiple puzzle file formats.
+
+Supported features:
+    - Solving of all American style and cryptic crosswords.
+    - Partial support for solving diagramless puzzles.
+    - Solving rebus puzzles.
+    - Solving puzzles with a variety of tricks, e.g. diagonal clues, arbitrary
+      numbering schemes, shaded squares.
+    - Support for reading number of puzzle formats:
+        - Across Lite
+        - XPF
+        - jpz
+        - ipuz (partial)
+    - Recovery of corrupted Across Lite .puz files.
+    - A timer.
+    - Checking and revealing letters.
+    - Scrambling and unscrambling puzzle solutions (for Across Lite files).
+    - Viewing puzzle notes.
+    - Zooming the grid in and out.
+    - Rearranging the window layout.
+    - Color, font, and solving behavior configuration.
+    - Printing (not yet polished, and somewhat buggy)
+
+XWord is extensible via the lua scripting language.  A number of plugins are
+available.  See Tools > Plugin Manager.
+
+Rebus
+=====
+
+Key               Function
+-------------------------------------
+Insert            Begin entering multiple letters and/or numbers into a square.
+Insert or Enter   End entering multiple letters.
+Delete            Remove letters from the beginning of the word.
+Backspace         Remove letters from the end of the word.
+Ctrl + Delete     Remove all letters.
+Ctrl + Backspace  Remove all letters.
+
+
+Diagramless Puzzles
+===================
+XWord allows the user to solve diagramless puzzles similarly to normal puzzles
+with the exception that black squares are allowed to be selected. When
+selected, black squares are outlined in the focused square color.
+To make a white square black, type a period (".").  To make a black square
+white, type a period or enter another letter.
+
+XWord provides some guidance when solving diagramless puzzles: clue numbers
+in the grid are automatically calculated when a square is made black or white.
+Numbers in the grid that do not appear in the clue list are highlighted in red.
+Naturally, this automatic calculation of grid numbers only works if the puzzle
+follows the normal rules of numbering a grid.
+
+
+Configuration
+=============
+
+Configuration settings can be accessed from the File menu (under "Preferences").
+Users can configure grid movement/solving options, colors, and fonts.  Most of
+XWord's configuration can be accessed this way.  However, there are a few
+configuration settings that are not yet implemented in the GUI (and require a
+program restart to take effect):
+
+
+    - Clue list spacing.
+        Accessed under [Clue] heading of config file (spacing)
+
+        X and y spacing applied to the clue list text, and between the clue
+        number and the clue text.
+        This is slightly buggy, as setting an X padding to zero causes some of
+        the clue numbers to get cut off.
+
+
+
+Building XWord
+==============
+
+XWord uses the wxWidgets cross-platform toolkit (version 2.8.10 as of this
+writing).  The distributed builds are statically linked and use unicode.  If you
+want to build a non-unicode version of XWord, you will get a couple of errors,
+because of a few unicode-specific functions and parameters.  These should be
+easy to fix.
+
+http://www.wxwidgets.org
+
+XWord uses a number of other statically or dynamically linked libraries. Most
+of these are supplied in the source distribution.  The external libraries
+you'll want are wxLua (required for buildling XWord with lua support) and
+cURL (if you want to build luacurl, which is needed for many of the lua
+scripts).
+
+XWord uses lua as a scripting extension language.  If you don't want to include
+lua, undefine XWORD_USE_LUA.  Odds are that there are a few modifications that
+will be needed for this option, though regenerating the makefiles using premake
+might be enough.
+
+
+Visual C++ project files and gnu makefules are supplied in the source
+distribution.  I haven't built XWord on linux in a while, so the makefiles
+probably don't work.
+
+XWord requires the following libraries in addition to the wxWidgets Base and
+Core libraries:
+
+wxAUI
+wxpng
+wxzlib
+
+
+Windows-specific building instructions
+======================================
+
+The VC project file is set up to link to the MSVC runtime library dynamically.
+You will either need to build the wxWidgets libraries so that they also link to
+the MSVC runtimes dynamically (the default), or change the setting
+(Properties >> C/C++ >> Code Generation >> Runtime Library).
+
+The VC project file assumes that you have an environmental variable $(WXWIN)
+that points to the wxWidgets folder (with compiled Unicode and Unicode Debug
+libraries).
