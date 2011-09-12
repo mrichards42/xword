@@ -33,19 +33,19 @@ function P.load_package(name)
             package.loaded[name] = { init = result[1], uninit = result[2] }
         else
             package.loaded[name] = result
-        end        
+        end
+    else
+        return false, "Package must return an initialization function"
     end
     -- Call init
     local init = package.loaded[name].init
     if init then
         local success, err = xpcall(init, debug.traceback)
     else
-        xword.logerror("Package %s must return an initialization function", name)
+        return false, "Package must return an initialization function"
     end
     if not success then
-        xword.Error("Package '%s' is disabled because of an error while loading the package.\nSee log for details.", name)
-        xword.logerror("Package '%s' is disabled because of an error while loading the package:\n%s", name, err)
-        return false
+        return false, err
     end
     return true
 end
@@ -55,6 +55,7 @@ end
 function P.load_packages()
     require 'serialize'
     collectgarbage('stop')
+    errors = {}
     -- Load the table of enabled/disabled packages
     local packages = P.load_enabled_packages()
     -- Walk the scripts directory and load all the packages
@@ -63,13 +64,18 @@ function P.load_packages()
             local success, err = P.load_package(name)
             -- If we can't require the package, disable it
             if not success then
-                xword.Error("Package '%s' is disabled because of an error while loading the package.\nSee log for details.", name)
+                table.insert(errors, name)
                 xword.logerror("Package '%s' is disabled because of an error while loading the package:\n%s", name, err)
                 packages[name] = false
             else
                 packages[name] = true
             end
         end
+    end
+    if #errors > 0 then
+        xword.Error("The following packages are disabled because of error(s)"..
+                    "while loading:\n    %s\nSee log for details.",
+                    table.concat(errors, '\n    '))
     end
     -- Rewrite the enabled/disabled packages file
     P.write_enabled_packages(packages)
