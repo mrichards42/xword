@@ -41,7 +41,7 @@ local function gen_packages(outdir)
         xword = {
             name = "XWord",
             version = xword_version,
-            download = "blah",
+            download = string.format("http://sourceforge.net/projects/wx-xword/files/Binary/XWord_%s.exe", xword_version)
         }
     }
     lfs.mkdir(join(outdir, "_temp_packages"))
@@ -106,8 +106,8 @@ local function gen_packages(outdir)
             end
         end
     end
-    serialize.pdump(packages, join(outdir, 'packages.lua'))
-    print("Packages written to "..join(outdir, 'packages.lua'))
+    serialize.pdump(packages, join(outdir, 'packages_windows.lua'))
+    print("Packages written to "..join(outdir, 'packages_windows.lua'))
 end
 
 lfs.mkdir(join(lfs.currentdir(), 'packages'))
