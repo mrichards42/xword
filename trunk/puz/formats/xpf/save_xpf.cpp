@@ -171,7 +171,9 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 clue.append_attribute("Row") = word.front()->GetRow() + 1;
                 clue.append_attribute("Col") = word.front()->GetCol() + 1;
                 clue.append_attribute("Num") = encode_utf8(it->GetNumber()).c_str();
-                xml::SetInnerXML(clue, it->GetText());
+                // Clue formatting needs to be escaped if it is XHTML.
+                // xml::SetInnerXML(clue, it->GetText());
+                xml::SetText(clue, it->GetText());
             }
         }
     }
