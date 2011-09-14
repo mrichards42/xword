@@ -1,4 +1,5 @@
 require 'download.messages'
+require 'luapuz'
 pcall(require, 'import')
 
 -- Arguments to this file:
@@ -33,8 +34,6 @@ end
 -- Puzzle conversion
 -- ---------------------------------------------------------------------------
 function convertPuzzle() -- the filename argument is an upvalue
-    -- Load the puzzle then save it as a .puz file
-    require 'luapuz'
     -- Try to load the puzzle
     local success, p = pcall(puz.Puzzle, filename)
     if success then
