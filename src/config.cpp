@@ -78,7 +78,7 @@ ConfigManager::CluePrompt_t::CluePrompt_t(ConfigGroup * parent)
       font(this, _T("font"), *wxSWISS_FONT),
       foregroundColor(this, _T("foregroundColor"), *wxBLACK),
       backgroundColor(this, _T("backgroundColor"), *wxWHITE),
-      displayFormat(this, _T("displayFormat"), _T("%N. %T"))
+      displayFormat(this, _T("displayFormat"), _T("<center>%N. %T</center>"))
 {}
 
 
