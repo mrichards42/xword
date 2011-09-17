@@ -1438,7 +1438,9 @@ XGridCtrl::OnHome(int mod)
     {
         puz::Square * newSquare = FirstWhite();
         puz::Word * word = m_puz->FindWord(newSquare);
-        if (HasStyle(BLANK_ON_NEW_WORD))
+        if (word)
+            newSquare = word->front();
+        if (HasStyle(BLANK_ON_NEW_WORD) && word)
         {
             SetFocusedSquare( EitherOr(newSquare,
                                        word->FindSquare(newSquare,
