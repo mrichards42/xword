@@ -2050,36 +2050,73 @@ MyFrame::UpdateClues()
     const puz::Square * focusedSquare = GetFocusedSquare();
     const puz::Word * focusedWord = GetFocusedWord();
     const puz::Clue * focusedClue = NULL;
-    puz::Clues::const_iterator it;
-    for (it = m_puz.GetClues().begin(); it != m_puz.GetClues().end(); ++it)
+
+    if (! m_puz.GetGrid().IsDiagramless())
     {
-        const puz::ClueList & cluelist = it->second;
-        if (focusedClue == NULL)
+        puz::Clues::const_iterator it;
+        for (it = m_puz.GetClues().begin(); it != m_puz.GetClues().end(); ++it)
         {
-            // Look for focusedWord in this clue list; if it is not in the list,
-            // look for a word with focusedSquare.
-            const puz::Clue * foundClue = NULL;
+            const puz::ClueList & cluelist = it->second;
+            if (focusedClue == NULL)
+            {
+                // Look for focusedWord in this clue list; if it is not in the list,
+                // look for a word with focusedSquare.
+                const puz::Clue * foundClue = NULL;
+                puz::ClueList::const_iterator clues_it;
+                for (clues_it = cluelist.begin(); clues_it != cluelist.end(); ++clues_it)
+                {
+                    const puz::Clue * clue = &*clues_it;
+                    const puz::Word * word = &clue->GetWord();
+                    if (word == focusedWord)
+                    {
+                        focusedClue = clue;
+                        m_clues[puz2wx(it->first)]->SetClue(focusedClue, CluePanel::FOCUSED);
+                        break;
+                    }
+                    else if (foundClue == NULL)
+                        if (word->Contains(focusedSquare))
+                            foundClue = clue;
+                }
+                if (! focusedClue)
+                    m_clues[puz2wx(it->first)]->SetClue(foundClue, CluePanel::CROSSING);
+            }
+            else // We have already set focusedClue, so this will be a crossing clue.
+            {
+                m_clues[puz2wx(it->first)]->SetClue(cluelist.Find(focusedSquare), CluePanel::CROSSING);
+            }
+        }
+    }
+    else // diagramless
+    {
+        const short direction = GetFocusedDirection();
+        const puz::GridDirection crossing_direction =
+            puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
+        const puz::Square * crossingSquare =
+            focusedSquare->GetWordStart(crossing_direction);
+
+        puz::Clues::const_iterator it;
+        for (it = m_puz.GetClues().begin(); it != m_puz.GetClues().end(); ++it)
+        {
+            const puz::ClueList & cluelist = it->second;
             puz::ClueList::const_iterator clues_it;
             for (clues_it = cluelist.begin(); clues_it != cluelist.end(); ++clues_it)
             {
                 const puz::Clue * clue = &*clues_it;
                 const puz::Word * word = &clue->GetWord();
-                if (word == focusedWord)
+                if (clue->GetNumber() == focusedWord->front()->GetNumber()
+                    && word->GetDirection() == direction)
                 {
-                    m_clues[puz2wx(it->first)]->SetClue(clue, CluePanel::FOCUSED);
                     focusedClue = clue;
+                    m_clues[puz2wx(it->first)]->SetClue(focusedClue, CluePanel::FOCUSED);
                     break;
                 }
-                else if (foundClue == NULL)
-                    if (word->Contains(focusedSquare))
-                        foundClue = clue;
+                else if (crossingSquare
+                         && clue->GetNumber() == crossingSquare->GetNumber()
+                         && word->GetDirection() == crossing_direction)
+                {
+                    m_clues[puz2wx(it->first)]->SetClue(clue, CluePanel::CROSSING);
+                }
             }
-            if (! focusedClue)
-                m_clues[puz2wx(it->first)]->SetClue(foundClue, CluePanel::CROSSING);
-        }
-        else // We have already set focusedClue, so this will be a crossing clue.
-        {
-            m_clues[puz2wx(it->first)]->SetClue(cluelist.Find(focusedSquare), CluePanel::CROSSING);
         }
     }
     m_cluePrompt->SetClue(focusedClue);
