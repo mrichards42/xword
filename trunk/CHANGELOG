@@ -1,3 +1,11 @@
+Version 0.5.1 (9/17/2011)
+    * Improved diagramless navigation
+
+    Bug Fixes
+    * Scripts that have any kind of error when loading are disabled.
+    * Fixes for loading/saving timer info for jpz.
+    * Formatted clues are saved correctly for XPF.
+
 Version 0.5 (9/9/2011)
     New Features
     * Added a preference to start the timer when a puzzle is opened

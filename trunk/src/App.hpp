@@ -42,7 +42,7 @@ extern wxPageSetupDialogData* g_pageSetupData;
 // Global misc
 #define XWORD_APP_NAME       _T("XWord")
 // Make sure this is made up of only numbers (for lua)
-#define XWORD_VERSION_STRING _T("0.5")
+#define XWORD_VERSION_STRING _T("0.5.1")
 #define XWORD_COPYRIGHT_STRING _T("(C) 2011 Mike Richards <mrichards42@gmx.com>")
 
 class MyApp : public wxApp
