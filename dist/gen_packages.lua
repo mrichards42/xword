@@ -1,4 +1,4 @@
-xword_version = "0.5"
+xword_version = "0.5.1"
 
 local lfs = require 'lfs'
 
