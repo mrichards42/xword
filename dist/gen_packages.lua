@@ -1,3 +1,8 @@
+-- Generate tar.gz files for all packages
+-- Generate packages_windows.lua file
+-- Generate readme.md for sourceforge.
+-- NOTE: don't forget to update xword_version
+
 xword_version = "0.5.1"
 
 local lfs = require 'lfs'
@@ -44,6 +49,7 @@ local function gen_packages(outdir)
             download = string.format("http://sourceforge.net/projects/wx-xword/files/Binary/XWord_%s.exe", xword_version)
         }
     }
+    local readme = {}
     lfs.mkdir(join(outdir, "_temp_packages"))
     for name in lfs.dir(scriptsdir) do
         local dirname = join(scriptsdir, name)
@@ -56,6 +62,8 @@ local function gen_packages(outdir)
                     -- Add info to the package table
                     info.download = string.format("http://sourceforge.net/projects/wx-xword/files/scripts/%s_%s.tar.gz", info.packagename, info.version)
                     table.insert(packages, info)
+                    -- Add info to readme.md
+                    table.insert(readme, string.format("%s (%s)\n==\n%s\n\n---\n\n", info.name, info.version, info.description))
                     -- Copy the files to a temp directory so that we can
                     -- create the scripts/packagename directory structure.
                     os.execute(string.format(
@@ -107,6 +115,9 @@ local function gen_packages(outdir)
         end
     end
     serialize.pdump(packages, join(outdir, 'packages_windows.lua'))
+    local f = io.open(join(outdir, 'readme.md'), 'w')
+    f:write(table.concat(readme, '\n'))
+    f:close()
     print("Packages written to "..join(outdir, 'packages_windows.lua'))
 end
 
