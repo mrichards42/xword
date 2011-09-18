@@ -303,7 +303,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     // Timer
     {
-        xml::node timer = applet.child("timer");
+        xml::node timer = applet.child("applet-settings").child("timer");
         puz->SetTime(timer.attribute("initial-value").as_int());
         puz->SetTimerRunning(
             GetAttribute(timer, "start-on-load") == puzT("true")
