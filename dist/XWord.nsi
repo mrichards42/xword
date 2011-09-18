@@ -171,6 +171,7 @@ Section "MainSection" SEC01
         File "${XWORD_TRUNK}\README"
         File "${XWORD_TRUNK}\AUTHORS"
         File "${XWORD_TRUNK}\COPYING"
+        File "${XWORD_TRUNK}\CHANGELOG"
 
     ; VC Redist
     SetOutPath "$INSTDIR\Microsoft.VC90.CRT"
@@ -368,6 +369,11 @@ Section Uninstall
         Delete "$INSTDIR\lua5.1.dll"
         Delete "$INSTDIR\libcurl.dll"
         Delete "$INSTDIR\libexpat.dll"
+
+        Delete "$INSTDIR\README"
+        Delete "$INSTDIR\AUTHORS"
+        Delete "$INSTDIR\COPYING"
+        Delete "$INSTDIR\CHANGELOG"
 
         ; VC Redist
         Delete "$INSTDIR\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest"

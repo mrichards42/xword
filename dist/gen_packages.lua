@@ -63,7 +63,7 @@ local function gen_packages(outdir)
                     info.download = string.format("http://sourceforge.net/projects/wx-xword/files/scripts/%s_%s.tar.gz", info.packagename, info.version)
                     table.insert(packages, info)
                     -- Add info to readme.md
-                    table.insert(readme, string.format("%s (%s)\n==\n%s\n\n---\n\n", info.name, info.version, info.description))
+                    table.insert(readme, string.format("%s (%s)\n====\n%s\n\n----\n\n", info.name, info.version, info.description))
                     -- Copy the files to a temp directory so that we can
                     -- create the scripts/packagename directory structure.
                     os.execute(string.format(
