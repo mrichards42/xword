@@ -167,6 +167,10 @@ Section "MainSection" SEC01
         File "${XWORD_BIN}\yajl.dll"
         File "${XWORD_BIN}\zlib1.dll"
         File "${XWORD_BIN}\libcurl.dll"
+        ; Info
+        File "${XWORD_TRUNK}\README"
+        File "${XWORD_TRUNK}\AUTHORS"
+        File "${XWORD_TRUNK}\COPYING"
 
     ; VC Redist
     SetOutPath "$INSTDIR\Microsoft.VC90.CRT"
