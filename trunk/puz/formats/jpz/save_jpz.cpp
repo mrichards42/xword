@@ -91,7 +91,8 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
     }
     // Timer
-    xml::node timer = doc.child("applet-settings").append_child("timer");
+    applet.child("applet-settings").remove_child("timer");
+    xml::node timer = applet.child("applet-settings").append_child("timer");
     timer.append_attribute("start-on-load") = puz->IsTimerRunning();
     timer.append_attribute("initial-value") = puz->GetTime();
 
@@ -224,6 +225,9 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
     // Save to a zip file.
     zip::Archive archive(filename);
+    if (! archive)
+        throw FatalFileError(std::string("Unable to open file for writing: ")
+                             + filename);
     // Open a zip in the archive with the filename part of the path
     zip::File & file = archive.OpenFile(
         filename.substr(filename.find_last_of("/\\") + 1));
