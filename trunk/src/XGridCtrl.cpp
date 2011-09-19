@@ -1273,7 +1273,7 @@ XGridCtrl::OnLetter(wxChar key, int mod)
 
     // Space bar always moves forward one square
     if (static_cast<int>(key) == WXK_SPACE)
-        SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE));
+        SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE), m_focusedWord);
     else
         MoveAfterLetter();
 }
