@@ -526,6 +526,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
                                    sw.Time()));
         if (m_autoStartTimer)
             StartTimer();
+        CheckPuzzle();
     }
     else
     {
@@ -691,9 +692,6 @@ MyFrame::ShowGrid()
         EnableReveal(! scrambled);
 
         m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite());
-
-        // Inform user if puzzle is already completed
-        CheckPuzzle();
     }
 
     m_XGridCtrl->SetPaused(false);
