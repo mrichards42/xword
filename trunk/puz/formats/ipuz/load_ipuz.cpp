@@ -27,6 +27,10 @@ class ipuzParser : public json::Parser
 {
 public:
     virtual bool DoLoadPuzzle(Puzzle * puz, json::Value * root);
+
+    void SetStyle(Square & square, json::Value * style_value);
+    std::map<string_t, json::Map *> m_style_map;
+    std::map<string_t, string_t> m_color_map;
 };
 
 void LoadIpuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
@@ -100,6 +104,32 @@ string_t ParseEnumeration(const string_t & str)
     return ret;
 }
 
+void ipuzParser::SetStyle(Square & square, json::Value * style_value)
+{
+    if (! style_value)
+        return;
+    // Get the style as a map
+    json::Map * style = NULL;
+    if (style_value->IsString()) // Named styles
+        style = m_style_map[style_value->AsString()];
+    else if (style_value->IsMap())
+        style = style_value->AsMap();
+    if (! style)
+        return;
+
+    // Named styles
+    string_t name = style->GetString(puzT("named"), puzT(""));
+    if (! name.empty())
+        SetStyle(square, m_style_map[name]);
+
+    // Set styles
+    if (style->GetString(puzT("shapebg"), puzT("")) == puzT("circle"))
+        square.SetCircle();
+    if (style->GetBool(puzT("highlight"), false))
+        square.SetHighlight();
+    // TODO: colors
+}
+
 
 bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
 {
@@ -118,8 +148,20 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
     puz->SetTitle(doc->PopString(puzT("title"), puzT("")));
     puz->SetAuthor(doc->PopString(puzT("author"), puzT("")));
     puz->SetCopyright(doc->PopString(puzT("copyright"), puzT("")));
-    puz->SetNotes(doc->PopString(puzT("intro"), puzT(""))
-                  + doc->PopString(puzT("notes"), puzT("")));
+    string_t notes = doc->PopString(puzT("notes"), puzT(""));
+    if (! notes.empty())
+        puz->SetNotes(notes);
+    else
+        puz->SetNotes(doc->PopString(puzT("intro"), puzT("")));
+
+    // Read the styles into a style map
+    if (doc->Contains(puzT("styles")))
+    {
+        json::Map * styles = doc->GetMap(puzT("styles"));
+        json::Map::iterator style;
+        for (style = styles->begin(); style != styles->end(); ++style)
+            m_style_map[style->first] = style->second->AsMap();
+    }
 
     // Grid
     string_t block_str = doc->PopString(puzT("block"), puzT("#"));
@@ -177,19 +219,7 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
                 json::Map * map = cell->AsMap();
                 val = map->GetString(puzT("cell"), empty_str);
                 if (map->Contains(puzT("style")))
-                {
-                    json::Value * v_style = map->Get(puzT("style"));
-                    if (v_style->IsMap())
-                    {
-                        json::Map * style = v_style->AsMap();
-                        if (style->GetString(puzT("shapebg"), puzT(""))
-                                == puzT("circle"))
-                            square.SetCircle();
-                        if (style->GetBool(puzT("highlight"), false))
-                            square.SetHighlight();
-                        // TODO: colors
-                    }
-                }
+                    SetStyle(square, map->Get(puzT("style")));
             }
             if (val == block_str)
                 square.SetSolution(square.Black);
