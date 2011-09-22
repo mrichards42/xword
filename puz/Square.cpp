@@ -322,13 +322,13 @@ void Square::SetColor(const string_t & hexcolor)
     }
     try {
         if (len == 3)
-            SetColor(ParseHex(hexcolor[1], hexcolor[1]),
-                     ParseHex(hexcolor[2], hexcolor[2]),
-                     ParseHex(hexcolor[3], hexcolor[3]));
+            SetColor(ParseHex(hexcolor[0], hexcolor[0]),
+                     ParseHex(hexcolor[1], hexcolor[1]),
+                     ParseHex(hexcolor[2], hexcolor[2]));
         else if (len == 6)
-            SetColor(ParseHex(hexcolor[1], hexcolor[2]),
-                     ParseHex(hexcolor[3], hexcolor[4]),
-                     ParseHex(hexcolor[5], hexcolor[6]));
+            SetColor(ParseHex(hexcolor[0], hexcolor[1]),
+                     ParseHex(hexcolor[2], hexcolor[3]),
+                     ParseHex(hexcolor[4], hexcolor[5]));
     }
     catch (Exception &) {
         // Don't set the color if we can't parse the hex value
@@ -341,11 +341,11 @@ string_t Square::GetHtmlColor() const
 {
     char_t ret[] = {
         puzT('#'),
-        hexDigits[m_red & 0xf0 >> 4],
+        hexDigits[(m_red & 0xf0) >> 4],
         hexDigits[m_red & 0x0f],
-        hexDigits[m_green & 0xf0 >> 4],
+        hexDigits[(m_green & 0xf0) >> 4],
         hexDigits[m_green & 0x0f],
-        hexDigits[m_blue & 0xf0 >> 4],
+        hexDigits[(m_blue & 0xf0) >> 4],
         hexDigits[m_blue & 0x0f],
     };
     return string_t(ret, 7);
