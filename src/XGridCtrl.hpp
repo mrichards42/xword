@@ -385,15 +385,17 @@ protected:
     // Rebus
     bool m_wantsRebus;
 
-private:
-    // Events
     void ConnectEvents();
     void DisconnectEvents();
+
+private:
+    // Events
     bool m_areEventsConnected;
 
     void OnLeftDown    (wxMouseEvent & evt);
     void OnRightDown   (wxMouseEvent & evt);
     void OnContextMenu (wxContextMenuEvent & evt);
+    void OnMouseMove   (wxMouseEvent & evt);
     void OnKeyDown     (wxKeyEvent & evt);
     void OnChar        (wxKeyEvent & evt);
 

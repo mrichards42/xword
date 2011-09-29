@@ -32,6 +32,8 @@ namespace puz {
     class Puzzle;
 }
 
+const int TRUNCATED_REBUS_LENGTH = 10;
+
 //=============================================================================
 // XGridDrawer is a class designed to scale and draw various parts of the
 // crossword grid.  In order to measure text sizes, XGridDrawer needs a 
