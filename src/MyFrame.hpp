@@ -203,7 +203,6 @@ private:
 
     // Incremental enabling/disabling . . .
     void EnableSave(bool enable = true);
-    void EnableSaveAs(bool enable = true) { EnableSave(! enable); }
     void EnableGridSize(bool enable = true);
     void EnableScramble(bool enable = true);
     void EnableUnscramble(bool enable = true);
