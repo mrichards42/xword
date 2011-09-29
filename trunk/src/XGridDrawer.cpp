@@ -560,6 +560,9 @@ XGridDrawer::DrawSquare(wxDC & adc,
         // Rebus entries
         if (text.length() > 4)
         {
+            if (text.length() > TRUNCATED_REBUS_LENGTH)
+                text = text.substr(0, TRUNCATED_REBUS_LENGTH - 5) + _T("[...]");
+
             const int len = (text.length() + 1) / 2;
             text.insert(len, _T("\n"));
 

@@ -18,6 +18,7 @@
 
 #include "XGridCtrl.hpp"
 #include <wx/dcbuffer.h>
+#include <wx/tooltip.h>
 #include <list>
 #include <algorithm>
 #include "PuzEvent.hpp"
@@ -1087,6 +1088,7 @@ XGridCtrl::ConnectEvents()
         Connect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
         Connect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
         Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+        Connect(wxEVT_MOTION,     wxMouseEventHandler(XGridCtrl::OnMouseMove));
     }
     m_areEventsConnected = true;
 }
@@ -1101,6 +1103,7 @@ XGridCtrl::DisconnectEvents()
         Disconnect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
         Disconnect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
         Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
+        Disconnect(wxEVT_MOTION,     wxMouseEventHandler(XGridCtrl::OnMouseMove));
     }
     m_areEventsConnected = false;
 }
@@ -1140,6 +1143,26 @@ XGridCtrl::OnRightDown(wxMouseEvent & evt)
     // Kill the event.
 }
 
+
+void
+XGridCtrl::OnMouseMove(wxMouseEvent & evt)
+{
+    wxASSERT(! IsEmpty());
+
+    wxPoint pt = evt.GetPosition();
+    puz::Square * square = HitTest(pt.x, pt.y);
+    if (square != NULL && (square->IsWhite() || GetGrid()->IsDiagramless())
+        && square->HasTextRebus())
+    {
+        wxString tip = puz2wx(square->GetText());
+        if (GetToolTip()->GetTip() != tip)
+            SetToolTip(tip);
+    }
+    else
+        SetToolTip(wxEmptyString);
+
+    evt.Skip();
+}
 
 void
 XGridCtrl::OnContextMenu(wxContextMenuEvent & evt)
@@ -1692,10 +1715,7 @@ GridRebusHandler::GridRebusHandler(XGridCtrl & grid)
 {
     m_grid.PushEventHandler(this);
     // Kill the grid's own event handling
-    m_grid.Disconnect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
-    m_grid.Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
-    m_grid.Disconnect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
-    m_grid.Disconnect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
+    m_grid.DisconnectEvents();
 }
 
 void
@@ -1703,10 +1723,7 @@ GridRebusHandler::EndEventHandling()
 {
     m_grid.RemoveEventHandler(this);
     // Restore the grid's own key handling
-    m_grid.Connect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
-    m_grid.Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
-    m_grid.Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
-    m_grid.Connect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
+    m_grid.ConnectEvents();
 }
 
 void
@@ -1766,8 +1783,6 @@ GridRebusHandler::OnChar(wxKeyEvent & evt)
 
     puz::Square * square = m_grid.GetFocusedSquare();
 
-    if (square->GetText().length() >= puz::REBUS_ENTRY_LENGTH)
-        return;
     if (square->IsBlank())
         m_grid.SetSquareText(*square, key);
     else
@@ -1795,10 +1810,7 @@ GridSelectionHandler::GridSelectionHandler(XGridCtrl & grid)
 {
     m_grid.PushEventHandler(this);
     // Kill the grid's own event handling
-    m_grid.Disconnect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
-    m_grid.Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
-    m_grid.Disconnect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
-    m_grid.Disconnect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
+    m_grid.DisconnectEvents();
 
     m_grid.m_selectionStart = NULL;
     m_grid.m_selectionEnd = NULL;
@@ -1811,10 +1823,7 @@ GridSelectionHandler::EndEventHandling()
 {
     m_grid.RemoveEventHandler(this);
     // Restore the grid's own key handling
-    m_grid.Connect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
-    m_grid.Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
-    m_grid.Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
-    m_grid.Connect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
+    m_grid.ConnectEvents();
 
     m_grid.SetCursor(wxNullCursor);
 
