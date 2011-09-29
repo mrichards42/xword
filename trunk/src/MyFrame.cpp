@@ -569,8 +569,7 @@ MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
         m_filename = puz2wx(puz::decode_utf8(fn));
         m_isModified = false;
 
-        // Reset save/save as flag
-        EnableSaveAs();
+        EnableSave(false);
 
         SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
                                    m_filename.c_str(),
@@ -647,7 +646,6 @@ MyFrame::ShowPuzzle()
         m_puz.Clear();
 
     // Enable / disable tools
-    EnableSaveAs();
     if (m_puz.IsOk())
     {
         EnableTools(true);
@@ -657,6 +655,7 @@ MyFrame::ShowPuzzle()
         EnableTools(false);
         m_cluePrompt->Clear();
     }
+    EnableSave(false);
 
     // Update the GUI
     ShowClues();
@@ -1228,7 +1227,7 @@ void
 MyFrame::EnableSave(bool enable)
 {
     m_toolMgr.Enable(wxID_SAVE,         enable);
-
+#if 0 // Don't swap the icons, just enable/disable
     if (m_toolbar == NULL)
         return;
 
@@ -1257,6 +1256,7 @@ MyFrame::EnableSave(bool enable)
     }
     // Have to call Realize() since we have inserted a tool.
     m_toolbar->Realize();
+#endif // 0
 }
 
 void
