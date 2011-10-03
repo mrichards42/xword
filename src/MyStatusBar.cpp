@@ -94,9 +94,9 @@ void MyStatusBar::SetAlert(const wxString & text, const wxColour & fgColor, cons
 }
 
 
-void MyStatusBar::SetTime(int time)
+void MyStatusBar::SetTime(int time, const wxString & msg)
 {
-    SetStatusText( wxTimeSpan::Seconds(time).Format(), STATUS_TIME);
+    SetStatusText( wxTimeSpan::Seconds(time).Format() + msg, STATUS_TIME);
 }
 
 

@@ -132,6 +132,9 @@ PreferencesDialog::LoadConfig()
 
     // Timer
     m_startTimer->SetValue(config.Timer.autoStart());
+
+    // Auto Save
+    m_autoSave->SetValue(config.autoSaveInterval());
 }
 
 void
@@ -232,6 +235,7 @@ PreferencesDialog::SaveConfig()
     printing.Fonts.clueFont = m_printClueFont->GetSelectedFont();
 
     config.Timer.autoStart = m_startTimer->GetValue();
+    config.autoSaveInterval = m_autoSave->GetValue();
 }
 
 

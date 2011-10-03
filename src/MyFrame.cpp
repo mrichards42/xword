@@ -127,12 +127,17 @@ enum toolIds
     ID_DUMP_LAYOUT,
     ID_FORCE_UNSCRAMBLE,
 #endif // __WXDEBUG__
+
+    // Timers
+    ID_CLOCK_TIMER,
+    ID_AUTOSAVE_TIMER
 };
 
 
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
-    EVT_TIMER          (wxID_ANY,             MyFrame::OnTimerNotify)
+    EVT_TIMER          (ID_CLOCK_TIMER,             MyFrame::OnTimerNotify)
+    EVT_TIMER          (ID_AUTOSAVE_TIMER,          MyFrame::OnAutoSaveNotify)
 
 #ifdef XWORD_USE_LUA
     EVT_LUA_PRINT      (wxID_ANY,             MyFrame::OnLuaPrint)
@@ -341,9 +346,11 @@ private:
 
 MyFrame::MyFrame()
     : wxFrame(NULL, -1, XWORD_APP_NAME, wxDefaultPosition, wxSize(700,700)),
-      m_timer(this),
+      m_timer(this, ID_CLOCK_TIMER),
       m_isTimerRunning(false),
       m_autoStartTimer(false),
+      m_autoSaveTimer(this, ID_AUTOSAVE_TIMER),
+      m_autoSaveInterval(0),
       m_preferencesDialog(NULL),
       m_charactersPanel(NULL),
       m_mgr(this),
@@ -516,7 +523,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     RemoveLayout(_T("(Current)"));
     ShowPuzzle();
 
-    m_filename = filename;
+    m_filename = wx2puz(filename);
 
     if (m_puz.IsOk())
     {
@@ -1334,6 +1341,7 @@ MyFrame::LoadConfig()
                                                   margins.bottom()));
 
     config.Timer.autoStart.AddCallback(this, &MyFrame::SetAutoStartTimer);
+    config.autoSaveInterval.AddCallback(this, &MyFrame::SetAutoSaveInterval);
     // Update the config of our controls
     config.Update();
 }
@@ -1791,6 +1799,7 @@ MyFrame::StartTimer()
 {
     m_timer.Start();
     m_toolMgr.Check(ID_TIMER);
+    m_status->SetTime(m_time);
 }
 
 void
@@ -1798,6 +1807,7 @@ MyFrame::StopTimer()
 {
     m_timer.Stop();
     m_toolMgr.Check(ID_TIMER, false);
+    m_status->SetTime(m_time, _T(" (Paused)"));
 }
 
 void
@@ -1814,6 +1824,14 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
     SetTime(m_time+1);
 }
 
+// AutoSave
+//---------
+void
+MyFrame::OnAutoSaveNotify(wxTimerEvent & WXUNUSED(evt))
+{
+    wxLogDebug(_T("AutoSave: %s"), m_filename);
+    SavePuzzle(m_filename);
+}
 
 // Character Map
 //--------------
@@ -2130,6 +2148,13 @@ MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
         EnableSave();
     }
     CheckPuzzle();
+    // Auto Save
+    if (m_autoSaveInterval > 0
+        && puz::Puzzle::CanSave(puz::encode_utf8(wx2puz(m_filename))))
+    {
+        wxLogDebug(_T("AutoSave in %d seconds"), m_autoSaveInterval);
+        m_autoSaveTimer.Start(m_autoSaveInterval * 1000, wxTIMER_ONE_SHOT);
+    }
 }
 
 

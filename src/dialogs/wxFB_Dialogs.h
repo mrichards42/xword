@@ -17,15 +17,15 @@
 #include <wx/checkbox.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
+#include <wx/stattext.h>
+#include <wx/spinctrl.h>
 #include <wx/panel.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/clrpicker.h>
-#include <wx/stattext.h>
 #include <wx/fontpicker.h>
 #include <wx/textctrl.h>
-#include <wx/spinctrl.h>
 #include <wx/gbsizer.h>
 #include <wx/slider.h>
 #include <wx/notebook.h>
@@ -59,6 +59,9 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxCheckBox* m_strictRebus;
 		wxCheckBox* m_moveOnRightClick;
 		wxCheckBox* m_startTimer;
+		wxStaticText* m_staticText36;
+		wxSpinCtrl* m_autoSave;
+		wxStaticText* m_staticText351;
 		wxStaticBoxSizer* sbSizer36;
 		wxColourPickerCtrl* m_penColor;
 		wxColourPickerCtrl* m_selectedLetterColor;

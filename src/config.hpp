@@ -29,7 +29,8 @@ public:
           Clue(&m_group),
           CluePrompt(&m_group),
           Printing(&m_group),
-          Timer(&m_group)
+          Timer(&m_group),
+          autoSaveInterval(&m_group, _T("autoSaveInterval"), 0)
     {}
 
     // Frame position
@@ -139,6 +140,8 @@ public:
 
         ConfigBool autoStart;
     } Timer;
+
+    ConfigLong autoSaveInterval;
 };
 
 #endif // XWORD_CONFIG_H

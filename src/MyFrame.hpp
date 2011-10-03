@@ -130,6 +130,10 @@ public:
     void SetAutoStartTimer(bool doit = true) { m_autoStartTimer = doit; }
     bool AutoStartTimer() const { return m_autoStartTimer; }
 
+    // AutoSave after 5 sec inactivity
+    void SetAutoSaveInterval(int seconds = 5) { m_autoSaveInterval = seconds; }
+    int AutoSaveInterval() const { return m_autoSaveInterval; }
+
     void OnAppDeactivate();
     void OnAppActivate();
 
@@ -221,6 +225,10 @@ private:
     bool m_isTimerRunning; // Used to start/stop timer on frame activate events.
     bool m_autoStartTimer;
 
+    // AutoSave
+    int m_autoSaveInterval;
+    wxTimer m_autoSaveTimer;
+
     // The XWord puzzle
     //-----------------
     puz::Puzzle m_puz;
@@ -292,6 +300,9 @@ private:
     // Timer
     void OnTimer      (wxCommandEvent & WXUNUSED(evt));
     void OnTimerNotify(wxTimerEvent   & WXUNUSED(evt));
+
+    // AutoSave
+    void OnAutoSaveNotify(wxTimerEvent   & WXUNUSED(evt));
 
     // Char Map
     void OnCharacterMap(wxCommandEvent & WXUNUSED(evt));
