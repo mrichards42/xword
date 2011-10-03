@@ -631,6 +631,7 @@ MyFrame::ClosePuzzle(bool prompt)
             SavePuzzle(m_filename);
     }
 
+    m_autoSaveTimer.Stop();
     SetStatus(_T("No file loaded"));
     m_puz.Clear();
 
@@ -1830,7 +1831,8 @@ void
 MyFrame::OnAutoSaveNotify(wxTimerEvent & WXUNUSED(evt))
 {
     wxLogDebug(_T("AutoSave: %s"), m_filename);
-    SavePuzzle(m_filename);
+    if(puz::Puzzle::CanSave(puz::encode_utf8(wx2puz(m_filename))))
+        SavePuzzle(m_filename);
 }
 
 // Character Map
@@ -2058,6 +2060,7 @@ MyFrame::OnClueFocus(wxPuzEvent & evt)
     puz::Clue * focusedClue = evt.GetClue();
     m_XGridCtrl->ChangeFocusedWord(&focusedClue->GetWord());
     UpdateClues();
+    m_XGridCtrl->SetFocus();
 }
 
 void
@@ -2149,8 +2152,7 @@ MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
     }
     CheckPuzzle();
     // Auto Save
-    if (m_autoSaveInterval > 0
-        && puz::Puzzle::CanSave(puz::encode_utf8(wx2puz(m_filename))))
+    if (m_autoSaveInterval > 0)
     {
         wxLogDebug(_T("AutoSave in %d seconds"), m_autoSaveInterval);
         m_autoSaveTimer.Start(m_autoSaveInterval * 1000, wxTIMER_ONE_SHOT);
