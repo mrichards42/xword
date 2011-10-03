@@ -91,7 +91,7 @@ download.sources =
         days = { true, true, true, true, true, false, false },
         format = 'UClick XML',
     },
-
+--[[
     {
         display = "Universal",
         url = "http://picayune.uclick.com/comics/fcx/data/fcx%y%m%d-data.xml",
@@ -100,7 +100,7 @@ download.sources =
         days = { true, true, true, true, true, true, true },
         format = 'UClick XML',
     },
-
+]]
     {
         display = "Ink Well",
         url = "http://herbach.dnsalias.com/Tausig/vv%y%m%d.puz",
