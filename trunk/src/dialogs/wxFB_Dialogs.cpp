@@ -85,6 +85,27 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	
 	bSizer5->Add( sbSizer411, 0, wxEXPAND|wxALL, 5 );
 	
+	wxStaticBoxSizer* sbSizer4111;
+	sbSizer4111 = new wxStaticBoxSizer( new wxStaticBox( solvePanel, wxID_ANY, wxT("Auto Save") ), wxVERTICAL );
+	
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText36 = new wxStaticText( solvePanel, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText36->Wrap( -1 );
+	bSizer24->Add( m_staticText36, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	
+	m_autoSave = new wxSpinCtrl( solvePanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), wxSP_ARROW_KEYS, 0, 99, 0 );
+	bSizer24->Add( m_autoSave, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	m_staticText351 = new wxStaticText( solvePanel, wxID_ANY, wxT("seconds (0 = disabled)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText351->Wrap( -1 );
+	bSizer24->Add( m_staticText351, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	
+	sbSizer4111->Add( bSizer24, 1, wxEXPAND, 5 );
+	
+	bSizer5->Add( sbSizer4111, 0, wxEXPAND|wxALL, 5 );
+	
 	bSizer3->Add( bSizer5, 1, wxALL|wxEXPAND, 5 );
 	
 	solvePanel->SetSizer( bSizer3 );
@@ -396,7 +417,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_staticText23->Wrap( -1 );
 	fgSizer1->Add( m_staticText23, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_cluePromptFormat = new wxTextCtrl( miscPanel, wxID_ANY, wxT("%N. %T"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cluePromptFormat = new wxTextCtrl( miscPanel, wxID_ANY, wxT("<center>%N. %T</center>"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_cluePromptFormat, 0, wxEXPAND, 5 );
 	
 	sbSizer13->Add( fgSizer1, 0, wxALL|wxEXPAND, 5 );

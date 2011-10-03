@@ -40,7 +40,7 @@ public:
 #ifdef XWORD_USE_LUA
     void SetLuaErrors(int num);
 #endif
-    void SetTime(int time);
+    void SetTime(int time, const wxString & msg = wxEmptyString);
 
 private:
     void OnSize(wxSizeEvent & WXUNUSED(evt));
