@@ -175,7 +175,8 @@ bool Square::IsValidString(const string_t & str)
 const Square * Square::FindWordBoundary(const Square * square, GridDirection dir)
 {
     // Only white squares have a word
-    if (! square->IsWhite())
+    // direction must be a normal direction.
+    if (! square->IsSolutionWhite() || (dir % 45) != 0)
         return NULL;
 
     // Iterate until the grid edge or a black/missing square.
@@ -194,7 +195,8 @@ const Square * Square::FindWordBoundary(const Square * square, GridDirection dir
 const Square * Square::FindSolutionWordBoundary(const Square * square, GridDirection dir)
 {
     // Only white squares have a word
-    if (! square->IsSolutionWhite())
+    // direction must be a normal direction.
+    if (! square->IsSolutionWhite() || (dir % 45) != 0)
         return NULL;
 
     // Iterate until the grid edge or a black/missing square.
