@@ -236,6 +236,8 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 {
                     square->AddFlag(FLAG_X);
                 }
+                // Top right number
+                square->m_mark[MARK_TR] = GetAttribute(cell, "top-right-number");
             }
             // Image
             xml::node image = cell.child("background-picture");
@@ -243,7 +245,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             {
                 square->m_imageformat = image.attribute("format").value();
                 square->m_imagedata = base64_decode(
-                    encode_utf8(TrimWhitespace(GetText(image, "encoded-image"))));
+                    image.child_value("encoded-image"));
             }
         }
     }
