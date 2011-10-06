@@ -316,21 +316,16 @@ XGridDrawer::ScaleLetterFont()
     // 1 letter
     ScaleFont(&m_letterFont[0], -1, GetLetterHeight());
 
-    // 2-3 letters
+    // 2 letters
     m_letterFont[1] = m_letterFont[0];
-    ScaleFont(&m_letterFont[1], GetSquareSize() / 4, GetLetterHeight());
+    ScaleFont(&m_letterFont[1], GetLetterHeight() / 2., GetLetterHeight());
+    // 3 letters
     m_letterFont[2] = m_letterFont[1];
+    ScaleFont(&m_letterFont[2], GetLetterHeight() / 3., GetLetterHeight());
 
-    // 4-5 letters
+    // 4+ letters
     m_letterFont[3] = m_letterFont[2];
-    ScaleFont(&m_letterFont[3], GetSquareSize() / 6, GetLetterHeight());
-    m_letterFont[4] = m_letterFont[3];
-
-    // 6+ (6-8) letters
-    m_letterFont[5] = m_letterFont[4];
-    ScaleFont(&m_letterFont[5], GetSquareSize() / 8, GetLetterHeight());
-    m_letterFont[6] = m_letterFont[5];
-    m_letterFont[7] = m_letterFont[6];
+    ScaleFont(&m_letterFont[3], GetLetterHeight() / 4., GetLetterHeight());
 }
 
 void
@@ -436,9 +431,15 @@ XGridDrawer::DrawSquare(wxDC & adc,
     if (square.HasImage() && m_boxSize > 2) // Prevent errors with scaling
     {
         wxLogNull no_log; // Prevent bad images from displaying errors.
-        // TODO: Make a std::map of puz::Square to wxImage
-        wxImage img(wxMemoryInputStream(square.m_imagedata.c_str(),
-                                        square.m_imagedata.length()));
+
+        wxImage img = m_imageMap[&square];
+        if (! img.IsOk())
+        {
+            // Load the image and cache it.
+            img = wxImage(wxMemoryInputStream(square.m_imagedata.c_str(),
+                                              square.m_imagedata.length()));
+            m_imageMap[&square] = img;
+        }
         if (img.IsOk())
         {
             img.Rescale(m_boxSize, m_boxSize);
@@ -617,7 +618,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
         else
         {
             if (! isSymbol)
-                dc.SetFont(m_letterFont[text.size() - 1]);
+                dc.SetFont(m_letterFont[text.length() - 1]);
             else
                 dc.SetFont(m_symbolFont);
         }

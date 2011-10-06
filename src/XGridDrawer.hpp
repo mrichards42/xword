@@ -18,6 +18,8 @@
 #ifndef MY_GRID_DRAWER_H
 #define MY_GRID_DRAWER_H
 
+#include <map>
+
 // For compilers that don't support precompilation, include "wx/wx.h"
 #include <wx/wxprec.h>
  
@@ -140,7 +142,8 @@ public:
     const puz::Puzzle * GetPuzzle() const { return m_puz; }
     puz::Grid * GetGrid();
     const puz::Grid * GetGrid() const;
-    void SetPuzzle(puz::Puzzle * puz) { m_puz = puz; UpdateGridSize(); }
+    void SetPuzzle(puz::Puzzle * puz)
+        { m_puz = puz; UpdateGridSize(); m_imageMap.clear(); }
 
     void DrawSquare(wxDC & dc, const puz::Square & square,
                     const wxColour & bgColor,
@@ -189,7 +192,7 @@ private:
 
     // Fonts
     wxFont m_numberFont;
-    wxFont m_letterFont[8];  // Cache fonts for all rebus lengths
+    wxFont m_letterFont[4];  // Cache fonts for text (1, 2, 3, 4+ letters)
     wxFont m_symbolFont;
     bool m_hasSymbolFont;
 
@@ -204,6 +207,9 @@ private:
     wxColour m_whiteSquareColor;
     wxColour m_blackSquareColor;
     wxColour m_penColor;
+
+    // Images
+    std::map<const puz::Square *, wxImage> m_imageMap;
 
     // Selective Drawing
     int m_drawOptions;
