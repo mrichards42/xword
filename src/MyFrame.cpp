@@ -1831,7 +1831,7 @@ void
 MyFrame::OnAutoSaveNotify(wxTimerEvent & WXUNUSED(evt))
 {
     wxLogDebug(_T("AutoSave: %s"), m_filename);
-    if(puz::Puzzle::CanSave(puz::encode_utf8(wx2puz(m_filename))))
+    if (puz::Puzzle::CanSave(puz::encode_utf8(wx2puz(m_filename))))
         SavePuzzle(m_filename);
 }
 

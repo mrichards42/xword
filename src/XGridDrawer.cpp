@@ -22,6 +22,9 @@
 #include <wx/fontenum.h> // wxFontEnumerator to test for Webdings
 #include "utils/string.hpp"
 #include "utils/timeit.hpp"
+#include "wx/graphics.h"
+#include <wx/mstream.h>
+
 #define XWORD_USE_GC 0
 
 const int MAX_POINT_SIZE = 150;
@@ -428,6 +431,23 @@ XGridDrawer::DrawSquare(wxDC & adc,
                      y - m_borderSize + offset,
                      m_boxSize + m_borderSize + 1,
                      m_boxSize + m_borderSize + 1);
+
+    // Background Image
+    if (square.HasImage())
+    {
+        wxLogNull no_log; // Prevent bad images from displaying errors.
+        // TODO: Make a std::map of puz::Square to wxImage
+        wxImage img(wxMemoryInputStream(square.m_imagedata.c_str(),
+                                        square.m_imagedata.length()));
+        if (img.IsOk())
+        {
+            double scale = double(m_boxSize)
+                            / std::max(img.GetWidth(), img.GetHeight());
+            img.Rescale(img.GetWidth() * scale, img.GetHeight() * scale);
+            dc.DrawBitmap(wxBitmap(img), x, y);
+        }
+    }
+
     // Draw the outline with a clear background
     if (HasFlag(DRAW_OUTLINE))
     {
@@ -445,7 +465,9 @@ XGridDrawer::DrawSquare(wxDC & adc,
                          m_boxSize - outlineSize * 2 + 1);
 
     }
-    else // Just draw the background
+    // Just draw the background, but don't paint over the background image
+    else if (bgColor != GetBlackSquareColor()
+             && bgColor != GetWhiteSquareColor())
     {
         dc.SetBrush(wxBrush(bgColor));
         dc.SetPen  (wxPen(bgColor));

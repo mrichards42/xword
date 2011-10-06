@@ -22,6 +22,7 @@
 #include "puzstring.hpp"
 #include <fstream>
 #include "utils/minizip.hpp"
+#include "parse/base64.hpp"
 
 namespace puz {
 
@@ -169,6 +170,15 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
                     cell.append_attribute("solve-status") = "incorrect";
                 else if (square->HasFlag(FLAG_X))
                     cell.append_attribute("solve-status") = "x";
+            }
+            if (square->HasImage())
+            {
+                xml::node img = cell.append_child("background-picture");
+                img.append_attribute("format") = square->m_imageformat.c_str();
+                std::string encoded = base64_encode(
+                    (const unsigned char *)square->m_imagedata.c_str(),
+                                           square->m_imagedata.length());
+                xml::SetText(img.append_child("encoded-image"), encoded.c_str());
             }
         }
     }

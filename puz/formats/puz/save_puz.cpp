@@ -51,8 +51,9 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
          square != NULL;
          square = square->Next())
     {
-        if (square->IsSolutionBlank() ||
-            square->GetFlag() & ~ ACROSS_LITE_MASK)
+        if (square->IsSolutionBlank()
+            || square->GetFlag() & ~ ACROSS_LITE_MASK
+            || ! square->HasImage())
         {
             throw ConversionError();
         }

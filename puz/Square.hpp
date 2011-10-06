@@ -261,6 +261,11 @@ public:
     unsigned char m_green;
     unsigned char m_blue;
 
+    // Image
+    bool HasImage() const { return ! m_imagedata.empty(); }
+    std::string m_imageformat;
+    std::string m_imagedata;
+
     // Linked-list
     //------------
     Square * Next(GridDirection dir = ACROSS) { return m_next[dir]; }

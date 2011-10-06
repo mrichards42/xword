@@ -22,6 +22,7 @@
 #include "puzstring.hpp"
 #include "utils/minizip.hpp"
 #include <sstream>
+#include "parse/base64.hpp"
 
 namespace puz {
 
@@ -235,6 +236,14 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 {
                     square->AddFlag(FLAG_X);
                 }
+            }
+            // Image
+            xml::node image = cell.child("background-picture");
+            if (image)
+            {
+                square->m_imageformat = image.attribute("format").value();
+                square->m_imagedata = base64_decode(
+                    encode_utf8(TrimWhitespace(GetText(image, "encoded-image"))));
             }
         }
     }
