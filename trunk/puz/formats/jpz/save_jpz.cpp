@@ -180,6 +180,11 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
                                            square->m_imagedata.length());
                 xml::SetText(img.append_child("encoded-image"), encoded.c_str());
             }
+            if (! square->m_mark[MARK_TR].empty())
+            {
+                cell.append_attribute("top-right-number") =
+                    encode_utf8(square->m_mark[MARK_TL]).c_str();
+            }
         }
     }
 

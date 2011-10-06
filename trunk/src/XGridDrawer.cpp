@@ -433,7 +433,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
                      m_boxSize + m_borderSize + 1);
 
     // Background Image
-    if (square.HasImage())
+    if (square.HasImage() && m_boxSize > 2) // Prevent errors with scaling
     {
         wxLogNull no_log; // Prevent bad images from displaying errors.
         // TODO: Make a std::map of puz::Square to wxImage
@@ -441,9 +441,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
                                         square.m_imagedata.length()));
         if (img.IsOk())
         {
-            double scale = double(m_boxSize)
-                            / std::max(img.GetWidth(), img.GetHeight());
-            img.Rescale(img.GetWidth() * scale, img.GetHeight() * scale);
+            img.Rescale(m_boxSize, m_boxSize);
             dc.DrawBitmap(wxBitmap(img), x, y);
         }
     }
@@ -503,9 +501,40 @@ XGridDrawer::DrawSquare(wxDC & adc,
     }
 
     // Draw square's number (top left).
-    if (HasFlag(DRAW_NUMBER) && square.HasNumber())
+    if (HasFlag(DRAW_NUMBER))
     {
+        dc.SetFont(m_numberFont);
         dc.SetTextForeground(textColor);
+
+        // Draw corner marks
+        wxRect markRect(x+1, y+1, m_boxSize - 2, m_boxSize - 2);
+        if (! square.m_mark[puz::MARK_TL].empty())
+            dc.DrawLabel(puz2wx(square.m_mark[puz::MARK_TL]), markRect,
+                         wxALIGN_TOP | wxALIGN_LEFT);
+        if (! square.m_mark[puz::MARK_TR].empty())
+            dc.DrawLabel(puz2wx(square.m_mark[puz::MARK_TR]), markRect,
+                         wxALIGN_TOP | wxALIGN_RIGHT);
+        if (! square.m_mark[puz::MARK_BL].empty())
+            dc.DrawLabel(puz2wx(square.m_mark[puz::MARK_BL]), markRect,
+                         wxALIGN_BOTTOM | wxALIGN_LEFT);
+        if (square.m_mark[puz::MARK_BR].empty())
+            dc.DrawLabel(puz2wx(square.m_mark[puz::MARK_BR]), markRect,
+                         wxALIGN_BOTTOM | wxALIGN_RIGHT);
+
+        // Draw the number
+        
+        // Set a solid text background so it will draw over any circles.
+        // It seems like we might want to also have a solid background
+        // for marks, but Crossword Solver doesn't . . . its display of
+        // the looking glass puzzle looks better without a solid background
+        // for marks, so I guess it's a toss-up.
+        if (! HasFlag(DRAW_OUTLINE))
+            dc.SetTextBackground(bgColor);
+        else if (square.IsWhite())
+            dc.SetTextBackground(GetWhiteSquareColor());
+        dc.SetBackgroundMode(wxSOLID);
+
+
         // If we have a diagramless grid and the square's number is
         // somehow broken, draw the number in red.
         if (GetGrid()->IsDiagramless())
@@ -526,15 +555,10 @@ XGridDrawer::DrawSquare(wxDC & adc,
                 dc.SetTextForeground(*wxRED);
             }
         }
-        // Set a solid text background so it will draw over any circles.
-        if (! HasFlag(DRAW_OUTLINE))
-            dc.SetTextBackground(bgColor);
-        else if (square.IsWhite())
-            dc.SetTextBackground(GetWhiteSquareColor());
-        dc.SetBackgroundMode(wxSOLID);
 
-        dc.SetFont(m_numberFont);
-        dc.DrawText(puz2wx(square.GetNumber()), x+1, y);
+        if (square.HasNumber())
+            dc.DrawText(puz2wx(square.GetNumber()), x+1, y);
+
         dc.SetBackgroundMode(wxTRANSPARENT);
     }
 

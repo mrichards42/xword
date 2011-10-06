@@ -120,6 +120,16 @@ AreInLine(unsigned short dir1, unsigned short dir2)
 }
 
 
+// Marks
+enum CornerMark
+{
+    MARK_TL = 0,
+    MARK_TR,
+    MARK_BL,
+    MARK_BR
+};
+
+
 // Used with Check()
 enum CheckTest
 {
@@ -209,12 +219,15 @@ public:
     static char_t * Blank;
     static char_t * Black;
 
-    // Clue
+    // Number
     //-----
     bool HasNumber() const                  { return ! m_number.empty(); }
     const string_t & GetNumber() const      { return m_number; }
     void SetNumber(const string_t & number) { m_number = number; }
     void SetNumber(int number)              { m_number = ToString(number); }
+
+    // Corner marks
+    string_t m_mark[4];
 
     // Clue
     //-----
