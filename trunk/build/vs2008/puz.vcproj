@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="puz"
-	ProjectGUID="{509163AA-A45E-1647-8A54-32C2DBB27A67}"
+	ProjectGUID="{384E6FC2-F614-7F47-97DA-0F53086A5299}"
 	RootNamespace="puz"
 	Keyword="Win32Proj"
 	>
@@ -285,68 +285,6 @@
 					Name="pugixml"
 					Filter=""
 					>
-					<Filter
-						Name="docs"
-						Filter=""
-						>
-						<Filter
-							Name="manual"
-							Filter=""
-							>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\access.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\apiref.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\changes.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\dom.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\install.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\loading.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\modify.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\saving.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\toc.html"
-								>
-							</File>
-							<File
-								RelativePath="..\..\puz\parse\pugixml\docs\manual\xpath.html"
-								>
-							</File>
-						</Filter>
-						<File
-							RelativePath="..\..\puz\parse\pugixml\docs\pugixml.css"
-							>
-						</File>
-						<File
-							RelativePath="..\..\puz\parse\pugixml\docs\manual.html"
-							>
-						</File>
-						<File
-							RelativePath="..\..\puz\parse\pugixml\docs\quickstart.html"
-							>
-						</File>
-					</Filter>
 					<File
 						RelativePath="..\..\puz\parse\pugixml\pugiconfig.hpp"
 						>
@@ -361,11 +299,19 @@
 					</File>
 				</Filter>
 				<File
+					RelativePath="..\..\puz\parse\base64.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\puz\parse\json.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\puz\parse\xml.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\puz\parse\base64.cpp"
 					>
 				</File>
 				<File

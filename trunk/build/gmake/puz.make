@@ -80,6 +80,7 @@ OBJECTS := \
 	$(OBJDIR)/load_txt.o \
 	$(OBJDIR)/load_xpf.o \
 	$(OBJDIR)/save_xpf.o \
+	$(OBJDIR)/base64.o \
 	$(OBJDIR)/json.o \
 	$(OBJDIR)/xml.o \
 	$(OBJDIR)/pugixml.o \
@@ -192,6 +193,9 @@ $(OBJDIR)/load_xpf.o: ../../puz/formats/xpf/load_xpf.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
 $(OBJDIR)/save_xpf.o: ../../puz/formats/xpf/save_xpf.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+$(OBJDIR)/base64.o: ../../puz/parse/base64.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
 $(OBJDIR)/json.o: ../../puz/parse/json.cpp

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="lua"
-	ProjectGUID="{AC9A6831-D59B-4D48-A160-540A4AECC135}"
+	ProjectGUID="{2B7B274C-3AF8-684E-AFB9-FB04EBE59129}"
 	RootNamespace="lua"
 	Keyword="Win32Proj"
 	>
