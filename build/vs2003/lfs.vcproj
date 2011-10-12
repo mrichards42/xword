@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="lfs"
-	ProjectGUID="{4FD8AE45-1CEA-7B4E-9052-8DA427F1FD04}"
+	ProjectGUID="{1D8F8786-774F-C944-A775-0339D0414BB6}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

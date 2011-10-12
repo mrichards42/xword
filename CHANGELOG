@@ -1,12 +1,33 @@
+Version 0.5.2 (10/12/2011)
+=================
+New Features
+------------
+* Background images (only jpz).
+* Marks in the corner of squares (only jpz).
+* Auto Save.
+
+Bug Fixes / Improvements
+------------------------
+* Save button is grayed when no changes have been made (it used to change
+  to Save As).
+* Focus remains on grid when the clue list is clicked.
+* Rebus entries are actually allowed to be any length.
+* Long rebus entries are truncated and given tooltips.
+* Rebus entries are displayed slightly larger.
+* Fixed a crash on puzzles with non-linear words (e.g. Looking Glass).
+
+
+----------------------------------------------------------------------
+
+
 Version 0.5.1 (9/17/2011)
 =========================
 Bug Fixes / Improvements
 ------------------------
-* Improved diagramless navigation
+* Improved diagramless navigation.
 * Timer info is loaded/saved correctly for jpz.
 * Formatted clues are saved correctly for XPF.
 * Scripts that have any kind of error when loading are disabled.
-
 
 
 ----------------------------------------------------------------------
@@ -16,14 +37,14 @@ Version 0.5 (9/9/2011)
 ======================
 New Features
 ------------
-* Added a preference to start the timer when a puzzle is opened
-* Added a Delete Puzzle button
-* Read/write support for XPF
-* Read/write support for jpz
-* Partial read support for ipuz
-* Script updater / package manager
+* Added a preference to start the timer when a puzzle is opened.
+* Added a Delete Puzzle button.
+* Read/write support for XPF.
+* Read/write support for jpz.
+* Partial read support for ipuz.
+* Script updater / package manager.
 
-* Better printing layout (could still be better and faster)
+* Better printing layout (could still be better and faster).
 
 * Support for more puzzle features:
     * Diagonal clues

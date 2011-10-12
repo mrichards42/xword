@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="luacurl"
-	ProjectGUID="{D3890E99-B719-B44C-BF23-A5AB01F58B84}"
+	ProjectGUID="{89FD0895-4875-1C49-85B9-43B35F905288}"
 	RootNamespace="luacurl"
 	Keyword="Win32Proj"
 	>
