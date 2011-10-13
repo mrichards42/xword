@@ -56,14 +56,14 @@ XPFParser::RequireSquare(Puzzle * puz, const xml::node & node)
     int col = node.attribute("Col").as_int();
     int row = node.attribute("Row").as_int();
     if (col == 0 || row == 0)
-        throw FatalFileError("Missing Col or Row");
+        throw LoadError("Missing Col or Row");
 
     try {
         return &puz->GetGrid().At(col - 1, row - 1);
     }
     catch (...)
     {
-        throw InvalidGridCell("Square is out of range");
+        throw LoadError("Square is out of range");
     }
 }
 
@@ -71,6 +71,9 @@ XPFParser::RequireSquare(Puzzle * puz, const xml::node & node)
 bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 {
     Grid & grid = puz->GetGrid();
+
+    if (! doc.child("Puzzles"))
+        throw FileTypeError("xpf");
 
     xml::node puzzle = RequireChild(doc.child("Puzzles"), "Puzzle");
 
@@ -88,7 +91,7 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     int height = ToInt(GetText(size, "Rows"));
     int width = ToInt(GetText(size, "Cols"));
     if (width <= 0 || height <= 0)
-        throw FatalFileError("Invalid grid size");
+        throw LoadError("Invalid grid size");
     grid.SetSize(width, height);
 
     // Answers
@@ -99,10 +102,10 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
         for (; row; row = row.next_sibling("Row"))
         {
             if (row_n >= height)
-                throw FatalFileError("Too many rows in grid");
+                throw LoadError("Too many rows in grid");
             string_t text = GetText(row);
             if (text.size() != width)
-                throw FatalFileError("Wrong number of squares in Row");
+                throw LoadError("Wrong number of squares in Row");
             string_t::iterator it;
             for (it = text.begin(); it != text.end(); ++it)
             {
@@ -126,7 +129,7 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             ++row_n;
         }
         if (row_n < height - 1)
-            throw FatalFileError("Not enough rows in grid");
+            throw LoadError("Not enough rows in grid");
         assert(! square);
     }
 

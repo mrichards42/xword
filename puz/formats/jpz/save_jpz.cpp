@@ -241,8 +241,7 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     // Save to a zip file.
     zip::Archive archive(filename);
     if (! archive)
-        throw FatalFileError(std::string("Unable to open file for writing: ")
-                             + filename);
+        throw FileError(filename);
     // Open a zip in the archive with the filename part of the path
     zip::File & file = archive.OpenFile(
         filename.substr(filename.find_last_of("/\\") + 1));

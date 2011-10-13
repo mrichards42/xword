@@ -67,18 +67,26 @@ PUZ_EXCEPTION(InvalidClues, Exception, "Clues do not match the grid");
 PUZ_EXCEPTION(NoClues,      Exception, "Unknown clue direction");
 
 // Loading / saving errors
-PUZ_EXCEPTION(FileError, Exception, "Unknown file error");
-PUZ_EXCEPTION(FatalFileError, FileError, "Unknown fatal file error");
-PUZ_EXCEPTION(ConversionError, FileError, "Puzzle cannot be fully represented in this file format");
+class FileTypeError : public Exception
+{
+public:
+    FileTypeError() : Exception("Wrong file type") {}
 
-PUZ_EXCEPTION(HeaderError, FatalFileError, "Unknown file header error");
-PUZ_EXCEPTION(VersionError, HeaderError, "Unreadable file version");
-PUZ_EXCEPTION(FileMagicError, HeaderError, "Not a valid AcrossLite puz file");
+    explicit FileTypeError (const std::string & type)
+        : Exception(std::string("Not a valid ") + type + " file")
+    {}
+};
 
-PUZ_EXCEPTION(DataError, FileError, "Unknown non-fatal file data error");
-PUZ_EXCEPTION(SectionError, DataError, "Puz section error");
-PUZ_EXCEPTION(ChecksumError, DataError, "Puz checksum mismatch error");
+class FileError : public Exception
+{
+public:
+    explicit FileError (const std::string & filename)
+        : Exception(std::string("Unable to open file ") + filename)
+    {}
+};
 
+PUZ_EXCEPTION(LoadError, Exception, "Error loading puzzle");
+PUZ_EXCEPTION(ConversionError, Exception, "Puzzle cannot be fully represented in this format");
 PUZ_EXCEPTION(MissingHandler, Exception, "Unknown file type");
 
 } // namespace puz

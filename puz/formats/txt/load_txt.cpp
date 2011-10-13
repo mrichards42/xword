@@ -32,24 +32,23 @@ void LoadTxt(Puzzle * puz, const std::string & filename, void * /* dummy */)
 {
     std::ifstream stream(filename.c_str(), std::ios::in | std::ios::binary);
     if (stream.fail())
-        throw FatalFileError(std::string("Unable to open file: ") + filename);
+        throw FileError(filename);
     istream_wrapper f(stream);
 
     std::string version = f.ReadLine();
     if (version != "<ACROSS PUZZLE>" && version != "<ACROSS PUZZLE V2>")
-        throw FatalFileError(
-            "Missing <ACROSS PUZZLE> or <ACROSS PUZZLE V2> header.");
+        throw FileTypeError("txt");
 
     if (f.ReadLine() != "<TITLE>")
-        throw FatalFileError("Missing <TITLE>");
+        throw LoadError("Missing <TITLE>");
     puz->SetTitle(TrimWhitespace(decode_utf8(f.ReadLine())));
 
     if (f.ReadLine() != "<AUTHOR>")
-        throw FatalFileError("Missing <AUTHOR>");
+        throw LoadError("Missing <AUTHOR>");
     puz->SetAuthor(TrimWhitespace(decode_utf8(f.ReadLine())));
 
     if (f.ReadLine() != "<COPYRIGHT>")
-        throw FatalFileError("Missing <COPYRIGHT>");
+        throw LoadError("Missing <COPYRIGHT>");
     string_t copyright = TrimWhitespace(decode_utf8(f.ReadLine()));
     if (! copyright.empty())
     {
@@ -58,21 +57,21 @@ void LoadTxt(Puzzle * puz, const std::string & filename, void * /* dummy */)
     }
 
     if (f.ReadLine() != "<SIZE>")
-        throw FatalFileError("Missing <SIZE>");
+        throw LoadError("Missing <SIZE>");
     string_t size = TrimWhitespace(decode_utf8(f.ReadLine()));
     size_t x_index = size.find(puzT("x"));
     if (x_index == string_t::npos)
-        throw FatalFileError("Missing 'x' in size specification");
+        throw LoadError("Missing 'x' in size specification");
     int width = ToInt(size.substr(0, x_index));
     int height = ToInt(size.substr(x_index + 1));
     if (width == -1 || height == -1)
-        throw FatalFileError("Improper size specification.");
+        throw LoadError("Improper size specification.");
     puz->GetGrid().SetSize(width, height);
 
 
     // Read the grid into a string
     if (f.ReadLine() != "<GRID>")
-        throw FatalFileError("Missing <GRID>");
+        throw LoadError("Missing <GRID>");
 
     string_t solution;
     solution.reserve(width * height);
@@ -83,9 +82,9 @@ void LoadTxt(Puzzle * puz, const std::string & filename, void * /* dummy */)
     for (size_t i = 0; i < height; ++i)
         solution.append(TrimWhitespace(decode_utf8(f.ReadLine())));
     if (solution.size() < width * height)
-        throw FatalFileError("Not enough squares in the grid");
+        throw LoadError("Not enough squares in the grid");
     else if (solution.size() > width * height)
-        throw FatalFileError("Too many squares in the grid");
+        throw LoadError("Too many squares in the grid");
 
     // Look for the rebus section
     std::string line = f.ReadLine();
@@ -157,13 +156,13 @@ void LoadTxt(Puzzle * puz, const std::string & filename, void * /* dummy */)
     // clues and notepad
     f.m_stream.exceptions(0);
     if (line != "<ACROSS>")
-        throw FatalFileError("Missing <ACROSS>");
+        throw LoadError("Missing <ACROSS>");
     ClueList & across = puz->SetClueList(puzT("Across"), ClueList());
     for (line = f.ReadLine(); line != "<DOWN>" && ! line.empty(); line = f.ReadLine())
         across.push_back(Clue(puzT(""), TrimWhitespace(decode_utf8(line))));
 
     if (line != "<DOWN>")
-        throw FatalFileError("Missing <DOWN>");
+        throw LoadError("Missing <DOWN>");
     ClueList & down = puz->SetClueList(puzT("Down"), ClueList());
     for (line = f.ReadLine(); line != "<NOTEPAD>" && ! line.empty(); line = f.ReadLine())
         down.push_back(Clue(puzT(""), TrimWhitespace(decode_utf8(line))));

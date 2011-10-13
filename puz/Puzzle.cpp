@@ -28,19 +28,6 @@
 
 namespace puz {
 
-void HandleExceptions(Puzzle * puz)
-{
-    try
-    {
-        throw;
-    }
-    catch (std::ios::failure &)
-    {
-        throw FatalFileError("Unexpected end of file");
-    }
-    // Everything else falls through
-}
-
 // -----------------------------------------------------------------------
 // Load functions
 // -----------------------------------------------------------------------
@@ -55,10 +42,13 @@ Puzzle::DoLoad(const std::string & filename, const FileHandlerDesc * desc)
             GenerateWords();
         TestOk();
     }
-    catch (...) {
-        // If the load function allocated a new FormatData, delete it.
+    catch (std::ios::failure &) {
         m_formatData.reset();
-        HandleExceptions(this);
+        throw LoadError("Unexpected end of file");
+    }
+    catch (...) {
+        m_formatData.reset();
+        throw;
     }
 }
 
@@ -72,38 +62,39 @@ Puzzle::Load(const std::string & filename, const FileHandlerDesc * desc)
     }
     else // ! desc, Try all the handlers
     {
+        // As long as loading a puzzle throws a FileTypeError, try loading
+        // all the handlers.
+        // If loading throws a different error (EOF or LoadError), it means
+        // that the file type isn't wrong, it just wasn't loaded.
+
         // Prefer the handler with the correct extension
-        const FileHandlerDesc * expected
+        const FileHandlerDesc * expectedHandler
             = FindLoadHandler(GetExtension(filename));
-        // Save the error from the expected type
-        Exception error;
-        if (expected)
+        if (expectedHandler)
         {
             try {
-                DoLoad(filename, expected);
+                DoLoad(filename, expectedHandler);
                 return;
             }
-            catch (Exception & e) {
-                error = e;
+            catch (FileTypeError &) {
+                // Do nothing
             }
         }
         // Try all the handlers
         for (desc = &sm_loadHandlers[0]; desc->handler != NULL; ++desc)
         {
-            if (desc == expected) // We've already tried the expected handler
+            // We've already tried the expected handler
+            if (desc == expectedHandler)
                 continue;
             try {
                 DoLoad(filename, desc);
                 return;
             }
-            catch (Exception &) {
+            catch (FileTypeError &) {
                 // Do nothing
             }
         }
-        if (expected)
-            throw error;
-        else
-            throw MissingHandler();
+        throw MissingHandler();
     }
 }
 
@@ -266,7 +257,12 @@ void Puzzle::GenerateWords()
         for (it = cluelist.begin(); it != cluelist.end(); ++it)
         {
             // Find the square with this clue number.
-            Square * start = wordMap.at(it->GetInt());
+            Square * start;
+            try {
+                start = wordMap.at(it->GetInt());
+            } catch (std::out_of_range &) {
+                throw InvalidClues("All Clues must have a word");
+            }
             if (! start)
                 throw InvalidClues("All clues must have a word");
             Square * end = start->GetSolutionWordEnd(dir);

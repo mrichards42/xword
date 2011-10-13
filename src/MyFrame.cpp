@@ -508,13 +508,8 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
         m_isModified = false;
         m_puz.Load(wx2file(filename), handler);
     }
-    catch (puz::ChecksumError &)
-    {
-        m_puz.SetOk(XWordPrompt(this, MSG_CORRUPT_PUZ));
-    }
     catch (...)
     {
-        // We can't recover from any other exception.
         m_puz.SetOk(false);
         HandlePuzException();
     }
