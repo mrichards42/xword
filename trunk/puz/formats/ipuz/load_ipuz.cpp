@@ -37,7 +37,7 @@ void LoadIpuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 {
     std::ifstream stream(filename.c_str());
     if (stream.fail())
-        throw FatalFileError(std::string("Unable to open file: ") + filename);
+        throw FileError(filename);
     // Throw away "ipuz("
     char test[6];
     stream.read(test, 5);
@@ -134,15 +134,20 @@ void ipuzParser::SetStyle(Square & square, json::Value * style_value)
 bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
 {
     json::Map * doc = root->AsMap();
-    // Check version
-    if (doc->PopString(puzT("version")) != puzT("http://ipuz.org/v1"))
-        throw VersionError("Unreadable ipuz version");
-    // Check kind
-    string_t kind = doc->PopArray(puzT("kind"))->at(0)->AsString();
-    if (kind.substr(kind.size() - 2) == puzT("#1"))
-        kind = kind.substr(0, kind.size() - 2);
-    if (kind != puzT("http://ipuz.org/crossword"))
-        throw VersionError("Not a crossword puzzle");
+    try {
+        // Check version
+        if (doc->PopString(puzT("version")) != puzT("http://ipuz.org/v1"))
+            throw LoadError("Unreadable ipuz version");
+        // Check kind
+        string_t kind = doc->PopArray(puzT("kind"))->at(0)->AsString();
+        if (kind.substr(kind.size() - 2) == puzT("#1"))
+            kind = kind.substr(0, kind.size() - 2);
+        if (kind != puzT("http://ipuz.org/crossword"))
+            throw LoadError("Not a crossword puzzle");
+    }
+    catch (json::BaseError &) {
+        throw FileTypeError("ipuz");
+    }
 
     // Metadata
     puz->SetTitle(doc->PopString(puzT("title"), puzT("")));

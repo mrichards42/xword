@@ -167,10 +167,7 @@ Value * ParseJSON(std::istream & stream)
             const int bytes_read = stream.gcount();
             yajl_status status = yajl_parse(p, buff, bytes_read);
             if (status != yajl_status_ok)
-            {
-                throw FatalFileError(std::string("Error loading json file: ") +
-                                     yajl_status_to_string(status));
-            }
+                throw FileTypeError("json");
             if (bytes_read == 0)
             {
                 yajl_complete_parse(p);
@@ -186,20 +183,26 @@ Value * ParseJSON(std::istream & stream)
     yajl_free(p);
     // Release ownership of the root pointer and return it
     if (! data.GetRoot())
-        throw FatalFileError("Unable to parse json file.");
+        throw FileTypeError("json");
     return data.ReleaseRoot();
 }
 
 void Parser::LoadPuzzle(Puzzle * puz, std::istream & stream)
 {
     std::auto_ptr<Value> root(ParseJSON(stream));
-    bool ptr_is_owned = DoLoadPuzzle(puz, root.get());
-    if (ptr_is_owned)
-    {
-        if (root->IsObject()) 
-            root->AsObject()->cleanup();
-        // The parser subclass owns the pointer
-        root.release();
+    // JSON document errors will be LoadErrors
+    try {
+        bool ptr_is_owned = DoLoadPuzzle(puz, root.get());
+        if (ptr_is_owned)
+        {
+            if (root->IsObject()) 
+                root->AsObject()->cleanup();
+            // The parser subclass owns the pointer
+            root.release();
+        }
+    }
+    catch (BaseError & e) {
+        throw LoadError(e.what());
     }
 }
 

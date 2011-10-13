@@ -72,7 +72,7 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
     std::ofstream stream(filename.c_str(), std::ios::out | std::ios::binary);
     if (stream.fail())
-        throw FatalFileError(std::string("Unable to open file: ") + filename);
+        throw FileError(filename);
     ostream_wrapper f(stream);
 
     // Header

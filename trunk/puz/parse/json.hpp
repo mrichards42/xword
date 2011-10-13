@@ -64,29 +64,38 @@ enum json_t
     j_array
 };
 
+class BaseError : public std::exception
+{
+public:
+    explicit BaseError(const std::string & msg)
+        : message(msg)
+    {}
+    std::string message;
+    virtual const char * what() const { return message.c_str(); }
+};
 
-class TypeError : public std::exception
+class TypeError : public BaseError
 {
 public:
     TypeError(const std::string & kind)
-        : std::exception((std::string("Expected json type: ") + kind).c_str())
+        : BaseError((std::string("Expected json type: ") + kind).c_str())
     {}
 };
 
-class KeyError : public std::exception
+class KeyError : public BaseError
 {
 public:
     KeyError(const std::string & key)
-        : std::exception((std::string("Invalid object key: ") + key).c_str())
+        : BaseError((std::string("Invalid object key: ") + key).c_str())
     {}
 };
 
 
-class IndexError : public std::exception
+class IndexError : public BaseError
 {
 public:
     IndexError(size_t index)
-        : std::exception(
+        : BaseError(
             (std::string("Index out of range: ")
             + encode_utf8(ToString(index))).c_str())
     {}

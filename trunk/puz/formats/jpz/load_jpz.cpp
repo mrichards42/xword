@@ -81,7 +81,7 @@ void LoadJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
         }
         f.Next();
     }
-    throw FatalFileError("Could not load any files in the archive");
+    throw FileTypeError("jpz");
 }
 
 Square *
@@ -90,9 +90,9 @@ jpzParser::RequireSquare(Puzzle * puz, xml::node & node)
     string_t x = GetAttribute(node, "x");
     string_t y = GetAttribute(node, "y");
     if (x.find(puzT("-")) != string_t::npos || y.find(puzT("-")) != string_t::npos)
-        throw InvalidGridCell("Spanned cells are not supported.");
+        throw LoadError("Spanned cells are not supported.");
     if (x.empty() || x.empty())
-        throw InvalidGridCell("Cell missing x or y");
+        throw LoadError("Cell missing x or y");
     try
     {
         // x and y are 1-based
@@ -100,7 +100,7 @@ jpzParser::RequireSquare(Puzzle * puz, xml::node & node)
     }
     catch (...)
     {
-        throw InvalidGridCell("Cell is out of range");
+        throw LoadError("Cell is out of range");
     }
 }
 
@@ -136,11 +136,11 @@ Word make_word(Puzzle * puz, const string_t & x, const string_t & y)
     int x1, x2;
     parse_range(x, &x1, &x2);
     if (x1 == -1 || x2 == -1)
-        throw InvalidGridCell("Invalid cell range in word.");
+        throw LoadError("Invalid cell range in word.");
     int y1, y2;
     parse_range(y, &y1, &y2);
     if (y1 == -1 || y2 == -1)
-        throw InvalidGridCell("Invalid cell range in word.");
+        throw LoadError("Invalid cell range in word.");
     Grid & grid = puz->GetGrid();
     // JPZ squares are 1-based.
     return Word(&grid.At(x1-1, y1-1), &grid.At(x2-1, y2-1));
@@ -152,7 +152,9 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 {
     Grid & grid = puz->GetGrid();
 
-    xml::node applet = RequireChild(doc, "crossword-compiler-applet");
+    xml::node applet = doc.child("crossword-compiler-applet");
+    if (! applet)
+        throw FileTypeError("jpz");
     xml::node puzzle = RequireChild(applet, "rectangular-puzzle");
     xml::node crossword = RequireChild(puzzle, "crossword");
 
@@ -176,7 +178,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
         int width = grid_node.attribute("width").as_int();
         int height = grid_node.attribute("height").as_int();
         if (width < 1 || height < 1)
-            throw FatalFileError("Invalid grid size");
+            throw LoadError("Invalid grid size");
         grid.SetSize(width, height);
 
         // Default all squares to missing, because missing cells don't have to
@@ -205,7 +207,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             }
             else if (type == puzT("clue"))
             {
-                throw FatalFileError("Clues inside squares are not supported.");
+                throw LoadError("Clues inside squares are not supported.");
             }
             else // type == puzT("letter")
             {
@@ -265,7 +267,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 word = make_word(puz, x, y);
             string_t id = GetAttribute(xmlword, "id");
             if (id.empty())
-                throw FatalFileError("Each word must have an id");
+                throw LoadError("Each word must have an id");
             // TODO: hidden
 
             // Word cells
@@ -291,7 +293,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
         {
             string_t key = GetText(clues, "title");
             if (key.empty())
-                throw FatalFileError("Each clue list must have a title");
+                throw LoadError("Each clue list must have a title");
             ClueList list(GetInnerXML(RequireChild(clues, "title")));
             xml::node clue = RequireChild(clues, "clue");
             for (; clue; clue = clue.next_sibling("clue"))
@@ -299,7 +301,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 std::map<string_t, Word>::iterator it;
                 it = words.find(GetAttribute(clue, "word"));
                 if (it == words.end())
-                    throw FatalFileError("Each clue must have a word");
+                    throw LoadError("Each clue must have a word");
                 string_t text = GetInnerXML(clue);
                 // Format is added after the clue in parentheses
                 string_t format = GetAttribute(clue, "format");

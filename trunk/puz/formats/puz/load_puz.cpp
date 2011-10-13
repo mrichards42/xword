@@ -35,12 +35,12 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 {
     std::ifstream stream(filename.c_str(), std::ios::in | std::ios::binary);
     if (stream.fail())
-        throw FatalFileError(std::string("Unable to open file: ") + filename);
+        throw FileError(filename);
     istream_wrapper f(stream);
 
     const unsigned short c_primary = f.ReadShort();
     if (strcmp(f.ReadString(12).c_str(), "ACROSS&DOWN") != 0)
-        throw FileMagicError();
+        throw FileTypeError("puz");
 
     const unsigned short c_cib = f.ReadShort();
     unsigned char c_masked[8];
@@ -50,7 +50,7 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     // We can read puzzles of 1.[anything]
     std::string versionstr = f.ReadString(4);
     if (versionstr[0] != '1' || ! isdigit(versionstr[2]))
-        throw VersionError();
+        throw LoadError("Unknown puz version.");
 
     const unsigned short version = 10 + versionstr[2] - 0x30;
 
@@ -140,7 +140,13 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     puz->SetOk(true);
 
     // Try to load the extra sections (i.e. GEXT, LTIM, etc).
-    LoadSections(puz, f);
+    try {
+        LoadSections(puz, f);
+    }
+    catch (std::ios::failure &) {
+        // EOF here doesn't matter.
+    }
+
 
     // Don't even bother with the checksums, since we check the validity
     // of the puzzle anyways
@@ -151,13 +157,13 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 // Load the sections
 //------------------------------------------------------------------------------
 
-static void LoadGEXT(Puzzle * puz, const std::string & data);
+static bool LoadGEXT(Puzzle * puz, const std::string & data);
 static void UnLoadGEXT(Puzzle * puz);
-static void LoadLTIM(Puzzle * puz, const std::string & data);
+static bool LoadLTIM(Puzzle * puz, const std::string & data);
 static void UnLoadLTIM(Puzzle * puz);
-static void LoadRUSR(Puzzle * puz, const std::string & data);
+static bool LoadRUSR(Puzzle * puz, const std::string & data);
 static void UnLoadRUSR(Puzzle * puz);
-static void LoadSolutionRebus(Puzzle * puz,
+static bool LoadSolutionRebus(Puzzle * puz,
                               const std::string & table,
                               const std::string & grid);
 static void UnLoadSolutionRebus(Puzzle * puz);
@@ -165,14 +171,8 @@ static void UnLoadSolutionRebus(Puzzle * puz);
 #define LOAD_SECTION(name)                              \
     data = sections[#name];                             \
     if (! data.empty())                                 \
-    {                                                   \
-        try {                                           \
-            Load##name(puz, data);                      \
-        }                                               \
-        catch (...) {                                   \
+        if (! Load##name(puz, data))                    \
             UnLoad##name(puz);                          \
-        }                                               \
-    }                                                   \
     sections.erase(#name);
 
 void LoadSections(Puzzle * puz, istream_wrapper & f)
@@ -180,42 +180,32 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
     std::map<std::string, std::string> sections;
 
     std::string title;
-    try {
-        // Read all the sections
-        // If an error occurs while reading a section, skip
-        // that section.
-        for (;;)
-        {
-            // An extra section is defined as:
-            // Title (4 chars)
-            // Section length   (le-short)
-            // Section checksum (le-short)
+    // Read all the sections
+    // If an error occurs while reading a section, skip
+    // that section.
+    for (;;)
+    {
+        // An extra section is defined as:
+        // Title (4 chars)
+        // Section length   (le-short)
+        // Section checksum (le-short)
 
-            try {
-                title = f.ReadString(4);
-            }
-            catch(std::ios::failure &) {
-                break;
-            }
+        title = f.ReadString(4);
 
-            unsigned short length = f.ReadShort();
-            unsigned short c_section = f.ReadShort();
+        unsigned short length = f.ReadShort();
+        unsigned short c_section = f.ReadShort();
 
-            std::string data = f.ReadString(length);
+        std::string data = f.ReadString(length);
 
-            // Check the nul-terminator
-            if (f.ReadChar() != 0)
-                throw SectionError("Missing nul-terminator in an extra section");
+        // Check the nul-terminator
+        if (f.ReadChar() != 0)
+            break; // Don't throw an error
 
-            // Test the checksum
-            if (c_section != Checksummer::cksum_region(data, 0))
-                continue; // Skip this section.
+        // Test the checksum
+        if (c_section != Checksummer::cksum_region(data, 0))
+            continue; // Skip this section.
 
-            sections[title] = data;
-        }
-    }
-    catch(...) {
-        // Don't process sections with errors
+        sections[title] = data;
     }
 
     // Fill in the puzzle data
@@ -230,12 +220,8 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
     data = sections["GRBS"];
     if (! data.empty() && ! table.empty())
     {
-        try {
-            LoadSolutionRebus(puz, table, data);
-        }
-        catch (...) {
+        if (! LoadSolutionRebus(puz, table, data))
             UnLoadSolutionRebus(puz);
-        }
         sections.erase("RTBL");
         sections.erase("GRBS");
     }
@@ -245,7 +231,7 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
         sections.erase("RTBL");
 
     // Add the remaining unknown sections
-    // If an exception is throw, Puzzle::LoadPuzzle will clean up this pointer
+    // If an exception is thrown, Puzzle::LoadPuzzle will clean up this pointer
     PuzData * extra = new PuzData;
     puz->SetFormatData(extra);
     std::map<std::string, std::string>::iterator it;
@@ -260,7 +246,7 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
 // GEXT (square flags)
 //------------------------------------------------------------------------------
 
-void LoadGEXT(Puzzle * puz, const std::string & data)
+bool LoadGEXT(Puzzle * puz, const std::string & data)
 {
     std::istringstream stream(data);
     istream_wrapper f(stream);
@@ -273,7 +259,8 @@ void LoadGEXT(Puzzle * puz, const std::string & data)
         square->SetFlag(f.ReadChar());
     }
     if (! f.CheckEof())
-        throw SectionError("Too Many values in GEXT");
+        return false;
+    return true;
 }
 
 // Rollback changes
@@ -291,7 +278,7 @@ void UnLoadGEXT(Puzzle * puz)
 // LTIM (timer)
 //------------------------------------------------------------------------------
 
-void LoadLTIM(Puzzle * puz, const std::string & data)
+bool LoadLTIM(Puzzle * puz, const std::string & data)
 {
     std::istringstream stream(data);
     istream_wrapper f(stream);
@@ -301,15 +288,16 @@ void LoadLTIM(Puzzle * puz, const std::string & data)
 
     int time = atoi(timestring.c_str());
     if (time == 0 && ! timestring.empty() && timestring[0] != '0')
-        throw SectionError("Incorrect LTIM value");
+        return false;
 
     const std::string runningstring = f.ReadString(-1);
     int isTimerRunning = atoi(runningstring.c_str());
     if (isTimerRunning == 0 && ! runningstring.empty() && runningstring[0] != '0')
-        throw SectionError("Incorrect LTIM value");
+        return false;
 
     puz->m_isTimerRunning = (isTimerRunning == 0);
     puz->m_time = time;
+    return true;
 }
 
 // Rollback changes
@@ -323,7 +311,7 @@ void UnLoadLTIM(Puzzle * puz)
 //------------------------------------------------------------------------------
 // RUSR (user rebus grid)
 //------------------------------------------------------------------------------
-void LoadRUSR(Puzzle * puz, const std::string & data)
+bool LoadRUSR(Puzzle * puz, const std::string & data)
 {
     // RUSR is a series of strings (each nul-terminated) that represent any
     // user grid rebus entries.  If the rebus is a symbol, it is enclosed
@@ -341,17 +329,11 @@ void LoadRUSR(Puzzle * puz, const std::string & data)
         if (str.empty())
             continue;
 
-        try
-        {
-            square->SetText(decode_puz(str));
-        }
-        catch (InvalidString &)
-        {
-            // Try to press on anyways
-        }
+        square->SetText(decode_puz(str));
     }
     if (! f.CheckEof())
-        throw SectionError("Too many values in RUSR");
+        return false;
+    return true;
 }
 
 void UnLoadRUSR(Puzzle * puz)
@@ -365,7 +347,7 @@ void UnLoadRUSR(Puzzle * puz)
 // RTBL and GRBS (solution grid)
 //------------------------------------------------------------------------------
 
-void LoadSolutionRebus(Puzzle * puz,
+bool LoadSolutionRebus(Puzzle * puz,
                        const std::string & table,
                        const std::string & grid)
 {
@@ -373,7 +355,7 @@ void LoadSolutionRebus(Puzzle * puz,
     // index in the rebus table section (RTBL).
 
     if (grid.size() !=  puz->m_grid.GetWidth() * puz->m_grid.GetHeight())
-        throw SectionError("GRBS size is not equal to the grid size");
+        return false;
 
     // Read the rebus table (RTBL)
     // Format: index ':' string ';'
@@ -397,7 +379,7 @@ void LoadSolutionRebus(Puzzle * puz,
 
         int index = atoi(key.c_str());
         if (index == 0 && key != " 0")
-            throw SectionError("Invalid rebus table key");
+            return false;
 
         // The index value in the rebus-table section is 1 less than the
         // index in the grid-rebus, so we need add 1 here.
@@ -408,7 +390,7 @@ void LoadSolutionRebus(Puzzle * puz,
         rebusTable[static_cast<unsigned char>(index)] = value;
     }
     if (! table_stream.CheckEof())
-        throw SectionError("Poorly formed RTBL");
+        return false;
 
 
     // Set the grid rebus solution
@@ -426,14 +408,15 @@ void LoadSolutionRebus(Puzzle * puz,
             std::map<unsigned char, std::string>::const_iterator it;
             it = rebusTable.find(index);
             if (it == rebusTable.end())
-                throw SectionError("Invalid value in GRBS section");
+                return false;
 
             // Don't overwrite the plain solution
             square->SetSolutionRebus(decode_puz(it->second));
         }
     }
     if (! grid_stream.CheckEof())
-        throw SectionError("Too many values in GRBS section");
+        return false;
+    return true;
 }
 
 void UnLoadSolutionRebus(Puzzle * puz)

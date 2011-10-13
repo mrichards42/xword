@@ -72,7 +72,7 @@ Parser::RequireChild(node & n, const char * name)
 {
     node child = n.child(name);
     if (! child)
-        throw FileError(std::string("Missing required element: \"") + name + "\"");
+        throw LoadError(std::string("Missing required element: \"") + name + "\"");
     return child;
 }
 

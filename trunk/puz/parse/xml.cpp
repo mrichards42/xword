@@ -27,7 +27,7 @@ void Parser::LoadFromFilename(Puzzle * puz, const std::string & filename)
     std::ifstream stream(filename.c_str(),
                          std::ios_base::binary | std::ios_base::in);
     if (stream.fail())
-        throw FatalFileError(std::string("Unable to open file: ") + filename);
+        throw FileError(filename);
     LoadFromStream(puz, stream);
 }
 
@@ -37,10 +37,7 @@ void Parser::LoadFromString(Puzzle * puz, const char * str)
     pugi::xml_parse_result result = doc->load(str);
 
     if (! result)
-    {
-        throw FatalFileError(std::string("Error loading XML file: ") +
-                             result.description());
-    }
+        throw FileTypeError("xml");
 
     if (DoLoadPuzzle(puz, *doc))
         doc.release();
@@ -52,10 +49,7 @@ void Parser::LoadFromStream(Puzzle * puz, std::istream & stream)
     pugi::xml_parse_result result = doc->load(stream);
 
     if (! result)
-    {
-        throw FatalFileError(std::string("Error loading XML file: ") +
-                             result.description());
-    }
+        throw FileTypeError("xml");
 
     if (DoLoadPuzzle(puz, *doc))
         doc.release();
