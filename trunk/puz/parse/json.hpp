@@ -332,9 +332,12 @@ Object_Template<KEY, CONTAINER>::GetString(KEY key, const string_t & def)
 {
     iterator it = find(key);
     if (it != end())
-        return get_value(it)->AsString();
-    else
-        return def;
+    {
+        Value * val = get_value(it);
+        if (! val->IsNull())
+            return val->AsString();
+    }
+    return def;
 }
 
 template <typename KEY, typename CONTAINER>
@@ -343,9 +346,12 @@ Object_Template<KEY, CONTAINER>::GetNumber(KEY key, const string_t & def)
 {
     iterator it = find(key);
     if (it != end())
-        return get_value(it)->AsNumber();
-    else
-        return def;
+    {
+        Value * val = get_value(it);
+        if (! val->IsNull())
+            return val->AsNumber();
+    }
+    return def;
 }
 
 template <typename KEY, typename CONTAINER>
@@ -354,9 +360,12 @@ Object_Template<KEY, CONTAINER>::GetBool(KEY key, bool def)
 {
     iterator it = find(key);
     if (it != end())
-        return get_value(it)->AsBool();
-    else
-        return def;
+    {
+        Value * val = get_value(it);
+        if (! val->IsNull())
+            return val->AsBool();
+    }
+    return def;
 }
 
 template <typename KEY, typename CONTAINER>
@@ -387,10 +396,10 @@ Object_Template<KEY, CONTAINER>::PopString(KEY key, const string_t & def)
         Value * val = get_value(it);
         m_container.erase(it);
         mark_for_deletion(val);
-        return val->AsString();
+        if (! val->IsNull())
+            return val->AsString();
     }
-    else
-        return def;
+    return def;
 }
 
 template <typename KEY, typename CONTAINER>
@@ -403,10 +412,10 @@ Object_Template<KEY, CONTAINER>::PopNumber(KEY key, const string_t & def)
         Value * val = get_value(it);
         m_container.erase(it);
         mark_for_deletion(val);
-        return val->AsNumber();
+        if (! val->IsNull())
+            return val->AsNumber();
     }
-    else
-        return def;
+    return def;
 }
 
 template <typename KEY, typename CONTAINER>
@@ -419,10 +428,10 @@ Object_Template<KEY, CONTAINER>::PopBool(KEY key, bool def)
         Value * val = get_value(it);
         m_container.erase(it);
         mark_for_deletion(val);
-        return val->AsBool();
+        if (! val->IsNull())
+            return val->AsBool();
     }
-    else
-        return def;
+    return def;
 }
 
 // --------------------------------------------------------------------------
