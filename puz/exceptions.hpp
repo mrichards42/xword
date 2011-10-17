@@ -67,6 +67,7 @@ PUZ_EXCEPTION(InvalidClues, Exception, "Clues do not match the grid");
 PUZ_EXCEPTION(NoClues,      Exception, "Unknown clue direction");
 
 // Loading / saving errors
+// This sucks . . . the lua import package relies on the specific wording here.
 class FileTypeError : public Exception
 {
 public:
