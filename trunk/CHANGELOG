@@ -1,11 +1,20 @@
 Version 0.5.3 (10/16/2011)
 ==========================
+New Features
+------------
+* Option to save a history of recently opened files.
+* Option to reopen the previous puzzle.
+
 Bug Fixes
 ---------
 * Fix major regression that prevents saving .puz files.
 * Puzzles with background images can't be saved in XPF format.
-* Puzzle loading errors do not include line information
+* Puzzle loading errors do not include line information:
   e.g. "../import.init.lua line xxx: error message"
+
+
+----------------------------------------------------------------------
+
 
 Version 0.5.2 (10/12/2011)
 =================
