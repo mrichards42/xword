@@ -29,11 +29,13 @@ end
 function import.UClick(p, filename)
     -- Open the file and parse it
     local f = assert(io.open(filename))
-    local doc = assert(lom.parse(f:lines()))
+    local doc = lom.parse(f:lines())
     f:close()
 
     -- Find the root node
-    assert(doc.tag == "crossword", 'Root node must be "crossword"')
+    if not doc or doc.tag ~= "crossword" then
+        return false -- Not a uclick XML
+    end
 
     local width, height
     local solution

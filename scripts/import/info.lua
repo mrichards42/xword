@@ -6,5 +6,5 @@ return {
 Import non-native puzzle types:
 * UClick XML
 ]],
-    requires = '0.5'
+    requires = '0.5.3'
 }

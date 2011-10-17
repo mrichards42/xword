@@ -126,8 +126,10 @@ function import.uninit()
     -- Remove the separator under the menu
     local fileMenu = xword.frame:GetMenu('File')
     local index = xword.findMenuItemIndex(fileMenu, 'Import')
-    fileMenu:Destroy(fileMenu:FindItemByPosition(index + 1))
-    xword.frame:RemoveMenu('File', 'Import')
+    if index ~= nil then
+        fileMenu:Destroy(fileMenu:FindItemByPosition(index + 1))
+        xword.frame:RemoveMenu('File', 'Import')
+    end
     importMenu = nil
 end
 
@@ -148,24 +150,41 @@ function import.load(p, filename)
     -- Try all handlers, but prefer those with a matching extension
     local handlers = tablex.filter(import.handlers,
                                    function (h) return h.ext == ext end)
-    table.insert(handlers, {load = puzzle_load})
+    -- load = nil means Puzzle.Load will be called normally
+    table.insert(handlers, {})
     tablex.insertvalues(
         handlers,
         tablex.filter(import.handlers,
                       function (h) return h.ext ~= ext end)
     )
 
-    local closest_err -- Error from an extension that matches
     for _, handler in ipairs(handlers) do
         p:Clear()
-        local success, err = pcall(handler.load, p, filename)
+
+        -- Load the puzzle (prevent line information from being added
+        local success, err
+        if handler.load ~= nil then
+            success, err = xpcall(
+                function () puzzle_load(p, filename, handler.load) end,
+                function (err) return err end
+            )
+        else
+            success, err = xpcall(function () puzzle_load(p, filename) end,
+                                  function (err) return err end)
+        end
+
+        -- Check the return value
         if success then
             return true
-        elseif handler.ext == ext then
-            closest_err = err
+        elseif err:sub(1,12) == "Not a valid " or err == "Unknown file type" or err == "Wrong file type" then
+            -- Try again . . . wrong handler for this file.
+        else
+            -- By setting the error level to 2, "import/init.lua line 180" is
+            -- omitted from the error report!
+            error(err, 2) -- Correct handler, bad file
         end
     end
-    error(closest_err or "Unknown file type")
+    error("Unknown file type", 2)
 end
 
 
