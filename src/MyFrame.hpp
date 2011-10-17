@@ -52,6 +52,7 @@ class ConfigManager;
 #include "utils/ToolManager.hpp"
 
 #include <wx/fileconf.h> // Used to get the layouts directly from wxConfig
+#include <wx/docview.h> // wxFileHistory
 
 #include <map>
 
@@ -134,6 +135,9 @@ public:
     void SetAutoSaveInterval(int seconds = 5) { m_autoSaveInterval = seconds; }
     int AutoSaveInterval() const { return m_autoSaveInterval; }
 
+    // File history
+    void SetSaveFileHistory(bool doit = true);
+
     void OnAppDeactivate();
     void OnAppActivate();
 
@@ -166,6 +170,8 @@ private:
 #endif
 
     wxMenuBar    * CreateMenuBar();
+
+    wxFileHistory m_fileHistory;
 
     XGridCtrl *  m_XGridCtrl;
 
@@ -260,6 +266,7 @@ private:
 
     // General
     void OnOpenPuzzle  (wxCommandEvent & WXUNUSED(evt));
+    void OnOpenRecentPuzzle(wxCommandEvent & evt);
     void OnSavePuzzle  (wxCommandEvent & WXUNUSED(evt));
     void OnSavePuzzleAs(wxCommandEvent & WXUNUSED(evt));
     void OnClosePuzzle (wxCommandEvent & WXUNUSED(evt))   { ClosePuzzle(true); }

@@ -135,16 +135,12 @@ PreferencesDialog::LoadConfig()
 
     // Auto Save
     m_autoSave->SetValue(config.autoSaveInterval());
+
+    // File History
+    m_saveFileHistory->SetValue(config.FileHistory.saveFileHistory());
+    m_reopenLastPuzzle->SetValue(config.FileHistory.reopenLastPuzzle());
 }
 
-void
-PreferencesDialog::OnPrintCustomFonts(wxCommandEvent & evt)
-{
-    const bool customFonts = evt.IsChecked();
-    m_printGridLetterFont->Enable(customFonts);
-    m_printGridNumberFont->Enable(customFonts);
-    m_printClueFont->Enable(customFonts);
-}
 
 //------------------------------------------------------------------------------
 // Save config
@@ -236,8 +232,24 @@ PreferencesDialog::SaveConfig()
 
     config.Timer.autoStart = m_startTimer->GetValue();
     config.autoSaveInterval = m_autoSave->GetValue();
+
+    // File History
+    config.FileHistory.saveFileHistory = m_saveFileHistory->IsChecked();
+    config.FileHistory.reopenLastPuzzle = m_reopenLastPuzzle->IsChecked();
 }
 
+//------------------------------------------------------------------------------
+// Events
+//------------------------------------------------------------------------------
+
+void
+PreferencesDialog::OnPrintCustomFonts(wxCommandEvent & evt)
+{
+    const bool customFonts = evt.IsChecked();
+    m_printGridLetterFont->Enable(customFonts);
+    m_printGridNumberFont->Enable(customFonts);
+    m_printClueFont->Enable(customFonts);
+}
 
 void
 PreferencesDialog::OnBlackSquareBrightness(wxScrollEvent & evt)
@@ -245,4 +257,12 @@ PreferencesDialog::OnBlackSquareBrightness(wxScrollEvent & evt)
     int value = evt.GetPosition();
     m_printBlackSquarePreview->SetBackgroundColour(wxColour(value, value, value));
     m_printBlackSquarePreview->Refresh();
+}
+
+void
+PreferencesDialog::OnSaveFileHistory(wxCommandEvent & evt)
+{
+    m_reopenLastPuzzle->Enable(evt.IsChecked());
+    if (! evt.IsChecked())
+        m_reopenLastPuzzle->SetValue(false);
 }

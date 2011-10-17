@@ -130,7 +130,11 @@ enum toolIds
 
     // Timers
     ID_CLOCK_TIMER,
-    ID_AUTOSAVE_TIMER
+    ID_AUTOSAVE_TIMER,
+
+    // This should be last so that we can have an unlimited file history
+    ID_FILE_HISTORY_MENU,
+    ID_FILE_HISTORY_1
 };
 
 
@@ -158,6 +162,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI      (ID_SHOW_NOTES,        MyFrame::OnUpdateUI)
     EVT_UPDATE_UI      (ID_CHARACTER_MAP,     MyFrame::OnUpdateUI)
 
+    EVT_MENU_RANGE     (ID_FILE_HISTORY_1,
+                        ID_FILE_HISTORY_1 + 10, MyFrame::OnOpenRecentPuzzle)
 END_EVENT_TABLE()
 
 // This function is here instead of with the rest of the MyFrame implementation
@@ -354,7 +360,8 @@ MyFrame::MyFrame()
       m_preferencesDialog(NULL),
       m_charactersPanel(NULL),
       m_mgr(this),
-      m_isIdleConnected(false)
+      m_isIdleConnected(false),
+      m_fileHistory(10, ID_FILE_HISTORY_1)
 { 
 #ifdef __WXDEBUG__
     // Debug window
@@ -411,6 +418,14 @@ MyFrame::MyFrame()
 #endif // XWORD_USE_LUA
 
     ShowPuzzle();
+
+    // See if we should open the last puzzle
+    if (wxGetApp().GetConfigManager().FileHistory.reopenLastPuzzle())
+    {
+        wxString fn = m_fileHistory.GetHistoryFile(0);
+        if (! fn.empty() && wxIsReadable(fn))
+            LoadPuzzle(fn);
+    }
 }
 
 
@@ -518,7 +533,9 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     RemoveLayout(_T("(Current)"));
     ShowPuzzle();
 
-    m_filename = wx2puz(filename);
+    wxFileName fn(filename);
+    fn.Normalize();
+    m_filename = fn.GetFullPath();
 
     if (m_puz.IsOk())
     {
@@ -529,6 +546,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
         if (m_autoStartTimer)
             StartTimer();
         CheckPuzzle();
+        m_fileHistory.AddFileToHistory(m_filename);
     }
     else
     {
@@ -1298,7 +1316,6 @@ MyFrame::EnableReveal(bool enable)
 
 
 
-
 //------------------------------------------------------------------------------
 // Config
 //------------------------------------------------------------------------------
@@ -1338,8 +1355,47 @@ MyFrame::LoadConfig()
 
     config.Timer.autoStart.AddCallback(this, &MyFrame::SetAutoStartTimer);
     config.autoSaveInterval.AddCallback(this, &MyFrame::SetAutoSaveInterval);
+
+    // File History
+    config.FileHistory.saveFileHistory.AddCallback(
+        this, &MyFrame::SetSaveFileHistory);
+    wxFileConfig * raw_cfg = GetConfig();
+    raw_cfg->SetPath(config.FileHistory.m_name);
+    m_fileHistory.Load(*raw_cfg);
+    raw_cfg->SetPath(_T(""));
+
     // Update the config of our controls
     config.Update();
+}
+
+void
+MyFrame::SetSaveFileHistory(bool doit)
+{
+    // Find the recent files menu
+    wxMenu * fileMenu = m_menubar->GetMenu(0);
+    if (! fileMenu)
+        return;
+    wxMenuItem * recent = fileMenu->FindItem(ID_FILE_HISTORY_MENU);
+    if (doit) // Add the menu if it doesn't exist.
+    {
+        if (! recent)
+        {
+            wxMenu * recentMenu = new wxMenu();
+            fileMenu->Insert(2, new wxMenuItem(
+                fileMenu, ID_FILE_HISTORY_MENU, _T("Recent Files"),
+                wxEmptyString, wxITEM_NORMAL, recentMenu));
+            m_fileHistory.UseMenu(recentMenu);
+            m_fileHistory.AddFilesToMenu();
+        }
+    }
+    else if (recent) // Remove the menu if it exists
+    {
+        m_fileHistory.RemoveMenu(recent->GetSubMenu());
+        delete fileMenu->Remove(ID_FILE_HISTORY_MENU);
+        // Remove the files
+        for (size_t i = m_fileHistory.GetCount(); i > 0; --i)
+            m_fileHistory.RemoveFileFromHistory(i-1);
+    }
 }
 
 void
@@ -1380,6 +1436,12 @@ MyFrame::SaveConfig()
     //-----
     config.Grid.boxSize = m_XGridCtrl->GetBoxSize();
     config.Grid.fit = m_toolMgr.IsChecked(wxID_ZOOM_FIT);
+
+    // File History
+    wxFileConfig * raw_cfg = GetConfig();
+    raw_cfg->SetPath(config.FileHistory.m_name);
+    m_fileHistory.Save(*raw_cfg);
+    raw_cfg->SetPath(_T(""));
 
     config.AutoUpdate(true);
     // The rest of the config has only changed if the user used the
@@ -1465,6 +1527,14 @@ MyFrame::OnOpenPuzzle(wxCommandEvent & WXUNUSED(evt))
 
     if (! filename.empty())
         LoadPuzzle(filename);
+}
+
+void
+MyFrame::OnOpenRecentPuzzle(wxCommandEvent & evt)
+{
+    wxString fn = m_fileHistory.GetHistoryFile(evt.GetId() - ID_FILE_HISTORY_1);
+    if (! fn.empty())
+        LoadPuzzle(fn);
 }
 
 

@@ -30,6 +30,7 @@ public:
           CluePrompt(&m_group),
           Printing(&m_group),
           Timer(&m_group),
+          FileHistory(&m_group),
           autoSaveInterval(&m_group, _T("autoSaveInterval"), 0)
     {}
 
@@ -140,6 +141,15 @@ public:
 
         ConfigBool autoStart;
     } Timer;
+
+    // FileHistory
+    class FileHistory_t : public ConfigGroup {
+    public:
+        FileHistory_t(ConfigGroup * parent);
+
+        ConfigBool saveFileHistory;
+        ConfigBool reopenLastPuzzle;
+    } FileHistory;
 
     ConfigLong autoSaveInterval;
 };

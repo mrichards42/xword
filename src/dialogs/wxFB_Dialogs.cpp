@@ -111,7 +111,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	solvePanel->SetSizer( bSizer3 );
 	solvePanel->Layout();
 	bSizer3->Fit( solvePanel );
-	m_notebook->AddPage( solvePanel, wxT("Solving"), true );
+	m_notebook->AddPage( solvePanel, wxT("Solving"), false );
 	wxPanel* colorPanel;
 	colorPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer35;
@@ -403,6 +403,18 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	wxBoxSizer* bSizer42;
 	bSizer42 = new wxBoxSizer( wxVERTICAL );
 	
+	wxStaticBoxSizer* sbSizer22;
+	sbSizer22 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("File history") ), wxHORIZONTAL );
+	
+	m_saveFileHistory = new wxCheckBox( miscPanel, wxID_ANY, wxT("Save recently opened puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer22->Add( m_saveFileHistory, 0, wxALL, 5 );
+	
+	m_reopenLastPuzzle = new wxCheckBox( miscPanel, wxID_ANY, wxT("Reopen last puzzle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_reopenLastPuzzle->SetValue(true); 
+	sbSizer22->Add( m_reopenLastPuzzle, 0, wxALL, 5 );
+	
+	bSizer42->Add( sbSizer22, 1, wxEXPAND|wxALL, 5 );
+	
 	wxStaticBoxSizer* sbSizer13;
 	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("Clue prompt format") ), wxVERTICAL );
 	
@@ -504,7 +516,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	miscPanel->SetSizer( bSizer42 );
 	miscPanel->Layout();
 	bSizer42->Fit( miscPanel );
-	m_notebook->AddPage( miscPanel, wxT("Misc"), false );
+	m_notebook->AddPage( miscPanel, wxT("Misc"), true );
 	printPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer371;
 	bSizer371 = new wxBoxSizer( wxVERTICAL );
@@ -513,7 +525,6 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	sbSizer14 = new wxStaticBoxSizer( new wxStaticBox( printPanel, wxID_ANY, wxT("Fonts") ), wxVERTICAL );
 	
 	m_printCustomFonts = new wxCheckBox( printPanel, wxID_ANY, wxT("Use custom fonts"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_printCustomFonts->SetValue(true); 
 	sbSizer14->Add( m_printCustomFonts, 0, wxALL, 8 );
 	
 	wxFlexGridSizer* fgSizer5;
@@ -611,6 +622,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	
 	// Connect Events
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
+	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnSaveFileHistory ), NULL, this );
 	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
 	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
 	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
@@ -629,6 +641,7 @@ wxFB_PreferencesDialog::~wxFB_PreferencesDialog()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
+	m_saveFileHistory->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnSaveFileHistory ), NULL, this );
 	m_printCustomFonts->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
 	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
 	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
