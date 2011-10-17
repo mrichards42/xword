@@ -32,20 +32,19 @@ static void luapuz_LoadSave_Puzzle(puz::Puzzle * puz,
     lua_pushstring(L, filename.c_str());
 
     // Call the function, check for errors.
-    // If an error is raised, throw a FileTypeError.
-    // If the function returns a string, throw a LoadError.
+    // If an error is raised, throw a LoadError.
+    // If a function returns false, throw a FileTypeError
     if (lua_pcall(L, 2, 1, 0) == 0)
+    {
+        if (lua_isboolean(L, -1) && ! lua_toboolean(L, -1))
+            throw puz::FileTypeError();
+    }
+    else // Error
     {
         if (lua_isstring(L, -1))
             throw puz::LoadError(lua_tostring(L, -1));
-    }
-    else
-    {
-        // Throw an exception
-        if (lua_isstring(L, -1))
-            throw puz::FileTypeError(lua_tostring(L, -1));
         else
-            throw puz::FileTypeError();
+            throw puz::LoadError("Error loading file");
     }
 }
 
