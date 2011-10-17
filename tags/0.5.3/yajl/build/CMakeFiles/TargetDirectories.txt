@@ -1,0 +1,11 @@
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/ALL_BUILD.dir
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/ZERO_CHECK.dir
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/doc.dir
+D:/C++/XWord/trunk/yajl/build/reformatter/CMakeFiles/json_reformat.dir
+D:/C++/XWord/trunk/yajl/build/verify/CMakeFiles/json_verify.dir
+D:/C++/XWord/trunk/yajl/build/example/CMakeFiles/parse_config.dir
+D:/C++/XWord/trunk/yajl/build/perf/CMakeFiles/perftest.dir
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/test.dir
+D:/C++/XWord/trunk/yajl/build/src/CMakeFiles/yajl.dir
+D:/C++/XWord/trunk/yajl/build/src/CMakeFiles/yajl_s.dir
+D:/C++/XWord/trunk/yajl/build/test/CMakeFiles/yajl_test.dir

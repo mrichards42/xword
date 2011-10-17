@@ -1,0 +1,73 @@
+Compiling XWord with XCode on a Mac
+
+----------------------------------------
+Build wxWidgets
+----------------------------------------
+
+Download wxMac from
+http://prdownloads.sourceforge.net/wxwindows/wxMac-2.8.10.tar.gz
+(XWord is currently using wxWidgets 2.8.10.  Other versions should work, but haven't been tested)
+
+Unzip to a folder.  From here on out, I'll refer to the location wxMac was unzipped to as $(WXPREFIX).  I'm going to write these directions for a debug build.  Everything should work exactly the same for a release build, just replace "debug" with "release" everywhere you see it.
+
+$ cd $(WXPREFIX)
+
+$ mkdir build-debug
+
+$ cd build-debug
+
+$ ../configure --enable-unicode --disable-shared --with-libpng=builtin --with-zlib=builtin --enable-universal-binary --enable-debug
+
+(leave out --enable-debug if you want a release build, naturally)
+(and leave out --enable-universal-binary if you don't want that)
+
+$ make
+
+
+----------------------------------------
+Build XWord
+----------------------------------------
+I've made an XCode project for this.  You'll have to make a couple of changes to the project to get it to compile and link (unless by some freak coincidence, you happened to install wxWidgets to /usr/share/wx/2.8.10)
+
+Just a little configuration (Targets > xword > Get Info > Build)
+
+$ cd $(WXPREFIX)
+$ build-debug/wx-config --cppflags
+$ build-debug/wx-config --libs
+
+Copy output from --libs (remove "-arch ppc -arch i386" if it's there) to
+General > Linking > Other Linker Flags
+
+Copy output from --cppflags to
+GCC > Language > Other C++ Flags
+
+
+And that should be it.  I've only tried this on Tiger.
+
+
+
+
+
+----------------------------------------
+XCode project from scratch (mostly for my own reference)
+----------------------------------------
+Make a new XCode project.
+Select Carbon C++ Application
+Remove everything from the Sources
+
+Change Configuration:
+
+General > Linking > ZeroLink (uncheck)
+
+GCC > Code Generation > Inline Functions Hidden (uncheck)
+
+GCC > Code Generation > Symbols Hidden by Default (uncheck)
+
+Copy output from wx-config --libs (removing -arch ppc -arch i386) to
+General > Linking > Other Linker Flags
+
+Copy output from wx-config --cppflags to
+GCC > Language > Other C++ Flags
+
+
+Remove GCC > Language > Prefix Header

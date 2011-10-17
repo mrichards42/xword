@@ -1,0 +1,17 @@
+# CMake generation dependency list for this directory.
+D:/C++/XWord/trunk/yajl/CMakeLists.txt
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/CMakeSystem.cmake
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/CMakeCCompiler.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/CMakeSystemSpecificInformation.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/CMakeGenericSystem.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/Platform/Windows.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/Platform/WindowsPaths.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/CMakeCInformation.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/Platform/Windows-cl.cmake
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/CMakeCPlatform.cmake
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/CMakeCXXPlatform.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/Platform/cl.cmake
+D:/C++/XWord/trunk/yajl/build/CMakeFiles/CMakeRCCompiler.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/CMakeRCInformation.cmake
+D:/C++/XWord/trunk/yajl/cmake-2.8.4-win32-x86/share/cmake-2.8/Modules/CMakeCommonLanguageInclude.cmake
+D:/C++/XWord/trunk/yajl/YAJLDoc.cmake
