@@ -86,6 +86,8 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxFontPickerCtrl* m_clueFont;
 		wxFontPickerCtrl* m_clueHeadingFont;
 		wxPanel* miscPanel;
+		wxCheckBox* m_saveFileHistory;
+		wxCheckBox* m_reopenLastPuzzle;
 		wxTextCtrl* m_cluePromptFormat;
 		wxSpinCtrl* m_letterScale;
 		wxSpinCtrl* m_numberScale;
@@ -102,6 +104,7 @@ class wxFB_PreferencesDialog : public wxDialog
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnInit( wxInitDialogEvent& event ) = 0;
+		virtual void OnSaveFileHistory( wxCommandEvent& event ) = 0;
 		virtual void OnPrintCustomFonts( wxCommandEvent& event ) = 0;
 		virtual void OnBlackSquareBrightness( wxScrollEvent& event ) = 0;
 		virtual void OnApply( wxCommandEvent& event ) = 0;

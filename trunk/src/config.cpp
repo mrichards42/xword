@@ -114,3 +114,10 @@ ConfigManager::Timer_t::Timer_t(ConfigGroup * parent)
     : ConfigGroup(parent, _T("Timer")),
       autoStart(this, _T("autoStart"), false)
 {}
+
+// FileHistory
+ConfigManager::FileHistory_t::FileHistory_t(ConfigGroup * parent)
+    : ConfigGroup(parent, _T("FileHistory")),
+      saveFileHistory(this, _T("saveFileHistory"), true),
+      reopenLastPuzzle(this, _T("reopenLastPuzzle"), false)
+{}
