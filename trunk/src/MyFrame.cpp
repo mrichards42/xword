@@ -1381,7 +1381,7 @@ MyFrame::SetSaveFileHistory(bool doit)
         if (! recent)
         {
             wxMenu * recentMenu = new wxMenu();
-            fileMenu->Insert(2, new wxMenuItem(
+            fileMenu->Insert(1, new wxMenuItem(
                 fileMenu, ID_FILE_HISTORY_MENU, _T("Recent Files"),
                 wxEmptyString, wxITEM_NORMAL, recentMenu));
             m_fileHistory.UseMenu(recentMenu);
