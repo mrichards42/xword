@@ -3,7 +3,7 @@
 -- Generate readme.md for sourceforge.
 -- NOTE: don't forget to update xword_version
 
-xword_version = "0.5.2"
+xword_version = "0.5.3"
 
 local lfs = require 'lfs'
 
@@ -55,6 +55,7 @@ local function gen_packages(outdir)
         local dirname = join(scriptsdir, name)
         if not startswith(name, '.') and name ~= 'xword' and name ~= 'libs'
             and lfs.attributes(dirname, 'mode') == 'directory'
+            and not startswith(name, "_")
         then
             local info = serialize.loadfile(join(dirname, 'info.lua'))
             if info then
