@@ -35,6 +35,13 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
         throw ConversionError("XPF does not support scrambled puzzles");
     if (! grid.HasSolution())
         throw ConversionError("XPF does not support puzzles without a solution");
+    for (const Square * square = puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (square->HasImage())
+            throw ConversionError("XPF does not support puzzles with background images.");
+    }
 
     xml::document doc;
     xml::node puzzles = doc.append_child("Puzzles");
