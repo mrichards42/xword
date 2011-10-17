@@ -28,6 +28,7 @@ wx.wxST_WRAP = 2
 local function wrap_line(text, dc, width)
     local lines = {}
     local words = split(text, ' ')
+    if #words == 0 then return '' end
     local this_line = ''
     repeat
         local test_line = this_line .. words[1] .. ' '
