@@ -21,7 +21,7 @@ local function OneAcrossSearch()
     local word = xword.frame:GetFocusedWord()
     local pattern = ''
     for _, square in ipairs(word) do
-        if #square.Text > 0 then
+        if not square:IsBlank() then
             pattern = pattern .. square.Text
         else
             -- Blank squares are represented by question marks
