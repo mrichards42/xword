@@ -95,6 +95,8 @@ enum toolIds
     ID_REVEAL_SELECTION,
     ID_REVEAL_GRID,
 
+    ID_ERASE_GRID,
+    ID_ERASE_UNCROSSED,
 
     ID_SCRAMBLE,
     ID_UNSCRAMBLE,
@@ -250,12 +252,17 @@ MyFrame::ManageTools()
         { ID_REVEAL_INCORRECT_SELECTION, wxITEM_NORMAL, _T("Reveal Incorrect letters (selection)..."), NULL, NULL,
                    _handler(MyFrame::OnRevealIncorrectSelection) },
 
-        { ID_REVEAL_SELECTION,      wxITEM_NORMAL, _T("Reveal &Selection..."), NULL, NULL,
+        { ID_REVEAL_SELECTION, wxITEM_NORMAL, _T("Reveal &Selection..."), NULL, NULL,
                    _handler(MyFrame::OnRevealSelection) },
 
         { ID_REVEAL_GRID,      wxITEM_NORMAL, _T("Reveal &Grid"), NULL, NULL,
                    _handler(MyFrame::OnRevealGrid) },
 
+        { ID_ERASE_GRID,       wxITEM_NORMAL, _T("Erase &Grid"), NULL, NULL,
+                   _handler(MyFrame::OnEraseGrid) },
+
+        { ID_ERASE_UNCROSSED,  wxITEM_NORMAL, _T("Erase &Uncrossed Letters\tCtrl+Shift+D"), NULL, NULL,
+                   _handler(MyFrame::OnEraseUncrossed) },
 
         { ID_LAYOUT_PANES, wxITEM_CHECK,  _T("&Edit Layout"), _T("layout"), NULL,
                    _handler(MyFrame::OnEditLayout) },
@@ -1038,6 +1045,10 @@ MyFrame::CreateMenuBar()
             m_toolMgr.Add(subMenu, ID_REVEAL_SELECTION);
             m_toolMgr.Add(subMenu, ID_REVEAL_GRID);
         menu->AppendSubMenu(subMenu, _T("&Reveal"));
+        subMenu = new wxMenu();
+            m_toolMgr.Add(subMenu, ID_ERASE_GRID);
+            m_toolMgr.Add(subMenu, ID_ERASE_UNCROSSED);
+        menu->AppendSubMenu(subMenu, _T("&Erase"));
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_SCRAMBLE);
         m_toolMgr.Add(menu, ID_UNSCRAMBLE);
@@ -1234,6 +1245,10 @@ MyFrame::EnableTools(bool enable)
     // is shown or closed.  These don't have any special logic.
     m_toolMgr.Enable(ID_UNSCRAMBLE, enable);
     m_toolMgr.Enable(ID_SCRAMBLE,   enable);
+    m_toolMgr.Enable(ID_ERASE_GRID, enable);
+    m_toolMgr.Enable(ID_ERASE_UNCROSSED,   enable);
+    m_menubar->Enable(m_menubar->FindMenuItem(_T("Solution"), _T("Erase")),
+                      enable);
     m_toolMgr.Enable(wxID_SAVE,    enable);
     m_toolMgr.Enable(wxID_SAVEAS, enable);
     m_toolMgr.Enable(wxID_CLOSE, enable);
@@ -1646,6 +1661,109 @@ MyFrame::OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
 {
     m_XGridCtrl->CheckLetter(REVEAL_ANSWER | CHECK_ALL);
 }
+
+void
+MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
+{
+    if (! XWordPrompt(this, _T("This will erase all letters in the grid ")
+                            _T("and reset the timer.  Continue?")))
+        return;
+
+    const bool is_diagramless = m_puz.m_grid.IsDiagramless();
+    for (puz::Square * square = m_puz.m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (is_diagramless || square->IsWhite())
+        {
+            square->SetText(puzT(""));
+            square->RemoveFlag(puz::FLAG_BLACK |
+                               puz::FLAG_X |
+                               puz::FLAG_REVEALED);
+        }
+    }
+    if (is_diagramless)
+        m_puz.m_grid.NumberGrid();
+    m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite(), puz::ACROSS);
+    m_XGridCtrl->Refresh();
+    SetTime(0);
+    GetEventHandler()->ProcessEvent(wxPuzEvent(wxEVT_PUZ_LETTER, GetId()));
+}
+
+
+void
+MyFrame::OnEraseUncrossed(wxCommandEvent & WXUNUSED(evt))
+{
+    // Helper function
+    struct _is_uncrossed {
+        _is_uncrossed(puz::Puzzle & puz) : m_puz(puz) {}
+
+        bool operator()(puz::Square & square, puz::Word * word)
+        {
+            // Look for another word that contains this square.
+            puz::Clues & clues = m_puz.GetClues();
+            puz::Clues::iterator clues_it;
+            for (clues_it = clues.begin(); clues_it != clues.end(); ++clues_it)
+            {
+                puz::ClueList & cluelist = clues_it->second;
+                puz::ClueList::iterator clue;
+                for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
+                {
+                    puz::Word & crossing = clue->GetWord();
+                    if (&crossing == word || ! crossing.Contains(&square))
+                        continue;
+                    if (is_word_filled(crossing))
+                        return false;
+                }
+            }
+            // If no filled words have been found, it might be because the
+            // crossing word doesn't exist.  Create a crossing word and
+            // check that.
+            puz::GridDirection dir = puz::IsHorizontal(word->GetDirection())
+                                        ? puz::DOWN : puz::ACROSS;
+            puz::Word crossing(square.GetWordStart(dir),
+                               square.GetWordEnd(dir));
+            // If this is the same as the given word, don't bother.
+            if (crossing.front() == word->front()
+                && crossing.back() == word->back())
+            {
+                return true;
+            }
+            if (is_word_filled(crossing))
+                return false;
+            // Otherwise this square is uncrossed
+            return true;
+        }
+
+        bool is_word_filled(puz::Word & word)
+        {
+            // Check to see that all squares in this word are filled.
+            for (puz::square_iterator square = word.begin();
+                 square != word.end();
+                 ++square)
+            {
+                if (square->IsBlank())
+                    return false;
+            }
+            return true;
+        }
+
+        puz::Puzzle & m_puz;
+
+    } is_uncrossed(m_puz);
+
+    puz::Word * word = m_XGridCtrl->GetFocusedWord();
+    puz::square_iterator square_it;
+    for (square_it = word->begin(); square_it != word->end(); ++square_it)
+    {
+        puz::Square & square = *square_it;
+        if (square.IsWhite() && is_uncrossed(square, word))
+            m_XGridCtrl->SetSquareText(square, _T(""));
+    }
+    m_XGridCtrl->Refresh();
+}
+
+
 
 
 // Scramble / Unscramble
