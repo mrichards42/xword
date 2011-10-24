@@ -315,8 +315,9 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
 
         m_focusedSquare = FirstWhite();
         m_focusedWord = NULL;
+        m_ownsFocusedWord = false;
         m_focusedDirection = puz::ACROSS;
-        m_ownsFocusedWord = m_grid->IsDiagramless();
+        DoSetFocusedWord(NULL, puz::ACROSS);
         if (m_grid->IsDiagramless())
             GetGrid()->NumberGrid();
 
@@ -646,10 +647,11 @@ XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
 {
     if (m_grid->IsDiagramless())
     {
-        assert(m_ownsFocusedWord);
+        assert(m_ownsFocusedWord || m_focusedWord == NULL);
         if (m_focusedWord != NULL && m_focusedWord == word)
             return;
-        delete m_focusedWord;
+        if (m_ownsFocusedWord && m_focusedWord != NULL)
+            delete m_focusedWord;
         if (m_focusedSquare->IsBlack())
         {
             m_focusedWord = new puz::Word(
@@ -665,6 +667,7 @@ XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
                 m_focusedSquare->GetWordEnd(dir)
             );
         }
+        m_ownsFocusedWord = true;
         return;
     }
 
