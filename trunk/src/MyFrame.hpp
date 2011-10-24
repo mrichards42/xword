@@ -290,6 +290,9 @@ private:
     void OnRevealWord     (wxCommandEvent & WXUNUSED(evt));
     void OnRevealLetter   (wxCommandEvent & WXUNUSED(evt));
 
+    void OnEraseGrid      (wxCommandEvent & WXUNUSED(evt));
+    void OnEraseUncrossed (wxCommandEvent & WXUNUSED(evt));
+
     // Scrambling
     void OnScramble   (wxCommandEvent & WXUNUSED(evt));
     void OnUnscramble (wxCommandEvent & WXUNUSED(evt));
