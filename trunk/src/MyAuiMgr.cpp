@@ -631,6 +631,10 @@ MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
 {
     Connect(wxEVT_AUI_PANE_BUTTON, wxAuiManagerEventHandler(MyAuiManager::OnPaneButton));
     Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MyAuiManager::OnContextMenu));
+    Connect(wxEVT_SIZE, wxSizeEventHandler(MyAuiManager::OnFrameSize));
+    // We're going to assume that managed_wnd is not NULL
+    m_frameSize = managed_wnd->GetClientSize();
+    m_defaultFrameSize = m_frameSize;
 }
 
 
@@ -643,6 +647,10 @@ MyAuiManager::FireCloseEvent(wxAuiPaneInfo & pane)
     ProcessMgrEvent(evt);
     return ! evt.GetVeto();
 }
+
+// ----------------------------------------------------------------------------
+// Search functions
+// ----------------------------------------------------------------------------
 
 // Find the dock that this pane belongs to
 wxAuiDockInfo &
@@ -702,8 +710,10 @@ MyAuiManager::GetPaneByCaption(const wxString & caption)
 
 #include <wx/tokenzr.h>
 
+// ----------------------------------------------------------------------------
 // Perspectives
-//-------------
+// ----------------------------------------------------------------------------
+
 // Omit "private" panes (such as the tabs), and save tabbed panes in
 // the perspective string: "__tab(direction)=pane1;pane2;pane3|"
 // Cache pane info strings and tab layouts if the expected pane
@@ -759,6 +769,10 @@ MyAuiManager::SavePerspective()
         result += _T("|");
     }
 
+    // Save the frame size
+    result += wxString::Format(_T("frame_size=%d,%d|"),
+                               m_frameSize.x, m_frameSize.y);
+
     return result;
 }
 
@@ -770,7 +784,7 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
     escaped_layout.Replace(_T("\\|"), _T("\a"));
     escaped_layout.Replace(_T("\\;"), _T("\b"));
 
-    // Get rid of __tab sections
+    // Get rid of __tab sections and frame_size section
     wxString processed_layout;
     processed_layout.reserve(layout.size());
     {
@@ -778,13 +792,18 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
         while (tok.HasMoreTokens())
         {
             wxString part = tok.GetNextToken();
-            if (! part.StartsWith(_T("__tab")))
+            if (! part.StartsWith(_T("__tab")) &&
+                ! part.StartsWith(_T("frame_size")))
+            {
                 processed_layout += part;
+            }
         }
         // Unescape
         processed_layout.Replace(_T("\a"), _T("\\|"));
         processed_layout.Replace(_T("\b"), _T("\\;"));
     }
+
+    wxSize frameSize = m_defaultFrameSize;
 
     if (! wxAuiManager::LoadPerspective(processed_layout, false))
         return false;
@@ -841,6 +860,17 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
         {
             // Nothing to do here
         }
+        else if (info_str.StartsWith(_T("frame_size")))
+        {
+            // Adjust the dock proportion for the current window size.
+            long x, y;
+            info_str = info_str.AfterFirst(_T('='));
+            if (info_str.BeforeFirst(_T(',')).ToLong(&x)
+                && info_str.AfterFirst(_T(',')).ToLong(&y))
+            {
+                frameSize = wxSize(x, y);
+            }
+        }
         else
         {
             // This is a pane info string
@@ -861,6 +891,8 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
         }
     }
 
+    ResizeDocks(frameSize, m_frameSize);
+
     UpdateMenu();
     if (update)
         Update();
@@ -868,8 +900,8 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
 }
 
 
-// Cache
-// -----
+// Pane Cache
+
 bool
 MyAuiManager::GetCachedPane(const wxString & name, wxAuiPaneInfo & pane)
 {
@@ -990,8 +1022,9 @@ MyAuiManager::DetachPane(wxWindow * window)
 }
 
 
-// Update
-//-------
+// ----------------------------------------------------------------------------
+// Update functions
+// ----------------------------------------------------------------------------
 
 // Make all panes in the given list the same size, assuming that all panes
 // are in docks of the same direction.
@@ -1113,8 +1146,9 @@ MyAuiManager::Update()
     wxAuiManager::Update();
 }
 
+// ----------------------------------------------------------------------------
 // Tabs
-//-----
+// ----------------------------------------------------------------------------
 
 // Return the MyAuiManagerTabs associated with the given direction.
 // Create the tabs window if it does not already exist.
@@ -1259,20 +1293,10 @@ MyAuiManager::OnPaneButton(wxAuiManagerEvent & evt)
 }
 
 
-// Set floating_size and best_size
-wxAuiFloatingFrame *
-MyAuiManager::CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo & pane)
-{
-    // Create the frame
-    wxAuiFloatingFrame * frame = wxAuiManager::CreateFloatingFrame(parent, pane);
-    // Attach a ContextMenu event
-    frame->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MyAuiManager::OnFloatingContextMenu), NULL, this);
-    return frame;
-}
+// ----------------------------------------------------------------------------
+// Menu
+// ----------------------------------------------------------------------------
 
-
-// Pane Menu
-// ---------
 // The pane menu is set with SetManagedMenu, and is altered via
 // AddPane and DetachPane.  The user can update the menu state using
 // UpdateMenu().
@@ -1355,8 +1379,9 @@ MyAuiManager::OnUpdateUI(wxUpdateUIEvent & evt)
 }
 
 
-// Context Menu
-// ------------
+// ----------------------------------------------------------------------------
+// Context menu
+// ----------------------------------------------------------------------------
 
 // Set a window that recieves the context menu event.  Pane captions always
 // get a context menu event.
@@ -1578,8 +1603,22 @@ MyAuiManager::OnContextMenu(wxContextMenuEvent &evt)
     }
 }
 
+// Add a context menu to the floating pane
+wxAuiFloatingFrame *
+MyAuiManager::CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo & pane)
+{
+    // Create the frame
+    wxAuiFloatingFrame * frame = wxAuiManager::CreateFloatingFrame(parent, pane);
+    // Attach a ContextMenu event
+    frame->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MyAuiManager::OnFloatingContextMenu), NULL, this);
+    return frame;
+}
+
+
+// ----------------------------------------------------------------------------
 // Pane state and position
-// -----------------------
+// ----------------------------------------------------------------------------
+
 void
 MyAuiManager::SavePaneSize(wxAuiPaneInfo & pane)
 {
@@ -1634,4 +1673,40 @@ MyAuiManager::IsPaneActive(wxAuiPaneInfo & pane)
     if (m_action == actionNone || ! m_action_part)
         return false;
     return HasPane(m_action_part, pane);
+}
+
+
+
+// ----------------------------------------------------------------------------
+// Frame size
+// ----------------------------------------------------------------------------
+
+void
+MyAuiManager::OnFrameSize(wxSizeEvent & evt)
+{
+    wxSize newSize = m_frame->GetClientSize();
+    if (newSize != m_frameSize)
+    {
+        ResizeDocks(m_frameSize, newSize);
+        m_frameSize = newSize;
+        Update();
+    }
+}
+
+void
+MyAuiManager::ResizeDocks(const wxSize & oldSize, const wxSize & newSize)
+{
+    // Calculate percent difference
+    double x = double(newSize.x) / oldSize.x;
+    double y = double(newSize.y) / oldSize.y;
+
+    // Go through the docks and adjust their sizes
+    for (size_t i = 0; i < m_docks.Count(); ++i)
+    {
+        wxAuiDockInfo & dock = m_docks.Item(i);
+        if (dock.IsVertical())
+            dock.size *= x;
+        else
+            dock.size *= y;
+    }
 }
