@@ -176,7 +176,7 @@ const Square * Square::FindWordBoundary(const Square * square, GridDirection dir
 {
     // Only white squares have a word
     // direction must be a normal direction.
-    if (! square->IsSolutionWhite() || (dir % 45) != 0)
+    if (! square->IsWhite() || (dir % 45) != 0)
         return NULL;
 
     // Iterate until the grid edge or a black/missing square.
