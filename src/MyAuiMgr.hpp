@@ -46,6 +46,8 @@
 // * The user can supply a menu that gets filled with panes and their state.
 //     * public function UpdateMenu()
 //     * UpdateMenu() is called in AddPane() and DetachPane()
+// * AuiManager keeps track of the frame size and resizes panes proportionally
+//   when the frame is resized.
 
 class MyAuiManagerTabs;
 
@@ -109,6 +111,7 @@ public:
     bool IsPaneClosed(const wxAuiPaneInfo & pane);
 
     virtual void Update();
+
 
 protected:
     bool FireCloseEvent(wxAuiPaneInfo & pane);
@@ -178,6 +181,16 @@ protected:
     };
 
     std::map<wxString, CachedPane> m_paneCache;
+
+    // Frame size
+    wxSize m_frameSize;
+    // The size to use if a perspective doesn't specify a size.
+    wxSize m_defaultFrameSize;
+    void OnFrameSize(wxSizeEvent & evt);
+    void ResizeDocks(const wxSize & oldSize, const wxSize & newSize);
+
+public:
+    void SetDefaultFrameSize(const wxSize & size) { m_defaultFrameSize = size; }
 };
 
 #endif // MY_AUI_MGR_H

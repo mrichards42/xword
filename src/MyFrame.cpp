@@ -1346,6 +1346,7 @@ MyFrame::LoadConfig()
     else
         SetSize( config.Window.left(), config.Window.top(),
                  config.Window.width(), config.Window.height() );
+    m_mgr.SetDefaultFrameSize(GetClientSize());
 
     // Grid
     //-----
@@ -1923,7 +1924,7 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
     config->SetPath(_T("/"));
 
     wxASSERT(nameArray.size() == layoutArray.size());
-    wxASSERT(nameArray.size() > 1);
+    wxASSERT(nameArray.size() > 0);
 
     // Show the dialog
 
