@@ -2305,12 +2305,17 @@ MyFrame::UpdateClues()
         {
             const puz::ClueList & cluelist = it->second;
             puz::ClueList::const_iterator clues_it;
+            const bool is_focused =
+                (direction == puz::ACROSS &&
+                 cluelist.GetTitle() == puzT("Across")) ||
+                (direction == puz::DOWN &&
+                 cluelist.GetTitle() == puzT("Down"));
+
             for (clues_it = cluelist.begin(); clues_it != cluelist.end(); ++clues_it)
             {
                 const puz::Clue * clue = &*clues_it;
-                const puz::Word * word = &clue->GetWord();
                 if (clue->GetNumber() == focusedWord->front()->GetNumber()
-                    && word->GetDirection() == direction)
+                    && is_focused)
                 {
                     focusedClue = clue;
                     m_clues[puz2wx(it->first)]->SetClue(focusedClue, CluePanel::FOCUSED);
@@ -2318,7 +2323,7 @@ MyFrame::UpdateClues()
                 }
                 else if (crossingSquare
                          && clue->GetNumber() == crossingSquare->GetNumber()
-                         && word->GetDirection() == crossing_direction)
+                         && ! is_focused)
                 {
                     m_clues[puz2wx(it->first)]->SetClue(clue, CluePanel::CROSSING);
                 }
