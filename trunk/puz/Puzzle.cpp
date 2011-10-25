@@ -225,6 +225,7 @@ void Puzzle::SetAllClues(const std::vector<string_t> & clues)
 void Puzzle::NumberGrid()
 {
     m_grid.NumberGrid();
+    GenerateWords();
 }
 
 void Puzzle::GenerateWords()
@@ -236,7 +237,7 @@ void Puzzle::GenerateWords()
          square != NULL;
          square = square->Next())
     {
-        if (square->SolutionWantsClue())
+        if (square->HasNumber())
             wordMap.push_back(square);
     }
 
