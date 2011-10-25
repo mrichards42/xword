@@ -190,7 +190,11 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
         // Section length   (le-short)
         // Section checksum (le-short)
 
-        title = f.ReadString(4);
+        try {
+            title = f.ReadString(4);
+        } catch (std::ios::failure &) {
+            break;
+        }
 
         unsigned short length = f.ReadShort();
         unsigned short c_section = f.ReadShort();
