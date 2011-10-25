@@ -352,6 +352,10 @@ function P.DownloadCtrl(parent, source, d)
             ctrl:Connect(item:GetId(),
                          wx.wxEVT_COMMAND_MENU_SELECTED,
                          function (evt) copy_text(dl.filename) end)
+            item = menu:Append(wx.wxID_ANY, "Redownload")
+            ctrl:Connect(item:GetId(),
+                         wx.wxEVT_COMMAND_MENU_SELECTED,
+                         function (evt) dl.start() end)
             ctrl:PopupMenu(menu)
             menu:delete()
         end
