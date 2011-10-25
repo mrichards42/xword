@@ -230,6 +230,8 @@ void Puzzle::NumberGrid()
 
 void Puzzle::GenerateWords()
 {
+    if (m_grid.IsDiagramless())
+        return;
     // Simulate numbering the grid (solution) so that we can generate words
     std::vector<Square *> wordMap;
     wordMap.push_back(NULL); // So that the vector is 1-based for clue numbers.
@@ -457,6 +459,7 @@ Puzzle::TestOk()
         throw InvalidGrid();
 
     // Make sure that all clues have words.
+    if (! m_grid.IsDiagramless())
     {
         Clues::const_iterator it;
         for (it = m_clues.begin(); it != m_clues.end(); ++it)
