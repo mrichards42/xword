@@ -620,11 +620,15 @@ XGridCtrl::MoveFocusedSquare(puz::Square * square,
             square->GetWordStart(dir),
             square->GetWordEnd(dir)
         );
-        if (
-        // Find the next blank square
-        puz::Square * blank = word->FindSquare(square, FIND_BLANK_SQUARE);
-        if (blank)
-            square = blank;
+        // Check that this is a new word.
+        if (! (m_focusedWord->front() == word->front() &&
+               m_focusedWord->back() == word->back()))
+        {
+            // Find the next blank square
+            puz::Square * blank = word->FindSquare(square, FIND_BLANK_SQUARE);
+            if (blank)
+                square = blank;
+        }
         delete word;
         return SetFocusedSquare(square, NULL, direction);
     }
