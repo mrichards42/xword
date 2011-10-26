@@ -27,6 +27,9 @@ namespace puz {
 
 class WordImpl;
 
+// Default functor for Find functions
+static bool FIND_ANY_SQUARE(const Square * square) { return true; }
+
 // A word
 // This is essentially a linked-list with an efficient implementation for
 // words that have squares in line.
@@ -43,6 +46,8 @@ public:
     Word & operator=(const Word & other);
 
     bool Contains(const Square * square) const;
+    // Return the index of square.  -1 means not found
+    int FindSquare(const Square * square) const;
     short GetDirection() const;
     bool empty() const;
 
@@ -104,7 +109,8 @@ public:
     }
 
     template <typename FUNC>
-    Square * FindNextSquare(Square * start, FUNC findFunc,
+    Square * FindNextSquare(Square * start,
+                            FUNC findFunc,
                             FindDirection direction = NEXT)
     {
         if (direction == NEXT)
@@ -125,6 +131,23 @@ public:
             ++it;
             return FindSquare(it, end_, findFunc);
         }
+    }
+
+    template <typename FUNC>
+    Square * FindPrevSquare(Square * start, FUNC findFunc)
+    {
+        return FindNextSquare(start, findFunc, PREV);
+    }
+
+    // Overloads
+    Square * FindNextSquare(Square * start)
+    {
+        return FindNextSquare(start, FIND_ANY_SQUARE, NEXT);
+    }
+
+    Square * FindPrevSquare(Square * start)
+    {
+        return FindPrevSquare(start, FIND_ANY_SQUARE);
     }
 
 protected:

@@ -116,24 +116,29 @@ Clue * ClueList::Find(const puz::Word * word)
 
 const Clue * ClueList::Find(const puz::Square * square) const
 {
-    const_iterator it;
-    for (it = begin(); it != end(); ++it)
-        if (it->word.Contains(square))
-            break;
-    if (it == end())
-        return NULL;
-    return &*it;
+    // Prefer clues that start with square, otherwise return clues that
+    // contain square.
+    // Prefer clues that have square closest to the front.
+    const Clue * bestClue = NULL;
+    int distance = -1;
+    for (const_iterator it = begin(); it != end(); ++it)
+    {
+        // Find the distance from the front
+        int d = it->word.FindSquare(square);
+        if (d == 0) // First word
+            return &*it;
+        else if (distance == -1 || d < distance) // Closest word
+        {
+            bestClue = &*it;
+            distance = d;
+        }
+    }
+    return bestClue;
 }
 
 Clue * ClueList::Find(const puz::Square * square)
 {
-    iterator it;
-    for (it = begin(); it != end(); ++it)
-        if (it->word.Contains(square))
-            break;
-    if (it == end())
-        return NULL;
-    return &*it;
+    return const_cast<Clue *>(const_cast<const ClueList *>(this)->Find(square));
 }
 
 
