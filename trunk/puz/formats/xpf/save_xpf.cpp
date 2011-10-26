@@ -159,24 +159,40 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
             for (it = cluelist.begin(); it != cluelist.end(); ++it)
             {
                 xml::node clue = clues_node.append_child("Clue");
-                const Word & word = it->GetWord();
-                switch (word.GetDirection())
+                // Find the clue direction
+                if (! puz->GetGrid().IsDiagramless())
                 {
-                case ACROSS:
-                    clue.append_attribute("Dir") = "Across";
-                    break;
-                case DOWN:
-                    clue.append_attribute("Dir") = "Down";
-                    break;
-                case DIAGONAL_SW:
-                    clue.append_attribute("Dir") = "Diagonal";
-                    break;
-                default:
-                    throw ConversionError("XPF clues must be Across, Down, or Diagonal");
-                    break;
+                    const Word & word = it->GetWord();
+                    switch (word.GetDirection())
+                    {
+                    case ACROSS:
+                        clue.append_attribute("Dir") = "Across";
+                        break;
+                    case DOWN:
+                        clue.append_attribute("Dir") = "Down";
+                        break;
+                    case DIAGONAL_SW:
+                        clue.append_attribute("Dir") = "Diagonal";
+                        break;
+                    default:
+                        throw ConversionError("XPF clues must be Across, Down, or Diagonal");
+                        break;
+                    }
+                    clue.append_attribute("Row") = word.front()->GetRow() + 1;
+                    clue.append_attribute("Col") = word.front()->GetCol() + 1;
                 }
-                clue.append_attribute("Row") = word.front()->GetRow() + 1;
-                clue.append_attribute("Col") = word.front()->GetCol() + 1;
+                else // diagramless
+                {
+                    puz::string_t title = cluelist.GetTitle();
+                    if (title == puzT("Across"))
+                        clue.append_attribute("Dir") = "Across";
+                    else if (title == puzT("Down"))
+                        clue.append_attribute("Dir") = "Down";
+                    else if (title == puzT("Diagonal"))
+                        clue.append_attribute("Dir") = "Diagonal";
+                    else
+                        throw ConversionError("XPF clues must be Across, Down, or Diagonal");
+                }
                 clue.append_attribute("Num") = encode_utf8(it->GetNumber()).c_str();
                 // Clue formatting needs to be escaped if it is XHTML.
                 // xml::SetInnerXML(clue, it->GetText());
