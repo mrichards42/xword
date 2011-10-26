@@ -345,10 +345,14 @@ Puzzle::FindWord(const puz::Square * square) const
 const Word *
 Puzzle::FindWord(const puz::Square * square, short direction) const
 {
-    short inverseDirection = InvertDirection(direction);
+    // Prefer words that start on square.  Otherwise use words that contain
+    // square.  Prefer words where square is closest to the start.
+    const Word * bestWord = NULL;
+    int distance = -1;
     // Prefer words in exactly the specified direction.
     // If we can't find any of those, return a word in the inverse
     // direction.
+    short inverseDirection = InvertDirection(direction);
     const Word * inverseWord = NULL;
 
     Clues::const_iterator it;
@@ -359,16 +363,27 @@ Puzzle::FindWord(const puz::Square * square, short direction) const
         for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
         {
             const Word * word = &clue->GetWord();
-            if (word->Contains(square))
+            int d = word->FindSquare(square);
+            if (d != -1)
             {
                 short wordDirection = word->GetDirection();
                 if (wordDirection == direction)
-                    return word;
+                {
+                    if (d == 0)
+                        return word;
+                    else if (distance == -1 || d <  distance)
+                    {
+                        bestWord = word;
+                        distance = d;
+                    }
+                }
                 else if (wordDirection == inverseDirection)
                     inverseWord = word;
             }
         }
     }
+    if (bestWord)
+        return bestWord;
     return inverseWord;
 }
 

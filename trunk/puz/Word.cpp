@@ -15,9 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include <windows.h> // OutputDebugStr
 #include <sstream>
-
 
 #include "Word.hpp"
 #include "Square.hpp"
@@ -38,6 +36,7 @@ public:
     virtual ~WordImpl() {}
 
     virtual bool Contains(const puz::Square * square) const=0;
+    virtual int FindSquare(const puz::Square * square) const=0;
     virtual short GetDirection() const=0;
 
     // Element access
@@ -76,6 +75,18 @@ public:
     bool Contains(const Square * square) const
     {
         return square->IsBetween(m_front, m_back);
+    }
+
+    int FindSquare(const Square * square) const
+    {
+        if (square->IsBetween(m_front, m_back))
+        {
+            int x = abs(square->GetCol() - m_front->GetCol());
+            if (x > 0)
+                return x;
+            return abs(square->GetRow() - m_front->GetRow());
+        }
+        return -1;
     }
 
     short GetDirection() const { return m_direction; }
@@ -192,12 +203,21 @@ public:
 
     bool Contains(const Square * square) const
     {
+        return FindSquare(square) != -1;
+    }
+
+    int FindSquare(const Square * square) const
+    {
         const_square_iterator it = const_square_iterator(get_begin());
         const_square_iterator end_ = const_square_iterator(get_end());
+        int i = 0;
         for (; it != end_; ++it)
+        {
             if (it == square)
-                return true;
-        return false;
+                return i;
+            ++i;
+        }
+        return -1;
     }
 
     short GetDirection() const
@@ -293,7 +313,14 @@ Word & Word::operator=(const Word & other)
 
 bool Word::Contains(const Square * square) const
 {
-    return m_impl->Contains(square);
+    return square && m_impl->Contains(square);
+}
+
+int Word::FindSquare(const Square * square) const
+{
+    if (square)
+        return m_impl->FindSquare(square);
+    return -1;
 }
 
 short Word::GetDirection() const { return m_impl->GetDirection(); }
