@@ -270,29 +270,6 @@ XGridCtrl::~XGridCtrl()
     wxGetApp().GetConfigManager().RemoveCallbacks(this);
 }
 
-void XGridCtrl::UpdateConfig(ConfigManager & config)
-{
-    /*
-    SetGridStyle(config.ReadLong(_T("style")) );
-
-    SetLetterFont(config.ReadFont(_T("letterFont")) );
-    SetNumberFont(config.ReadFont(_T("numberFont")) );
-
-    SetBorderSize(config.ReadLong(_T("lineThickness")));
-
-    SetFocusedLetterColor(config.ReadColor(_T("focusedLetterColor")));
-    SetFocusedWordColor(config.ReadColor(_T("focusedWordColor")));
-    SetBackgroundColour(config.ReadColor(_T("backgroundColor")));
-    SetWhiteSquareColor(config.ReadColor(_T("whiteSquareColor")));
-    SetBlackSquareColor(config.ReadColor(_T("blackSquareColor")));
-    SetSelectionColor(config.ReadColor(_T("selectionColor")));
-    SetPenColor(config.ReadColor(_T("penColor")));
-    SetPencilColor(config.ReadColor(_T("pencilColor")));
-    SetNumberScale(config.ReadLong(_T("numberScale")) / 100.);
-    SetLetterScale(config.ReadLong(_T("letterScale")) / 100.);
-    */
-}
-
 
 void
 XGridCtrl::SetPuzzle(puz::Puzzle * puz)
@@ -317,7 +294,7 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
         m_focusedWord = NULL;
         m_ownsFocusedWord = false;
         m_focusedDirection = puz::ACROSS;
-        DoSetFocusedWord(NULL, puz::ACROSS);
+        DoSetFocusedWord(m_focusedSquare, NULL, puz::ACROSS);
         if (m_grid->IsDiagramless())
             GetGrid()->NumberGrid();
 
@@ -517,9 +494,9 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
 // Focus functions
 //-------------------------------------------------------
 puz::Square *
-XGridCtrl::ChangeFocusedSquare(puz::Square * square,
-                               puz::Word * word,
-                               short direction)
+XGridCtrl::SetFocusedSquare(puz::Square * square,
+                            puz::Word * word,
+                            short direction)
 {
     wxASSERT(m_focusedSquare != NULL || square != NULL);
     if (square == NULL)
@@ -574,7 +551,7 @@ XGridCtrl::ChangeFocusedSquare(puz::Square * square,
     // Set new state
     //--------------
     m_focusedSquare = square;
-    DoSetFocusedWord(word, direction);
+    DoSetFocusedWord(square, word, direction);
     wxASSERT(m_focusedWord != NULL);
 
     MakeVisible(*m_focusedSquare);
@@ -608,19 +585,52 @@ XGridCtrl::ChangeFocusedSquare(puz::Square * square,
     }
 
     RecalcDirection();
-    return m_focusedSquare;
-}
-
-
-puz::Square *
-XGridCtrl::SetFocusedSquare(puz::Square * square,
-                            puz::Word * word,
-                            short direction)
-{
-    ChangeFocusedSquare(square, word, direction);
     SendEvent();
     return m_focusedSquare;
 }
+
+puz::Square *
+XGridCtrl::MoveFocusedSquare(puz::Square * square,
+                             puz::Word * word,
+                             short direction)
+{
+    if (! HasStyle(BLANK_ON_NEW_WORD))
+        return SetFocusedSquare(square, word, direction);
+    if (square == NULL)
+        square = m_focusedSquare;
+    // Find the new word
+    word = CalcFocusedWord(square, word, direction);
+    // If this is not a new word, we're done
+    if (m_focusedWord != NULL && m_focusedWord == word)
+        return SetFocusedSquare(square, word, direction);
+    if (word)
+    {
+        puz::Square * blank = word->FindSquare(square, FIND_BLANK_SQUARE);
+        if (blank)
+            square = blank;
+        return SetFocusedSquare(square, word, direction);
+    }
+    else // If this word doesn't exist, we need to create it
+    {
+        if (puz::IsDiagonal(direction)) // Don't make up diagonal words.
+            direction = m_focusedDirection;
+        puz::GridDirection dir = puz::IsHorizontal(direction)
+                                    ? puz::ACROSS : puz::DOWN;
+        word = new puz::Word(
+            square->GetWordStart(dir),
+            square->GetWordEnd(dir)
+        );
+        if (
+        // Find the next blank square
+        puz::Square * blank = word->FindSquare(square, FIND_BLANK_SQUARE);
+        if (blank)
+            square = blank;
+        delete word;
+        return SetFocusedSquare(square, NULL, direction);
+    }
+}
+
+
 
 void
 XGridCtrl::SendEvent()
@@ -633,82 +643,48 @@ XGridCtrl::SendEvent()
 
 
 void
-XGridCtrl::ChangeFocusedWord(puz::Word * word, short direction)
+XGridCtrl::SetFocusedWord(puz::Word * word, short direction)
 {
     wxASSERT(word != NULL);
     puz::Square * square = word->front();
     if (HasStyle(BLANK_ON_NEW_WORD))
         SetIfExists(square, word->FindSquare(FIND_BLANK_SQUARE));
-    ChangeFocusedSquare(square, word, direction);
+    SetFocusedSquare(square, word, direction);
 }
 
-void
-XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
+// Figure out the focused word.
+puz::Word *
+XGridCtrl::CalcFocusedWord(puz::Square * square,
+                           puz::Word * word,
+                           short direction)
 {
-    if (m_grid->IsDiagramless())
-    {
-        assert(m_ownsFocusedWord || m_focusedWord == NULL);
-        if (m_focusedWord != NULL && m_focusedWord == word)
-            return;
-        if (m_ownsFocusedWord && m_focusedWord != NULL)
-            delete m_focusedWord;
-        if (m_focusedSquare->IsBlack())
-        {
-            m_focusedWord = new puz::Word(
-                m_focusedSquare, m_focusedSquare
-            );
-        }
-        else
-        {
-            puz::GridDirection dir = puz::IsHorizontal(direction)
-                                        ? puz::ACROSS : puz::DOWN;
-            m_focusedWord = new puz::Word(
-                m_focusedSquare->GetWordStart(dir),
-                m_focusedSquare->GetWordEnd(dir)
-            );
-        }
-        m_ownsFocusedWord = true;
-        return;
-    }
-
-    // If these words are going to be the same, return now
-    if (m_focusedWord != NULL
-        && (word == m_focusedWord
-            || (word == NULL
-                && puz::AreInLine(m_focusedDirection, direction)
-                && m_focusedWord->Contains(m_focusedSquare))))
-    {
-        return;
-    }
-    if (m_ownsFocusedWord)
-    {
-        delete m_focusedWord;
-        m_ownsFocusedWord = false;
-    }
-
     // If we were supplied with a word, we're done.
     if (word != NULL)
+        return word;
+    // Diagramless puzzles always have to invent a word.
+    if (m_grid->IsDiagramless())
+        return NULL;
+    // If the current word contains this square and it is in the
+    // supplied direction, use the current word.
+    if (m_focusedWord != NULL
+        && puz::AreInLine(m_focusedDirection, direction)
+        && m_focusedWord->Contains(square))
     {
-        m_focusedWord = word;
-        return;
+        return m_focusedWord;
     }
-
-    // Look for a word in the given direction
-    m_focusedWord = m_puz->FindWord(m_focusedSquare, direction);
-    if (m_focusedWord)
-        return;
-
-    // If we moved diagonally, don't change the direction
+    // Look for a word in the supplied direction
+    word = m_puz->FindWord(square, direction);
+    if (word)
+        return word;
+    // If we moved diagonally, try using the focused direction
     if (puz::IsDiagonal(direction))
     {
-        direction = m_focusedDirection;
-        m_focusedWord = m_puz->FindWord(m_focusedSquare, m_focusedDirection);
-        if (m_focusedWord)
-            return;
+        word = m_puz->FindWord(square, m_focusedDirection);
+        if (word)
+            return word;
     }
-
-    // Look for a word that is neither across nor down (diagonal or arbitrary
-    // words).
+    // Look for a word that contains the focused square that is neither across
+    // nor down (diagonal or arbitrary words).
     puz::Clues & clues = m_puz->GetClues();
     puz::Clues::iterator it;
     for (it = clues.begin(); it != clues.end(); ++it)
@@ -717,25 +693,70 @@ XGridCtrl::DoSetFocusedWord(puz::Word * word, short direction)
         puz::ClueList::iterator clue;
         for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
         {
-            puz::Word * word = &clue->GetWord();
-            if (word->Contains(m_focusedSquare)
+            word = &clue->GetWord();
+            if (word->Contains(square)
                 && word->GetDirection() % 90 != 0)
             {
-                m_focusedWord = word;
-                return;
+                return word;
             }
         }
     }
+    // Couldn't find any words . . . we must invent a word.
+    return NULL;
+}
 
+
+void
+XGridCtrl::DoSetFocusedWord(puz::Square * square,
+                            puz::Word * word,
+                            short direction)
+{
+    if (! m_grid->IsDiagramless())
+    {
+       // Find the new word
+        word = CalcFocusedWord(square, word, direction);
+        // If these words are the same, return now
+        if (m_focusedWord != NULL && word == m_focusedWord)
+            return;
+        // Delete the old word if necessary
+        if (m_ownsFocusedWord)
+        {
+            delete m_focusedWord;
+            m_ownsFocusedWord = false;
+        }
+        // If we got a new word, use that
+        if (word != NULL)
+        {
+            m_focusedWord = word;
+            return;
+        }
+    }
+    else // diagramless
+    {
+        assert(m_ownsFocusedWord || m_focusedWord == NULL);
+        if (m_focusedWord != NULL && m_focusedWord == word)
+            return;
+        if (m_ownsFocusedWord && m_focusedWord != NULL)
+            delete m_focusedWord;
+        if (square->IsBlack())
+        {
+            m_focusedWord = new puz::Word(square, square);
+            m_ownsFocusedWord = true;
+            return;
+        }
+    }
     // As a last resort, make up a word
+    if (puz::IsDiagonal(direction)) // Don't make up diagonal words.
+        direction = m_focusedDirection;
     puz::GridDirection dir = puz::IsHorizontal(direction)
                                 ? puz::ACROSS : puz::DOWN;
     m_focusedWord = new puz::Word(
-        m_focusedSquare->GetWordStart(dir),
-        m_focusedSquare->GetWordEnd(dir)
+        square->GetWordStart(dir),
+        square->GetWordEnd(dir)
     );
     m_ownsFocusedWord = true;
 }
+
 
 void
 XGridCtrl::MakeVisible(const puz::Square & square)
@@ -797,8 +818,6 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
     const bool numberGrid = GetGrid()->IsDiagramless() &&
                             (text == puz2wx(puz::Square::Black) != (square.IsBlack()));
 
-    // This could throw an exception if text is longer than
-    // 8 characeters, so try this first.
     square.SetText(wx2puz(text));
 
     if (square.HasFlag(puz::FLAG_X))
@@ -1052,7 +1071,7 @@ XGridCtrl::PostCheck(std::vector<puz::Square *> & incorrect, int options)
 // functor -- that is, it is passed arguments in the constructor
 // which are subsequently used in the only function call.
 //
-// These class names are an absolte mess.
+// These class names are an absolute mess.
 
 
 // A dummy class that is used to call DoCheckSelection with the
@@ -1415,7 +1434,7 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
         if (! GetGrid()->IsDiagramless())
         {
             // Find the next white square in the arrow direction
-            SetFocusedSquare(
+            MoveFocusedSquare(
                 m_grid->FindNextSquare(
                     m_focusedSquare, FIND_WHITE_SQUARE,
                     arrowDirection, puz::NO_WRAP
@@ -1426,17 +1445,17 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
         else // Diagramless
         {
             // Move to the next square (so that black squares can be selected)
-            SetFocusedSquare(m_focusedSquare->Next(arrowDirection),
-                             NULL, arrowDirection);
+            MoveFocusedSquare(m_focusedSquare->Next(arrowDirection),
+                              NULL, arrowDirection);
         }
     }
     else // Shift
     {
         puz::GridDirection focusedDirection = 
             static_cast<puz::GridDirection>(m_focusedDirection);
+        puz::Square * newSquare = NULL;
         if (AreInLine(m_focusedDirection, arrowDirection))
         {
-            puz::Square * newSquare = NULL;
             // Move to the next white square in the arrow direction that
             // *could* have a word.
             for (newSquare = m_focusedSquare;
@@ -1451,17 +1470,30 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
             }
             // Find the first square in the word
             if (newSquare)
-                SetFocusedSquare(newSquare->GetWordStart(focusedDirection));
-            else
-                SetFocusedSquare();
+                newSquare = newSquare->GetWordStart(focusedDirection);
         }
         else
         {
             // Move to the next white square in the arrow direction
-            SetFocusedSquare(m_grid->FindNextSquare(
-                m_focusedSquare, FIND_WHITE_SQUARE,
-                arrowDirection, puz::NO_WRAP));
+            newSquare = m_grid->FindNextSquare(
+                m_focusedSquare,
+                FIND_WHITE_SQUARE,
+                arrowDirection,
+                puz::NO_WRAP
+            );
         }
+        if (newSquare && HasStyle(BLANK_ON_NEW_WORD))
+        {
+            SetIfExists(newSquare,
+                m_grid->FindSquare(
+                    newSquare->GetWordStart(focusedDirection),
+                    FIND_BLANK_SQUARE,
+                    focusedDirection,
+                    puz::FIND_IN_WORD
+                )
+            );
+        }
+        MoveFocusedSquare(newSquare, focusedDirection);
     }
 }
 
@@ -1544,7 +1576,7 @@ XGridCtrl::OnTab(int mod)
                 ++clue;
                 if (clue != cluelist.end())
                 {
-                    SetFocusedWord(&clue->GetWord());
+                    MoveFocusedWord(&clue->GetWord());
                 }
                 else
                 {
@@ -1553,7 +1585,7 @@ XGridCtrl::OnTab(int mod)
                     if (cluelist_it == clues.end())
                         // We're at the end of the lists: go to the first clue.
                         cluelist_it = clues.begin();
-                    SetFocusedWord(&cluelist_it->second.front().GetWord());
+                    MoveFocusedWord(&cluelist_it->second.front().GetWord());
                 }
             }
             else // Shift (reverse)
@@ -1562,21 +1594,21 @@ XGridCtrl::OnTab(int mod)
                 if (clue != cluelist.begin())
                 {
                     --clue;
-                    SetFocusedWord(&clue->GetWord());
+                    MoveFocusedWord(&clue->GetWord());
                 }
                 else if (cluelist_it == clues.begin())
                 {
                     // We're at the beginning: go to the last clue.
                     cluelist_it = clues.end();
                     --cluelist_it;
-                    SetFocusedWord(&cluelist_it->second.back().GetWord());
+                    MoveFocusedWord(&cluelist_it->second.back().GetWord());
                 }
                 else
                 {
                     // We're at the beginning of this clue list: try the
                     // previous list.
                     --cluelist_it;
-                    SetFocusedWord(&cluelist_it->second.back().GetWord());
+                    MoveFocusedWord(&cluelist_it->second.back().GetWord());
                 }
             }
             return;

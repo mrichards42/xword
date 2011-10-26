@@ -2245,7 +2245,7 @@ void
 MyFrame::OnClueFocus(wxPuzEvent & evt)
 {
     puz::Clue * focusedClue = evt.GetClue();
-    m_XGridCtrl->ChangeFocusedWord(&focusedClue->GetWord());
+    m_XGridCtrl->SetFocusedWord(&focusedClue->GetWord());
     UpdateClues();
     m_XGridCtrl->SetFocus();
 }

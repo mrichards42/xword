@@ -137,8 +137,6 @@ public:
 
     ~XGridCtrl();
 
-    void UpdateConfig(ConfigManager & config);
-
     void SetPaused(bool pause = true) { m_isPaused = pause; Refresh(); }
 
     void SetFocus() { SetFocusIgnoringChildren(); }
@@ -151,38 +149,32 @@ public:
     bool UnscrambleSolution(unsigned short key);
 
     // Set* functions trigger an event.
-    // Change* functions do not trigger an event
+    // Move* functions check BLANK_ON_NEW_WORD
     // Essentially this is SetFocusedSquare([square, ][word, ][direction])
-    puz::Square * SetFocusedSquare(puz::Square * square,
-                                   puz::Word * word,
-                                   short direction);
+    puz::Square * SetFocusedSquare(puz::Square *, puz::Word *, short);
     puz::Square * SetFocusedSquare(puz::Square * square, short direction)
         { return SetFocusedSquare(square, NULL, direction); }
     puz::Square * SetFocusedSquare(puz::Square * square = NULL, puz::Word * word = NULL)
         { return SetFocusedSquare(square, word, m_focusedDirection); }
 
-    puz::Square * ChangeFocusedSquare(puz::Square * square,
-                                      puz::Word * word,
-                                      short direction);
-    puz::Square * ChangeFocusedSquare(puz::Square * square, short direction)
-        { return ChangeFocusedSquare(square, NULL, direction); }
-    puz::Square * ChangeFocusedSquare(puz::Square * square = NULL, puz::Word * word = NULL)
-        { return ChangeFocusedSquare(square, word, m_focusedDirection); }
+    puz::Square * MoveFocusedSquare(puz::Square *, puz::Word *, short);
+    puz::Square * MoveFocusedSquare(puz::Square * square, short direction)
+        { return MoveFocusedSquare(square, NULL, direction); }
+    puz::Square * MoveFocusedSquare(puz::Square * square, puz::Word * word = NULL)
+        { return MoveFocusedSquare(square, word, m_focusedDirection); }
+    puz::Square * MoveFocusedWord(puz::Word * word)
+        { return MoveFocusedSquare(word->front(), word, m_focusedDirection); }
 
     void SendEvent();
 
     short GetDirection() const;
 
-    void SetFocusedWord(puz::Word * word, short direction)
-        { ChangeFocusedWord(word, direction); SendEvent(); }
-    void SetFocusedWord(puz::Word * word) { SetFocusedWord(word, m_focusedDirection); }
-
-    void ChangeFocusedWord(puz::Word * word, short direction);
-    void ChangeFocusedWord(puz::Word * word) { ChangeFocusedWord(word, m_focusedDirection); }
+    void SetFocusedWord(puz::Word * word, short direction);
+    void SetFocusedWord(puz::Word * word)
+        { SetFocusedWord(word, m_focusedDirection); }
 
     void SetFocusedDirection(short direction)
-        { ChangeFocusedDirection(direction); SendEvent(); }
-    void ChangeFocusedDirection(short direction) { ChangeFocusedSquare(NULL, direction); }
+        { SetFocusedSquare(NULL, direction); }
 
     // Drawing functions
     void RefreshSquare(wxDC & dc, const puz::Square & square)  { DrawSquare(dc, square); }
@@ -370,9 +362,11 @@ protected:
     short m_focusedDirection;
     void RecalcDirection();
     // Make sure that we have a focused word, even if we have to invent one.
-    void DoSetFocusedWord(puz:: Word * word, short direction);
-    void DoSetFocusedWord(puz:: Word * word) { DoSetFocusedWord(word, m_focusedDirection); }
+    void DoSetFocusedWord(puz::Square *, puz:: Word *, short);
+    void DoSetFocusedWord(puz::Square * square, puz:: Word * word)
+        { DoSetFocusedWord(square, word, m_focusedDirection); }
     bool m_ownsFocusedWord;
+    puz::Word * CalcFocusedWord(puz::Square *, puz::Word *, short);
     // A selection block (NULL if there is no selection)
     puz::Square * m_selectionStart;
     puz::Square * m_selectionEnd;
