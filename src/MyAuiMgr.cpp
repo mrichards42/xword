@@ -1704,9 +1704,22 @@ MyAuiManager::ResizeDocks(const wxSize & oldSize, const wxSize & newSize)
     for (size_t i = 0; i < m_docks.Count(); ++i)
     {
         wxAuiDockInfo & dock = m_docks.Item(i);
-        if (dock.IsVertical())
-            dock.size *= x;
-        else
-            dock.size *= y;
+        // Only resize docks that are made up of ClueLists
+        bool is_clue_dock = true;
+        for (size_t pane = 0; pane < dock.panes.Count(); ++pane)
+        {
+            if (! dock.panes.Item(pane)->name.StartsWith(_T("ClueList")))
+            {
+                is_clue_dock = false;
+                break;
+            }
+        }
+        if (is_clue_dock)
+        {
+            if (dock.IsVertical())
+                dock.size *= x;
+            else
+                dock.size *= y;
+        }
     }
 }
