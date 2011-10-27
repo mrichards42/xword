@@ -1438,7 +1438,7 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
         if (! GetGrid()->IsDiagramless())
         {
             // Find the next white square in the arrow direction
-            MoveFocusedSquare(
+            SetFocusedSquare(
                 m_grid->FindNextSquare(
                     m_focusedSquare, FIND_WHITE_SQUARE,
                     arrowDirection, puz::NO_WRAP
@@ -1449,7 +1449,7 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
         else // Diagramless
         {
             // Move to the next square (so that black squares can be selected)
-            MoveFocusedSquare(m_focusedSquare->Next(arrowDirection),
+            SetFocusedSquare(m_focusedSquare->Next(arrowDirection),
                               NULL, arrowDirection);
         }
     }
