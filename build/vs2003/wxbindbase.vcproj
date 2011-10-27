@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="wxbindbase"
-	ProjectGUID="{C8DC6C46-A83D-D24A-84B3-4347D8F6BD48}"
+	ProjectGUID="{8B6719B4-5A12-8A44-AA01-8753BB86EAEA}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

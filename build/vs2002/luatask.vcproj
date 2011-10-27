@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="luatask"
-	ProjectGUID="{644EE89A-02C4-9847-93EE-D2EC390CE416}"
+	ProjectGUID="{ECAEF343-E767-5A49-B954-99BF8C383E59}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="expat"
-	ProjectGUID="{B9CA22B8-502A-7D41-B85C-5E1BBF377351}"
+	ProjectGUID="{15162DED-6EC4-B34C-B0C2-EF689220E59B}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="wxbindhtml"
-	ProjectGUID="{1A35B12B-6837-C940-B83B-858A241ACBCB}"
+	ProjectGUID="{D1625BBF-0027-2F4B-9030-5E90D3AF414A}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
