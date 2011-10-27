@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="puz"
-	ProjectGUID="{384E6FC2-F614-7F47-97DA-0F53086A5299}"
+	ProjectGUID="{EA6370DD-1208-3D45-B2AD-EA0270DF63FE}"
 	RootNamespace="puz"
 	Keyword="Win32Proj"
 	>

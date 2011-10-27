@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="luapuz"
-	ProjectGUID="{E1E2A358-6BA0-2845-BEC6-BA0082DC6E32}"
+	ProjectGUID="{5FE801D3-E292-994E-9D74-0E68D0B9787A}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
