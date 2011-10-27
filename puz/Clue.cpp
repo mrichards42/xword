@@ -125,7 +125,9 @@ const Clue * ClueList::Find(const puz::Square * square) const
     {
         // Find the distance from the front
         int d = it->word.FindSquare(square);
-        if (d == 0) // First word
+        if (d == -1)
+            continue;
+        if (d == 0) // First square
             return &*it;
         else if (distance == -1 || d < distance) // Closest word
         {
