@@ -364,22 +364,21 @@ Puzzle::FindWord(const puz::Square * square, short direction) const
         {
             const Word * word = &clue->GetWord();
             int d = word->FindSquare(square);
-            if (d != -1)
+            if (d == -1)
+                continue;
+            short wordDirection = word->GetDirection();
+            if (wordDirection == direction)
             {
-                short wordDirection = word->GetDirection();
-                if (wordDirection == direction)
+                if (d == 0)
+                    return word;
+                else if (distance == -1 || d <  distance)
                 {
-                    if (d == 0)
-                        return word;
-                    else if (distance == -1 || d <  distance)
-                    {
-                        bestWord = word;
-                        distance = d;
-                    }
+                    bestWord = word;
+                    distance = d;
                 }
-                else if (wordDirection == inverseDirection)
-                    inverseWord = word;
             }
+            else if (wordDirection == inverseDirection)
+                inverseWord = word;
         }
     }
     if (bestWord)
