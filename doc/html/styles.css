@@ -11,7 +11,7 @@ table {
     border-collapse:collapse;
 }
 
-tr > * {
+td, th {
     border: 1px solid black;
     padding: .3em;
 }
@@ -24,6 +24,10 @@ td {
     font-size: .8em;
     background: #eee;
 }
+
+th:first-child { width:auto; }
+
+th { width: 3em; }
 
 
 /* styles for the fancy image map (window.html) */
