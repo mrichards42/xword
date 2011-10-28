@@ -208,8 +208,8 @@ public:
 
     int FindSquare(const Square * square) const
     {
-        const_square_iterator it = const_square_iterator(get_begin());
-        const_square_iterator end_ = const_square_iterator(get_end());
+        square_iterator it = square_iterator(get_begin());
+        square_iterator end_ = square_iterator(get_end());
         int i = 0;
         for (; it != end_; ++it)
         {
