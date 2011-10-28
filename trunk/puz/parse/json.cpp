@@ -167,7 +167,13 @@ Value * ParseJSON(std::istream & stream)
             const int bytes_read = stream.gcount();
             yajl_status status = yajl_parse(p, buff, bytes_read);
             if (status != yajl_status_ok)
-                throw FileTypeError("json");
+            {
+                if (! data.GetRoot()) // We didn't parse anything
+                    throw FileTypeError("json");
+                else // This is json, but not well formed
+                    throw LoadError(
+                        (char *)yajl_get_error(p, 0, buff, BUFF_SIZE));
+            }
             if (bytes_read == 0)
             {
                 yajl_complete_parse(p);
