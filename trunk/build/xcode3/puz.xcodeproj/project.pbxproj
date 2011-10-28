@@ -1,0 +1,532 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		76E35D7237C1001319747771 /* Checksummer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54685C6B2BB0001319747771 /* Checksummer.cpp */; };
+		218F7C2E6280001319747771 /* Clue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD4412F2BB5001319747771 /* Clue.cpp */; };
+		76D31C193006001319747771 /* Grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 477031061BE5001319747771 /* Grid.cpp */; };
+		7CE10416024A001319747771 /* Puzzle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 770460663E5A001319747771 /* Puzzle.cpp */; };
+		2BD80B402C92001319747771 /* Scrambler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 504A119F20C5001319747771 /* Scrambler.cpp */; };
+		2F616FA54C92001319747771 /* Square.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C315D932C5C001319747771 /* Square.cpp */; };
+		64E60E80792E001319747771 /* Word.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 358115887B7E001319747771 /* Word.cpp */; };
+		16A03CE460D0001319747771 /* load_ipuz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 346218DC6122001319747771 /* load_ipuz.cpp */; };
+		5B1B6F577688001319747771 /* load_jpz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5E92693A30F5001319747771 /* load_jpz.cpp */; };
+		28FF307948A0001319747771 /* save_jpz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61767A9B4F0F001319747771 /* save_jpz.cpp */; };
+		33BE7F441A53001319747771 /* load_puz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A8155084A94001319747771 /* load_puz.cpp */; };
+		276B02580B37001319747771 /* save_puz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5C4D19042E24001319747771 /* save_puz.cpp */; };
+		236167B53010001319747771 /* load_txt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 50700FCC032C001319747771 /* load_txt.cpp */; };
+		19BC33190045001319747771 /* load_xpf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D5A69CA5DC1001319747771 /* load_xpf.cpp */; };
+		6B7F16C712B8001319747771 /* save_xpf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 096426CF4428001319747771 /* save_xpf.cpp */; };
+		11E502E17FD9001319747771 /* base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5C8E5FBD3F2A001319747771 /* base64.cpp */; };
+		1F1B613C7EFE001319747771 /* json.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B8B12B26EFA001319747771 /* json.cpp */; };
+		25A866E0577B001319747771 /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15E32EFA2344001319747771 /* pugixml.cpp */; };
+		329130E67D5A001319747771 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C57701A0CDF001319747771 /* xml.cpp */; };
+		37FB3BB71F2E001319747771 /* puzstring.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 187C60774C15001319747771 /* puzstring.cpp */; };
+		59DC34715881001319747771 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 548F053E6CE0001319747771 /* ioapi.c */; };
+		472C7E9F40CF001319747771 /* iowin32.c in Sources */ = {isa = PBXBuildFile; fileRef = 679C1C1B4DA3001319747771 /* iowin32.c */; };
+		187E79970191001319747771 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 2ACD2D4D0773001319747771 /* unzip.c */; };
+		4B844B1D2FE3001319747771 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 112500E405C2001319747771 /* zip.c */; };
+		78551F312204001319747771 /* minizip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23E307C33B0F001319747771 /* minizip.cpp */; };
+		42027FB05FE8001319747771 /* libyajl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CB55C801868001319747771 /* libyajl.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0FB60D9624E1001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A4F31D23203001319747771 /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 25864AC7576A001319747771;
+			remoteInfo = "libyajl.dylib";
+		};
+		036C34F8497E001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A4F31D23203001319747771 /* yajl.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 7B7E33B95656001319747771;
+			remoteInfo = "libyajl.dylib";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		54685C6B2BB0001319747771 /* Checksummer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Checksummer.cpp"; path = "Checksummer.cpp"; sourceTree = "<group>"; };
+		0B9001DB3C05001319747771 /* Checksummer.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Checksummer.hpp"; path = "Checksummer.hpp"; sourceTree = "<group>"; };
+		1FD4412F2BB5001319747771 /* Clue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Clue.cpp"; path = "Clue.cpp"; sourceTree = "<group>"; };
+		0CEB75B442AF001319747771 /* Clue.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Clue.hpp"; path = "Clue.hpp"; sourceTree = "<group>"; };
+		477031061BE5001319747771 /* Grid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Grid.cpp"; path = "Grid.cpp"; sourceTree = "<group>"; };
+		37342E386338001319747771 /* Grid.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Grid.hpp"; path = "Grid.hpp"; sourceTree = "<group>"; };
+		770460663E5A001319747771 /* Puzzle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Puzzle.cpp"; path = "Puzzle.cpp"; sourceTree = "<group>"; };
+		77A105711973001319747771 /* Puzzle.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Puzzle.hpp"; path = "Puzzle.hpp"; sourceTree = "<group>"; };
+		504A119F20C5001319747771 /* Scrambler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Scrambler.cpp"; path = "Scrambler.cpp"; sourceTree = "<group>"; };
+		05A9102A088B001319747771 /* Scrambler.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Scrambler.hpp"; path = "Scrambler.hpp"; sourceTree = "<group>"; };
+		0C315D932C5C001319747771 /* Square.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Square.cpp"; path = "Square.cpp"; sourceTree = "<group>"; };
+		2F9360662AD5001319747771 /* Square.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Square.hpp"; path = "Square.hpp"; sourceTree = "<group>"; };
+		358115887B7E001319747771 /* Word.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Word.cpp"; path = "Word.cpp"; sourceTree = "<group>"; };
+		77E0200259A5001319747771 /* Word.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Word.hpp"; path = "Word.hpp"; sourceTree = "<group>"; };
+		7A96426D6E59001319747771 /* char_tables.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "char_tables.hpp"; path = "char_tables.hpp"; sourceTree = "<group>"; };
+		15EE3C0F563F001319747771 /* exceptions.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "exceptions.hpp"; path = "exceptions.hpp"; sourceTree = "<group>"; };
+		055C188D0F60001319747771 /* ipuz.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ipuz.hpp"; path = "ipuz.hpp"; sourceTree = "<group>"; };
+		346218DC6122001319747771 /* load_ipuz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "load_ipuz.cpp"; path = "load_ipuz.cpp"; sourceTree = "<group>"; };
+		25AB67272FBC001319747771 /* jpz.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "jpz.hpp"; path = "jpz.hpp"; sourceTree = "<group>"; };
+		5E92693A30F5001319747771 /* load_jpz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "load_jpz.cpp"; path = "load_jpz.cpp"; sourceTree = "<group>"; };
+		61767A9B4F0F001319747771 /* save_jpz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "save_jpz.cpp"; path = "save_jpz.cpp"; sourceTree = "<group>"; };
+		0A8155084A94001319747771 /* load_puz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "load_puz.cpp"; path = "load_puz.cpp"; sourceTree = "<group>"; };
+		5833199F2BA9001319747771 /* puz.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "puz.hpp"; path = "puz.hpp"; sourceTree = "<group>"; };
+		5C4D19042E24001319747771 /* save_puz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "save_puz.cpp"; path = "save_puz.cpp"; sourceTree = "<group>"; };
+		50700FCC032C001319747771 /* load_txt.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "load_txt.cpp"; path = "load_txt.cpp"; sourceTree = "<group>"; };
+		4A6D46BC3E8A001319747771 /* txt.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "txt.hpp"; path = "txt.hpp"; sourceTree = "<group>"; };
+		5D5A69CA5DC1001319747771 /* load_xpf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "load_xpf.cpp"; path = "load_xpf.cpp"; sourceTree = "<group>"; };
+		096426CF4428001319747771 /* save_xpf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "save_xpf.cpp"; path = "save_xpf.cpp"; sourceTree = "<group>"; };
+		407941AF110F001319747771 /* xpf.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "xpf.hpp"; path = "xpf.hpp"; sourceTree = "<group>"; };
+		129844F3372F001319747771 /* iterator.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "iterator.hpp"; path = "iterator.hpp"; sourceTree = "<group>"; };
+		5C8E5FBD3F2A001319747771 /* base64.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "base64.cpp"; path = "base64.cpp"; sourceTree = "<group>"; };
+		36DD6EF93A59001319747771 /* base64.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "base64.hpp"; path = "base64.hpp"; sourceTree = "<group>"; };
+		1B8B12B26EFA001319747771 /* json.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "json.cpp"; path = "json.cpp"; sourceTree = "<group>"; };
+		2635684B0F48001319747771 /* json.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "json.hpp"; path = "json.hpp"; sourceTree = "<group>"; };
+		34036C0A5375001319747771 /* pugiconfig.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "pugiconfig.hpp"; path = "pugiconfig.hpp"; sourceTree = "<group>"; };
+		15E32EFA2344001319747771 /* pugixml.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "pugixml.cpp"; path = "pugixml.cpp"; sourceTree = "<group>"; };
+		00950D792362001319747771 /* pugixml.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "pugixml.hpp"; path = "pugixml.hpp"; sourceTree = "<group>"; };
+		6C57701A0CDF001319747771 /* xml.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "xml.cpp"; path = "xml.cpp"; sourceTree = "<group>"; };
+		409440515B4C001319747771 /* xml.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "xml.hpp"; path = "xml.hpp"; sourceTree = "<group>"; };
+		187C60774C15001319747771 /* puzstring.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "puzstring.cpp"; path = "puzstring.cpp"; sourceTree = "<group>"; };
+		19F826790509001319747771 /* puzstring.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "puzstring.hpp"; path = "puzstring.hpp"; sourceTree = "<group>"; };
+		53B35CC6541E001319747771 /* crypt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "crypt.h"; path = "crypt.h"; sourceTree = "<group>"; };
+		548F053E6CE0001319747771 /* ioapi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "ioapi.c"; path = "ioapi.c"; sourceTree = "<group>"; };
+		4799446D1BC9001319747771 /* ioapi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ioapi.h"; path = "ioapi.h"; sourceTree = "<group>"; };
+		679C1C1B4DA3001319747771 /* iowin32.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "iowin32.c"; path = "iowin32.c"; sourceTree = "<group>"; };
+		02981E617905001319747771 /* iowin32.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "iowin32.h"; path = "iowin32.h"; sourceTree = "<group>"; };
+		2ACD2D4D0773001319747771 /* unzip.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "unzip.c"; path = "unzip.c"; sourceTree = "<group>"; };
+		700438F26B06001319747771 /* unzip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "unzip.h"; path = "unzip.h"; sourceTree = "<group>"; };
+		112500E405C2001319747771 /* zip.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "zip.c"; path = "zip.c"; sourceTree = "<group>"; };
+		1451367C0A89001319747771 /* zip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "zip.h"; path = "zip.h"; sourceTree = "<group>"; };
+		23E307C33B0F001319747771 /* minizip.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "minizip.cpp"; path = "minizip.cpp"; sourceTree = "<group>"; };
+		3909446E6415001319747771 /* minizip.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "minizip.hpp"; path = "minizip.hpp"; sourceTree = "<group>"; };
+		660C0A137A26001319747771 /* streamwrapper.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "streamwrapper.hpp"; path = "streamwrapper.hpp"; sourceTree = "<group>"; };
+		370E48570F80001319747771 /* libpuz.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = "libpuz.dylib"; path = "libpuz.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A4F31D23203001319747771 /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "yajl.xcodeproj"; path = "yajl.xcodeproj"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		217052251E0A001319747771 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				42027FB05FE8001319747771 /* libyajl.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		23D26D742A5F001319747771 /* puz */ = {
+			isa = PBXGroup;
+			children = (
+				569A57A47742001319747771 /* puz */,
+				47A72F624B2A001319747771 /* Products */,
+				73DA66E562DF001319747771 /* Projects */,
+			);
+			name = puz;
+			sourceTree = "<group>";
+		};
+		569A57A47742001319747771 /* puz */ = {
+			isa = PBXGroup;
+			children = (
+				54685C6B2BB0001319747771 /* Checksummer.cpp */,
+				0B9001DB3C05001319747771 /* Checksummer.hpp */,
+				1FD4412F2BB5001319747771 /* Clue.cpp */,
+				0CEB75B442AF001319747771 /* Clue.hpp */,
+				477031061BE5001319747771 /* Grid.cpp */,
+				37342E386338001319747771 /* Grid.hpp */,
+				770460663E5A001319747771 /* Puzzle.cpp */,
+				77A105711973001319747771 /* Puzzle.hpp */,
+				504A119F20C5001319747771 /* Scrambler.cpp */,
+				05A9102A088B001319747771 /* Scrambler.hpp */,
+				0C315D932C5C001319747771 /* Square.cpp */,
+				2F9360662AD5001319747771 /* Square.hpp */,
+				358115887B7E001319747771 /* Word.cpp */,
+				77E0200259A5001319747771 /* Word.hpp */,
+				7A96426D6E59001319747771 /* char_tables.hpp */,
+				15EE3C0F563F001319747771 /* exceptions.hpp */,
+				78663C7A3A91001319747771 /* formats */,
+				129844F3372F001319747771 /* iterator.hpp */,
+				79FF04B54C18001319747771 /* parse */,
+				187C60774C15001319747771 /* puzstring.cpp */,
+				19F826790509001319747771 /* puzstring.hpp */,
+				2D0F3A0A5364001319747771 /* utils */,
+			);
+			name = puz;
+			path = ../../puz;
+			sourceTree = "<group>";
+		};
+		78663C7A3A91001319747771 /* formats */ = {
+			isa = PBXGroup;
+			children = (
+				438438741DF9001319747771 /* ipuz */,
+				301953842E1E001319747771 /* jpz */,
+				69192ECF027A001319747771 /* puz */,
+				19D44FC23056001319747771 /* txt */,
+				641F12D41509001319747771 /* xpf */,
+			);
+			name = formats;
+			path = formats;
+			sourceTree = "<group>";
+		};
+		438438741DF9001319747771 /* ipuz */ = {
+			isa = PBXGroup;
+			children = (
+				055C188D0F60001319747771 /* ipuz.hpp */,
+				346218DC6122001319747771 /* load_ipuz.cpp */,
+			);
+			name = ipuz;
+			path = ipuz;
+			sourceTree = "<group>";
+		};
+		301953842E1E001319747771 /* jpz */ = {
+			isa = PBXGroup;
+			children = (
+				25AB67272FBC001319747771 /* jpz.hpp */,
+				5E92693A30F5001319747771 /* load_jpz.cpp */,
+				61767A9B4F0F001319747771 /* save_jpz.cpp */,
+			);
+			name = jpz;
+			path = jpz;
+			sourceTree = "<group>";
+		};
+		69192ECF027A001319747771 /* puz */ = {
+			isa = PBXGroup;
+			children = (
+				0A8155084A94001319747771 /* load_puz.cpp */,
+				5833199F2BA9001319747771 /* puz.hpp */,
+				5C4D19042E24001319747771 /* save_puz.cpp */,
+			);
+			name = puz;
+			path = puz;
+			sourceTree = "<group>";
+		};
+		19D44FC23056001319747771 /* txt */ = {
+			isa = PBXGroup;
+			children = (
+				50700FCC032C001319747771 /* load_txt.cpp */,
+				4A6D46BC3E8A001319747771 /* txt.hpp */,
+			);
+			name = txt;
+			path = txt;
+			sourceTree = "<group>";
+		};
+		641F12D41509001319747771 /* xpf */ = {
+			isa = PBXGroup;
+			children = (
+				5D5A69CA5DC1001319747771 /* load_xpf.cpp */,
+				096426CF4428001319747771 /* save_xpf.cpp */,
+				407941AF110F001319747771 /* xpf.hpp */,
+			);
+			name = xpf;
+			path = xpf;
+			sourceTree = "<group>";
+		};
+		79FF04B54C18001319747771 /* parse */ = {
+			isa = PBXGroup;
+			children = (
+				5C8E5FBD3F2A001319747771 /* base64.cpp */,
+				36DD6EF93A59001319747771 /* base64.hpp */,
+				1B8B12B26EFA001319747771 /* json.cpp */,
+				2635684B0F48001319747771 /* json.hpp */,
+				553F0A846D6A001319747771 /* pugixml */,
+				6C57701A0CDF001319747771 /* xml.cpp */,
+				409440515B4C001319747771 /* xml.hpp */,
+			);
+			name = parse;
+			path = parse;
+			sourceTree = "<group>";
+		};
+		553F0A846D6A001319747771 /* pugixml */ = {
+			isa = PBXGroup;
+			children = (
+				34036C0A5375001319747771 /* pugiconfig.hpp */,
+				15E32EFA2344001319747771 /* pugixml.cpp */,
+				00950D792362001319747771 /* pugixml.hpp */,
+			);
+			name = pugixml;
+			path = pugixml;
+			sourceTree = "<group>";
+		};
+		2D0F3A0A5364001319747771 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				182C624119E7001319747771 /* minizip */,
+				23E307C33B0F001319747771 /* minizip.cpp */,
+				3909446E6415001319747771 /* minizip.hpp */,
+				660C0A137A26001319747771 /* streamwrapper.hpp */,
+			);
+			name = utils;
+			path = utils;
+			sourceTree = "<group>";
+		};
+		182C624119E7001319747771 /* minizip */ = {
+			isa = PBXGroup;
+			children = (
+				53B35CC6541E001319747771 /* crypt.h */,
+				548F053E6CE0001319747771 /* ioapi.c */,
+				4799446D1BC9001319747771 /* ioapi.h */,
+				679C1C1B4DA3001319747771 /* iowin32.c */,
+				02981E617905001319747771 /* iowin32.h */,
+				2ACD2D4D0773001319747771 /* unzip.c */,
+				700438F26B06001319747771 /* unzip.h */,
+				112500E405C2001319747771 /* zip.c */,
+				1451367C0A89001319747771 /* zip.h */,
+			);
+			name = minizip;
+			path = minizip;
+			sourceTree = "<group>";
+		};
+		47A72F624B2A001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				370E48570F80001319747771 /* libpuz.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		73DA66E562DF001319747771 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				5A4F31D23203001319747771 /* yajl.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		73C008C12972001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1CB55C801868001319747771 /* libyajl.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6B2B1E2366FF001319747771 /* puz */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 596D2C8409BB001319747771 /* Build configuration list for PBXNativeTarget "puz" */;
+			buildPhases = (
+				6E530CC849DF001319747771 /* Resources */,
+				11A523E43C60001319747771 /* Sources */,
+				217052251E0A001319747771 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1E5D7E9F3EA8001319747771 /* PBXTargetDependency */,
+			);
+			name = puz;
+			productName = puz;
+			productReference = 370E48570F80001319747771 /* libpuz.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "puz" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 23D26D742A5F001319747771 /* puz */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 73C008C12972001319747771 /* Products */;
+					ProjectRef = 5A4F31D23203001319747771 /* yajl.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				6B2B1E2366FF001319747771 /* libpuz.dylib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		1CB55C801868001319747771 /* libyajl.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = "../../bin/Release/libyajl.dylib";
+			remoteRef = 0FB60D9624E1001319747771 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6E530CC849DF001319747771 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		11A523E43C60001319747771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				76E35D7237C1001319747771 /* Checksummer.cpp in Sources */,
+				218F7C2E6280001319747771 /* Clue.cpp in Sources */,
+				76D31C193006001319747771 /* Grid.cpp in Sources */,
+				7CE10416024A001319747771 /* Puzzle.cpp in Sources */,
+				2BD80B402C92001319747771 /* Scrambler.cpp in Sources */,
+				2F616FA54C92001319747771 /* Square.cpp in Sources */,
+				64E60E80792E001319747771 /* Word.cpp in Sources */,
+				16A03CE460D0001319747771 /* load_ipuz.cpp in Sources */,
+				5B1B6F577688001319747771 /* load_jpz.cpp in Sources */,
+				28FF307948A0001319747771 /* save_jpz.cpp in Sources */,
+				33BE7F441A53001319747771 /* load_puz.cpp in Sources */,
+				276B02580B37001319747771 /* save_puz.cpp in Sources */,
+				236167B53010001319747771 /* load_txt.cpp in Sources */,
+				19BC33190045001319747771 /* load_xpf.cpp in Sources */,
+				6B7F16C712B8001319747771 /* save_xpf.cpp in Sources */,
+				11E502E17FD9001319747771 /* base64.cpp in Sources */,
+				1F1B613C7EFE001319747771 /* json.cpp in Sources */,
+				25A866E0577B001319747771 /* pugixml.cpp in Sources */,
+				329130E67D5A001319747771 /* xml.cpp in Sources */,
+				37FB3BB71F2E001319747771 /* puzstring.cpp in Sources */,
+				59DC34715881001319747771 /* ioapi.c in Sources */,
+				472C7E9F40CF001319747771 /* iowin32.c in Sources */,
+				187E79970191001319747771 /* unzip.c in Sources */,
+				4B844B1D2FE3001319747771 /* zip.c in Sources */,
+				78551F312204001319747771 /* minizip.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin PBXTargetDependency section */
+		1E5D7E9F3EA8001319747771 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "libyajl.dylib";
+			targetProxy = 036C34F8497E001319747771 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3AC41E17008E001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				CONFIGURATION_BUILD_DIR = ../../bin/Release;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "puz";
+			};
+			name = "Release";
+		};
+		3C2C3F3229A3001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_PREFIX = lib;
+				CONFIGURATION_BUILD_DIR = ../../bin/Debug;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "puz";
+			};
+			name = "Debug";
+		};
+		424656740FD3001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NDEBUG",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../puz",
+					"../../yajl/build/yajl-2.0.2/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Release",
+					"../../lib/Release",
+				);
+				OBJROOT = "obj/Release/puz";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../bin/Release";
+			};
+			name = "Release";
+		};
+		2CB7457219CF001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG",
+					"_DEBUG",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../puz",
+					"../../yajl/build/yajl-2.0.2/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Debug",
+					"../../lib/Debug",
+				);
+				OBJROOT = "obj/Debug/puz";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../bin/Debug";
+			};
+			name = "Debug";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		596D2C8409BB001319747771 /* Build configuration list for PBXNativeTarget "libpuz.dylib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3AC41E17008E001319747771 /* Release */,
+				3C2C3F3229A3001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "puz" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				424656740FD3001319747771 /* Release */,
+				2CB7457219CF001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

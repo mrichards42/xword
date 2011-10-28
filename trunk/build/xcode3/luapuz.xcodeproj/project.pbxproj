@@ -1,0 +1,398 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7F9E51F34C4B001319747771 /* luapuz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B4A2B724737001319747771 /* luapuz.cpp */; };
+		60894D04104D001319747771 /* luapuz_puz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48FF098F5017001319747771 /* luapuz_puz.cpp */; };
+		772B7E5316AC001319747771 /* luapuz_puz_Grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C76194655D2001319747771 /* luapuz_puz_Grid.cpp */; };
+		77613AAD0AE0001319747771 /* luapuz_puz_Puzzle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DBF428F6EF8001319747771 /* luapuz_puz_Puzzle.cpp */; };
+		59EC4DE4546C001319747771 /* luapuz_puz_Square.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5C904A4E53E3001319747771 /* luapuz_puz_Square.cpp */; };
+		273D31876536001319747771 /* luapuz_std.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1ED70DC5084B001319747771 /* luapuz_std.cpp */; };
+		07872628179B001319747771 /* luapuz_tracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B0D47B72073001319747771 /* luapuz_tracking.cpp */; };
+		72BE2F763171001319747771 /* liblua5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 635A04B06A0F001319747771 /* liblua5.1.dylib */; };
+		47195A712991001319747771 /* libpuz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 217B0BBC0A0B001319747771 /* libpuz.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		25802A7E19D3001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 67AD61A01635001319747771 /* lua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2288200346CC001319747771;
+			remoteInfo = "liblua5.1.dylib";
+		};
+		0E1972E1266B001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 67AD61A01635001319747771 /* lua.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 647746505D69001319747771;
+			remoteInfo = "liblua5.1.dylib";
+		};
+		5DBB17903616001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0DC771E03A78001319747771 /* puz.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 370E48570F80001319747771;
+			remoteInfo = "libpuz.dylib";
+		};
+		20A450057071001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0DC771E03A78001319747771 /* puz.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 6B2B1E2366FF001319747771;
+			remoteInfo = "libpuz.dylib";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		2B4A2B724737001319747771 /* luapuz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "luapuz.cpp"; path = "luapuz.cpp"; sourceTree = "<group>"; };
+		1D6C6CFB6B29001319747771 /* luapuz.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz.hpp"; path = "luapuz.hpp"; sourceTree = "<group>"; };
+		48FF098F5017001319747771 /* luapuz_puz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "luapuz_puz.cpp"; path = "luapuz_puz.cpp"; sourceTree = "<group>"; };
+		45BB1B451E19001319747771 /* luapuz_puz.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz_puz.hpp"; path = "luapuz_puz.hpp"; sourceTree = "<group>"; };
+		1C76194655D2001319747771 /* luapuz_puz_Grid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "luapuz_puz_Grid.cpp"; path = "luapuz_puz_Grid.cpp"; sourceTree = "<group>"; };
+		35E00A7A753B001319747771 /* luapuz_puz_Grid.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz_puz_Grid.hpp"; path = "luapuz_puz_Grid.hpp"; sourceTree = "<group>"; };
+		3DBF428F6EF8001319747771 /* luapuz_puz_Puzzle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "luapuz_puz_Puzzle.cpp"; path = "luapuz_puz_Puzzle.cpp"; sourceTree = "<group>"; };
+		7CF12BF047CA001319747771 /* luapuz_puz_Puzzle.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz_puz_Puzzle.hpp"; path = "luapuz_puz_Puzzle.hpp"; sourceTree = "<group>"; };
+		10695DF14B5A001319747771 /* luapuz_puz_Puzzle_helpers.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz_puz_Puzzle_helpers.hpp"; path = "luapuz_puz_Puzzle_helpers.hpp"; sourceTree = "<group>"; };
+		5C904A4E53E3001319747771 /* luapuz_puz_Square.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "luapuz_puz_Square.cpp"; path = "luapuz_puz_Square.cpp"; sourceTree = "<group>"; };
+		7B7670A7439B001319747771 /* luapuz_puz_Square.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz_puz_Square.hpp"; path = "luapuz_puz_Square.hpp"; sourceTree = "<group>"; };
+		1ED70DC5084B001319747771 /* luapuz_std.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "luapuz_std.cpp"; path = "luapuz_std.cpp"; sourceTree = "<group>"; };
+		7AB47009584E001319747771 /* luapuz_std.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz_std.hpp"; path = "luapuz_std.hpp"; sourceTree = "<group>"; };
+		49A22E697039001319747771 /* luapuz_functions.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz_functions.hpp"; path = "luapuz_functions.hpp"; sourceTree = "<group>"; };
+		4B0D47B72073001319747771 /* luapuz_tracking.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "luapuz_tracking.cpp"; path = "luapuz_tracking.cpp"; sourceTree = "<group>"; };
+		406B5EEF4737001319747771 /* luapuz_tracking.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "luapuz_tracking.hpp"; path = "luapuz_tracking.hpp"; sourceTree = "<group>"; };
+		5BE507EE3E46001319747771 /* libluapuz.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = "libluapuz.dylib"; path = "libluapuz.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		67AD61A01635001319747771 /* lua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "lua.xcodeproj"; path = "lua.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		0DC771E03A78001319747771 /* puz.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "puz.xcodeproj"; path = "puz.xcodeproj"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		088C2E776C24001319747771 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72BE2F763171001319747771 /* liblua5.1.dylib in Frameworks */,
+				47195A712991001319747771 /* libpuz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		633F4DF832AE001319747771 /* luapuz */ = {
+			isa = PBXGroup;
+			children = (
+				2D5D3C8A6449001319747771 /* lua */,
+				56D252D711B7001319747771 /* Products */,
+				61FF19624DB7001319747771 /* Projects */,
+			);
+			name = luapuz;
+			sourceTree = "<group>";
+		};
+		2D5D3C8A6449001319747771 /* lua */ = {
+			isa = PBXGroup;
+			children = (
+				3464587B2FAE001319747771 /* luapuz */,
+			);
+			name = lua;
+			path = ../../lua;
+			sourceTree = "<group>";
+		};
+		3464587B2FAE001319747771 /* luapuz */ = {
+			isa = PBXGroup;
+			children = (
+				1DA17F550503001319747771 /* bind */,
+				49A22E697039001319747771 /* luapuz_functions.hpp */,
+				4B0D47B72073001319747771 /* luapuz_tracking.cpp */,
+				406B5EEF4737001319747771 /* luapuz_tracking.hpp */,
+			);
+			name = luapuz;
+			path = luapuz;
+			sourceTree = "<group>";
+		};
+		1DA17F550503001319747771 /* bind */ = {
+			isa = PBXGroup;
+			children = (
+				2B4A2B724737001319747771 /* luapuz.cpp */,
+				1D6C6CFB6B29001319747771 /* luapuz.hpp */,
+				48FF098F5017001319747771 /* luapuz_puz.cpp */,
+				45BB1B451E19001319747771 /* luapuz_puz.hpp */,
+				1C76194655D2001319747771 /* luapuz_puz_Grid.cpp */,
+				35E00A7A753B001319747771 /* luapuz_puz_Grid.hpp */,
+				3DBF428F6EF8001319747771 /* luapuz_puz_Puzzle.cpp */,
+				7CF12BF047CA001319747771 /* luapuz_puz_Puzzle.hpp */,
+				10695DF14B5A001319747771 /* luapuz_puz_Puzzle_helpers.hpp */,
+				5C904A4E53E3001319747771 /* luapuz_puz_Square.cpp */,
+				7B7670A7439B001319747771 /* luapuz_puz_Square.hpp */,
+				1ED70DC5084B001319747771 /* luapuz_std.cpp */,
+				7AB47009584E001319747771 /* luapuz_std.hpp */,
+			);
+			name = bind;
+			path = bind;
+			sourceTree = "<group>";
+		};
+		56D252D711B7001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5BE507EE3E46001319747771 /* libluapuz.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		61FF19624DB7001319747771 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				67AD61A01635001319747771 /* lua.xcodeproj */,
+				0DC771E03A78001319747771 /* puz.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		160228EB18A6001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				635A04B06A0F001319747771 /* liblua5.1.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2EA81A6F5776001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				217B0BBC0A0B001319747771 /* libpuz.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2E9A1B767389001319747771 /* luapuz */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 26A81E322097001319747771 /* Build configuration list for PBXNativeTarget "luapuz" */;
+			buildPhases = (
+				7E0A18B74CD1001319747771 /* Resources */,
+				0C943FC47AB6001319747771 /* Sources */,
+				088C2E776C24001319747771 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3218786614EF001319747771 /* PBXTargetDependency */,
+				507345CF5A02001319747771 /* PBXTargetDependency */,
+			);
+			name = luapuz;
+			productName = luapuz;
+			productReference = 5BE507EE3E46001319747771 /* libluapuz.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "luapuz" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 633F4DF832AE001319747771 /* luapuz */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 160228EB18A6001319747771 /* Products */;
+					ProjectRef = 67AD61A01635001319747771 /* lua.xcodeproj */;
+				},
+				{
+					ProductGroup = 2EA81A6F5776001319747771 /* Products */;
+					ProjectRef = 0DC771E03A78001319747771 /* puz.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				2E9A1B767389001319747771 /* libluapuz.dylib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		635A04B06A0F001319747771 /* liblua5.1.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = "../../bin/Release/liblua5.1.dylib";
+			remoteRef = 25802A7E19D3001319747771 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		217B0BBC0A0B001319747771 /* libpuz.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = "../../bin/Release/libpuz.dylib";
+			remoteRef = 5DBB17903616001319747771 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7E0A18B74CD1001319747771 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0C943FC47AB6001319747771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F9E51F34C4B001319747771 /* luapuz.cpp in Sources */,
+				60894D04104D001319747771 /* luapuz_puz.cpp in Sources */,
+				772B7E5316AC001319747771 /* luapuz_puz_Grid.cpp in Sources */,
+				77613AAD0AE0001319747771 /* luapuz_puz_Puzzle.cpp in Sources */,
+				59EC4DE4546C001319747771 /* luapuz_puz_Square.cpp in Sources */,
+				273D31876536001319747771 /* luapuz_std.cpp in Sources */,
+				07872628179B001319747771 /* luapuz_tracking.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin PBXTargetDependency section */
+		3218786614EF001319747771 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "liblua5.1.dylib";
+			targetProxy = 0E1972E1266B001319747771 /* PBXContainerItemProxy */;
+		};
+		507345CF5A02001319747771 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "libpuz.dylib";
+			targetProxy = 20A450057071001319747771 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5373658A2230001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				CONFIGURATION_BUILD_DIR = ../../bin/Release;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "luapuz";
+			};
+			name = "Release";
+		};
+		091D40122864001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_PREFIX = lib;
+				CONFIGURATION_BUILD_DIR = ../../bin/Debug;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "luapuz";
+			};
+			name = "Debug";
+		};
+		6FEB266863D3001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NDEBUG",
+					"LUA_LIB",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/lua",
+					"../../lua/lua/include",
+					"../..",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Release",
+					"../../lib/Release",
+				);
+				OBJROOT = "obj/Release/luapuz";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../bin/Release";
+			};
+			name = "Release";
+		};
+		02C848BF09E6001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG",
+					"_DEBUG",
+					"LUA_LIB",
+					"LUA_USE_APICHECK",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/lua",
+					"../../lua/lua/include",
+					"../..",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Debug",
+					"../../lib/Debug",
+				);
+				OBJROOT = "obj/Debug/luapuz";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../bin/Debug";
+			};
+			name = "Debug";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		26A81E322097001319747771 /* Build configuration list for PBXNativeTarget "libluapuz.dylib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5373658A2230001319747771 /* Release */,
+				091D40122864001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "luapuz" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6FEB266863D3001319747771 /* Release */,
+				02C848BF09E6001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

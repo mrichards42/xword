@@ -1,0 +1,350 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		47D4330B1581001319747771 /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71B16CD83D1D001319747771 /* dummy.cpp */; };
+		0BD319473E84001319747771 /* wxlbind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F3B566E1CA2001319747771 /* wxlbind.cpp */; };
+		7A466BC320EF001319747771 /* wxlcallb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09F44A5E6460001319747771 /* wxlcallb.cpp */; };
+		6B6174384098001319747771 /* wxlstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AF27D021076001319747771 /* wxlstate.cpp */; };
+		472E41743467001319747771 /* wxlua_bind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BBD2AB65900001319747771 /* wxlua_bind.cpp */; };
+		4A4770803709001319747771 /* liblua5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 69516A393A45001319747771 /* liblua5.1.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		62FA11AA1C7F001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 14A23ACE0321001319747771 /* lua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2288200346CC001319747771;
+			remoteInfo = "liblua5.1.dylib";
+		};
+		187D6B7F0839001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 14A23ACE0321001319747771 /* lua.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 647746505D69001319747771;
+			remoteInfo = "liblua5.1.dylib";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		17376D110F67001319747771 /* wxlbind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxlbind.h"; path = "wxlbind.h"; sourceTree = "<group>"; };
+		28295C480BAC001319747771 /* wxlcallb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxlcallb.h"; path = "wxlcallb.h"; sourceTree = "<group>"; };
+		056D7ED32353001319747771 /* wxldefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxldefs.h"; path = "wxldefs.h"; sourceTree = "<group>"; };
+		75A929580FA8001319747771 /* wxlstate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxlstate.h"; path = "wxlstate.h"; sourceTree = "<group>"; };
+		14566C5F4B36001319747771 /* wxlua.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxlua.h"; path = "wxlua.h"; sourceTree = "<group>"; };
+		6E4928F62530001319747771 /* wxlua_bind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxlua_bind.h"; path = "wxlua_bind.h"; sourceTree = "<group>"; };
+		71B16CD83D1D001319747771 /* dummy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "dummy.cpp"; path = "dummy.cpp"; sourceTree = "<group>"; };
+		6F3B566E1CA2001319747771 /* wxlbind.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxlbind.cpp"; path = "wxlbind.cpp"; sourceTree = "<group>"; };
+		09F44A5E6460001319747771 /* wxlcallb.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxlcallb.cpp"; path = "wxlcallb.cpp"; sourceTree = "<group>"; };
+		3AF27D021076001319747771 /* wxlstate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxlstate.cpp"; path = "wxlstate.cpp"; sourceTree = "<group>"; };
+		4BBD2AB65900001319747771 /* wxlua_bind.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxlua_bind.cpp"; path = "wxlua_bind.cpp"; sourceTree = "<group>"; };
+		5AA372133A5A001319747771 /* libwxlua.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libwxlua.a"; path = "libwxlua.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		14A23ACE0321001319747771 /* lua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "lua.xcodeproj"; path = "lua.xcodeproj"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		37B5415759E0001319747771 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4A4770803709001319747771 /* liblua5.1.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7CAD350914A9001319747771 /* wxlua */ = {
+			isa = PBXGroup;
+			children = (
+				2E2401520ED6001319747771 /* lua */,
+				65AF652457CA001319747771 /* Products */,
+				6BF76D84674A001319747771 /* Projects */,
+			);
+			name = wxlua;
+			sourceTree = "<group>";
+		};
+		2E2401520ED6001319747771 /* lua */ = {
+			isa = PBXGroup;
+			children = (
+				5F51183D6E14001319747771 /* wxlua */,
+			);
+			name = lua;
+			path = ../../lua;
+			sourceTree = "<group>";
+		};
+		5F51183D6E14001319747771 /* wxlua */ = {
+			isa = PBXGroup;
+			children = (
+				2BAC32BB2677001319747771 /* include */,
+				23F024D46471001319747771 /* src */,
+			);
+			name = wxlua;
+			path = wxlua;
+			sourceTree = "<group>";
+		};
+		2BAC32BB2677001319747771 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				17376D110F67001319747771 /* wxlbind.h */,
+				28295C480BAC001319747771 /* wxlcallb.h */,
+				056D7ED32353001319747771 /* wxldefs.h */,
+				75A929580FA8001319747771 /* wxlstate.h */,
+				14566C5F4B36001319747771 /* wxlua.h */,
+				6E4928F62530001319747771 /* wxlua_bind.h */,
+			);
+			name = include;
+			path = include;
+			sourceTree = "<group>";
+		};
+		23F024D46471001319747771 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				71B16CD83D1D001319747771 /* dummy.cpp */,
+				6F3B566E1CA2001319747771 /* wxlbind.cpp */,
+				09F44A5E6460001319747771 /* wxlcallb.cpp */,
+				3AF27D021076001319747771 /* wxlstate.cpp */,
+				4BBD2AB65900001319747771 /* wxlua_bind.cpp */,
+			);
+			name = src;
+			path = src;
+			sourceTree = "<group>";
+		};
+		65AF652457CA001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5AA372133A5A001319747771 /* libwxlua.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6BF76D84674A001319747771 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				14A23ACE0321001319747771 /* lua.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		19E562596817001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				69516A393A45001319747771 /* liblua5.1.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		41F325487A99001319747771 /* wxlua */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 43FE16E11EA8001319747771 /* Build configuration list for PBXNativeTarget "wxlua" */;
+			buildPhases = (
+				7CEE5C767D44001319747771 /* Resources */,
+				115A13882BDD001319747771 /* Sources */,
+				37B5415759E0001319747771 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				70BC3B4D4EBE001319747771 /* PBXTargetDependency */,
+			);
+			name = wxlua;
+			productName = wxlua;
+			productReference = 5AA372133A5A001319747771 /* libwxlua.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "wxlua" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 7CAD350914A9001319747771 /* wxlua */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 19E562596817001319747771 /* Products */;
+					ProjectRef = 14A23ACE0321001319747771 /* lua.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				41F325487A99001319747771 /* libwxlua.a */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		69516A393A45001319747771 /* liblua5.1.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = "../../bin/Release/liblua5.1.dylib";
+			remoteRef = 62FA11AA1C7F001319747771 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7CEE5C767D44001319747771 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		115A13882BDD001319747771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				47D4330B1581001319747771 /* dummy.cpp in Sources */,
+				0BD319473E84001319747771 /* wxlbind.cpp in Sources */,
+				7A466BC320EF001319747771 /* wxlcallb.cpp in Sources */,
+				6B6174384098001319747771 /* wxlstate.cpp in Sources */,
+				472E41743467001319747771 /* wxlua_bind.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin PBXTargetDependency section */
+		70BC3B4D4EBE001319747771 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "liblua5.1.dylib";
+			targetProxy = 187D6B7F0839001319747771 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		175C42100ED6001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				CONFIGURATION_BUILD_DIR = ../../lib/Release;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "wxlua";
+			};
+			name = "Release";
+		};
+		666E483372C5001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../../lib/Debug;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "wxlua";
+			};
+			name = "Debug";
+		};
+		324F19316499001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NDEBUG",
+					"UNICODE",
+					"_UNICODE",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/wxbind/setup",
+					"../../lua/lua/include",
+					"../../lua",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Release",
+					"../../lib/Release",
+				);
+				OBJROOT = "obj/Release/wxlua";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../lib/Release";
+			};
+			name = "Release";
+		};
+		326068C70C5F001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG",
+					"_DEBUG",
+					"UNICODE",
+					"_UNICODE",
+					"__WXDEBUG__",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/wxbind/setup",
+					"../../lua/lua/include",
+					"../../lua",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Debug",
+					"../../lib/Debug",
+				);
+				OBJROOT = "obj/Debug/wxlua";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../lib/Debug";
+			};
+			name = "Debug";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		43FE16E11EA8001319747771 /* Build configuration list for PBXNativeTarget "libwxlua.a" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				175C42100ED6001319747771 /* Release */,
+				666E483372C5001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "wxlua" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				324F19316499001319747771 /* Release */,
+				326068C70C5F001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
