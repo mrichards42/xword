@@ -184,16 +184,16 @@ public:
     template <typename T>
     inline T Get(const wxString & path, const T & default_val)
     {
-        AdaptedType<T>::type ret;
+        typename AdaptedType<T>::type ret;
         if (m_config->Read(path, &ret))
-            return Convert<AdaptedType<T>::type, T>(ret);
+            return Convert<typename AdaptedType<T>::type, T>(ret);
         return default_val;
     }
 
     template <typename T>
     inline void Set(const wxString & path, const T & val)
     {
-        m_config->Write(path, Convert<T, AdaptedType<T>::type>(val));
+        m_config->Write(path, Convert<T, typename AdaptedType<T>::type>(val));
     }
 
     inline void Update() { m_group.Update(); }
@@ -232,8 +232,8 @@ class ConfigValue
     public:
         Callback(OBJ * obj, FUNC func) : m_obj(obj), m_func(func) {}
         inline virtual void Call(T val) { (m_obj->*m_func)(val); }
-        typename OBJ * m_obj;
-        typename FUNC m_func;
+		OBJ * m_obj;
+        FUNC m_func;
     };
 
 public:
@@ -250,13 +250,13 @@ public:
     {
         // Callback windows should remove themselves.
         wxASSERT(m_callbacks.empty());
-        map_t::iterator it;
+        typename map_t::iterator it;
         for (it = m_callbacks.begin(); it != m_callbacks.end(); ++it)
             delete it->second;
     }
 
     // Get and set functions
-    inline T Get() { return GetConfig()->Get<T>(m_name, m_default); }
+    inline T Get() { return GetConfig()->Get(m_name, m_default); }
 
     inline void Set(const T & val)
     {
@@ -283,9 +283,9 @@ public:
     void RemoveCallbacks(wxWindow * win)
     {
         // Delete the callbacks and erase the map entries for this window.
-        std::pair<map_t::iterator, map_t::iterator> range =
+        std::pair<typename map_t::iterator, typename map_t::iterator> range =
             m_callbacks.equal_range(win);
-        for (map_t::iterator it = range.first; it != range.second; ++it)
+        for (typename map_t::iterator it = range.first; it != range.second; ++it)
             delete it->second;
         m_callbacks.erase(range.first, range.second);
     }
@@ -294,14 +294,14 @@ public:
     inline void Update() { Update(Get()); }
     inline void Update(T val)
     {
-        map_t::iterator it;
+        typename map_t::iterator it;
         for (it = m_callbacks.begin(); it != m_callbacks.end(); ++it)
             it->second->Call(val);
     }
 
 protected:
     ConfigManagerBase * GetConfig() { return m_cfg; }
-    typename T m_default;
+    T m_default;
     typedef std::multimap<wxWindow *, CallbackBase*> map_t;
     typedef std::pair<wxWindow *, CallbackBase*> pair_t;
     map_t m_callbacks;

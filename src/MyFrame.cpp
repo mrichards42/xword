@@ -1688,7 +1688,8 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
     m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite(), puz::ACROSS);
     m_XGridCtrl->Refresh();
     SetTime(0);
-    GetEventHandler()->ProcessEvent(wxPuzEvent(wxEVT_PUZ_LETTER, GetId()));
+	wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
+    GetEventHandler()->ProcessEvent(evt);
 }
 
 
@@ -2014,7 +2015,7 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
 void
 MyFrame::OnAutoSaveNotify(wxTimerEvent & WXUNUSED(evt))
 {
-    wxLogDebug(_T("AutoSave: %s"), m_filename);
+    wxLogDebug(_T("AutoSave: %s"), m_filename.c_str());
     if (puz::Puzzle::CanSave(puz::encode_utf8(wx2puz(m_filename)))
         && wxFileName::IsFileWritable(m_filename))
     {

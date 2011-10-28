@@ -22,7 +22,7 @@
 #include "widgets/SizedText.hpp"
 #include "messages.hpp"
 
-static enum StatusIds
+enum StatusIds
 {
     STATUS_FIRST = 0,
     STATUS_GENERAL = STATUS_FIRST,

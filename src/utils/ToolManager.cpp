@@ -145,7 +145,7 @@ ToolManager::ConnectEvents()
          it != m_toolList.end();
          ++it)
     {
-        if (! it->m_function == NULL)
+        if (it->m_function != NULL)
             Connect(&*it);
     }
 }
