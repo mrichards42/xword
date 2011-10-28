@@ -1,0 +1,352 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5FAA56D356CD001319747771 /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B18346B6786001319747771 /* dummy.cpp */; };
+		54796EFF58E2001319747771 /* wxbase_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59EC6D162CF4001319747771 /* wxbase_base.cpp */; };
+		20E3221D05D2001319747771 /* wxbase_bind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68C6229E01FC001319747771 /* wxbase_bind.cpp */; };
+		756272D67163001319747771 /* wxbase_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60F647714C3A001319747771 /* wxbase_config.cpp */; };
+		203B79036419001319747771 /* wxbase_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2BEE48E67EA1001319747771 /* wxbase_data.cpp */; };
+		54E874E76506001319747771 /* wxbase_datetime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 77F95C9D2ED7001319747771 /* wxbase_datetime.cpp */; };
+		34BA22DA764E001319747771 /* wxbase_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 504A17C930D7001319747771 /* wxbase_file.cpp */; };
+		7A5147F81321001319747771 /* libwxlua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7934149D4D38001319747771 /* libwxlua.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5827658D2BDF001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 44107D536469001319747771 /* wxlua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5AA372133A5A001319747771;
+			remoteInfo = "libwxlua.a";
+		};
+		59892A1B5966001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 44107D536469001319747771 /* wxlua.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 41F325487A99001319747771;
+			remoteInfo = "libwxlua.a";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		59365DC30D80001319747771 /* wxbase_bind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxbase_bind.h"; path = "wxbase_bind.h"; sourceTree = "<group>"; };
+		608D31484F5F001319747771 /* wxbinddefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxbinddefs.h"; path = "wxbinddefs.h"; sourceTree = "<group>"; };
+		1B18346B6786001319747771 /* dummy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "dummy.cpp"; path = "dummy.cpp"; sourceTree = "<group>"; };
+		59EC6D162CF4001319747771 /* wxbase_base.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxbase_base.cpp"; path = "wxbase_base.cpp"; sourceTree = "<group>"; };
+		68C6229E01FC001319747771 /* wxbase_bind.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxbase_bind.cpp"; path = "wxbase_bind.cpp"; sourceTree = "<group>"; };
+		60F647714C3A001319747771 /* wxbase_config.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxbase_config.cpp"; path = "wxbase_config.cpp"; sourceTree = "<group>"; };
+		2BEE48E67EA1001319747771 /* wxbase_data.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxbase_data.cpp"; path = "wxbase_data.cpp"; sourceTree = "<group>"; };
+		77F95C9D2ED7001319747771 /* wxbase_datetime.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxbase_datetime.cpp"; path = "wxbase_datetime.cpp"; sourceTree = "<group>"; };
+		504A17C930D7001319747771 /* wxbase_file.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxbase_file.cpp"; path = "wxbase_file.cpp"; sourceTree = "<group>"; };
+		4C2942D4131D001319747771 /* libwxbindbase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libwxbindbase.a"; path = "libwxbindbase.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		44107D536469001319747771 /* wxlua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "wxlua.xcodeproj"; path = "wxlua.xcodeproj"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3BCF6309700C001319747771 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A5147F81321001319747771 /* libwxlua.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5FFF15144EC3001319747771 /* wxbindbase */ = {
+			isa = PBXGroup;
+			children = (
+				085D134B4840001319747771 /* lua */,
+				40E476FE250D001319747771 /* Products */,
+				33FA5D563A88001319747771 /* Projects */,
+			);
+			name = wxbindbase;
+			sourceTree = "<group>";
+		};
+		085D134B4840001319747771 /* lua */ = {
+			isa = PBXGroup;
+			children = (
+				715002C73B22001319747771 /* wxbind */,
+			);
+			name = lua;
+			path = ../../lua;
+			sourceTree = "<group>";
+		};
+		715002C73B22001319747771 /* wxbind */ = {
+			isa = PBXGroup;
+			children = (
+				53BD6D173EF9001319747771 /* include */,
+				3A73069D219C001319747771 /* src */,
+			);
+			name = wxbind;
+			path = wxbind;
+			sourceTree = "<group>";
+		};
+		53BD6D173EF9001319747771 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				59365DC30D80001319747771 /* wxbase_bind.h */,
+				608D31484F5F001319747771 /* wxbinddefs.h */,
+			);
+			name = include;
+			path = include;
+			sourceTree = "<group>";
+		};
+		3A73069D219C001319747771 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				1B18346B6786001319747771 /* dummy.cpp */,
+				59EC6D162CF4001319747771 /* wxbase_base.cpp */,
+				68C6229E01FC001319747771 /* wxbase_bind.cpp */,
+				60F647714C3A001319747771 /* wxbase_config.cpp */,
+				2BEE48E67EA1001319747771 /* wxbase_data.cpp */,
+				77F95C9D2ED7001319747771 /* wxbase_datetime.cpp */,
+				504A17C930D7001319747771 /* wxbase_file.cpp */,
+			);
+			name = src;
+			path = src;
+			sourceTree = "<group>";
+		};
+		40E476FE250D001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4C2942D4131D001319747771 /* libwxbindbase.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		33FA5D563A88001319747771 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				44107D536469001319747771 /* wxlua.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		74B4794C6959001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7934149D4D38001319747771 /* libwxlua.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		259343AE0A98001319747771 /* wxbindbase */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3C756A7A431A001319747771 /* Build configuration list for PBXNativeTarget "wxbindbase" */;
+			buildPhases = (
+				2F1F6F952E14001319747771 /* Resources */,
+				0AA025CF16F8001319747771 /* Sources */,
+				3BCF6309700C001319747771 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1F726CB7151B001319747771 /* PBXTargetDependency */,
+			);
+			name = wxbindbase;
+			productName = wxbindbase;
+			productReference = 4C2942D4131D001319747771 /* libwxbindbase.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "wxbindbase" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 5FFF15144EC3001319747771 /* wxbindbase */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 74B4794C6959001319747771 /* Products */;
+					ProjectRef = 44107D536469001319747771 /* wxlua.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				259343AE0A98001319747771 /* libwxbindbase.a */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		7934149D4D38001319747771 /* libwxlua.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "../../lib/Release/libwxlua.a";
+			remoteRef = 5827658D2BDF001319747771 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2F1F6F952E14001319747771 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0AA025CF16F8001319747771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5FAA56D356CD001319747771 /* dummy.cpp in Sources */,
+				54796EFF58E2001319747771 /* wxbase_base.cpp in Sources */,
+				20E3221D05D2001319747771 /* wxbase_bind.cpp in Sources */,
+				756272D67163001319747771 /* wxbase_config.cpp in Sources */,
+				203B79036419001319747771 /* wxbase_data.cpp in Sources */,
+				54E874E76506001319747771 /* wxbase_datetime.cpp in Sources */,
+				34BA22DA764E001319747771 /* wxbase_file.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin PBXTargetDependency section */
+		1F726CB7151B001319747771 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "libwxlua.a";
+			targetProxy = 59892A1B5966001319747771 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		18DE3D605DAF001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				CONFIGURATION_BUILD_DIR = ../../lib/Release;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "wxbindbase";
+			};
+			name = "Release";
+		};
+		1F1A31B871DB001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../../lib/Debug;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "wxbindbase";
+			};
+			name = "Debug";
+		};
+		42B133896C57001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NDEBUG",
+					"_LIB",
+					"UNICODE",
+					"_UNICODE",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/wxbind/setup",
+					"../../lua/lua/include",
+					"../../lua",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Release",
+					"../../lib/Release",
+				);
+				OBJROOT = "obj/Release/wxbindbase";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../lib/Release";
+			};
+			name = "Release";
+		};
+		1F6C0AFA70F9001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG",
+					"_DEBUG",
+					"_LIB",
+					"UNICODE",
+					"_UNICODE",
+					"__WXDEBUG__",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/wxbind/setup",
+					"../../lua/lua/include",
+					"../../lua",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Debug",
+					"../../lib/Debug",
+				);
+				OBJROOT = "obj/Debug/wxbindbase";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../lib/Debug";
+			};
+			name = "Debug";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3C756A7A431A001319747771 /* Build configuration list for PBXNativeTarget "libwxbindbase.a" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				18DE3D605DAF001319747771 /* Release */,
+				1F1A31B871DB001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "wxbindbase" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				42B133896C57001319747771 /* Release */,
+				1F6C0AFA70F9001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

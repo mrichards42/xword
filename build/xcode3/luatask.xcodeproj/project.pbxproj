@@ -1,0 +1,319 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1E7939D7395D001319747771 /* ltask.c in Sources */ = {isa = PBXBuildFile; fileRef = 60D762D66081001319747771 /* ltask.c */; };
+		653D2EB27038001319747771 /* queue.c in Sources */ = {isa = PBXBuildFile; fileRef = 119D615611F1001319747771 /* queue.c */; };
+		01BF4CAD29A1001319747771 /* syncos.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A28383D13FB001319747771 /* syncos.c */; };
+		226F19B40FDB001319747771 /* liblua5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 258F7B9A407F001319747771 /* liblua5.1.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6EAF4F436570001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 046E685972A4001319747771 /* lua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2288200346CC001319747771;
+			remoteInfo = "liblua5.1.dylib";
+		};
+		4CDD63A41755001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 046E685972A4001319747771 /* lua.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 647746505D69001319747771;
+			remoteInfo = "liblua5.1.dylib";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		60D762D66081001319747771 /* ltask.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "ltask.c"; path = "ltask.c"; sourceTree = "<group>"; };
+		119D615611F1001319747771 /* queue.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "queue.c"; path = "queue.c"; sourceTree = "<group>"; };
+		5A28383D13FB001319747771 /* syncos.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "syncos.c"; path = "syncos.c"; sourceTree = "<group>"; };
+		2D1C0EF93F94001319747771 /* libtask.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = "libtask.dylib"; path = "libtask.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		046E685972A4001319747771 /* lua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "lua.xcodeproj"; path = "lua.xcodeproj"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D3D03005092001319747771 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				226F19B40FDB001319747771 /* liblua5.1.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		488E05F7348E001319747771 /* luatask */ = {
+			isa = PBXGroup;
+			children = (
+				054A0AC12BC8001319747771 /* lua */,
+				2A402FE25EAD001319747771 /* Products */,
+				50A8074D668E001319747771 /* Projects */,
+			);
+			name = luatask;
+			sourceTree = "<group>";
+		};
+		054A0AC12BC8001319747771 /* lua */ = {
+			isa = PBXGroup;
+			children = (
+				2B1B61E04B88001319747771 /* luatask */,
+			);
+			name = lua;
+			path = ../../lua;
+			sourceTree = "<group>";
+		};
+		2B1B61E04B88001319747771 /* luatask */ = {
+			isa = PBXGroup;
+			children = (
+				20197B7E74F2001319747771 /* src */,
+			);
+			name = luatask;
+			path = luatask;
+			sourceTree = "<group>";
+		};
+		20197B7E74F2001319747771 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				60D762D66081001319747771 /* ltask.c */,
+				119D615611F1001319747771 /* queue.c */,
+				5A28383D13FB001319747771 /* syncos.c */,
+			);
+			name = src;
+			path = src;
+			sourceTree = "<group>";
+		};
+		2A402FE25EAD001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2D1C0EF93F94001319747771 /* libtask.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		50A8074D668E001319747771 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				046E685972A4001319747771 /* lua.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		45FB62A96FD1001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				258F7B9A407F001319747771 /* liblua5.1.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		53DC6AA91981001319747771 /* luatask */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3FF344B8512E001319747771 /* Build configuration list for PBXNativeTarget "luatask" */;
+			buildPhases = (
+				0DA75C1928DC001319747771 /* Resources */,
+				0F3A575E29AD001319747771 /* Sources */,
+				1D3D03005092001319747771 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				36A2024E587C001319747771 /* PBXTargetDependency */,
+			);
+			name = luatask;
+			productName = luatask;
+			productReference = 2D1C0EF93F94001319747771 /* libtask.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "luatask" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 488E05F7348E001319747771 /* luatask */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 45FB62A96FD1001319747771 /* Products */;
+					ProjectRef = 046E685972A4001319747771 /* lua.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				53DC6AA91981001319747771 /* libtask.dylib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		258F7B9A407F001319747771 /* liblua5.1.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = "../../bin/Release/liblua5.1.dylib";
+			remoteRef = 6EAF4F436570001319747771 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0DA75C1928DC001319747771 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0F3A575E29AD001319747771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E7939D7395D001319747771 /* ltask.c in Sources */,
+				653D2EB27038001319747771 /* queue.c in Sources */,
+				01BF4CAD29A1001319747771 /* syncos.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin PBXTargetDependency section */
+		36A2024E587C001319747771 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "liblua5.1.dylib";
+			targetProxy = 4CDD63A41755001319747771 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		352504E34E3A001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				CONFIGURATION_BUILD_DIR = ../../bin/Release/scripts/libs;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "task";
+			};
+			name = "Release";
+		};
+		30BB06B16C80001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_PREFIX = lib;
+				CONFIGURATION_BUILD_DIR = ../../bin/Debug/scripts/libs;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "task";
+			};
+			name = "Debug";
+		};
+		476D1F604354001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NDEBUG",
+					"LUA_LIB",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/lua",
+					"../../lua/lua/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Release",
+					"../../lib/Release",
+				);
+				OBJROOT = "obj/Release/luatask";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../bin/Release/scripts/libs";
+			};
+			name = "Release";
+		};
+		7D7457236960001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG",
+					"_DEBUG",
+					"LUA_LIB",
+					"LUA_USE_APICHECK",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/lua",
+					"../../lua/lua/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Debug",
+					"../../lib/Debug",
+				);
+				OBJROOT = "obj/Debug/luatask";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../bin/Debug/scripts/libs";
+			};
+			name = "Debug";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3FF344B8512E001319747771 /* Build configuration list for PBXNativeTarget "libtask.dylib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				352504E34E3A001319747771 /* Release */,
+				30BB06B16C80001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "luatask" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				476D1F604354001319747771 /* Release */,
+				7D7457236960001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

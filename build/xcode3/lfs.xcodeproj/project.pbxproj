@@ -1,0 +1,313 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		14FC46990EE2001319747771 /* lfs.c in Sources */ = {isa = PBXBuildFile; fileRef = 224059FA77E8001319747771 /* lfs.c */; };
+		1D4E7DEB7B3B001319747771 /* liblua5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E7F2356462C001319747771 /* liblua5.1.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6A0418204CF3001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F27391B181A001319747771 /* lua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2288200346CC001319747771;
+			remoteInfo = "liblua5.1.dylib";
+		};
+		37FA45922F31001319747771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F27391B181A001319747771 /* lua.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 647746505D69001319747771;
+			remoteInfo = "liblua5.1.dylib";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		224059FA77E8001319747771 /* lfs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "lfs.c"; path = "lfs.c"; sourceTree = "<group>"; };
+		77932E0E5964001319747771 /* lfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "lfs.h"; path = "lfs.h"; sourceTree = "<group>"; };
+		28AF07B765D6001319747771 /* liblfs.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = "liblfs.dylib"; path = "liblfs.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F27391B181A001319747771 /* lua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "lua.xcodeproj"; path = "lua.xcodeproj"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6E930218287C001319747771 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D4E7DEB7B3B001319747771 /* liblua5.1.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		24B17FCA6A54001319747771 /* lfs */ = {
+			isa = PBXGroup;
+			children = (
+				5069218206DC001319747771 /* lua */,
+				49BB459E3F6E001319747771 /* Products */,
+				4D0128F3660B001319747771 /* Projects */,
+			);
+			name = lfs;
+			sourceTree = "<group>";
+		};
+		5069218206DC001319747771 /* lua */ = {
+			isa = PBXGroup;
+			children = (
+				64CE19276900001319747771 /* lfs */,
+			);
+			name = lua;
+			path = ../../lua;
+			sourceTree = "<group>";
+		};
+		64CE19276900001319747771 /* lfs */ = {
+			isa = PBXGroup;
+			children = (
+				6C7D1BDC6767001319747771 /* src */,
+			);
+			name = lfs;
+			path = lfs;
+			sourceTree = "<group>";
+		};
+		6C7D1BDC6767001319747771 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				224059FA77E8001319747771 /* lfs.c */,
+				77932E0E5964001319747771 /* lfs.h */,
+			);
+			name = src;
+			path = src;
+			sourceTree = "<group>";
+		};
+		49BB459E3F6E001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				28AF07B765D6001319747771 /* liblfs.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4D0128F3660B001319747771 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				5F27391B181A001319747771 /* lua.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		490B530C0EE2001319747771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3E7F2356462C001319747771 /* liblua5.1.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		370729366812001319747771 /* lfs */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72431AF6276B001319747771 /* Build configuration list for PBXNativeTarget "lfs" */;
+			buildPhases = (
+				1E8F130559B3001319747771 /* Resources */,
+				446F071838F1001319747771 /* Sources */,
+				6E930218287C001319747771 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7FC857985D9A001319747771 /* PBXTargetDependency */,
+			);
+			name = lfs;
+			productName = lfs;
+			productReference = 28AF07B765D6001319747771 /* liblfs.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "lfs" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 24B17FCA6A54001319747771 /* lfs */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 490B530C0EE2001319747771 /* Products */;
+					ProjectRef = 5F27391B181A001319747771 /* lua.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				370729366812001319747771 /* liblfs.dylib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		3E7F2356462C001319747771 /* liblua5.1.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = "../../bin/Release/liblua5.1.dylib";
+			remoteRef = 6A0418204CF3001319747771 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1E8F130559B3001319747771 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		446F071838F1001319747771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14FC46990EE2001319747771 /* lfs.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin PBXTargetDependency section */
+		7FC857985D9A001319747771 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "liblua5.1.dylib";
+			targetProxy = 37FA45922F31001319747771 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		6AC0553865BA001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				CONFIGURATION_BUILD_DIR = ../../bin/Release/scripts/libs;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "lfs";
+			};
+			name = "Release";
+		};
+		4418259A5331001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_PREFIX = lib;
+				CONFIGURATION_BUILD_DIR = ../../bin/Debug/scripts/libs;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "lfs";
+			};
+			name = "Debug";
+		};
+		13A53DFD6B57001319747771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NDEBUG",
+					"LUA_LIB",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/lua",
+					"../../lua/lua/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Release",
+					"../../lib/Release",
+				);
+				OBJROOT = "obj/Release/lfs";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../bin/Release/scripts/libs";
+			};
+			name = "Release";
+		};
+		53C776E31C25001319747771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG",
+					"_DEBUG",
+					"LUA_LIB",
+					"LUA_USE_APICHECK",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../lua/lua",
+					"../../lua/lua/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../bin/Debug",
+					"../../lib/Debug",
+				);
+				OBJROOT = "obj/Debug/lfs";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SYMROOT = "../../bin/Debug/scripts/libs";
+			};
+			name = "Debug";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		72431AF6276B001319747771 /* Build configuration list for PBXNativeTarget "liblfs.dylib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6AC0553865BA001319747771 /* Release */,
+				4418259A5331001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "lfs" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13A53DFD6B57001319747771 /* Release */,
+				53C776E31C25001319747771 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
