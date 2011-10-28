@@ -308,7 +308,7 @@ Grid::CheckWord(std::vector<Square *> * incorrect,
 {
     if (! word)
         throw NoWord();
-    const_square_iterator it;
+    square_iterator it;
     for (it = word->begin(); it != word->end(); ++it)
     {
         if (! it->Check(checkBlank, strictRebus))

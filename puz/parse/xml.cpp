@@ -57,7 +57,7 @@ void Parser::LoadFromStream(Puzzle * puz, std::istream & stream)
 
 
 // Utility functions
-void TextToStream(node & n, std::ostringstream & stream)
+void TextToStream(node n, std::ostringstream & stream)
 {
     for (node child = n.first_child(); child; child = child.next_sibling())
     {
@@ -69,14 +69,14 @@ void TextToStream(node & n, std::ostringstream & stream)
     }
 }
 
-string_t Parser::GetText(node & n)
+string_t Parser::GetText(node n)
 {
     std::ostringstream stream;
     TextToStream(n, stream);
     return decode_utf8(stream.str());
 }
 
-string_t Parser::GetInnerXML(node & n)
+string_t Parser::GetInnerXML(node n)
 {
     std::ostringstream stream;
     for (node child = n.first_child(); child; child = child.next_sibling())
@@ -84,7 +84,7 @@ string_t Parser::GetInnerXML(node & n)
     return decode_utf8(stream.str());
 }
 
-void SetInnerXML(node & node, const string_t & innerxml)
+void SetInnerXML(node n, const string_t & innerxml)
 {
     // Parse the XML, and add it as a child.
     // We need to add a dummy xml wrapper element so that plain text still
@@ -94,9 +94,9 @@ void SetInnerXML(node & node, const string_t & innerxml)
     temp.append(encode_utf8(innerxml)).append("</dummy>");
     pugi::xml_parse_result result = doc.load(temp.c_str());
     if (! result)
-        SetText(node, innerxml);
+        SetText(n, innerxml);
     else
-        node.append_copy(doc.first_child().first_child());
+        n.append_copy(doc.first_child().first_child());
 }
 
 } // namespace xml

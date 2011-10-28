@@ -121,8 +121,8 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     // Grid
     xml::node xmlgrid = crossword.append_child("grid");
     // Size
-    xmlgrid.append_attribute("width") = grid.GetWidth();
-    xmlgrid.append_attribute("height") = grid.GetHeight();
+    xmlgrid.append_attribute("width") = int(grid.GetWidth());
+    xmlgrid.append_attribute("height") = int(grid.GetHeight());
     // Meta
     xml::node gridlook = xmlgrid.append_child("grid-look");
     gridlook.append_attribute("numbering-scheme") = "normal";

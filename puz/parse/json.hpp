@@ -70,8 +70,9 @@ public:
     explicit BaseError(const std::string & msg)
         : message(msg)
     {}
+	virtual ~BaseError() throw() {}
     std::string message;
-    virtual const char * what() const { return message.c_str(); }
+    virtual const char * what() const throw() { return message.c_str(); }
 };
 
 class TypeError : public BaseError
@@ -274,7 +275,7 @@ protected:
         return it;
     }
 
-    typename container_t m_container;
+	container_t m_container;
 };
 
 
@@ -439,19 +440,19 @@ Object_Template<KEY, CONTAINER>::PopBool(KEY key, bool def)
 // --------------------------------------------------------------------------
 
 // template specialization for Object_Template:: find and get_value
-inline Map::iterator
+template<> inline Map::iterator
 Object_Template<Map::key_t, Map::container_t>::find(const string_t & key)
 {
     return m_container.find(key);
 }
 
-inline Value *
+template<> inline Value *
 Object_Template<Map::key_t, Map::container_t>::get_value(Map::iterator it)
 {
     return it->second;
 }
 
-inline void
+template<> inline void
 Object_Template<Map::key_t, Map::container_t>::throw_out_of_range(Map::key_t key)
 {
     throw KeyError(encode_utf8(key));
@@ -474,7 +475,7 @@ inline void Map::Set(const string_t & key, Value * val)
 // Array methods
 // --------------------------------------------------------------------------
 // template specialization for Object_Template:: find and get_value
-inline Array::iterator
+template<> inline Array::iterator
 Object_Template<Array::key_t, Array::container_t>::find(size_t index)
 {
     if (index >= size())
@@ -482,13 +483,13 @@ Object_Template<Array::key_t, Array::container_t>::find(size_t index)
     return begin() + index;
 }
 
-inline Value *
+template<> inline Value *
 Object_Template<Array::key_t, Array::container_t>::get_value(Array::iterator it)
 {
     return *it;
 }
 
-inline void
+template<> inline void
 Object_Template<Array::key_t, Array::container_t>::throw_out_of_range(size_t index)
 {
     throw IndexError(index);

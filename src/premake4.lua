@@ -1,4 +1,4 @@
-USE_LUA = true
+USE_LUA = false
 
 project "XWord"
     -- --------------------------------------------------------------------
@@ -57,6 +57,14 @@ project "XWord"
     configuration "linux"
         defines { [[PUZ_API=""]] }
         links { "dl" }
+
+    configuration "macosx"
+        defines {
+            [[PUZ_API="extern"]],
+            [[LUAPUZ_API="extern"]],
+            "USE_FILE32API" -- for minizip
+        }
+        links { "z" }
 
     -- Disable some warnings
     configuration "vs*"

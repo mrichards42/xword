@@ -42,9 +42,11 @@ public:
         : message(a_message)
     {}
 
+	virtual ~Exception() throw() {}
+
     std::string message;
 
-    virtual const char * what() const { return message.c_str(); }
+    virtual const char * what() const throw() { return message.c_str(); }
 };
 
 // String exceptions

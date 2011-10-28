@@ -50,25 +50,26 @@ public:
     //------------------
 
     // Throw an exception if the child node does not exist.  Return the node
-    node RequireChild(node &, const char * name);
+    node RequireChild(node, const char * name);
 
     // Text functions
 
-    string_t GetText(node &);
-    string_t GetAttribute(node &, const char * name);
-    string_t GetInnerXML(node &);
+    // NB: node is a wrapper around a pointer, so passing it by reference is redundant.
+    string_t GetText(node);
+    string_t GetAttribute(node, const char * name);
+    string_t GetInnerXML(node);
 
     // Child text
-    inline string_t GetText(node & n, const char * name)
+    inline string_t GetText(node n, const char * name)
         { return GetText(n.child(name)); }
 
     // Child InnerXML
-    string_t GetInnerXML(const node & n, const char * name)
+    string_t GetInnerXML(node n, const char * name)
         { return GetInnerXML(n.child(name)); }
 };
 
 inline node
-Parser::RequireChild(node & n, const char * name)
+Parser::RequireChild(node n, const char * name)
 {
     node child = n.child(name);
     if (! child)
@@ -77,29 +78,29 @@ Parser::RequireChild(node & n, const char * name)
 }
 
 inline string_t
-Parser::GetAttribute(node & n, const char * name)
+Parser::GetAttribute(const node n, const char * name)
 {
     return decode_utf8(n.attribute(name).value());
 }
 
-inline void SetText(node & node, const char * text)
+inline void SetText(node node, const char * text)
 {
     node.append_child(pugi::node_pcdata).set_value(text);
 }
 
-inline void SetText(node & node, const string_t & text)
+inline void SetText(node node, const string_t & text)
 {
     SetText(node, encode_utf8(text).c_str());
 }
 
-void SetInnerXML(node & node, const string_t & innerxml);
+void SetInnerXML(node node, const string_t & innerxml);
 
-inline void Append(node & node, const char * name, const char * value)
+inline void Append(node node, const char * name, const char * value)
 {
     SetText(node.append_child(name), value);
 }
 
-inline void Append(node & node, const char * name, const string_t & value)
+inline void Append(node node, const char * name, const string_t & value)
 {
     SetText(node.append_child(name), value);
 }

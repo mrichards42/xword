@@ -154,7 +154,7 @@ void LoadTxt(Puzzle * puz, const std::string & filename, void * /* dummy */)
     // Clues
     // Turn off exceptions on EOF, since we might reach EOF when reading
     // clues and notepad
-    f.m_stream.exceptions(0);
+    f.m_stream.exceptions(std::ios::goodbit);
     if (line != "<ACROSS>")
         throw LoadError("Missing <ACROSS>");
     ClueList & across = puz->SetClueList(puzT("Across"), ClueList());

@@ -61,7 +61,7 @@ public:
     GridSquare()
         : m_square()
     {}
-    GridSquare(Square & square)
+    GridSquare(const Square & square)
         : m_square(square)
     {}
     Square m_square;
@@ -381,7 +381,7 @@ Grid::FindNextSquare(const Square * start,
                       unsigned int options) const
 {
     return const_cast<Grid*>(this)->
-        FindNextSquare(const_cast<Square*>(square), findFunc, direction, options);
+        FindNextSquare(const_cast<Square*>(start), findFunc, direction, options);
 }
 
 } // namespace puz

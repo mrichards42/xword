@@ -7,27 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		08AB07566D0E001319747771 /* xmlparse.c in Sources */ = {isa = PBXBuildFile; fileRef = 5E0839070C57001319747771 /* xmlparse.c */; };
-		4F551B5D284C001319747771 /* xmlrole.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A979BF6C37001319747771 /* xmlrole.c */; };
-		78AA02FC2EF5001319747771 /* xmltok.c in Sources */ = {isa = PBXBuildFile; fileRef = 7AD771E270B0001319747771 /* xmltok.c */; };
-		2F3E1B1F6C50001319747771 /* xmltok_impl.c in Sources */ = {isa = PBXBuildFile; fileRef = 752F033F3946001319747771 /* xmltok_impl.c */; };
-		6E16176B2F4C001319747771 /* xmltok_ns.c in Sources */ = {isa = PBXBuildFile; fileRef = 7FB5204E1F1B001319747771 /* xmltok_ns.c */; };
+		04342C7143011C5B1DF22599 /* xmlparse.c in Sources */ = {isa = PBXBuildFile; fileRef = 356B3B6E55FB773A41390A76 /* xmlparse.c */; };
+		76F638447EB8095418293BCA /* xmlrole.c in Sources */ = {isa = PBXBuildFile; fileRef = 09B57E5B2130631B11CB65B7 /* xmlrole.c */; };
+		7C71616E0C931E30682C20FA /* xmltok.c in Sources */ = {isa = PBXBuildFile; fileRef = 55B71B7811E242E82022576E /* xmltok.c */; };
+		5D4E5C76636F0E6F4AA812F8 /* xmltok_impl.c in Sources */ = {isa = PBXBuildFile; fileRef = 3E1772082230177128935004 /* xmltok_impl.c */; };
+		7ACD50835CC51C74343E04A7 /* xmltok_ns.c in Sources */ = {isa = PBXBuildFile; fileRef = 63CF2D0728A10C3B27AF6F5F /* xmltok_ns.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		021B5E84494B001319747771 /* expat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "expat.h"; path = "expat.h"; sourceTree = "<group>"; };
-		61E1428D41B0001319747771 /* expat_external.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "expat_external.h"; path = "expat_external.h"; sourceTree = "<group>"; };
-		3F8078560B2F001319747771 /* libexpat.def */ = {isa = PBXFileReference; lastKnownFileType = text; name = "libexpat.def"; path = "libexpat.def"; sourceTree = "<group>"; };
-		5E0839070C57001319747771 /* xmlparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmlparse.c"; path = "xmlparse.c"; sourceTree = "<group>"; };
-		20A979BF6C37001319747771 /* xmlrole.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmlrole.c"; path = "xmlrole.c"; sourceTree = "<group>"; };
-		7AD771E270B0001319747771 /* xmltok.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmltok.c"; path = "xmltok.c"; sourceTree = "<group>"; };
-		752F033F3946001319747771 /* xmltok_impl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmltok_impl.c"; path = "xmltok_impl.c"; sourceTree = "<group>"; };
-		7FB5204E1F1B001319747771 /* xmltok_ns.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmltok_ns.c"; path = "xmltok_ns.c"; sourceTree = "<group>"; };
-		0C0F6F281B74001319747771 /* liblibexpat.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = "liblibexpat.dylib"; path = "liblibexpat.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		57F4768117826D1539660069 /* expat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "expat.h"; path = "expat.h"; sourceTree = "<group>"; };
+		0B843410438221FF04B53A91 /* expat_external.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "expat_external.h"; path = "expat_external.h"; sourceTree = "<group>"; };
+		07440C3C4D822BD32CBE70E6 /* libexpat.def */ = {isa = PBXFileReference; lastKnownFileType = text; name = "libexpat.def"; path = "libexpat.def"; sourceTree = "<group>"; };
+		356B3B6E55FB773A41390A76 /* xmlparse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmlparse.c"; path = "xmlparse.c"; sourceTree = "<group>"; };
+		09B57E5B2130631B11CB65B7 /* xmlrole.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmlrole.c"; path = "xmlrole.c"; sourceTree = "<group>"; };
+		55B71B7811E242E82022576E /* xmltok.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmltok.c"; path = "xmltok.c"; sourceTree = "<group>"; };
+		3E1772082230177128935004 /* xmltok_impl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmltok_impl.c"; path = "xmltok_impl.c"; sourceTree = "<group>"; };
+		63CF2D0728A10C3B27AF6F5F /* xmltok_ns.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "xmltok_ns.c"; path = "xmltok_ns.c"; sourceTree = "<group>"; };
+		34AD5A01341C5A6541006E1A /* liblibexpat.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = "liblibexpat.dylib"; path = "liblibexpat.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		26E44A91477D001319747771 /* Frameworks */ = {
+		681D485F5D3E4F8D482B38F9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -37,66 +37,66 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3B9926AD2AB6001319747771 /* expat */ = {
+		1E963C880ACF55A228BD2B5E /* expat */ = {
 			isa = PBXGroup;
 			children = (
-				088344541868001319747771 /* expat */,
-				67FF49151FB3001319747771 /* Products */,
+				3A79025A15A46D7F363F742A /* expat */,
+				285770E8128C5F2261E870F0 /* Products */,
 			);
-			name = expat;
+			name = "expat";
 			sourceTree = "<group>";
 		};
-		088344541868001319747771 /* expat */ = {
+		3A79025A15A46D7F363F742A /* expat */ = {
 			isa = PBXGroup;
 			children = (
-				30036E5821D5001319747771 /* lib */,
+				02CC242A53DF6C6709FF7343 /* lib */,
 			);
-			name = expat;
+			name = "expat";
 			path = ../../expat;
 			sourceTree = "<group>";
 		};
-		30036E5821D5001319747771 /* lib */ = {
+		02CC242A53DF6C6709FF7343 /* lib */ = {
 			isa = PBXGroup;
 			children = (
-				021B5E84494B001319747771 /* expat.h */,
-				61E1428D41B0001319747771 /* expat_external.h */,
-				3F8078560B2F001319747771 /* libexpat.def */,
-				5E0839070C57001319747771 /* xmlparse.c */,
-				20A979BF6C37001319747771 /* xmlrole.c */,
-				7AD771E270B0001319747771 /* xmltok.c */,
-				752F033F3946001319747771 /* xmltok_impl.c */,
-				7FB5204E1F1B001319747771 /* xmltok_ns.c */,
+				57F4768117826D1539660069 /* expat.h */,
+				0B843410438221FF04B53A91 /* expat_external.h */,
+				07440C3C4D822BD32CBE70E6 /* libexpat.def */,
+				356B3B6E55FB773A41390A76 /* xmlparse.c */,
+				09B57E5B2130631B11CB65B7 /* xmlrole.c */,
+				55B71B7811E242E82022576E /* xmltok.c */,
+				3E1772082230177128935004 /* xmltok_impl.c */,
+				63CF2D0728A10C3B27AF6F5F /* xmltok_ns.c */,
 			);
-			name = lib;
+			name = "lib";
 			path = lib;
 			sourceTree = "<group>";
 		};
-		67FF49151FB3001319747771 /* Products */ = {
+		285770E8128C5F2261E870F0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0C0F6F281B74001319747771 /* liblibexpat.dylib */,
+				34AD5A01341C5A6541006E1A /* liblibexpat.dylib */,
 			);
-			name = Products;
+			name = "Products";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7079139873E1001319747771 /* expat */ = {
+		28652A7D276455F144202D08 /* expat */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1BE91E050EA9001319747771 /* Build configuration list for PBXNativeTarget "expat" */;
+			buildConfigurationList = 576C33A73E8929D251390186 /* Build configuration list for PBXNativeTarget "expat" */;
 			buildPhases = (
-				064377953D2E001319747771 /* Resources */,
-				79E24CBE64F4001319747771 /* Sources */,
-				26E44A91477D001319747771 /* Frameworks */,
+				0F80289F781A797322236959 /* Resources */,
+				6F68397364172E4013FC1B0C /* Sources */,
+				681D485F5D3E4F8D482B38F9 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = expat;
-			productName = expat;
-			productReference = 0C0F6F281B74001319747771 /* liblibexpat.dylib */;
+			name = "expat";
+			productName = "expat";
+			productReference = 34AD5A01341C5A6541006E1A /* liblibexpat.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -107,17 +107,17 @@
 			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "expat" */;
 			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 1;
-			mainGroup = 3B9926AD2AB6001319747771 /* expat */;
+			mainGroup = 1E963C880ACF55A228BD2B5E /* expat */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7079139873E1001319747771 /* liblibexpat.dylib */,
+				28652A7D276455F144202D08 /* liblibexpat.dylib */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		064377953D2E001319747771 /* Resources */ = {
+		0F80289F781A797322236959 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -127,15 +127,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		79E24CBE64F4001319747771 /* Sources */ = {
+		6F68397364172E4013FC1B0C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				08AB07566D0E001319747771 /* xmlparse.c in Sources */,
-				4F551B5D284C001319747771 /* xmlrole.c in Sources */,
-				78AA02FC2EF5001319747771 /* xmltok.c in Sources */,
-				2F3E1B1F6C50001319747771 /* xmltok_impl.c in Sources */,
-				6E16176B2F4C001319747771 /* xmltok_ns.c in Sources */,
+				04342C7143011C5B1DF22599 /* xmlparse.c in Sources */,
+				76F638447EB8095418293BCA /* xmlrole.c in Sources */,
+				7C71616E0C931E30682C20FA /* xmltok.c in Sources */,
+				5D4E5C76636F0E6F4AA812F8 /* xmltok_impl.c in Sources */,
+				7ACD50835CC51C74343E04A7 /* xmltok_ns.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,7 +145,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		673D7032261C001319747771 /* Release */ = {
+		3731114B71A044BF5CDA0CE5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -159,7 +159,7 @@
 			};
 			name = "Release";
 		};
-		5A1B3FB42A1D001319747771 /* Debug */ = {
+		09121CC440D028FC5ED646C0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -172,7 +172,7 @@
 			};
 			name = "Debug";
 		};
-		56B03FEA7D8E001319747771 /* Release */ = {
+		41C064ED096C3EBC5C4944B0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
@@ -196,7 +196,7 @@
 			};
 			name = "Release";
 		};
-		32753725329B001319747771 /* Debug */ = {
+		7C1225B54F0E41731BC55E07 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
@@ -226,11 +226,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1BE91E050EA9001319747771 /* Build configuration list for PBXNativeTarget "liblibexpat.dylib" */ = {
+		576C33A73E8929D251390186 /* Build configuration list for PBXNativeTarget "liblibexpat.dylib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				673D7032261C001319747771 /* Release */,
-				5A1B3FB42A1D001319747771 /* Debug */,
+				3731114B71A044BF5CDA0CE5 /* Release */,
+				09121CC440D028FC5ED646C0 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Release";
@@ -238,8 +238,8 @@
 		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "expat" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				56B03FEA7D8E001319747771 /* Release */,
-				32753725329B001319747771 /* Debug */,
+				41C064ED096C3EBC5C4944B0 /* Release */,
+				7C1225B54F0E41731BC55E07 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Release";

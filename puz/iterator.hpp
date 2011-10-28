@@ -134,31 +134,16 @@ protected:
 };
 
 // Swap increment/decrement for reverse iterators
-void square_iterator_t<Square, false>::increment()
-{
-    m_impl->decrement();
-}
-
-void square_iterator_t<Square, false>::decrement()
-{
-    m_impl->increment();
-}
-
-void square_iterator_t<const Square, false>::increment()
-{
-    m_impl->decrement();
-}
-
-void square_iterator_t<const Square, false>::decrement()
-{
-    m_impl->increment();
-}
+// Implementation of theses functions was moved t iterator.cpp
+// to avoid duplicate symbols with gcc.
+template<> void square_iterator_t<Square, false>::increment();
+template<> void square_iterator_t<Square, false>::decrement();
+template<> void square_iterator_t<const Square, false>::increment();
+template<> void square_iterator_t<const Square, false>::decrement();
 
 // Typedefs
 typedef square_iterator_t<Square, true> square_iterator;
-typedef square_iterator_t<const Square, true> const_square_iterator;
 typedef square_iterator_t<Square, false> square_reverse_iterator;
-typedef square_iterator_t<const Square, false> const_square_reverse_iterator;
 
 // Basic iterator implementation
 // This is a drop-in replacement for the usual construction:
