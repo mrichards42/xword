@@ -111,7 +111,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	solvePanel->SetSizer( bSizer3 );
 	solvePanel->Layout();
 	bSizer3->Fit( solvePanel );
-	m_notebook->AddPage( solvePanel, wxT("Solving"), false );
+	m_notebook->AddPage( solvePanel, wxT("Solving"), true );
 	wxPanel* colorPanel;
 	colorPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer35;
@@ -516,7 +516,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	miscPanel->SetSizer( bSizer42 );
 	miscPanel->Layout();
 	bSizer42->Fit( miscPanel );
-	m_notebook->AddPage( miscPanel, wxT("Misc"), true );
+	m_notebook->AddPage( miscPanel, wxT("Misc"), false );
 	printPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer371;
 	bSizer371 = new wxBoxSizer( wxVERTICAL );
