@@ -1,13 +1,13 @@
 Diagramless Puzzles
 -------------------
 
-Solving diagramless puzzles interactively is similar to solving normal puzzles,
-with the notable exception that the user has to place black squares to fill
-in the grid.  When a black square is focused, the cursor becomes an outline
-of the square instead of solid.
+Solving diagramless puzzles interactively is similar to [solving](solving.html)
+normal puzzles, with the notable exception that the user has to place black
+squares to fill in the grid.  When a black square is focused, the cursor
+becomes an outline of the square instead of solid.
 
 ### To toggle a square between black and white ###
-1. Navigate to the square:
+1. [Navigate](navigation.html) to the square:
     - Left-click the square or
     - Navigate using the arrow keys
 2. Press the "." key (period/dot).

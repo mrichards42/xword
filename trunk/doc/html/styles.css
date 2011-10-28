@@ -3,3 +3,67 @@ body { font-family: sans-serif; font-size: .8em; }
 code { font-size: 1.2em; font-weight: bold; }
 
 img { border: 1px solid gray; padding: 5px; margin:10px;}
+
+
+/* table styles */
+table {
+    background: #eee;
+    border-collapse:collapse;
+}
+
+tr > * {
+    border: 1px solid black;
+    padding: .3em;
+}
+
+tr {
+    background: #aaa;
+}
+
+td {
+    font-size: .8em;
+    background: #eee;
+}
+
+
+/* styles for the fancy image map (window.html) */
+
+.image-map {
+    border:1px solid gray;
+    padding: 5px;
+    margin: 5px;
+}
+
+.image-map img {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.image-map a {
+    position:absolute;
+    width:100%;
+    height:100%;
+    border:1px solid red;
+    background: #fee;
+    /* opacity = 15% */
+    opacity: .15;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=15)";
+    filter: alpha(opacity=15);
+}
+
+.image-map.focused a:hover{
+    /* opacity = 70% */
+    opacity: .7;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+    filter: alpha(opacity=70);
+}
+
+.image-map.focused a {
+    background: #fee;
+    border:1px solid red;
+    /* opacity = 30% */
+    opacity: .4;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    filter: alpha(opacity=40);
+}
