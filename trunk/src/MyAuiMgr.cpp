@@ -20,7 +20,7 @@
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
-#    include <wx/frame.h>
+#    include <wx/wx.h>
 #endif
 
 // "private" panes start with a double-underscore

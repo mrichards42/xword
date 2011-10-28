@@ -436,8 +436,9 @@ XGridDrawer::DrawSquare(wxDC & adc,
         if (! img.IsOk())
         {
             // Load the image and cache it.
-            img = wxImage(wxMemoryInputStream(square.m_imagedata.c_str(),
-                                              square.m_imagedata.length()));
+			wxMemoryInputStream stream(square.m_imagedata.c_str(),
+									   square.m_imagedata.length());
+            img = wxImage(stream);
             m_imageMap[&square] = img;
         }
         if (img.IsOk())

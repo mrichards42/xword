@@ -192,7 +192,7 @@ public:
     // Clue list heading
     //------------------
     void SetHeading(const wxString & heading) { m_heading->SetLabel(heading); }
-    wxString GetHeading() const { m_heading->GetLabel(); }
+    wxString GetHeading() const { return m_heading->GetLabel(); }
     bool SetHeadingFont(const wxFont & font)
     {
         if (! m_heading->SetFont(font))
