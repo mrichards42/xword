@@ -1,0 +1,63 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+<h2>Entering Letters in the Grid</h2>
+<p>To enter a letter into a square, navigate to the square and type a letter.
+The focused word is highlighted in one color, and the focused square is
+highlighted in a different color.  Unless configured otherwise, the focused
+square will move to the next square in the current word when a letter is typed.</p>
+<p>XWord supports entering any printable character<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> in a square, including
+symbols, however certain puzzle formats (such as .puz) only support a limited
+character set.</p>
+<h3>Erasing Letters</h3>
+<ul>
+<li><code>BACKSPACE</code> erases the letter in the current square and moves the cursor
+   backward one square.</li>
+<li><code>DELETE</code> erases the letter in the current square and does not move
+   the cursor.</li>
+<li><code>SPACE</code> erases the letter in the current square and moves the cursor
+   forward one square.</li>
+<li>The <code>Solution</code> menu contains two erasing items:<ul>
+<li><code>Erase Grid</code> clears the grid and resets the timer.</li>
+<li><code>Erase Uncrossed Letters</code> erases letters in the current word that are
+   not part of an already filled word.</li>
+</ul>
+</li>
+</ul>
+<h3>Rebus Entries</h3>
+<p>Some puzzles require multiple letters to be entered in a square.</p>
+<ol>
+<li>Press the <code>INSERT</code> key to enter rebus mode (the cursor will become an outline).</li>
+<li>Type multiple letters.<ul>
+<li><code>BACKSPACE</code> can be used to remove letters (from the end).</li>
+<li><code>DELETE</code> will remove letters from the beginning.</li>
+<li><code>CTRL+BACKSPACE</code> or <code>CTRL+DELETE</code> will delete all letters in the square.</li>
+</ul>
+</li>
+<li>Press INSERT or ENTER to exit rebus mode (the cursor will become solid again).</li>
+</ol>
+<p>Rebus entries longer than 4 characters are wrapped.  Entries longer than 10
+characters are truncated (for display only; XWord supports unlimited rebus
+entry length).  If the mouse is hovered over a rebus entry, a tool tip will
+pop up and display the entire entry (useful for truncated entries).</p>
+<p><img alt="Image of filling a rebus entry" src="images/rebus.png" title="Filling a rebus entry" /></p>
+<h3>Webdings Symbols</h3>
+<p>Across Lite allows users to enter symbols from the Webdings font.
+If Webdings is installed, XWord will display these symbols, but it does not
+support entering Webdings symbols.</p>
+<h3>Circles</h3>
+<p>As a legacy holdover from Across Lite, typing an asterisk (*) will toggle a
+circle in the current square.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>A few reserved characters are not allowed to be entered as text: <code>: . [ </code>and<code> *</code>
+&#160;<a href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+</body>
+</html>
