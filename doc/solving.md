@@ -1,7 +1,8 @@
 Entering Letters in the Grid
 ----------------------------
 
-To enter a letter into a square, navigate to the square and type a letter.
+To enter a letter into a square, [navigate](navigation.html) to the square and
+type a letter.
 The focused word is highlighted in one color, and the focused square is
 highlighted in a different color.  Unless configured otherwise, the focused
 square will move to the next square in the current word when a letter is typed.

@@ -6,14 +6,16 @@ sub-categories:
 
 ### Solving Preferences ###
 
-The Solving prefrences page contains preferences related to grid navigation,
-solution checking, the timer, and auto saving.
+The Solving prefrences page contains preferences related to
+[grid navigation](navigation.html), solution checking, the timer,
+and auto saving.
 
 ![](images/solving_prefs.png)
 
 - Strict rebus checking
-    - If this box is checked, squares with rebus entries for solutions will
-      only be counted as correct if the user enters a matching rebus entry.
+    - If this box is checked, squares with [rebus entries](solving.html#rebus_entries)
+      for solutions will only be counted as correct if the user enters a
+      matching rebus entry.
     - If this box is unchecked, squares with rebus entries for solutions will
       also be counted as correct if the user enters only the first letter
       of the correct rebus entry.
@@ -32,10 +34,10 @@ XWord uses to display a crossword puzzle.
 
 - Multi-square selection
     - The color that is used to highlight squares in the grid when the user
-      selects multiple squares (for [Check and Reveal]() section commands).
+      selects multiple squares (for Check and Reveal section commands).
 - Grid background
     - The color used to fill the background when the grid does not take up the
-      entire window
+      entire window.
 
 
 ### Font Preferences ###
@@ -57,8 +59,8 @@ This page contains file history preferences as well as various tweaks.
 
 - Clue prompt format
     - The clue prompt can be formatted using simple HTML.  "%T" will be
-      replaced by the clue text, and "%N" by the clue number.  The default
-      centers the clue and includes the clue number.
+      replaced by the clue text, and "%N" by the clue number.  The clue is
+      centered and includes the clue number by default.
 - Grid tweaks
     - This section allows the user to make minor aesthetic changes to the way
       the grid is presented.
@@ -73,7 +75,7 @@ squares (to save ink), and to select fonts to be used for printing.
 
 - Fonts
     - If Use custom fonts is not checked, the appropriate values from the font
-      preferences page will be used for [printing](print.html).
+      preferences page will be used for printing.
 - Black square brightness
     - The scale of black square brightness can be adjusted from 0 (black)
       to 255 (white).
