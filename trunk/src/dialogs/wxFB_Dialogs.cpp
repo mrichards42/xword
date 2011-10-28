@@ -406,10 +406,10 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	wxStaticBoxSizer* sbSizer22;
 	sbSizer22 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("File history") ), wxHORIZONTAL );
 	
-	m_saveFileHistory = new wxCheckBox( miscPanel, wxID_ANY, wxT("Save recently opened puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_saveFileHistory = new wxCheckBox( miscPanel, wxID_ANY, wxT("Save a history of recently opened puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer22->Add( m_saveFileHistory, 0, wxALL, 5 );
 	
-	m_reopenLastPuzzle = new wxCheckBox( miscPanel, wxID_ANY, wxT("Reopen last puzzle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_reopenLastPuzzle = new wxCheckBox( miscPanel, wxID_ANY, wxT("Open last puzzle when XWord starts"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_reopenLastPuzzle->SetValue(true); 
 	sbSizer22->Add( m_reopenLastPuzzle, 0, wxALL, 5 );
 	
