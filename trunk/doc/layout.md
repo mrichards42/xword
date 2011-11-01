@@ -27,11 +27,15 @@ hold the `ALT` key.
 
 ![Image of docking a floating pane](images/layout_float.png)
 
+#### Context menu ####
+
 The layout of each pane can also be changed by right-clicking on the pane to
 display a context menu.  For clue lists you must right-click on the list title
 to get a context menu.
 
 ![Image of a pane context menu](images/layout_context.png)
+
+#### Panes menu ####
 
 Panes can be hidden or shown through the `Panes` submenu of the `View` menu.
 This is especially useful if you accidentally close a pane.

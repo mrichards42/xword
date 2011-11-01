@@ -19,7 +19,7 @@ character set.
    the cursor.
 - `SPACE` erases the letter in the current square and moves the cursor
    forward one square.
-- The `Solution` menu contains two erasing items:
+- The [`Solution`](window.html#solution_menu) menu contains two erasing items:
     - `Erase Grid` clears the grid and resets the timer.
     - `Erase Uncrossed Letters` erases letters in the current word that are
        not part of an already filled word.
@@ -45,12 +45,14 @@ pop up and display the entire entry (useful for truncated entries).
 
 
 ### Webdings Symbols ###
+
 Across Lite allows users to enter symbols from the Webdings font.
 If Webdings is installed, XWord will display these symbols, but it does not
 support entering Webdings symbols.
 
 
 ### Circles ###
+
 As a legacy holdover from Across Lite, typing an asterisk (\*) will toggle a
 circle in the current square.
 

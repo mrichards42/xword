@@ -4,6 +4,13 @@ code { font-size: 1.2em; font-weight: bold; }
 
 img { border: 1px solid gray; padding: 5px; margin:10px;}
 
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
 
 /* table styles */
 table {

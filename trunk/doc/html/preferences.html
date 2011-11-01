@@ -17,8 +17,8 @@ sub-categories:</p>
 <a href="navigation.html">grid navigation</a>, solution checking, the timer,
 and auto saving.</p>
 <p><img alt="" src="images/solving_prefs.png" /></p>
+<h4 id="strict_rebus_checking">Strict rebus checking</h4>
 <ul>
-<li>Strict rebus checking<ul>
 <li>If this box is checked, squares with <a href="solving.html#rebus_entries">rebus entries</a>
   for solutions will only be counted as correct if the user enters a
   matching rebus entry.</li>
@@ -26,14 +26,9 @@ and auto saving.</p>
   also be counted as correct if the user enters only the first letter
   of the correct rebus entry.</li>
 </ul>
-</li>
-<li>Auto save<ul>
-<li>Auto save puzzles (if they are not temporary files) X seconds after the
-  last letter was filled into the grid.</li>
-<li>Auto save is disabled if this value is 0.</li>
-</ul>
-</li>
-</ul>
+<h4 id="auto_save">Auto save</h4>
+<p>Auto save puzzles (if they are not temporary files) X seconds after the
+last letter was filled into the grid.  Auto save is disabled if this value is 0.</p>
 <h3 id="color_preferences">Color Preferences</h3>
 <p>The Color prefrences page allows the user to change nearly every color that
 XWord uses to display a crossword puzzle.</p>
@@ -53,42 +48,39 @@ XWord uses to display a crossword puzzle.</p>
 <h3 id="font_preferences">Font Preferences</h3>
 <p><img alt="" src="images/font_prefs.png" /></p>
 <p>Note that text is scaled to fit the allotted space in many places, so font
-size is irrelevant to several of these font choices:
-- Text entered into the grid by the user
-- Clue numbers in the grid
-- The main clue prompt</p>
+size is irrelevant to several of these font choices:</p>
+<ul>
+<li>Text entered into the grid by the user</li>
+<li>Clue numbers in the grid</li>
+<li>The main clue prompt</li>
+</ul>
 <h3 id="miscellaneous_preferences">Miscellaneous Preferences</h3>
 <p>This page contains file history preferences as well as various tweaks.</p>
 <p><img alt="" src="images/misc_prefs.png" /></p>
-<ul>
-<li>Clue prompt format<ul>
-<li>The clue prompt can be formatted using simple HTML.  "%T" will be
-  replaced by the clue text, and "%N" by the clue number.  The clue is
-  centered and includes the clue number by default.</li>
-</ul>
-</li>
-<li>Grid tweaks<ul>
-<li>This section allows the user to make minor aesthetic changes to the way
-  the grid is presented.</li>
-</ul>
-</li>
-</ul>
+<h4 id="clue_prompt_format">Clue prompt format</h4>
+<p>The clue prompt can be formatted using simple HTML.  <code>"%T"</code> will be replaced
+by the clue text, and <code>"%N"</code> by the clue number.  The clue is centered and
+includes the clue number by default.</p>
+<h4 id="grid_tweaks">Grid tweaks</h4>
+<p>This section allows the user to make minor aesthetic changes to the way
+the grid is presented by changing the size of grid text and numbers and the
+thickness of the lines in the grid.</p>
 <h3 id="printing_preferences">Printing Preferences</h3>
 <p>This page allows the user to change grid placement, brightness of the black
 squares (to save ink), and to select fonts to be used for printing.</p>
 <p><img alt="" src="images/printing_prefs.png" /></p>
+<h4 id="fonts">Fonts</h4>
+<p>If <code>Use custom fonts</code> is checked, the following fonts can be changed:</p>
 <ul>
-<li>Fonts<ul>
-<li>If Use custom fonts is not checked, the appropriate values from the font
-  preferences page will be used for printing.</li>
+<li>Grid text</li>
+<li>Grid numbers</li>
+<li>Clues</li>
 </ul>
-</li>
-<li>Black square brightness<ul>
-<li>The scale of black square brightness can be adjusted from 0 (black)
-  to 255 (white).</li>
-</ul>
-</li>
-</ul>
+<p>If <code>Use custom fonts</code> is left unchecked, the appropriate values from the font
+preferences page will be used for printing.</p>
+<h4 id="black_square_brightness">Black square brightness</h4>
+<p>The scale of black square brightness can be adjusted from 0 (black) to
+255 (white).</p>
 <hr />
 <p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
