@@ -12,17 +12,19 @@ and auto saving.
 
 ![](images/solving_prefs.png)
 
-- Strict rebus checking
-    - If this box is checked, squares with [rebus entries](solving.html#rebus_entries)
-      for solutions will only be counted as correct if the user enters a
-      matching rebus entry.
-    - If this box is unchecked, squares with rebus entries for solutions will
-      also be counted as correct if the user enters only the first letter
-      of the correct rebus entry.
-- Auto save
-    - Auto save puzzles (if they are not temporary files) X seconds after the
-      last letter was filled into the grid.
-    - Auto save is disabled if this value is 0.
+#### Strict rebus checking ####
+
+- If this box is checked, squares with [rebus entries](solving.html#rebus_entries)
+  for solutions will only be counted as correct if the user enters a
+  matching rebus entry.
+- If this box is unchecked, squares with rebus entries for solutions will
+  also be counted as correct if the user enters only the first letter
+  of the correct rebus entry.
+
+#### Auto save ####
+
+Auto save puzzles (if they are not temporary files) X seconds after the
+last letter was filled into the grid.  Auto save is disabled if this value is 0.
 
 
 ### Color Preferences ###
@@ -46,6 +48,7 @@ XWord uses to display a crossword puzzle.
 
 Note that text is scaled to fit the allotted space in many places, so font
 size is irrelevant to several of these font choices:
+
 - Text entered into the grid by the user
 - Clue numbers in the grid
 - The main clue prompt
@@ -57,13 +60,17 @@ This page contains file history preferences as well as various tweaks.
 
 ![](images/misc_prefs.png)
 
-- Clue prompt format
-    - The clue prompt can be formatted using simple HTML.  "%T" will be
-      replaced by the clue text, and "%N" by the clue number.  The clue is
-      centered and includes the clue number by default.
-- Grid tweaks
-    - This section allows the user to make minor aesthetic changes to the way
-      the grid is presented.
+#### Clue prompt format ####
+
+The clue prompt can be formatted using simple HTML.  `"%T"` will be replaced
+by the clue text, and `"%N"` by the clue number.  The clue is centered and
+includes the clue number by default.
+
+#### Grid tweaks ####
+
+This section allows the user to make minor aesthetic changes to the way
+the grid is presented by changing the size of grid text and numbers and the
+thickness of the lines in the grid.
 
 
 ### Printing Preferences ###
@@ -73,9 +80,16 @@ squares (to save ink), and to select fonts to be used for printing.
 
 ![](images/printing_prefs.png)
 
-- Fonts
-    - If Use custom fonts is not checked, the appropriate values from the font
-      preferences page will be used for printing.
-- Black square brightness
-    - The scale of black square brightness can be adjusted from 0 (black)
-      to 255 (white).
+#### Fonts ####
+If `Use custom fonts` is checked, the following fonts can be changed:
+
+- Grid text
+- Grid numbers
+- Clues
+
+If `Use custom fonts` is left unchecked, the appropriate values from the font
+preferences page will be used for printing.
+
+#### Black square brightness ####
+The scale of black square brightness can be adjusted from 0 (black) to
+255 (white).

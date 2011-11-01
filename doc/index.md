@@ -26,7 +26,7 @@ XWord
 - A [timer](window.html#timer)
 - Checking and revealing letters
 - Printing
-- [Autosaving](preferences.html#solving_preferences)
+- [Autosaving](preferences.html#auto_save)
 - Many [configuration](preferences.html) options, including
     - [Colors](preferences.html#color_preferences) in the grid and clue list
     - [Fonts](preferences.html#font_preferences)
