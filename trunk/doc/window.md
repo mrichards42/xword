@@ -109,7 +109,8 @@ displayed in their own panes.
 Notes are read-only and can contain simple xhtml formatting.  Show and hide the
 notes window using the [`View`](#view_menu) menu, the toolbar buttons, or the
 [context menu](layout.html#context_menu) or
-[close button](layout.html#pane_buttons) on the pane.
+[close button](layout.html#pane_buttons) on the pane.  If a puzzle has any
+notes, the toolbar icon will be yellow.
 
 
 ### File Menu ###
