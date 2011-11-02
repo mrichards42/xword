@@ -502,6 +502,8 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
     if (square == NULL)
         square = m_focusedSquare;
 
+    wxASSERT(m_focusedSquare->IsWhite() || m_grid->IsDiagramless());
+
     if (! word)
     {
         // If there is no word supplied, see if the current word works
@@ -605,7 +607,7 @@ XGridCtrl::MoveFocusedSquare(puz::Square * square,
         return SetFocusedSquare(square, word, direction);
     if (word)
     {
-        puz::Square * blank = word->FindSquare(square, FIND_BLANK_SQUARE);
+        puz::Square * blank = word->FindSquare(FIND_BLANK_SQUARE);
         if (blank)
             square = blank;
         return SetFocusedSquare(square, word, direction);
@@ -625,7 +627,7 @@ XGridCtrl::MoveFocusedSquare(puz::Square * square,
                m_focusedWord->back() == word->back()))
         {
             // Find the next blank square
-            puz::Square * blank = word->FindSquare(square, FIND_BLANK_SQUARE);
+            puz::Square * blank = word->FindSquare(FIND_BLANK_SQUARE);
             if (blank)
                 square = blank;
         }
@@ -1485,17 +1487,6 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
                 puz::NO_WRAP
             );
         }
-        if (newSquare && HasStyle(BLANK_ON_NEW_WORD))
-        {
-            SetIfExists(newSquare,
-                m_grid->FindSquare(
-                    newSquare->GetWordStart(focusedDirection),
-                    FIND_BLANK_SQUARE,
-                    focusedDirection,
-                    puz::FIND_IN_WORD
-                )
-            );
-        }
         MoveFocusedSquare(newSquare, focusedDirection);
     }
 }
@@ -1740,18 +1731,8 @@ XGridCtrl::GetDirection() const
 void
 XGridCtrl::RecalcDirection()
 {
-    const puz::Square * square1 = m_focusedSquare;
-    const puz::Square * square2 = m_focusedWord->FindNextSquare(m_focusedSquare);
-    if (! square2 || square2 == square1)
-    {
-        // If this is the end of the word, measure the angle between
-        // the previous square and this square
-        square2 = m_focusedSquare;
-        square1 = m_focusedWord->FindPrevSquare(m_focusedSquare);
-    }
-    if (square1 && square2)
-        m_focusedDirection = puz::GetDirection(*square1, *square2);
-    // Else focused direction doesn't change.
+    if (m_focusedWord->front() != m_focusedWord->back())
+        m_focusedDirection = m_focusedWord->GetDirection();
 }
 
 
