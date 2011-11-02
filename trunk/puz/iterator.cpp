@@ -17,8 +17,32 @@
 
 #include "iterator.hpp"
 
+#ifndef _WINDOWS
 namespace puz {
+#endif // _WINDOWS
 
+// Increment/Decrement for forward iterators
+template<> void square_iterator_t<Square, true>::increment()
+{
+    m_impl->increment();
+}
+
+template<> void square_iterator_t<Square, true>::decrement()
+{
+    m_impl->decrement();
+}
+
+template<> void square_iterator_t<const Square, true>::increment()
+{
+    m_impl->increment();
+}
+
+template<> void square_iterator_t<const Square, true>::decrement()
+{
+    m_impl->decrement();
+}
+
+// Increment/Decrement for reverse iterators
 template<> void square_iterator_t<Square, false>::increment()
 {
     m_impl->decrement();
@@ -39,4 +63,6 @@ template<> void square_iterator_t<const Square, false>::decrement()
     m_impl->increment();
 }
 
+#ifndef _WINDOWS
 } // namespace puz
+#endif // _WINDOWS
