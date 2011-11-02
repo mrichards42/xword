@@ -4,14 +4,7 @@ XWord for Across Lite Users
 XWord is intended to be as familiar as possible for users transitioning from
 [Across Lite](http://www.litsoft.com/across/alite/download/).  Besides
 supporting more formats (and more crosswordy-gimmicks), there are a few
-subtle (and not so subtle) differences between XWord and Across lite (based on
-Across Lite 2.0.5).
-
-#### [Diagramless](diagramless.html) puzzles ####
-
-- Across Lite gives the user an option to print diagramless puzzles or to
-  display the black squares for interactive solving.
-- XWord allows interactive solving of diagramless puzzles.
+differences between XWord and Across lite (based on Across Lite 2.0.5).
 
 #### Long clues ####
 
@@ -20,6 +13,11 @@ Across Lite 2.0.5).
 - Long clues in XWord are wrapped so that they display in a normal font
   size.  In case a clue is especially long, a tool tip is shown if the
   user hovers the mouse over the main clue prompt.
+
+#### Scrambled puzzles ####
+
+- If a puzzle is scrambled, XWord alerts the user when the puzzle is solved
+  correctly; Across Lite does not.
 
 #### [Layout](layout.html) ####
 
@@ -32,6 +30,12 @@ Across Lite 2.0.5).
   To mitigate some of the potential frustration with manually arranging
   panes, XWord ships with a a set of default layouts that approximately
   mimic the familiar Across Lite layouts.
+
+#### [Diagramless](diagramless.html) puzzles ####
+
+- Across Lite gives the user an option to print diagramless puzzles or to
+  display the black squares for interactive solving.
+- XWord allows interactive solving of diagramless puzzles.
 
 #### [Check and reveal](check.html) ####
 

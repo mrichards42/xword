@@ -10,6 +10,9 @@ if sys.platform == 'win32':
 
 import markdown
 
+def convert(t):
+    return markdown.markdown(t, ['footnotes', 'headerid', 'tables'])
+
 
 prefix = """<html>
 <head>
@@ -17,29 +20,21 @@ prefix = """<html>
 <title>%s</title>
 </head>
 <body>
-[Index](index.html) |
-[Back](javascript: history.go(-1);) |
-[Sourceforge](https://sourceforge.net/projects/wx-xword/) |
-[Download](http://sourceforge.net/projects/wx-xword/files/Binary/)
-- - -
 """
 
 suffix = """
-- - -
-[Index](index.html) |
-[Back](javascript: history.go(-1);) |
-[Sourceforge](https://sourceforge.net/projects/wx-xword/) |
-[Download](http://sourceforge.net/projects/wx-xword/files/Binary/)
 </body>
 </html>
 """
 
+links = convert("""[Index](index.html) |
+[Back](javascript: history.go(-1);) |
+[Sourceforge](https://sourceforge.net/projects/wx-xword/) |
+[Download](http://sourceforge.net/projects/wx-xword/files/Binary/)""")
+
 # Make html dir
 if not os.path.exists('html'):
     os.mkdir('html')
-
-def convert(t):
-    return markdown.markdown(t, ['footnotes', 'headerid', 'tables'])
 
 # Convert files
 for filename in os.listdir(os.getcwd()):
@@ -53,9 +48,11 @@ for filename in os.listdir(os.getcwd()):
             title = input.readline().strip()
             text = '\n'.join((title, input.read()))
             output.write('\n'.join((
-                convert((prefix % title)),
+                (prefix % title),
+                links + "<hr />",
                 convert(text),
-                convert(suffix),
+                "<hr />" + links,
+                suffix,
             )))
 
 #raw_input("Press any key to continue...")
