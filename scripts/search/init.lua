@@ -15,10 +15,33 @@ function search.addEntry(name, func)
     table.insert(search.entries, {name = name, func = func})
 end
 
+function search.makePattern()
+    -- Get the current clue
+    local number, clue = xword.frame:GetFocusedClue()
+
+    -- Assemble the search pattern for the current word
+    local word = xword.frame:GetFocusedWord()
+    local pattern = ''
+    for _, square in ipairs(word) do
+        if not square:IsBlank() then
+            pattern = pattern .. square.Text
+        else
+            -- Blank squares are represented by question marks
+            pattern = pattern .. '?'
+        end
+    end
+    return pattern
+end
+
+function search.search(base)
+    wx.wxLaunchDefaultBrowser(base .. wx.wxURL(search.makePattern()):BuildURI())
+end
+
 function search.init()
     -- Search handlers
     require 'search.wikipedia'
     require 'search.oneacross'
+    require 'search.google'
 
     for _, entry in ipairs(search.entries) do
         -- Add to the menu
