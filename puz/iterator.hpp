@@ -137,11 +137,13 @@ protected:
 typedef square_iterator_t<Square, true> square_iterator;
 typedef square_iterator_t<Square, false> square_reverse_iterator;
 
+#ifdef _WINDOWS
 // Swap increment/decrement for reverse iterators
 inline void square_iterator::increment() { m_impl->increment(); }
 inline void square_iterator::decrement() { m_impl->decrement(); }
 inline void square_reverse_iterator::increment() { m_impl->decrement(); }
 inline void square_reverse_iterator::decrement() { m_impl->increment(); }
+#endif // _WINDOWS
 
 // Basic iterator implementation
 // This is a drop-in replacement for the usual construction:

@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#ifndef _WINDOWS
+
 #include "iterator.hpp"
 
-#ifndef _WINDOWS
 namespace puz {
-#endif // _WINDOWS
 
 // Increment/Decrement for forward iterators
 template<> void square_iterator_t<Square, true>::increment()
@@ -63,6 +63,5 @@ template<> void square_iterator_t<const Square, false>::decrement()
     m_impl->increment();
 }
 
-#ifndef _WINDOWS
 } // namespace puz
 #endif // _WINDOWS
