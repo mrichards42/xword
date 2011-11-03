@@ -16,18 +16,7 @@ end
 local function OneAcrossSearch()
     -- Get the current clue
     local number, clue = xword.frame:GetFocusedClue()
-
-    -- Assemble the search pattern for the current word
-    local word = xword.frame:GetFocusedWord()
-    local pattern = ''
-    for _, square in ipairs(word) do
-        if not square:IsBlank() then
-            pattern = pattern .. square.Text
-        else
-            -- Blank squares are represented by question marks
-            pattern = pattern .. '?'
-        end
-    end
+    local pattern = search.makePattern()
 
     wx.wxLaunchDefaultBrowser(makeURL(clue, pattern))
 end
