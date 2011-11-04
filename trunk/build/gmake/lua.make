@@ -107,6 +107,7 @@ endif
 .PHONY: clean prebuild prelink
 
 all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
+	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	@echo Linking lua
@@ -148,95 +149,96 @@ prelink:
 ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	-$(SILENT) cp $< $(OBJDIR)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
 $(OBJDIR)/lapi.o: ../../lua/lua/src/lapi.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lcode.o: ../../lua/lua/src/lcode.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ldebug.o: ../../lua/lua/src/ldebug.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ldo.o: ../../lua/lua/src/ldo.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ldump.o: ../../lua/lua/src/ldump.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lfunc.o: ../../lua/lua/src/lfunc.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lgc.o: ../../lua/lua/src/lgc.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/llex.o: ../../lua/lua/src/llex.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lmem.o: ../../lua/lua/src/lmem.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lobject.o: ../../lua/lua/src/lobject.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lopcodes.o: ../../lua/lua/src/lopcodes.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lparser.o: ../../lua/lua/src/lparser.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lstate.o: ../../lua/lua/src/lstate.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lstring.o: ../../lua/lua/src/lstring.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ltable.o: ../../lua/lua/src/ltable.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ltm.o: ../../lua/lua/src/ltm.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lundump.o: ../../lua/lua/src/lundump.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lvm.o: ../../lua/lua/src/lvm.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lzio.o: ../../lua/lua/src/lzio.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lauxlib.o: ../../lua/lua/src/lauxlib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lbaselib.o: ../../lua/lua/src/lbaselib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ldblib.o: ../../lua/lua/src/ldblib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/liolib.o: ../../lua/lua/src/liolib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lmathlib.o: ../../lua/lua/src/lmathlib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/loslib.o: ../../lua/lua/src/loslib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ltablib.o: ../../lua/lua/src/ltablib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lstrlib.o: ../../lua/lua/src/lstrlib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/loadlib.o: ../../lua/lua/src/loadlib.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/linit.o: ../../lua/lua/src/linit.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

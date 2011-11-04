@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="wxbindnet"
-	ProjectGUID="{EBEDDE59-5186-BD4D-A1A1-90B5378B9174}"
+	ProjectGUID="{E4F4C24F-4FDE-8046-A75A-EC69B11E578E}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -138,24 +138,24 @@
 				Filter=""
 				>
 				<Filter
-					Name="src"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxbind\src\wxnet_bind.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
 					Name="include"
 					Filter=""
 					>
 					<File
 						RelativePath="..\..\lua\wxbind\include\wxnet_bind.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxnet_bind.cpp"
 						>
 					</File>
 				</Filter>

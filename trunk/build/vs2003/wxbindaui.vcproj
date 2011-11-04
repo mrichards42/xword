@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="wxbindaui"
-	ProjectGUID="{7B5FFCF2-276C-E145-9723-29B197441B38}"
+	ProjectGUID="{3ECCABDC-1F97-4544-95B8-A4B62D0EE833}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -156,24 +156,24 @@
 				Filter=""
 				>
 				<Filter
-					Name="src"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxbind\src\wxaui_bind.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
 					Name="include"
 					Filter=""
 					>
 					<File
 						RelativePath="..\..\lua\wxbind\include\wxaui_bind.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxaui_bind.cpp"
 						>
 					</File>
 				</Filter>

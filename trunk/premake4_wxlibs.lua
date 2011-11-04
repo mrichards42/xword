@@ -1,6 +1,5 @@
 -- wxWidgets links
-
-local WXWIN = "$(WXWIN)"
+dofile 'premake_config.lua'
 
 configuration "windows"
     libdirs { WXWIN.."/lib/vc_lib" }
@@ -59,5 +58,12 @@ configuration { "linux", "Debug" }
 configuration { "linux", "Release" }
     linkoptions  "`wx-config --release --unicode --static --libs`"
 
--- Reset the configuration
+if os.is("macosx") then
+configuration { "macosx", "Debug" }
+    buildoptions{ os.outputof(WXMAC_BUILD_DEBUG .. "/wx-config --libs") }
+
+configuration { "macosx", "Release" }
+    buildoptions{ os.outputof(WXMAC_BUILD_RELEASE .. "/wx-config --libs") }
+end
+
 configuration {}

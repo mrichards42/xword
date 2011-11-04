@@ -29,7 +29,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 `wx-config --release --unicode --static --cxxflags`
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -L../../bin/Release -L../../lib/Release
-  LIBS      += -lwxbindbase
+  LIBS      += ../../lib/Release/libwxbindbase.a
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../../lib/Release/libwxbindbase.a
   LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
@@ -51,7 +51,7 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g `wx-config --debug --unicode --static --cxxflags`
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L../../bin/Debug -L../../lib/Debug
-  LIBS      += -lwxbindbase
+  LIBS      += ../../lib/Debug/libwxbindbase.a
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../../lib/Debug/libwxbindbase.a
   LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
@@ -98,6 +98,7 @@ endif
 .PHONY: clean prebuild prelink
 
 all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
+	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	@echo Linking wxbindcore
@@ -139,68 +140,69 @@ prelink:
 ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	-$(SILENT) cp $< $(OBJDIR)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
 $(OBJDIR)/wxcore_appframe.o: ../../lua/wxbind/src/wxcore_appframe.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_bind.o: ../../lua/wxbind/src/wxcore_bind.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_clipdrag.o: ../../lua/wxbind/src/wxcore_clipdrag.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_controls.o: ../../lua/wxbind/src/wxcore_controls.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_core.o: ../../lua/wxbind/src/wxcore_core.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_defsutils.o: ../../lua/wxbind/src/wxcore_defsutils.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_dialogs.o: ../../lua/wxbind/src/wxcore_dialogs.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_event.o: ../../lua/wxbind/src/wxcore_event.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_gdi.o: ../../lua/wxbind/src/wxcore_gdi.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_geometry.o: ../../lua/wxbind/src/wxcore_geometry.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_help.o: ../../lua/wxbind/src/wxcore_help.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_image.o: ../../lua/wxbind/src/wxcore_image.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_mdi.o: ../../lua/wxbind/src/wxcore_mdi.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_menutool.o: ../../lua/wxbind/src/wxcore_menutool.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_picker.o: ../../lua/wxbind/src/wxcore_picker.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_print.o: ../../lua/wxbind/src/wxcore_print.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_sizer.o: ../../lua/wxbind/src/wxcore_sizer.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_windows.o: ../../lua/wxbind/src/wxcore_windows.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxcore_wxlcore.o: ../../lua/wxbind/src/wxcore_wxlcore.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/dummy.o: ../../lua/wxbind/src/dummy.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="luatask"
-	ProjectGUID="{D0C72DD8-31FB-364A-A6C5-EB74778A60E6}"
+	ProjectGUID="{D461E6FF-4E25-D344-B882-C12E9C2D313B}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -33,6 +33,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\task.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -105,6 +106,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\task.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

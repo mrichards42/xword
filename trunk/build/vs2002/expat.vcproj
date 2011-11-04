@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="expat"
-	ProjectGUID="{15162DED-6EC4-B34C-B0C2-EF689220E59B}"
+	ProjectGUID="{A033EDC8-46DE-7F48-A7B8-1A658C4CC1B1}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -32,6 +32,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\libexpat.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -93,6 +94,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\libexpat.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -145,6 +147,18 @@
 				Filter=""
 				>
 				<File
+					RelativePath="..\..\expat\lib\expat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\expat\lib\expat_external.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\expat\lib\libexpat.def"
+					>
+				</File>
+				<File
 					RelativePath="..\..\expat\lib\xmlparse.c"
 					>
 				</File>
@@ -162,18 +176,6 @@
 				</File>
 				<File
 					RelativePath="..\..\expat\lib\xmltok_ns.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\expat\lib\expat.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\expat\lib\expat_external.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\expat\lib\libexpat.def"
 					>
 				</File>
 			</Filter>

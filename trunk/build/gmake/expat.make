@@ -83,6 +83,7 @@ endif
 .PHONY: clean prebuild prelink
 
 all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
+	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	@echo Linking expat
@@ -124,23 +125,24 @@ prelink:
 ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	-$(SILENT) cp $< $(OBJDIR)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
 $(OBJDIR)/xmlparse.o: ../../expat/lib/xmlparse.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/xmlrole.o: ../../expat/lib/xmlrole.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/xmltok.o: ../../expat/lib/xmltok.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/xmltok_impl.o: ../../expat/lib/xmltok_impl.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/xmltok_ns.o: ../../expat/lib/xmltok_ns.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

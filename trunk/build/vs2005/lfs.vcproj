@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="lfs"
-	ProjectGUID="{6F668C22-496F-6F41-811E-5C708561AB39}"
+	ProjectGUID="{D6CF53F3-09F8-3E46-817E-CB181822E220}"
 	RootNamespace="lfs"
 	Keyword="Win32Proj"
 	>
@@ -51,6 +51,7 @@
 				Detect64BitPortabilityProblems="true"
 				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -138,6 +139,7 @@
 				Detect64BitPortabilityProblems="true"
 				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

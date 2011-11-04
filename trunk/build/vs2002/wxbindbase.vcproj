@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="wxbindbase"
-	ProjectGUID="{C4ECBA0E-EC33-3A42-9216-E6D30B285E93}"
+	ProjectGUID="{382ACCB8-6F3E-BC42-8786-DD5860627D95}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -138,9 +138,26 @@
 				Filter=""
 				>
 				<Filter
+					Name="include"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\include\wxbase_bind.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\include\wxbinddefs.h"
+						>
+					</File>
+				</Filter>
+				<Filter
 					Name="src"
 					Filter=""
 					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\lua\wxbind\src\wxbase_base.cpp"
 						>
@@ -163,23 +180,6 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\wxbind\src\wxbase_file.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="include"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxbind\include\wxbase_bind.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\include\wxbinddefs.h"
 						>
 					</File>
 				</Filter>

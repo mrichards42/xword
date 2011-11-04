@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="luacurl"
-	ProjectGUID="{AD9B1CC3-5336-4342-9A7D-A387D06AA238}"
+	ProjectGUID="{ED1A7873-CDA6-3145-9CF2-DB8DC727FC84}"
 	RootNamespace="luacurl"
 	Keyword="Win32Proj"
 	>
@@ -50,6 +50,7 @@
 				Detect64BitPortabilityProblems="true"
 				ProgramDataBaseFileName="$(OutDir)\luacurl.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -137,6 +138,7 @@
 				Detect64BitPortabilityProblems="true"
 				ProgramDataBaseFileName="$(OutDir)\luacurl.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -204,10 +206,6 @@
 					Filter=""
 					>
 					<File
-						RelativePath="..\..\lua\luacurl\src\curlopt.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\lua\luacurl\src\curl_authopt.h"
 						>
 					</File>
@@ -228,7 +226,19 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\lua\luacurl\src\curlopt.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\luacurl\src\lua-curl.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\lua\luacurl\src\lua-curl.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\luacurl\src\luabind.c"
 						>
 					</File>
 					<File
@@ -237,14 +247,6 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\luacurl\src\version.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\luacurl\src\lua-curl.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\luacurl\src\luabind.c"
 						>
 					</File>
 				</Filter>

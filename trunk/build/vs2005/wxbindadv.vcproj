@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="wxbindadv"
-	ProjectGUID="{D8155879-0677-E140-9D7A-610B6EAD1E01}"
+	ProjectGUID="{D65483FD-7732-5848-A35A-FE4DC1AEF481}"
 	RootNamespace="wxbindadv"
 	Keyword="Win32Proj"
 	>
@@ -187,23 +187,6 @@
 				Filter=""
 				>
 				<Filter
-					Name="src"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxbind\src\wxadv_bind.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\wxadv_wxladv.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
 					Name="include"
 					Filter=""
 					>
@@ -213,6 +196,23 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\wxbind\include\wxadv_wxladv.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxadv_bind.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxadv_wxladv.cpp"
 						>
 					</File>
 				</Filter>

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="lsqlite3"
-	ProjectGUID="{801E652D-DC4C-1C49-84AA-664426930705}"
+	ProjectGUID="{0D7F8CCF-14B2-7043-90D9-62D4A121DF7C}"
 	RootNamespace="lsqlite3"
 	Keyword="Win32Proj"
 	>
@@ -51,6 +51,7 @@
 				Detect64BitPortabilityProblems="true"
 				ProgramDataBaseFileName="$(OutDir)\lsqlite3.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -138,6 +139,7 @@
 				Detect64BitPortabilityProblems="true"
 				ProgramDataBaseFileName="$(OutDir)\lsqlite3.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

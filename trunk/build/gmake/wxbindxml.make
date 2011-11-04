@@ -29,7 +29,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 `wx-config --release --unicode --static --cxxflags`
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -L../../bin/Release -L../../lib/Release
-  LIBS      += -lwxbindbase
+  LIBS      += ../../lib/Release/libwxbindbase.a
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../../lib/Release/libwxbindbase.a
   LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
@@ -51,7 +51,7 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g `wx-config --debug --unicode --static --cxxflags`
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L../../bin/Debug -L../../lib/Debug
-  LIBS      += -lwxbindbase
+  LIBS      += ../../lib/Debug/libwxbindbase.a
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../../lib/Debug/libwxbindbase.a
   LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
@@ -80,6 +80,7 @@ endif
 .PHONY: clean prebuild prelink
 
 all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
+	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	@echo Linking wxbindxml
@@ -121,14 +122,15 @@ prelink:
 ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	-$(SILENT) cp $< $(OBJDIR)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
 $(OBJDIR)/wxxml_bind.o: ../../lua/wxbind/src/wxxml_bind.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/dummy.o: ../../lua/wxbind/src/dummy.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

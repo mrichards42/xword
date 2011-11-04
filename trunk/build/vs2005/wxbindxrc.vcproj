@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="wxbindxrc"
-	ProjectGUID="{7738B3C9-1525-654A-B34D-19FB45112FB3}"
+	ProjectGUID="{EF01397B-931E-4B4C-9DFE-DF5EDEEF693B}"
 	RootNamespace="wxbindxrc"
 	Keyword="Win32Proj"
 	>
@@ -187,24 +187,24 @@
 				Filter=""
 				>
 				<Filter
-					Name="src"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxbind\src\wxxrc_bind.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
 					Name="include"
 					Filter=""
 					>
 					<File
 						RelativePath="..\..\lua\wxbind\include\wxxrc_bind.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxxrc_bind.cpp"
 						>
 					</File>
 				</Filter>

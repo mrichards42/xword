@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="lfs"
-	ProjectGUID="{E09975F2-2251-D94B-8109-460397E82D3E}"
+	ProjectGUID="{F4F889FE-053B-164D-9B8E-DFC91E26F71F}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -34,6 +34,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -107,6 +108,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

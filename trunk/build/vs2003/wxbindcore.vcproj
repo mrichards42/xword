@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="wxbindcore"
-	ProjectGUID="{8D2D41F1-4D1E-8649-96A7-53CB5F69088D}"
+	ProjectGUID="{C2F84974-165E-4D49-94E1-729009DF2B62}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -156,9 +156,26 @@
 				Filter=""
 				>
 				<Filter
+					Name="include"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\include\wxcore_bind.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\include\wxcore_wxlcore.h"
+						>
+					</File>
+				</Filter>
+				<Filter
 					Name="src"
 					Filter=""
 					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\lua\wxbind\src\wxcore_appframe.cpp"
 						>
@@ -233,23 +250,6 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\wxbind\src\wxcore_wxlcore.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="include"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxbind\include\wxcore_bind.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\include\wxcore_wxlcore.h"
 						>
 					</File>
 				</Filter>
