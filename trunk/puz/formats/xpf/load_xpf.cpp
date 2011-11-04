@@ -273,12 +273,14 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 continue;
             if (flag.attribute("Pencil").value() == std::string("true"))
                 square->AddFlag(FLAG_PENCIL);
-            if (flag.attribute("Incorrect").value() == std::string("true"))
+            if (flag.attribute("Checked").value() == std::string("true"))
                 square->AddFlag(FLAG_BLACK);
             if (flag.attribute("Revealed").value() == std::string("true"))
                 square->AddFlag(FLAG_REVEALED);
-            if (flag.attribute("X").value() == std::string("true"))
+            if (flag.attribute("Incorrect").value() == std::string("true"))
                 square->AddFlag(FLAG_X);
+            if (flag.attribute("Correct").value() == std::string("true"))
+                square->AddFlag(FLAG_CORRECT);
         }
     }
 

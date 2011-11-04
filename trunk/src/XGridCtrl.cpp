@@ -502,7 +502,7 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
     if (square == NULL)
         square = m_focusedSquare;
 
-    wxASSERT(m_focusedSquare->IsWhite() || m_grid->IsDiagramless());
+    wxASSERT(square->IsWhite() || m_grid->IsDiagramless());
 
     if (! word)
     {
@@ -816,8 +816,8 @@ XGridCtrl::MakeVisible(const puz::Square & square)
 bool
 XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
 {
-    // Not allowed to overwrite revealed letters
-    if (square.HasFlag(puz::FLAG_REVEALED))
+    // Not allowed to overwrite revealed letters or checked letters
+    if (square.HasFlag(puz::FLAG_REVEALED | puz::FLAG_CORRECT))
         return false;
 
     // renumber the grid if the square is changing from black to white or vice-versa
@@ -980,11 +980,9 @@ XGridCtrl::CheckGrid(int options)
 {
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
-    const bool checkBlank = (options & CHECK_ALL) != 0;
-    std::vector<puz::Square *> incorrect;
-    m_grid->CheckGrid(&incorrect, checkBlank, HasStyle(STRICT_REBUS));
-
-    PostCheck(incorrect, options);
+    puz::square_iterator begin(m_grid->First());
+    puz::square_iterator end(m_grid->Last());
+    Check(begin, end, options);
 }
 
 
@@ -993,13 +991,7 @@ XGridCtrl::CheckWord(int options)
 {
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
-    const bool checkBlank = (options & CHECK_ALL) != 0;
-    std::vector<puz::Square *> incorrect;
-    m_grid->CheckWord( &incorrect, m_focusedWord,
-                       checkBlank,
-                       HasStyle(STRICT_REBUS));
-
-    PostCheck(incorrect, options);
+    Check(m_focusedWord->begin(), m_focusedWord->end(), options);
 }
 
 
@@ -1010,33 +1002,37 @@ XGridCtrl::CheckLetter(int options)
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
     puz::Square * square = GetFocusedSquare();
+    puz::square_iterator begin(square);
+    puz::square_iterator end(square->Next());
 
-    const bool checkBlank = (options & CHECK_ALL) != 0;
-
-    std::vector<puz::Square *> incorrect;
-    if (! square->Check(checkBlank, HasStyle(STRICT_REBUS)))
-        incorrect.push_back(square);
-
-    PostCheck(incorrect, options);
+    Check(begin, end, options);
 }
 
 
 void
-XGridCtrl::PostCheck(std::vector<puz::Square *> & incorrect, int options)
+XGridCtrl::Check(puz::square_iterator begin, puz::square_iterator end,
+                 int options)
 {
-    if (incorrect.empty() && (options & NO_MESSAGE_BOX) == 0)
-    {
-        XWordMessage(this, MSG_NO_INCORRECT);
-        return;
-    }
+    wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
     wxClientDC dc(this); DoPrepareDC(dc);
-    for (std::vector<puz::Square *>::iterator it = incorrect.begin();
-         it != incorrect.end();
-         ++it)
-    {
-        puz::Square * square = *it;
+    bool incorrect = false;
+    for (puz::square_iterator square = begin; square != end; ++square)
+        if (! CheckSquare(&*square, options, dc))
+            incorrect = true;
+    if (! incorrect && (options & NO_MESSAGE_BOX) == 0)
+        XWordMessage(this, MSG_NO_INCORRECT);
+}
 
+// Check an individual square, set flags, refresh the square
+bool
+XGridCtrl::CheckSquare(puz::Square * square, int options, wxDC & dc)
+{
+    if (! square->IsWhite())
+        return true;
+    square->RemoveFlag(puz::FLAG_CORRECT);
+    if (! square->Check((options & CHECK_ALL) != 0, HasStyle(STRICT_REBUS)))
+    {
         if ( (options & REVEAL_ANSWER) != 0)
         {
             SetSquareText(*square, puz2wx(square->GetSolution()));
@@ -1049,7 +1045,15 @@ XGridCtrl::PostCheck(std::vector<puz::Square *> & incorrect, int options)
             square->AddFlag(puz::FLAG_X);
         }
         RefreshSquare(dc, *square);
+        return false;
     }
+    else if (! square->IsBlank() && ! square->HasFlag(puz::FLAG_REVEALED))
+    {
+        square->AddFlag(puz::FLAG_CORRECT);
+        RefreshSquare(dc, *square);
+        return true;
+    }
+    return true;
 }
 
 
@@ -1112,19 +1116,14 @@ XGridCtrl::DoCheckSelection(puz::Square * start, puz::Square * end, int options)
 {
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
-    const bool checkBlank = (options & CHECK_ALL) != 0;
-
-    std::vector<puz::Square *> incorrect;
-
+    wxClientDC dc(this); DoPrepareDC(dc);
+    bool incorrect = false;
     for (int col = start->GetCol(); col <= end->GetCol(); ++col)
         for (int row = start->GetRow(); row <= end->GetRow(); ++row)
-        {
-            puz::Square * square = &At(col, row);
-            if (square->IsWhite() && ! square->Check(checkBlank, HasStyle(STRICT_REBUS)))
-                incorrect.push_back(square);
-        }
-
-    PostCheck(incorrect, options);
+            if (! CheckSquare(&At(col, row), options, dc))
+                incorrect = true;
+    if (! incorrect && (options & NO_MESSAGE_BOX) == 0)
+        XWordMessage(this, MSG_NO_INCORRECT);
 }
 
 // Start the selection process and defer checking the squares until later.

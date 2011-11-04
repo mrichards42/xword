@@ -166,10 +166,12 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
                     cell.append_attribute("solve-status") = "pencil";
                 // Extra square flags to keep track of incorrect letters
                 // This is nonstandard, but doesn't break Crossword Solver.
-                else if (square->HasFlag(FLAG_BLACK))
-                    cell.append_attribute("solve-status") = "incorrect";
-                else if (square->HasFlag(FLAG_X))
-                    cell.append_attribute("solve-status") = "x";
+                if (square->HasFlag(FLAG_BLACK))
+                    cell.append_attribute("checked") = "true";
+                if (square->HasFlag(FLAG_X))
+                    cell.append_attribute("incorect") = "true";
+                if (square->HasFlag(FLAG_CORRECT))
+                    cell.append_attribute("correct") = "true";
             }
             if (square->HasImage())
             {

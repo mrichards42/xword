@@ -87,6 +87,9 @@ XGridDrawer::Init()
     SetWhiteSquareColor(*wxWHITE);
     SetBlackSquareColor(*wxBLACK);
     SetPenColor(*wxBLACK);
+    SetRevealedColor(wxColour(246, 36, 0));
+    SetCheckedColor(*wxBLACK);
+    SetCorrectColor(wxColour(64, 193, 23));
 
     m_drawOptions = DRAW_ALL;
 
@@ -396,10 +399,11 @@ XGridDrawer::DrawSquare(wxDC & adc,
     // the more important parts of a square:
     // 1. The background
     // 2. An incorrect / revealed indicator (the little triangle in the corner)
-    // 3. A circle
-    // 4. The number (with an opaque background so it draws over the circle)
-    // 5. The text
-    // 6. An X over everything
+    // 3. A correct indicator (green check in the corner)
+    // 4. A circle
+    // 5. The number (with an opaque background so it draws over the circle)
+    // 6. The text
+    // 7. An X over everything
 
     // If we are supposed to draw the outline, we'll draw the square with
     // the default square background, and then draw the outline using the
@@ -477,21 +481,26 @@ XGridDrawer::DrawSquare(wxDC & adc,
     // Draw square's flag (top right)
     if (HasFlag(DRAW_FLAG) && square.HasFlag(puz::FLAG_REVEALED | puz::FLAG_BLACK))
     {
+        wxColor flagColor = GetCheckedColor();
         if (square.HasFlag(puz::FLAG_REVEALED))
-        {
-            dc.SetBrush(*wxRED_BRUSH);
-            dc.SetPen(*wxRED_PEN);
-        }
-        else
-        {
-            dc.SetBrush(*wxBLACK_BRUSH);
-            dc.SetPen(*wxBLACK_PEN);
-        }
+            flagColor = GetRevealedColor();
+        dc.SetPen(wxPen(flagColor));
+        dc.SetBrush(wxBrush(flagColor));
+
         wxPoint pts[3];
         pts[0] = wxPoint(x + 2./3.*m_boxSize, y);
         pts[1] = wxPoint(x + m_boxSize - 1, y);
         pts[2] = wxPoint(x + m_boxSize - 1, y + 1./3.*m_boxSize);
         dc.DrawPolygon(3, pts);
+    }
+
+    if (HasFlag(DRAW_FLAG) && square.HasFlag(puz::FLAG_CORRECT)
+        && ! square.HasFlag(puz::FLAG_REVEALED))
+    {
+        dc.SetPen(wxPen(GetCorrectColor()));
+        dc.SetBrush(wxBrush(GetCorrectColor()));
+        // Draw a circle at the centroid of the above triangle.
+        dc.DrawCircle(x + 8./9.*m_boxSize, y + 1./9.*m_boxSize, m_boxSize/12.);
     }
 
 

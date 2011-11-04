@@ -56,6 +56,30 @@ public:
     Square & ref() { throw std::exception(); }
 };
 
+// Basic iterator implementation
+// This is a drop-in replacement for the usual construction:
+// for (square = grid.First(); square != NULL; square = square->Next())
+// Instead you can use
+// for (square_iterator it = grid.begin(); it != grid.end(); ++it)
+class basic_iterator_impl : public iterator_impl
+{
+public:
+    basic_iterator_impl(Square * square = NULL, GridDirection dir = ACROSS)
+        : m_square(square),
+          m_direction(dir)
+    {}
+    virtual iterator_impl * clone()
+        { return new basic_iterator_impl(m_square, m_direction); }
+    virtual void increment() { m_square = m_square->Next(m_direction); }
+    virtual void decrement() { m_square = m_square->Prev(m_direction); }
+    virtual Square * ptr() { return m_square; }
+    virtual Square & ref() { return *m_square; }
+
+protected:
+    Square * m_square;
+    GridDirection m_direction;
+};
+
 // ----------------------------------------------------------------------------
 // The square iterator (wrapper for implementation classes)
 // ----------------------------------------------------------------------------
@@ -74,6 +98,11 @@ public:
 
     explicit square_iterator_t<Square_T, INC>(iterator_impl * it)
         : m_impl(it)
+    {}
+
+    explicit square_iterator_t<Square_T, INC>(Square * square,
+                                              GridDirection dir = ACROSS)
+        : m_impl(new basic_iterator_impl(square, dir))
     {}
 
     // Copy constructor: make a copy of m_impl
@@ -144,30 +173,6 @@ inline void square_iterator::decrement() { m_impl->decrement(); }
 inline void square_reverse_iterator::increment() { m_impl->decrement(); }
 inline void square_reverse_iterator::decrement() { m_impl->increment(); }
 #endif // _WINDOWS
-
-// Basic iterator implementation
-// This is a drop-in replacement for the usual construction:
-// for (square = grid.First(); square != NULL; square = square->Next())
-// Instead you can use
-// for (square_iterator it = grid.begin(); it != grid.end(); ++it)
-class basic_iterator_impl : public iterator_impl
-{
-public:
-    basic_iterator_impl(Square * square = NULL, GridDirection dir = ACROSS)
-        : m_square(square),
-          m_direction(dir)
-    {}
-    virtual iterator_impl * clone()
-        { return new basic_iterator_impl(m_square, m_direction); }
-    virtual void increment() { m_square = m_square->Next(m_direction); }
-    virtual void decrement() { m_square = m_square->Prev(m_direction); }
-    virtual Square * ptr() { return m_square; }
-    virtual Square & ref() { return *m_square; }
-
-protected:
-    Square * m_square;
-    GridDirection m_direction;
-};
 
 } // namespace puz
 
