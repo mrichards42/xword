@@ -319,8 +319,9 @@ protected:
         { return ch < 256 && puz::Square::IsValidChar(static_cast<char>(ch)); }
 
     // Common CheckXXX function
-    void PostCheck(std::vector<puz::Square *> & incorrect, int options);
     void DoCheckSelection(puz::Square * start, puz::Square * end, int options);
+    void Check(puz::square_iterator begin, puz::square_iterator end, int options);
+    bool CheckSquare(puz::Square * square, int options, wxDC & dc);
 
     // Drawing functions
     void OnPaint(wxPaintEvent & evt);

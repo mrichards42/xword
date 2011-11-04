@@ -159,6 +159,8 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
 static bool LoadGEXT(Puzzle * puz, const std::string & data);
 static void UnLoadGEXT(Puzzle * puz);
+static bool LoadCHKD(Puzzle * puz, const std::string & data);
+static void UnLoadCHKD(Puzzle * puz);
 static bool LoadLTIM(Puzzle * puz, const std::string & data);
 static void UnLoadLTIM(Puzzle * puz);
 static bool LoadRUSR(Puzzle * puz, const std::string & data);
@@ -216,6 +218,7 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
     std::string data;
 
     LOAD_SECTION(GEXT)
+    LOAD_SECTION(CHKD)
     LOAD_SECTION(LTIM)
     LOAD_SECTION(RUSR)
 
@@ -275,6 +278,39 @@ void UnLoadGEXT(Puzzle * puz)
          square = square->Next())
     {
         square->SetFlag(FLAG_CLEAR);
+    }
+}
+
+//------------------------------------------------------------------------------
+// CHKD (correct squares) // This is my own extension
+//------------------------------------------------------------------------------
+
+bool LoadCHKD(Puzzle * puz, const std::string & data)
+{
+    std::istringstream stream(data);
+    istream_wrapper f(stream);
+
+    std::string::const_iterator it = data.begin();
+    for (Square * square = puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (f.ReadChar() != 0)
+            square->AddFlag(FLAG_CORRECT);
+    }
+    if (! f.CheckEof())
+        return false;
+    return true;
+}
+
+// Rollback changes
+void UnLoadCHKD(Puzzle * puz)
+{
+    for (Square * square = puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        square->RemoveFlag(FLAG_CORRECT);
     }
 }
 

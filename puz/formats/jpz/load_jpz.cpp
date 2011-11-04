@@ -228,16 +228,15 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 }
                 else if (status == puzT("pencil"))
                     square->AddFlag(FLAG_PENCIL);
-                // Extra square flags to keep track of incorrect letters
+                // Extra square flags to keep track of checked and correct
+                // letters
                 // This is nonstandard, but doesn't break Crossword Solver.
-                else if (status == puzT("incorrect"))
-                {
+                if (GetAttribute(cell, "checked") == puzT("true"))
                     square->AddFlag(FLAG_BLACK);
-                }
-                else if (status == puzT("x"))
-                {
+                if (GetAttribute(cell, "incorrect") == puzT("true"))
                     square->AddFlag(FLAG_X);
-                }
+                if (GetAttribute(cell, "correct") == puzT("true"))
+                    square->AddFlag(FLAG_CORRECT);
                 // Top right number
                 square->m_mark[MARK_TR] = GetAttribute(cell, "top-right-number");
             }

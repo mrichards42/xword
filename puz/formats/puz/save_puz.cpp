@@ -52,7 +52,7 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
          square = square->Next())
     {
         if (square->IsSolutionBlank()
-            || square->GetFlag() & ~ ACROSS_LITE_MASK
+            || square->GetFlag() & ~ (ACROSS_LITE_MASK | FLAG_CORRECT)
             || square->HasImage())
         {
             throw ConversionError();
@@ -112,6 +112,7 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
 
 static void WriteGEXT(Puzzle * puz, ostream_wrapper & f);
+static void WriteCHKD(Puzzle * puz, ostream_wrapper & f);
 static void WriteLTIM(Puzzle * puz, ostream_wrapper & f);
 static void WriteRUSR(Puzzle * puz, ostream_wrapper & f);
 static void WriteSolutionRebus(Puzzle * puz, ostream_wrapper & f);
@@ -122,6 +123,7 @@ static void WriteSection(ostream_wrapper & f,
 void SaveSections(Puzzle * puz, ostream_wrapper & f)
 {
     WriteGEXT(puz, f);
+    WriteCHKD(puz, f);
     WriteLTIM(puz, f);
     WriteRUSR(puz, f);
     WriteSolutionRebus(puz, f);
@@ -170,6 +172,27 @@ void WriteGEXT(Puzzle * puz, ostream_wrapper & f)
     if (hasData)
         WriteSection(f, "GEXT", data);
 }
+
+
+void WriteCHKD(Puzzle * puz, ostream_wrapper & f)
+{
+    std::string data;
+    data.reserve(puz->m_grid.GetWidth() * puz->m_grid.GetHeight());
+    bool hasData = false;
+
+    for (Square * square = puz->m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        const bool correct = square->HasFlag(FLAG_CORRECT);
+        data.push_back(correct ? 1 : 0);
+        if (! hasData && correct)
+            hasData = true;
+    }
+    if (hasData)
+        WriteSection(f, "CHKD", data);
+}
+
 
 
 void WriteLTIM(Puzzle * puz, ostream_wrapper & f)

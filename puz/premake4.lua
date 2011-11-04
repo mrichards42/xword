@@ -13,6 +13,7 @@ project "puz"
 
     configuration "not windows"
         excludes { "utils/minizip/iowin32.*" }
+    configuration {}
 
     includedirs {
         -- This allows #include "Puzzle.hpp" from the formats subdirs.

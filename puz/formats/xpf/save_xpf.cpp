@@ -264,11 +264,13 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 if (square->HasFlag(FLAG_PENCIL))
                     entry.append_attribute("Pencil") = "true";
                 if (square->HasFlag(FLAG_BLACK))
-                    entry.append_attribute("Incorrect") = "true";
+                    entry.append_attribute("Checked") = "true";
                 if (square->HasFlag(FLAG_REVEALED))
                     entry.append_attribute("Revealed") = "true";
                 if (square->HasFlag(FLAG_X))
-                    entry.append_attribute("X") = "true";
+                    entry.append_attribute("Incorrect") = "true";
+                if (square->HasFlag(FLAG_CORRECT))
+                    entry.append_attribute("Correct") = "true";
             }
         }
         if (flags.empty())

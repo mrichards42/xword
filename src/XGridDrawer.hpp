@@ -100,12 +100,19 @@ public:
     const wxColour & GetWhiteSquareColor() const { return m_whiteSquareColor; }
     const wxColour & GetBlackSquareColor() const { return m_blackSquareColor; }
     const wxColour & GetPenColor()         const { return m_penColor; }
+    const wxColour & GetCorrectColor()     const { return m_correctColor; }
+    const wxColour & GetCheckedColor()     const { return m_checkedColor; }
+    const wxColour & GetRevealedColor()    const { return m_revealedColor; }
+
 
     void SetWhiteSquareColor(const wxColour & color)
         { m_whiteSquareColor = color; }
     void SetBlackSquareColor(const wxColour & color)
         { m_blackSquareColor = color; }
     void SetPenColor(const wxColour & color) { m_penColor = color; }
+    void SetCorrectColor(const wxColour & color) { m_correctColor = color; }
+    void SetCheckedColor(const wxColour & color) { m_checkedColor = color; }
+    void SetRevealedColor(const wxColour & color) { m_revealedColor = color; }
 
 
     // Selective Drawing
@@ -207,6 +214,9 @@ private:
     wxColour m_whiteSquareColor;
     wxColour m_blackSquareColor;
     wxColour m_penColor;
+    wxColour m_revealedColor;
+    wxColour m_correctColor;
+    wxColour m_checkedColor;
 
     // Images
     std::map<const puz::Square *, wxImage> m_imageMap;

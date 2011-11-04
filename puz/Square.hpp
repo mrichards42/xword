@@ -38,15 +38,17 @@ enum GextFlag
     FLAG_REVEALED    = 0x40,
     FLAG_CIRCLE = 0x80,
 
+    FLAG_COLOR = 0x100,
+    FLAG_MISSING = 0x200,
+    FLAG_CORRECT = 0x400,
+
     ACROSS_LITE_MASK = FLAG_CLEAR |
                        FLAG_PENCIL |
                        FLAG_BLACK |
                        FLAG_X |
                        FLAG_REVEALED |
-                       FLAG_CIRCLE,
+                       FLAG_CIRCLE
 
-    FLAG_COLOR = 0x100,
-    FLAG_MISSING = 0x200
 };
 
 
