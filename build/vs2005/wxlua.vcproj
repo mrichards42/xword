@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="wxlua"
-	ProjectGUID="{B1904B19-1291-9D4E-9628-FBC679428D4A}"
+	ProjectGUID="{D0ED230F-A33E-7B47-840F-0731F4E74AC0}"
 	RootNamespace="wxlua"
 	Keyword="Win32Proj"
 	>
@@ -187,31 +187,6 @@
 				Filter=""
 				>
 				<Filter
-					Name="src"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxlua\src\dummy.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxlua\src\wxlbind.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxlua\src\wxlcallb.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxlua\src\wxlstate.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxlua\src\wxlua_bind.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
 					Name="include"
 					Filter=""
 					>
@@ -237,6 +212,31 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\wxlua\include\wxlua_bind.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxlua\src\dummy.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxlua\src\wxlbind.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxlua\src\wxlcallb.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxlua\src\wxlstate.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxlua\src\wxlua_bind.cpp"
 						>
 					</File>
 				</Filter>

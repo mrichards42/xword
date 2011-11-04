@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="luatask"
-	ProjectGUID="{F30E32AC-EF0C-B74E-8B9B-64E77C52E7C4}"
+	ProjectGUID="{C6700C23-8119-2947-ABC0-E9AF3AE7BDCA}"
 	RootNamespace="luatask"
 	Keyword="Win32Proj"
 	>
@@ -49,6 +49,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\task.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -134,6 +135,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\task.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

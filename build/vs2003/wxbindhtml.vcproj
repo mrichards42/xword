@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="wxbindhtml"
-	ProjectGUID="{D1625BBF-0027-2F4B-9030-5E90D3AF414A}"
+	ProjectGUID="{13BCD348-C68F-AC4F-BAA0-1D46BC493F40}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -156,23 +156,6 @@
 				Filter=""
 				>
 				<Filter
-					Name="src"
-					Filter=""
-					>
-					<File
-						RelativePath="..\..\lua\wxbind\src\wxhtml_bind.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\wxhtml_wxlhtml.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
 					Name="include"
 					Filter=""
 					>
@@ -182,6 +165,23 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\wxbind\include\wxhtml_wxlhtml.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="src"
+					Filter=""
+					>
+					<File
+						RelativePath="..\..\lua\wxbind\src\dummy.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxhtml_bind.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\wxbind\src\wxhtml_wxlhtml.cpp"
 						>
 					</File>
 				</Filter>

@@ -1,6 +1,5 @@
 -- wxWidgets defines and include directories
-
-local WXWIN = "$(WXWIN)"
+dofile 'premake_config.lua'
 
 configuration {}
     defines { "UNICODE", "_UNICODE", }
@@ -24,5 +23,12 @@ configuration { "linux", "Debug" }
 configuration { "linux", "Release" }
     buildoptions "`wx-config --release --unicode --static --cxxflags`"
 
+if os.is("macosx") then
+configuration { "macosx", "Debug" }
+    buildoptions{ os.outputof(WXMAC_BUILD_DEBUG .. "/wx-config --cxxflags") }
+
+configuration { "macosx", "Release" }
+    buildoptions{ os.outputof(WXMAC_BUILD_RELEASE .. "/wx-config --cxxflags") }
+end
 -- Reset the configuration
 configuration {}

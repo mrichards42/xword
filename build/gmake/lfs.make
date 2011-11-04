@@ -79,6 +79,7 @@ endif
 .PHONY: clean prebuild prelink
 
 all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
+	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	@echo Linking lfs
@@ -120,11 +121,12 @@ prelink:
 ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	-$(SILENT) cp $< $(OBJDIR)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
 $(OBJDIR)/lfs.o: ../../lua/lfs/src/lfs.c
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o $@ -c $<
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="expat"
-	ProjectGUID="{263DD6C5-8E77-3A46-B502-E11E7BDAF1F3}"
+	ProjectGUID="{544E8752-B147-3D44-A2DF-E3E8AA687EC5}"
 	RootNamespace="expat"
 	Keyword="Win32Proj"
 	>
@@ -48,6 +48,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\libexpat.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -131,6 +132,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\libexpat.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -192,6 +194,18 @@
 				Filter=""
 				>
 				<File
+					RelativePath="..\..\expat\lib\expat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\expat\lib\expat_external.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\expat\lib\libexpat.def"
+					>
+				</File>
+				<File
 					RelativePath="..\..\expat\lib\xmlparse.c"
 					>
 				</File>
@@ -209,18 +223,6 @@
 				</File>
 				<File
 					RelativePath="..\..\expat\lib\xmltok_ns.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\expat\lib\expat.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\expat\lib\expat_external.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\expat\lib\libexpat.def"
 					>
 				</File>
 			</Filter>

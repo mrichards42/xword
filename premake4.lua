@@ -1,7 +1,8 @@
-USE_LUA = true
+dofile 'premake_config.lua'
 
 solution "XWord"
     configurations { "Release", "Debug" }
+    platforms { "native" }
 
     -- Output for premake4 (vs projects / makefiles, etc)
     location ("build/".._ACTION)
@@ -40,8 +41,8 @@ solution "XWord"
 
     include "src" -- the XWord premake file
     include "puz" -- the puzzle library
-    include "expat"
     include "yajl"
     if USE_LUA then
         include "lua" -- lua libraries
+        include "expat"
     end

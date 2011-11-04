@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="yajl"
-	ProjectGUID="{786B6D27-E5B7-014A-9C7F-4805A2E79C10}"
+	ProjectGUID="{5C3A9257-70FA-6E45-B39C-97B967E2872A}"
 	RootNamespace="yajl"
 	Keyword="Win32Proj"
 	>
@@ -50,6 +50,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\yajl.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -135,6 +136,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\yajl.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -215,13 +217,21 @@
 						RelativePath="..\..\yajl\src\api\yajl_tree.h"
 						>
 					</File>
-					<File
-						RelativePath="..\..\yajl\src\api\yajl_version.h.cmake"
-						>
-					</File>
 				</Filter>
 				<File
+					RelativePath="..\..\yajl\src\yajl.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\yajl\src\yajl_alloc.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\yajl\src\yajl_alloc.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\yajl\src\yajl_buf.c"
 					>
 				</File>
 				<File
@@ -233,31 +243,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\yajl\src\yajl_encode.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\yajl\src\yajl_lex.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\yajl\src\yajl_parser.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\yajl\src\yajl.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\yajl\src\yajl_alloc.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\yajl\src\yajl_buf.c"
-					>
-				</File>
-				<File
 					RelativePath="..\..\yajl\src\yajl_encode.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\yajl\src\yajl_encode.h"
 					>
 				</File>
 				<File
@@ -269,7 +259,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\yajl\src\yajl_lex.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\yajl\src\yajl_parser.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\yajl\src\yajl_parser.h"
 					>
 				</File>
 				<File

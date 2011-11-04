@@ -29,7 +29,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 `wx-config --release --unicode --static --cxxflags`
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -lwxbindxrc -lwxbindxml -lwxbindnet -lwxbindhtml -lwxbindaui -lwxbindadv -lwxbindcore -lwxbindbase -lwxlua -llua5.1 `wx-config --release --unicode --static --libs` -L../../bin/Release -L../../lib/Release
-  LIBS      += -lpuz -ldl -llua5.1 -lwxlua -lwxbindbase -lwxbindcore -lwxbindadv -lwxbindaui -lwxbindhtml -lwxbindnet -lwxbindxml -lwxbindxrc -lluapuz
+  LIBS      += -lpuz -llua5.1 ../../lib/Release/libwxlua.a ../../lib/Release/libwxbindbase.a ../../lib/Release/libwxbindcore.a ../../lib/Release/libwxbindadv.a ../../lib/Release/libwxbindaui.a ../../lib/Release/libwxbindhtml.a ../../lib/Release/libwxbindnet.a ../../lib/Release/libwxbindxml.a ../../lib/Release/libwxbindxrc.a -lluapuz -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../../bin/Release/libpuz.so ../../bin/Release/liblua5.1.so ../../lib/Release/libwxlua.a ../../lib/Release/libwxbindbase.a ../../lib/Release/libwxbindcore.a ../../lib/Release/libwxbindadv.a ../../lib/Release/libwxbindaui.a ../../lib/Release/libwxbindhtml.a ../../lib/Release/libwxbindnet.a ../../lib/Release/libwxbindxml.a ../../lib/Release/libwxbindxrc.a ../../bin/Release/libluapuz.so
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -51,7 +51,7 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g `wx-config --debug --unicode --static --cxxflags`
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -lwxbindxrc -lwxbindxml -lwxbindnet -lwxbindhtml -lwxbindaui -lwxbindadv -lwxbindcore -lwxbindbase -lwxlua -llua5.1 `wx-config --debug --unicode --static --libs` -L../../bin/Debug -L../../lib/Debug
-  LIBS      += -lpuz -ldl -llua5.1 -lwxlua -lwxbindbase -lwxbindcore -lwxbindadv -lwxbindaui -lwxbindhtml -lwxbindnet -lwxbindxml -lwxbindxrc -lluapuz
+  LIBS      += -lpuz -llua5.1 ../../lib/Debug/libwxlua.a ../../lib/Debug/libwxbindbase.a ../../lib/Debug/libwxbindcore.a ../../lib/Debug/libwxbindadv.a ../../lib/Debug/libwxbindaui.a ../../lib/Debug/libwxbindhtml.a ../../lib/Debug/libwxbindnet.a ../../lib/Debug/libwxbindxml.a ../../lib/Debug/libwxbindxrc.a -lluapuz -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../../bin/Debug/libpuz.so ../../bin/Debug/liblua5.1.so ../../lib/Debug/libwxlua.a ../../lib/Debug/libwxbindbase.a ../../lib/Debug/libwxbindcore.a ../../lib/Debug/libwxbindadv.a ../../lib/Debug/libwxbindaui.a ../../lib/Debug/libwxbindhtml.a ../../lib/Debug/libwxbindnet.a ../../lib/Debug/libwxbindxml.a ../../lib/Debug/libwxbindxrc.a ../../bin/Debug/libluapuz.so
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -104,6 +104,7 @@ endif
 .PHONY: clean prebuild prelink
 
 all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
+	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	@echo Linking XWord
@@ -145,86 +146,87 @@ prelink:
 ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	-$(SILENT) cp $< $(OBJDIR)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
 $(OBJDIR)/App.o: ../../src/App.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ClueListBox.o: ../../src/ClueListBox.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/CluePanel.o: ../../src/CluePanel.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/CluePrompt.o: ../../src/CluePrompt.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/config.o: ../../src/config.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/messages.o: ../../src/messages.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/MyAuiMgr.o: ../../src/MyAuiMgr.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/MyFrame.o: ../../src/MyFrame.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/MyStatusBar.o: ../../src/MyStatusBar.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/paths.o: ../../src/paths.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/printout.o: ../../src/printout.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/PuzEvent.o: ../../src/PuzEvent.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/SelectionEvent.o: ../../src/SelectionEvent.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/XGridCtrl.o: ../../src/XGridCtrl.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/XGridDrawer.o: ../../src/XGridDrawer.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/Characters.o: ../../src/dialogs/Characters.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/Preferences.o: ../../src/dialogs/Preferences.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/wxFB_Dialogs.o: ../../src/dialogs/wxFB_Dialogs.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/m_break.o: ../../src/html/m_break.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/parse.o: ../../src/html/parse.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/render.o: ../../src/html/render.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ToolInfo.o: ../../src/utils/ToolInfo.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ToolManager.o: ../../src/utils/ToolManager.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/htmlcluelist.o: ../../src/widgets/htmlcluelist.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/SizedText.o: ../../src/widgets/SizedText.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/xword_bind.o: ../../src/xwordbind/xword_bind.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

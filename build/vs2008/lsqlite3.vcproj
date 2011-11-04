@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="lsqlite3"
-	ProjectGUID="{4EE6A4B2-4196-584C-98DC-2EDAAB9084E4}"
+	ProjectGUID="{94E0A20E-A668-7E49-B7A9-21BAC8616755}"
 	RootNamespace="lsqlite3"
 	Keyword="Win32Proj"
 	>
@@ -50,6 +50,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\lsqlite3.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -136,6 +137,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\lsqlite3.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

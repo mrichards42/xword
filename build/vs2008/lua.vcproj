@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="lua"
-	ProjectGUID="{891707C4-FE18-CE4E-BFD5-9B98FA6F0058}"
+	ProjectGUID="{FABE4E63-7DAD-0D48-B15D-4FE7E4B0A607}"
 	RootNamespace="lua"
 	Keyword="Win32Proj"
 	>
@@ -49,6 +49,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\lua5.1.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -134,6 +135,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\lua5.1.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -208,11 +210,27 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\lua\lua\src\lauxlib.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\lua\src\lauxlib.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\lua\src\lbaselib.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\lua\lua\src\lcode.c"
 						>
 					</File>
 					<File
 						RelativePath="..\..\lua\lua\src\lcode.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\lua\src\ldblib.c"
 						>
 					</File>
 					<File
@@ -252,6 +270,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\lua\lua\src\linit.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\lua\src\liolib.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\lua\lua\src\llex.c"
 						>
 					</File>
@@ -260,11 +286,19 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\lua\lua\src\lmathlib.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\lua\lua\src\lmem.c"
 						>
 					</File>
 					<File
 						RelativePath="..\..\lua\lua\src\lmem.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\lua\src\loadlib.c"
 						>
 					</File>
 					<File
@@ -281,6 +315,10 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\lua\src\lopcodes.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\lua\src\loslib.c"
 						>
 					</File>
 					<File
@@ -308,11 +346,19 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\lua\lua\src\lstrlib.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\lua\lua\src\ltable.c"
 						>
 					</File>
 					<File
 						RelativePath="..\..\lua\lua\src\ltable.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\lua\src\ltablib.c"
 						>
 					</File>
 					<File
@@ -345,50 +391,6 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\lua\src\lzio.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\lauxlib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\lauxlib.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\lbaselib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\ldblib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\liolib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\lmathlib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\loslib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\ltablib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\lstrlib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\loadlib.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\lua\src\linit.c"
 						>
 					</File>
 				</Filter>

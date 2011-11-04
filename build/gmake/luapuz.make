@@ -29,7 +29,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -fPIC
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -shared -L../../bin/Release -L../../lib/Release
-  LIBS      += -llua5.1 -ldl -lpuz
+  LIBS      += -llua5.1 -lpuz -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../../bin/Release/liblua5.1.so ../../bin/Release/libpuz.so
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -51,7 +51,7 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -fPIC
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -shared -L../../bin/Debug -L../../lib/Debug
-  LIBS      += -llua5.1 -ldl -lpuz
+  LIBS      += -llua5.1 -lpuz -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../../bin/Debug/liblua5.1.so ../../bin/Debug/libpuz.so
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -85,6 +85,7 @@ endif
 .PHONY: clean prebuild prelink
 
 all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
+	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	@echo Linking luapuz
@@ -126,29 +127,30 @@ prelink:
 ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	-$(SILENT) cp $< $(OBJDIR)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
 $(OBJDIR)/luapuz_tracking.o: ../../lua/luapuz/luapuz_tracking.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/luapuz.o: ../../lua/luapuz/bind/luapuz.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/luapuz_puz.o: ../../lua/luapuz/bind/luapuz_puz.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/luapuz_puz_Grid.o: ../../lua/luapuz/bind/luapuz_puz_Grid.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/luapuz_puz_Puzzle.o: ../../lua/luapuz/bind/luapuz_puz_Puzzle.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/luapuz_puz_Square.o: ../../lua/luapuz/bind/luapuz_puz_Square.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/luapuz_std.o: ../../lua/luapuz/bind/luapuz_std.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

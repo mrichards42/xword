@@ -11,6 +11,9 @@ project "puz"
         "**.h",
     }
 
+    configuration "not windows"
+        excludes { "utils/minizip/iowin32.*" }
+
     includedirs {
         -- This allows #include "Puzzle.hpp" from the formats subdirs.
         -- The alternative would be #include "../../Puzzle.hpp", which is a pain
@@ -34,6 +37,14 @@ project "puz"
     configuration "linux"
         defines { [[PUZ_API=""]] }
         links { "dl", "zlib" }
+
+    configuration "macosx"
+        defines {
+            [[PUZ_API=\"\"]],
+            [[LUAPUZ_API=\"\"]],
+            "USE_FILE32API" -- for minizip
+        }
+        links { "z" }
 
     -- Disable some warnings
     configuration "vs*"

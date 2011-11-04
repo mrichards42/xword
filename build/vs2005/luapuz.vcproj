@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="luapuz"
-	ProjectGUID="{11A3F5D9-1687-3441-9A5A-69C7E9213F39}"
+	ProjectGUID="{AE03161F-E84B-6248-8E06-E49C0825A1C1}"
 	RootNamespace="luapuz"
 	Keyword="Win32Proj"
 	>
@@ -208,27 +208,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\lua\luapuz\bind\luapuz_puz.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\luapuz\bind\luapuz_puz_Grid.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\luapuz\bind\luapuz_puz_Puzzle.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\luapuz\bind\luapuz_puz_Square.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\luapuz\bind\luapuz_std.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\lua\luapuz\bind\luapuz.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\luapuz\bind\luapuz_puz.cpp"
 						>
 					</File>
 					<File
@@ -236,7 +220,15 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\lua\luapuz\bind\luapuz_puz_Grid.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\lua\luapuz\bind\luapuz_puz_Grid.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\luapuz\bind\luapuz_puz_Puzzle.cpp"
 						>
 					</File>
 					<File
@@ -248,7 +240,15 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\lua\luapuz\bind\luapuz_puz_Square.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\lua\luapuz\bind\luapuz_puz_Square.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\luapuz\bind\luapuz_std.cpp"
 						>
 					</File>
 					<File
@@ -257,11 +257,11 @@
 					</File>
 				</Filter>
 				<File
-					RelativePath="..\..\lua\luapuz\luapuz_tracking.cpp"
+					RelativePath="..\..\lua\luapuz\luapuz_functions.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\lua\luapuz\luapuz_functions.hpp"
+					RelativePath="..\..\lua\luapuz\luapuz_tracking.cpp"
 					>
 				</File>
 				<File

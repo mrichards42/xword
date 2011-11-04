@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="luacurl"
-	ProjectGUID="{FF642F59-64DA-F048-90EA-1A668B078654}"
+	ProjectGUID="{B30212FC-72C3-7D49-80D0-8F518C1CA7EE}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -33,6 +33,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\luacurl.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -106,6 +107,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\luacurl.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -173,10 +175,6 @@
 					Filter=""
 					>
 					<File
-						RelativePath="..\..\lua\luacurl\src\curlopt.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\lua\luacurl\src\curl_authopt.h"
 						>
 					</File>
@@ -197,7 +195,19 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\lua\luacurl\src\curlopt.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\luacurl\src\lua-curl.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\lua\luacurl\src\lua-curl.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\lua\luacurl\src\luabind.c"
 						>
 					</File>
 					<File
@@ -206,14 +216,6 @@
 					</File>
 					<File
 						RelativePath="..\..\lua\luacurl\src\version.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\luacurl\src\lua-curl.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\lua\luacurl\src\luabind.c"
 						>
 					</File>
 				</Filter>

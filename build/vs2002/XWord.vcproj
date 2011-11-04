@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="XWord"
-	ProjectGUID="{5C7ED712-8DC6-8849-8871-6DF159449363}"
+	ProjectGUID="{066EF968-301C-0C44-A458-0F2508B4F9F5}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -144,10 +144,110 @@
 			Name="src"
 			Filter=""
 			>
+			<File
+				RelativePath="..\..\src\App.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\App.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ClueListBox.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ClueListBox.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\CluePanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\CluePanel.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\CluePrompt.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\CluePrompt.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MyAuiMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MyAuiMgr.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MyFrame.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MyFrame.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MyStatusBar.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MyStatusBar.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\PuzEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\PuzEvent.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SelectionEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SelectionEvent.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\XGridCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\XGridCtrl.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\XGridDrawer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\XGridDrawer.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\config.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\config.hpp"
+				>
+			</File>
 			<Filter
 				Name="dialogs"
 				Filter=""
 				>
+				<File
+					RelativePath="..\..\src\dialogs\Characters.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\src\dialogs\Characters.hpp"
 					>
@@ -157,15 +257,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dialogs\Preferences.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\dialogs\Characters.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\src\dialogs\Preferences.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\dialogs\Preferences.hpp"
 					>
 				</File>
 				<File
@@ -182,14 +278,6 @@
 				Filter=""
 				>
 				<File
-					RelativePath="..\..\src\html\parse.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\html\render.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\src\html\m_break.cpp"
 					>
 				</File>
@@ -198,10 +286,46 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\html\parse.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\html\render.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\html\render.hpp"
+					>
+				</File>
 			</Filter>
+			<File
+				RelativePath="..\..\src\messages.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\messages.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\paths.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\paths.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\printout.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\printout.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\resource.rc"
+				>
+			</File>
 			<Filter
 				Name="utils"
 				Filter=""
@@ -215,6 +339,22 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\utils\ToolInfo.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\utils\ToolInfo.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\utils\ToolManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\utils\ToolManager.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\utils\string.hpp"
 					>
 				</File>
@@ -223,23 +363,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\utils\ToolInfo.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\utils\ToolManager.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\src\utils\wrap.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\utils\ToolInfo.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\utils\ToolManager.cpp"
 					>
 				</File>
 			</Filter>
@@ -248,7 +372,7 @@
 				Filter=""
 				>
 				<File
-					RelativePath="..\..\src\widgets\htmlcluelist.hpp"
+					RelativePath="..\..\src\widgets\SizedText.cpp"
 					>
 				</File>
 				<File
@@ -260,7 +384,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\widgets\SizedText.cpp"
+					RelativePath="..\..\src\widgets\htmlcluelist.hpp"
 					>
 				</File>
 			</Filter>
@@ -269,14 +393,6 @@
 				Filter=""
 				>
 				<File
-					RelativePath="..\..\src\xwordbind\xword_bind_helpers.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\xwordbind\xword_override.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\src\xwordbind\xword_bind.cpp"
 					>
 				</File>
@@ -284,133 +400,17 @@
 					RelativePath="..\..\src\xwordbind\xword_bind.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\xwordbind\xword_bind_helpers.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\xwordbind\xword_override.hpp"
+					>
+				</File>
 			</Filter>
 			<File
-				RelativePath="..\..\src\App.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ClueListBox.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\CluePanel.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\CluePrompt.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\config.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\messages.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MyAuiMgr.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MyFrame.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MyStatusBar.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\paths.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\printout.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\PuzEvent.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\SelectionEvent.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\XGridCtrl.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\XGridDrawer.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\xwordlua.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\App.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ClueListBox.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\CluePanel.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\CluePrompt.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\messages.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MyAuiMgr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MyFrame.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MyStatusBar.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\paths.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\printout.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\PuzEvent.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\SelectionEvent.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\XGridCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\XGridDrawer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\resource.rc"
 				>
 			</File>
 		</Filter>

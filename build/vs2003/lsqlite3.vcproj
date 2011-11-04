@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="lsqlite3"
-	ProjectGUID="{697F51E8-241D-B64E-B7C7-3031C98414A5}"
+	ProjectGUID="{981B3211-330B-5C41-8704-C1A968A14F08}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -34,6 +34,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\lsqlite3.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -107,6 +108,7 @@
 				Detect64BitPortabilityProblems="TRUE"
 				ProgramDataBaseFileName="$(OutDir)\lsqlite3.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

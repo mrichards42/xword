@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="lfs"
-	ProjectGUID="{9E7E5E93-6ADA-5749-B936-C482E170AE5C}"
+	ProjectGUID="{CD2123B8-4157-BA47-AFFA-2E4D59FD787A}"
 	RootNamespace="lfs"
 	Keyword="Win32Proj"
 	>
@@ -50,6 +50,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -136,6 +137,7 @@
 				WarningLevel="3"
 				ProgramDataBaseFileName="$(OutDir)\lfs.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

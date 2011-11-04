@@ -1,4 +1,4 @@
-USE_LUA = false
+dofile '../premake_config.lua'
 
 project "XWord"
     -- --------------------------------------------------------------------
@@ -60,11 +60,10 @@ project "XWord"
 
     configuration "macosx"
         defines {
-            [[PUZ_API="extern"]],
-            [[LUAPUZ_API="extern"]],
+            [[PUZ_API=\"\"]],
+            [[LUAPUZ_API=\"\"]],
             "USE_FILE32API" -- for minizip
         }
-        links { "z" }
 
     -- Disable some warnings
     configuration "vs*"

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="puz"
-	ProjectGUID="{3887B5A4-0D1A-4648-92EE-D974051B1B69}"
+	ProjectGUID="{E38A01B9-84A8-D54B-92F6-41F57C1B1764}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -23,7 +23,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/wd4251 /wd4275"
 				Optimization="3"
-				AdditionalIncludeDirectories="..\..\puz;..\..\yajl\build\yajl-2.0.2\include;..\..\zlib\include"
+				AdditionalIncludeDirectories="..\..\zlib\include"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;_USRDLL;YAJL_SHARED;PUZ_API=__declspec(dllexport)"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -40,7 +40,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\bin\Release\yajl.lib zdll.lib"
+				AdditionalDependencies="zdll.lib"
 				OutputFile="$(OutDir)\puz.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\bin\Release;..\..\lib\Release;..\..\zlib\lib"
@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;_USRDLL;YAJL_SHARED;PUZ_API=__declspec(dllexport)"
-				AdditionalIncludeDirectories="..\..\puz;..\..\yajl\build\yajl-2.0.2\include;..\..\zlib\include"
+				AdditionalIncludeDirectories="..\..\zlib\include"
 			/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"
@@ -87,7 +87,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/wd4251 /wd4275"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\puz;..\..\yajl\build\yajl-2.0.2\include;..\..\zlib\include"
+				AdditionalIncludeDirectories="..\..\zlib\include"
 				PreprocessorDefinitions="DEBUG;_DEBUG;WIN32;_WINDOWS;_USRDLL;YAJL_SHARED;PUZ_API=__declspec(dllexport)"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -105,7 +105,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\bin\Debug\yajl.lib zdll.lib"
+				AdditionalDependencies="zdll.lib"
 				OutputFile="$(OutDir)\puz.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\bin\Debug;..\..\lib\Debug;..\..\zlib\lib"
@@ -131,7 +131,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="DEBUG;_DEBUG;WIN32;_WINDOWS;_USRDLL;YAJL_SHARED;PUZ_API=__declspec(dllexport)"
-				AdditionalIncludeDirectories="..\..\puz;..\..\yajl\build\yajl-2.0.2\include;..\..\zlib\include"
+				AdditionalIncludeDirectories="..\..\zlib\include"
 			/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"
@@ -148,6 +148,70 @@
 			Name="puz"
 			Filter=""
 			>
+			<File
+				RelativePath="..\..\puz\Checksummer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Checksummer.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Clue.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Clue.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Grid.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Grid.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Puzzle.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Puzzle.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Scrambler.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Scrambler.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Square.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Square.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Word.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\Word.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\char_tables.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\exceptions.hpp"
+				>
+			</File>
 			<Filter
 				Name="formats"
 				Filter=""
@@ -187,11 +251,11 @@
 					Filter=""
 					>
 					<File
-						RelativePath="..\..\puz\formats\puz\puz.hpp"
+						RelativePath="..\..\puz\formats\puz\load_puz.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\puz\formats\puz\load_puz.cpp"
+						RelativePath="..\..\puz\formats\puz\puz.hpp"
 						>
 					</File>
 					<File
@@ -204,11 +268,11 @@
 					Filter=""
 					>
 					<File
-						RelativePath="..\..\puz\formats\txt\txt.hpp"
+						RelativePath="..\..\puz\formats\txt\load_txt.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\puz\formats\txt\load_txt.cpp"
+						RelativePath="..\..\puz\formats\txt\txt.hpp"
 						>
 					</File>
 				</Filter>
@@ -217,10 +281,6 @@
 					Filter=""
 					>
 					<File
-						RelativePath="..\..\puz\formats\xpf\xpf.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\puz\formats\xpf\load_xpf.cpp"
 						>
 					</File>
@@ -228,12 +288,40 @@
 						RelativePath="..\..\puz\formats\xpf\save_xpf.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\puz\formats\xpf\xpf.hpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
+			<File
+				RelativePath="..\..\puz\iterator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\iterator.hpp"
+				>
+			</File>
 			<Filter
 				Name="parse"
 				Filter=""
 				>
+				<File
+					RelativePath="..\..\puz\parse\base64.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\puz\parse\base64.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\puz\parse\json.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\puz\parse\json.hpp"
+					>
+				</File>
 				<Filter
 					Name="pugixml"
 					Filter=""
@@ -243,39 +331,31 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\puz\parse\pugixml\pugixml.hpp"
+						RelativePath="..\..\puz\parse\pugixml\pugixml.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\puz\parse\pugixml\pugixml.cpp"
+						RelativePath="..\..\puz\parse\pugixml\pugixml.hpp"
 						>
 					</File>
 				</Filter>
 				<File
-					RelativePath="..\..\puz\parse\base64.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\puz\parse\json.hpp"
+					RelativePath="..\..\puz\parse\xml.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\puz\parse\xml.hpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\puz\parse\base64.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\puz\parse\json.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\puz\parse\xml.cpp"
-					>
-				</File>
 			</Filter>
+			<File
+				RelativePath="..\..\puz\puzstring.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\puz\puzstring.hpp"
+				>
+			</File>
 			<Filter
 				Name="utils"
 				Filter=""
@@ -285,23 +365,11 @@
 					Filter=""
 					>
 					<File
-						RelativePath="..\..\puz\utils\minizip\ioapi.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\puz\utils\minizip\iowin32.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\puz\utils\minizip\unzip.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\puz\utils\minizip\zip.c"
-						>
-					</File>
-					<File
 						RelativePath="..\..\puz\utils\minizip\crypt.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\puz\utils\minizip\ioapi.c"
 						>
 					</File>
 					<File
@@ -309,11 +377,23 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\puz\utils\minizip\iowin32.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\puz\utils\minizip\iowin32.h"
 						>
 					</File>
 					<File
+						RelativePath="..\..\puz\utils\minizip\unzip.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\puz\utils\minizip\unzip.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\puz\utils\minizip\zip.c"
 						>
 					</File>
 					<File
@@ -322,6 +402,10 @@
 					</File>
 				</Filter>
 				<File
+					RelativePath="..\..\puz\utils\minizip.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\puz\utils\minizip.hpp"
 					>
 				</File>
@@ -329,87 +413,7 @@
 					RelativePath="..\..\puz\utils\streamwrapper.hpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\puz\utils\minizip.cpp"
-					>
-				</File>
 			</Filter>
-			<File
-				RelativePath="..\..\puz\char_tables.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Checksummer.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Clue.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\exceptions.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Grid.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\iterator.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\puzstring.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Puzzle.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Scrambler.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Square.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Word.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Checksummer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Clue.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Grid.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\puzstring.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Puzzle.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Scrambler.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Square.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\puz\Word.cpp"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

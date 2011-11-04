@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="luatask"
-	ProjectGUID="{BD993B1C-1C4D-854C-9311-3EB316DD2E66}"
+	ProjectGUID="{5282B4CD-CF40-394B-B867-E2912728CC5B}"
 	RootNamespace="luatask"
 	Keyword="Win32Proj"
 	>
@@ -50,6 +50,7 @@
 				Detect64BitPortabilityProblems="true"
 				ProgramDataBaseFileName="$(OutDir)\task.pdb"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -136,6 +137,7 @@
 				Detect64BitPortabilityProblems="true"
 				ProgramDataBaseFileName="$(OutDir)\task.pdb"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
