@@ -2,7 +2,9 @@ dofile 'premake_config.lua'
 
 solution "XWord"
     configurations { "Release", "Debug" }
-    platforms { "native" }
+    configuration { "macoxs" }
+        platforms { "x32" }
+    configuration {}
 
     -- Output for premake4 (vs projects / makefiles, etc)
     location ("build/".._ACTION)
