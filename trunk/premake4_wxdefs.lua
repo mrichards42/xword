@@ -25,10 +25,10 @@ configuration { "linux", "Release" }
 
 if os.is("macosx") then
 configuration { "macosx", "Debug" }
-    buildoptions{ os.outputof(WXMAC_BUILD_DEBUG .. "/wx-config --cxxflags") }
+    buildoptions{ trim(os.outputof(WXMAC_BUILD_DEBUG .. "/wx-config --cxxflags")) }
 
 configuration { "macosx", "Release" }
-    buildoptions{ os.outputof(WXMAC_BUILD_RELEASE .. "/wx-config --cxxflags") }
+    buildoptions{ trim(os.outputof(WXMAC_BUILD_RELEASE .. "/wx-config --cxxflags")) }
 end
 -- Reset the configuration
 configuration {}
