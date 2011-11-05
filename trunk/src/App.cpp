@@ -71,6 +71,7 @@ MyApp::OnInit()
 {
     //_CrtSetBreakAlloc(37630);
     m_frame = NULL;
+    m_config = new ConfigManager();
 
     wxLogDebug(_T("Starting App"));
 
@@ -167,6 +168,8 @@ MyApp::OnExit()
 
     wxFileOutputStream fileStream(configFile.GetFullPath());
     config->Save(fileStream);
+
+    delete m_config;
 
     // Clean up printing stuff.
     delete g_printData;
@@ -334,7 +337,7 @@ MyApp::SetupConfig()
     }
 
     // Setup our config manager
-    m_config.SetConfig(config);
+    m_config->SetConfig(config);
 }
 
 
