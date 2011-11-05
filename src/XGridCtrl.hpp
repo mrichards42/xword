@@ -311,6 +311,11 @@ public:
     puz::Square * HitTest(int x, int y);
     puz::Square * HitTestNearest(int x, int y);
 
+    // Rebus
+    void StartRebusEntry();
+    void EndRebusEntry();
+    bool IsRebusEntry() const { return m_rebusHandler != NULL; }
+
 protected:
     void Init();
 
@@ -378,7 +383,7 @@ protected:
     wxColor m_colors[COLOR_COUNT];
 
     // Rebus
-    bool m_wantsRebus;
+    GridRebusHandler * m_rebusHandler;
 
     void ConnectEvents();
     void DisconnectEvents();

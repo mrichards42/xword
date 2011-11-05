@@ -98,6 +98,8 @@ enum toolIds
     ID_ERASE_GRID,
     ID_ERASE_UNCROSSED,
 
+    ID_REBUS_ENTRY,
+
     ID_SCRAMBLE,
     ID_UNSCRAMBLE,
 
@@ -163,6 +165,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
     EVT_UPDATE_UI      (ID_SHOW_NOTES,        MyFrame::OnUpdateUI)
     EVT_UPDATE_UI      (ID_CHARACTER_MAP,     MyFrame::OnUpdateUI)
+    EVT_UPDATE_UI      (ID_REBUS_ENTRY,       MyFrame::OnUpdateUI)
 
     EVT_MENU_RANGE     (ID_FILE_HISTORY_1,
                         ID_FILE_HISTORY_1 + 10, MyFrame::OnOpenRecentPuzzle)
@@ -264,6 +267,9 @@ MyFrame::ManageTools()
         { ID_ERASE_UNCROSSED,  wxITEM_NORMAL, _T("Erase &Uncrossed Letters\tCtrl+Shift+D"), NULL, NULL,
                    _handler(MyFrame::OnEraseUncrossed) },
 
+        { ID_REBUS_ENTRY,  wxITEM_CHECK, _T("Enter Multiple Letters\tCtrl+R"), _T("rebus"), NULL,
+                   _handler(MyFrame::OnRebusEntry) },
+                   
         { ID_LAYOUT_PANES, wxITEM_CHECK,  _T("&Edit Layout"), _T("layout"), NULL,
                    _handler(MyFrame::OnEditLayout) },
 
@@ -977,6 +983,8 @@ MyFrame::CreateToolBar()
     m_toolMgr.Add(tb, ID_LAYOUT_PANES);
     m_toolMgr.Add(tb, ID_SHOW_NOTES);
     tb->AddSeparator();
+    m_toolMgr.Add(tb, ID_REBUS_ENTRY);
+    tb->AddSeparator();
     m_toolMgr.Add(tb, ID_TIMER);
 
 #ifdef USE_AUI_TOOLBAR
@@ -1049,6 +1057,8 @@ MyFrame::CreateMenuBar()
             m_toolMgr.Add(subMenu, ID_ERASE_GRID);
             m_toolMgr.Add(subMenu, ID_ERASE_UNCROSSED);
         menu->AppendSubMenu(subMenu, _T("&Erase"));
+        menu->AppendSeparator();
+        m_toolMgr.Add(menu, ID_REBUS_ENTRY);
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_SCRAMBLE);
         m_toolMgr.Add(menu, ID_UNSCRAMBLE);
@@ -1766,6 +1776,15 @@ MyFrame::OnEraseUncrossed(wxCommandEvent & WXUNUSED(evt))
 }
 
 
+void
+MyFrame::OnRebusEntry(wxCommandEvent & evt)
+{
+    if (evt.IsChecked())
+        m_XGridCtrl->StartRebusEntry();
+    else
+        m_XGridCtrl->EndRebusEntry();
+}
+
 
 
 // Scramble / Unscramble
@@ -1972,7 +1991,10 @@ MyFrame::OnUpdateUI(wxUpdateUIEvent & evt)
         {
             wxAuiPaneInfo & pane = m_mgr.GetPane(_T("Characters"));
             evt.Check(pane.IsOk() && pane.IsShown());
+            break;
         }
+        case ID_REBUS_ENTRY:
+            evt.Check(m_XGridCtrl->IsRebusEntry());
             break;
     }
 }
