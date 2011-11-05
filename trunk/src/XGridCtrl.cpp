@@ -38,7 +38,7 @@ class GridRebusHandler : wxEvtHandler
 {
 public:
     GridRebusHandler(XGridCtrl & grid);
-    void EndEventHandling();
+    ~GridRebusHandler();
 
     DECLARE_EVENT_TABLE()
 
@@ -200,7 +200,7 @@ void XGridCtrl::Init()
 
     m_lastBoxSize = UNDEFINED_BOX_SIZE;
 
-    m_wantsRebus = false;
+    m_rebusHandler = NULL;
 
     m_areEventsConnected = false;
 
@@ -461,7 +461,7 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
     //    - The incorrect/revealed indicator
     //    - The X.
     const bool drawOutline = IsFocusedLetter(square) &&
-                                (m_wantsRebus || square.IsBlack());
+                                (IsRebusEntry() || square.IsBlack());
     if (drawOutline)
     {
         m_drawer.AddFlag(XGridDrawer::DRAW_OUTLINE);
@@ -834,7 +834,7 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
 
     // Don't send letter updated events if the user is in the middle of entering
     // a rebus entry.
-    if (! m_wantsRebus)
+    if (! IsRebusEntry())
     {
         if (HasStyle(CHECK_WHILE_TYPING) && ! m_grid->IsScrambled())
             CheckLetter(NO_REVEAL_ANSWER | NO_MESSAGE_BOX);
@@ -1216,9 +1216,10 @@ XGridCtrl::OnMouseMove(wxMouseEvent & evt)
     if (square != NULL && (square->IsWhite() || GetGrid()->IsDiagramless())
         && square->GetText().length() > 1)
     {
-        wxString tip = puz2wx(square->GetText());
-        if (GetToolTip()->GetTip() != tip)
-            SetToolTip(tip);
+        wxString text = puz2wx(square->GetText());
+        wxToolTip * tip = GetToolTip();
+        if (tip && tip->GetTip() != text)
+            SetToolTip(text);
     }
     else
         SetToolTip(wxEmptyString);
@@ -1349,7 +1350,7 @@ XGridCtrl::OnLetter(wxChar key, int mod)
     if (! (mod == wxMOD_NONE || mod == wxMOD_SHIFT))
         return;
 
-    wxASSERT(! m_wantsRebus);
+    wxASSERT(! IsRebusEntry());
 
     if (static_cast<int>(key) == WXK_SPACE)
         SetSquareText(*m_focusedSquare, _T(""));
@@ -1616,29 +1617,42 @@ void
 XGridCtrl::OnInsert(int WXUNUSED(mod))
 {
     wxASSERT(! IsEmpty());
-    if (! m_wantsRebus)
-    {
-        m_wantsRebus = true;
-
-        RefreshSquare();
-
-        // GridRebusHandler will capture keyboard until it is destroyed.
-        // When GridRebusHandler recieves a key event that indicates that
-        // the user is done entering a rebus square, it will destroy itself.
-        new GridRebusHandler(*this);
-    }
+    if (! m_rebusHandler)
+        StartRebusEntry();
     else
-    {
-        m_wantsRebus = false;
-        // Force checking the square since checking has been prevented by
-        // GridRebusHandler.
-        SetSquareText(*m_focusedSquare, puz2wx(m_focusedSquare->GetText()));
+        EndRebusEntry();
+}
 
-        if (! m_focusedSquare->IsBlank())
-            MoveAfterLetter();
-        else
-            RefreshSquare();
-    }
+void
+XGridCtrl::StartRebusEntry()
+{
+    if (m_rebusHandler)
+        return;
+
+    // GridRebusHandler will capture keyboard until it is destroyed.
+    // When GridRebusHandler recieves a key event that indicates that
+    // the user is done entering a rebus square, it will destroy itself.
+    m_rebusHandler = new GridRebusHandler(*this);
+
+    RefreshSquare();
+}
+
+void
+XGridCtrl::EndRebusEntry()
+{
+    if (! m_rebusHandler)
+        return;
+
+    delete m_rebusHandler;
+    m_rebusHandler = NULL;
+    // Force checking the square since checking has been prevented by
+    // GridRebusHandler.
+    SetSquareText(*m_focusedSquare, puz2wx(m_focusedSquare->GetText()));
+
+    if (! m_focusedSquare->IsBlank())
+        MoveAfterLetter();
+    else
+        RefreshSquare();
 }
 
 
@@ -1757,8 +1771,7 @@ GridRebusHandler::GridRebusHandler(XGridCtrl & grid)
     m_grid.DisconnectEvents();
 }
 
-void
-GridRebusHandler::EndEventHandling()
+GridRebusHandler::~GridRebusHandler()
 {
     m_grid.RemoveEventHandler(this);
     // Restore the grid's own key handling
@@ -1778,10 +1791,7 @@ GridRebusHandler::OnKeyDown(wxKeyEvent & evt)
              key == WXK_ESCAPE)
     {
         evt.Skip(false);
-        EndEventHandling();
-        // Notify the XGridCtrl that we are done capturing events.
-        m_grid.OnInsert(wxMOD_NONE);
-        delete this;
+        m_grid.EndRebusEntry();
     }
     else if (key == WXK_BACK)
     {
