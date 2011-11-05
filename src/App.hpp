@@ -55,7 +55,7 @@ public:
 
     int OnExit();
 
-    ConfigManager & GetConfigManager() { return m_config; }
+    ConfigManager & GetConfigManager() { return *m_config; }
 
     // Portable mode
     bool IsPortable() { return m_isPortable; }
@@ -76,7 +76,7 @@ private:
     void SetupPrinting();
 
     MyFrame * m_frame;
-    ConfigManager m_config;
+    ConfigManager * m_config;
     bool m_isTimerRunning;
 
     // Portable mode
