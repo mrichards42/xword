@@ -47,4 +47,5 @@ solution "XWord"
     if USE_LUA then
         include "lua" -- lua libraries
         include "expat"
+        include "expat"
     end
