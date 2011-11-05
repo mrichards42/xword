@@ -1259,6 +1259,7 @@ MyFrame::EnableTools(bool enable)
     m_toolMgr.Enable(ID_ERASE_UNCROSSED,   enable);
     m_menubar->Enable(m_menubar->FindMenuItem(_T("Solution"), _T("Erase")),
                       enable);
+    m_toolMgr.Enable(ID_REBUS_ENTRY,   enable);
     m_toolMgr.Enable(wxID_SAVE,    enable);
     m_toolMgr.Enable(wxID_SAVEAS, enable);
     m_toolMgr.Enable(wxID_CLOSE, enable);
