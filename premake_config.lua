@@ -1,5 +1,5 @@
 -- General options
-USE_LUA = true
+USE_LUA = false
 
 -- Windows options
 WXWIN = "$(WXWIN)"
@@ -11,6 +11,18 @@ WXMAC_BUILD_RELEASE = WXMAC .. "/build-release"
 
 
 -- Don't mess with anything below this
-function trim(text)
-    return string.match(text, "[ \t\r\f\n]*(.*)[ \t\r\f\n]*")
+
+function split(text, delims)
+    delims = delims or " \t\r\f\n"
+    local t = {}
+    local patt = "([^" .. delims .. "]+)
+    for s in text:gmatch(patt) do
+        table.insert(t, s)
+    end
+    return t
+end
+
+-- Execute the command specified and return the result, correctly formatted
+function cmd(cmd_)
+    return table.concat(split(os.outputof(cmd_)), " ")
 end

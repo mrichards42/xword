@@ -60,10 +60,10 @@ configuration { "linux", "Release" }
 
 if os.is("macosx") then
 configuration { "macosx", "Debug" }
-    linkoptions{ trim(os.outputof(WXMAC_BUILD_DEBUG .. "/wx-config --libs")) }
+    linkoptions(cmd(WXMAC_BUILD_DEBUG .. "/wx-config --libs"))
 
 configuration { "macosx", "Release" }
-    linkoptions{ trim(os.outputof(WXMAC_BUILD_RELEASE .. "/wx-config --libs")) }
+    linkoptions(cmd(WXMAC_BUILD_RELEASE .. "/wx-config --libs"))
 end
 
 configuration {}
