@@ -114,9 +114,13 @@ enum toolIds
 
     //wxID_PREFERENCES,
 
-    //wxID_PREVIEW,
     ID_PAGE_SETUP,
-    //wxID_PRINT,
+    ID_PREVIEW_CURRENT,
+    ID_PREVIEW_BLANK,
+    ID_PREVIEW_SOLUTION,
+    ID_PRINT_CURRENT,
+    ID_PRINT_BLANK,
+    ID_PRINT_SOLUTION,
 
     //wxID_ABOUT,
     ID_LICENSE,
@@ -202,16 +206,29 @@ MyFrame::ManageTools()
         { wxID_PREFERENCES, wxITEM_NORMAL, _T("Preferences..."), NULL, NULL,
                      _handler(MyFrame::OnPreferences) },
 
-        { ID_PAGE_SETUP,    wxITEM_NORMAL, _T("Page Setup..."), NULL, NULL,
+        { ID_PAGE_SETUP,     wxITEM_NORMAL, _T("Page Setup..."), NULL, NULL,
                      _handler(MyFrame::OnPageSetup) },
 
-        { wxID_PREVIEW,     wxITEM_NORMAL, _T("Print Preview"), NULL, NULL,
-                     _handler(MyFrame::OnPrintPreview) },
+        { ID_PRINT_CURRENT,  wxITEM_NORMAL, _T("&Current Progress"), NULL, NULL,
+                     _handler(MyFrame::OnPrintCurrent) },
 
-        { wxID_PRINT,       wxITEM_NORMAL, _T("Print..."), NULL, NULL,
-                     _handler(MyFrame::OnPrint) },
+        { ID_PRINT_BLANK,    wxITEM_NORMAL, _T("&Blank Grid\tCtrl+P"), NULL, NULL,
+                     _handler(MyFrame::OnPrintBlankGrid) },
 
-        { wxID_EXIT,        wxITEM_NORMAL, _T("&Quit\tCtrl+Q"), NULL, NULL,
+        { ID_PRINT_SOLUTION,  wxITEM_NORMAL, _T("&Solution"), NULL, NULL,
+                     _handler(MyFrame::OnPrintSolution) },
+
+        { ID_PREVIEW_CURRENT,  wxITEM_NORMAL, _T("&Current Progress"), NULL, NULL,
+                     _handler(MyFrame::OnPreviewCurrent) },
+
+        { ID_PREVIEW_BLANK,    wxITEM_NORMAL, _T("&Blank Grid"), NULL, NULL,
+                     _handler(MyFrame::OnPreviewBlankGrid) },
+
+        { ID_PREVIEW_SOLUTION, wxITEM_NORMAL, _T("&Solution"), NULL, NULL,
+                     _handler(MyFrame::OnPreviewSolution) },
+
+
+        { wxID_EXIT,         wxITEM_NORMAL, _T("&Quit\tCtrl+Q"), NULL, NULL,
                      _handler(MyFrame::OnQuit) },
 
 
@@ -1004,8 +1021,11 @@ MyFrame::CreateMenuBar()
 {
     wxMenuBar * mb = new wxMenuBar();
 
+    wxMenu * menu;
+    wxMenu * submenu;
+
     // File Menu
-    wxMenu * menu = new wxMenu();
+    menu = new wxMenu();
         m_toolMgr.Add(menu, wxID_OPEN);
         m_toolMgr.Add(menu, wxID_SAVE);
         m_toolMgr.Add(menu, wxID_SAVEAS);
@@ -1015,8 +1035,16 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, wxID_PREFERENCES);
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_PAGE_SETUP);
-        m_toolMgr.Add(menu, wxID_PREVIEW);
-        m_toolMgr.Add(menu, wxID_PRINT);
+        submenu = new wxMenu();
+            m_toolMgr.Add(submenu, ID_PRINT_CURRENT);
+            m_toolMgr.Add(submenu, ID_PRINT_BLANK);
+            m_toolMgr.Add(submenu, ID_PRINT_SOLUTION);
+        menu->AppendSubMenu(submenu, _T("&Print"));
+        submenu = new wxMenu();
+            m_toolMgr.Add(submenu, ID_PREVIEW_CURRENT);
+            m_toolMgr.Add(submenu, ID_PREVIEW_BLANK);
+            m_toolMgr.Add(submenu, ID_PREVIEW_SOLUTION);
+        menu->AppendSubMenu(submenu, _T("Print Preview"));
         menu->AppendSeparator();
         m_toolMgr.Add(menu, wxID_EXIT);
     mb->Append(menu, _T("&File"));
@@ -1038,25 +1066,25 @@ MyFrame::CreateMenuBar()
 
     // Solution Menu
     menu = new wxMenu();
-        wxMenu * subMenu = new wxMenu();
-            m_toolMgr.Add(subMenu, ID_CHECK_LETTER);
-            m_toolMgr.Add(subMenu, ID_CHECK_WORD);
-            m_toolMgr.Add(subMenu, ID_CHECK_SELECTION);
-            m_toolMgr.Add(subMenu, ID_CHECK_GRID);
-        menu->AppendSubMenu(subMenu, _T("&Check"));
-        subMenu = new wxMenu();
-            m_toolMgr.Add(subMenu, ID_REVEAL_LETTER);
-            m_toolMgr.Add(subMenu, ID_REVEAL_WORD);
-            m_toolMgr.Add(subMenu, ID_REVEAL_INCORRECT);
-            m_toolMgr.Add(subMenu, ID_REVEAL_INCORRECT_SELECTION);
-            subMenu->AppendSeparator();
-            m_toolMgr.Add(subMenu, ID_REVEAL_SELECTION);
-            m_toolMgr.Add(subMenu, ID_REVEAL_GRID);
-        menu->AppendSubMenu(subMenu, _T("&Reveal"));
-        subMenu = new wxMenu();
-            m_toolMgr.Add(subMenu, ID_ERASE_GRID);
-            m_toolMgr.Add(subMenu, ID_ERASE_UNCROSSED);
-        menu->AppendSubMenu(subMenu, _T("&Erase"));
+        submenu = new wxMenu();
+            m_toolMgr.Add(submenu, ID_CHECK_LETTER);
+            m_toolMgr.Add(submenu, ID_CHECK_WORD);
+            m_toolMgr.Add(submenu, ID_CHECK_SELECTION);
+            m_toolMgr.Add(submenu, ID_CHECK_GRID);
+        menu->AppendSubMenu(submenu, _T("&Check"));
+        submenu = new wxMenu();
+            m_toolMgr.Add(submenu, ID_REVEAL_LETTER);
+            m_toolMgr.Add(submenu, ID_REVEAL_WORD);
+            m_toolMgr.Add(submenu, ID_REVEAL_INCORRECT);
+            m_toolMgr.Add(submenu, ID_REVEAL_INCORRECT_SELECTION);
+            submenu->AppendSeparator();
+            m_toolMgr.Add(submenu, ID_REVEAL_SELECTION);
+            m_toolMgr.Add(submenu, ID_REVEAL_GRID);
+        menu->AppendSubMenu(submenu, _T("&Reveal"));
+        submenu = new wxMenu();
+            m_toolMgr.Add(submenu, ID_ERASE_GRID);
+            m_toolMgr.Add(submenu, ID_ERASE_UNCROSSED);
+        menu->AppendSubMenu(submenu, _T("&Erase"));
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_REBUS_ENTRY);
         menu->AppendSeparator();
@@ -1265,8 +1293,18 @@ MyFrame::EnableTools(bool enable)
     m_toolMgr.Enable(wxID_CLOSE, enable);
     m_toolMgr.Enable(wxID_DELETE, enable);
     m_toolMgr.Enable(ID_TIMER, enable);
-    m_toolMgr.Enable(wxID_PREVIEW, enable);
-    m_toolMgr.Enable(wxID_PRINT, enable);
+
+    m_toolMgr.Enable(ID_PRINT_CURRENT, enable);
+    m_toolMgr.Enable(ID_PRINT_BLANK, enable);
+    m_toolMgr.Enable(ID_PRINT_SOLUTION, enable);
+    m_menubar->Enable(m_menubar->FindMenuItem(_T("File"), _T("Print")),
+                      enable);
+    m_toolMgr.Enable(ID_PREVIEW_CURRENT, enable);
+    m_toolMgr.Enable(ID_PREVIEW_BLANK, enable);
+    m_toolMgr.Enable(ID_PREVIEW_SOLUTION, enable);
+    m_menubar->Enable(m_menubar->FindMenuItem(_T("File"), _T("Print Preview")),
+                      enable);
+
 }
 
 
@@ -2209,14 +2247,60 @@ MyFrame::OnPageSetup(wxCommandEvent & WXUNUSED(evt))
     *g_printData = g_pageSetupData->GetPrintData();
 }
 
+
 void
-MyFrame::OnPrintPreview(wxCommandEvent & WXUNUSED(evt))
+MyFrame::DoPrint(int options)
+{
+    wxPrintDialogData printDialogData(*g_printData);
+
+    wxPrinter printer(& printDialogData);
+    MyPrintout printout(this, &m_puz, options, 01);
+    if (!printer.Print(this, &printout, true /*prompt*/))
+    {
+        if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+            wxMessageBox(_T("There was a problem printing.\n")
+                         _T("Perhaps your current printer is not set correctly?"),
+                         _T("Printing"),
+                         wxOK);
+    }
+    else
+    {
+        *g_printData = printer.GetPrintDialogData().GetPrintData();
+    }
+}
+
+void
+MyFrame::OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt))
+{
+    DoPrint(XGridDrawer::DRAW_CIRCLE | XGridDrawer::DRAW_NUMBER);
+}
+
+void
+MyFrame::OnPrintCurrent(wxCommandEvent & WXUNUSED(evt))
+{
+    DoPrint(XGridDrawer::DRAW_CIRCLE
+            | XGridDrawer::DRAW_NUMBER
+            | XGridDrawer::DRAW_USER_TEXT);
+}
+
+void
+MyFrame::OnPrintSolution(wxCommandEvent & WXUNUSED(evt))
+{
+    DoPrint(XGridDrawer::DRAW_CIRCLE
+            | XGridDrawer::DRAW_NUMBER
+            | XGridDrawer::DRAW_SOLUTION);
+}
+
+void
+MyFrame::DoPrintPreview(int options)
 {
     // Pass two printout objects: for preview, and possible printing.
     wxPrintDialogData printDialogData(*g_printData);
-    wxPrintPreview * preview = new wxPrintPreview(new MyPrintout(this, &m_puz, 1),
-                                                  new MyPrintout(this, &m_puz, 1),
-                                                  &printDialogData);
+    wxPrintPreview * preview = new wxPrintPreview(
+        new MyPrintout(this, &m_puz, options, 1),
+        new MyPrintout(this, &m_puz, options, 1),
+        &printDialogData
+    );
     if (! preview->Ok())
     {
         delete preview;
@@ -2231,25 +2315,27 @@ MyFrame::OnPrintPreview(wxCommandEvent & WXUNUSED(evt))
     frame->Show();
 }
 
-void
-MyFrame::OnPrint(wxCommandEvent & WXUNUSED(evt))
-{
-    wxPrintDialogData printDialogData(*g_printData);
 
-    wxPrinter printer(& printDialogData);
-    MyPrintout printout(this, &m_puz, 1);
-    if (!printer.Print(this, &printout, true /*prompt*/))
-    {
-        if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
-            wxMessageBox(_T("There was a problem printing.\n")
-                         _T("Perhaps your current printer is not set correctly?"),
-                         _T("Printing"),
-                         wxOK);
-    }
-    else
-    {
-        *g_printData = printer.GetPrintDialogData().GetPrintData();
-    }
+void
+MyFrame::OnPreviewBlankGrid(wxCommandEvent & WXUNUSED(evt))
+{
+    DoPrintPreview(XGridDrawer::DRAW_CIRCLE | XGridDrawer::DRAW_NUMBER);
+}
+
+void
+MyFrame::OnPreviewCurrent(wxCommandEvent & WXUNUSED(evt))
+{
+    DoPrintPreview(XGridDrawer::DRAW_CIRCLE
+                   | XGridDrawer::DRAW_NUMBER
+                   | XGridDrawer::DRAW_USER_TEXT);
+}
+
+void
+MyFrame::OnPreviewSolution(wxCommandEvent & WXUNUSED(evt))
+{
+    DoPrintPreview(XGridDrawer::DRAW_CIRCLE
+                   | XGridDrawer::DRAW_NUMBER
+                   | XGridDrawer::DRAW_SOLUTION);
 }
 
 

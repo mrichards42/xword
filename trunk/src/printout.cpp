@@ -293,7 +293,8 @@ MyPrintout::GetHTML()
 // Setup functions
 //-----------------------------------------------------------------------------
 
-MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, int numPages)
+MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, int options,
+                       int numPages)
     : wxPrintout(puz2wx(puz->m_title)),
       m_frame(frame),
       m_puz(puz),
@@ -303,10 +304,7 @@ MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, int numPages)
 {
     m_htmlRenderer = new MyHtmlDCRenderer(new PrintHtmlWinParser);
 
-    // Don't draw any grid text, incorrect / revealed triangles, Xs for
-    // incorrect answers, etc.
-    m_drawer.SetFlags(XGridDrawer::DRAW_CIRCLE
-                    | XGridDrawer::DRAW_NUMBER);
+    m_drawer.SetFlags(options);
     // Since print DPI huge, set the number scale to something reasonable
     m_drawer.SetNumberScale(0.25);
     ReadConfig();
