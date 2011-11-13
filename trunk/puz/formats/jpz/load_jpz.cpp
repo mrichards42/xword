@@ -234,7 +234,13 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 if (GetAttribute(cell, "checked") == puzT("true"))
                     square->AddFlag(FLAG_BLACK);
                 if (GetAttribute(cell, "incorrect") == puzT("true"))
-                    square->AddFlag(FLAG_X);
+                {
+                    // "Incorrect" used to mean the black flag instead of X
+                    if (square->Check())
+                        square->AddFlag(FLAG_BLACK);
+                    else
+                        square->AddFlag(FLAG_X);
+                }
                 if (GetAttribute(cell, "correct") == puzT("true"))
                     square->AddFlag(FLAG_CORRECT);
                 // Top right number

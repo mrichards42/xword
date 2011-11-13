@@ -278,7 +278,13 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             if (flag.attribute("Revealed").value() == std::string("true"))
                 square->AddFlag(FLAG_REVEALED);
             if (flag.attribute("Incorrect").value() == std::string("true"))
-                square->AddFlag(FLAG_X);
+            {
+                // "Incorrect" used to mean the black flag instead of X
+                if (square->Check())
+                    square->AddFlag(FLAG_BLACK);
+                else
+                    square->AddFlag(FLAG_X);
+            }
             if (flag.attribute("Correct").value() == std::string("true"))
                 square->AddFlag(FLAG_CORRECT);
         }
