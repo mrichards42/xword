@@ -325,8 +325,14 @@ private:
 
     // Printing
     void OnPageSetup(wxCommandEvent & WXUNUSED(evt));
-    void OnPrintPreview(wxCommandEvent & WXUNUSED(evt));
-    void OnPrint(wxCommandEvent & WXUNUSED(evt));
+    void DoPrint(int options);
+    void DoPrintPreview(int options);
+    void OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt));
+    void OnPrintSolution(wxCommandEvent & WXUNUSED(evt));
+    void OnPrintCurrent(wxCommandEvent & WXUNUSED(evt));
+    void OnPreviewBlankGrid(wxCommandEvent & WXUNUSED(evt));
+    void OnPreviewSolution(wxCommandEvent & WXUNUSED(evt));
+    void OnPreviewCurrent(wxCommandEvent & WXUNUSED(evt));
 
     // Help
     void OnAbout(wxCommandEvent & WXUNUSED(evt));

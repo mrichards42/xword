@@ -33,7 +33,7 @@ class MyFrame;
 class MyPrintout : public wxPrintout
 {
 public:
-    MyPrintout(MyFrame * frame, puz::Puzzle * puz, int numPages);
+    MyPrintout(MyFrame * frame, puz::Puzzle * puz, int options, int numPages);
     ~MyPrintout();
 
     bool HasPage(int pageNum);
