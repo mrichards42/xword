@@ -2,13 +2,44 @@
 <head>
 <link rel="stylesheet" type="text/css" href="styles.css">
 <title>Window Layout</title>
+<script type="text/javascript">
+// Highlight the currently focused heading (based on location.hash)
+var hash;
+function updateHash()
+{
+    var id = location.hash.substr(1);
+    // Remove "hash" from the old element's className
+    var oldEl = document.getElementById(hash);
+    if (oldEl)
+    {
+        var className = oldEl.className;
+        if (className.length > 4 &&
+            className.substr(className.length - 5) == " hash")
+        {
+            oldEl.className = className.substr(0, className.length - 5);
+        }
+        else if (className == "hash")
+            oldEl.className = "";
+    }
+    // Add "hash" to the new element's className
+    var newEl = document.getElementById(id)
+    if (newEl)
+    {
+        if (newEl.className.length != 0)
+            newEl.className = newEl.className = " hash";
+        else
+            newEl.className = "hash";
+    }
+    hash = id;
+}
+</script>
 </head>
 <body>
 
 <p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
-<a href="https://sourceforge.net/projects/wx-xword/">Sourceforge</a> |
-<a href="http://sourceforge.net/projects/wx-xword/files/Binary/">Download</a></p><hr />
+<a href="https://sourceforge.net/projects/wx-xword/" class="external">Sourceforge</a> |
+<a href="http://sourceforge.net/projects/wx-xword/files/Binary/" class="external">Download</a></p><hr />
 <h2>Window Layout</h2>
 <p>XWord allows the user to adjust the window layout by rearranging panes.  To
 put XWord in layout mode, select <code>Edit Layout</code> from the
@@ -32,12 +63,12 @@ pane will be placed (this area is shaded blue in the image).  Release the
 mouse to drop the pane in place.  To prevent docking a pane that is floating
 hold the <code>ALT</code> key.</p>
 <p><img alt="Image of docking a floating pane" src="images/layout_float.png" /></p>
-<h4 id="context_menu">Context menu</h4>
+<h4 id="context_menu">Context Menu</h4>
 <p>The layout of each pane can also be changed by right-clicking on the pane to
 display a context menu.  For clue lists you must right-click on the list title
 to get a context menu.</p>
 <p><img alt="Image of a pane context menu" src="images/layout_context.png" /></p>
-<h4 id="panes_menu">Panes menu</h4>
+<h4 id="panes_menu">Panes Menu</h4>
 <p>Panes can be hidden or shown through the <code>Panes</code> submenu of the <code>View</code> menu.
 This is especially useful if you accidentally close a pane.</p>
 <p><img alt="Image of the layout pane menu" src="images/layout_pane_menu.png" /></p>
@@ -52,8 +83,11 @@ every time you run the program.</p>
 <p><img alt="Image of the Load Layout dialog" src="images/load_layout.png" /></p>
 <hr /><p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
-<a href="https://sourceforge.net/projects/wx-xword/">Sourceforge</a> |
-<a href="http://sourceforge.net/projects/wx-xword/files/Binary/">Download</a></p>
+<a href="https://sourceforge.net/projects/wx-xword/" class="external">Sourceforge</a> |
+<a href="http://sourceforge.net/projects/wx-xword/files/Binary/" class="external">Download</a></p>
 
+<script>
+updateHash();
+</script>
 </body>
 </html>

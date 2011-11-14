@@ -10,8 +10,12 @@ If the user checks the grid, incorrect letters are show with a red X through
 them.  When an incorrect letter is overwritten by any other letter the X is
 replaced by a black "flag" (a triangle) in the upper right corner of the square
 indicating that the square was checked and found to be incorrect at some point.
-When a letter is revealed, it gets a red flag in the upper right corner.  XWord
-will not allow the user to overwrite a revealed letter.
+When a letter is revealed, it gets a red flag in the upper right corner.  If a
+square is checked and found to be correct, this is indicated by a green circle
+in the top right corner.  
+
+XWord will not allow the user to overwrite a square with a red flag (revealed)
+or a green circle (checked and correct).
 
 ![Image of incorrect letters](images/check1.png "Incorrect Letters")
 ![Image of checked and revealed letters](images/check2.png "Checked and Revealed Letters")

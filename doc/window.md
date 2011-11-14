@@ -1,5 +1,5 @@
-Overview of the XWord main window
----------------------------------
+The Main Window
+---------------
 
 <!-- Fancy image map -->
 
@@ -45,7 +45,10 @@ Overview of the XWord main window
 <div style="position:absolute; left:341px; top:52px; width:32px; height:29px;">
     <a href="#notes" title="Notes"></a>
 </div>
-<div style="position:absolute; left:380px; top:52px; width:32px; height:29px;">
+<div style="position:absolute; left:378px; top:52px; width:32px; height:29px;">
+    <a href="solving.html#rebus_entries" title="Rebus Entries"></a>
+</div>
+<div style="position:absolute; left:418px; top:52px; width:32px; height:29px;">
     <a href="#timer" title="Timer"></a>
 </div>
 <div style="position:absolute; left:9px; top:83px; width:207px; height:458px;">
@@ -149,7 +152,8 @@ automatically scrolls into view.
 ### Solution Menu ###
 
 The solution menu allows the user to [check, reveal](check.html),
-[erase](solving.html#erasing_letters), or [unscramble](#unscrambling) the grid.
+[erase](solving.html#erasing_letters), or [unscramble](#unscrambling) the grid,
+and enter [multiple letters](solving.html#rebus_entries) in a square.
 
 #### Unscrambling ####
 

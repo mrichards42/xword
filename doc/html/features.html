@@ -2,13 +2,44 @@
 <head>
 <link rel="stylesheet" type="text/css" href="styles.css">
 <title>XWord Support for Puzzle Features</title>
+<script type="text/javascript">
+// Highlight the currently focused heading (based on location.hash)
+var hash;
+function updateHash()
+{
+    var id = location.hash.substr(1);
+    // Remove "hash" from the old element's className
+    var oldEl = document.getElementById(hash);
+    if (oldEl)
+    {
+        var className = oldEl.className;
+        if (className.length > 4 &&
+            className.substr(className.length - 5) == " hash")
+        {
+            oldEl.className = className.substr(0, className.length - 5);
+        }
+        else if (className == "hash")
+            oldEl.className = "";
+    }
+    // Add "hash" to the new element's className
+    var newEl = document.getElementById(id)
+    if (newEl)
+    {
+        if (newEl.className.length != 0)
+            newEl.className = newEl.className = " hash";
+        else
+            newEl.className = "hash";
+    }
+    hash = id;
+}
+</script>
 </head>
 <body>
 
 <p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
-<a href="https://sourceforge.net/projects/wx-xword/">Sourceforge</a> |
-<a href="http://sourceforge.net/projects/wx-xword/files/Binary/">Download</a></p><hr />
+<a href="https://sourceforge.net/projects/wx-xword/" class="external">Sourceforge</a> |
+<a href="http://sourceforge.net/projects/wx-xword/files/Binary/" class="external">Download</a></p><hr />
 <h2>XWord Support for Puzzle Features</h2>
 <table>
 <thead>
@@ -17,7 +48,7 @@
 <th align="center">puz</th>
 <th align="center">xpf</th>
 <th align="center">jpz</th>
-<th align="center">ipuz<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></th>
+<th align="center">ipuz<sup id="fnref:1"><a href="#fn:1" onclick="location='#fn:1'; updateHash();" rel="footnote">1</a></sup></th>
 </tr>
 </thead>
 <tbody>
@@ -95,7 +126,7 @@
 <td>More than 2 clue lists</td>
 <td align="center" />
 <td align="center" />
-<td align="center">X<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></td>
+<td align="center">X<sup id="fnref:2"><a href="#fn:2" onclick="location='#fn:2'; updateHash();" rel="footnote">2</a></sup></td>
 <td align="center">X</td>
 </tr>
 <tr>
@@ -119,20 +150,23 @@
 <ol>
 <li id="fn:1">
 <p>XWord can load ipuz files but cannot write them.
-&#160;<a href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+&#160;<a href="#fnref:1" onclick="location='#fnref:1'; updateHash();" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:2">
 <p>jpz format only allows 2 clue lists, but XWord supports unlimited clue
   lists.  XWord will read and write altered jpz files with extra clue
   lists, but <a href="crosswordsolver.html">Crossword Solver</a> will refuse to
-  them.&#160;<a href="#fnref:2" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+  them.&#160;<a href="#fnref:2" onclick="location='#fnref:2'; updateHash();" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <hr /><p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
-<a href="https://sourceforge.net/projects/wx-xword/">Sourceforge</a> |
-<a href="http://sourceforge.net/projects/wx-xword/files/Binary/">Download</a></p>
+<a href="https://sourceforge.net/projects/wx-xword/" class="external">Sourceforge</a> |
+<a href="http://sourceforge.net/projects/wx-xword/files/Binary/" class="external">Download</a></p>
 
+<script>
+updateHash();
+</script>
 </body>
 </html>
