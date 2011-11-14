@@ -2,16 +2,47 @@
 <head>
 <link rel="stylesheet" type="text/css" href="styles.css">
 <title>XWord for Across Lite Users</title>
+<script type="text/javascript">
+// Highlight the currently focused heading (based on location.hash)
+var hash;
+function updateHash()
+{
+    var id = location.hash.substr(1);
+    // Remove "hash" from the old element's className
+    var oldEl = document.getElementById(hash);
+    if (oldEl)
+    {
+        var className = oldEl.className;
+        if (className.length > 4 &&
+            className.substr(className.length - 5) == " hash")
+        {
+            oldEl.className = className.substr(0, className.length - 5);
+        }
+        else if (className == "hash")
+            oldEl.className = "";
+    }
+    // Add "hash" to the new element's className
+    var newEl = document.getElementById(id)
+    if (newEl)
+    {
+        if (newEl.className.length != 0)
+            newEl.className = newEl.className = " hash";
+        else
+            newEl.className = "hash";
+    }
+    hash = id;
+}
+</script>
 </head>
 <body>
 
 <p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
-<a href="https://sourceforge.net/projects/wx-xword/">Sourceforge</a> |
-<a href="http://sourceforge.net/projects/wx-xword/files/Binary/">Download</a></p><hr />
+<a href="https://sourceforge.net/projects/wx-xword/" class="external">Sourceforge</a> |
+<a href="http://sourceforge.net/projects/wx-xword/files/Binary/" class="external">Download</a></p><hr />
 <h2>XWord for Across Lite Users</h2>
 <p>XWord is intended to be as familiar as possible for users transitioning from
-<a href="http://www.litsoft.com/across/alite/download/">Across Lite</a>.  Besides
+<a href="http://www.litsoft.com/across/alite/download/" class="external">Across Lite</a>.  Besides
 supporting more formats (and more crosswordy-gimmicks), there are a few
 differences between XWord and Across lite (based on Across Lite 2.0.5).</p>
 <h4 id="long_clues">Long clues</h4>
@@ -27,7 +58,7 @@ differences between XWord and Across lite (based on Across Lite 2.0.5).</p>
 <li>If a puzzle is scrambled, XWord alerts the user when the puzzle is solved
   correctly; Across Lite does not.</li>
 </ul>
-<h4 id="layoutlayouthtml"><a href="layout.html">Layout</a></h4>
+<h4 id="layout"><a href="layout.html">Layout</a></h4>
 <ul>
 <li>Across Lite provides 9 layouts with some limited customizability.  Across
   Lite gives users the option of customizing the toolbar.</li>
@@ -39,19 +70,19 @@ differences between XWord and Across lite (based on Across Lite 2.0.5).</p>
   panes, XWord ships with a a set of default layouts that approximately
   mimic the familiar Across Lite layouts.</li>
 </ul>
-<h4 id="diagramlessdiagramlesshtml_puzzles"><a href="diagramless.html">Diagramless</a> puzzles</h4>
+<h4 id="diagramless_puzzles"><a href="diagramless.html">Diagramless</a> puzzles</h4>
 <ul>
 <li>Across Lite gives the user an option to print diagramless puzzles or to
   display the black squares for interactive solving.</li>
 <li>XWord allows interactive solving of diagramless puzzles.</li>
 </ul>
-<h4 id="check_and_revealcheckhtml"><a href="check.html">Check and reveal</a></h4>
+<h4 id="check_and_reveal"><a href="check.html">Check and reveal</a></h4>
 <ul>
 <li>Across Lite allows the user to check or reveal the current letter, word,
   or entire grid.</li>
 <li>XWord also allows the user to check or reveal a section of the grid.</li>
 </ul>
-<h4 id="grid_navigationnavigationhtml"><a href="navigation.html">Grid navigation</a></h4>
+<h4 id="grid_navigation"><a href="navigation.html">Grid navigation</a></h4>
 <ul>
 <li>In Across Lite, when the focused clue is Down, <code>SHIFT+DOWN</code> moves the
   cursor to the <em>next</em> Down clue.<br />
@@ -76,7 +107,7 @@ differences between XWord and Across lite (based on Across Lite 2.0.5).</p>
 <ul>
 <li>XWord does not allow users to copy and paste text in the grid.</li>
 </ul>
-<h4 id="notepadwindowhtmlnotes"><a href="window.html#notes">Notepad</a></h4>
+<h4 id="notepad"><a href="window.html#notes">Notepad</a></h4>
 <ul>
 <li>XWord does not allow the user to type in the notepad.  Additionally,
   the notepad can contain an unlimited number of characters and xhtml
@@ -90,8 +121,11 @@ differences between XWord and Across lite (based on Across Lite 2.0.5).</p>
 </ul>
 <hr /><p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
-<a href="https://sourceforge.net/projects/wx-xword/">Sourceforge</a> |
-<a href="http://sourceforge.net/projects/wx-xword/files/Binary/">Download</a></p>
+<a href="https://sourceforge.net/projects/wx-xword/" class="external">Sourceforge</a> |
+<a href="http://sourceforge.net/projects/wx-xword/files/Binary/" class="external">Download</a></p>
 
+<script>
+updateHash();
+</script>
 </body>
 </html>

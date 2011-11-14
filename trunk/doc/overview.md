@@ -1,11 +1,11 @@
-XWord
-=====
+XWord Overview
+==============
 
-[![](images/xword.png "XWord")](https://sourceforge.net/projects/wx-xword/)
+![](images/xword.png "XWord")
 
 [XWord](https://sourceforge.net/projects/wx-xword/) is an interactive crossword solving program with support for all major puzzle formats.
 
-### Crossword [features](features.html) ###
+### Crossword [Features](features.html) ###
 - Supported formats:
     - puz ([Across Lite](acrosslite.html) format)
     - [xpf](http://www.xwordinfo.com/XPF/)
@@ -22,7 +22,7 @@ XWord
 - Puzzles with scrambled solutions
 - [Notes](window.html#notes)
 
-### Program features ###
+### Program Features ###
 - A [timer](window.html#timer)
 - Checking and revealing letters
 - Printing

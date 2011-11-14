@@ -29,12 +29,15 @@ character set.
 
 Some puzzles require multiple letters to be entered in a square.
 
-1. Press the `INSERT` key to enter rebus mode (the cursor will become an outline).
+1. Enter rebus mode by pressing `INSERT`, clicking the rebus toolbar icon, or
+   selecting `Enter Multiple Letters` from the
+   [`Solution`](window.html#solution_menu) menu.
 2. Type multiple letters.
     - `BACKSPACE` can be used to remove letters (from the end).
     - `DELETE` will remove letters from the beginning.
     - `CTRL+BACKSPACE` or `CTRL+DELETE` will delete all letters in the square.
-3. Press INSERT or ENTER to exit rebus mode (the cursor will become solid again).
+3. Press `INSERT` or `ENTER` to exit rebus mode (the cursor will become
+   solid again).
 
 Rebus entries longer than 4 characters are wrapped.  Entries longer than 10
 characters are truncated (for display only; XWord supports unlimited rebus

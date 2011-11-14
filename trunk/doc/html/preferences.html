@@ -2,13 +2,44 @@
 <head>
 <link rel="stylesheet" type="text/css" href="styles.css">
 <title>Preferences</title>
+<script type="text/javascript">
+// Highlight the currently focused heading (based on location.hash)
+var hash;
+function updateHash()
+{
+    var id = location.hash.substr(1);
+    // Remove "hash" from the old element's className
+    var oldEl = document.getElementById(hash);
+    if (oldEl)
+    {
+        var className = oldEl.className;
+        if (className.length > 4 &&
+            className.substr(className.length - 5) == " hash")
+        {
+            oldEl.className = className.substr(0, className.length - 5);
+        }
+        else if (className == "hash")
+            oldEl.className = "";
+    }
+    // Add "hash" to the new element's className
+    var newEl = document.getElementById(id)
+    if (newEl)
+    {
+        if (newEl.className.length != 0)
+            newEl.className = newEl.className = " hash";
+        else
+            newEl.className = "hash";
+    }
+    hash = id;
+}
+</script>
 </head>
 <body>
 
 <p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
-<a href="https://sourceforge.net/projects/wx-xword/">Sourceforge</a> |
-<a href="http://sourceforge.net/projects/wx-xword/files/Binary/">Download</a></p><hr />
+<a href="https://sourceforge.net/projects/wx-xword/" class="external">Sourceforge</a> |
+<a href="http://sourceforge.net/projects/wx-xword/files/Binary/" class="external">Download</a></p><hr />
 <h2>Preferences</h2>
 <p>The preferences dialog can be opened from the <code>File</code> menu and contains many
 sub-categories:</p>
@@ -83,8 +114,11 @@ preferences page will be used for printing.</p>
 255 (white).</p>
 <hr /><p><a href="index.html">Index</a> |
 <a href="javascript: history.go(-1);">Back</a> |
-<a href="https://sourceforge.net/projects/wx-xword/">Sourceforge</a> |
-<a href="http://sourceforge.net/projects/wx-xword/files/Binary/">Download</a></p>
+<a href="https://sourceforge.net/projects/wx-xword/" class="external">Sourceforge</a> |
+<a href="http://sourceforge.net/projects/wx-xword/files/Binary/" class="external">Download</a></p>
 
+<script>
+updateHash();
+</script>
 </body>
 </html>
