@@ -99,7 +99,7 @@ the clue prompt will have a tooltip with the current clue.
 XWord supports unlimited clue lists, though the vast majority of puzzles will
 have just Across and Down clues.  Clues with text that exceeds the boundary
 of the clue list will be wrapped.  The currently focused clue is highlighted,
-and the clue that crosses the focused letter is highlited in a different
+and the clue that crosses the focused letter is highlighted in a different
 color.  Clicking on a clue in a clue list will make that clue the focused word.
 
 #### Title, Author, Copyright ####
@@ -112,8 +112,8 @@ displayed in their own panes.
 Notes are read-only and can contain simple xhtml formatting.  Show and hide the
 notes window using the [`View`](#view_menu) menu, the toolbar buttons, or the
 [context menu](layout.html#context_menu) or
-[close button](layout.html#pane_buttons) on the pane.  If a puzzle has any
-notes, the toolbar icon will be yellow.
+[close button](layout.html#pane_buttons) on the pane.  If a puzzle has notes,
+the toolbar icon will turn yellow.
 
 
 ### File Menu ###
@@ -134,6 +134,12 @@ or by clicking on the `Save Puzzle` toolbar button.  If no modifications have
 been made to the puzzle, the `Save Puzzle` toolbar button will be disabled.
 XWord can also be set to [auto save](preferences.html#auto_save) puzzles after
 a certain amount of time.
+
+#### Printing Puzzles ####
+
+XWord prints puzzles on a single page, attempting to achieve the correct
+balance between readable clues and a large grid.  Puzzles can be printed with
+a blank grid, as currently solved, or with the solution.
 
 
 ### View Menu ###

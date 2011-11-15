@@ -7,7 +7,7 @@ navigation behaviors.  Actual behavior depends on user
 
 ### Mouse Navigation ###
 - Click on a square to move the cursor to that square.
-- Right click to switch the direction betwee Across and Down.
+- Right click to switch the direction between Across and Down.
 - Click on a clue in a clue list to move the cursor to the start of that
   clue.
 

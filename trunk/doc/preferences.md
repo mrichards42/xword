@@ -6,7 +6,7 @@ sub-categories:
 
 ### Solving Preferences ###
 
-The Solving prefrences page contains preferences related to
+The Solving preferences page contains preferences related to
 [grid navigation](navigation.html), solution checking, the timer,
 and auto saving.
 
@@ -29,7 +29,7 @@ last letter was filled into the grid.  Auto save is disabled if this value is 0.
 
 ### Color Preferences ###
 
-The Color prefrences page allows the user to change nearly every color that
+The Color preferences page allows the user to change nearly every color that
 XWord uses to display a crossword puzzle.
 
 ![](images/color_prefs.png)

@@ -2,11 +2,16 @@
 # Configuration
 #============================================================================#
 
-prefix = """<html>
+prefix = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<link rel="stylesheet" type="text/css" href="styles.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="styles.css" />
 <title>%s</title>
 <script type="text/javascript">
+//<![CDATA[
+
 // Highlight the currently focused heading (based on location.hash)
 var hash;
 function updateHash()
@@ -24,40 +29,63 @@ function updateHash()
         }
         else if (className == "hash")
             oldEl.className = "";
+        // Remove the top-link
+        var top = document.getElementById("top-link");
+        if (top)
+            oldEl.removeChild(top);
     }
     // Add "hash" to the new element's className
     var newEl = document.getElementById(id)
+    // Don't add things to footnote links
     if (newEl)
     {
         if (newEl.className.length != 0)
             newEl.className = newEl.className = " hash";
         else
             newEl.className = "hash";
+        // Add a link to the top (unless it's a footnote)
+        if (id.substr(0, 6) != "fnref:" && id.substr(0,3) != "fn:")
+        {
+            var a = document.createElement("a");
+            a.href = "#";
+            a.title = "Top";
+            a.id = "top-link";
+            a.onclick = function() { location='#'; updateHash(); };
+            a.appendChild(document.createTextNode("^"))
+            newEl.insertBefore(a, newEl.firstChild)
+        }
     }
     hash = id;
 }
+
+//]]>
 </script>
 </head>
 <body>
+<div id="content">
 """
 
 suffix = """
-<script>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+
 updateHash();
+
+//]]>
 </script>
 </body>
 </html>
 """
 
-links = """[Index](index.html) |
-[Back](javascript: history.go(-1);) |
+links = """[Overview](index.html) |
 [Sourceforge](https://sourceforge.net/projects/wx-xword/) |
 [Download](http://sourceforge.net/projects/wx-xword/files/Binary/)"""
 
 no_ids = set(['license'])
 
 contents_order = [
-    'overview',
+    'index',
     'window',
     'solving',
     'navigation',
@@ -65,6 +93,7 @@ contents_order = [
     'diagramless',
     'layout',
     'preferences',
+    'packages',
     'features',
     'acrosslite',
     'crosswordsolver',
@@ -91,7 +120,8 @@ def html_escape(text):
 def convert(t):
     return markdown.markdown(t, ['footnotes', 'tables'])
 
-import sys, os, re
+import sys, os, re, shutil
+
 if sys.platform == 'win32':
         # We have to remove the Scripts dir from path on windows.
         # If we don't, it will try to import itself rather than markdown lib.
@@ -106,11 +136,8 @@ import markdown
 links = convert(links)
 
 #============================================================================#
-# The code
+# Make the CHM
 #============================================================================#
-
-# Files for chms
-
 
 class ContentsItem:
     def __init__(self, name, link, sublist = None):
@@ -131,9 +158,11 @@ class ContentsItem:
 contents = {}
 files = []
 
-# Make html dir
-if not os.path.exists('html'):
-    os.mkdir('html')
+os.chdir(os.path.dirname(__file__))
+
+# Clear the chm directory and re-make it
+shutil.rmtree('chm')
+os.mkdir('chm')
 
 # Convert files
 for mdfile in os.listdir(os.getcwd()):
@@ -141,62 +170,66 @@ for mdfile in os.listdir(os.getcwd()):
         continue
     filename = os.path.splitext(mdfile)[0]
     htmlfile = filename + '.html'
-    outfile = os.path.join('html', htmlfile)
     files.append(htmlfile)
     print 'converting', mdfile
     with open(mdfile, 'r') as input:
-        with open(outfile, 'w') as output:
-            # Read the first line and make it the title
-            title = input.readline().strip()
-            text = '\n'.join((title, input.read()))
-            text = '\n'.join((
-                (prefix % title),
-                links + "<hr />",
-                convert(text),
-                "<hr />" + links,
-                suffix,
-            ))
+        # Read the first line and make it the title
+        title = input.readline().strip()
+        text = '\n'.join((title, input.read()))
+        text = '\n'.join((
+            (prefix % title),
+            links + "<hr />",
+            convert(text),
+            "<hr />" + links,
+            suffix,
+        ))
 
-            # Search the text for table of contents headings
-            contents[filename] = ContentsItem(title, htmlfile)
-            if filename not in contents_order:
-                print filename + "not in contents"
-            if filename not in no_ids:
-                c = contents[filename]
-                level = -1
-                for h, headinghtml in re.findall(r'<h(\d)>(.*?)</h\1>', text):
-                    # Extract the heading text from the html
-                    heading = re.sub('<[^>]*>', '', headinghtml)
-                    if heading == title:
-                        continue
-                    # Make an id
-                    id = heading.replace(' ', '_').replace('"', '').replace("'", '').lower()
-                    # Add the id in the html
-                    text = text.replace(
-                        '<h%s>%s</h%s>' % (h, headinghtml, h),
-                        '<h%s id="%s">%s</h%s>' % (h, id, headinghtml, h)
-                    )
+        # Search the text for table of contents headings
+        contents[filename] = ContentsItem(title, htmlfile)
+        if filename not in contents_order:
+            print '"%s" not in contents' % filename
+        if filename not in no_ids:
+            c = contents[filename]
+            level = -1
+            for h, headinghtml in re.findall(r'<h(\d)>(.*?)</h\1>', text):
+                # Extract the heading text from the html
+                heading = re.sub(r'<[^>]*>', '', headinghtml)
+                if heading == title:
+                    continue
+                # Make an id
+                id = re.sub(r'[^a-zA-Z_]+', '', re.sub(r'[\s\-]+', '_', heading)).lower()
+                # Add the id in the html
+                text = text.replace(
+                    '<h%s>%s</h%s>' % (h, headinghtml, h),
+                    '<h%s id="%s">%s</h%s>' % (h, id, headinghtml, h)
+                )
 
-                    # Figure out the sublevel of this heading
-                    h = int(h)
-                    if level > h:
-                        if c.parent:
-                            c = c.parent
-                    elif level < h and level != -1:
-                        if c.sublist:
-                            c = c.sublist[-1]
-                    level = h
-                    # Write the contents item
-                    c.append(html_escape(heading), htmlfile + "#" + id)
+                # Figure out the sublevel of this heading
+                h = int(h)
+                if level > h:
+                    if c.parent:
+                        c = c.parent
+                elif level < h and level != -1:
+                    if c.sublist:
+                        c = c.sublist[-1]
+                level = h
+                # Write the contents item
+                c.append(html_escape(heading), htmlfile + "#" + id)
 
-            # Set a class for external links
-            text = re.sub(r'(href="http.*?")', r'\1 class="external"', text)
-            # Update hash style for internal links
-            text = re.sub(r'href="#(.*?)"', r'''href="#\1" onclick="location='#\1'; updateHash();"''', text)
+        # Set a class for external links
+        text = re.sub(r'(a href="http.*?")', r'\1 class="external"', text)
+        # Update hash style for internal links
+        text = re.sub(
+            r'a href="#(.*?)"',
+            r'''a href="#\1" onclick="location='#\1'; updateHash();"''',
+            text)
+
+        # Write html for the chm
+        with open(os.path.join('chm', htmlfile), 'w') as output:
             output.write(text)
 
 # Create the html help project file
-with open(os.path.join('html', 'help.hhp'), 'w') as f:
+with open(os.path.join('chm', 'help.hhp'), 'w') as f:
     f.write(
 """[OPTIONS]
 Compatibility=1.1 or later
@@ -214,9 +247,8 @@ Language=0x409 English (United States)
 
     f.write("""\n\n[INFOTYPES]\n""")
 
-
 # Create the table of contents
-with open(os.path.join('html', 'contents.hhc'), 'w') as f:
+with open(os.path.join('chm', 'contents.hhc'), 'w') as f:
 
     def write_list(l):
         f.write("<UL>\n")
@@ -250,5 +282,34 @@ with open(os.path.join('html', 'contents.hhc'), 'w') as f:
 
     f.write("""</BODY></HTML>""")
 
+#============================================================================#
+# Make the HTML files
+#============================================================================#
+
+# Clear the html directory and re-make it
+shutil.rmtree('html')
+os.mkdir('html')
+
+
+for htmlfile in os.listdir('chm'):
+    if not htmlfile.endswith(".html"):
+        continue
+
+    with open(os.path.join('chm', htmlfile), 'r') as input:
+        text = input.read()
+        # Write html for the web site
+        with open(os.path.join('html', htmlfile), 'w') as output:
+            # Add navigation stuff
+            output.write(text)
 
 #raw_input("Press any key to continue...")
+
+
+#============================================================================#
+# Copy resources
+#============================================================================#
+shutil.copytree('images', 'chm/images', ignore = shutil.ignore_patterns('.*'))
+shutil.copy2('styles.css', 'chm/styles.css')
+
+shutil.copytree('images', 'html/images', ignore = shutil.ignore_patterns('.*'))
+shutil.copy2('styles.css', 'html/styles.css')
