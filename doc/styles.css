@@ -1,14 +1,37 @@
+/* general styles */
+
 body { font-family: sans-serif; font-size: .8em; }
 
 code { font-size: 1.2em; font-weight: bold; }
 
-img { padding: 5px; margin:10px; border: 1px solid gray;}
+/* Highlighting */
 
-.hash { color: green; font-style: italic; }
+.hash {
+    font-style: italic;
+    background: #a5daa5;
+}
+
+#top-link {
+    font-style: normal;
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+
+/* images */
+img {
+    border: 1px solid gray;
+    padding: 5px;
+    margin: 10px;
+}
+
 
 /* links */
 
-a { text-decoration: none; }
+a {
+    color: blue;
+    text-decoration: none;
+}
 
 a:hover { text-decoration: underline; }
 
@@ -16,6 +39,7 @@ a:hover { text-decoration: underline; }
     background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFZJREFUeF59z4EJADEIQ1F36k7u5E7ZKXeUQPACJ3wK7UNokVxVk9kHnQH7bY9hbDyDhNXgjpRLqFlo4M2GgfyJHhjq8V4agfrgPQX3JtJQGbofmCHgA/nAKks+JAjFAAAAAElFTkSuQmCC") no-repeat scroll right center transparent;
     padding-right: 13px;
 }
+
 
 /* table styles */
 table {
@@ -33,7 +57,6 @@ tr {
 }
 
 td {
-    font-size: .8em;
     background: #eee;
 }
 
@@ -46,8 +69,8 @@ th { width: 3em; }
 
 .image-map {
     border:1px solid gray;
-    padding: 5px;
-    margin: 5px;
+    padding: 10px;
+    margin: 10px;
 }
 
 .image-map img {

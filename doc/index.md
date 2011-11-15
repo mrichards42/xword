@@ -5,7 +5,9 @@ XWord Overview
 
 [XWord](https://sourceforge.net/projects/wx-xword/) is an interactive crossword solving program with support for all major puzzle formats.
 
+
 ### Crossword [Features](features.html) ###
+
 - Supported formats:
     - puz ([Across Lite](acrosslite.html) format)
     - [xpf](http://www.xwordinfo.com/XPF/)
@@ -19,23 +21,19 @@ XWord Overview
 - Clues in directions (and shapes) other than straight Across and Down
 - Formatted clue text
 - Background images
-- Puzzles with scrambled solutions
+- Puzzles with [scrambled](window.html#unscrambling) solutions
 - [Notes](window.html#notes)
 
+
 ### Program Features ###
+
 - A [timer](window.html#timer)
-- Checking and revealing letters
-- Printing
+- [Checking and revealing](check.html) letters
+- [Printing](window.html#printing_puzzles)
 - [Autosaving](preferences.html#auto_save)
 - Many [configuration](preferences.html) options, including
     - [Colors](preferences.html#color_preferences) in the grid and clue list
     - [Fonts](preferences.html#font_preferences)
     - Grid navigation / [solving](preferences.html#solving_preferences) behavior
     - [Window layout](layout.html)
-- [Extensible](packages.html) via the lua programming language.
-  Available packages include the following and more:
-    - Puzzle downloader
-    - OneAcross and Wikipedia search
-    - Enhanced grid navigation, e.g.
-        - Find clues that reference the current clue
-        - Find the next blank square
+- [Extensible](packages.html) via the Lua programming language.

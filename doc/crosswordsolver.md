@@ -1,7 +1,7 @@
 XWord for Crossword Solver Users
 --------------------------------
 
-XWord supports [Crossword Solver](http://www.crosswordsolver.info/)'s
+XWord supports [Crossword Solver's](http://www.crosswordsolver.info/)
 .jpz format, including the various gimmicks it allows.  XWord provides a
 significantly different solving experience (based on Crossword Solver 1.2).
 
@@ -28,7 +28,7 @@ significantly different solving experience (based on Crossword Solver 1.2).
 #### [Layout](layout.html) ####
 
 - Crossword Solver has a single layout that is not resizable.  Puzzles in
-  jpz format can customize the user iterface (e.g. supply a different
+  jpz format can customize the user interface (e.g. supply a different
   message when the puzzle is complete, disable reveal buttons).
 - XWord allows the user to position GUI components anywhere and resize them
   to the user's liking.  XWord does not support loading or saving interface
