@@ -24,6 +24,7 @@
 #include "messages.hpp"
 #include "utils/string.hpp"
 #include <wx/filename.h>
+#include <wx/stdpaths.h> // wxStandardPaths
 
 #include <wx/log.h>
 #include <wx/file.h>
@@ -140,6 +141,11 @@ MyApp::OnInit()
             status->SetLuaErrors(m_luaMessages);
     }
 #endif // XWORD_USE_LUA
+
+#ifdef __WXMSW__
+    m_help.Initialize(exedir() + sep() + _T("xword.chm"));
+#endif // __WXMSW__
+
     m_frame->Show();
 
     return true;

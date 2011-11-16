@@ -337,6 +337,9 @@ private:
     // Help
     void OnAbout(wxCommandEvent & WXUNUSED(evt));
     void OnLicense(wxCommandEvent & WXUNUSED(evt));
+#ifdef __WXMSW__
+    void OnHelp(wxCommandEvent & WXUNUSED(evt));
+#endif // __WXMSW__
 
     // XGridCtrl and CluePanel events
     //------------------------------
@@ -355,7 +358,6 @@ private:
     void OnLinkClicked (wxHtmlLinkEvent & evt);
 
 #ifdef XWORD_USE_LUA
-    void OnLuaScript  (wxCommandEvent & WXUNUSED(evt));
     wxLuaState m_lua;
     void LuaInit();
     void LuaUninit();
