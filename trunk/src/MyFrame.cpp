@@ -2266,26 +2266,43 @@ MyFrame::DoPrint(int options)
     }
 }
 
+const int PRINT_BLANK = XGridDrawer::DRAW_CIRCLE
+                      | XGridDrawer::DRAW_NUMBER;
+
+const int PRINT_CURRENT = XGridDrawer::DRAW_CIRCLE
+                        | XGridDrawer::DRAW_NUMBER
+                        | XGridDrawer::DRAW_USER_TEXT;
+
+const int PRINT_SOLUTION = XGridDrawer::DRAW_CIRCLE
+                         | XGridDrawer::DRAW_NUMBER
+                         | XGridDrawer::DRAW_SOLUTION;
+
 void
 MyFrame::OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt))
 {
-    DoPrint(XGridDrawer::DRAW_CIRCLE | XGridDrawer::DRAW_NUMBER);
+    if (! m_puz.GetGrid().IsDiagramless())
+        DoPrint(PRINT_BLANK);
+    else
+        DoPrint(PRINT_BLANK & ~XGridDrawer::DRAW_NUMBER
+                | XGridDrawer::DRAW_BLANK_DIAGRAMLESS);
 }
 
 void
 MyFrame::OnPrintCurrent(wxCommandEvent & WXUNUSED(evt))
 {
-    DoPrint(XGridDrawer::DRAW_CIRCLE
-            | XGridDrawer::DRAW_NUMBER
-            | XGridDrawer::DRAW_USER_TEXT);
+    if (! m_puz.GetGrid().IsDiagramless())
+        DoPrint(PRINT_CURRENT);
+    else
+        DoPrint(PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER);
 }
 
 void
 MyFrame::OnPrintSolution(wxCommandEvent & WXUNUSED(evt))
 {
-    DoPrint(XGridDrawer::DRAW_CIRCLE
-            | XGridDrawer::DRAW_NUMBER
-            | XGridDrawer::DRAW_SOLUTION);
+    if (! m_puz.GetGrid().IsDiagramless())
+        DoPrint(PRINT_SOLUTION);
+    else
+        DoPrint(PRINT_SOLUTION & ~XGridDrawer::DRAW_NUMBER);
 }
 
 void
@@ -2316,23 +2333,29 @@ MyFrame::DoPrintPreview(int options)
 void
 MyFrame::OnPreviewBlankGrid(wxCommandEvent & WXUNUSED(evt))
 {
-    DoPrintPreview(XGridDrawer::DRAW_CIRCLE | XGridDrawer::DRAW_NUMBER);
+    if (! m_puz.GetGrid().IsDiagramless())
+        DoPrintPreview(PRINT_BLANK);
+    else
+        DoPrintPreview(PRINT_BLANK & ~XGridDrawer::DRAW_NUMBER
+                       | XGridDrawer::DRAW_BLANK_DIAGRAMLESS);
 }
 
 void
 MyFrame::OnPreviewCurrent(wxCommandEvent & WXUNUSED(evt))
 {
-    DoPrintPreview(XGridDrawer::DRAW_CIRCLE
-                   | XGridDrawer::DRAW_NUMBER
-                   | XGridDrawer::DRAW_USER_TEXT);
+    if (! m_puz.GetGrid().IsDiagramless())
+        DoPrintPreview(PRINT_CURRENT);
+    else
+        DoPrintPreview(PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER);
 }
 
 void
 MyFrame::OnPreviewSolution(wxCommandEvent & WXUNUSED(evt))
 {
-    DoPrintPreview(XGridDrawer::DRAW_CIRCLE
-                   | XGridDrawer::DRAW_NUMBER
-                   | XGridDrawer::DRAW_SOLUTION);
+    if (! m_puz.GetGrid().IsDiagramless())
+        DoPrintPreview(PRINT_SOLUTION);
+    else
+        DoPrintPreview(PRINT_SOLUTION & ~XGridDrawer::DRAW_NUMBER);
 }
 
 
