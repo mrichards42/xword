@@ -122,12 +122,9 @@ enum toolIds
     ID_PRINT_BLANK,
     ID_PRINT_SOLUTION,
 
+    //wxID_HELP_CONTENTS,
     //wxID_ABOUT,
     ID_LICENSE,
-
-#ifdef XWORD_USE_LUA
-    ID_LUA_SCRIPT,
-#endif // XWORD_USE_LUA
 
 #ifdef __WXDEBUG__
 
@@ -306,11 +303,10 @@ MyFrame::ManageTools()
         { ID_CHARACTER_MAP,  wxITEM_CHECK, _T("&Character Map\tCtrl+M"), NULL, NULL,
                    _handler(MyFrame::OnCharacterMap) },
 
-
-#ifdef XWORD_USE_LUA
-        { ID_LUA_SCRIPT, wxITEM_NORMAL, _T("Run &Script"), NULL, NULL,
-                   _handler(MyFrame::OnLuaScript) },
-#endif // XWORD_USE_LUA
+#ifdef __WXMSW__
+        { wxID_HELP_CONTENTS, wxITEM_NORMAL, _T("&Help Contents\tF1"), NULL, NULL,
+                   _handler(MyFrame::OnHelp) },
+#endif // __WXMSW__
 
         { wxID_ABOUT, wxITEM_NORMAL, _T("&About ") XWORD_APP_NAME _T("..."), NULL, NULL,
                    _handler(MyFrame::OnAbout) },
@@ -1096,13 +1092,13 @@ MyFrame::CreateMenuBar()
     menu = new wxMenu();
         m_toolMgr.Add(menu, ID_TIMER);
         m_toolMgr.Add(menu, ID_CHARACTER_MAP);
-#ifdef XWORD_USE_LUA
-        m_toolMgr.Add(menu, ID_LUA_SCRIPT);
-#endif // XWORD_USE_LUA
     mb->Append(menu, _T("&Tools"));
 
     // Help Menu
     menu = new wxMenu();
+#ifdef __WXMSW__
+        m_toolMgr.Add(menu, wxID_HELP_CONTENTS);
+#endif // __WXMSW__
         m_toolMgr.Add(menu, wxID_ABOUT);
         m_toolMgr.Add(menu, ID_LICENSE);
     mb->Append(menu, _T("&Help"));
@@ -2149,14 +2145,6 @@ MyFrame::RunLuaScript(const wxString & filename)
 }
 
 void
-MyFrame::OnLuaScript(wxCommandEvent & WXUNUSED(evt))
-{
-    const wxString & filename = wxFileSelector(_T("Select a script to run"));
-    if (! filename.IsEmpty())
-        RunLuaScript(filename);
-}
-
-void
 MyFrame::OnLuaPrint(wxLuaEvent & evt)
 {
     wxLogDebug(_T("%s"), evt.GetString().c_str());
@@ -2184,8 +2172,17 @@ MyFrame::OnPreferences(wxCommandEvent & WXUNUSED(evt))
 
 
 
-// About
+// Help
 //------------
+
+#ifdef __WXMSW__
+void
+MyFrame::OnHelp(wxCommandEvent & WXUNUSED(evt))
+{
+    wxGetApp().ShowHelp();
+}
+#endif // __WXMSW__
+
 void
 MyFrame::OnAbout(wxCommandEvent & WXUNUSED(evt))
 {

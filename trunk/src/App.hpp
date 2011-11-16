@@ -26,6 +26,10 @@
 
 #include "config.hpp"
 
+#ifdef __WXMSW__
+#    include "wx/msw/helpchm.h"
+#endif // __WXMSW__
+
 class MyFrame;
 class wxPrintData;
 class wxPageSetupDialogData;
@@ -69,6 +73,10 @@ public:
     bool HasLuaLog() const;
 #endif // XWORD_USE_LUA
 
+#ifdef __WXMSW__
+    void ShowHelp() { m_help.DisplayContents(); }
+#endif // __WXMSW__
+
 private:
     void OnActivate(wxActivateEvent & evt);
 
@@ -78,6 +86,10 @@ private:
     MyFrame * m_frame;
     ConfigManager * m_config;
     bool m_isTimerRunning;
+
+#ifdef __WXMSW__
+    wxCHMHelpController m_help;
+#endif // __WXMSW__
 
     // Portable mode
     bool m_isPortable;

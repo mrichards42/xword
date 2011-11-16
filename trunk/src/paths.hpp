@@ -27,6 +27,8 @@ wxString GetConfigDir();   // Directory for config files (DataDir/config)
 wxString GetConfigFile();  // The main XWord config file (DataDir/config/config.ini)
 wxString GetImagesDir();   // Images
 wxString GetScriptsDir();  // Scripts
+wxString exedir();
+wxChar sep();
 
 #ifdef XWORD_USE_LUA
 wxString GetLuaPath();
