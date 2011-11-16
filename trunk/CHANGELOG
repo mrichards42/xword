@@ -1,3 +1,36 @@
+Version 0.5.4 (11/16/2011)
+==========================
+New Features
+------------
+* New printing options: Current progress, blank grid, solution
+* Letters that have been checked and found to be correct are indicated with
+  a green circle in the top right corner.  These squares are not allowed to
+  be overwritten.
+* Panes resize proportionally when the window is resized.
+* Help files
+* New menu item: Erase Grid.
+* New menu item: Erase Uncrossed Squares.
+* New menu item / toolbar item: Rebus Entry (previously only accessible by
+  pressing INSERT)
+
+
+Bug Fixes
+---------
+* Fix regression where .puz files did not load sections (e.g. timer, circles).
+* Diagramless puzzles: fixed crashes and/or error messages on loading.
+* Diagramless puzzles: clicking on a clue no longer moves the cursor to the
+  start of the word (revealing information about the grid).
+* Odd numbering schemes are correctly displayed (XPF; see NYT 10/21/2011).
+
+Removed Features
+----------------
+* Run Script menu item removed from the Tools menu (redundant: the package
+  system should take care of all script needs).
+
+
+----------------------------------------------------------------------
+
+
 Version 0.5.3 (10/17/2011)
 ==========================
 New Features
