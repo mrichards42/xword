@@ -1,3 +1,3 @@
 markdown.py
-"%programfiles%\HTML Help Workshop\hhc" html\help.hhp
-html\XWord.chm
+"%programfiles%\HTML Help Workshop\hhc" chm\help.hhp
+chm\XWord.chm

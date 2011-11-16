@@ -36,7 +36,7 @@ a {
 a:hover { text-decoration: underline; }
 
 .external {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFZJREFUeF59z4EJADEIQ1F36k7u5E7ZKXeUQPACJ3wK7UNokVxVk9kHnQH7bY9hbDyDhNXgjpRLqFlo4M2GgfyJHhjq8V4agfrgPQX3JtJQGbofmCHgA/nAKks+JAjFAAAAAElFTkSuQmCC") no-repeat scroll right center transparent;
+    background: url("images/external.png") no-repeat scroll right center transparent;
     padding-right: 13px;
 }
 
@@ -105,4 +105,65 @@ th { width: 3em; }
     opacity: .4;
     -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
     filter: alpha(opacity=40);
+}
+
+
+/* navigation styles */
+
+
+#nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    padding: 5px;
+    overflow: auto;
+
+}
+
+#content {
+    position: absolute;
+    top: 10px;
+    left: 310px;
+    padding-left: 40px;
+    border-left: 1px solid black;
+}
+
+#nav > ul {
+    padding: 0;
+    margin: 0;
+}
+
+#nav ul {
+    white-space: nowrap;
+    list-style: none;
+    padding-left: 1em;
+    margin: 0;
+}
+
+#nav li {
+    margin: 2px;
+}
+
+#nav li div {
+    display: inline-block;
+    width: 1em;
+    cursor: pointer;
+    /* This make IE display as inline-block */
+    zoom: 1;
+    *display: inline;
+}
+
+#nav li div.collapsed {
+    background: url("images/arrow-collapsed.png") no-repeat scroll left center transparent;
+}
+
+#nav li div.expanded {
+    background: url("images/arrow-expanded.png") no-repeat scroll left center transparent;
+}
+
+#nav .hash {
+    padding: 1px;
+    background: none;
+    border: 2px solid #a5daa5;
 }

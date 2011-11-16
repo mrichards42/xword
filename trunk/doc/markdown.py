@@ -9,60 +9,10 @@ prefix = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="styles.css" />
 <title>%s</title>
-<script type="text/javascript">
-//<![CDATA[
-
-// Highlight the currently focused heading (based on location.hash)
-var hash;
-function updateHash()
-{
-    var id = location.hash.substr(1);
-    // Remove "hash" from the old element's className
-    var oldEl = document.getElementById(hash);
-    if (oldEl)
-    {
-        var className = oldEl.className;
-        if (className.length > 4 &&
-            className.substr(className.length - 5) == " hash")
-        {
-            oldEl.className = className.substr(0, className.length - 5);
-        }
-        else if (className == "hash")
-            oldEl.className = "";
-        // Remove the top-link
-        var top = document.getElementById("top-link");
-        if (top)
-            oldEl.removeChild(top);
-    }
-    // Add "hash" to the new element's className
-    var newEl = document.getElementById(id)
-    // Don't add things to footnote links
-    if (newEl)
-    {
-        if (newEl.className.length != 0)
-            newEl.className = newEl.className = " hash";
-        else
-            newEl.className = "hash";
-        // Add a link to the top (unless it's a footnote)
-        if (id.substr(0, 6) != "fnref:" && id.substr(0,3) != "fn:")
-        {
-            var a = document.createElement("a");
-            a.href = "#";
-            a.title = "Top";
-            a.id = "top-link";
-            a.onclick = function() { location='#'; updateHash(); };
-            a.appendChild(document.createTextNode("^"))
-            newEl.insertBefore(a, newEl.firstChild)
-        }
-    }
-    hash = id;
-}
-
-//]]>
-</script>
+<script type="text/javascript" src="functions.js"></script>
 </head>
 <body>
-<div id="content">
+<div>
 """
 
 suffix = """
@@ -161,7 +111,8 @@ files = []
 os.chdir(os.path.dirname(__file__))
 
 # Clear the chm directory and re-make it
-shutil.rmtree('chm')
+if os.path.exists('chm'):
+    shutil.rmtree('chm')
 os.mkdir('chm')
 
 # Convert files
@@ -244,6 +195,11 @@ Language=0x409 English (United States)
 """)
     for filename in files:
         f.write(filename + '\n')
+    # Add the images (linked images are automatically added, but not images
+    # used as css backgrounds
+    for filename in os.listdir('images'):
+        if not filename.startswith('.'):
+            f.write('images\\' + filename + '\n')
 
     f.write("""\n\n[INFOTYPES]\n""")
 
@@ -287,9 +243,39 @@ with open(os.path.join('chm', 'contents.hhc'), 'w') as f:
 #============================================================================#
 
 # Clear the html directory and re-make it
-shutil.rmtree('html')
+if os.path.exists('html'):
+    shutil.rmtree('html')
 os.mkdir('html')
 
+# Make the html navigation div
+def make_nav():
+    nav = []
+    def write_list(l, hidden = False):
+        if hidden:
+            nav.append('<ul style="display:none;">')
+        else:
+            nav.append("<ul>")
+        for item in l:
+            write_item(item)
+        nav.append("</ul>")
+
+    def write_item(item):
+        id = "nav_" + item.link.replace('.', '_').replace('#', '_')
+        nav.append('<li id="%s">' % id)
+        if item.sublist:
+            nav.append('<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>');
+        else:
+            nav.append('<div></div>')
+        nav.append('''<a href="%s" onclick="location='%s'; updateHash();">%s</a>''' % (item.link, item.link, item.name))
+        if item.sublist:
+            write_list(item.sublist, True)
+        nav.append('</li>')
+
+    write_list([contents[fn] for fn in contents_order])
+
+    return '\n'.join(nav)
+
+nav = make_nav()
 
 for htmlfile in os.listdir('chm'):
     if not htmlfile.endswith(".html"):
@@ -297,7 +283,8 @@ for htmlfile in os.listdir('chm'):
 
     with open(os.path.join('chm', htmlfile), 'r') as input:
         text = input.read()
-        # Write html for the web site
+        # Add the nav div
+        text = text.replace('<body>\n<div>', '<body>\n<div id="nav">%s</div>\n<div id="content"' % nav)
         with open(os.path.join('html', htmlfile), 'w') as output:
             # Add navigation stuff
             output.write(text)
@@ -310,6 +297,8 @@ for htmlfile in os.listdir('chm'):
 #============================================================================#
 shutil.copytree('images', 'chm/images', ignore = shutil.ignore_patterns('.*'))
 shutil.copy2('styles.css', 'chm/styles.css')
+shutil.copy2('functions.js', 'chm/functions.js')
 
 shutil.copytree('images', 'html/images', ignore = shutil.ignore_patterns('.*'))
 shutil.copy2('styles.css', 'html/styles.css')
+shutil.copy2('functions.js', 'html/functions.js')
