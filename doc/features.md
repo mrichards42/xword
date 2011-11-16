@@ -20,5 +20,5 @@ XWord Support for Puzzle Features
 [^1]: XWord can load ipuz files but cannot write them.
 [^2]: jpz format only allows 2 clue lists, but XWord supports unlimited clue
       lists.  XWord will read and write altered jpz files with extra clue
-      lists, but [Crossword Solver](crosswordsolver.html) will refuse to
+      lists, but [Crossword Solver](crosswordsolver.html) will refuse to load
       them.

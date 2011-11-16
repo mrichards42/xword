@@ -184,7 +184,7 @@ with open(os.path.join('chm', 'help.hhp'), 'w') as f:
     f.write(
 """[OPTIONS]
 Compatibility=1.1 or later
-Compiled file=XWord.chm
+Compiled file=xword.chm
 Contents file=contents.hhc
 Default topic=index.html
 Display compile progress=No
