@@ -1,4 +1,4 @@
-Compiling XWord with XCode on a Mac
+Compiling XWord with XCode3 on a Mac
 
 ----------------------------------------
 Build wxWidgets
@@ -6,68 +6,66 @@ Build wxWidgets
 
 Download wxMac from
 http://prdownloads.sourceforge.net/wxwindows/wxMac-2.8.10.tar.gz
-(XWord is currently using wxWidgets 2.8.10.  Other versions should work, but haven't been tested)
+(XWord is currently using wxWidgets 2.8.10.  Other versions should work,
+but haven't been tested)
 
-Unzip to a folder.  From here on out, I'll refer to the location wxMac was unzipped to as $(WXPREFIX).  I'm going to write these directions for a debug build.  Everything should work exactly the same for a release build, just replace "debug" with "release" everywhere you see it.
+Unzip to a folder.
 
-$ cd $(WXPREFIX)
-
-$ mkdir build-debug
-
-$ cd build-debug
-
-$ ../configure --enable-unicode --disable-shared --with-libpng=builtin --with-zlib=builtin --enable-universal-binary --enable-debug
-
-(leave out --enable-debug if you want a release build, naturally)
-(and leave out --enable-universal-binary if you don't want that)
-
-$ make
+    $ cd to_wherever_wxMac_is
+    $ mkdir build-release
+    $ cd build-release
+    $ ../configure --enable-unicode --disable-shared
+    $ make
 
 
 ----------------------------------------
 Build XWord
 ----------------------------------------
-I've made an XCode project for this.  You'll have to make a couple of changes to the project to get it to compile and link (unless by some freak coincidence, you happened to install wxWidgets to /usr/share/wx/2.8.10)
+XWord uses premake to generate project files.  Get the most recent version
+(currently 4.4-beta3) here:
 
-Just a little configuration (Targets > xword > Get Info > Build)
+http://industriousone.com/premake/download
 
-$ cd $(WXPREFIX)
-$ build-debug/wx-config --cppflags
-$ build-debug/wx-config --libs
+Unzip premake4 to xword/trunk
 
-Copy output from --libs (remove "-arch ppc -arch i386" if it's there) to
-General > Linking > Other Linker Flags
+Edit xword/trunk/premake_config.lua to direct premake to where you installed
+wxMac.  Optionally disable lua support (I've only tried this without lua).
 
-Copy output from --cppflags to
-GCC > Language > Other C++ Flags
+Execute the following command to create xcode project files:
 
+    $ premake4 xcode3
 
-And that should be it.  I've only tried this on Tiger.
+After the build process, you will probably need to do several things:
 
+1. Copy images to XWord.app/Contents/Resources/images
 
+2. Copy all the dylibs to XWord.app/Contents/Frameworks
 
+3. Tell XWord and libraries where to find each other:
 
+    $ cd xword/trunk/build/release
+    $ otool -L XWord.app/Contents/MacOS/XWord
 
-----------------------------------------
-XCode project from scratch (mostly for my own reference)
-----------------------------------------
-Make a new XCode project.
-Select Carbon C++ Application
-Remove everything from the Sources
+    [Spits out a long list of libraries that XWord links to.]
 
-Change Configuration:
+Somewhere in this list will be something like: "/usr/lib/libpuz.dylib"
 
-General > Linking > ZeroLink (uncheck)
+We need to change that:
 
-GCC > Code Generation > Inline Functions Hidden (uncheck)
+    $ install_name_tool -change \
+        /usr/lib/libpuz.dylib \
+        @executable_path/../Frameworks/libpuz.dylib \
+        XWord.app/Contents/MacOS/XWord
 
-GCC > Code Generation > Symbols Hidden by Default (uncheck)
+Check other libraries as well:
 
-Copy output from wx-config --libs (removing -arch ppc -arch i386) to
-General > Linking > Other Linker Flags
+    $ otool -L XWord.app/Frameworks/libpuz.dylib
 
-Copy output from wx-config --cppflags to
-GCC > Language > Other C++ Flags
+Somewhere in this list is something like "/usr/lib/libyajl.dylib"
 
+    $ install_name_tool -change \
+        /usr/lib/libyajl.dylib \
+        @executable_path/../Frameworks/libyajl.dylib \
+        XWord.app/Contents/Frameworks/libpuz.dylib
 
-Remove GCC > Language > Prefix Header
+Repeat install_name_tool as necessary with other libraries
