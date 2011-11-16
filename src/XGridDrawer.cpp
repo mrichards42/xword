@@ -478,7 +478,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
         dc.DrawRectangle(x, y, m_boxSize, m_boxSize);
     }
 
-    if (square.IsBlack())
+    if (HasFlag(DRAW_SOLUTION) ? square.IsSolutionBlack() : square.IsBlack())
         return; // Nothing else to do if it's a black square.
 
     // Draw square's flag (top right)
@@ -577,7 +577,8 @@ XGridDrawer::DrawSquare(wxDC & adc,
     }
 
     // Draw square's text (bottom and center to avoid conflicts with numbers)
-    if (HasFlag(DRAW_TEXT) && ! square.IsBlank())
+    if ((HasFlag(DRAW_USER_TEXT) && ! square.IsBlank()) ||
+        (HasFlag(DRAW_SOLUTION) && ! square.IsSolutionBlank()))
     {
         dc.SetTextForeground(textColor);
         wxString text;
@@ -672,16 +673,33 @@ XGridDrawer::DrawGrid(wxDC & dc)
 wxColour
 XGridDrawer::GetSquareColor(const puz::Square & square) const
 {
-    if (square.IsWhite())
+    if (! HasFlag(DRAW_SOLUTION))
     {
-        if (square.HasColor())
-            return wxColor(square.m_red, square.m_green, square.m_blue);
-        else
-            return GetWhiteSquareColor();
+        if (square.IsWhite() || HasFlag(DRAW_BLANK_DIAGRAMLESS))
+        {
+            if (square.HasColor())
+                return wxColor(square.m_red, square.m_green, square.m_blue);
+            else
+                return GetWhiteSquareColor();
+        }
+        else if (square.IsBlack())
+        {
+            return GetBlackSquareColor();
+        }
     }
-    else if (square.IsBlack())
+    else
     {
-        return GetBlackSquareColor();
+        if (square.IsSolutionWhite() || HasFlag(DRAW_BLANK_DIAGRAMLESS))
+        {
+            if (square.HasColor())
+                return wxColor(square.m_red, square.m_green, square.m_blue);
+            else
+                return GetWhiteSquareColor();
+        }
+        else if (square.IsSolutionBlack())
+        {
+            return GetBlackSquareColor();
+        }
     }
     return wxNullColour;
 }

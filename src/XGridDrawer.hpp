@@ -126,6 +126,7 @@ public:
         DRAW_X          = 0x10,
         DRAW_CIRCLE     = 0x20,
         DRAW_OUTLINE    = 0x40,
+        DRAW_BLANK_DIAGRAMLESS = 0x80,
 
         DRAW_ALL = DRAW_USER_TEXT
                  | DRAW_NUMBER
