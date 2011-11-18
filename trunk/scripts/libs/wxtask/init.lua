@@ -507,6 +507,7 @@ if wx then
                     end
                 end
             end
+            evt:RequestMore()
             evt:Skip()
         end
 
