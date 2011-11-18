@@ -233,14 +233,13 @@ void Puzzle::GenerateWords()
     if (m_grid.IsDiagramless())
         return;
     // Simulate numbering the grid (solution) so that we can generate words
-    std::vector<Square *> wordMap;
-    wordMap.push_back(NULL); // So that the vector is 1-based for clue numbers.
+    std::map<string_t, Square *> wordMap;
     for (Square * square = m_grid.First();
          square != NULL;
          square = square->Next())
     {
         if (square->HasNumber())
-            wordMap.push_back(square);
+            wordMap[square->GetNumber()] = square;
     }
 
     Clues::iterator cluelist_it;
@@ -256,22 +255,19 @@ void Puzzle::GenerateWords()
             dir = DIAGONAL_SE;
         else
             throw InvalidClues();
-        ClueList::iterator it;
-        for (it = cluelist.begin(); it != cluelist.end(); ++it)
+        ClueList::iterator clue;
+        for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
         {
             // Find the square with this clue number.
-            Square * start;
-            try {
-                start = wordMap.at(it->GetInt());
-            } catch (std::out_of_range &) {
+            std::map<string_t, Square*>::iterator map_it;
+            map_it = wordMap.find(clue->GetNumber());
+            if (map_it == wordMap.end())
                 throw InvalidClues("All Clues must have a word");
-            }
-            if (! start)
-                throw InvalidClues("All clues must have a word");
+            Square * start = map_it->second;
             Square * end = start->GetSolutionWordEnd(dir);
             if (! end)
                 throw InvalidClues("All clues must have a word");
-            it->SetWord(Word(start, end));
+            clue->SetWord(Word(start, end));
         }
     }
 }
