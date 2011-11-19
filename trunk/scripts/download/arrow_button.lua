@@ -1,4 +1,5 @@
 local bmp = require 'download.bmp'
+BmpButton = require 'download.bmp_button'
 
 local function get_collapsed()
     return bmp.arrows:GetSubBitmap(wx.wxRect(0, 0, 10, 10))
@@ -9,14 +10,9 @@ local function get_expanded()
 end
 
 
--- Events: We have to reuse other event IDs, because wxLua doesn't have a
--- custom event mechanism
-wx.wxEVT_ARROW_CLICKED = wx.wxEVT_COMMAND_BUTTON_CLICKED
-
 local function ArrowButton(parent, id)
-    local ctrl = wx.wxStaticBitmap(parent, id or wx.wxID_ANY, get_collapsed())
+    local ctrl = BmpButton(parent, id or wx.wxID_ANY, get_collapsed())
     ctrl.collapsed = true
-    ctrl:SetCursor(wx.wxCursor(wx.wxCURSOR_HAND))
 
     function ctrl:IsCollapsed()
         return self.collapsed
@@ -29,19 +25,11 @@ local function ArrowButton(parent, id)
     function ctrl:Collapse()
         self.collapsed = true
         self:SetBitmap(get_collapsed())
-        wx.wxPostEvent(
-            self:GetEventHandler(),
-            wx.wxCommandEvent(wx.wxEVT_ARROW_CLICKED, self:GetId())
-        )
     end
 
     function ctrl:Expand()
         self.collapsed = false
         self:SetBitmap(get_expanded())
-        wx.wxPostEvent(
-            self:GetEventHandler(),
-            wx.wxCommandEvent(wx.wxEVT_ARROW_CLICKED, self:GetId())
-        )
     end
 
     function ctrl:Toggle()
@@ -52,7 +40,11 @@ local function ArrowButton(parent, id)
         end
     end
 
-    ctrl:Connect(wx.wxEVT_LEFT_DOWN, function(evt) ctrl:Toggle() end)
+    ctrl:Connect(wx.wxEVT_LEFT_DOWN,
+        function(evt)
+            ctrl:Toggle()
+            evt:Skip()
+        end)
 
     return ctrl
 end

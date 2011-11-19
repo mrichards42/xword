@@ -1,5 +1,6 @@
 download_dir = xword.userdatadir.."/puzzles"
 download_fmt = '%Y%m%d'
+require 'luacurl'
 
 puzzles = 
 {
@@ -11,7 +12,7 @@ puzzles =
         days = { true, true, true, true, true, true, true },
         curlopts =
         {
-            --[curl.OPT_REFERER] = 'http://www.xwordinfo.com/',
+            [curl.OPT_REFERER] = 'http://www.xwordinfo.com/',
         },
     },
 
