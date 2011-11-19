@@ -427,7 +427,6 @@ MyFrame::MyFrame()
     LoadConfig();
 
     LoadLayout(_T("(Previous)"));
-    m_mgr.Update();
 
     // Check to see if we know about some windows.
     if (m_mgr.HasCachedPane(_T("Characters")))
@@ -539,7 +538,8 @@ MyFrame::LoadPuzzle(const wxString & filename)
 bool
 MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
 {
-    if ( ! ClosePuzzle(true) ) // Prompt for save
+    Freeze();
+    if ( ! ClosePuzzle(true, false) ) // Prompt for save, don't update
         return false;
 
     wxStopWatch sw;
@@ -557,7 +557,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
 
     LoadLayout(_T("(Current)"), false);
     RemoveLayout(_T("(Current)"));
-    ShowPuzzle();
+    ShowPuzzle(false); // don't update
 
     wxFileName fn(filename);
     fn.Normalize();
@@ -579,6 +579,8 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
         SetStatus(_T("No file loaded"));
     }
 
+    m_mgr.Update();
+    Thaw();
     return m_puz.IsOk();
 }
 
@@ -653,7 +655,7 @@ MyFrame::HandlePuzException()
 
 
 bool
-MyFrame::ClosePuzzle(bool prompt)
+MyFrame::ClosePuzzle(bool prompt, bool update)
 {
     // No puzzle is open
     if (! m_puz.IsOk())
@@ -679,13 +681,14 @@ MyFrame::ClosePuzzle(bool prompt)
     // then load the current perspective when we load a new puzzle.
     SaveLayout(_T("(Current)"));
 
-    ShowPuzzle();
+    ShowPuzzle(update);
+
     return true;
 }
 
 
 void
-MyFrame::ShowPuzzle()
+MyFrame::ShowPuzzle(bool update)
 {
     Freeze();
     // If there is no puzzle, display a blank frame
@@ -718,6 +721,8 @@ MyFrame::ShowPuzzle()
     if (m_puz.m_isTimerRunning)
         StartTimer();
 
+    if (update)
+        m_mgr.Update();
     Thaw();
 }
 
@@ -841,7 +846,6 @@ MyFrame::ShowClues()
 
     // Update the UI
     UpdateCluePanelConfig();
-    m_mgr.Update();
 }
 
 
@@ -1725,7 +1729,8 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
             square->SetText(puzT(""));
             square->RemoveFlag(puz::FLAG_BLACK |
                                puz::FLAG_X |
-                               puz::FLAG_REVEALED);
+                               puz::FLAG_REVEALED |
+                               puz::FLAG_CORRECT);
         }
     }
     if (is_diagramless)
