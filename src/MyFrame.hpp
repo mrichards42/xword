@@ -83,14 +83,14 @@ public:
     bool LoadPuzzle(const wxString & filename);
     bool LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler);
     bool SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL);
-    bool ClosePuzzle(bool prompt = true); // Return true = puzzle is closed
+    bool ClosePuzzle(bool prompt = true, bool update = true); // Return true = puzzle is closed
     void CheckPuzzle();
 
     static wxString GetSaveTypeString();
     static wxString GetLoadTypeString();
 
     // Gui display / updating
-    void ShowPuzzle(); // Everything
+    void ShowPuzzle(bool update = true); // Everything
     void ShowGrid();
     void ShowClues();
     void ShowAuthor();
