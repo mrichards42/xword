@@ -1,6 +1,9 @@
 require 'lfs'
+local join = require 'pl.path'.join
 local PopupWindow = require 'download.popup'
+local TextButton = require 'download.text_button'
 require 'download.stats'
+require 'download.download'
 
 local box_size = 14
 local font_size = 8
@@ -42,7 +45,7 @@ local function draw_puzzle(p)
 end
 
 local function make_popup(parent, filename, url)
-    local popup = PopupWindow(parent, wx.wxID_ANY, wx.wxPoint(0, 0))
+    local popup = PopupWindow(parent, wx.wxID_ANY)
     local border = wx.wxBoxSizer(wx.wxVERTICAL)
     popup:SetSizer(border)
     
@@ -91,53 +94,32 @@ local function make_popup(parent, filename, url)
         destroy(popup)
     end
 
-    -- Move the popup off of the cursor, and make the popup fit on the screen
-    local screenx = wx.wxSystemSettings.GetMetric(wx.wxSYS_SCREEN_X)
-    local screeny = wx.wxSystemSettings.GetMetric(wx.wxSYS_SCREEN_Y)
-    local size = popup.Size
-    local pos = popup.Position
-    local offsetx, offsety = 20, 20
-    -- Check right edge
-    if pos.X + size.Width + 30 > screenx then
-        offsetx = -size.Width
-    end
-    -- Check bottom edge
-    if pos.Y + size.Height + 30 > screeny then
-        offsety = -size.Height
-    end
-    popup:Move(pos.X + offsetx, pos.Y + offsety)
-
     return popup
 end
 
-local function PuzzleCtrl(parent, text, url, filename)
-    local ctrl = wx.wxStaticText(parent, wx.wxID_ANY, text)
+local function PuzzleCtrl(parent, text, url, filename, opts)
+    local ctrl = TextButton(parent, wx.wxID_ANY, text)
     ctrl.filename = filename
     ctrl.url = url
-
-    ctrl:SetCursor(wx.wxCursor(wx.wxCURSOR_HAND))
+    ctrl.opts = opts
 
     local popup
 
-    -- Show underline on hover
+    -- Show popup on hover
     ctrl:Connect(wx.wxEVT_ENTER_WINDOW,
         function (evt)
-            local font = ctrl.Font
-            font:SetUnderlined(true)
-            ctrl.Font = font
             popup = make_popup(ctrl, filename, url)
-            popup:Show()
+            popup:Popup()
+            evt:Skip()
         end)
 
     ctrl:Connect(wx.wxEVT_LEAVE_WINDOW,
         function (evt)
-            local font = ctrl.Font
-            font:SetUnderlined(false)
-            ctrl.Font = font
             if popup then
                 popup:Destroy()
                 popup = nil
             end
+            evt:Skip()
         end)
 
     -- Open the puzzle
@@ -145,7 +127,40 @@ local function PuzzleCtrl(parent, text, url, filename)
         function (evt)
             if lfs.attributes(filename, 'mode') then
                 xword.frame:LoadPuzzle(filename)
+            else
+                download.add_download(url, filename, opts)
             end
+        end)
+
+    -- Context menu
+    local function copy_text(text)
+        -- Copy text to the clipboard
+        local clipBoard = wx.wxClipboard.Get()
+        if clipBoard and clipBoard:Open() then
+            clipBoard:SetData(wx.wxTextDataObject(text))
+            clipBoard:Flush() -- Make this available after we've exited
+            clipBoard:Close()
+        end
+    end
+
+    ctrl:Connect(wx.wxEVT_CONTEXT_MENU,
+        function(evt)
+            local menu = wx.wxMenu()
+            local item
+            item = menu:Append(wx.wxID_ANY, "Copy URL")
+            ctrl:Connect(item:GetId(),
+                         wx.wxEVT_COMMAND_MENU_SELECTED,
+                         function (evt) copy_text(url) end)
+            item = menu:Append(wx.wxID_ANY, "Copy local filename")
+            ctrl:Connect(item:GetId(),
+                         wx.wxEVT_COMMAND_MENU_SELECTED,
+                         function (evt) copy_text(filename) end)
+            item = menu:Append(wx.wxID_ANY, "Redownload")
+            ctrl:Connect(item:GetId(),
+                         wx.wxEVT_COMMAND_MENU_SELECTED,
+                         function (evt) download.add_download(url, filename, opts) end)
+            ctrl:PopupMenu(menu)
+            menu:delete()
         end)
 
     -- Keep track of this ctrl

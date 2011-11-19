@@ -15,8 +15,6 @@
 download = {}
 local download = download
 
-require 'download.dialog'
-
 local DownloadDialog = require 'download.dialog'
 
 -- ----------------------------------------------------------------------------

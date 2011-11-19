@@ -1,5 +1,7 @@
 require 'date'
 local bmp = require 'download.bmp'
+local BmpButton = require 'download.bmp_button'
+local TextButton = require 'download.text_button'
 
 local function DownloadHeader(parent)
     local header = wx.wxPanel(parent, wx.wxID_ANY)
@@ -10,49 +12,66 @@ local function DownloadHeader(parent)
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
     header:SetSizer(sizer)
 
-    local nav = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizer:Add(nav, 0, wx.wxEXPAND + wx.wxBOTTOM, 5)
+    -- Top sizer
+    local top = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    sizer:Add(top, 0, wx.wxEXPAND + wx.wxBOTTOM, 5)
 
-    -- Previous arrow
-    local prev = wx.wxBitmapButton(header, wx.wxID_ANY, bmp.left)
-    nav:Add(prev, 0, wx.wxALIGN_LEFT + wx.wxRIGHT, 5)
+    -- Previous arrows
+    local prev_week = BmpButton(header, wx.wxID_ANY, bmp.prev_week)
+    prev_week.ToolTip = wx.wxToolTip("Previous Week")
+    top:Add(prev_week, 0, wx.wxALIGN_LEFT + wx.wxALIGN_CENTER_VERTICAL + wx.wxRIGHT, 10)
 
-    nav:AddStretchSpacer()
+    local prev = BmpButton(header, wx.wxID_ANY, bmp.prev)
+    prev.ToolTip = wx.wxToolTip("Previous Day")
+    top:Add(prev, 0, wx.wxALIGN_LEFT + wx.wxALIGN_CENTER_VERTICAL)
+
+    -- Label
+    local label = TextButton(header, wx.wxID_ANY, "",
+                             wx.wxDefaultPosition, wx.wxDefaultSize,
+                             wx.wxALIGN_CENTER + wx.wxST_NO_AUTORESIZE)
+    label.ToolTip = wx.wxToolTip("Download Puzzles")
+    label.Font = wx.wxFont(12, wx.wxFONTFAMILY_SWISS, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD)
+    top:Add(label, 1, wx.wxALIGN_CENTER)
+
+    -- Next arrows
+    local next = BmpButton(header, wx.wxID_ANY, bmp.next)
+    next.ToolTip = wx.wxToolTip("Next Day")
+    top:Add(next, 0, wx.wxALIGN_RIGHT + wx.wxALIGN_CENTER_VERTICAL + wx.wxRIGHT, 10)
+
+    local next_week = BmpButton(header, wx.wxID_ANY, bmp.next_week)
+    next_week.ToolTip = wx.wxToolTip("Next Week")
+    top:Add(next_week, 0, wx.wxALIGN_RIGHT + wx.wxALIGN_CENTER_VERTICAL)
+
+    -- Bottom sizer
+    local bottom = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    sizer:Add(bottom, 0, wx.wxEXPAND)
+
+    -- Kind
+    local kind = wx.wxChoice(header, wx.wxID_ANY,
+                             wx.wxDefaultPosition, wx.wxDefaultSize,
+                             { "Day", "Week", "Month", "Custom" })
+    kind.Selection = 0
+    bottom:Add(kind, 0, wx.wxALIGN_CENTER_VERTICAL)
+
+    bottom:AddStretchSpacer()
 
     -- Start date
     local start_text = wx.wxStaticText(header, wx.wxID_ANY, "Start:")
-    nav:Add(start_text, 0, wx.wxALIGN_CENTER + wx.wxLEFT + wx.wxRIGHT, 5)
+    bottom:Add(start_text, 0, wx.wxALIGN_CENTER + wx.wxLEFT + wx.wxRIGHT, 5)
 
     local start_date = wx.wxDatePickerCtrl(header, wx.wxID_ANY,
         wx.wxDefaultDateTime, wx.wxDefaultPosition, wx.wxDefaultSize,
         wx.wxDP_DROPDOWN + wx.wxDP_SHOWCENTURY)
-    nav:Add(start_date, 0, wx.wxRIGHT, 5)
+    bottom:Add(start_date, 0, wx.wxRIGHT, 5)
 
     -- End date
     local end_text = wx.wxStaticText(header, wx.wxID_ANY, "End:")
-    nav:Add(end_text, 0, wx.wxALIGN_CENTER + wx.wxLEFT + wx.wxRIGHT, 5)
+    bottom:Add(end_text, 0, wx.wxALIGN_CENTER + wx.wxLEFT + wx.wxRIGHT, 5)
 
     local end_date = wx.wxDatePickerCtrl(header, wx.wxID_ANY,
         wx.wxDefaultDateTime, wx.wxDefaultPosition, wx.wxDefaultSize,
         wx.wxDP_DROPDOWN + wx.wxDP_SHOWCENTURY)
-    nav:Add(end_date, 0, wx.wxRIGHT, 5)
-
-    nav:AddStretchSpacer()
-
-    -- Next arrow
-    local next = wx.wxBitmapButton(header, wx.wxID_ANY, bmp.right)
-    nav:Add(next, 0, wx.wxALIGN_RIGHT)
-
-    local hsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizer:Add(hsizer, 0, wx.wxEXPAND)
-
-    local label = wx.wxStaticText(header, wx.wxID_ANY, "")
-    label:SetFont(wx.wxFont(14, wx.wxFONTFAMILY_SWISS, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD))
-    hsizer:Add(label, 1, wx.wxEXPAND)
-
-    local kind = wx.wxChoice(header, wx.wxID_ANY, wx.wxDefaultPosition, wx.wxDefaultSize, { "Day", "Week", "Month", "Custom" })
-    kind.Selection = 0
-    hsizer:Add(kind, 0, wx.wxALIGN_CENTER_VERTICAL)
+    bottom:Add(end_date, 0, wx.wxRIGHT, 5)
 
     -- ------------------------------------------------------------------------
     -- Data Access
@@ -104,29 +123,37 @@ local function DownloadHeader(parent)
     -- Update kind
     local function update_kind(kind)
         local kind = header:get_kind()
-        -- Show or hide the nav controls
-        local show = (kind == 'custom')
-        nav:Show(end_text, show)
-        nav:Show(end_date, show)
-        nav:Show(prev, not show)
-        nav:Show(next, not show)
-        -- Change the label for nav controls
+        -- Show or hide controls
+        top:Show(prev_week, (kind == 'day'))
+        top:Show(prev, (kind ~= 'custom'))
+        top:Show(next, (kind ~= 'custom'))
+        top:Show(next_week, (kind == 'day'))
+
+        bottom:Show(start_text, (kind == 'custom'))
+        bottom:Show(end_text, (kind == 'custom'))
+        bottom:Show(end_date, (kind == 'custom'))
+        -- Change labels
         if kind == 'day' then
-            start_text.Label = "Day:"
         elseif kind == 'week' then
-            start_text.Label = "Week of:"
+            prev.ToolTip = wx.wxToolTip("Previous Week")
+            next.ToolTip = wx.wxToolTip("Next Week")
         elseif kind == 'month' then
-            start_text.Label = "Month of:"
-        elseif kind == 'custom' then
-            start_text.Label = "Start:"
+            prev.ToolTip = wx.wxToolTip("Previous Month")
+            next.ToolTip = wx.wxToolTip("Next Month")
         end
-        nav:Layout()
+        header:Layout()
         update_dates()
     end
 
     -- ------------------------------------------------------------------------
     -- Events
     -- ------------------------------------------------------------------------
+
+    prev_week:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED,
+        function (evt)
+            real_start:Subtract(wx.wxTimeSpan.Week())
+            update_dates()
+        end)
 
     prev:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED,
         function (evt)
@@ -156,10 +183,12 @@ local function DownloadHeader(parent)
             update_dates()
         end)
 
-    function header:set_kind(kind_)
-        kind:SetStringSelection(kind_:sub(1,1):upper() .. kind_:sub(2))
-        update_kind()
-    end
+    next_week:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED,
+        function (evt)
+            real_start:Add(wx.wxTimeSpan.Week())
+            update_dates()
+        end)
+
 
     kind:Connect(wx.wxEVT_COMMAND_CHOICE_SELECTED, update_kind)
 
@@ -170,6 +199,15 @@ local function DownloadHeader(parent)
         end)
 
     end_date:Connect(wx.wxEVT_DATE_CHANGED, update_dates)
+
+    label:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED,
+        function (evt) parent:download_puzzles() end)
+
+    -- Functions
+    function header:set_kind(kind_)
+        kind:SetStringSelection(kind_:sub(1,1):upper() .. kind_:sub(2))
+        update_kind()
+    end
 
     return header
 end
