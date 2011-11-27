@@ -16,7 +16,6 @@ local function process_messages(timeout)
     while true do
         if task.checkAbort() then return 'abort' end
         local data, flag, rc = task.receive(timeout or 0, 1)
-        timeout = 0 -- Respect the timeout just the first time
         if rc ~= 0 then return end -- No messages
         if flag == task.ABORT then
             return 'abort'
@@ -27,6 +26,7 @@ local function process_messages(timeout)
         elseif flag == download.APPEND then
             queue:append(unpack(data))
         end
+        timeout = 0 -- Respect the timeout just the first time
     end
 end
 

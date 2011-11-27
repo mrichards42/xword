@@ -1,6 +1,11 @@
 -- A status bar sort of thing
 require 'download.download'
 local PopupWindow = require 'download.popup'
+local basename = require 'pl.path'.basename
+
+local function abbrev(url)
+    return select(1, url:gsub('^(http[^:]*://[^/]+/).-(/[^/]+)$', '%1...%2'))
+end
 
 local function make_spacer(parent)
     local spacer = wx.wxWindow(
@@ -18,27 +23,27 @@ local function make_queue_popup(parent)
 
     local ctrls = {}
 
+    --local ctrl = wx.wxStaticText(popup, wx.wxID_ANY, "")
+    --sizer:Add(ctrl)
     function popup:update()
         popup:Freeze()
+        -- --[[
         for _, ctrl in ipairs(ctrls) do
             sizer:Detach(ctrl)
             ctrl:Destroy()
         end
         ctrls = {}
-        --[[
-        for _, data in ipairs(download.queue) do
-            local ctrl = wx.wxStaticText(popup, wx.wxID_ANY, tostring(data[1]))
+        for i=1,math.min(#download.queue, 10) do
+            local ctrl = wx.wxStaticText(popup, wx.wxID_ANY, tostring(basename(download.queue[i][2])))
             table.insert(ctrls, ctrl)
             sizer:Add(ctrl)
         end
-        ]]
-        local text = {}
-        for _, data in ipairs(download.queue) do
-            table.insert(text, data[1])
+        local extra = #download.queue - 10
+        if extra > 0 then
+            ctrl = wx.wxStaticText(popup, wx.wxID_ANY, string.format("(%d more)", extra))
+            table.insert(ctrls, ctrl)
+            sizer:Add(ctrl)
         end
-        local ctrl = wx.wxStaticText(popup, wx.wxID_ANY, table.concat(text, '\n'))
-        table.insert(ctrls, ctrl)
-        sizer:Add(ctrl)
         sizer:Layout()
         popup:Fit()
         popup:Thaw()
@@ -70,7 +75,7 @@ local function make_error_popup(parent)
         for i=#download.errors,math.max(#download.errors-9, 1),-1 do
             local data = download.errors[i]
             local ctrl
-            ctrl = wx.wxStaticText(popup, wx.wxID_ANY, tostring(data[1]))
+            ctrl = wx.wxStaticText(popup, wx.wxID_ANY, tostring(basename(data[2])))
             table.insert(ctrls, ctrl)
             sizer:Add(ctrl)
             ctrl = wx.wxStaticText(popup, wx.wxID_ANY, tostring(data[3]))
@@ -151,7 +156,7 @@ local function Status(parent)
         end)
 
     function panel:update_status()
-        self.current.Label = download.current or "Ready"
+        self.current.Label = abbrev(download.current or "Ready")
         self.queue.Label = string.format('%d Queued', #download.queue)
         self.errors.Label = string.format('%d Errors', #download.errors)
         if queue_popup then queue_popup:update() end

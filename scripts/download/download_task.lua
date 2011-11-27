@@ -12,7 +12,6 @@ end
 
 local function do_download(args)
     local url, filename, curlopts = unpack(args)
-    task.debug(url)
     local f, rc, err
     f, err = io.open(filename, 'wb')
     if f then
@@ -46,7 +45,6 @@ local function do_download(args)
         -- Run the download
         task.post(1, {url, filename}, download.START)
         rc, err = c:perform()
-        task.debug(rc)
         -- Check the return code
         if rc ~= 0 then
             if rc == 22 then -- CURLE_HTTP_RETURNED_ERROR
