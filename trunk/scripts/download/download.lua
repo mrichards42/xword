@@ -44,6 +44,11 @@ local function start_task(downloads)
             if err then
                 table.insert(download.errors, data)
             end
+            if #download.queue > 0 then
+                download.current = download.queue[1][1]
+            else
+                download.current = nil
+            end
             if download.dialog then
                 download.dialog:update_status()
             end
@@ -61,13 +66,11 @@ end
 -- ---------------------------------------------------------------------------
 -- Public functions
 -- ---------------------------------------------------------------------------
-
+require 'serialize'
 function download.add_downloads(downloads)
     download.queue:append(unpack(downloads))
     if task_id then
-        if task.isrunning(task_id) then
-            task.post(task_id, downloads, download.APPEND)
-        else
+        if task.post(task_id, downloads, download.APPEND) ~= 0 then
             table.insert(queued_messages, {downloads, download.APPEND})
         end
     else

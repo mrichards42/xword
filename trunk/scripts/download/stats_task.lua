@@ -48,6 +48,5 @@ local function get_status(filename)
 end
 
 loop_through_queue(function(filename)
-    --task.debug(task.id() .. ' ' .. filename:match('[\\/]([^\\/]+)$'))
     task.post(1, {filename, get_status(filename)}, download.STATS)
 end)
