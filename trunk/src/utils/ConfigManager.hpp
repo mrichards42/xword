@@ -149,6 +149,8 @@ public:
     void AutoUpdate(bool doit) { m_autoUpdate = doit; }
     bool AutoUpdate() const { return m_autoUpdate; }
 
+    class ConversionError : public std::exception {};
+
 protected:
     // A little metaprogramming :)
 
@@ -186,7 +188,13 @@ public:
     {
         typename AdaptedType<T>::type ret;
         if (m_config->Read(path, &ret))
-            return Convert<typename AdaptedType<T>::type, T>(ret);
+        {
+            try {
+                return Convert<typename AdaptedType<T>::type, T>(ret);
+            } catch (ConversionError &) {
+                // default
+            }
+        }
         return default_val;
     }
 
@@ -329,7 +337,7 @@ template <>
 inline wxString
 ConfigManagerBase::Convert<wxFont, wxString>(const wxFont & font)
 {
-    return font.GetNativeFontInfoUserDesc();
+    return font.GetNativeFontInfoDesc();
 }
 
 // String to Font conversion
@@ -338,7 +346,11 @@ inline wxFont
 ConfigManagerBase::Convert<wxString, wxFont>(const wxString & str)
 {
     wxFont font;
-    font.SetNativeFontInfoUserDesc(str);
+    // We user to user NativeFontInfoUserDesc instead of NativeFontInfoDesc,
+    // So try both here.
+    if (! font.SetNativeFontInfo(str))
+        if (! font.SetNativeFontInfoUserDesc(str))
+            throw ConfigManagerBase::ConversionError();
     return font;
 }
 
