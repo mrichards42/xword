@@ -2072,7 +2072,7 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
     // Check to see if somebody is active.
     // Calling SetPaused is already done in OnApp(De)Activate, but in case that
     // doesn't work, we'll do it here too.
-    if (wxWindow::FindFocus() != NULL)
+    if (wxGetApp().IsActive())
     {
         SetTime(m_time+1);
         m_XGridCtrl->SetPaused(false);
