@@ -356,15 +356,9 @@ MyApp::OnActivate(wxActivateEvent & evt)
     if (m_frame != NULL)
     {
         if (evt.GetActive())
-        {
-            wxLogDebug(_T("App Activate"));
             m_frame->OnAppActivate();
-        }
         else
-        {
-            wxLogDebug(_T("App Deactivate"));
             m_frame->OnAppDeactivate();
-        }
     }
 
     evt.Skip();

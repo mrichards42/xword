@@ -368,7 +368,26 @@ XGridCtrl::OnPaint(wxPaintEvent & WXUNUSED(evt))
 void
 XGridCtrl::DrawPauseMessage(wxDC & dc)
 {
-    dc.DrawLabel(_T("(Paused)"), wxRect(wxPoint(0,0), dc.GetSize()), wxALIGN_CENTER);
+    wxString msg = _T("(Paused)");
+    // Scale the font
+    wxFont font = GetFont();
+    int max_width, max_height;
+    dc.GetSize(&max_width, &max_height);
+    int w = 0, h = 0;
+    while (w < max_width && h < max_height && font.GetPointSize() < 50)
+    {
+        font.SetPointSize(font.GetPointSize() + 2);
+        dc.SetFont(font);
+        dc.GetTextExtent(msg, &w, &h);
+    }
+    while ((w > max_width || h > max_height) && font.GetPointSize() > 6)
+    {
+        font.SetPointSize(font.GetPointSize() - 2);
+        dc.SetFont(font);
+        dc.GetTextExtent(msg, &w, &h);
+    }
+    // Draw the label
+    dc.DrawLabel(msg, wxRect(wxPoint(0,0), dc.GetSize()), wxALIGN_CENTER);
 }
 
 

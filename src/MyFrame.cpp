@@ -2069,7 +2069,18 @@ MyFrame::OnTimer(wxCommandEvent & evt)
 void
 MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
 {
-    SetTime(m_time+1);
+    // Check to see if somebody is active.
+    // Calling SetPaused is already done in OnApp(De)Activate, but in case that
+    // doesn't work, we'll do it here too.
+    if (wxWindow::FindFocus() != NULL)
+    {
+        SetTime(m_time+1);
+        m_XGridCtrl->SetPaused(false);
+    }
+    else
+    {
+        m_XGridCtrl->SetPaused(true);
+    }
 }
 
 // AutoSave
@@ -2528,15 +2539,15 @@ MyFrame::SetFocusOnIdle(wxIdleEvent & evt)
 }
 
 
+// This used to be where the timer would be started and stopped.
+// Now this is handled in OnTimerNotify.
+// Since OnTimerNotify only happens every second, we still display the
+// "(Paused)" message here because the delay would be noticeable.
 void
 MyFrame::OnAppActivate()
 {
     if (m_toolMgr.IsChecked(ID_TIMER))
-    {
-        wxLogDebug(_T("Starting timer"));
-        m_timer.Start();
         m_XGridCtrl->SetPaused(false);
-    }
 }
 
 
@@ -2544,11 +2555,7 @@ void
 MyFrame::OnAppDeactivate()
 {
     if (m_toolMgr.IsChecked(ID_TIMER))
-    {
-        wxLogDebug(_T("Stopping timer"));
-        m_timer.Stop();
         m_XGridCtrl->SetPaused(true);
-    }
 }
 
 
