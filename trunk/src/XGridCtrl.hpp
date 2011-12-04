@@ -137,7 +137,13 @@ public:
 
     ~XGridCtrl();
 
-    void SetPaused(bool pause = true) { m_isPaused = pause; Refresh(); }
+    void SetPaused(bool pause = true)
+    {
+        const bool refresh = (pause != m_isPaused);
+        m_isPaused = pause;
+        if (refresh)
+            Refresh();
+    }
 
     void SetFocus() { SetFocusIgnoringChildren(); }
 
