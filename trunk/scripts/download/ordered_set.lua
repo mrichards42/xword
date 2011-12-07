@@ -25,6 +25,10 @@ mt.__index = mt
         end
     end
 
+    function mt:clear()
+        for i, _ in ipairs(self) do self[i] = nil end
+    end
+
     function mt:append(...)
         self:remove(...)
         local arg = {n=select('#',...),...}

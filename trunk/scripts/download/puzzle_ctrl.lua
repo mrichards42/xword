@@ -44,7 +44,7 @@ local function draw_puzzle(p)
     return bmp
 end
 
-local function make_popup(parent, filename, url)
+local function make_popup(parent, puzzle)
     local popup = PopupWindow(parent, wx.wxID_ANY)
     local border = wx.wxBoxSizer(wx.wxVERTICAL)
     popup:SetSizer(border)
@@ -53,7 +53,7 @@ local function make_popup(parent, filename, url)
     border:Add(sizer, 1, wx.wxEXPAND + wx.wxALL, 5)
 
     -- Load the puzzle and display various puzzle information
-    local success, p = pcall(puz.Puzzle, filename)
+    local success, p = pcall(puz.Puzzle, puzzle.filename)
     local bmp
     if success then
         bmp = draw_puzzle(p)
@@ -81,7 +81,7 @@ local function make_popup(parent, filename, url)
         sizer:Add(wx.wxStaticBitmap(popup, wx.wxID_ANY, bmp), 0, wx.wxTOP, 5)
         p:__gc()
     else
-        sizer:Add(wx.wxStaticText(popup, wx.wxID_ANY, url))
+        sizer:Add(wx.wxStaticText(popup, wx.wxID_ANY, tostring(puzzle.url)))
     end
 
     popup:Fit()
@@ -97,18 +97,17 @@ local function make_popup(parent, filename, url)
     return popup
 end
 
-local function PuzzleCtrl(parent, text, url, filename, opts)
+local function PuzzleCtrl(parent, text, puzzle)
     local ctrl = TextButton(parent, wx.wxID_ANY, text)
     ctrl.filename = filename
-    ctrl.url = url
-    ctrl.opts = opts
+    ctrl.puzzle = puzzle
 
     local popup
 
     -- Show popup on hover
     ctrl:Connect(wx.wxEVT_ENTER_WINDOW,
         function (evt)
-            popup = make_popup(ctrl, filename, url)
+            popup = make_popup(ctrl, puzzle)
             popup:Popup()
             evt:Skip()
         end)
@@ -125,10 +124,11 @@ local function PuzzleCtrl(parent, text, url, filename, opts)
     -- Open the puzzle
     ctrl:Connect(wx.wxEVT_LEFT_DOWN,
         function (evt)
-            if lfs.attributes(filename, 'mode') then
-                xword.frame:LoadPuzzle(filename)
+            if download.puzzle_exists(puzzle.filename) then
+                xword.frame:LoadPuzzle(puzzle.filename)
             else
-                download.add_download(url, filename, opts)
+                download.add_download(puzzle, download.PREPEND)
+                download.open_after_download = puzzle.filename
             end
         end)
 
@@ -150,15 +150,15 @@ local function PuzzleCtrl(parent, text, url, filename, opts)
             item = menu:Append(wx.wxID_ANY, "Copy URL")
             ctrl:Connect(item:GetId(),
                          wx.wxEVT_COMMAND_MENU_SELECTED,
-                         function (evt) copy_text(url) end)
+                         function (evt) copy_text(tostring(puzzle.url)) end)
             item = menu:Append(wx.wxID_ANY, "Copy local filename")
             ctrl:Connect(item:GetId(),
                          wx.wxEVT_COMMAND_MENU_SELECTED,
-                         function (evt) copy_text(filename) end)
+                         function (evt) copy_text(puzzle.filename) end)
             item = menu:Append(wx.wxID_ANY, "Redownload")
             ctrl:Connect(item:GetId(),
                          wx.wxEVT_COMMAND_MENU_SELECTED,
-                         function (evt) download.add_download(url, filename, opts) end)
+                         function (evt) download.add_download(puzzle) end)
             ctrl:PopupMenu(menu)
             menu:delete()
         end)

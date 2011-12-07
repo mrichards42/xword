@@ -20,7 +20,8 @@ local function process_messages(timeout)
         if flag == task.ABORT then
             return 'abort'
         elseif flag == download.CLEAR then
-            queue = OrderedSet(queue.hash)
+            task.debug('clear')
+            queue:clear()
         elseif flag == download.PREPEND then
             queue:prepend(unpack(data))
         elseif flag == download.APPEND then

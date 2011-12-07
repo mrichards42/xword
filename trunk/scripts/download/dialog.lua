@@ -4,6 +4,7 @@ local DownloadHeader = require 'download.header'
 local PuzzlePanel = require 'download.puzzle_panel'
 local Status = require 'download.status'
 require 'download.stats'
+local clear = require 'pl.tablex'.clear
 
 local function make_puzzles(parent)
     local scroller = wx.wxScrolledWindow(parent, wx.wxID_ANY)
@@ -12,7 +13,7 @@ local function make_puzzles(parent)
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
     scroller:SetSizer(sizer)
     scroller.puzzles = {}
-    for _, puzzle in ipairs(puzzles) do
+    for _, puzzle in ipairs(download.puzzles) do
         local p = PuzzlePanel(scroller, puzzle, kind, start_date, end_date)
         table.insert(scroller.puzzles, p)
         sizer:Add(p, 0, wx.wxEXPAND)
@@ -20,7 +21,7 @@ local function make_puzzles(parent)
 
     function scroller:set_dates(kind, start_date, end_date)
         download.clear_stats()
-        download.puzzle_map = {}
+        clear(download.puzzle_map)
         self:Freeze()
         local stats_filenames = {}
         for _, p in ipairs(self.puzzles) do
@@ -79,6 +80,21 @@ local function DownloadDialog(parent, id, title, pos, size)
 
     local status = Status(panel)
     sizer:Add(status, 0, wx.wxEXPAND)
+
+    local btn = wx.wxButton(panel, wx.wxID_ANY, "config")
+    sizer:Add(btn, 0, wx.wxALL, 5)
+
+    btn:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+        require 'download.config'
+        download.get_config_dialog():Show()
+    end)
+
+    local btn2 = wx.wxButton(panel, wx.wxID_ANY, "clear")
+    sizer:Add(btn2, 0, wx.wxALL, 5)
+
+    btn2:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+        download.clear_downloads()
+    end)
 
     -- Sizing
     dialog:Fit()
