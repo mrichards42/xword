@@ -33,7 +33,7 @@ local function init()
 end
 
 local function uninit()
-    xword.frame:RemoveMenuItem('Tools', 'Download puzzles2')
+    xword.frame:RemoveMenuItem('Tools', 'Download puzzles')
     -- Save configuration and sources
 end
 

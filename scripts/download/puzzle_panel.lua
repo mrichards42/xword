@@ -4,17 +4,36 @@ local PuzzleCtrl = require 'download.puzzle_ctrl'
 local TextButton = require 'download.text_button'
 local join = require 'pl.path'.join
 require 'download.stats'
+require 'download.config'
+local deepcopy = require 'pl.tablex'.deepcopy
 
 local function get_url(puzzle, d)
-    return d:fmt(puzzle.url)
+    if type(puzzle.url) == 'string' then
+        return d:fmt(puzzle.url)
+    else
+        return puzzle.url
+    end
+end
+
+local function sanitize(text)
+    local text = text:gsub('[?<>:*|"\']', ""):gsub("%s", "_")
+    return text
 end
 
 local function get_filename(puzzle, d)
-    return join(download_dir, puzzle.prefix .. d:fmt(download_fmt) .. '.' .. puzzle.ext)
+    if download.separate_directories then
+        return join(download.puzzle_directory, sanitize(puzzle.name), d:fmt(puzzle.filename))
+    else
+        return join(download.puzzle_directory, d:fmt(puzzle.filename))
+    end
 end
 
 local function get_download_data(puzzle, d)
-    return get_url(puzzle, d), get_filename(puzzle, d), puzzle.curlopts
+    local data = deepcopy(puzzle)
+    if data.url then data.url = get_url(puzzle, d) end
+    if data.filename then data.filename = get_filename(puzzle, d) end
+    data.date = d
+    return data
 end
 
 
@@ -125,6 +144,7 @@ local function PuzzlePanel(parent, puzzle)
 
     -- Display number of puzzles with a link to download
     local download_button = TextButton(header, wx.wxID_ANY, "")
+    download_button:SetToolTip("Download Missing Puzzles")
     header_sizer:Add(download_button, 0, wx.wxALIGN_CENTER_VERTICAL)
 
     local header_puzzle
@@ -196,10 +216,10 @@ local function PuzzlePanel(parent, puzzle)
     function panel:get_download_data()
         local data = {}
         for _, d in ipairs(self:get_dates()) do
-            local url, filename, opts = get_download_data(puzzle, d)
+            local p = get_download_data(puzzle, d)
             -- Don't redownload files
-            if lfs.attributes(filename, 'mode') ~= 'file' then
-                table.insert(data, { url, filename, opts })
+            if not download.puzzle_exists(p.filename) then
+                table.insert(data, p)
             end
         end
         return data

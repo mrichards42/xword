@@ -1,6 +1,8 @@
 require 'wxtask'
 require 'download.messages'
 local join = require 'pl.path'.join
+local clear = require 'pl.tablex'.clear
+
 
 -- ------------------------------------------------------------------------
 -- Stats thread management
@@ -16,7 +18,7 @@ local function update_ctrl(filename, status)
     -- Update the status of the PuzzleCtrl
     ctrl = ctrls[filename]
     if not ctrl then return end
-    status = status or download.status_map[ctrl.filename]
+    status = status or download.status_map[ctrl.puzzle.filename]
     if not status then return end
     if status == download.MISSING then
         ctrl:SetForegroundColour(wx.wxBLUE)
@@ -86,19 +88,28 @@ function download.fetch_stats(filenames)
 end
 
 function download.add_ctrl(ctrl)
-    ctrls[ctrl.filename] = ctrl
-    update_ctrl(ctrl.filename)
+    ctrls[ctrl.puzzle.filename] = ctrl
+    update_ctrl(ctrl.puzzle.filename)
 end
 
 function download.clear_stats()
     if task_id and task.isrunning(task_id) then
         task.post(task_id, nil, download.CLEAR)
     end
-    ctrls = {}
-    --download.status_map = {}
+    clear(ctrls)
+    --clear(download.status_map)
 end
 
 function download.erase_stats()
     download.clear_stats()
-    download.status_map = {}
+    clear(download.status_map)
+end
+
+function download.puzzle_exists(filename)
+    local status = download.status_map[filename]
+    if status then
+        return status ~= download.MISSING
+    else
+        return lfs.attributes(filename, 'mode') == 'file'
+    end
 end
