@@ -45,7 +45,7 @@ local function start_task(downloads)
         [download.END] = function (data)
             local puzzle, err = unpack(data)
             puzzle.date = setmetatable(puzzle.date, getmetatable(date()))
-            download.fetch_stats{{filename}, force = true}
+            download.fetch_stats{{puzzle.filename}, force = true}
             if err then
                 table.insert(download.errors, data)
             end
@@ -57,10 +57,10 @@ local function start_task(downloads)
             if download.dialog then
                 download.dialog:update_status()
             end
-            if download.open_after_download == filename then
+            if download.open_after_download == puzzle.filename then
                 download.open_after_download = nil
-                if not err and lfs.attributes(filename, 'mode') == 'file' then
-                    xword.frame:LoadPuzzle(filename)
+                if not err and lfs.attributes(puzzle.filename, 'mode') == 'file' then
+                    xword.frame:LoadPuzzle(puzzle.filename)
                 end
             end
         end,

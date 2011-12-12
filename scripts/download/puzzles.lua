@@ -1,10 +1,23 @@
 require 'luacurl'
 
-download.puzzles = 
-{
+function download.get_default_puzzles()
+return {
     {
-        name = "NY Times",
+        name = "NY Times Premium",
+        url = "?",
+        directoryname = "NY_Times",
+        filename = "nyt%Y%m%d.puz",
+        days = { true, true, true, true, true, true, true },
+        curlopts =
+        {},
+        func = "return download.download(puzzle.url, puzzle.filename, puzzle.curlopts)",
+        fields = { "User Name", "Password", "other field" }
+    },
+
+    {
+        name = "NY Times (XWord Info)",
         url = "http://www.xwordinfo.com/XPF/?date=%m/%d/%Y",
+        directoryname = "NY_Times",
         filename = "nyt%Y%m%d.xml",
         days = { true, true, true, true, true, true, true },
         curlopts =
@@ -98,6 +111,9 @@ download.puzzles =
     },
 
 }
+end -- function get_default_puzzles
+
+download.puzzles = download.get_default_puzzles()
 
 -- Update the download sources
 require 'download.config'
