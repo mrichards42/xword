@@ -20,7 +20,6 @@ local function process_messages(timeout)
         if flag == task.ABORT then
             return 'abort'
         elseif flag == download.CLEAR then
-            task.debug('clear')
             queue:clear()
         elseif flag == download.PREPEND then
             queue:prepend(unpack(data))
@@ -32,6 +31,7 @@ local function process_messages(timeout)
 end
 
 -- Loop through the queue calling callback with each piece of data
+-- Call
 function loop_through_queue(callback, hash)
     if hash then
         queue.hash = hash
@@ -41,7 +41,24 @@ function loop_through_queue(callback, hash)
         local data = table.remove(queue, 1)
         if data then
             -- Do something with it
-            if callback(data) == 'abort' then break end
+            local success, err = xpcall(
+                function () callback(data) end,
+                -- error handler . . . separates aborts
+                function (e)
+                    if type(e) == 'table' and e[1] == 'abort' then
+                        return 'abort'
+                    else
+                        return debug.traceback(e)
+                    end
+                end)
+            if not success then
+                if err == 'abort' then
+                    break
+                else
+                    task.error(err)
+                    break
+                end
+            end
         else
             -- Wait forever for new messages
             if process_messages(-1) == 'abort' then break end

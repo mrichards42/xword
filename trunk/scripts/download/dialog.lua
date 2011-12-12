@@ -14,9 +14,11 @@ local function make_puzzles(parent)
     scroller:SetSizer(sizer)
     scroller.puzzles = {}
     for _, puzzle in ipairs(download.puzzles) do
-        local p = PuzzlePanel(scroller, puzzle, kind, start_date, end_date)
-        table.insert(scroller.puzzles, p)
-        sizer:Add(p, 0, wx.wxEXPAND)
+        if not download.disabled[puzzle.name] then
+            local p = PuzzlePanel(scroller, puzzle, kind, start_date, end_date)
+            table.insert(scroller.puzzles, p)
+            sizer:Add(p, 0, wx.wxEXPAND)
+        end
     end
 
     function scroller:set_dates(kind, start_date, end_date)
@@ -86,14 +88,7 @@ local function DownloadDialog(parent, id, title, pos, size)
 
     btn:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
         require 'download.config'
-        download.get_config_dialog():Show()
-    end)
-
-    local btn2 = wx.wxButton(panel, wx.wxID_ANY, "clear")
-    sizer:Add(btn2, 0, wx.wxALL, 5)
-
-    btn2:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
-        download.clear_downloads()
+        download.show_config_dialog()
     end)
 
     -- Sizing

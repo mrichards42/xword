@@ -15,14 +15,9 @@ local function get_url(puzzle, d)
     end
 end
 
-local function sanitize(text)
-    local text = text:gsub('[?<>:*|"\']', ""):gsub("%s", "_")
-    return text
-end
-
 local function get_filename(puzzle, d)
     if download.separate_directories then
-        return join(download.puzzle_directory, sanitize(puzzle.name), d:fmt(puzzle.filename))
+        return join(download.puzzle_directory, download.sanitize_name(puzzle.directoryname or puzzle.name), d:fmt(puzzle.filename))
     else
         return join(download.puzzle_directory, d:fmt(puzzle.filename))
     end

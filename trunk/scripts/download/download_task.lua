@@ -40,9 +40,62 @@ local function progress(dltotal, dlnow, ultotal, ulnow)
     return 0 -- continue
 end
 
+local function check_return_code(rc, err)
+    if rc ~= 0 then
+        if rc == 22 then -- CURLE_HTTP_RETURNED_ERROR
+            local code = get_http_error(err)
+            if code == 404 or code == 410 then
+                err = "URL not found: "..url
+            end
+        elseif rc == 42 then -- abort from the progress function
+            error({'abort'})
+        end
+        return nil, err
+    else
+        return true
+    end
+end
+
 -- Download a file
-function download.download(url, filename, opts)
-    assert(url and filename)
+local function do_download(url, callback, opts)
+    -- Setup the cURL object
+    local c = curl.easy_init()
+    c:setopt(curl.OPT_URL, url)
+    c:setopt(curl.OPT_FOLLOWLOCATION, 1)
+    c:setopt(curl.OPT_WRITEFUNCTION, callback)
+    c:setopt(curl.OPT_PROGRESSFUNCTION, progress)
+    c:setopt(curl.OPT_NOPROGRESS, 0)
+    c:setopt(curl.OPT_FAILONERROR, 1) -- e.g. 404 errors
+
+    -- Set user-defined options
+    for k,v in pairs(opts or {}) do c:setopt(k, v) end
+
+    -- Run the download
+    rc, err = c:perform()
+
+    -- Check the return code
+    if rc ~= 0 then
+        if rc == 22 then -- CURLE_HTTP_RETURNED_ERROR
+            local code = get_http_error(err)
+            if code == 404 or code == 410 then
+                err = "URL not found: "..url
+            end
+        elseif rc == 42 then -- abort from the progress function
+            return 'abort'
+        end
+        return nil, err
+    else
+        return true
+    end
+end
+
+local function download_to_file(url, filename, opts)
+    local f, rc, err
+    makedirs(pl.path.dirname(filename))
+    f, err = io.open(filename, 'wb')
+    if not f then
+        return nil, err
+    end
 
     local f, rc, err
     makedirs(pl.path.dirname(filename))
@@ -57,37 +110,103 @@ function download.download(url, filename, opts)
         return length -- Return length to continue download
     end
 
-    -- Setup the cURL object
-    local c = curl.easy_init()
-    c:setopt(curl.OPT_URL, url)
-    c:setopt(curl.OPT_FOLLOWLOCATION, 1)
-    c:setopt(curl.OPT_WRITEFUNCTION, write_to_file)
-    c:setopt(curl.OPT_PROGRESSFUNCTION, progress)
-    c:setopt(curl.OPT_NOPROGRESS, 0)
-    c:setopt(curl.OPT_FAILONERROR, 1) -- e.g. 404 errors
+    -- Download
+    rc, err = do_download(url, write_to_file, opts)
 
-    -- Set user-defined options
-    for k,v in pairs(opts or {}) do c:setopt(k, v) end
-
-    -- Run the download
-    rc, err = c:perform()
     -- Cleanup
     f:close()
 
-    -- Check the return code
-    if rc ~= 0 then
+    if not rc then
         os.remove(filename)
-        if rc == 22 then -- CURLE_HTTP_RETURNED_ERROR
-            local code = get_http_error(err)
-            if code == 404 or code == 410 then
-                err = "URL not found: "..url
-            end
-        elseif rc == 42 then -- abort from the progress function
-            return 'abort', err
-        end
-        return false, err
+    end
+
+    return rc, err
+end
+
+local function download_to_string(url, opts)
+    local t = {}
+
+    -- Write to the table
+    local function write_to_table(str, length)
+        table.insert(t, str)
+        return length -- Return length to continue download
+    end
+
+    -- Download
+    local success, err = do_download(url, write_to_table, opts)
+
+    -- Return the string
+    if success then
+        return table.concat(t)
     else
-        return true
+        return success, err
+    end
+end
+
+--[[
+    Downlod something
+    -----------------
+
+    To a file
+    ---------
+    download.download{url = url, filename = filename, [curl]opts = opts}
+        or
+    download.download(url, filename, opts)
+        -> true or nil, err
+
+    With a callback function
+    ------------------------
+
+        function callback(str, length)
+            return length -- to continue downloading
+        end
+
+    download.download{url = url, callback = callback, [curl]opts = opts}
+        or 
+    download.download(url, callback, opts)
+        -> true or nil, err
+
+    To a string
+    -----------
+    download.download{url = url, [curl]opts = opts}
+        or 
+    download.download(url, opts)
+        -> str or nil, err
+]]
+function download.download(opts, filename, curlopts)
+    -- Gather the arguments
+    local url, callback
+    if type(opts) == 'table' then
+        url = opts.url or opts[1]
+        filename = opts.filename or opts[2]
+        callback = opts.callback
+        curlopts = opts.opts or opts.curlopts or opts[3]
+    else
+        url = opts
+    end
+    if type(filename) == 'function' then
+        callback = filename
+        filename = nil
+    end
+
+    assert(url and ((filename and type(filename) == 'string') or
+                    (callback and type(callback) == 'function')))
+
+    -- Figure out which variant to call
+    local success, err
+    if callback then
+        success, err = do_download(url, callback, curlopts)
+    elseif filename then
+        success, err = download_to_file(url, filename, curlopts)
+    else
+        success, err = download_to_string(url, curlopts)
+    end
+    -- Check for abort
+    if success == 'abort' then
+        -- wrapped in a table so that location info isn't addeds
+        error({'abort'})
+    else
+        return success, err
     end
 end
 
@@ -107,7 +226,7 @@ local function do_download(puzzle)
         success, err = download.download(puzzle.url, puzzle.filename, puzzle.curlopts)
     end
 
-    if success == 'abort' then return 'abort' end
+    if success == 'abort' then error({'abort'}) end
 
     -- Try to open the file
     if success then

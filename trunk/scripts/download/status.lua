@@ -1,8 +1,11 @@
 -- A status bar sort of thing
 require 'download.download'
 local PopupWindow = require 'download.popup'
+local BmpButton = require 'download.bmp_button'
+local bmp = require 'download.bmp'
 local basename = require 'pl.path'.basename
 local clear = require 'pl.tablex'.clear
+
 
 local function abbrev(url, length)
     return select(1, url:gsub('^(http[^:]*://[^/]+/).-(/[^/]+)$', '%1...%2'))
@@ -177,6 +180,16 @@ local function Status(parent)
     panel.errors = wx.wxStaticText(panel, wx.wxID_ANY, '(No Errors)')
     panel.errors.WindowStyle = wx.wxALIGN_RIGHT
     sizer:Add(panel.errors, 0, wx.wxEXPAND + wx.wxALL, 5)
+
+    sizer:Add(make_spacer(panel), 0, wx.wxEXPAND)
+
+    panel.clear = BmpButton(panel, wx.wxID_ANY, bmp.x)
+    panel.clear:SetToolTip("Cancel downloads")
+    sizer:Add(panel.clear, 0, wx.wxALL + wx.wxALIGN_CENTER, 5)
+
+    panel.clear:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+        download.clear_downloads()
+    end)
 
 
     local error_popup
