@@ -25,13 +25,9 @@ local function TextButton(parent, id, label, pos, size, style)
 
     ctrl:Connect(wx.wxEVT_LEFT_DOWN,
         function(evt)
-            wx.wxPostEvent(
-                ctrl:GetEventHandler(),
-                wx.wxCommandEvent(wx.wxEVT_COMMAND_BUTTON_CLICKED, ctrl:GetId())
-            )
-            evt:Skip()
+            ctrl:GetEventHandler():ProcessEvent(
+            wx.wxCommandEvent(wx.wxEVT_COMMAND_BUTTON_CLICKED, ctrl:GetId()))
         end)
-
 
     return ctrl
 end
