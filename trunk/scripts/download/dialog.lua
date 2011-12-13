@@ -13,8 +13,8 @@ local function make_puzzles(parent)
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
     scroller:SetSizer(sizer)
     scroller.puzzles = {}
-    for _, puzzle in ipairs(download.puzzles) do
-        if not download.disabled[puzzle.name] then
+    for key, puzzle in download.puzzles:iter() do
+        if not download.disabled[key] then
             local p = PuzzlePanel(scroller, puzzle, kind, start_date, end_date)
             table.insert(scroller.puzzles, p)
             sizer:Add(p, 0, wx.wxEXPAND)

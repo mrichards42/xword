@@ -189,8 +189,7 @@ function download.download(opts, filename, curlopts)
         filename = nil
     end
 
-    assert(url and ((filename and type(filename) == 'string') or
-                    (callback and type(callback) == 'function')))
+    assert(url)
 
     -- Figure out which variant to call
     local success, err

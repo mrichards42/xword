@@ -6,10 +6,8 @@ local function BmpButton(parent, id, bmp)
 
     ctrl:Connect(wx.wxEVT_LEFT_DOWN,
         function(evt)
-            wx.wxPostEvent(
-                ctrl:GetEventHandler(),
-                wx.wxCommandEvent(wx.wxEVT_COMMAND_BUTTON_CLICKED, ctrl:GetId())
-            )
+                ctrl:GetEventHandler():ProcessEvent(
+                wx.wxCommandEvent(wx.wxEVT_COMMAND_BUTTON_CLICKED, ctrl:GetId()))
         end)
 
     return ctrl
