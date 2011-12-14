@@ -372,7 +372,7 @@ XGridCtrl::DrawPauseMessage(wxDC & dc)
     // Scale the font
     wxFont font = GetFont();
     int max_width, max_height;
-    dc.GetSize(&max_width, &max_height);
+    GetClientSize(&max_width, &max_height);
     int w = 0, h = 0;
     while (w < max_width && h < max_height && font.GetPointSize() < 50)
     {
@@ -387,7 +387,7 @@ XGridCtrl::DrawPauseMessage(wxDC & dc)
         dc.GetTextExtent(msg, &w, &h);
     }
     // Draw the label
-    dc.DrawLabel(msg, wxRect(wxPoint(0,0), dc.GetSize()), wxALIGN_CENTER);
+    dc.DrawLabel(msg, wxRect(wxPoint(0,0), GetClientSize()), wxALIGN_CENTER);
 }
 
 
@@ -1000,7 +1000,7 @@ XGridCtrl::CheckGrid(int options)
     wxASSERT(! IsEmpty() && ! m_grid->IsScrambled());
 
     puz::square_iterator begin(m_grid->First());
-    puz::square_iterator end(m_grid->Last());
+    puz::square_iterator end(m_grid->Last()->Next());
     Check(begin, end, options);
 }
 
