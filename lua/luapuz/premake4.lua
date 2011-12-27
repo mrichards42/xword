@@ -37,3 +37,8 @@ project "luapuz"
         defines { [[PUZ_API=""]] }
         links { "dl" }
 
+	configuration "macosx"
+    	defines {
+    		[[PUZ_API=\"\"]],
+            [[LUAPUZ_API=\"\"]]
+    	}
