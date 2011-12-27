@@ -1,28 +1,26 @@
 -- General options
-USE_LUA = false
+newoption {
+    trigger = "disable-lua",
+    description = "Disable support for lua packages",
+}
+
 
 -- Windows options
 WXWIN = "$(WXWIN)"
 
 -- Mac options
-WXMAC = "/Developer/wxMac-2.8.10"
-WXMAC_BUILD_DEBUG = WXMAC .. "/build-debug"
+WXMAC = "/Developer/wxMac-2.8.12"
+WXMAC_BUILD_DEBUG = WXMAC .. "/build-release"
 WXMAC_BUILD_RELEASE = WXMAC .. "/build-release"
 
 
 -- Don't mess with anything below this
-
-function split(text, delims)
-    delims = delims or " \t\r\f\n"
-    local t = {}
-    local patt = "([^" .. delims .. "]+)
-    for s in text:gmatch(patt) do
-        table.insert(t, s)
-    end
-    return t
-end
-
--- Execute the command specified and return the result, correctly formatted
-function cmd(cmd_)
-    return table.concat(split(os.outputof(cmd_)), " ")
+function cmd(command_text)
+	local text = os.outputof(command_text)
+	-- split text
+	local t = {}
+	for word in text:gmatch("%S+") do
+		table.insert(t, word)
+	end
+	return table.concat(t, " ")
 end
