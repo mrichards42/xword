@@ -2579,7 +2579,7 @@ MyFrame::OnClose(wxCloseEvent & evt)
         // Check to see if we have lua messages
         if (wxGetApp().HasLuaLog())
         {
-            XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename());
+            XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename().c_str());
         #ifdef __WXDEBUG__
             wxGetApp().m_luaLog->Close();
             wxShell(wxString::Format(_T("\"%s\""), GetLuaLogFilename().c_str()));
