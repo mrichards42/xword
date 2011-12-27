@@ -7,266 +7,552 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5D416EC71D8517C8443C211B /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7971298967EC4EB24AC042E3 /* App.cpp */; };
-		5BD76FF51F4A0E2F4B083751 /* ClueListBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40F0355A26A950895D304D53 /* ClueListBox.cpp */; };
-		145C3D4457E1737D1BFD376F /* CluePanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ED91FE7244B716C3851613C /* CluePanel.cpp */; };
-		03BA773B27EF47191CF46BCD /* CluePrompt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E4E3BDB74977AAC7A411DF4 /* CluePrompt.cpp */; };
-		489E159F74AE1BB956A35FB8 /* MyAuiMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E8F16984604451734072629 /* MyAuiMgr.cpp */; };
-		76EA05B103B8607C03D47253 /* MyFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5AF37CC82E7F432A796564EA /* MyFrame.cpp */; };
-		14A52FCA74AA549214F4306D /* MyStatusBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6915005F67E36023062C5627 /* MyStatusBar.cpp */; };
-		700675CD4455021332027729 /* PuzEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43F32BB319397CCB3E5722DB /* PuzEvent.cpp */; };
-		244D49071D9D13FC5F2912BC /* SelectionEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B163C8F3BF97C29527D5446 /* SelectionEvent.cpp */; };
-		4B887D6F26351C6324875785 /* XGridCtrl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EFA7B6C00E5557E48587ECF /* XGridCtrl.cpp */; };
-		157C516C01D33B6907F8694B /* XGridDrawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 385256355E334E361F685C94 /* XGridDrawer.cpp */; };
-		583C0C86049A5C7557D0536E /* config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DDC2344392125BC540930B1 /* config.cpp */; };
-		334C41A52DCA34BC4AF31F9A /* Characters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D3E6CAB0DC93EAF47F00E3F /* Characters.cpp */; };
-		40752C40633C3223010A5BF2 /* Preferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514A1F7600174132479C3F21 /* Preferences.cpp */; };
-		26914D76541C749742932445 /* wxFB_Dialogs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15294E9016C654CF3AE33B8C /* wxFB_Dialogs.cpp */; };
-		548517CF6FE94A277A80382E /* m_break.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 686B731451DA1F36084A6F0A /* m_break.cpp */; };
-		1C9451DC1CD67CE455796E6E /* parse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2F2625A12DB619D9337D4ADB /* parse.cpp */; };
-		73651347112257FC775B5DE5 /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0501787A7F15729C42AF5072 /* render.cpp */; };
-		6BBE5BC3263C43A64F932F3C /* messages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 393A74492A575C706B8B2774 /* messages.cpp */; };
-		0BA9095579AF287528D31D17 /* paths.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FF9748F2D1D55EC53C9624B /* paths.cpp */; };
-		4D2139BD57245CAD5C856E90 /* printout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7831726F1200455D7E467F01 /* printout.cpp */; };
-		0CB45AB72A5740EA158B148C /* ToolInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22E602D7667A111D30C5528A /* ToolInfo.cpp */; };
-		502E44E1263415E955F349C8 /* ToolManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B3B02A721BF5FD331344129 /* ToolManager.cpp */; };
-		3E2C31996C900B63517122A4 /* SizedText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 365E68352DCD509F3E891E19 /* SizedText.cpp */; };
-		4F284E1336FB223829D24582 /* htmlcluelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78E856772C8736942A633504 /* htmlcluelist.cpp */; };
-		28EC0B487B594EA66F716D6D /* xword_bind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 29D072FB50C645F04B7D19A6 /* xword_bind.cpp */; };
-		7154656347757DF13E1625CF /* libpuz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA97EE062282075065026E9 /* libpuz.dylib */; };
+		078A79B10C1353490FD923AD /* Characters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11125594208A5CE82E0F6483 /* Characters.cpp */; };
+		0A2B32F4513775782CAE1470 /* CluePrompt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D9747B160AD12046BC21FB8 /* CluePrompt.cpp */; };
+		0DEF681B4B41395706737506 /* ToolManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 73665EA959561F111ABF2461 /* ToolManager.cpp */; };
+		10B82E022CA33455665C2C4C /* CluePanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75EE64D3645B4F082C8C1C58 /* CluePanel.cpp */; };
+		16C433FA06DE6F5475F277BC /* parse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0BF53ACB0C216ADE2F1A784D /* parse.cpp */; };
+		1882147A0368542355E966EC /* htmlcluelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B9227F76524441752360D77 /* htmlcluelist.cpp */; };
+		1D9D3AC71E1922E45F1A4534 /* xword_bind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A3D66F437B84318094E15E9 /* xword_bind.cpp */; };
+		23F476F63954469A62946884 /* libwxlua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 009E1A2F27AB017738EC180B /* libwxlua.a */; };
+		2531660C3FAE4D1C1267570B /* libwxbindadv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 05FD2DBB5FD942B249F24104 /* libwxbindadv.a */; };
+		274003DF37BA4ECB130C0B63 /* MyFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B7508A35091B4D1724769E /* MyFrame.cpp */; };
+		2C03332970820AE42F6401C0 /* libwxbindxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FB7748A2F854F6576A446FD /* libwxbindxml.a */; };
+		2C6F539158F217E611617DCD /* libwxbindbase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A140957352C63BE7AB469B2 /* libwxbindbase.a */; };
+		2FD76C8B55211D664E5975E8 /* paths.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7E3C4F8E0BE23D4A6C435A17 /* paths.cpp */; };
+		34F62D5065B22C09413E6B67 /* config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76BE47F156423BDA1DCD2EB0 /* config.cpp */; };
+		377A4D794BFE229D2A494EBF /* XGridDrawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF20EC6AD005FF496C7A87 /* XGridDrawer.cpp */; };
+		3B4B749227D5517D227C0F87 /* MyAuiMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DB03C2550BE22943663276E /* MyAuiMgr.cpp */; };
+		3EA845C517845EF00E6C684E /* XGridCtrl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 678039543EDE155C64D83F6B /* XGridCtrl.cpp */; };
+		441C41C04E0A7B0C77293335 /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663A299A72E673AC5C4A3C1F /* render.cpp */; };
+		44BF12C21317516B604423AB /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1DE211475F872CF866173094 /* App.cpp */; };
+		45D150FE0EC15F29290B2834 /* m_break.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A52E524A3F026C287E1932 /* m_break.cpp */; };
+		4F3133F9512D0D0E208A4A72 /* liblua5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DBA385216A9342B2DA4016B /* liblua5.1.dylib */; };
+		5206241C400C6F4A77EE3EE1 /* libpuz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E0A2A0E12D4569962494FE7 /* libpuz.dylib */; };
+		524C1507290C04EF71C40872 /* ToolInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15B342DD64C3465039AC0691 /* ToolInfo.cpp */; };
+		52D129D37DCC756B448B34F1 /* SizedText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D7F45B849E22D4F5CD40D32 /* SizedText.cpp */; };
+		536117522463137F7A8B74B9 /* libwxbindxrc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78804C0647E4619F43254C5C /* libwxbindxrc.a */; };
+		53EF2EE07ABE00DB64682789 /* messages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083A310207B8643F103C57DA /* messages.cpp */; };
+		541A1B05172844C22E867ADB /* SelectionEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E5E558B519B47620EA379E1 /* SelectionEvent.cpp */; };
+		542D6316787815A6056C1741 /* wxFB_Dialogs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7BB423F20FE649E02EB376B0 /* wxFB_Dialogs.cpp */; };
+		564704207DB736D5779230FF /* libwxbindnet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 02AB3EC70911587039011E4F /* libwxbindnet.a */; };
+		57FA72A5592952F97A4953B7 /* printout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10BD04D361C02CDF00570B79 /* printout.cpp */; };
+		59016521131A4C91669E4716 /* libwxbindaui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04F1761978EC7F7F198467E2 /* libwxbindaui.a */; };
+		5AA052FC3DA07F8F2A182922 /* libwxbindhtml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E753ED951F009BB6A091B1A /* libwxbindhtml.a */; };
+		5BEA072A0AEB760020D670D9 /* MyStatusBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F893D917B2139D20C6F6282 /* MyStatusBar.cpp */; };
+		5C0971B14E6010A20F5673F2 /* PuzEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04607A3B3C3C0BB7431459D3 /* PuzEvent.cpp */; };
+		6018681541F814625B357574 /* ClueListBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EBE7E3B70625EB43B23153F /* ClueListBox.cpp */; };
+		6AC2685F3FDC1BE710FA117D /* Preferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CFE09D32B820FD5693F66A7 /* Preferences.cpp */; };
+		6D2E1BA36DE4235D5B420428 /* libwxbindcore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 43025F1919E00139477355BE /* libwxbindcore.a */; };
+		7F870F250596408F20EA0203 /* libluapuz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 73A95CDA74C21F011DEE2DBD /* libluapuz.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		6952394634B525F777316575 /* PBXContainerItemProxy */ = {
+		0ABB162C4F8813A0780D440C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 7E734F366CA8238C55E46BC2 /* puz.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1F34778B19C25856781F64A6;
-			remoteInfo = "libpuz.dylib";
-		};
-		42040EB4383A28D67BAB10A2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7E734F366CA8238C55E46BC2 /* puz.xcodeproj */;
+			containerPortal = 5DD77E201081352520CB7AE8 /* wxbindbase.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 601D7C85451673776BCA655D;
-			remoteInfo = "libpuz.dylib";
+			remoteGlobalIDString = 136E329556C3560F2FFD2CD3;
+			remoteInfo = libwxbindbase.a;
+		};
+		0B74229E39605A587DE90505 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 30D43EC506F20EDC0EA65B33 /* wxlua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0B532C722BE15322059F3AB8;
+			remoteInfo = libwxlua.a;
+		};
+		180A6F7C62772FF71AD34F36 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 75B6000C16C56D1735731916 /* wxbindxrc.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 7A6B0FA814250D2B02E945BA;
+			remoteInfo = libwxbindxrc.a;
+		};
+		18DE3B5356996FFC22CF64DD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0DA508DD186F245813210A25 /* wxbindhtml.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 38F82A297044064725FA5CA1;
+			remoteInfo = libwxbindhtml.a;
+		};
+		1AAE2262612D7F7018A450B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2C471BFE7967064C7F596959 /* lua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4DA870D61CA343A70A5E479B;
+			remoteInfo = liblua5.1.dylib;
+		};
+		1C94722E43FC7D2D34FD7376 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 128366874FF83A4C0091713B /* wxbindadv.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 0FB760F5111865C50CF95908;
+			remoteInfo = libwxbindadv.a;
+		};
+		26696549548C74CF786F4E26 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43C2760640B26C9358013216 /* wxbindcore.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2FC416460BFB30C6533D543F;
+			remoteInfo = libwxbindcore.a;
+		};
+		26761E0C29D840F71BF923B0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0DA508DD186F245813210A25 /* wxbindhtml.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 44736CA817C721381B5368E1;
+			remoteInfo = libwxbindhtml.a;
+		};
+		26A3313B46F277D63F8E1190 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 42535AD236E318583E3A0B6A /* luapuz.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3A0F647B7EB951BB58094998;
+			remoteInfo = libluapuz.dylib;
+		};
+		2B06268172005EC167227467 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0FBA2DF1437E4180466607BC /* wxbindnet.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 64AF49BE184034A33E481ADB;
+			remoteInfo = libwxbindnet.a;
+		};
+		2DED5D1E621F7F3D25124506 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2C471BFE7967064C7F596959 /* lua.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1E1656367897216F3F065D8B;
+			remoteInfo = liblua5.1.dylib;
+		};
+		30736CC23E2379480954203D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 75B6000C16C56D1735731916 /* wxbindxrc.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7F580CE40B8A2DD37D7E5C47;
+			remoteInfo = libwxbindxrc.a;
+		};
+		37032F8B6796616767C97C63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 30D43EC506F20EDC0EA65B33 /* wxlua.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 34C93177220E61C2291C7657;
+			remoteInfo = libwxlua.a;
+		};
+		40972CB542BA662203144EC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5DD77E201081352520CB7AE8 /* wxbindbase.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 44F34614056561486B080EAF;
+			remoteInfo = libwxbindbase.a;
+		};
+		47BC3CA25617175101842934 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0FBA2DF1437E4180466607BC /* wxbindnet.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 55AB741938BB1B5B270D5C89;
+			remoteInfo = libwxbindnet.a;
+		};
+		49023A9278DC36D71A244C8F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5FE7387F2F0F142C7A490D5B /* wxbindxml.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 612626024F102D8737985CED;
+			remoteInfo = libwxbindxml.a;
+		};
+		520A2AFD6DC32469138A095A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 42535AD236E318583E3A0B6A /* luapuz.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4D3776A958BF781A16B20F15;
+			remoteInfo = libluapuz.dylib;
+		};
+		6027602800B25FAB099D3423 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7F2049A22C0070A70DC03E95 /* puz.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B0B7EAF4B0227E7365B50DC;
+			remoteInfo = libpuz.dylib;
+		};
+		606462D332241746351856CC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43C2760640B26C9358013216 /* wxbindcore.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 169A093C66B3070F13500FF5;
+			remoteInfo = libwxbindcore.a;
+		};
+		6B27743605654F8C7AD60FAD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7F2049A22C0070A70DC03E95 /* puz.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5B074F2A560D7D8C174169A1;
+			remoteInfo = libpuz.dylib;
+		};
+		6C3A147E5F2049E509A34F63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F15108724940A5512D45336 /* wxbindaui.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6E2D618567DF68E71A94775A;
+			remoteInfo = libwxbindaui.a;
+		};
+		72310D11734225693992506D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5FE7387F2F0F142C7A490D5B /* wxbindxml.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 501810E0779415F47F7C4B8A;
+			remoteInfo = libwxbindxml.a;
+		};
+		7526294502CD7EC55C6B29B6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F15108724940A5512D45336 /* wxbindaui.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AF25FD009884C0C67BF3BAD;
+			remoteInfo = libwxbindaui.a;
+		};
+		7E2967D7653861BB3EF82653 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 128366874FF83A4C0091713B /* wxbindadv.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 728642D275F20A752CF70ED4;
+			remoteInfo = libwxbindadv.a;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		7971298967EC4EB24AC042E3 /* App.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "App.cpp"; path = "../../src/App.cpp"; sourceTree = "<group>"; };
-		07FA2E5370187B4B5B591CAC /* App.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "App.hpp"; path = "../../src/App.hpp"; sourceTree = "<group>"; };
-		40F0355A26A950895D304D53 /* ClueListBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "ClueListBox.cpp"; path = "../../src/ClueListBox.cpp"; sourceTree = "<group>"; };
-		0BAA7DF8682E789862EB772F /* ClueListBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ClueListBox.hpp"; path = "../../src/ClueListBox.hpp"; sourceTree = "<group>"; };
-		0ED91FE7244B716C3851613C /* CluePanel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "CluePanel.cpp"; path = "../../src/CluePanel.cpp"; sourceTree = "<group>"; };
-		51757CBD1389372A3E6813BC /* CluePanel.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "CluePanel.hpp"; path = "../../src/CluePanel.hpp"; sourceTree = "<group>"; };
-		4E4E3BDB74977AAC7A411DF4 /* CluePrompt.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "CluePrompt.cpp"; path = "../../src/CluePrompt.cpp"; sourceTree = "<group>"; };
-		0EB7358518A8160961374EAA /* CluePrompt.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "CluePrompt.hpp"; path = "../../src/CluePrompt.hpp"; sourceTree = "<group>"; };
-		0E8F16984604451734072629 /* MyAuiMgr.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "MyAuiMgr.cpp"; path = "../../src/MyAuiMgr.cpp"; sourceTree = "<group>"; };
-		793028111D421D21105D6A90 /* MyAuiMgr.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "MyAuiMgr.hpp"; path = "../../src/MyAuiMgr.hpp"; sourceTree = "<group>"; };
-		5AF37CC82E7F432A796564EA /* MyFrame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "MyFrame.cpp"; path = "../../src/MyFrame.cpp"; sourceTree = "<group>"; };
-		4CED7BCA606717655A9B545E /* MyFrame.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "MyFrame.hpp"; path = "../../src/MyFrame.hpp"; sourceTree = "<group>"; };
-		6915005F67E36023062C5627 /* MyStatusBar.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "MyStatusBar.cpp"; path = "../../src/MyStatusBar.cpp"; sourceTree = "<group>"; };
-		1152392874C8307259FF0F27 /* MyStatusBar.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "MyStatusBar.hpp"; path = "../../src/MyStatusBar.hpp"; sourceTree = "<group>"; };
-		43F32BB319397CCB3E5722DB /* PuzEvent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "PuzEvent.cpp"; path = "../../src/PuzEvent.cpp"; sourceTree = "<group>"; };
-		37895ADF47B230250FB47542 /* PuzEvent.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "PuzEvent.hpp"; path = "../../src/PuzEvent.hpp"; sourceTree = "<group>"; };
-		0B163C8F3BF97C29527D5446 /* SelectionEvent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "SelectionEvent.cpp"; path = "../../src/SelectionEvent.cpp"; sourceTree = "<group>"; };
-		18E343396F8103BB6B083BA3 /* SelectionEvent.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "SelectionEvent.hpp"; path = "../../src/SelectionEvent.hpp"; sourceTree = "<group>"; };
-		1EFA7B6C00E5557E48587ECF /* XGridCtrl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "XGridCtrl.cpp"; path = "../../src/XGridCtrl.cpp"; sourceTree = "<group>"; };
-		79F947464C9413791F066D9D /* XGridCtrl.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "XGridCtrl.hpp"; path = "../../src/XGridCtrl.hpp"; sourceTree = "<group>"; };
-		385256355E334E361F685C94 /* XGridDrawer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "XGridDrawer.cpp"; path = "../../src/XGridDrawer.cpp"; sourceTree = "<group>"; };
-		178060C26A0B3CF55E1A3A6E /* XGridDrawer.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "XGridDrawer.hpp"; path = "../../src/XGridDrawer.hpp"; sourceTree = "<group>"; };
-		7DDC2344392125BC540930B1 /* config.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "config.cpp"; path = "../../src/config.cpp"; sourceTree = "<group>"; };
-		743400EE4FD17D68798F3B43 /* config.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "config.hpp"; path = "../../src/config.hpp"; sourceTree = "<group>"; };
-		3D3E6CAB0DC93EAF47F00E3F /* Characters.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Characters.cpp"; path = "../../src/dialogs/Characters.cpp"; sourceTree = "<group>"; };
-		526C03933F785930317F4F18 /* Characters.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Characters.hpp"; path = "../../src/dialogs/Characters.hpp"; sourceTree = "<group>"; };
-		7DEF28F555EB06E346A160E6 /* Layout.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Layout.hpp"; path = "../../src/dialogs/Layout.hpp"; sourceTree = "<group>"; };
-		514A1F7600174132479C3F21 /* Preferences.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Preferences.cpp"; path = "../../src/dialogs/Preferences.cpp"; sourceTree = "<group>"; };
-		45136A1230247C2C450B0C7D /* Preferences.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Preferences.hpp"; path = "../../src/dialogs/Preferences.hpp"; sourceTree = "<group>"; };
-		15294E9016C654CF3AE33B8C /* wxFB_Dialogs.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wxFB_Dialogs.cpp"; path = "../../src/dialogs/wxFB_Dialogs.cpp"; sourceTree = "<group>"; };
-		4E6B0BB7644A1E17074D2447 /* wxFB_Dialogs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "wxFB_Dialogs.h"; path = "../../src/dialogs/wxFB_Dialogs.h"; sourceTree = "<group>"; };
-		686B731451DA1F36084A6F0A /* m_break.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "m_break.cpp"; path = "../../src/html/m_break.cpp"; sourceTree = "<group>"; };
-		2F2625A12DB619D9337D4ADB /* parse.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "parse.cpp"; path = "../../src/html/parse.cpp"; sourceTree = "<group>"; };
-		54A10340366877D11B2551EC /* parse.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "parse.hpp"; path = "../../src/html/parse.hpp"; sourceTree = "<group>"; };
-		0501787A7F15729C42AF5072 /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "render.cpp"; path = "../../src/html/render.cpp"; sourceTree = "<group>"; };
-		3B00157804E97D7834D70A87 /* render.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "render.hpp"; path = "../../src/html/render.hpp"; sourceTree = "<group>"; };
-		393A74492A575C706B8B2774 /* messages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "messages.cpp"; path = "../../src/messages.cpp"; sourceTree = "<group>"; };
-		36275F265C9725E944307D12 /* messages.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "messages.hpp"; path = "../../src/messages.hpp"; sourceTree = "<group>"; };
-		4FF9748F2D1D55EC53C9624B /* paths.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "paths.cpp"; path = "../../src/paths.cpp"; sourceTree = "<group>"; };
-		4DDD09C9467C6D69164264C9 /* paths.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "paths.hpp"; path = "../../src/paths.hpp"; sourceTree = "<group>"; };
-		7831726F1200455D7E467F01 /* printout.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "printout.cpp"; path = "../../src/printout.cpp"; sourceTree = "<group>"; };
-		7AE368FF161F5656751C17FF /* printout.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "printout.hpp"; path = "../../src/printout.hpp"; sourceTree = "<group>"; };
-		0B8D52882EAE15E7006B66C4 /* ConfigManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ConfigManager.hpp"; path = "../../src/utils/ConfigManager.hpp"; sourceTree = "<group>"; };
-		6EBE5FAE047138DE57291E85 /* SizerPrinter.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "SizerPrinter.hpp"; path = "../../src/utils/SizerPrinter.hpp"; sourceTree = "<group>"; };
-		22E602D7667A111D30C5528A /* ToolInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "ToolInfo.cpp"; path = "../../src/utils/ToolInfo.cpp"; sourceTree = "<group>"; };
-		0F072E8B02D40E6D2F732964 /* ToolInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ToolInfo.hpp"; path = "../../src/utils/ToolInfo.hpp"; sourceTree = "<group>"; };
-		6B3B02A721BF5FD331344129 /* ToolManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "ToolManager.cpp"; path = "../../src/utils/ToolManager.cpp"; sourceTree = "<group>"; };
-		6E206E831E4450B237060323 /* ToolManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ToolManager.hpp"; path = "../../src/utils/ToolManager.hpp"; sourceTree = "<group>"; };
-		79B13CC4190B06A61DB4435B /* string.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "string.hpp"; path = "../../src/utils/string.hpp"; sourceTree = "<group>"; };
-		32A421FC4289629555093ED1 /* timeit.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "timeit.hpp"; path = "../../src/utils/timeit.hpp"; sourceTree = "<group>"; };
-		533F211454E7656C64107AFE /* wrap.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "wrap.hpp"; path = "../../src/utils/wrap.hpp"; sourceTree = "<group>"; };
-		365E68352DCD509F3E891E19 /* SizedText.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "SizedText.cpp"; path = "../../src/widgets/SizedText.cpp"; sourceTree = "<group>"; };
-		642162DA35D2456D5B487127 /* SizedText.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "SizedText.hpp"; path = "../../src/widgets/SizedText.hpp"; sourceTree = "<group>"; };
-		78E856772C8736942A633504 /* htmlcluelist.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "htmlcluelist.cpp"; path = "../../src/widgets/htmlcluelist.cpp"; sourceTree = "<group>"; };
-		6FAA7B7C735B4B2D11187421 /* htmlcluelist.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "htmlcluelist.hpp"; path = "../../src/widgets/htmlcluelist.hpp"; sourceTree = "<group>"; };
-		29D072FB50C645F04B7D19A6 /* xword_bind.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "xword_bind.cpp"; path = "../../src/xwordbind/xword_bind.cpp"; sourceTree = "<group>"; };
-		0115513763B07719220D6095 /* xword_bind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "xword_bind.h"; path = "../../src/xwordbind/xword_bind.h"; sourceTree = "<group>"; };
-		5A0335165A7A60655E911DB9 /* xword_bind_helpers.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "xword_bind_helpers.hpp"; path = "../../src/xwordbind/xword_bind_helpers.hpp"; sourceTree = "<group>"; };
-		36E91C507A6711AD61EC6EF1 /* xword_override.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "xword_override.hpp"; path = "../../src/xwordbind/xword_override.hpp"; sourceTree = "<group>"; };
-		4ECB59F13A0F4FF17ACC4724 /* xwordlua.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = "xwordlua.hpp"; path = "../../src/xwordlua.hpp"; sourceTree = "<group>"; };
-		15DD07F103AD607F48270C44 /* XWord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "XWord.app"; path = "XWord.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7E734F366CA8238C55E46BC2 /* puz.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "puz.xcodeproj"; path = "puz.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		01C34369499F743758E31F34 /* ToolManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = ToolManager.hpp; path = ../../src/utils/ToolManager.hpp; sourceTree = "<group>"; };
+		04607A3B3C3C0BB7431459D3 /* PuzEvent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PuzEvent.cpp; path = ../../src/PuzEvent.cpp; sourceTree = "<group>"; };
+		05524DD2348A6F6F00AE4A04 /* parse.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = parse.hpp; path = ../../src/html/parse.hpp; sourceTree = "<group>"; };
+		05A93795299C4FF8252B3D2B /* ToolInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = ToolInfo.hpp; path = ../../src/utils/ToolInfo.hpp; sourceTree = "<group>"; };
+		06D6003472AA038006344417 /* XGridCtrl.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = XGridCtrl.hpp; path = ../../src/XGridCtrl.hpp; sourceTree = "<group>"; };
+		083A310207B8643F103C57DA /* messages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = messages.cpp; path = ../../src/messages.cpp; sourceTree = "<group>"; };
+		0B9227F76524441752360D77 /* htmlcluelist.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = htmlcluelist.cpp; path = ../../src/widgets/htmlcluelist.cpp; sourceTree = "<group>"; };
+		0BC822B6163E4261100F7D88 /* MyAuiMgr.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = MyAuiMgr.hpp; path = ../../src/MyAuiMgr.hpp; sourceTree = "<group>"; };
+		0BF53ACB0C216ADE2F1A784D /* parse.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = parse.cpp; path = ../../src/html/parse.cpp; sourceTree = "<group>"; };
+		0DA508DD186F245813210A25 /* wxbindhtml.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxbindhtml.xcodeproj; sourceTree = SOURCE_ROOT; };
+		0DB03C2550BE22943663276E /* MyAuiMgr.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MyAuiMgr.cpp; path = ../../src/MyAuiMgr.cpp; sourceTree = "<group>"; };
+		0E5E558B519B47620EA379E1 /* SelectionEvent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SelectionEvent.cpp; path = ../../src/SelectionEvent.cpp; sourceTree = "<group>"; };
+		0EBE7E3B70625EB43B23153F /* ClueListBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ClueListBox.cpp; path = ../../src/ClueListBox.cpp; sourceTree = "<group>"; };
+		0FBA2DF1437E4180466607BC /* wxbindnet.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxbindnet.xcodeproj; sourceTree = SOURCE_ROOT; };
+		10BD04D361C02CDF00570B79 /* printout.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = printout.cpp; path = ../../src/printout.cpp; sourceTree = "<group>"; };
+		11125594208A5CE82E0F6483 /* Characters.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Characters.cpp; path = ../../src/dialogs/Characters.cpp; sourceTree = "<group>"; };
+		1240389368FF79927FFE004E /* htmlcluelist.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = htmlcluelist.hpp; path = ../../src/widgets/htmlcluelist.hpp; sourceTree = "<group>"; };
+		128366874FF83A4C0091713B /* wxbindadv.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxbindadv.xcodeproj; sourceTree = SOURCE_ROOT; };
+		13905F8140ED2E14560C3A41 /* paths.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = paths.hpp; path = ../../src/paths.hpp; sourceTree = "<group>"; };
+		15B342DD64C3465039AC0691 /* ToolInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ToolInfo.cpp; path = ../../src/utils/ToolInfo.cpp; sourceTree = "<group>"; };
+		1D0565EC080947A079806C67 /* PuzEvent.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = PuzEvent.hpp; path = ../../src/PuzEvent.hpp; sourceTree = "<group>"; };
+		1DE211475F872CF866173094 /* App.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../../src/App.cpp; sourceTree = "<group>"; };
+		26B7508A35091B4D1724769E /* MyFrame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MyFrame.cpp; path = ../../src/MyFrame.cpp; sourceTree = "<group>"; };
+		281F30AB524218C201F64DBF /* printout.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = printout.hpp; path = ../../src/printout.hpp; sourceTree = "<group>"; };
+		2C471BFE7967064C7F596959 /* lua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = lua.xcodeproj; sourceTree = SOURCE_ROOT; };
+		2D9747B160AD12046BC21FB8 /* CluePrompt.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = CluePrompt.cpp; path = ../../src/CluePrompt.cpp; sourceTree = "<group>"; };
+		2F7B5A126B051F8854B56127 /* Preferences.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Preferences.hpp; path = ../../src/dialogs/Preferences.hpp; sourceTree = "<group>"; };
+		30C436DC5ED878801F632F47 /* xwordlua.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = xwordlua.hpp; path = ../../src/xwordlua.hpp; sourceTree = "<group>"; };
+		30D43EC506F20EDC0EA65B33 /* wxlua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxlua.xcodeproj; sourceTree = SOURCE_ROOT; };
+		39B7310E2804587F0DA50D47 /* MyFrame.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = MyFrame.hpp; path = ../../src/MyFrame.hpp; sourceTree = "<group>"; };
+		3A784782302B0B3632E90C17 /* ClueListBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = ClueListBox.hpp; path = ../../src/ClueListBox.hpp; sourceTree = "<group>"; };
+		3F15108724940A5512D45336 /* wxbindaui.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxbindaui.xcodeproj; sourceTree = SOURCE_ROOT; };
+		3F8B4D3648631CEC051405C3 /* xword_bind_helpers.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = xword_bind_helpers.hpp; path = ../../src/xwordbind/xword_bind_helpers.hpp; sourceTree = "<group>"; };
+		3FEF7DE5591E48A445082BF2 /* wxFB_Dialogs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = wxFB_Dialogs.h; path = ../../src/dialogs/wxFB_Dialogs.h; sourceTree = "<group>"; };
+		40B8766976B505CA336D5C9F /* config.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = config.hpp; path = ../../src/config.hpp; sourceTree = "<group>"; };
+		42535AD236E318583E3A0B6A /* luapuz.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = luapuz.xcodeproj; sourceTree = SOURCE_ROOT; };
+		43C2760640B26C9358013216 /* wxbindcore.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxbindcore.xcodeproj; sourceTree = SOURCE_ROOT; };
+		4A0A5A323EAB7A2469AB7EDF /* messages.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = messages.hpp; path = ../../src/messages.hpp; sourceTree = "<group>"; };
+		4F28788C51B41FB666205867 /* string.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = string.hpp; path = ../../src/utils/string.hpp; sourceTree = "<group>"; };
+		5133780472715F8804F1176F /* wrap.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = wrap.hpp; path = ../../src/utils/wrap.hpp; sourceTree = "<group>"; };
+		51F768B01D4875573B623ACE /* ConfigManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = ConfigManager.hpp; path = ../../src/utils/ConfigManager.hpp; sourceTree = "<group>"; };
+		5514155671B34B1225E70BD0 /* xword_override.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = xword_override.hpp; path = ../../src/xwordbind/xword_override.hpp; sourceTree = "<group>"; };
+		578B188C1F9F015706556067 /* App.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = App.hpp; path = ../../src/App.hpp; sourceTree = "<group>"; };
+		5A93216B20D252EC145F75FF /* SelectionEvent.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = SelectionEvent.hpp; path = ../../src/SelectionEvent.hpp; sourceTree = "<group>"; };
+		5AAF20EC6AD005FF496C7A87 /* XGridDrawer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = XGridDrawer.cpp; path = ../../src/XGridDrawer.cpp; sourceTree = "<group>"; };
+		5D7F45B849E22D4F5CD40D32 /* SizedText.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SizedText.cpp; path = ../../src/widgets/SizedText.cpp; sourceTree = "<group>"; };
+		5DD77E201081352520CB7AE8 /* wxbindbase.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxbindbase.xcodeproj; sourceTree = SOURCE_ROOT; };
+		5F893D917B2139D20C6F6282 /* MyStatusBar.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MyStatusBar.cpp; path = ../../src/MyStatusBar.cpp; sourceTree = "<group>"; };
+		5FE7387F2F0F142C7A490D5B /* wxbindxml.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxbindxml.xcodeproj; sourceTree = SOURCE_ROOT; };
+		61AB3F0850EF3338403E355D /* Layout.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Layout.hpp; path = ../../src/dialogs/Layout.hpp; sourceTree = "<group>"; };
+		663A299A72E673AC5C4A3C1F /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = render.cpp; path = ../../src/html/render.cpp; sourceTree = "<group>"; };
+		666902C61C9715126B56750F /* XWord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XWord.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		67314636180D33E805425819 /* MyStatusBar.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = MyStatusBar.hpp; path = ../../src/MyStatusBar.hpp; sourceTree = "<group>"; };
+		678039543EDE155C64D83F6B /* XGridCtrl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = XGridCtrl.cpp; path = ../../src/XGridCtrl.cpp; sourceTree = "<group>"; };
+		67ED27A036115045229A3092 /* XGridDrawer.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = XGridDrawer.hpp; path = ../../src/XGridDrawer.hpp; sourceTree = "<group>"; };
+		6A3D66F437B84318094E15E9 /* xword_bind.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = xword_bind.cpp; path = ../../src/xwordbind/xword_bind.cpp; sourceTree = "<group>"; };
+		6A5118071FF31BCE30180F69 /* Characters.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Characters.hpp; path = ../../src/dialogs/Characters.hpp; sourceTree = "<group>"; };
+		6B6739B9547305F81AB513AC /* SizerPrinter.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = SizerPrinter.hpp; path = ../../src/utils/SizerPrinter.hpp; sourceTree = "<group>"; };
+		710A66FD0A5426F9512B6553 /* CluePanel.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = CluePanel.hpp; path = ../../src/CluePanel.hpp; sourceTree = "<group>"; };
+		71945DCB6A2B406A7DAA3EDD /* xword_bind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = xword_bind.h; path = ../../src/xwordbind/xword_bind.h; sourceTree = "<group>"; };
+		71A52E524A3F026C287E1932 /* m_break.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = m_break.cpp; path = ../../src/html/m_break.cpp; sourceTree = "<group>"; };
+		72F0723B3AB75A0941405E25 /* CluePrompt.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = CluePrompt.hpp; path = ../../src/CluePrompt.hpp; sourceTree = "<group>"; };
+		73665EA959561F111ABF2461 /* ToolManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ToolManager.cpp; path = ../../src/utils/ToolManager.cpp; sourceTree = "<group>"; };
+		75B6000C16C56D1735731916 /* wxbindxrc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = wxbindxrc.xcodeproj; sourceTree = SOURCE_ROOT; };
+		75EE64D3645B4F082C8C1C58 /* CluePanel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = CluePanel.cpp; path = ../../src/CluePanel.cpp; sourceTree = "<group>"; };
+		76BE47F156423BDA1DCD2EB0 /* config.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = config.cpp; path = ../../src/config.cpp; sourceTree = "<group>"; };
+		77D95D5938C314DE0EA85F9E /* render.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = render.hpp; path = ../../src/html/render.hpp; sourceTree = "<group>"; };
+		798260DE48304B326BEF45A0 /* SizedText.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = SizedText.hpp; path = ../../src/widgets/SizedText.hpp; sourceTree = "<group>"; };
+		7BB423F20FE649E02EB376B0 /* wxFB_Dialogs.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = wxFB_Dialogs.cpp; path = ../../src/dialogs/wxFB_Dialogs.cpp; sourceTree = "<group>"; };
+		7CFE09D32B820FD5693F66A7 /* Preferences.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Preferences.cpp; path = ../../src/dialogs/Preferences.cpp; sourceTree = "<group>"; };
+		7E3C4F8E0BE23D4A6C435A17 /* paths.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = paths.cpp; path = ../../src/paths.cpp; sourceTree = "<group>"; };
+		7F2049A22C0070A70DC03E95 /* puz.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = puz.xcodeproj; sourceTree = SOURCE_ROOT; };
+		7F824A950ECE77D019B76115 /* timeit.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = timeit.hpp; path = ../../src/utils/timeit.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		484E0A5D1A4A01AB79BD6BD8 /* Frameworks */ = {
+		622B780451974FA75EBB05CB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7154656347757DF13E1625CF /* libpuz.dylib in Frameworks */,
+				5206241C400C6F4A77EE3EE1 /* libpuz.dylib in Frameworks */,
+				4F3133F9512D0D0E208A4A72 /* liblua5.1.dylib in Frameworks */,
+				23F476F63954469A62946884 /* libwxlua.a in Frameworks */,
+				2C6F539158F217E611617DCD /* libwxbindbase.a in Frameworks */,
+				6D2E1BA36DE4235D5B420428 /* libwxbindcore.a in Frameworks */,
+				2531660C3FAE4D1C1267570B /* libwxbindadv.a in Frameworks */,
+				59016521131A4C91669E4716 /* libwxbindaui.a in Frameworks */,
+				5AA052FC3DA07F8F2A182922 /* libwxbindhtml.a in Frameworks */,
+				564704207DB736D5779230FF /* libwxbindnet.a in Frameworks */,
+				2C03332970820AE42F6401C0 /* libwxbindxml.a in Frameworks */,
+				536117522463137F7A8B74B9 /* libwxbindxrc.a in Frameworks */,
+				7F870F250596408F20EA0203 /* libluapuz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		184C0B732300264027F604E2 /* XWord */ = {
+		06094CC33256353621731724 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7AA51BB179C2036404AC493F /* src */,
-				040D0D707F1E56010D4434A7 /* Products */,
-				14257D2652676DCC26500819 /* Projects */,
+				73A95CDA74C21F011DEE2DBD /* libluapuz.dylib */,
 			);
-			name = "XWord";
+			name = Products;
 			sourceTree = "<group>";
 		};
-		7AA51BB179C2036404AC493F /* src */ = {
+		0929702E02756D88261E3765 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7971298967EC4EB24AC042E3 /* App.cpp */,
-				07FA2E5370187B4B5B591CAC /* App.hpp */,
-				40F0355A26A950895D304D53 /* ClueListBox.cpp */,
-				0BAA7DF8682E789862EB772F /* ClueListBox.hpp */,
-				0ED91FE7244B716C3851613C /* CluePanel.cpp */,
-				51757CBD1389372A3E6813BC /* CluePanel.hpp */,
-				4E4E3BDB74977AAC7A411DF4 /* CluePrompt.cpp */,
-				0EB7358518A8160961374EAA /* CluePrompt.hpp */,
-				0E8F16984604451734072629 /* MyAuiMgr.cpp */,
-				793028111D421D21105D6A90 /* MyAuiMgr.hpp */,
-				5AF37CC82E7F432A796564EA /* MyFrame.cpp */,
-				4CED7BCA606717655A9B545E /* MyFrame.hpp */,
-				6915005F67E36023062C5627 /* MyStatusBar.cpp */,
-				1152392874C8307259FF0F27 /* MyStatusBar.hpp */,
-				43F32BB319397CCB3E5722DB /* PuzEvent.cpp */,
-				37895ADF47B230250FB47542 /* PuzEvent.hpp */,
-				0B163C8F3BF97C29527D5446 /* SelectionEvent.cpp */,
-				18E343396F8103BB6B083BA3 /* SelectionEvent.hpp */,
-				1EFA7B6C00E5557E48587ECF /* XGridCtrl.cpp */,
-				79F947464C9413791F066D9D /* XGridCtrl.hpp */,
-				385256355E334E361F685C94 /* XGridDrawer.cpp */,
-				178060C26A0B3CF55E1A3A6E /* XGridDrawer.hpp */,
-				7DDC2344392125BC540930B1 /* config.cpp */,
-				743400EE4FD17D68798F3B43 /* config.hpp */,
-				44D82879772A6E4B2F7647BE /* dialogs */,
-				2E396DB6577720F771DA71FB /* html */,
-				393A74492A575C706B8B2774 /* messages.cpp */,
-				36275F265C9725E944307D12 /* messages.hpp */,
-				4FF9748F2D1D55EC53C9624B /* paths.cpp */,
-				4DDD09C9467C6D69164264C9 /* paths.hpp */,
-				7831726F1200455D7E467F01 /* printout.cpp */,
-				7AE368FF161F5656751C17FF /* printout.hpp */,
-				1962600350F87FFC3BF500EC /* utils */,
-				535531D762EE2048130A2440 /* widgets */,
-				15DD54955F571245480C2270 /* xwordbind */,
-				4ECB59F13A0F4FF17ACC4724 /* xwordlua.hpp */,
+				3E0A2A0E12D4569962494FE7 /* libpuz.dylib */,
 			);
-			name = "src";
+			name = Products;
 			sourceTree = "<group>";
 		};
-		44D82879772A6E4B2F7647BE /* dialogs */ = {
+		1058231F59935A7D0006259A /* widgets */ = {
 			isa = PBXGroup;
 			children = (
-				3D3E6CAB0DC93EAF47F00E3F /* Characters.cpp */,
-				526C03933F785930317F4F18 /* Characters.hpp */,
-				7DEF28F555EB06E346A160E6 /* Layout.hpp */,
-				514A1F7600174132479C3F21 /* Preferences.cpp */,
-				45136A1230247C2C450B0C7D /* Preferences.hpp */,
-				15294E9016C654CF3AE33B8C /* wxFB_Dialogs.cpp */,
-				4E6B0BB7644A1E17074D2447 /* wxFB_Dialogs.h */,
+				5D7F45B849E22D4F5CD40D32 /* SizedText.cpp */,
+				798260DE48304B326BEF45A0 /* SizedText.hpp */,
+				0B9227F76524441752360D77 /* htmlcluelist.cpp */,
+				1240389368FF79927FFE004E /* htmlcluelist.hpp */,
 			);
-			name = "dialogs";
+			name = widgets;
 			sourceTree = "<group>";
 		};
-		2E396DB6577720F771DA71FB /* html */ = {
+		1A3B1A6E2BF22E5B6A192720 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				686B731451DA1F36084A6F0A /* m_break.cpp */,
-				2F2625A12DB619D9337D4ADB /* parse.cpp */,
-				54A10340366877D11B2551EC /* parse.hpp */,
-				0501787A7F15729C42AF5072 /* render.cpp */,
-				3B00157804E97D7834D70A87 /* render.hpp */,
+				78804C0647E4619F43254C5C /* libwxbindxrc.a */,
 			);
-			name = "html";
+			name = Products;
 			sourceTree = "<group>";
 		};
-		1962600350F87FFC3BF500EC /* utils */ = {
+		1ACC7A5A463B4EBA47F21221 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0B8D52882EAE15E7006B66C4 /* ConfigManager.hpp */,
-				6EBE5FAE047138DE57291E85 /* SizerPrinter.hpp */,
-				22E602D7667A111D30C5528A /* ToolInfo.cpp */,
-				0F072E8B02D40E6D2F732964 /* ToolInfo.hpp */,
-				6B3B02A721BF5FD331344129 /* ToolManager.cpp */,
-				6E206E831E4450B237060323 /* ToolManager.hpp */,
-				79B13CC4190B06A61DB4435B /* string.hpp */,
-				32A421FC4289629555093ED1 /* timeit.hpp */,
-				533F211454E7656C64107AFE /* wrap.hpp */,
+				02AB3EC70911587039011E4F /* libwxbindnet.a */,
 			);
-			name = "utils";
+			name = Products;
 			sourceTree = "<group>";
 		};
-		535531D762EE2048130A2440 /* widgets */ = {
+		1DFE3F2E24A4127E2C235CF0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				365E68352DCD509F3E891E19 /* SizedText.cpp */,
-				642162DA35D2456D5B487127 /* SizedText.hpp */,
-				78E856772C8736942A633504 /* htmlcluelist.cpp */,
-				6FAA7B7C735B4B2D11187421 /* htmlcluelist.hpp */,
+				7FB7748A2F854F6576A446FD /* libwxbindxml.a */,
 			);
-			name = "widgets";
+			name = Products;
 			sourceTree = "<group>";
 		};
-		15DD54955F571245480C2270 /* xwordbind */ = {
+		286A001C447C551652FC3820 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				29D072FB50C645F04B7D19A6 /* xword_bind.cpp */,
-				0115513763B07719220D6095 /* xword_bind.h */,
-				5A0335165A7A60655E911DB9 /* xword_bind_helpers.hpp */,
-				36E91C507A6711AD61EC6EF1 /* xword_override.hpp */,
+				05FD2DBB5FD942B249F24104 /* libwxbindadv.a */,
 			);
-			name = "xwordbind";
+			name = Products;
 			sourceTree = "<group>";
 		};
-		040D0D707F1E56010D4434A7 /* Products */ = {
+		311F7D0238AF6C095CC2770F /* Projects */ = {
 			isa = PBXGroup;
 			children = (
-				15DD07F103AD607F48270C44 /* XWord.app */,
+				7F2049A22C0070A70DC03E95 /* puz.xcodeproj */,
+				2C471BFE7967064C7F596959 /* lua.xcodeproj */,
+				30D43EC506F20EDC0EA65B33 /* wxlua.xcodeproj */,
+				5DD77E201081352520CB7AE8 /* wxbindbase.xcodeproj */,
+				43C2760640B26C9358013216 /* wxbindcore.xcodeproj */,
+				128366874FF83A4C0091713B /* wxbindadv.xcodeproj */,
+				3F15108724940A5512D45336 /* wxbindaui.xcodeproj */,
+				0DA508DD186F245813210A25 /* wxbindhtml.xcodeproj */,
+				0FBA2DF1437E4180466607BC /* wxbindnet.xcodeproj */,
+				5FE7387F2F0F142C7A490D5B /* wxbindxml.xcodeproj */,
+				75B6000C16C56D1735731916 /* wxbindxrc.xcodeproj */,
+				42535AD236E318583E3A0B6A /* luapuz.xcodeproj */,
 			);
-			name = "Products";
+			name = Projects;
 			sourceTree = "<group>";
 		};
-		14257D2652676DCC26500819 /* Projects */ = {
+		33BF018959E4254912FD3499 /* xwordbind */ = {
 			isa = PBXGroup;
 			children = (
-				7E734F366CA8238C55E46BC2 /* puz.xcodeproj */,
+				6A3D66F437B84318094E15E9 /* xword_bind.cpp */,
+				71945DCB6A2B406A7DAA3EDD /* xword_bind.h */,
+				3F8B4D3648631CEC051405C3 /* xword_bind_helpers.hpp */,
+				5514155671B34B1225E70BD0 /* xword_override.hpp */,
 			);
-			name = "Projects";
+			name = xwordbind;
 			sourceTree = "<group>";
 		};
-		09404F6C170E7CA635943018 /* Products */ = {
+		3BE9579E532B3012137B2242 /* utils */ = {
 			isa = PBXGroup;
 			children = (
-				4DA97EE062282075065026E9 /* libpuz.dylib */,
+				51F768B01D4875573B623ACE /* ConfigManager.hpp */,
+				6B6739B9547305F81AB513AC /* SizerPrinter.hpp */,
+				15B342DD64C3465039AC0691 /* ToolInfo.cpp */,
+				05A93795299C4FF8252B3D2B /* ToolInfo.hpp */,
+				73665EA959561F111ABF2461 /* ToolManager.cpp */,
+				01C34369499F743758E31F34 /* ToolManager.hpp */,
+				4F28788C51B41FB666205867 /* string.hpp */,
+				7F824A950ECE77D019B76115 /* timeit.hpp */,
+				5133780472715F8804F1176F /* wrap.hpp */,
+			);
+			name = utils;
+			sourceTree = "<group>";
+		};
+		44032D4457FC6D9F234260F8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				04F1761978EC7F7F198467E2 /* libwxbindaui.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		51412BD20ABC6A7932854AF4 /* html */ = {
+			isa = PBXGroup;
+			children = (
+				71A52E524A3F026C287E1932 /* m_break.cpp */,
+				0BF53ACB0C216ADE2F1A784D /* parse.cpp */,
+				05524DD2348A6F6F00AE4A04 /* parse.hpp */,
+				663A299A72E673AC5C4A3C1F /* render.cpp */,
+				77D95D5938C314DE0EA85F9E /* render.hpp */,
+			);
+			name = html;
+			sourceTree = "<group>";
+		};
+		574F1DB61C90730037E0540D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2E753ED951F009BB6A091B1A /* libwxbindhtml.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5D8205337C8F221C03AE2631 /* XWord */ = {
+			isa = PBXGroup;
+			children = (
+				78CE43AF45717ED64D716244 /* src */,
+				5F60444402B8064675E8602D /* Products */,
+				311F7D0238AF6C095CC2770F /* Projects */,
+			);
+			name = XWord;
+			sourceTree = "<group>";
+		};
+		5F60444402B8064675E8602D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				666902C61C9715126B56750F /* XWord.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5F9D6B970E5A49152D0A7474 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				43025F1919E00139477355BE /* libwxbindcore.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6CB170D570A82E541D5B433F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				009E1A2F27AB017738EC180B /* libwxlua.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		786D788C5BD8455623C15825 /* dialogs */ = {
+			isa = PBXGroup;
+			children = (
+				11125594208A5CE82E0F6483 /* Characters.cpp */,
+				6A5118071FF31BCE30180F69 /* Characters.hpp */,
+				61AB3F0850EF3338403E355D /* Layout.hpp */,
+				7CFE09D32B820FD5693F66A7 /* Preferences.cpp */,
+				2F7B5A126B051F8854B56127 /* Preferences.hpp */,
+				7BB423F20FE649E02EB376B0 /* wxFB_Dialogs.cpp */,
+				3FEF7DE5591E48A445082BF2 /* wxFB_Dialogs.h */,
+			);
+			name = dialogs;
+			sourceTree = "<group>";
+		};
+		78CE43AF45717ED64D716244 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				1DE211475F872CF866173094 /* App.cpp */,
+				578B188C1F9F015706556067 /* App.hpp */,
+				0EBE7E3B70625EB43B23153F /* ClueListBox.cpp */,
+				3A784782302B0B3632E90C17 /* ClueListBox.hpp */,
+				75EE64D3645B4F082C8C1C58 /* CluePanel.cpp */,
+				710A66FD0A5426F9512B6553 /* CluePanel.hpp */,
+				2D9747B160AD12046BC21FB8 /* CluePrompt.cpp */,
+				72F0723B3AB75A0941405E25 /* CluePrompt.hpp */,
+				0DB03C2550BE22943663276E /* MyAuiMgr.cpp */,
+				0BC822B6163E4261100F7D88 /* MyAuiMgr.hpp */,
+				26B7508A35091B4D1724769E /* MyFrame.cpp */,
+				39B7310E2804587F0DA50D47 /* MyFrame.hpp */,
+				5F893D917B2139D20C6F6282 /* MyStatusBar.cpp */,
+				67314636180D33E805425819 /* MyStatusBar.hpp */,
+				04607A3B3C3C0BB7431459D3 /* PuzEvent.cpp */,
+				1D0565EC080947A079806C67 /* PuzEvent.hpp */,
+				0E5E558B519B47620EA379E1 /* SelectionEvent.cpp */,
+				5A93216B20D252EC145F75FF /* SelectionEvent.hpp */,
+				678039543EDE155C64D83F6B /* XGridCtrl.cpp */,
+				06D6003472AA038006344417 /* XGridCtrl.hpp */,
+				5AAF20EC6AD005FF496C7A87 /* XGridDrawer.cpp */,
+				67ED27A036115045229A3092 /* XGridDrawer.hpp */,
+				76BE47F156423BDA1DCD2EB0 /* config.cpp */,
+				40B8766976B505CA336D5C9F /* config.hpp */,
+				786D788C5BD8455623C15825 /* dialogs */,
+				51412BD20ABC6A7932854AF4 /* html */,
+				083A310207B8643F103C57DA /* messages.cpp */,
+				4A0A5A323EAB7A2469AB7EDF /* messages.hpp */,
+				7E3C4F8E0BE23D4A6C435A17 /* paths.cpp */,
+				13905F8140ED2E14560C3A41 /* paths.hpp */,
+				10BD04D361C02CDF00570B79 /* printout.cpp */,
+				281F30AB524218C201F64DBF /* printout.hpp */,
+				3BE9579E532B3012137B2242 /* utils */,
+				1058231F59935A7D0006259A /* widgets */,
+				33BF018959E4254912FD3499 /* xwordbind */,
+				30C436DC5ED878801F632F47 /* xwordlua.hpp */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		7B26150134AA356A017C21A9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0DBA385216A9342B2DA4016B /* liblua5.1.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7CD924A91100466721853457 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4A140957352C63BE7AB469B2 /* libwxbindbase.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -274,23 +560,34 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2E5F1DA52C42138E6AF428D2 /* XWord */ = {
+		6BDE75CF102845853C8F583A /* XWord */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3D5B74FF53EA639335866A59 /* Build configuration list for PBXNativeTarget "XWord" */;
+			buildConfigurationList = 1C4E761F23087E93185102B5 /* Build configuration list for PBXNativeTarget "XWord" */;
 			buildPhases = (
-				039129C356CC51477BC0128D /* Resources */,
-				1FAF071A5A1564631EEA796D /* Sources */,
-				484E0A5D1A4A01AB79BD6BD8 /* Frameworks */,
+				6B465E525BE45EFD486D7DCA /* Resources */,
+				6ED230D0659951431BB052A3 /* Sources */,
+				622B780451974FA75EBB05CB /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				77072AEB153152FD38712D7E /* PBXTargetDependency */,
+				248B5E4E718A398D04735502 /* PBXTargetDependency */,
+				39221C371603535174AC59C4 /* PBXTargetDependency */,
+				4CA232E4337207144CBB1595 /* PBXTargetDependency */,
+				3116217943C00AB309562881 /* PBXTargetDependency */,
+				7629243A66B735EC5A8962A0 /* PBXTargetDependency */,
+				76597F4A5B305E17637134F3 /* PBXTargetDependency */,
+				12EF487455B9762A64133F5A /* PBXTargetDependency */,
+				6E9847A0756C1CCE24C805C2 /* PBXTargetDependency */,
+				16D236F9191F6BB6011664BE /* PBXTargetDependency */,
+				49DF5F1B6D7D462352967E30 /* PBXTargetDependency */,
+				062868C10FF5545A679C5BF4 /* PBXTargetDependency */,
+				1E1730AE31013E9A0D3200B6 /* PBXTargetDependency */,
 			);
-			name = "XWord";
+			name = XWord;
 			productInstallPath = "$(HOME)/Applications";
-			productName = "XWord";
-			productReference = 15DD07F103AD607F48270C44 /* XWord.app */;
+			productName = XWord;
+			productReference = 666902C61C9715126B56750F /* XWord.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -300,34 +597,162 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "XWord" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
-			mainGroup = 184C0B732300264027F604E2 /* XWord */;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 5D8205337C8F221C03AE2631 /* XWord */;
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 09404F6C170E7CA635943018 /* Products */;
-					ProjectRef = 7E734F366CA8238C55E46BC2 /* puz.xcodeproj */;
+					ProductGroup = 7B26150134AA356A017C21A9 /* Products */;
+					ProjectRef = 2C471BFE7967064C7F596959 /* lua.xcodeproj */;
+				},
+				{
+					ProductGroup = 06094CC33256353621731724 /* Products */;
+					ProjectRef = 42535AD236E318583E3A0B6A /* luapuz.xcodeproj */;
+				},
+				{
+					ProductGroup = 0929702E02756D88261E3765 /* Products */;
+					ProjectRef = 7F2049A22C0070A70DC03E95 /* puz.xcodeproj */;
+				},
+				{
+					ProductGroup = 286A001C447C551652FC3820 /* Products */;
+					ProjectRef = 128366874FF83A4C0091713B /* wxbindadv.xcodeproj */;
+				},
+				{
+					ProductGroup = 44032D4457FC6D9F234260F8 /* Products */;
+					ProjectRef = 3F15108724940A5512D45336 /* wxbindaui.xcodeproj */;
+				},
+				{
+					ProductGroup = 7CD924A91100466721853457 /* Products */;
+					ProjectRef = 5DD77E201081352520CB7AE8 /* wxbindbase.xcodeproj */;
+				},
+				{
+					ProductGroup = 5F9D6B970E5A49152D0A7474 /* Products */;
+					ProjectRef = 43C2760640B26C9358013216 /* wxbindcore.xcodeproj */;
+				},
+				{
+					ProductGroup = 574F1DB61C90730037E0540D /* Products */;
+					ProjectRef = 0DA508DD186F245813210A25 /* wxbindhtml.xcodeproj */;
+				},
+				{
+					ProductGroup = 1ACC7A5A463B4EBA47F21221 /* Products */;
+					ProjectRef = 0FBA2DF1437E4180466607BC /* wxbindnet.xcodeproj */;
+				},
+				{
+					ProductGroup = 1DFE3F2E24A4127E2C235CF0 /* Products */;
+					ProjectRef = 5FE7387F2F0F142C7A490D5B /* wxbindxml.xcodeproj */;
+				},
+				{
+					ProductGroup = 1A3B1A6E2BF22E5B6A192720 /* Products */;
+					ProjectRef = 75B6000C16C56D1735731916 /* wxbindxrc.xcodeproj */;
+				},
+				{
+					ProductGroup = 6CB170D570A82E541D5B433F /* Products */;
+					ProjectRef = 30D43EC506F20EDC0EA65B33 /* wxlua.xcodeproj */;
 				},
 			);
 			projectRoot = "";
 			targets = (
-				2E5F1DA52C42138E6AF428D2 /* XWord.app */,
+				6BDE75CF102845853C8F583A /* XWord */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		4DA97EE062282075065026E9 /* libpuz.dylib */ = {
+		009E1A2F27AB017738EC180B /* libwxlua.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxlua.a;
+			remoteRef = 0B74229E39605A587DE90505 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		02AB3EC70911587039011E4F /* libwxbindnet.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxbindnet.a;
+			remoteRef = 47BC3CA25617175101842934 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		04F1761978EC7F7F198467E2 /* libwxbindaui.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxbindaui.a;
+			remoteRef = 6C3A147E5F2049E509A34F63 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		05FD2DBB5FD942B249F24104 /* libwxbindadv.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxbindadv.a;
+			remoteRef = 7E2967D7653861BB3EF82653 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0DBA385216A9342B2DA4016B /* liblua5.1.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			path = "../../bin/Release/libpuz.dylib";
-			remoteRef = 6952394634B525F777316575 /* PBXContainerItemProxy */;
+			path = liblua5.1.dylib;
+			remoteRef = 1AAE2262612D7F7018A450B5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2E753ED951F009BB6A091B1A /* libwxbindhtml.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxbindhtml.a;
+			remoteRef = 26761E0C29D840F71BF923B0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3E0A2A0E12D4569962494FE7 /* libpuz.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libpuz.dylib;
+			remoteRef = 6B27743605654F8C7AD60FAD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		43025F1919E00139477355BE /* libwxbindcore.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxbindcore.a;
+			remoteRef = 26696549548C74CF786F4E26 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4A140957352C63BE7AB469B2 /* libwxbindbase.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxbindbase.a;
+			remoteRef = 40972CB542BA662203144EC1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		73A95CDA74C21F011DEE2DBD /* libluapuz.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libluapuz.dylib;
+			remoteRef = 520A2AFD6DC32469138A095A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		78804C0647E4619F43254C5C /* libwxbindxrc.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxbindxrc.a;
+			remoteRef = 30736CC23E2379480954203D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		7FB7748A2F854F6576A446FD /* libwxbindxml.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxbindxml.a;
+			remoteRef = 49023A9278DC36D71A244C8F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
-		039129C356CC51477BC0128D /* Resources */ = {
+		6B465E525BE45EFD486D7DCA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -337,118 +762,193 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1FAF071A5A1564631EEA796D /* Sources */ = {
+		6ED230D0659951431BB052A3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D416EC71D8517C8443C211B /* App.cpp in Sources */,
-				5BD76FF51F4A0E2F4B083751 /* ClueListBox.cpp in Sources */,
-				145C3D4457E1737D1BFD376F /* CluePanel.cpp in Sources */,
-				03BA773B27EF47191CF46BCD /* CluePrompt.cpp in Sources */,
-				489E159F74AE1BB956A35FB8 /* MyAuiMgr.cpp in Sources */,
-				76EA05B103B8607C03D47253 /* MyFrame.cpp in Sources */,
-				14A52FCA74AA549214F4306D /* MyStatusBar.cpp in Sources */,
-				700675CD4455021332027729 /* PuzEvent.cpp in Sources */,
-				244D49071D9D13FC5F2912BC /* SelectionEvent.cpp in Sources */,
-				4B887D6F26351C6324875785 /* XGridCtrl.cpp in Sources */,
-				157C516C01D33B6907F8694B /* XGridDrawer.cpp in Sources */,
-				583C0C86049A5C7557D0536E /* config.cpp in Sources */,
-				334C41A52DCA34BC4AF31F9A /* Characters.cpp in Sources */,
-				40752C40633C3223010A5BF2 /* Preferences.cpp in Sources */,
-				26914D76541C749742932445 /* wxFB_Dialogs.cpp in Sources */,
-				548517CF6FE94A277A80382E /* m_break.cpp in Sources */,
-				1C9451DC1CD67CE455796E6E /* parse.cpp in Sources */,
-				73651347112257FC775B5DE5 /* render.cpp in Sources */,
-				6BBE5BC3263C43A64F932F3C /* messages.cpp in Sources */,
-				0BA9095579AF287528D31D17 /* paths.cpp in Sources */,
-				4D2139BD57245CAD5C856E90 /* printout.cpp in Sources */,
-				0CB45AB72A5740EA158B148C /* ToolInfo.cpp in Sources */,
-				502E44E1263415E955F349C8 /* ToolManager.cpp in Sources */,
-				3E2C31996C900B63517122A4 /* SizedText.cpp in Sources */,
-				4F284E1336FB223829D24582 /* htmlcluelist.cpp in Sources */,
-				28EC0B487B594EA66F716D6D /* xword_bind.cpp in Sources */,
+				44BF12C21317516B604423AB /* App.cpp in Sources */,
+				6018681541F814625B357574 /* ClueListBox.cpp in Sources */,
+				10B82E022CA33455665C2C4C /* CluePanel.cpp in Sources */,
+				0A2B32F4513775782CAE1470 /* CluePrompt.cpp in Sources */,
+				3B4B749227D5517D227C0F87 /* MyAuiMgr.cpp in Sources */,
+				274003DF37BA4ECB130C0B63 /* MyFrame.cpp in Sources */,
+				5BEA072A0AEB760020D670D9 /* MyStatusBar.cpp in Sources */,
+				5C0971B14E6010A20F5673F2 /* PuzEvent.cpp in Sources */,
+				541A1B05172844C22E867ADB /* SelectionEvent.cpp in Sources */,
+				3EA845C517845EF00E6C684E /* XGridCtrl.cpp in Sources */,
+				377A4D794BFE229D2A494EBF /* XGridDrawer.cpp in Sources */,
+				34F62D5065B22C09413E6B67 /* config.cpp in Sources */,
+				078A79B10C1353490FD923AD /* Characters.cpp in Sources */,
+				6AC2685F3FDC1BE710FA117D /* Preferences.cpp in Sources */,
+				542D6316787815A6056C1741 /* wxFB_Dialogs.cpp in Sources */,
+				45D150FE0EC15F29290B2834 /* m_break.cpp in Sources */,
+				16C433FA06DE6F5475F277BC /* parse.cpp in Sources */,
+				441C41C04E0A7B0C77293335 /* render.cpp in Sources */,
+				53EF2EE07ABE00DB64682789 /* messages.cpp in Sources */,
+				2FD76C8B55211D664E5975E8 /* paths.cpp in Sources */,
+				57FA72A5592952F97A4953B7 /* printout.cpp in Sources */,
+				524C1507290C04EF71C40872 /* ToolInfo.cpp in Sources */,
+				0DEF681B4B41395706737506 /* ToolManager.cpp in Sources */,
+				52D129D37DCC756B448B34F1 /* SizedText.cpp in Sources */,
+				1882147A0368542355E966EC /* htmlcluelist.cpp in Sources */,
+				1D9D3AC71E1922E45F1A4534 /* xword_bind.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-/* End PBXVariantGroup section */
-
 /* Begin PBXTargetDependency section */
-		77072AEB153152FD38712D7E /* PBXTargetDependency */ = {
+		062868C10FF5545A679C5BF4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = "libpuz.dylib";
-			targetProxy = 42040EB4383A28D67BAB10A2 /* PBXContainerItemProxy */;
+			name = libwxbindxrc.a;
+			targetProxy = 180A6F7C62772FF71AD34F36 /* PBXContainerItemProxy */;
+		};
+		12EF487455B9762A64133F5A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libwxbindaui.a;
+			targetProxy = 7526294502CD7EC55C6B29B6 /* PBXContainerItemProxy */;
+		};
+		16D236F9191F6BB6011664BE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libwxbindnet.a;
+			targetProxy = 2B06268172005EC167227467 /* PBXContainerItemProxy */;
+		};
+		1E1730AE31013E9A0D3200B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libluapuz.dylib;
+			targetProxy = 26A3313B46F277D63F8E1190 /* PBXContainerItemProxy */;
+		};
+		248B5E4E718A398D04735502 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libpuz.dylib;
+			targetProxy = 6027602800B25FAB099D3423 /* PBXContainerItemProxy */;
+		};
+		3116217943C00AB309562881 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libwxbindbase.a;
+			targetProxy = 0ABB162C4F8813A0780D440C /* PBXContainerItemProxy */;
+		};
+		39221C371603535174AC59C4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = liblua5.1.dylib;
+			targetProxy = 2DED5D1E621F7F3D25124506 /* PBXContainerItemProxy */;
+		};
+		49DF5F1B6D7D462352967E30 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libwxbindxml.a;
+			targetProxy = 72310D11734225693992506D /* PBXContainerItemProxy */;
+		};
+		4CA232E4337207144CBB1595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libwxlua.a;
+			targetProxy = 37032F8B6796616767C97C63 /* PBXContainerItemProxy */;
+		};
+		6E9847A0756C1CCE24C805C2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libwxbindhtml.a;
+			targetProxy = 18DE3B5356996FFC22CF64DD /* PBXContainerItemProxy */;
+		};
+		7629243A66B735EC5A8962A0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libwxbindcore.a;
+			targetProxy = 606462D332241746351856CC /* PBXContainerItemProxy */;
+		};
+		76597F4A5B305E17637134F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libwxbindadv.a;
+			targetProxy = 1C94722E43FC7D2D34FD7376 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		390F641A0133082C6DA64E79 /* Release */ = {
+		154D1F03243F24A563D35140 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				CONFIGURATION_BUILD_DIR = ../../bin/Release;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/Applications";
-				PRODUCT_NAME = "XWord";
-			};
-			name = "Release";
-		};
-		45D62B2837A246CF7DA8656F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CONFIGURATION_BUILD_DIR = ../../bin/Debug;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/Applications";
-				PRODUCT_NAME = "XWord";
-			};
-			name = "Debug";
-		};
-		36F060AB6E4C486206E32407 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = i386;
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
 				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"NDEBUG",
-					"UNICODE",
-					"_UNICODE",
+					NDEBUG,
+					XWORD_USE_LUA,
+					UNICODE,
+					_UNICODE,
 					"PUZ_API=\"\"",
 					"LUAPUZ_API=\"\"",
-					"USE_FILE32API",
+					USE_FILE32API,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"../..",
+					../..,
+					../../lua,
+					../../lua/lua/include,
+					../../lua/wxbind/setup,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"../../bin/Release",
-					"../../lib/Release",
+					../../bin/Release,
+					../../lib/Release,
 				);
-				OBJROOT = "obj/Release/XWord";
+				OBJROOT = obj/x32/Release/XWord;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
-					"",
+					"-I/Developer/wxMac-2.8.12/build-release/lib/wx/include/mac-unicode-release-static-2.8",
+					"-I/Developer/wxMac-2.8.12/include",
+					"-I/Developer/wxMac-2.8.12/contrib/include",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-D__WXMAC__",
+				);
+				OTHER_LDFLAGS = (
+					"-L/Developer/wxMac-2.8.12/build-release/lib",
+					"-arch",
+					i386,
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					Cocoa,
+					"-framework",
+					System,
+					"-framework",
+					QuickTime,
+					"-framework",
+					OpenGL,
+					"-framework",
+					AGL,
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_richtext-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_aui-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_xrc-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_qa-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_html-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_adv-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_core-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_base_carbonu_xml-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_base_carbonu_net-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_base_carbonu-2.8.a",
+					"-framework",
+					WebKit,
+					"-lexpat",
+					"-lwxregexu-2.8",
+					"-lwxtiff-2.8",
+					"-lwxjpeg-2.8",
+					"-lwxpng-2.8",
+					"-lz",
+					"-lpthread",
+					"-liconv",
 				);
 				PREBINDING = NO;
-				SYMROOT = "../../bin/Release";
+				SYMROOT = ../../bin/Release;
 			};
-			name = "Release";
+			name = Release;
 		};
-		1CD62F5C7ECB27EC20EC68B1 /* Debug */ = {
+		28495E966F3323715A782528 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = i386;
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
 				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
 				COPY_PHASE_STRIP = NO;
@@ -456,58 +956,130 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG",
-					"_DEBUG",
-					"UNICODE",
-					"_UNICODE",
-					"__WXDEBUG__",
+					DEBUG,
+					_DEBUG,
+					XWORD_USE_LUA,
+					UNICODE,
+					_UNICODE,
+					__WXDEBUG__,
 					"PUZ_API=\"\"",
 					"LUAPUZ_API=\"\"",
-					"USE_FILE32API",
+					USE_FILE32API,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"../..",
+					../..,
+					../../lua,
+					../../lua/lua/include,
+					../../lua/wxbind/setup,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"../../bin/Debug",
-					"../../lib/Debug",
+					../../bin/Debug,
+					../../lib/Debug,
 				);
-				OBJROOT = "obj/Debug/XWord";
+				OBJROOT = obj/x32/Debug/XWord;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
-					"",
+					"-I/Developer/wxMac-2.8.12/build-release/lib/wx/include/mac-unicode-release-static-2.8",
+					"-I/Developer/wxMac-2.8.12/include",
+					"-I/Developer/wxMac-2.8.12/contrib/include",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-D__WXMAC__",
+				);
+				OTHER_LDFLAGS = (
+					"-L/Developer/wxMac-2.8.12/build-release/lib",
+					"-arch",
+					i386,
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					Cocoa,
+					"-framework",
+					System,
+					"-framework",
+					QuickTime,
+					"-framework",
+					OpenGL,
+					"-framework",
+					AGL,
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_richtext-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_aui-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_xrc-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_qa-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_html-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_adv-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_macu_core-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_base_carbonu_xml-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_base_carbonu_net-2.8.a",
+					"/Developer/wxMac-2.8.12/build-release/lib/libwx_base_carbonu-2.8.a",
+					"-framework",
+					WebKit,
+					"-lexpat",
+					"-lwxregexu-2.8",
+					"-lwxtiff-2.8",
+					"-lwxjpeg-2.8",
+					"-lwxpng-2.8",
+					"-lz",
+					"-lpthread",
+					"-liconv",
 				);
 				PREBINDING = NO;
-				SYMROOT = "../../bin/Debug";
+				SYMROOT = ../../bin/Debug;
 			};
-			name = "Debug";
+			name = Debug;
+		};
+		67CE3A8861CD66BC71816FBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../../bin/Debug;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = XWord;
+			};
+			name = Debug;
+		};
+		7D1D197E50B1331411D015F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../../bin/Release;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = XWord;
+			};
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3D5B74FF53EA639335866A59 /* Build configuration list for PBXNativeTarget "XWord.app" */ = {
+		1C4E761F23087E93185102B5 /* Build configuration list for PBXNativeTarget "XWord" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				390F641A0133082C6DA64E79 /* Release */,
-				45D62B2837A246CF7DA8656F /* Debug */,
+				7D1D197E50B1331411D015F3 /* Release */,
+				67CE3A8861CD66BC71816FBA /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release";
+			defaultConfigurationName = Release;
 		};
 		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "XWord" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				36F060AB6E4C486206E32407 /* Release */,
-				1CD62F5C7ECB27EC20EC68B1 /* Debug */,
+				154D1F03243F24A563D35140 /* Release */,
+				28495E966F3323715A782528 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
 }

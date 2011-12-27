@@ -47,8 +47,8 @@ namespace puz {
     #endif
 
     // Insert a string into a std::ostream
-    inline std::ostream &
-    operator<<(std::ostream & stream, const string_t & str)
+    template <typename STREAM> STREAM &
+    operator<<(STREAM & stream, const string_t & str)
     {
         return (stream << encode_utf8(str));
     }

@@ -143,7 +143,7 @@ static bool luapuz_isuint(lua_State * L, int index, bool strong = false)
 
 static bool luapuz_isuintstrong(lua_State * L, int index)
 {
-    luapuz_isuint(L, index, true);
+    return luapuz_isuint(L, index, true);
 }
 
 

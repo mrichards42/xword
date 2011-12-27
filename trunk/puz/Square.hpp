@@ -322,19 +322,19 @@ public:
 
     // These should not be used to actually find the word . . . they calculate
     // the word start and end using FindWordBoundary.
-    const Square * Square::GetWordStart(GridDirection dir) const;
-    const Square * Square::GetWordEnd(GridDirection dir) const;
-    const Square * Square::GetSolutionWordStart(GridDirection dir) const;
-    const Square * Square::GetSolutionWordEnd(GridDirection dir) const;
-    Square * Square::GetWordStart(GridDirection dir);
-    Square * Square::GetWordEnd(GridDirection dir);
-    Square * Square::GetSolutionWordStart(GridDirection dir);
-    Square * Square::GetSolutionWordEnd(GridDirection dir);
+    const Square * GetWordStart(GridDirection dir) const;
+    const Square * GetWordEnd(GridDirection dir) const;
+    const Square * GetSolutionWordStart(GridDirection dir) const;
+    const Square * GetSolutionWordEnd(GridDirection dir) const;
+    Square * GetWordStart(GridDirection dir);
+    Square * GetWordEnd(GridDirection dir);
+    Square * GetSolutionWordStart(GridDirection dir);
+    Square * GetSolutionWordEnd(GridDirection dir);
     static const Square * FindWordBoundary(const Square * square, GridDirection dir);
     static const Square * FindSolutionWordBoundary(const Square * square, GridDirection dir);
     static Square * FindWordBoundary(Square * square, GridDirection dir);
     static Square * FindSolutionWordBoundary(Square * square, GridDirection dir);
-    bool Square::HasWord(GridDirection dir) const;
+    bool HasWord(GridDirection dir) const;
 
     bool IsBetween(const Square * start, const Square * end) const;
 protected:

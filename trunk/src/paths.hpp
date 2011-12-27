@@ -31,6 +31,8 @@ wxString exedir();
 wxChar sep();
 
 #ifdef XWORD_USE_LUA
+#include <wx/arrstr.h>
+
 wxString GetLuaPath();
 const wxArrayString & GetLuaPathList();
 wxString GetLuaCPath();
