@@ -6,13 +6,16 @@ project "XWord"
     -- --------------------------------------------------------------------
     kind "WindowedApp"
     language "C++"
+
     files
     {
         "**.hpp", "**.cpp", "**.h",
     }
 
-    if USE_LUA then
+    if not _OPTIONS["disable-lua"] then
         defines { "XWORD_USE_LUA" }
+    else
+    	excludes { "xwordbind/*" }
     end
 
     configuration "windows"
@@ -25,7 +28,7 @@ project "XWord"
     configuration "linux"
         -- These link options ensure that the wxWidgets libraries are
         -- linked in the correct order under linux.
-        if USE_LUA then
+        if not _OPTIONS["disable-lua"] then
             linkoptions {
                 "-lwxbindxrc",
                 "-lwxbindxml",
@@ -57,13 +60,13 @@ project "XWord"
     configuration "linux"
         defines { [[PUZ_API=""]] }
         links { "dl" }
-
+    
     configuration "macosx"
-        defines {
-            [[PUZ_API=\"\"]],
+    	defines {
+    		[[PUZ_API=\"\"]],
             [[LUAPUZ_API=\"\"]],
             "USE_FILE32API" -- for minizip
-        }
+    	}
 
     -- Disable some warnings
     configuration "vs*"
@@ -75,7 +78,7 @@ project "XWord"
     -- wxLua
     -- --------------------------------------------------------------------
     configuration {}
-    if USE_LUA then
+	if not _OPTIONS["disable-lua"] then
         includedirs {
             "../lua",
             "../lua/lua/include",
@@ -83,7 +86,7 @@ project "XWord"
         }
     end
 
-    if USE_LUA then
+    if  not _OPTIONS["disable-lua"] then
         links {
             "lua",
             "wxlua",
@@ -105,3 +108,4 @@ project "XWord"
     configuration "windows"
         files { "**.rc" }
         resincludedirs { ".." }
+
