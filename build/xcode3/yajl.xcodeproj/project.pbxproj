@@ -7,42 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		60D47EC55823003C77B46B1A /* yajl.c in Sources */ = {isa = PBXBuildFile; fileRef = 204952307D7931C4666A69BA /* yajl.c */; };
-		603A325D07A36E3160416219 /* yajl_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B7D6FB355432C94585135C2 /* yajl_alloc.c */; };
-		4293514F553A52FD1C8505C5 /* yajl_buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 669421227449156F5B67072B /* yajl_buf.c */; };
-		5AF44EB0134A7C012FAE01A9 /* yajl_encode.c in Sources */ = {isa = PBXBuildFile; fileRef = 537B4F037C3D201434E01026 /* yajl_encode.c */; };
-		30560AD47669078674191E59 /* yajl_gen.c in Sources */ = {isa = PBXBuildFile; fileRef = 064B56CD37DE5B8519986992 /* yajl_gen.c */; };
-		41231B9D094400F702655B50 /* yajl_lex.c in Sources */ = {isa = PBXBuildFile; fileRef = 1542382F15FB2E42249A227F /* yajl_lex.c */; };
-		133927F77D002F0872776340 /* yajl_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 611D66DB483A14975BBF00D2 /* yajl_parser.c */; };
-		15A72E0A41A422ED34B62368 /* yajl_tree.c in Sources */ = {isa = PBXBuildFile; fileRef = 017A30DC76022D4725D96F9A /* yajl_tree.c */; };
-		0B445B992C56458B4B000061 /* yajl_version.c in Sources */ = {isa = PBXBuildFile; fileRef = 3E4C01524BCB318533444791 /* yajl_version.c */; };
+		77E71AB3659A734003E36957 /* yajl.c in Sources */ = {isa = PBXBuildFile; fileRef = 7F054927206C20994BBF7850 /* yajl.c */; };
+		79AB07D36EC95CD26AB347B0 /* yajl_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C9F550C3E0B604221901B5B /* yajl_alloc.c */; };
+		48AB62995F807A9F15B405EE /* yajl_buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 3DDC59F45106748F67AD291D /* yajl_buf.c */; };
+		4AE8568F4A764074053B12F6 /* yajl_encode.c in Sources */ = {isa = PBXBuildFile; fileRef = 697E5C44108A753522D22231 /* yajl_encode.c */; };
+		068B1D21101B19F9652443A6 /* yajl_gen.c in Sources */ = {isa = PBXBuildFile; fileRef = 39422C9B268E5BDE75241916 /* yajl_gen.c */; };
+		2A0A22D95FA03BEA28707E54 /* yajl_lex.c in Sources */ = {isa = PBXBuildFile; fileRef = 03AD133526BF676A0FAE06A0 /* yajl_lex.c */; };
+		239271FE684D20310E8C46AA /* yajl_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 6F8B46AA03036A9173BA7398 /* yajl_parser.c */; };
+		08F057066A04415E317B11DC /* yajl_tree.c in Sources */ = {isa = PBXBuildFile; fileRef = 564435583D3233391AB059B1 /* yajl_tree.c */; };
+		2854232A492C266D3F3D67CD /* yajl_version.c in Sources */ = {isa = PBXBuildFile; fileRef = 12EF2F0D113624462A784AAB /* yajl_version.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7AEB76EC3C5666AB683D0AE1 /* yajl_common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_common.h"; path = "../../yajl/src/api/yajl_common.h"; sourceTree = "<group>"; };
-		69923068256868A2150719B1 /* yajl_gen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_gen.h"; path = "../../yajl/src/api/yajl_gen.h"; sourceTree = "<group>"; };
-		48393AC77ACF5C7A651B10C8 /* yajl_parse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_parse.h"; path = "../../yajl/src/api/yajl_parse.h"; sourceTree = "<group>"; };
-		50775696516168480B147FE5 /* yajl_tree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_tree.h"; path = "../../yajl/src/api/yajl_tree.h"; sourceTree = "<group>"; };
-		204952307D7931C4666A69BA /* yajl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl.c"; path = "../../yajl/src/yajl.c"; sourceTree = "<group>"; };
-		0B7D6FB355432C94585135C2 /* yajl_alloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_alloc.c"; path = "../../yajl/src/yajl_alloc.c"; sourceTree = "<group>"; };
-		14E74C840EEE439D388B414C /* yajl_alloc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_alloc.h"; path = "../../yajl/src/yajl_alloc.h"; sourceTree = "<group>"; };
-		669421227449156F5B67072B /* yajl_buf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_buf.c"; path = "../../yajl/src/yajl_buf.c"; sourceTree = "<group>"; };
-		663934F6041F3E4F70145350 /* yajl_buf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_buf.h"; path = "../../yajl/src/yajl_buf.h"; sourceTree = "<group>"; };
-		4A6963CD51BF5CE40C0F48CA /* yajl_bytestack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_bytestack.h"; path = "../../yajl/src/yajl_bytestack.h"; sourceTree = "<group>"; };
-		537B4F037C3D201434E01026 /* yajl_encode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_encode.c"; path = "../../yajl/src/yajl_encode.c"; sourceTree = "<group>"; };
-		35F71DB179F77203360B4BBF /* yajl_encode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_encode.h"; path = "../../yajl/src/yajl_encode.h"; sourceTree = "<group>"; };
-		064B56CD37DE5B8519986992 /* yajl_gen.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_gen.c"; path = "../../yajl/src/yajl_gen.c"; sourceTree = "<group>"; };
-		1542382F15FB2E42249A227F /* yajl_lex.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_lex.c"; path = "../../yajl/src/yajl_lex.c"; sourceTree = "<group>"; };
-		66C9269115185CEE4C7F501D /* yajl_lex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_lex.h"; path = "../../yajl/src/yajl_lex.h"; sourceTree = "<group>"; };
-		611D66DB483A14975BBF00D2 /* yajl_parser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_parser.c"; path = "../../yajl/src/yajl_parser.c"; sourceTree = "<group>"; };
-		0DEC0E333E7F16D23CA23140 /* yajl_parser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_parser.h"; path = "../../yajl/src/yajl_parser.h"; sourceTree = "<group>"; };
-		017A30DC76022D4725D96F9A /* yajl_tree.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_tree.c"; path = "../../yajl/src/yajl_tree.c"; sourceTree = "<group>"; };
-		3E4C01524BCB318533444791 /* yajl_version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_version.c"; path = "../../yajl/src/yajl_version.c"; sourceTree = "<group>"; };
-		588F333C6004602558F55531 /* libyajl.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = "libyajl.dylib"; path = "libyajl.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		514C77853F4617E02CC579A1 /* yajl_common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_common.h"; path = "../../yajl/src/api/yajl_common.h"; sourceTree = "<group>"; };
+		571733341C450912037F19ED /* yajl_gen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_gen.h"; path = "../../yajl/src/api/yajl_gen.h"; sourceTree = "<group>"; };
+		55162FE037812499400272DE /* yajl_parse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_parse.h"; path = "../../yajl/src/api/yajl_parse.h"; sourceTree = "<group>"; };
+		73515C11105776095AE57787 /* yajl_tree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_tree.h"; path = "../../yajl/src/api/yajl_tree.h"; sourceTree = "<group>"; };
+		7F054927206C20994BBF7850 /* yajl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl.c"; path = "../../yajl/src/yajl.c"; sourceTree = "<group>"; };
+		6C9F550C3E0B604221901B5B /* yajl_alloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_alloc.c"; path = "../../yajl/src/yajl_alloc.c"; sourceTree = "<group>"; };
+		2EC851AE342B215E45555954 /* yajl_alloc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_alloc.h"; path = "../../yajl/src/yajl_alloc.h"; sourceTree = "<group>"; };
+		3DDC59F45106748F67AD291D /* yajl_buf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_buf.c"; path = "../../yajl/src/yajl_buf.c"; sourceTree = "<group>"; };
+		6C7B078759B91C1A26DC5482 /* yajl_buf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_buf.h"; path = "../../yajl/src/yajl_buf.h"; sourceTree = "<group>"; };
+		237172906315309534BF091F /* yajl_bytestack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_bytestack.h"; path = "../../yajl/src/yajl_bytestack.h"; sourceTree = "<group>"; };
+		697E5C44108A753522D22231 /* yajl_encode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_encode.c"; path = "../../yajl/src/yajl_encode.c"; sourceTree = "<group>"; };
+		71C41C5A7B48695E4F6C633C /* yajl_encode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_encode.h"; path = "../../yajl/src/yajl_encode.h"; sourceTree = "<group>"; };
+		39422C9B268E5BDE75241916 /* yajl_gen.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_gen.c"; path = "../../yajl/src/yajl_gen.c"; sourceTree = "<group>"; };
+		03AD133526BF676A0FAE06A0 /* yajl_lex.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_lex.c"; path = "../../yajl/src/yajl_lex.c"; sourceTree = "<group>"; };
+		6DBD4B0832A306372A4D2D79 /* yajl_lex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_lex.h"; path = "../../yajl/src/yajl_lex.h"; sourceTree = "<group>"; };
+		6F8B46AA03036A9173BA7398 /* yajl_parser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_parser.c"; path = "../../yajl/src/yajl_parser.c"; sourceTree = "<group>"; };
+		733B4B0A0C872A19080B342A /* yajl_parser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "yajl_parser.h"; path = "../../yajl/src/yajl_parser.h"; sourceTree = "<group>"; };
+		564435583D3233391AB059B1 /* yajl_tree.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_tree.c"; path = "../../yajl/src/yajl_tree.c"; sourceTree = "<group>"; };
+		12EF2F0D113624462A784AAB /* yajl_version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "yajl_version.c"; path = "../../yajl/src/yajl_version.c"; sourceTree = "<group>"; };
+		5B721DF97FCC452467D77BF5 /* libyajl.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = "libyajl.dylib"; path = "libyajl.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		2D607F39126C22A939321458 /* Frameworks */ = {
+		193503304EC83A63607E7475 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -52,61 +52,61 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		27675E1145B463F8416301DD /* yajl */ = {
+		4ACA2E60235E01BC5EE11561 /* yajl */ = {
 			isa = PBXGroup;
 			children = (
-				57F86B17549475005B3B20AD /* yajl */,
-				132624C730EC774442746191 /* Products */,
+				213146774AA060605790366E /* yajl */,
+				78554EC852DC69E80A5F22E9 /* Products */,
 			);
 			name = "yajl";
 			sourceTree = "<group>";
 		};
-		57F86B17549475005B3B20AD /* yajl */ = {
+		213146774AA060605790366E /* yajl */ = {
 			isa = PBXGroup;
 			children = (
-				6CF244DC082019A205E7030B /* src */,
+				1E7412B35A7966A21FFB3E09 /* src */,
 			);
 			name = "yajl";
 			sourceTree = "<group>";
 		};
-		6CF244DC082019A205E7030B /* src */ = {
+		1E7412B35A7966A21FFB3E09 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				52224DEA43261B7262A15829 /* api */,
-				204952307D7931C4666A69BA /* yajl.c */,
-				0B7D6FB355432C94585135C2 /* yajl_alloc.c */,
-				14E74C840EEE439D388B414C /* yajl_alloc.h */,
-				669421227449156F5B67072B /* yajl_buf.c */,
-				663934F6041F3E4F70145350 /* yajl_buf.h */,
-				4A6963CD51BF5CE40C0F48CA /* yajl_bytestack.h */,
-				537B4F037C3D201434E01026 /* yajl_encode.c */,
-				35F71DB179F77203360B4BBF /* yajl_encode.h */,
-				064B56CD37DE5B8519986992 /* yajl_gen.c */,
-				1542382F15FB2E42249A227F /* yajl_lex.c */,
-				66C9269115185CEE4C7F501D /* yajl_lex.h */,
-				611D66DB483A14975BBF00D2 /* yajl_parser.c */,
-				0DEC0E333E7F16D23CA23140 /* yajl_parser.h */,
-				017A30DC76022D4725D96F9A /* yajl_tree.c */,
-				3E4C01524BCB318533444791 /* yajl_version.c */,
+				77727EAB20291C6560CA0556 /* api */,
+				7F054927206C20994BBF7850 /* yajl.c */,
+				6C9F550C3E0B604221901B5B /* yajl_alloc.c */,
+				2EC851AE342B215E45555954 /* yajl_alloc.h */,
+				3DDC59F45106748F67AD291D /* yajl_buf.c */,
+				6C7B078759B91C1A26DC5482 /* yajl_buf.h */,
+				237172906315309534BF091F /* yajl_bytestack.h */,
+				697E5C44108A753522D22231 /* yajl_encode.c */,
+				71C41C5A7B48695E4F6C633C /* yajl_encode.h */,
+				39422C9B268E5BDE75241916 /* yajl_gen.c */,
+				03AD133526BF676A0FAE06A0 /* yajl_lex.c */,
+				6DBD4B0832A306372A4D2D79 /* yajl_lex.h */,
+				6F8B46AA03036A9173BA7398 /* yajl_parser.c */,
+				733B4B0A0C872A19080B342A /* yajl_parser.h */,
+				564435583D3233391AB059B1 /* yajl_tree.c */,
+				12EF2F0D113624462A784AAB /* yajl_version.c */,
 			);
 			name = "src";
 			sourceTree = "<group>";
 		};
-		52224DEA43261B7262A15829 /* api */ = {
+		77727EAB20291C6560CA0556 /* api */ = {
 			isa = PBXGroup;
 			children = (
-				7AEB76EC3C5666AB683D0AE1 /* yajl_common.h */,
-				69923068256868A2150719B1 /* yajl_gen.h */,
-				48393AC77ACF5C7A651B10C8 /* yajl_parse.h */,
-				50775696516168480B147FE5 /* yajl_tree.h */,
+				514C77853F4617E02CC579A1 /* yajl_common.h */,
+				571733341C450912037F19ED /* yajl_gen.h */,
+				55162FE037812499400272DE /* yajl_parse.h */,
+				73515C11105776095AE57787 /* yajl_tree.h */,
 			);
 			name = "api";
 			sourceTree = "<group>";
 		};
-		132624C730EC774442746191 /* Products */ = {
+		78554EC852DC69E80A5F22E9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				588F333C6004602558F55531 /* libyajl.dylib */,
+				5B721DF97FCC452467D77BF5 /* libyajl.dylib */,
 			);
 			name = "Products";
 			sourceTree = "<group>";
@@ -114,13 +114,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2067539F120B46E04C342705 /* yajl */ = {
+		34411C5C5EBB7CAD69F02CC7 /* yajl */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1C5C006F158B737120F81A33 /* Build configuration list for PBXNativeTarget "yajl" */;
+			buildConfigurationList = 7DE9679A587521FD0B754257 /* Build configuration list for PBXNativeTarget "yajl" */;
 			buildPhases = (
-				27851E4202C24C68737D1D68 /* Resources */,
-				3A3371422D70525A509A6CB0 /* Sources */,
-				2D607F39126C22A939321458 /* Frameworks */,
+				6D7D3AD3075916F41AEC1110 /* Resources */,
+				358A05275D8A2A807A7D49E2 /* Sources */,
+				193503304EC83A63607E7475 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -128,7 +128,7 @@
 			);
 			name = "yajl";
 			productName = "yajl";
-			productReference = 588F333C6004602558F55531 /* libyajl.dylib */;
+			productReference = 5B721DF97FCC452467D77BF5 /* libyajl.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -139,17 +139,17 @@
 			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "yajl" */;
 			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 1;
-			mainGroup = 27675E1145B463F8416301DD /* yajl */;
+			mainGroup = 4ACA2E60235E01BC5EE11561 /* yajl */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2067539F120B46E04C342705 /* libyajl.dylib */,
+				34411C5C5EBB7CAD69F02CC7 /* libyajl.dylib */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		27851E4202C24C68737D1D68 /* Resources */ = {
+		6D7D3AD3075916F41AEC1110 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -159,19 +159,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		3A3371422D70525A509A6CB0 /* Sources */ = {
+		358A05275D8A2A807A7D49E2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60D47EC55823003C77B46B1A /* yajl.c in Sources */,
-				603A325D07A36E3160416219 /* yajl_alloc.c in Sources */,
-				4293514F553A52FD1C8505C5 /* yajl_buf.c in Sources */,
-				5AF44EB0134A7C012FAE01A9 /* yajl_encode.c in Sources */,
-				30560AD47669078674191E59 /* yajl_gen.c in Sources */,
-				41231B9D094400F702655B50 /* yajl_lex.c in Sources */,
-				133927F77D002F0872776340 /* yajl_parser.c in Sources */,
-				15A72E0A41A422ED34B62368 /* yajl_tree.c in Sources */,
-				0B445B992C56458B4B000061 /* yajl_version.c in Sources */,
+				77E71AB3659A734003E36957 /* yajl.c in Sources */,
+				79AB07D36EC95CD26AB347B0 /* yajl_alloc.c in Sources */,
+				48AB62995F807A9F15B405EE /* yajl_buf.c in Sources */,
+				4AE8568F4A764074053B12F6 /* yajl_encode.c in Sources */,
+				068B1D21101B19F9652443A6 /* yajl_gen.c in Sources */,
+				2A0A22D95FA03BEA28707E54 /* yajl_lex.c in Sources */,
+				239271FE684D20310E8C46AA /* yajl_parser.c in Sources */,
+				08F057066A04415E317B11DC /* yajl_tree.c in Sources */,
+				2854232A492C266D3F3D67CD /* yajl_version.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,7 +181,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		7A6D1DD11451040F1D3B34C7 /* Release */ = {
+		46896D15077C6F5745941F92 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -195,7 +195,7 @@
 			};
 			name = "Release";
 		};
-		76750CD57649596250D95B79 /* Debug */ = {
+		6C7B30FF6B6C20F54ACF0BE0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -208,7 +208,7 @@
 			};
 			name = "Debug";
 		};
-		30CD1AE94C0E4BB57B727C63 /* Release */ = {
+		2AC917D678EC5528609B138A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "i386";
@@ -239,7 +239,7 @@
 			};
 			name = "Release";
 		};
-		0B4771B560FE7D3D3C9F056E /* Debug */ = {
+		27DB2D4E076A444C7AC742FA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "i386";
@@ -265,6 +265,9 @@
 				);
 				OBJROOT = "obj/x32/Debug/yajl";
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-install_name @executable_path/../Frameworks/libyajl.dylib",
+				);
 				PREBINDING = NO;
 				SYMROOT = "../../bin/Debug/XWord.app/Contents/Frameworks";
 			};
@@ -273,11 +276,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1C5C006F158B737120F81A33 /* Build configuration list for PBXNativeTarget "libyajl.dylib" */ = {
+		7DE9679A587521FD0B754257 /* Build configuration list for PBXNativeTarget "libyajl.dylib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7A6D1DD11451040F1D3B34C7 /* Release */,
-				76750CD57649596250D95B79 /* Debug */,
+				46896D15077C6F5745941F92 /* Release */,
+				6C7B30FF6B6C20F54ACF0BE0 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Release";
@@ -285,8 +288,8 @@
 		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "yajl" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				30CD1AE94C0E4BB57B727C63 /* Release */,
-				0B4771B560FE7D3D3C9F056E /* Debug */,
+				2AC917D678EC5528609B138A /* Release */,
+				27DB2D4E076A444C7AC742FA /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Release";

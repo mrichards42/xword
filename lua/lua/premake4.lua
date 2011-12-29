@@ -50,11 +50,17 @@ project "lua"
             "DLL_EXPORTS",
             "_CRT_SECURE_NO_WARNINGS",
         }
-        links { "winmm" }
+        links "winmm"
 
     configuration "linux"
-        defines { "LUA_USE_LINUX" }
-        links { "dl" }
+        defines "LUA_USE_LINUX"
+        links "dl"
+
+    configuration "macosx"
+        defines {
+            "LUA_USE_MACOSX",
+            "LUA_USE_DLOPEN"
+        }
 
     -- --------------------------------------------------------------------
     -- Debug / Release

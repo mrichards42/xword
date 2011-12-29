@@ -1,8 +1,6 @@
 -- wxWidgets links
-dofile 'premake_config.lua'
-
 configuration "windows"
-    libdirs { WXWIN.."/lib/vc_lib" }
+    libdirs { _OPTIONS["wx-prefix"].."/lib/vc_lib" }
     links {
         "winmm",
         "comctl32",
