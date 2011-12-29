@@ -1,5 +1,3 @@
-dofile '../premake_config.lua'
-
 project "XWord"
     -- --------------------------------------------------------------------
     -- General
@@ -7,16 +5,7 @@ project "XWord"
     kind "WindowedApp"
     language "C++"
 
-    files
-    {
-        "**.hpp", "**.cpp", "**.h",
-    }
-
-    if not _OPTIONS["disable-lua"] then
-        defines { "XWORD_USE_LUA" }
-    else
-    	excludes { "xwordbind/*" }
-    end
+    files { "**.hpp", "**.cpp", "**.h" }
 
     configuration "windows"
         -- Use WinMain() instead of main() for windows apps
@@ -25,23 +14,6 @@ project "XWord"
     -- --------------------------------------------------------------------
     -- wxWidgets
     -- --------------------------------------------------------------------
-    configuration "linux"
-        -- These link options ensure that the wxWidgets libraries are
-        -- linked in the correct order under linux.
-        if not _OPTIONS["disable-lua"] then
-            linkoptions {
-                "-lwxbindxrc",
-                "-lwxbindxml",
-                "-lwxbindnet",
-                "-lwxbindhtml",
-                "-lwxbindaui",
-                "-lwxbindadv",
-                "-lwxbindcore",
-                "-lwxbindbase",
-                "-lwxlua",
-                "-llua5.1",
-            }
-        end
 
     dofile "../premake4_wxdefs.lua"
     dofile "../premake4_wxlibs.lua"
@@ -62,11 +34,11 @@ project "XWord"
         links { "dl" }
     
     configuration "macosx"
-    	defines {
-    		[[PUZ_API=\"\"]],
+        defines {
+            [[PUZ_API=\"\"]],
             [[LUAPUZ_API=\"\"]],
             "USE_FILE32API" -- for minizip
-    	}
+        }
 
     -- Disable some warnings
     configuration "vs*"
@@ -77,29 +49,50 @@ project "XWord"
     -- --------------------------------------------------------------------
     -- wxLua
     -- --------------------------------------------------------------------
-    configuration {}
-	if not _OPTIONS["disable-lua"] then
-        includedirs {
-            "../lua",
-            "../lua/lua/include",
-            "../lua/wxbind/setup",
-        }
-    end
 
-    if  not _OPTIONS["disable-lua"] then
-        links {
-            "lua",
-            "wxlua",
-            "wxbindbase",
-            "wxbindcore",
-            "wxbindadv",
-            "wxbindaui",
-            "wxbindhtml",
-            "wxbindnet",
-            "wxbindxml",
-            "wxbindxrc",
-            "luapuz",
-        }
+    if not _OPTIONS["disable-lua"] then
+        configuration {}
+            defines "XWORD_USE_LUA"
+    
+            includedirs {
+                "../lua",
+                "../lua/lua/include",
+                "../lua/wxbind/setup",
+            }
+    
+            links {
+                "lua",
+                "wxlua",
+                "wxbindbase",
+                "wxbindcore",
+                "wxbindadv",
+                "wxbindaui",
+                "wxbindhtml",
+                "wxbindnet",
+                "wxbindxml",
+                "wxbindxrc",
+                "luapuz",
+            }
+
+        -- These link options ensure that the wxWidgets libraries are
+        -- linked in the correct order under linux.
+        configuration "linux"
+            linkoptions {
+                "-lwxbindxrc",
+                "-lwxbindxml",
+                "-lwxbindnet",
+                "-lwxbindhtml",
+                "-lwxbindaui",
+                "-lwxbindadv",
+                "-lwxbindcore",
+                "-lwxbindbase",
+                "-lwxlua",
+                "-llua5.1",
+            }
+
+    else -- disable-lua
+        configuration {}
+            excludes { "xwordbind/*" }
     end
 
     -- --------------------------------------------------------------------

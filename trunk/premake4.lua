@@ -1,7 +1,12 @@
-dofile 'premake_config.lua'
+if not dofile 'premake_config.lua' then
+	return
+end
 
 if _ACTION == "clean" then
     os.rmdir("build")
+    return
+elseif not _ACTION then
+	return
 end
 
 solution "XWord"
@@ -56,28 +61,27 @@ solution "XWord"
 
 -- Mac stuff
 if os.is("macosx") then
-	-- Find a value in project.blocks
-	local function get_key(p, k)
-		if p[k] then return p[k] end
-		for _, block in ipairs(p.blocks) do
-			if block[k] then
-				return block[k]
-			end
-		end
-	end
-	
-	for _, p in pairs(solution().projects) do
-		if get_key(p, "kind") == "SharedLib" then
-			print(p.name)
-			project(p.name)
-				-- Set the output to the app bundle
-				configuration "Debug"
-					targetdir "bin/Debug/XWord.app/Contents/Frameworks"
-				configuration "Release"
-					targetdir "bin/Release/XWord.app/Contents/Frameworks"
-
-				-- Set the install name
-				linkoptions{ "-install_name @executable_path/../Frameworks/lib"..(get_key(p, "targetname") or p.name)..".dylib" }
-		end
-	end
+    -- Find a value in project.blocks
+    local function get_key(p, k)
+        if p[k] then return p[k] end
+        for _, block in ipairs(p.blocks) do
+            if block[k] then
+                return block[k]
+            end
+        end
+    end
+    
+    for _, p in pairs(solution().projects) do
+        if get_key(p, "kind") == "SharedLib" then
+            project(p.name)
+                -- Set the output to the app bundle
+                configuration "Debug"
+                    targetdir "bin/Debug/XWord.app/Contents/Frameworks"
+                configuration "Release"
+                    targetdir "bin/Release/XWord.app/Contents/Frameworks"
+                configuration {}
+                -- Set the install name
+                linkoptions{ "-install_name @executable_path/../Frameworks/lib"..(get_key(p, "targetname") or p.name)..".dylib" }
+        end
+    end
 end

@@ -14,7 +14,10 @@ Unzip to a folder.
     $ cd to_wherever_wxMac_is
     $ mkdir build-release
     $ cd build-release
-    $ ../configure --enable-unicode --disable-shared
+
+If building on snow leopard, tell it to build 32-bit
+    $ arch_flags="-arch i386"
+    $ ../configure --enable-unicode --disable-shared CFLAGS="$arch_flags" CXXFLAGS="$arch_flags" CPPFLAGS="$arch_flags" LDFLAGS="$arch_flags" OBJCFLAGS="$arch_flags" OBJCXXFLAGS="$arch_flags"
     $ make
 
 

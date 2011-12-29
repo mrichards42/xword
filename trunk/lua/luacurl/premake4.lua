@@ -15,7 +15,7 @@ project "luacurl"
         libdirs { LIBCURL.."/lib/DLL-Release" }
         links { "libcurl_imp" } -- for luacurl
 
-    configuration "linux"
+    configuration "linux or macosx"
         links { "curl" }
 
     -- Postbuild: copy libcurl.dll to XWord directory
