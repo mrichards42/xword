@@ -31,44 +31,10 @@ http://industriousone.com/premake/download
 
 Unzip premake4 to xword/trunk
 
-Edit xword/trunk/premake_config.lua to direct premake to where you installed
-wxMac.  Optionally disable lua support (I've only tried this without lua).
+Optionally disable lua support.
 
 Execute the following command to create xcode project files:
 
-    $ premake4 xcode3
+    $ ./premake4 --wx-prefix="/wherever/you/unzipped/wxMac" xcode3
 
-After the build process, you will probably need to do several things:
-
-1. Copy images to XWord.app/Contents/Resources/images
-
-2. Copy all the dylibs to XWord.app/Contents/Frameworks
-
-3. Tell XWord and libraries where to find each other:
-
-    $ cd xword/trunk/build/release
-    $ otool -L XWord.app/Contents/MacOS/XWord
-
-    [Spits out a long list of libraries that XWord links to.]
-
-Somewhere in this list will be something like: "/usr/lib/libpuz.dylib"
-
-We need to change that:
-
-    $ install_name_tool -change \
-        /usr/lib/libpuz.dylib \
-        @executable_path/../Frameworks/libpuz.dylib \
-        XWord.app/Contents/MacOS/XWord
-
-Check other libraries as well:
-
-    $ otool -L XWord.app/Frameworks/libpuz.dylib
-
-Somewhere in this list is something like "/usr/lib/libyajl.dylib"
-
-    $ install_name_tool -change \
-        /usr/lib/libyajl.dylib \
-        @executable_path/../Frameworks/libyajl.dylib \
-        XWord.app/Contents/Frameworks/libpuz.dylib
-
-Repeat install_name_tool as necessary with other libraries
+(Previously there were images, etc. to copy, and also some magic that needed to happen to get XWord to know where to find the dylibs.  That's all automated now!)
