@@ -134,7 +134,7 @@ function import.uninit()
 end
 
 -- Import the handlers
-require('import.uclick')
+pcall(require, 'import.uclick')
 
 -- ============================================================================
 -- Replace loading functions with import.load

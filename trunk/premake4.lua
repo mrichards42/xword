@@ -11,12 +11,9 @@ end
 
 solution "XWord"
     configurations { "Release", "Debug" }
-    configuration "macoxs"
-        platforms "x32"
-    configuration {}
 
     -- Output for premake4 (vs projects / makefiles, etc)
-    location ("build/" .. (_ACTION or ''))
+    location ("build/" .. _ACTION)
 
     -- Output for compiled files
     configuration "Debug"
@@ -43,6 +40,9 @@ solution "XWord"
     -- --------------------------------------------------------------------
     configuration "windows"
         defines { "WIN32", "_WINDOWS" }
+
+    configuration "macoxs"
+        platforms "x32"
 
     -- ------------------------------------------------------------------------
     -- General
