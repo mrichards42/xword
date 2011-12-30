@@ -96,9 +96,17 @@ project "XWord"
     end
 
     -- --------------------------------------------------------------------
-    -- Resource files
+    -- Resources
     -- --------------------------------------------------------------------
     configuration "windows"
         files { "**.rc" }
         resincludedirs { ".." }
+
+    configuration { "macosx" }
+        postbuildcommands {
+            "mkdir -p $TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH",
+            "ln -sF ../../../../../scripts $TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH/scripts",
+            "mkdir -p $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH",
+            "ln -sF ../../../../../images $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/images",
+        }
 
