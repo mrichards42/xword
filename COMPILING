@@ -5,13 +5,13 @@ Build wxWidgets
 ----------------------------------------
 
 Download wxMac from
-http://prdownloads.sourceforge.net/wxwindows/wxMac-2.8.10.tar.gz
-(XWord is currently using wxWidgets 2.8.10.  Other versions should work,
+http://prdownloads.sourceforge.net/wxwindows/wxMac-2.8.12.tar.gz
+(XWord is currently using wxWidgets 2.8.12.  Newer versions *might* work,
 but haven't been tested)
 
-Unzip to a folder.
+Unzip to a folder.  I'll pretend you unzipped to /Developer/wxMac-2.8.12
 
-    $ cd to_wherever_wxMac_is
+    $ cd /Developer/wxMac-2.8.12
     $ mkdir build-release
     $ cd build-release
 
@@ -20,21 +20,27 @@ If building on snow leopard, tell it to build 32-bit
     $ ../configure --enable-unicode --disable-shared CFLAGS="$arch_flags" CXXFLAGS="$arch_flags" CPPFLAGS="$arch_flags" LDFLAGS="$arch_flags" OBJCFLAGS="$arch_flags" OBJCXXFLAGS="$arch_flags"
     $ make
 
+Build the debug release too (the XWord configure script needs both builds for now)
+    $ cd ..
+    $ mkdir build-debug
+    $ cd build-debug
+    $ ../configure --enable-unicode --disable-shared --enable-debug CFLAGS="$arch_flags" CXXFLAGS="$arch_flags" CPPFLAGS="$arch_flags" LDFLAGS="$arch_flags" OBJCFLAGS="$arch_flags" OBJCXXFLAGS="$arch_flags"
+    $ make
+
+
 
 ----------------------------------------
 Build XWord
 ----------------------------------------
-XWord uses premake to generate project files.  Get the most recent version
-(currently 4.4-beta3) here:
+XWord uses premake to generate project files.  Premake for mac is already included in the distribution.  You can also download the most recent beta here:
 
 http://industriousone.com/premake/download
 
 Unzip premake4 to xword/trunk
 
-Optionally disable lua support.
+    $ cd xword/trunk
+    $ ./premake4 --wx-prefix="/Developer/wxMac-2.8.12" xcode3
 
-Execute the following command to create xcode project files:
-
-    $ ./premake4 --wx-prefix="/wherever/you/unzipped/wxMac" xcode3
+(If you actually unzipped wxMac there, the configure script will find it without having to add --wx-prefix)
 
 (Previously there were images, etc. to copy, and also some magic that needed to happen to get XWord to know where to find the dylibs.  That's all automated now!)
