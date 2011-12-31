@@ -126,6 +126,7 @@ function download.save_config()
         end
     end
 
+    pl.dir.makepath(join(xword.configdir, 'download'))
     serialize.pdump(config, join(xword.configdir, 'download', 'config.lua'))
 end
 

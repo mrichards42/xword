@@ -10,7 +10,7 @@ elseif not _ACTION then
 end
 
 solution "XWord"
-    configurations { "Release", "Debug" }
+    configurations(get_configurations())
 
     -- Output for premake4 (vs projects / makefiles, etc)
     location ("build/" .. _ACTION)

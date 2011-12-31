@@ -6,28 +6,31 @@ newoption {
     description = "Disable support for lua packages",
 }
 
-if not os.is("linux") then
 newoption {
 	trigger     = "wx-prefix",
     value       = "path",
-    description = "Custom wxWidgets directory; defaults by system\n" ..
-                  "     windows: \t $(WXWIN)\n" ..
-                  "     mac: \t /Developer/wxMac-[latest version]\n" ..
-                  "     linux: \t unused (system-wide wx-config is used)"
+    description = "Custom wxWidgets directory"
 }
-end
 
 if not os.is("windows") then
 newoption {
 	trigger = "wx-config",
 	value = "path",
-	description = 
-		"Custom wx-config to use (instead of the system-wide " ..
-								"wx-config); defaults by system:\n" ..
-	    "     windows: \t unused (use --wx-prefix instead)\n" ..
-	    "     mac: \t wx-config found in build[-release/-debug] directory\n" ..
-	    "     linux: system-wide wx-config"
+	description = "Custom wx-config to use"
 }
+
+newoption {
+	trigger = "wx-config-debug",
+	value = "path",
+	description = "Custom wx-config to use for debug builds."
+}
+
+newoption {
+	trigger = "wx-config-release",
+	value = "path",
+	description = "Custom wx-config to use for release builds."
+}
+
 end
 
 
@@ -36,63 +39,8 @@ if not _ACTION then
 	return false
 end
 
-if not _OPTIONS["wx-prefix"] and not os.is("linux") then
-	print("Searching for wxWidgets installation . . .")
-	local wxwin = os.getenv("WXWIN")
-	if os.is("windows") then
-		_OPTIONS["wx-prefix"] = "$(WXWIN)"
-		print("Using wxWidgets installation set through $(WXWIN):")
-		if wxwin then
-			print("    "..wxwin)
-		else
-			print("    (environmental variable doesn't exist)")
-		end
-	elseif os.is("macosx") then
-		if wxwin then
-			print("Using wxWidgets installation set through $(WXWIN):")
-			print("    "..wxwin)
-			_OPTIONS["wx-prefix"] = wxwin
-		else
-			-- Search for wxWidgets in various locations
-			local paths = {
-				'/Developer',
-			}
-			function has_wx_config(p)
-				return os.pathsearch('wx-config', path.join(p, 'build-debug'), path.join(p, 'build-release'))
-			end
-			local highest_version = 0
-			for _, directory in ipairs(paths) do
-				for _, p in ipairs(os.matchdirs(path.join(directory, "wx*"))) do
-					local v1, v2, v3 = p:match(path.join(directory, "wx.*(%d+)%.(%d+)%.(%d+)"))
-					if v1 then
-						version = tonumber(v1) * 10000 + tonumber(v2) * 100 + tonumber(v3)
-						if version > highest_version and has_wx_config(p) then
-							highest_version = version
-							_OPTIONS["wx-prefix"] = p
-						end
-					elseif highest_version == 0 and has_wx_config(p) then
-						_OPTIONS["wx-prefix"] = p
-					end
-				end
-			end
-			if _OPTIONS["wx-prefix"] then
-				print("Using wxWidgets installation found at:")
-				print("    ".._OPTIONS["wx-prefix"])
-				WXMAC_BUILD_DEBUG = _OPTIONS["wx-prefix"] .. "/build-debug"
-				WXMAC_BUILD_RELEASE = _OPTIONS["wx-prefix"] .. "/build-release"
-			else
-				error("Could not find wxWidgets installation.")
-				return false
-			end
-		end
-	end
-end
 
-
-if not _OPTIONS["wx-config"] then
-	_OPTIONS["wx-config"] = "wx-config"
-end
-
+-- Return output of the given command stripped of extra whitespace
 function cmd(command_text)
     local text = os.outputof(command_text)
     -- split text
@@ -101,6 +49,199 @@ function cmd(command_text)
         table.insert(t, word)
     end
     return table.concat(t, " ")
+end
+
+-- ===========================================================================
+-- Ensure that we have enough _OPTIONS, and fill in the blanks
+-- ===========================================================================
+
+-- Search for a wx-config in a list of directories (and all subdirs)
+-- return a table of the best matches (i.e. highest version numbers)
+-- { debug =   { path = "/path/to/wx-config", version = "version.string" },
+--   release = { path = "/path/to/wx-config", version = "version.string" } }
+-- If a debug or release config doesn't exist, it will be set to nil
+local function get_wx_config(directories, use_system_wide_config)
+	local t = {}
+	function is_higher_version(v2, v1)
+		a,b,c = v1:match("(%d+)%.(%d+)%.(%d+)")
+		x,y,z = v2:match("(%d+)%.(%d+)%.(%d+)")
+		if not a or not x then return false end
+		return x * 10000 + y * 100 + z > a * 10000 + b * 100 + c
+	end
+	-- Check the wx-config in this path and add it to t if it's newer than
+	-- the current version
+	function add_wx_config(config)
+		local version = cmd(config .. ' --version')
+		local build = cmd(config .. ' --list')
+		local debug = build:match("debug")
+		local release = build:match("release")
+		if not (version and debug or release) then return end
+		-- Check against previous versions
+		function add_if_newer(build)
+			if t[build] then
+				if is_higher_version(version, t[build].version) then
+					t[build].path = config
+					t[build].version = version
+				end
+			elseif is_higher_version(version, "0.0.0") then
+				t[build] = { path = config, version = version }
+			end
+		end
+		if debug then add_if_newer("debug") end
+		if release then add_if_newer("release") end
+	end
+	-- Check a directory for wx-config
+	-- Print a dot every 1000 directories for long-running operations
+	local counter = 0
+	function test_config(directory)
+		counter = counter + 1
+		if counter % 1000 == 0 then io.write('.') io.flush() end
+		-- Look for wx-config in this directory
+		local config = path.join(directory, 'wx-config')
+		if os.isfile(config) then
+			add_wx_config(config)
+		end
+		-- Look in subdirs
+		for _, subdir in ipairs(os.matchdirs(path.join(directory, "*"))) do
+			test_config(path.join(directory, subdir))
+		end
+	end
+	-- Check the given directories
+	if type(directories) == "string" then
+		test_config(directories)
+	else
+		for _, d in ipairs(directories) do
+			test_config(d)
+		end
+	end
+	-- Also try the global wx-config
+	if use_system_wide_config and cmd('whereis wx-config') ~= "" then
+		add_wx_config('wx-config')
+	end
+	if counter > 1000 then print() end
+	return t
+end
+
+
+-- Check _OPTIONS to see if we have a wx-config; if we don't, search for it.
+if os.is("windows") then
+	if not _OPTIONS["wx-prefix"] then
+		local wxwin = os.getenv("WXWIN")
+		_OPTIONS["wx-prefix"] = "$(WXWIN)"
+		print("Using wxWidgets installation at $(WXWIN):")
+		if wxwin then
+			print("    "..wxwin)
+		else
+			print("    (environmental variable doesn't exist)")
+		end
+	end
+elseif not (_OPTIONS["wx-config-debug"] and _OPTIONS["wx-config-release"]) then
+	-- If we got a wx-config option, our work is done
+	if _OPTIONS["wx-config"] then
+		_OPTIONS["wx-config-debug"] = _OPTIONS["wx-config-debug"] or _OPTIONS["wx-config"]
+		_OPTIONS["wx-config-debug"] = _OPTIONS["wx-config-release"] or _OPTIONS["wx-config"]
+	-- Otherwise we'll have to search for wx-config
+	else
+		local configs
+		local wxwin = os.getenv("WXWIN")
+		-- First try the user-supplied wx-prefix
+		if _OPTIONS["wx-prefix"] then
+			print("Searching for wx-config with")
+			print("    --wx-prefix=" .. _OPTIONS["wx-prefix"])
+			configs = get_wx_config(_OPTIONS["wx-prefix"])
+		-- Then try the $WXWIN environmental variable
+		elseif wxwin then
+			print("Searching for wx-config at $WXWIN (" .. wxwin .. ")")
+			configs = get_wx_config(wxwin)
+		-- Then search for wxWidgets under whatever paths could make sense
+		else
+			local paths = {
+				'/Developer',
+			}
+			-- Compile a list of folders beginning with wx
+			local config_paths = {}
+			for _, directory in ipairs(paths) do
+				for _, p in ipairs(os.matchdirs(path.join(directory, "wx*"))) do
+					table.insert(config_paths, path.join(directory, p))
+				end
+			end
+			-- Look for wx-config somewhere within these folders
+			print("Searching for wx-config in these locations:")
+			for _, p in ipairs(config_paths) do
+				print("    " .. p)
+			end
+			configs = get_wx_config(config_paths, true) -- Also use system-wide
+		end
+		-- Check out our results
+		if not _OPTIONS["wx-config-debug"] then
+			if configs.debug then
+				_OPTIONS["wx-config-debug"] = configs.debug.path
+			else
+				print("Could not find a wx-config for a debug build.")
+			end
+		end
+		if not _OPTIONS["wx-config-release"] then
+			if configs.release then
+				_OPTIONS["wx-config-release"] = configs.release.path
+			else
+				print("Could not find a wx-config for a release build.")
+			end
+		end
+	end
+end
+
+-- ===========================================================================
+-- Public functions
+-- ===========================================================================
+
+-- Safely execute and return the value of a wx-config command
+-- cache the results so error messages aren't printed a bunch of times
+local wx_config_cache = {}
+function wx_config(options)
+	if wx_config_cache[options] then return wx_config_cache[options] end
+	local result = (function()
+		local config
+		if options:match("debug") then
+			config = _OPTIONS["wx-config-debug"]
+		elseif options:match("release") then
+			config = _OPTIONS["wx-config-release"]
+		else
+			error("No build configuration specified in wx_config function")
+		end
+		-- Don't break if we don't have this configuration
+		if not config then return "" end
+		return cmd(config .. " " .. options)
+	end)()
+	wx_config_cache[options] = result
+	return result
+end
+
+-- Return a list of valid configurations (based on which wx-configs we found)
+function get_configurations()
+	if not os.is("windows") then
+		-- Check wx-config
+		if not (_OPTIONS["wx-config-debug"] or _OPTIONS["wx-config-release"]) then
+			print("Unable to find wx-config on this system.")
+			error()
+		end
+		function check_build(build)
+			local config = _OPTIONS["wx-config-" .. build]
+			if config then
+				print("Using wx-config for " .. build .. " builds:")
+				local version = cmd(config .. ' --version')
+				print("    Path: " ..config)
+				print("    Version: " .. version)
+				table.insert(configs, build)
+			else
+				print("No wx-config exists for a " .. build .. " build.\n" ..
+					  "*** Output will not contain a " .. build .. " configuration. ***")
+			end
+		end
+		configs = {}
+		check_build("debug")
+		check_build("release")
+	end
+	return { "Debug", "Release" }
 end
 
 return true

@@ -1,4 +1,6 @@
 -- wxWidgets links
+if os.is("windows") then
+
 configuration "windows"
     libdirs { _OPTIONS["wx-prefix"].."/lib/vc_lib" }
     links {
@@ -50,18 +52,24 @@ configuration "windows"
             "wxexpatd",
         }
 
+elseif os.is("linux") then
+
 configuration { "linux", "Debug" }
-    linkoptions  "`wx-config --debug --unicode --static --libs`"
+    buildoptions(string.format("`%s --debug --unicode --static --libs`",
+    							_OPTIONS["wx-config-debug"]))
 
 configuration { "linux", "Release" }
-    linkoptions  "`wx-config --release --unicode --static --libs`"
+    buildoptions(string.format("`%s --release --unicode --static --libs`",
+    							_OPTIONS["wx-config-release"]))
 
-if os.is("macosx") then
+elseif os.is("macosx") then
+
 configuration { "macosx", "Debug" }
-    linkoptions(cmd(WXMAC_BUILD_DEBUG .. "/wx-config --libs"))
+    buildoptions(wx_config("--debug --unicode --static --libs"))
 
 configuration { "macosx", "Release" }
-    linkoptions(cmd(WXMAC_BUILD_RELEASE .. "/wx-config --libs"))
+    buildoptions(wx_config("--release --unicode --static --libs"))
+
 end
 
 configuration {}
