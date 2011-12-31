@@ -5,6 +5,8 @@ configuration {}
 configuration "Debug"
     defines { "__WXDEBUG__" }
 
+if os.is("windows") then
+
 configuration "windows"
     defines { "__WXMSW__" }
     includedirs { _OPTIONS["wx-prefix"].."/include" }
@@ -15,18 +17,25 @@ configuration "windows"
     configuration { "windows", "Debug" }
         includedirs { _OPTIONS["wx-prefix"].."/lib/vc_lib/mswud" }
 
+elseif os.is("linux") then
+
 configuration { "linux", "Debug" }
-    buildoptions "`wx-config --debug --unicode --static --cxxflags`"
+    buildoptions(string.format("`%s --debug --unicode --static --cxxflags`",
+    							_OPTIONS["wx-config-debug"]))
 
 configuration { "linux", "Release" }
-    buildoptions "`wx-config --release --unicode --static --cxxflags`"
+    buildoptions(string.format("`%s --release --unicode --static --cxxflags`",
+    							_OPTIONS["wx-config-release"]))
 
-if os.is("macosx") then
+elseif os.is("macosx") then
+
 configuration { "macosx", "Debug" }
-    buildoptions(cmd(WXMAC_BUILD_DEBUG .. "/wx-config --cxxflags"))
+    buildoptions(wx_config("--debug --unicode --static --cxxflags"))
 
 configuration { "macosx", "Release" }
-    buildoptions(cmd(WXMAC_BUILD_RELEASE .. "/wx-config --cxxflags"))
+    buildoptions(wx_config("--release --unicode --static --cxxflags"))
+
 end
+
 -- Reset the configuration
 configuration {}
