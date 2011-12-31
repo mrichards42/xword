@@ -55,20 +55,20 @@ configuration "windows"
 elseif os.is("linux") then
 
 configuration { "linux", "Debug" }
-    buildoptions(string.format("`%s --debug --unicode --static --libs`",
+    linkoptions(string.format("`%s --debug --unicode --static --libs`",
     							_OPTIONS["wx-config-debug"]))
 
 configuration { "linux", "Release" }
-    buildoptions(string.format("`%s --release --unicode --static --libs`",
+    linkoptions(string.format("`%s --release --unicode --static --libs`",
     							_OPTIONS["wx-config-release"]))
 
 elseif os.is("macosx") then
 
 configuration { "macosx", "Debug" }
-    buildoptions(wx_config("--debug --unicode --static --libs"))
+    linkoptions(wx_config("--debug --unicode --static --libs"))
 
 configuration { "macosx", "Release" }
-    buildoptions(wx_config("--release --unicode --static --libs"))
+    linkoptions(wx_config("--release --unicode --static --libs"))
 
 end
 
