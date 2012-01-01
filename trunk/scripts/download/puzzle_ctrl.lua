@@ -102,24 +102,11 @@ local function PuzzleCtrl(parent, text, puzzle)
     ctrl.filename = filename
     ctrl.puzzle = puzzle
 
-    local popup
-
     -- Show popup on hover
-    ctrl:Connect(wx.wxEVT_ENTER_WINDOW,
-        function (evt)
-            popup = make_popup(ctrl, puzzle)
-            popup:Popup()
-            evt:Skip()
-        end)
-
-    ctrl:Connect(wx.wxEVT_LEAVE_WINDOW,
-        function (evt)
-            if popup then
-                popup:Destroy()
-                popup = nil
-            end
-            evt:Skip()
-        end)
+    ctrl:Connect(wx.wxEVT_ENTER_WINDOW, function (evt)
+        make_popup(ctrl, puzzle):Popup()
+        evt:Skip()
+    end)
 
     -- Open the puzzle
     ctrl:Connect(wx.wxEVT_LEFT_DOWN,

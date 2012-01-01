@@ -55,6 +55,42 @@ local function PopupWindow(parent, id, pos, size)
             self:Move(pos.X + offsetx, pos.Y + offsety)
         end
 
+        -- Add events to the parent window
+        -- We have to capture the mouse from the parent window . . .
+        -- Mac enter/leave window events don't work like windows events,
+        -- and this keeps everything consitent.
+        local parent = self:GetParent()
+        local handler = wx.wxEvtHandler()
+        parent:PushEventHandler(handler)
+
+        parent:CaptureMouse()
+
+        local is_destroyed = false
+        local function on_leave(evt)
+            if parent:HasCapture() then
+                parent:ReleaseMouse()
+            end
+            if not is_destroyed then
+                self:Destroy()
+                is_destroyed = true
+            end
+            parent:RemoveEventHandler(handler)
+            if evt then evt:Skip() end
+        end
+
+        -- Connect mouse events
+        handler:Connect(wx.wxEVT_MOTION, function (evt)
+            local rect = wx.wxRect(0, 0, parent.Size.Width, parent.Size.Height)
+            if not rect:Contains(evt:GetPosition()) then
+                on_leave()
+            end
+            evt:Skip()
+        end)
+
+        handler:Connect(wx.wxEVT_LEAVE_WINDOW, on_leave)
+        handler:Connect(wx.wxEVT_MOUSE_CAPTURE_LOST, on_leave)
+        handler:Connect(wx.wxEVT_DESTROY, on_leave)
+
         self:Show()
         return
     end

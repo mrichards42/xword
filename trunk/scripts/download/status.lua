@@ -191,38 +191,17 @@ local function Status(parent)
         download.clear_downloads()
     end)
 
-
-    local error_popup
     panel.errors:Connect(wx.wxEVT_ENTER_WINDOW,
         function (evt)
             if #download.errors > 0 then
-                error_popup = make_error_popup(panel)
-                error_popup:Popup()
+                make_error_popup(panel):Popup()
             end
         end)
 
-    panel.errors:Connect(wx.wxEVT_LEAVE_WINDOW,
-        function (evt)
-            if error_popup then
-                error_popup:Destroy()
-                error_popup = nil
-            end
-        end)
-
-    local queue_popup
     panel.queue:Connect(wx.wxEVT_ENTER_WINDOW,
         function (evt)
             if #download.queue > 0 then
-                queue_popup = make_queue_popup(panel)
-                queue_popup:Popup()
-            end
-        end)
-
-    panel.queue:Connect(wx.wxEVT_LEAVE_WINDOW,
-        function (evt)
-            if queue_popup then
-                queue_popup:Destroy()
-                queue_popup = nil
+                make_queue_popup(panel):Popup()
             end
         end)
 
