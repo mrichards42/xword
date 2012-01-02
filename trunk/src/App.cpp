@@ -458,4 +458,17 @@ MyApp::OnLuaError(wxLuaEvent & evt)
     LogLuaMessage(_T("(error) ") + evt.GetString());
 }
 
+
+//------------------------------------------------------------------------------
+// Mac
+//------------------------------------------------------------------------------
+
+#ifdef __WXMAC__
+void MyApp::MacOpenFile(const wxString & fileName)
+{
+    if (m_frame)
+        m_frame->LoadPuzzle(fileName);
+}
+#endif
+
 #endif // XWORD_USE_LUA

@@ -91,6 +91,10 @@ private:
     wxCHMHelpController m_help;
 #endif // __WXMSW__
 
+#ifdef __WXMAC__
+    virtual void MacOpenFile(const wxString & fileName);
+#endif
+
     // Portable mode
     bool m_isPortable;
     // First run

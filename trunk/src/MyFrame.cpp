@@ -356,6 +356,7 @@ public:
     virtual bool OnDropFiles(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
                              const wxArrayString & filenames)
     {
+		wxLogDebug(_T("Drag and dropped %d files"), filenames.Count());
 #if XWORD_USE_LUA
         // Run the file as a script if it ends with .lua
         if (filenames.Item(0).EndsWith(_T(".lua")))
@@ -926,6 +927,12 @@ void
 MyFrame::CreateWindows()
 {
     m_XGridCtrl = new XGridCtrl(this);
+	// Windows uses the frame and all child windows as the drop target.
+	// Mac seems to do this on a window-by-window basis, so we should at least
+	// let the user drop a puzzle onto the grid
+#ifndef __WXMSW__
+	m_XGridCtrl->SetDropTarget(new XWordFileDropTarget(this));
+#endif
 
     m_title      = new SizedText (this, wxID_ANY);
     m_author     = new SizedText (this, wxID_ANY);
