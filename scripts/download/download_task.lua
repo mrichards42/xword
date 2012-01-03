@@ -187,6 +187,9 @@ function download.download(opts, filename, curlopts)
     if type(filename) == 'function' then
         callback = filename
         filename = nil
+    elseif type(filename) == 'table' then
+        curlopts = filename
+        filename = nil
     end
 
     assert(url)
@@ -202,44 +205,59 @@ function download.download(opts, filename, curlopts)
     end
     -- Check for abort
     if success == 'abort' then
-        -- wrapped in a table so that location info isn't addeds
+        -- wrapped in a table so that location info isn't added
         error({'abort'})
+    elseif not success then
+        error({err})
     else
-        return success, err
+        return success
     end
 end
 
-
+local deepcopy = require 'pl.tablex'.deepcopy
 local function do_download(puzzle)
+    -- If we don't copy the date, we could accidentally set the metatable
+    -- twice (the date mt is "protected" and doesn't allow that).
+    puzzle.date = deepcopy(puzzle.date)
     setmetatable(puzzle.date, getmetatable(date()))
-    local success, func, err
 
     task.post(1, {puzzle}, download.START)
 
-    if puzzle.func then
-        func, err = loadstring([[return function(puzzle) ]]..puzzle.func..[[ end]])
-        if not err then
-            success, err = func()(puzzle)
-        end
-    else
-        success, err = download.download(puzzle.url, puzzle.filename, puzzle.curlopts)
-    end
+    local success, err = xpcall(
+        function ()
+            -- Download the puzzle
+            if puzzle.func then
+                local func, err = loadstring([[return function(puzzle) ]]..puzzle.func..[[ end]])
+                if not err then
+                    err = func()(puzzle)
+                end
+                if err and err ~= true then
+                    return err
+                end
+            else
+                download.download(puzzle.url, puzzle.filename, puzzle.curlopts)
+            end
 
-    if success == 'abort' then error({'abort'}) end
-
-    -- Try to open the file
-    if success then
-        local success, p = pcall(puz.Puzzle, puzzle.filename)
-        if success then
-            p:__gc()
-            err = nil
-        else
-            err = p
-            os.remove(puzzle.filename)
+            -- Try to open the file
+            local success, result = pcall(puz.Puzzle, puzzle.filename)
+            if success then
+                result:__gc() -- This is a puzzle
+            else
+                os.remove(puzzle.filename)
+                return result
+            end
+        end,
+        -- error handler . . . separates user errors from programming errors
+        function (e)
+            if type(e) == 'table' and type(e[1]) == 'string' then
+                return e[1]
+            else
+                return debug.traceback(e)
+            end
         end
-    else
-        os.remove(puzzle.filename)
-    end
+    )
+
+    if err == 'abort' then error({'abort'}) end
 
     task.post(1, {puzzle, err}, download.END)
 end

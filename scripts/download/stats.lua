@@ -20,19 +20,7 @@ local function update_ctrl(filename, status)
     if not ctrl then return end
     status = status or download.status_map[ctrl.puzzle.filename]
     if not status then return end
-    if status == download.MISSING then
-        ctrl:SetForegroundColour(wx.wxBLUE)
-    elseif status == download.EXISTS then
-        ctrl:SetForegroundColour(wx.wxColour(128, 0, 128))
-    elseif status == download.SOLVING then
-        ctrl:SetForegroundColour(wx.wxColour(34, 139, 34))
-        local font = ctrl.Font
-        font.Weight = wx.wxFONTWEIGHT_BOLD
-        ctrl.Font = font
-    elseif status == download.COMPLETE then
-        ctrl:SetForegroundColour(wx.wxColour(34, 139, 34))
-    end
-    ctrl:Refresh()
+    ctrl:set_status(status)
 end
 
 -- ---------------------------------------------------------------------------

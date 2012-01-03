@@ -31,6 +31,7 @@ local function DownloadHeader(parent)
                              wx.wxALIGN_CENTER + wx.wxST_NO_AUTORESIZE)
     label.ToolTip = wx.wxToolTip("Download Puzzles")
     label.Font = wx.wxFont(12, wx.wxFONTFAMILY_SWISS, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD)
+    label.ForegroundColour = wx.wxBLUE
     top:Add(label, 1, wx.wxALIGN_CENTER)
 
     -- Next arrows
@@ -200,8 +201,9 @@ local function DownloadHeader(parent)
 
     end_date:Connect(wx.wxEVT_DATE_CHANGED, update_dates)
 
-    label:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED,
-        function (evt) parent:download_puzzles() end)
+    label:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
+        parent:download_puzzles()
+    end)
 
     -- Functions
     function header:set_kind(kind_)

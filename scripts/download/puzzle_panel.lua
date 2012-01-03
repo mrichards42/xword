@@ -2,35 +2,8 @@ require 'date'
 local ArrowButton = require 'download.arrow_button'
 local PuzzleCtrl = require 'download.puzzle_ctrl'
 local TextButton = require 'download.text_button'
-local join = require 'pl.path'.join
 require 'download.stats'
 require 'download.config'
-local deepcopy = require 'pl.tablex'.deepcopy
-
-local function get_url(puzzle, d)
-    if type(puzzle.url) == 'string' then
-        return d:fmt(puzzle.url)
-    else
-        return puzzle.url
-    end
-end
-
-local function get_filename(puzzle, d)
-    if download.separate_directories then
-        return join(download.puzzle_directory, download.sanitize_name(puzzle.directoryname or puzzle.name), d:fmt(puzzle.filename))
-    else
-        return join(download.puzzle_directory, d:fmt(puzzle.filename))
-    end
-end
-
-local function get_download_data(puzzle, d)
-    local data = deepcopy(puzzle)
-    if data.url then data.url = get_url(puzzle, d) end
-    if data.filename then data.filename = get_filename(puzzle, d) end
-    data.date = d
-    return data
-end
-
 
 -- Display puzzles as a vertical list
 local function ListPanel(parent, puzzle, start_date, end_date)
@@ -46,7 +19,7 @@ local function ListPanel(parent, puzzle, start_date, end_date)
         local ctrl
         local text = d:fmt("%a %m/%d")
         if puzzle.days[d:getisoweekday()] and d <= today then
-            ctrl = PuzzleCtrl(panel, text, get_download_data(puzzle, d))
+            ctrl = PuzzleCtrl(panel, text, download.get_download_data(puzzle, d))
             item_size = math.max(item_size, ctrl.Size.Width)
             sizer:Add(ctrl, 1, wx.wxEXPAND)
         end
@@ -93,7 +66,7 @@ local function MonthPanel(parent, puzzle, start_date)
     while d:getmonth() == month do
         local ctrl
         if puzzle.days[d:getisoweekday()] and d <= today then
-            ctrl = PuzzleCtrl(panel, d:fmt("%d"), get_download_data(puzzle, d))
+            ctrl = PuzzleCtrl(panel, d:fmt("%d"), download.get_download_data(puzzle, d))
         else
             ctrl = wx.wxStaticText(panel, wx.wxID_ANY, d:fmt("%d"))
             ctrl:SetForegroundColour(wx.wxLIGHT_GREY)
@@ -133,7 +106,7 @@ local function PuzzlePanel(parent, puzzle)
     header_sizer:Add(button, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxRIGHT, 5)
 
     -- Name
-    local name = wx.wxStaticText(header, wx.wxID_ANY, puzzle.name)
+    local name = TextButton(header, wx.wxID_ANY, puzzle.name)
     name:SetFont(wx.wxFont(10, wx.wxFONTFAMILY_SWISS, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD))
     header_sizer:Add(name, 1, wx.wxEXPAND + wx.wxALIGN_CENTER_VERTICAL + wx.wxRIGHT, 5)
 
@@ -211,7 +184,7 @@ local function PuzzlePanel(parent, puzzle)
     function panel:get_download_data()
         local data = {}
         for _, d in ipairs(self:get_dates()) do
-            local p = get_download_data(puzzle, d)
+            local p = download.get_download_data(puzzle, d)
             -- Don't redownload files
             if not download.puzzle_exists(p.filename) then
                 table.insert(data, p)
@@ -251,7 +224,7 @@ local function PuzzlePanel(parent, puzzle)
             if #dates == 1 then
                 local d = dates[1]
                 header_puzzle = PuzzleCtrl(header, d:fmt("%a %m/%d"),
-                                           get_download_data(puzzle, d))
+                                           download.get_download_data(puzzle, d))
                 header_sizer:Add(header_puzzle)
                 header_sizer:Show(download_button, false)
             end
@@ -266,7 +239,7 @@ local function PuzzlePanel(parent, puzzle)
         -- Turn the dates into filenames
         local filenames = {}
         for _, d in ipairs(dates) do
-            table.insert(filenames, get_filename(puzzle, d))
+            table.insert(filenames, download.get_filename(puzzle, d))
         end
         return filenames, button:IsExpanded()
     end
@@ -276,7 +249,7 @@ local function PuzzlePanel(parent, puzzle)
         local counts = {}
         local dates = panel:get_dates()
         for _, d in ipairs(dates) do
-            local status = download.status_map[get_filename(puzzle, d)]
+            local status = download.status_map[download.get_filename(puzzle, d)]
             if status then
                 counts[status] = (counts[status] or 0) + 1
             else
@@ -297,35 +270,46 @@ local function PuzzlePanel(parent, puzzle)
     -- Events
     -- ------------------------------------------------------------------------
     -- Show or hide the body panel
-    button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED,
-        function(evt)
-            -- Lazy creation of the body
-            if not body then
-                make_body()
-                -- Fetch the files
-                local dates = panel:get_dates()
-                local filenames = {}
-                for _, d in ipairs(dates) do
-                    table.insert(filenames, get_filename(puzzle, d))
-                end
-                download.fetch_stats{filenames, prepend = true}
+    local function update_body()
+        -- Lazy creation of the body
+        if not body then
+            make_body()
+            -- Fetch the files
+            local dates = panel:get_dates()
+            local filenames = {}
+            for _, d in ipairs(dates) do
+                table.insert(filenames, download.get_filename(puzzle, d))
             end
-            sizer:Show(body, button:IsExpanded())
-            panel.Parent:Layout()
-            panel.Parent:FitInside()
-            panel.Parent:Refresh()
-        end)
+            download.fetch_stats{filenames, prepend = true}
+        end
+        panel.Parent:Freeze()
+        sizer:Show(body, button:IsExpanded())
+        panel.Parent:Layout()
+        panel.Parent:FitInside()
+        panel.Parent:Thaw()
+    end
+    button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+        update_body()
+    end)
+
+    name:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
+        if header_puzzle then
+            header_puzzle:open_puzzle()
+        else
+            button:Toggle()
+            update_body()
+        end
+    end)
 
     -- Download puzzles
-    download_button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED,
-        function(evt)
-            -- Fetch the files
-            local downloads = panel:get_download_data()
-            if #downloads > 0 then
-                download.add_downloads(downloads)
-            end
-            evt:Skip()
-        end)
+    download_button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+        -- Fetch the files
+        local downloads = panel:get_download_data()
+        if #downloads > 0 then
+            download.add_downloads(downloads)
+        end
+        evt:Skip()
+    end)
 
     return panel
 end

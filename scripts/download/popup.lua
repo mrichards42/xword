@@ -63,8 +63,6 @@ local function PopupWindow(parent, id, pos, size)
         local handler = wx.wxEvtHandler()
         parent:PushEventHandler(handler)
 
-        parent:CaptureMouse()
-
         local is_destroyed = false
         local function on_leave(evt)
             if parent:HasCapture() then
@@ -75,21 +73,28 @@ local function PopupWindow(parent, id, pos, size)
                 is_destroyed = true
             end
             parent:RemoveEventHandler(handler)
-            if evt then evt:Skip() end
+            if evt then
+                evt:Skip()
+                parent:ProcessEvent(evt)
+            end
         end
 
-        -- Connect mouse events
-        handler:Connect(wx.wxEVT_MOTION, function (evt)
-            local rect = wx.wxRect(0, 0, parent.Size.Width, parent.Size.Height)
-            if not rect:Contains(evt:GetPosition()) then
-                on_leave()
-            end
-            evt:Skip()
-        end)
+        -- The LEAVE_WINDOW event works well on windows, so we only need to
+        -- capture the mouse on Mac
+        if not wx.__WXMSW__ then
+            parent:CaptureMouse()
+            handler:Connect(wx.wxEVT_MOTION, function (evt)
+                local rect = wx.wxRect(0, 0, parent.Size.Width, parent.Size.Height)
+                if not rect:Contains(evt:GetPosition()) then
+                    on_leave()
+                end
+                evt:Skip()
+            end)
+            handler:Connect(wx.wxEVT_MOUSE_CAPTURE_LOST, on_leave)
+            handler:Connect(wx.wxEVT_DESTROY, on_leave)
+        end
 
         handler:Connect(wx.wxEVT_LEAVE_WINDOW, on_leave)
-        handler:Connect(wx.wxEVT_MOUSE_CAPTURE_LOST, on_leave)
-        handler:Connect(wx.wxEVT_DESTROY, on_leave)
 
         self:Show()
         return

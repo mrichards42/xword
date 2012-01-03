@@ -1,95 +1,182 @@
 local join = require 'pl.path'.join
 local deepcopy = require 'pl.tablex'.deepcopy
 local clear = require 'pl.tablex'.clear
+require 'safe_exec'
+require 'os'
+require 'lfs'
 
-download.puzzle_directory = xword.userdatadir.."/puzzles"
+download.puzzle_directory = join(xword.userdatadir, "puzzles")
+
+require 'luacurl'
+local curl_opt_names = {}
+local curl_opt_table = {}
+for k, v in pairs(curl) do
+    if k:sub(1,4) == "OPT_" then
+        k = k:sub(5)
+        curl_opt_names[v] = k
+        curl_opt_table[k] = v
+    end
+end
+
+-- ============================================================================
+-- Default config
+-- ============================================================================
+download.puzzle_directory = xword.userdatadir.."\\puzzles"
 download.separate_directories = true
 download.disabled = {
     "NY Times Premium",
     "Newsday",
     "Universal",
 }
+download.auto_download = 0
+download.styles = {
+    missing = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxBLUE },
+    downloaded = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(128, 0, 128) },
+    progress = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },
+    complete = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },
+}
+
+download.styles.progress.font.Weight = wx.wxFONTWEIGHT_BOLD
 
 -- Load the config file
-local success, config = pcall(dofile, join(xword.configdir, 'download', 'config.lua'))
-if success and config then
-    for _, name in ipairs({'puzzle_directory', 'separate_directories'}) do
-        if config[name] ~= nil then
-            download[name] = config[name]
-        end
-    end
+local function get_config_filename()
+    return join(xword.configdir, 'download', 'config.lua')
+end
 
-    local dl_list = config.disabled or download.disabled
-    download.disabled = {}
-    for o, name in ipairs(dl_list) do
-        download.disabled[name] = true
+local config, err = safe_dofile(get_config_filename())
+if not config and lfs.attributes(get_config_filename(), 'mode') == 'file' then
+    local msg =
+        "Error while loading Puzzle Downloader configuration file.\n" ..
+        "Would you like to reset Puzzle Downloader settings permanently?"
+    if type(err) == 'string' and #err > 0 then
+        msg = msg .. "\n\nDetails:\n" .. err
     end
-
-    -- Add download sources
-    for _, puzzle in ipairs(config.added or {}) do
-        download.puzzles:insert(puzzle)
-    end
-    -- Changed sources
-    for key, data in pairs(config.changed or {}) do
-        local puzzle = download.puzzles[key]
-        local function update(puz1, puz2)
-            -- Update nil values
-            for _, k in ipairs(puz2._nil or {}) do
-                puz1[k] = nil
-            end
-            puz2._nil = nil
-            -- Copy puz2 to puz1
-            for k,v in pairs(puz2) do
-                if type(v) == 'table' then
-                    if type(puz1[k]) ~= 'table' then
-                        puz1[k] = {}
-                    end
-                    update(puz1[k], puz2[k])
-                else
-                    puz1[k] = v
-                end
-            end
-        end
-        if puzzle then
-            update(puzzle, data)
-        end
-    end
-    -- Adjust the order
-    local oldorder = download.puzzles._order
-    download.puzzles._order = {}
-    for _, id in ipairs(config.order or {}) do
-        -- Look for this id in the order.
-        for i, puzid in ipairs(oldorder) do
-            if puzid == id then
-                table.insert(download.puzzles._order, id)
-                table.remove(oldorder, i)
-            end
-        end
-    end
-    -- Add the rest of the puzzles in order
-    for _, id in ipairs(oldorder) do
-        table.insert(download.puzzles._order, id)
+    local rc = wx.wxMessageBox(msg, "XWord Error", wx.wxYES_NO + wx.wxICON_ERROR)
+    if rc == wx.wxYES then
+        os.remove(get_config_filename())
     end
 end
 
--- Write config to a file
+if type(config) ~= 'table' then
+    config = {}
+end
+
+-- ============================================================================
+-- Load config
+-- ============================================================================
+for _, name in ipairs({'puzzle_directory', 'separate_directories', 'auto_download'}) do
+    if config[name] ~= nil then
+        download[name] = config[name]
+    end
+end
+
+-- Styles
+if not config.styles then config.styles = {} end
+for k, style in pairs(download.styles) do
+    local config_style = config.styles[k]
+    if config_style then
+        if config_style.font then
+            style.font:SetNativeFontInfo(config_style.font)
+        end
+        if config_style.color then
+            style.color:Set(config_style.color)
+        end
+    end
+end
+-- Disabled
+local dl_list = config.disabled or download.disabled
+download.disabled = {}
+for _, id in ipairs(dl_list) do
+    download.disabled[id] = true
+end
+-- Add download sources
+for _, puzzle in ipairs(config.added or {}) do
+    download.puzzles:insert(puzzle)
+end
+-- Changed sources
+for key, data in pairs(config.changed or {}) do
+    local function update(puz1, puz2)
+        -- Update nil values
+        for _, k in ipairs(puz2._nil or {}) do
+            puz1[k] = nil
+        end
+        puz2._nil = nil
+        -- Copy puz2 to puz1
+        for k,v in pairs(puz2) do
+            if type(v) == 'table' then
+                if type(puz1[k]) ~= 'table' then
+                    puz1[k] = {}
+                end
+                update(puz1[k], puz2[k])
+            else
+                puz1[k] = v
+            end
+        end
+    end
+
+    local puzzle = download.puzzles[key]
+    if puzzle then
+        -- Make string curl options into numbers
+        if data.curlopts then
+            local curlopts = deepcopy(data.curlopts)
+            clear(data.curlopts)
+            for id, value in pairs(curlopts) do
+                if type(id) == 'string' then
+                    data.curlopts[curl_opt_table[id]] = value
+                else
+                    data.curlopts[id] = value
+                end
+            end
+        end
+        update(puzzle, data)
+    end
+end
+-- Adjust the order
+local oldorder = download.puzzles._order
+download.puzzles._order = {}
+for _, id in ipairs(config.order or {}) do
+    -- Look for this id in the order.
+    for i, puzid in ipairs(oldorder) do
+        if puzid == id then
+            table.insert(download.puzzles._order, id)
+            table.remove(oldorder, i)
+        end
+    end
+end
+-- Add the rest of the puzzles in order
+for _, id in ipairs(oldorder) do
+    table.insert(download.puzzles._order, id)
+end
+
+
+-- ============================================================================
+-- Save config
+-- ============================================================================
 function download.save_config()
     local config = {
         puzzle_directory = download.puzzle_directory,
         separate_directories = download.separate_directories,
+        auto_download = download.auto_download,
         disabled = {},
         added = {},
         changed = {},
-        order = download.puzzles._order
+        order = download.puzzles._order,
+        styles = {}
     }
+    -- disabled
     for id, disabled in pairs(download.disabled or {}) do
         if disabled then
             table.insert(config.disabled, id)
         end
     end
+    -- Styles
+    for k, style in pairs(download.styles) do
+        config.styles[k] = { font = style.font:GetNativeFontInfoDesc(),
+                             color = style.color:GetAsString() }
+    end
     -- Figure out what has changed from the defaults
     local defaults = download.get_default_puzzles()
-    for _, puzzle in download.puzzles:iter() do
+    for _, puzzle in download.puzzles:iterall() do
         local default = defaults[puzzle.id]
         if default then
             local function get_changes(puz1, puz2)
@@ -121,19 +208,24 @@ function download.save_config()
                 if changed then return changes end
             end
             config.changed[puzzle.id] = get_changes(puzzle, default)
+            -- Make curl options into strings
+            if config.changed[puzzle.id] then
+                config.changed[puzzle.id] = deepcopy(config.changed[puzzle.id])
+                local opts = config.changed[puzzle.id].curlopts
+                if opts then
+                    local curlopts = deepcopy(opts)
+                    clear(opts)
+                    for id, value in pairs(curlopts) do
+                        opts[curl_opt_names[id]] = value
+                    end
+                end
+            end
         else
             table.insert(config.added, puzzle)
         end
     end
 
-    pl.dir.makepath(join(xword.configdir, 'download'))
-    serialize.pdump(config, join(xword.configdir, 'download', 'config.lua'))
-end
-
--- Helper function for download directory
-function download.sanitize_name(text)
-    local text = text:gsub('[?<>:*|"\']', ""):gsub("%s", "_")
-    return text
+    serialize.pdump(config, get_config_filename())
 end
 
 -- ============================================================================
@@ -236,23 +328,23 @@ function get_curl_options_panel(parent, puzzle)
     grid:AddGrowableCol(1)
     scroller.panel:SetSizer(grid)
 
-    local curl_opts = {}
-    local opt_names = {}
+    local curl_opt_list = {}
+    local cutl_opt_names = {}
     for k, v in pairs(curl) do
         if k:sub(1,4) == "OPT_" then
-            table.insert(curl_opts, k:sub(5))
-            opt_names[v] = k:sub(5)
+            table.insert(curl_opt_list, k:sub(5))
+            curl_opt_names[v] = k:sub(5)
         end
     end
-    table.sort(curl_opts)
+    table.sort(curl_opt_list)
 
     local opts = {}
 
-    local function add_option(name, value)
+    local function add_option(id, value)
         local opt = wx.wxChoice(
             scroller.panel, wx.wxID_ANY,
-            wx.wxDefaultPosition, wx.wxDefaultSize, curl_opts)
-        opt.StringSelection = opt_names[name] or ''
+            wx.wxDefaultPosition, wx.wxDefaultSize, curl_opt_list)
+        opt.StringSelection = curl_opt_names[id] or ''
         local text = wx.wxTextCtrl(scroller.panel, wx.wxID_ANY, value or '')
         local remove_button = BmpButton(scroller.panel, wx.wxID_ANY, bmp.remove)
         remove_button.ToolTip = wx.wxToolTip("Remove option")
@@ -316,7 +408,7 @@ function get_curl_options_panel(parent, puzzle)
         end
         clear(opts)
         for k, v in pairs(p.curlopts or {}) do
-            if type(v) == 'string' and opt_names[k] then
+            if type(v) == 'string' and curl_opt_names[k] then
                 add_option(k, v)
             end
         end
@@ -656,23 +748,67 @@ function download.get_config_panel(parent)
     panel:SetSizer(sizer)
 
     local sizer1 = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizer:Add(sizer1, 0, wx.wxEXPAND + wx.wxBOTTOM, 5)
+    sizer:Add(sizer1, 0, wx.wxEXPAND + wx.wxBOTTOM, 10)
 
     local puzzle_directory = wx.wxDirPickerCtrl(panel, wx.wxID_ANY, download.puzzle_directory)
     sizer1:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Download Directory:"), 0, wx.wxALIGN_CENTER)
     sizer1:Add(puzzle_directory, 1, wx.wxEXPAND)
 
+    local sizer2 = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    sizer:Add(sizer2, 0, wx.wxEXPAND)
+
     local separate_directories = wx.wxRadioBox(
-        panel, wx.wxID_ANY, "Download puzzles to:",
+        panel, wx.wxID_ANY, "Download puzzles to",
         wx.wxDefaultPosition, wx.wxDefaultSize,
         {"One directory", "Directories by source"}, 2
     )
     separate_directories.Selection = download.separate_directories and 1 or 0
-    sizer:Add(separate_directories)
+    sizer2:Add(separate_directories)
+
+    -- Auto download
+    local autosizer = wx.wxStaticBoxSizer(wx.wxHORIZONTAL, panel, "Automatically download")
+    sizer2:Add(autosizer, 0, wx.wxLEFT, 10)
+    autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Last"), 0, wx.wxALIGN_CENTER_VERTICAL)
+    local auto_download = wx.wxSpinCtrl(
+        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(50, -1),
+        wx.wxSP_ARROW_KEYS, 0, 30, download.auto_download or 0)
+    autosizer:Add(auto_download, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxLEFT + wx.wxRIGHT, 5)
+    autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "day(s) [0 = disabled]"), 0, wx.wxALIGN_CENTER_VERTICAL)
+
+    -- Text styles
+    local stylesizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Text styles")
+    sizer:Add(stylesizer)
+
+    local stylegrid = wx.wxGridSizer(0, 3, 5, 5)
+    stylesizer:Add(stylegrid, 1, wx.wxEXPAND + wx.wxALL, 5)
+
+    local function make_style(label, style)
+        local text = wx.wxStaticText(panel, wx.wxID_ANY, label)
+        text.Font = style.font
+        text.ForegroundColour = style.color
+        local font = wx.wxFontPickerCtrl(panel, wx.wxID_ANY, style.font, wx.wxDefaultPosition, wx.wxDefaultSize, 0)
+        font:Connect(wx.wxEVT_COMMAND_FONTPICKER_CHANGED, function (evt)
+            style.font = evt.Font
+            text.Font = evt.Font
+        end)
+        local color = wx.wxColourPickerCtrl(panel, wx.wxID_ANY, style.color)
+        color:Connect(wx.wxEVT_COMMAND_COLOURPICKER_CHANGED, function (evt)
+            style.color = evt.Colour
+            text.Colour = evt.Colour
+        end)
+        stylegrid:Add(text)
+        stylegrid:Add(font)
+        stylegrid:Add(color)
+    end
+
+    make_style("Missing", download.styles.missing)
+    make_style("Downloaded", download.styles.downloaded)
+    make_style("In Progress", download.styles.progress)
+    make_style("Complete", download.styles.complete)
 
     -- Puzzle Sources
     local srcsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizer:Add(srcsizer, 1, wx.wxEXPAND + wx.wxTOP, 5)
+    sizer:Add(srcsizer, 1, wx.wxEXPAND + wx.wxTOP, 10)
 
     local listsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Puzzle sources")
     srcsizer:Add(listsizer, 0, wx.wxEXPAND)
@@ -685,7 +821,7 @@ function download.get_config_panel(parent)
     local puzzles = deepcopy(download.puzzles)
     function puzzle_list:update_sources()
         local names = {}
-        for key, puzzle in puzzles:iter() do
+        for key, puzzle in puzzles:iterall() do
             table.insert(names, puzzle.name)
         end
         local selection = puzzle_list.Selection
@@ -761,7 +897,7 @@ function download.get_config_panel(parent)
 
     -- Details panel
     local detailsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Configuration")
-    srcsizer:Add(detailsizer, 1, wx.wxEXPAND + wx.wxLEFT, 5)
+    srcsizer:Add(detailsizer, 1, wx.wxEXPAND + wx.wxLEFT, 10)
     local details
 
     local text = wx.wxStaticText(panel, wx.wxID_ANY, "Select a Puzzle",
@@ -808,6 +944,7 @@ function download.get_config_panel(parent)
         download.separate_directories = separate_directories.Selection == 1
         if details then details:apply() end
         download.puzzles = deepcopy(puzzles)
+        download.auto_download = auto_download.Value
     end
     
     puzzle_list:update_sources()

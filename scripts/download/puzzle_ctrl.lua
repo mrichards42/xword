@@ -108,16 +108,35 @@ local function PuzzleCtrl(parent, text, puzzle)
         evt:Skip()
     end)
 
+    function ctrl:set_status(status)
+        if status == download.MISSING then
+            self.ForegroundColour = download.styles.missing.color
+            self.Font = download.styles.missing.font
+        elseif status == download.EXISTS then
+            self.ForegroundColour = download.styles.downloaded.color
+            self.Font = download.styles.downloaded.font
+        elseif status == download.SOLVING then
+            self.ForegroundColour = download.styles.progress.color
+            self.Font = download.styles.progress.font
+        elseif status == download.COMPLETE then
+            self.ForegroundColour = download.styles.complete.color
+            self.Font = download.styles.complete.font
+        end
+        self:Refresh()
+    end
+
     -- Open the puzzle
-    ctrl:Connect(wx.wxEVT_LEFT_DOWN,
-        function (evt)
-            if download.puzzle_exists(puzzle.filename) then
-                xword.frame:LoadPuzzle(puzzle.filename)
-            else
-                download.add_download(puzzle, download.PREPEND)
-                download.open_after_download = puzzle.filename
-            end
-        end)
+    function ctrl:open_puzzle()
+        if download.puzzle_exists(puzzle.filename) then
+            xword.frame:LoadPuzzle(puzzle.filename)
+        else
+            download.add_download(puzzle, download.PREPEND)
+            download.open_after_download = puzzle.filename
+        end
+    end
+    ctrl:Connect(wx.wxEVT_LEFT_DOWN, function (evt)
+        ctrl:open_puzzle()
+    end)
 
     -- Context menu
     local function copy_text(text)

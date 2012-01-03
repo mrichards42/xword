@@ -108,7 +108,6 @@ function download.add_download(data, prepend)
 end
 
 function download.clear_downloads()
-    print 'hello world'
     if task_id then
         post(task_id, nil, download.CLEAR)
     end
