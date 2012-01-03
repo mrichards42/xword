@@ -33,7 +33,7 @@ configuration { "macosx", "Debug" }
     buildoptions(wx_config("--debug --unicode --static --cxxflags"))
 
 configuration { "macosx", "Release" }
-    buildoptions(wx_config("--release --unicode --static --cxxflags"))
+    buildoptions(wx_config("--unicode --static --cxxflags"))
 
 end
 

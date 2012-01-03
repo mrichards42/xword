@@ -68,7 +68,7 @@ configuration { "macosx", "Debug" }
     linkoptions(wx_config("--debug --unicode --static --libs"))
 
 configuration { "macosx", "Release" }
-    linkoptions(wx_config("--release --unicode --static --libs"))
+    linkoptions(wx_config("--unicode --static --libs"))
 
 end
 

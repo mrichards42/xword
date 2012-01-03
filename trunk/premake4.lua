@@ -29,6 +29,8 @@ solution "XWord"
         defines { "NDEBUG" }
         flags { "Optimize" }
         libdirs { "bin/Release", "lib/Release" }
+    configuration { "macoxs", "Release" }
+    	linkoptions "-S" -- Strip debug symbols
 
     configuration "Debug"
         defines { "DEBUG", "_DEBUG" }
@@ -74,14 +76,15 @@ if os.is("macosx") then
     end
     
     for _, p in pairs(solution().projects) do
+    	-- Put shared libs in XWord.app/Contents/Frameworks
         if get_key(p, "kind") == "SharedLib" then
             project(p.name)
                 -- Set the output to the app bundle
-                configuration "Debug"
+                configuration { "macosx", "Debug" }
                     targetdir "bin/Debug/XWord.app/Contents/Frameworks"
-                configuration "Release"
+                configuration { "macosx", "Release" }
                     targetdir "bin/Release/XWord.app/Contents/Frameworks"
-                configuration {}
+                configuration { "macosx" }
                 -- Set the install name
                 linkoptions{ "-install_name @executable_path/../Frameworks/lib"..(get_key(p, "targetname") or p.name)..".dylib" }
         end

@@ -203,10 +203,8 @@ function wx_config(options)
 		local config
 		if options:match("debug") then
 			config = _OPTIONS["wx-config-debug"]
-		elseif options:match("release") then
-			config = _OPTIONS["wx-config-release"]
 		else
-			error("No build configuration specified in wx_config function")
+			config = _OPTIONS["wx-config-release"]
 		end
 		-- Don't break if we don't have this configuration
 		if not config then return "" end
