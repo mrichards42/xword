@@ -1,4 +1,6 @@
 local function init()
+    xword.showerrors = true
+
     -- Add a "debug" menu if it does not exist
     xword.frame:GetMenu('Debug')
 
