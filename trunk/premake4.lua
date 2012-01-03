@@ -55,7 +55,9 @@ solution "XWord"
     include "yajl"
     if not _OPTIONS["disable-lua"] then
         include "lua" -- lua libraries
-        include "expat"
+        if os.is("windows") then
+        	include "expat"
+    	end
     end
 
 
