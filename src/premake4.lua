@@ -104,9 +104,20 @@ project "XWord"
 
     configuration { "macosx" }
         postbuildcommands {
-            "mkdir -p $TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH",
-            "ln -sF ../../../../../scripts $TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH/scripts",
-            "mkdir -p $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH",
-            "ln -sF ../../../../../images $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/images",
+            "cd $TARGET_BUILD_DIR",
+            -- Symlink images and scripts
+            "mkdir -p $PLUGINS_FOLDER_PATH",
+            "ln -sF ../../../../../scripts $PLUGINS_FOLDER_PATH/scripts",
+            "mkdir -p $UNLOCALIZED_RESOURCES_FOLDER_PATH",
+            "ln -sF ../../../../../images $UNLOCALIZED_RESOURCES_FOLDER_PATH/images",
+            -- Copy Info.plist and xword.icns
+            "cp ../../src/Info.plist $INFOPLIST_PATH",
+            "cp ../../images/xword.icns $UNLOCALIZED_RESOURCES_FOLDER_PATH",
+            -- Build the rest of the projects
+            "cd ../../build/" .. _ACTION,
+            "xcodebuild -project lfs.xcodeproj",
+            "xcodebuild -project luacurl.xcodeproj",
+            "xcodebuild -project luapuz.xcodeproj",
+            "xcodebuild -project luatask.xcodeproj",
         }
 

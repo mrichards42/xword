@@ -35,7 +35,7 @@ end
 
 
 -- End of options
-if not _ACTION then
+if not _ACTION or _ACTION == "clean" then
 	return false
 end
 
