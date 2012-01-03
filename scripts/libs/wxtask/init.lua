@@ -95,6 +95,9 @@ end
 -- This is used to circumvent custom task.post behavior, which posts with
 -- a given id to the queue designated for the current task.
 task.post_to_queue = function(queue_id, data, flag)
+    if type(data) == 'string' then
+        data = task.id() .. ': ' .. data
+    end
     return task_post(1, serialize({id=queue_id, data=data}), flag)
 end
 
@@ -332,7 +335,7 @@ task.create = function(s, args, globals)
             arg = fargs
 
             -- Execute the script
-            task.post(1, nil, task.START)
+            task.post(1, task.id(), task.START)
             func()
 
         end, -- end of xpcall function
@@ -345,7 +348,7 @@ task.create = function(s, args, globals)
             task.error(err)
         end
         -- Make sure task.END is posted
-        task.post(1, nil, task.END)
+        task.post(1, task.id(), task.END)
         ]]
 
     -- Create the task
@@ -507,7 +510,6 @@ if wx then
                     end
                 end
             end
-            evt:RequestMore()
             evt:Skip()
         end
 
