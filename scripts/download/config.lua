@@ -2,7 +2,7 @@ local join = require 'pl.path'.join
 local deepcopy = require 'pl.tablex'.deepcopy
 local clear = require 'pl.tablex'.clear
 
-download.puzzle_directory = xword.userdatadir.."\\puzzles"
+download.puzzle_directory = xword.userdatadir.."/puzzles"
 download.separate_directories = true
 download.disabled = {
     "NY Times Premium",
