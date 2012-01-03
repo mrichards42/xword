@@ -356,7 +356,7 @@ public:
     virtual bool OnDropFiles(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
                              const wxArrayString & filenames)
     {
-		wxLogDebug(_T("Drag and dropped %d files"), filenames.Count());
+
 #if XWORD_USE_LUA
         // Run the file as a script if it ends with .lua
         if (filenames.Item(0).EndsWith(_T(".lua")))
@@ -2582,15 +2582,25 @@ MyFrame::OnClose(wxCloseEvent & evt)
             (*it)->Hide();
 
 #ifdef XWORD_USE_LUA
+        // Check to see if we should show lua errors:
+        bool showerrors = false;
+        lua_State * L = m_lua.GetLuaState();
+        lua_getglobal(L, "xword");
+        lua_getfield(L, -1, "showerrors");
+        showerrors = lua_toboolean(L, -1);
+        lua_pop(L, 2);
+
         LuaUninit();
         // Check to see if we have lua messages
         if (wxGetApp().HasLuaLog())
         {
-            XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename().c_str());
-        #ifdef __WXDEBUG__
             wxGetApp().m_luaLog->Close();
-            wxShell(wxString::Format(_T("\"%s\""), GetLuaLogFilename().c_str()));
-        #endif // __WXDEBUG__
+            if (showerrors) {
+                XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename());
+            #ifdef __WXDEBUG__
+                wxShell(wxString::Format(_T("\"%s\""), GetLuaLogFilename().c_str()));
+            #endif // __WXDEBUG__
+            }
         }
 #endif
         Destroy();
