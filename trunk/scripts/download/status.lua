@@ -177,7 +177,7 @@ local function Status(parent)
 
     sizer:Add(make_spacer(panel), 0, wx.wxEXPAND)
 
-    panel.errors = wx.wxStaticText(panel, wx.wxID_ANY, '(No Errors)')
+    panel.errors = wx.wxStaticText(panel, wx.wxID_ANY, '0 Errors')
     panel.errors.WindowStyle = wx.wxALIGN_RIGHT
     sizer:Add(panel.errors, 0, wx.wxEXPAND + wx.wxALL, 5)
 
@@ -191,19 +191,19 @@ local function Status(parent)
         download.clear_downloads()
     end)
 
-    panel.errors:Connect(wx.wxEVT_ENTER_WINDOW,
-        function (evt)
-            if #download.errors > 0 then
-                make_error_popup(panel):Popup()
-            end
-        end)
+    panel.errors:Connect(wx.wxEVT_ENTER_WINDOW, function (evt)
+        if #download.errors > 0 then
+            make_error_popup(panel.errors):Popup()
+        end
+        evt:Skip()
+    end)
 
-    panel.queue:Connect(wx.wxEVT_ENTER_WINDOW,
-        function (evt)
-            if #download.queue > 0 then
-                make_queue_popup(panel):Popup()
-            end
-        end)
+    panel.queue:Connect(wx.wxEVT_ENTER_WINDOW, function (evt)
+        if #download.queue > 0 then
+            make_queue_popup(panel.queue):Popup()
+        end
+        evt:Skip()
+    end)
 
     function panel:update_status()
         if download.current then
@@ -212,7 +212,11 @@ local function Status(parent)
             self.current:SetLabel("Ready")
         end
         self.queue.Label = string.format('%d Queued', #download.queue)
-        self.errors.Label = string.format('%d Errors', #download.errors)
+        if #download.errors == 1 then
+            self.errors.Label = '1 Error'
+        else
+            self.errors.Label = string.format('%d Errors', #download.errors)
+        end
         self:Layout()
         if queue_popup then queue_popup:update() end
         if error_popup then error_popup:update() end

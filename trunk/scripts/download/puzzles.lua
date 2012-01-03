@@ -1,5 +1,9 @@
 require 'luacurl'
 
+-- ============================================================================
+-- Sources
+-- ============================================================================
+
 function download.get_default_puzzles()
 local sources = {
     {
@@ -8,7 +12,7 @@ local sources = {
         directoryname = "NY_Times",
         filename = "nyt%Y%m%d.puz",
         days = { true, true, true, true, true, true, true },
-        func = "return download.download(puzzle.url, puzzle.filename, puzzle.curlopts)",
+        func = "download.download(puzzle.url, puzzle.filename, puzzle.curlopts)",
         fields = { "User Name", "Password", }
     },
 
@@ -22,7 +26,6 @@ local sources = {
         {
             [curl.OPT_REFERER] = 'http://www.xwordinfo.com/',
         },
-        func = "return download.download(puzzle.url, puzzle.filename, puzzle.curlopts)"
     },
 
     {
@@ -138,7 +141,7 @@ local sources = {
                 puzzle.filename)
         end
     end
-    return nil, "Could not figure out puzzle number"
+    return "Could not figure out puzzle number"
 ]]
     },
 
@@ -146,11 +149,11 @@ local sources = {
         name = "Matt Gaffney's Daily Crossword",
         filename = "mgdc%Y%m%d.puz",
         days = { true, true, true, true, true, false, false },
+        url = "http://mattgaffneydaily.blogspot.com/%Y_%m_01_archive.html",
         -- Custom download function
         func = [[
     -- Download the page with puzzles for the month
-    local archive = download.download(puzzle.date:fmt(
-        "http://mattgaffneydaily.blogspot.com/%Y_%m_01_archive.html"))
+    local archive = download.download(puzzle.url)
 
     -- Search for the puzzle number for the current date
     local day = puzzle.date:fmt('%d')
@@ -158,6 +161,7 @@ local sources = {
 
     local number = archive:match("MGDC[^<]-(%d+)[^<]* " .. puzzle.date:fmt("%b") .. "[^<]* " .. day .. "[^,<%d]*, " .. puzzle.date:fmt("%Y"))
 
+    task.debug(number)
     -- Download the puzzle
     if number then
         -- Find the applet url
@@ -169,7 +173,7 @@ local sources = {
                 puzzle.filename)
         end
     end
-    return nil, "Could not figure out puzzle number"
+    return "Could not figure out puzzle number"
 ]]
     },
 
@@ -190,7 +194,7 @@ local sources = {
     if url then
         return download.download(url, puzzle.filename)
     end
-    return nil, "Could not find a download link"
+    return "Could not find a download link"
 ]]
     },
 }
@@ -202,7 +206,25 @@ puzzles._order = {}
 local mt = {}
 mt.__index = mt
 
+-- Iterate enabled puzzles
 function mt:iter()
+    local i = 0
+    local n = #self._order
+    return function ()
+        while i <= n do
+            i = i + 1
+            if i <= n then
+                local key = self._order[i]
+                if download.isenabled(self[key]) then
+                    return key, self[key]
+                end
+            end
+        end
+    end
+end
+
+-- Iterate all puzzles
+function mt:iterall()
     local i = 0
     local n = #self._order
     return function ()
@@ -262,6 +284,50 @@ return puzzles
 end -- function get_default_puzzles
 
 download.puzzles = download.get_default_puzzles()
+
+-- ============================================================================
+-- Source-related functions
+-- ============================================================================
+local deepcopy = require 'pl.tablex'.deepcopy
+local join = require 'pl.path'.join
+
+function download.sanitize_name(text)
+    local text = text:gsub('[?<>:*|"\']', ""):gsub("%s", "_")
+    return text
+end
+
+function download.get_url(puzzle, d)
+    if type(puzzle.url) == 'string' then
+        return d:fmt(puzzle.url)
+    else
+        return puzzle.url
+    end
+end
+
+function download.get_filename(puzzle, d)
+    if download.separate_directories then
+        return join(download.puzzle_directory, download.sanitize_name(puzzle.directoryname or puzzle.name), d:fmt(puzzle.filename))
+    else
+        return join(download.puzzle_directory, d:fmt(puzzle.filename))
+    end
+end
+
+function download.get_download_data(puzzle, d)
+    local data = deepcopy(puzzle)
+    if data.url then data.url = download.get_url(puzzle, d) end
+    if data.filename then data.filename = download.get_filename(puzzle, d) end
+    data.date = d
+    return data
+end
+
+function download.isdisabled(puzzle)
+    return (download.disabled or {})[puzzle.id] == true
+end
+
+function download.isenabled(puzzle)
+    return not download.isdisabled(puzzle)
+end
+
 
 -- Update the download sources
 require 'download.config'

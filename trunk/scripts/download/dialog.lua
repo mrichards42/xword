@@ -13,12 +13,10 @@ local function make_puzzles(parent)
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
     scroller:SetSizer(sizer)
     scroller.puzzles = {}
-    for key, puzzle in download.puzzles:iter() do
-        if not download.disabled[key] then
-            local p = PuzzlePanel(scroller, puzzle, kind, start_date, end_date)
-            table.insert(scroller.puzzles, p)
-            sizer:Add(p, 0, wx.wxEXPAND)
-        end
+    for _, puzzle in download.puzzles:iter() do
+        local p = PuzzlePanel(scroller, puzzle, kind, start_date, end_date)
+        table.insert(scroller.puzzles, p)
+        sizer:Add(p, 0, wx.wxEXPAND)
     end
 
     function scroller:set_dates(kind, start_date, end_date)
@@ -109,12 +107,16 @@ local function DownloadDialog(parent, id, title, pos, size)
         puzzle_panel:set_dates(header:get_kind(), header:get_start_date(), header:get_end_date())
     end
 
+    function panel:download_puzzles()
+        puzzle_panel:download_puzzles()
+    end
+
     function dialog:update_status()
         status:update_status()
     end
 
-    function panel:download_puzzles()
-        puzzle_panel:download_puzzles()
+    function dialog.update()
+        panel:update_puzzles()
     end
 
     header:set_kind('day')
