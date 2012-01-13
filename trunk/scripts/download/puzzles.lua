@@ -119,29 +119,29 @@ local sources = {
         name = "Matt Gaffney's Weekly Crossword Contest",
         filename = "mgwcc%Y%m%d.puz",
         days = { false, false, false, false, true, false, false },
+        url = "http://crosswordcontest.blogspot.com/%Y_%m_%d_archive.html",
         -- Custom download function
         func = [[
-    -- Download the page with puzzles for the month
-    local archive = download.download(puzzle.date:fmt(
-        "http://crosswordcontest.blogspot.com/%Y_%m_01_archive.html"))
+    -- Sometimes the puzzles are released early
+    puzzle.date:adddays(-4)
+    task.debug(tostring(puzzle.date))
+    puzzle.url = puzzle.date:fmt("http://crosswordcontest.blogspot.com/%Y_%m_%d_archive.html")
+    task.debug(puzzle.url)
+    -- Download the page with puzzles after today's date
+    local archive = download.download(puzzle.url)
 
-    -- Search for the puzzle number for the current date
-    local day = puzzle.date:fmt('%d')
-    if day:sub(1,1) == '0' then day = day:sub(2) end
-    local number = archive:match("MGWCC[^<]-(%d+)[^<]* " .. puzzle.date:fmt("%b") .. "[^<]* " .. day .. "[^,<]*, " .. puzzle.date:fmt("%Y"))
-
-    -- Download the puzzle
-    if number then
-        -- Find the applet url
-        local id, name = archive:match('"http://icrossword.com/embed/%?id=([^"]*)(mgwcc[^"]*' .. number .. '[^"]*)"')
-        if id and name then
-            return download.download(
-                string.format("http://icrossword.com/publish/server/puzzle/index.php/%s?id=%s%s",
-                              name, id, name),
-                puzzle.filename)
-        end
+    -- Find the last Across Lite applet
+    local id, name
+    for a,b in archive:gmatch('"http://icrossword.com/embed/%?id=([^"]*)(mgwcc[^"]*)"') do
+        id, name = a,b
     end
-    return "Could not figure out puzzle number"
+    if id and name then
+        return download.download(
+            string.format("http://icrossword.com/publish/server/puzzle/index.php/%s?id=%s%s",
+                          name, id, name),
+            puzzle.filename)
+    end
+    return "Could not find a puzzle."
 ]]
     },
 
@@ -149,31 +149,24 @@ local sources = {
         name = "Matt Gaffney's Daily Crossword",
         filename = "mgdc%Y%m%d.puz",
         days = { true, true, true, true, true, false, false },
-        url = "http://mattgaffneydaily.blogspot.com/%Y_%m_01_archive.html",
+        url = "http://mattgaffneydaily.blogspot.com/%Y_%m_%d_archive.html",
         -- Custom download function
         func = [[
-    -- Download the page with puzzles for the month
+    -- Download the page with puzzles after today's date
     local archive = download.download(puzzle.url)
 
-    -- Search for the puzzle number for the current date
-    local day = puzzle.date:fmt('%d')
-    if day:sub(1,1) == '0' then day = day:sub(2) end
-
-    local number = archive:match("MGDC[^<]-(%d+)[^<]* " .. puzzle.date:fmt("%b") .. "[^<]* " .. day .. "[^,<%d]*, " .. puzzle.date:fmt("%Y"))
-
-    task.debug(number)
-    -- Download the puzzle
-    if number then
-        -- Find the applet url
-        local id, name = archive:match('"http://icrossword.com/embed/%?id=([^"]*)(mgdc[^"]*' .. number .. '[^"]*)"')
-        if id and name then
-            return download.download(
-                string.format("http://icrossword.com/publish/server/puzzle/index.php/%s?id=%s%s",
-                              name, id, name),
-                puzzle.filename)
-        end
+    -- Find the last Across Lite applet
+    local id, name
+    for a,b in archive:gmatch('"http://icrossword.com/embed/%?id=([^"]*)(mgdc[^"]*)"') do
+        id, name = a,b
     end
-    return "Could not figure out puzzle number"
+    if id and name then
+        return download.download(
+            string.format("http://icrossword.com/publish/server/puzzle/index.php/%s?id=%s%s",
+                          name, id, name),
+            puzzle.filename)
+    end
+    return "Could not find a puzzle."
 ]]
     },
 
@@ -316,7 +309,7 @@ function download.get_download_data(puzzle, d)
     local data = deepcopy(puzzle)
     if data.url then data.url = download.get_url(puzzle, d) end
     if data.filename then data.filename = download.get_filename(puzzle, d) end
-    data.date = d
+    data.date = d:copy()
     return data
 end
 

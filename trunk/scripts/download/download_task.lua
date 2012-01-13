@@ -218,7 +218,7 @@ local deepcopy = require 'pl.tablex'.deepcopy
 local function do_download(puzzle)
     -- If we don't copy the date, we could accidentally set the metatable
     -- twice (the date mt is "protected" and doesn't allow that).
-    puzzle.date = deepcopy(puzzle.date)
+    puzzle = deepcopy(puzzle)
     setmetatable(puzzle.date, getmetatable(date()))
 
     task.post(1, {puzzle}, download.START)
