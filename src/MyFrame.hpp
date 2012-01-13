@@ -256,6 +256,7 @@ private:
 
 private:
     // Load / save exception handling.
+    void DoSavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL);
     void HandlePuzException();
 
     // Event Handlers

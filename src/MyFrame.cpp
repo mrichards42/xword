@@ -586,8 +586,9 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
 }
 
 
-bool
-MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
+void
+MyFrame::DoSavePuzzle(const wxString & filename,
+                      const puz::Puzzle::FileHandlerDesc * handler)
 {
     // We can't save notes now that notes are XHTML.
     //m_puz.m_notes = wx2puz(m_notes->GetValue());
@@ -608,21 +609,26 @@ MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
             ));
 
     if (fn.empty())
-        return false;
+        return;
 
     wxStopWatch sw;
 
-    try
-    {
-        m_puz.Save(fn, handler);
-        m_filename = puz2wx(puz::decode_utf8(fn));
-        m_isModified = false;
+    m_puz.Save(fn, handler);
+    m_filename = puz2wx(puz::decode_utf8(fn));
+    m_isModified = false;
 
-        EnableSave(false);
+    EnableSave(false);
 
-        SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
-                                   m_filename.c_str(),
-                                   sw.Time()));
+    SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
+                               m_filename.c_str(),
+                               sw.Time()));
+}
+
+bool
+MyFrame::SavePuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
+{
+    try {
+        DoSavePuzzle(filename, handler);
         return true;
     }
     catch (...)
@@ -2099,7 +2105,13 @@ MyFrame::OnAutoSaveNotify(wxTimerEvent & WXUNUSED(evt))
     if (puz::Puzzle::CanSave(puz::encode_utf8(wx2puz(m_filename)))
         && wxFileName::IsFileWritable(m_filename))
     {
-        SavePuzzle(m_filename);
+        try {
+            DoSavePuzzle(m_filename);
+        } catch (...) {
+            wxLogDebug(_T("AutoSave failed"));
+            SetStatus(_T("Auto save faield"));
+            // If it doesn't work, don't show a message box
+        }
     }
 }
 
