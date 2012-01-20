@@ -12,7 +12,7 @@ local sources = {
         directoryname = "NY_Times",
         filename = "nyt%Y%m%d.puz",
         days = { true, true, true, true, true, true, true },
-        func = "download.download(puzzle.url, puzzle.filename, puzzle.curlopts)",
+        func = "download(puzzle.url, puzzle.filename, puzzle.curlopts)",
         fields = { "User Name", "Password", }
     },
 
@@ -26,6 +26,23 @@ local sources = {
         {
             [curl.OPT_REFERER] = 'http://www.xwordinfo.com/',
         },
+        func = [[
+    -- Try to download the XPF first
+    download(puzzle.url, puzzle.filename, puzzle.curlopts)
+    local success, p = pcall(puz.Puzzle, puzzle.filename)
+    if success then
+        p:__gc()
+        return
+    end
+    -- Otherwise download it as JSON
+    local url = puzzle.date:fmt("http://www.xwordinfo.com/JSON/Data.aspx?date=%m/%d/%Y")
+    download(url, puzzle.filename, puzzle.curlopts)
+    local success, p = pcall(puz.Puzzle, puzzle.filename, import.xwordinfoJSON)
+    if success then
+        p:Save(puzzle.filename) -- Save this as an XPF
+        p:__gc()
+    end
+]]
     },
 
     {
@@ -124,11 +141,9 @@ local sources = {
         func = [[
     -- Sometimes the puzzles are released early
     puzzle.date:adddays(-4)
-    task.debug(tostring(puzzle.date))
     puzzle.url = puzzle.date:fmt("http://crosswordcontest.blogspot.com/%Y_%m_%d_archive.html")
-    task.debug(puzzle.url)
     -- Download the page with puzzles after today's date
-    local archive = download.download(puzzle.url)
+    local archive = download(puzzle.url)
 
     -- Find the last Across Lite applet
     local id, name
@@ -136,7 +151,7 @@ local sources = {
         id, name = a,b
     end
     if id and name then
-        return download.download(
+        return download(
             string.format("http://icrossword.com/publish/server/puzzle/index.php/%s?id=%s%s",
                           name, id, name),
             puzzle.filename)
@@ -153,7 +168,7 @@ local sources = {
         -- Custom download function
         func = [[
     -- Download the page with puzzles after today's date
-    local archive = download.download(puzzle.url)
+    local archive = download(puzzle.url)
 
     -- Find the last Across Lite applet
     local id, name
@@ -161,7 +176,7 @@ local sources = {
         id, name = a,b
     end
     if id and name then
-        return download.download(
+        return download(
             string.format("http://icrossword.com/publish/server/puzzle/index.php/%s?id=%s%s",
                           name, id, name),
             puzzle.filename)
@@ -178,14 +193,14 @@ local sources = {
         -- Custom download function
         func = [[
     -- Download the page with the puzzle
-    local page = download.download(puzzle.url)
+    local page = download(puzzle.url)
 
     -- Search for a download link
     local url = page:match('<a href="(http://www.brendanemmettquigley.com/[^"]-.jpz)">')
 
     -- Download the puzzle
     if url then
-        return download.download(url, puzzle.filename)
+        return download(url, puzzle.filename)
     end
     return "Could not find a download link"
 ]]
