@@ -41,6 +41,7 @@ end
 
 -- Import the handlers
 pcall(require, 'import.uclick')
+pcall(require, 'import.xwordinfo')
 
 -- ============================================================================
 -- Replace loading functions with import.load
