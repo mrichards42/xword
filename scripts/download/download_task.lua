@@ -97,13 +97,6 @@ local function download_to_file(url, filename, opts)
         return nil, err
     end
 
-    local f, rc, err
-    makedirs(pl.path.dirname(filename))
-    f, err = io.open(filename, 'wb')
-    if not f then
-        return nil, err
-    end
-
     -- Write to a file
     local function write_to_file(str, length)
         f:write(str)
@@ -227,24 +220,15 @@ local function do_download(puzzle)
         function ()
             -- Download the puzzle
             if puzzle.func then
-                local func, err = loadstring([[return function(puzzle) ]]..puzzle.func..[[ end]])
+                local func, err = loadstring([[return function(puzzle, download) ]]..puzzle.func..[[ end]])
                 if not err then
-                    err = func()(puzzle)
+                    err = func()(puzzle, download.download)
                 end
                 if err and err ~= true then
                     return err
                 end
             else
                 download.download(puzzle.url, puzzle.filename, puzzle.curlopts)
-            end
-
-            -- Try to open the file
-            local success, result = pcall(puz.Puzzle, puzzle.filename)
-            if success then
-                result:__gc() -- This is a puzzle
-            else
-                os.remove(puzzle.filename)
-                return result
             end
         end,
         -- error handler . . . separates user errors from programming errors
@@ -257,7 +241,21 @@ local function do_download(puzzle)
         end
     )
 
-    if err == 'abort' then error({'abort'}) end
+    if err then
+        os.remove(puzzle.filename)
+        if err == 'abort' then
+            error({'abort'})
+        end
+    else
+        -- Try to open the file
+        local success, result = pcall(puz.Puzzle, puzzle.filename)
+        if success then
+            result:__gc() -- This is a puzzle
+        else
+            os.remove(puzzle.filename)
+            err = result
+        end
+    end
 
     task.post(1, {puzzle, err}, download.END)
 end
