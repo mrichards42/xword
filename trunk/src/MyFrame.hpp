@@ -312,6 +312,7 @@ private:
 
     // Timer
     void OnTimer      (wxCommandEvent & WXUNUSED(evt));
+    void OnResetTimer (wxCommandEvent & WXUNUSED(evt));
     void OnTimerNotify(wxTimerEvent   & WXUNUSED(evt));
 
     // AutoSave
