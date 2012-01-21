@@ -110,6 +110,8 @@ enum toolIds
     ID_SHOW_NOTES,
 
     ID_TIMER,
+    ID_RESET_TIMER,
+
     ID_CHARACTER_MAP,
 
     //wxID_PREFERENCES,
@@ -297,8 +299,10 @@ MyFrame::ManageTools()
                    _handler(MyFrame::OnShowNotes) },
 
 
-        { ID_TIMER,          wxITEM_CHECK, _T("&Timer\tCtrl+T"), _T("timer"), NULL,
+        { ID_TIMER,          wxITEM_CHECK, _T("&Start/Pause\tCtrl+T"), _T("timer"), NULL,
                    _handler(MyFrame::OnTimer) },
+        { ID_RESET_TIMER,    wxITEM_NORMAL, _T("&Reset"), NULL, NULL,
+                   _handler(MyFrame::OnResetTimer) },
 
         { ID_CHARACTER_MAP,  wxITEM_CHECK, _T("&Character Map\tCtrl+M"), NULL, NULL,
                    _handler(MyFrame::OnCharacterMap) },
@@ -1107,7 +1111,10 @@ MyFrame::CreateMenuBar()
 
     // Tools Menu
     menu = new wxMenu();
-        m_toolMgr.Add(menu, ID_TIMER);
+        submenu = new wxMenu();
+            m_toolMgr.Add(submenu, ID_TIMER);
+            m_toolMgr.Add(submenu, ID_RESET_TIMER);
+        menu->AppendSubMenu(submenu, _T("&Timer"));
         m_toolMgr.Add(menu, ID_CHARACTER_MAP);
     mb->Append(menu, _T("&Tools"));
 
@@ -2076,6 +2083,12 @@ MyFrame::OnTimer(wxCommandEvent & evt)
 {
     wxASSERT(evt.IsChecked() != IsTimerRunning());
     ToggleTimer();
+}
+
+void
+MyFrame::OnResetTimer(wxCommandEvent & evt)
+{
+    SetTime(0);
 }
 
 
