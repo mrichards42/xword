@@ -8,12 +8,54 @@ function download.get_default_puzzles()
 local sources = {
     {
         name = "NY Times Premium",
-        url = "?",
+        url = "http://select.nytimes.com/premium/xword/%Y/%m/%d/%a%d%y.puz",
         directoryname = "NY_Times",
         filename = "nyt%Y%m%d.puz",
         days = { true, true, true, true, true, true, true },
-        func = "download(puzzle.url, puzzle.filename, puzzle.curlopts)",
-        fields = { "User Name", "Password", }
+        fields = { "User Name", "Password", },
+        func = [[
+    local cookies_filename = path.join(xword.configdir, 'download', 'nytcookie.txt')
+    -- Look for the cookies
+    local function has_cookie()
+        local f = io.open(cookies_filename, 'rb')
+        if not f then return false end
+        local has_cookie = f:read("*a"):match("NYT-S")
+        f:close()
+        return has_cookie and true or false
+    end
+    if not has_cookie() then
+        if not puzzle.user_name or not puzzle.password then
+            return "User name or password not specified"
+        end
+        -- Download authentication page
+        local auth = download("https://myaccount.nytimes.com/auth/login")
+        -- Find the form
+        local form = auth:match("<form(.-)</form>")
+        -- Look for the <input>s and assemble the POST string
+        local postdata = {}
+        for data in form:gmatch("<input([^>]*)>") do
+            local name = data:match('name%s*=%s*"(.-)"')
+            if name ~= "userid" and name ~= "password" then
+                local value = data:match('value%s*=%s*"(.-)"')
+                table.insert(postdata, curl.escape(name) .. "=" .. curl.escape(value))
+            end
+        end
+        table.insert(postdata, "userid=" .. curl.escape(puzzle.user_name))
+        table.insert(postdata, "password=" .. curl.escape(puzzle.password))
+        task.debug(table.concat(postdata, "&"))
+        -- Send the POST request and save the cookie
+        download("https://myaccount.nytimes.com/auth/login",
+                { [curl.OPT_POST] = 1,
+                  [curl.OPT_POSTFIELDS] = table.concat(postdata, "&"),
+                  [curl.OPT_COOKIEJAR] = cookies_filename })
+        if not has_cookie() then
+            return "Unable to login"
+        end
+    end
+    -- Download the puzzle, using the supplied cookies
+    download(puzzle.url, puzzle.filename,
+             { [curl.OPT_COOKIEFILE] = cookies_filename })
+]]
     },
 
     {
@@ -29,6 +71,7 @@ local sources = {
         func = [[
     -- Try to download the XPF first
     download(puzzle.url, puzzle.filename, puzzle.curlopts)
+    if true then return end -- Cut this off for now.
     local success, p = pcall(puz.Puzzle, puzzle.filename)
     if success then
         p:__gc()
