@@ -25,8 +25,13 @@ download.puzzle_directory = xword.userdatadir.."\\puzzles"
 download.separate_directories = true
 download.disabled = {
     "NY Times Premium",
+    "NY Times (XWord Info)",
     "Newsday",
+    "USA Today",
     "Universal",
+    "Matt Gaffney's Weekly Crossword Contest",
+    "Matt Gaffney's Daily Crossword",
+    "Brendan Emmett Quigley",
 }
 download.auto_download = 0
 download.styles = {
