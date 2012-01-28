@@ -4,7 +4,7 @@ local DownloadHeader = require 'download.header'
 local PuzzlePanel = require 'download.puzzle_panel'
 local Status = require 'download.status'
 require 'download.stats'
-local clear = require 'pl.tablex'.clear
+local tablex = require 'pl.tablex'
 
 local function make_puzzles(parent)
     local scroller = wx.wxScrolledWindow(parent, wx.wxID_ANY)
@@ -12,19 +12,28 @@ local function make_puzzles(parent)
     scroller:SetScrollRate(10, 10)
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
     scroller:SetSizer(sizer)
-    scroller.puzzles = {}
-    for _, puzzle in download.puzzles:iter() do
-        local p = PuzzlePanel(scroller, puzzle, kind, start_date, end_date)
-        table.insert(scroller.puzzles, p)
-        sizer:Add(p, 0, wx.wxEXPAND)
+    local puzzle_panels = {}
+
+    function scroller:update_puzzle_list()
+        for _, w in ipairs(puzzle_panels) do
+            self.Sizer:Detach(w)
+            w:Destroy()
+        end
+        tablex.clear(puzzle_panels)
+        for _, puzzle in download.puzzles:iter() do
+            local p = PuzzlePanel(self, puzzle, kind, start_date, end_date)
+            table.insert(puzzle_panels, p)
+            sizer:Add(p, 0, wx.wxEXPAND)
+        end
+        self:Layout()
     end
 
     function scroller:set_dates(kind, start_date, end_date)
         download.clear_stats()
-        clear(download.puzzle_map)
+        tablex.clear(download.puzzle_map)
         self:Freeze()
         local stats_filenames = {}
-        for _, p in ipairs(self.puzzles) do
+        for _, p in ipairs(puzzle_panels) do
             local filenames, now = p:set_dates(kind, start_date, end_date)
             for _, fn in ipairs(filenames) do
                 download.puzzle_map[fn] = p
@@ -44,10 +53,12 @@ local function make_puzzles(parent)
     end
 
     function scroller:download_puzzles()
-        for _, p in ipairs(self.puzzles) do
+        for _, p in ipairs(puzzle_panels) do
             download.add_downloads(p:get_download_data())
         end
     end
+
+    scroller:update_puzzle_list()
 
     return scroller
 end
@@ -115,8 +126,11 @@ local function DownloadDialog(parent, id, title, pos, size)
         status:update_status()
     end
 
-    function dialog.update()
+    function dialog:update()
+        self:Freeze()
+        puzzle_panel:update_puzzle_list()
         panel:update_puzzles()
+        self:Thaw()
     end
 
     header:set_kind('day')
