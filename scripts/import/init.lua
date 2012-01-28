@@ -51,6 +51,9 @@ local tablex = require 'pl.tablex'
 local path = require 'pl.path'
 -- Try all handlers on a puzzle.
 function import.load(p, filename)
+    if not path.exists(filename) then
+        error("File does not exist: "..filename, 2)
+    end
      -- Extension without the dot
     local ext = path.extension(filename):lower():sub(2)
 
@@ -86,7 +89,7 @@ function import.load(p, filename)
         elseif err:sub(1,12) == "Not a valid " or err == "Unknown file type" or err == "Wrong file type" then
             -- Try again . . . wrong handler for this file.
         else
-            -- By setting the error level to 2, "import/init.lua line 180" is
+            -- By setting the error level to 2, "import/init.lua line xx" is
             -- omitted from the error report!
             error(err, 2) -- Correct handler, bad file
         end
