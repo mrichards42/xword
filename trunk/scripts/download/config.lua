@@ -514,7 +514,7 @@ function get_download_function_panel(parent, puzzle)
 
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
 
-    local st = wx.wxStaticText(panel, wx.wxID_ANY, "function (puzzle)")
+    local st = wx.wxStaticText(panel, wx.wxID_ANY, "function(puzzle)")
     st.Font = font
     sizer:Add(st, 0, wx.wxLEFT, 10)
 
@@ -945,6 +945,9 @@ function download.get_config_panel(parent)
         if details then details:apply() end
         download.puzzles = deepcopy(puzzles)
         download.auto_download = auto_download.Value
+        if download.dialog then
+            download.dialog:update()
+        end
     end
     
     puzzle_list:update_sources()
