@@ -4,7 +4,7 @@ require 'luacurl'
 require 'luapuz'
 require 'import'
 require 'os'
-require 'pl.path'
+path = require 'pl.path' -- make this global for custom download functions
 require 'lfs'
 require 'date'
 
@@ -14,12 +14,12 @@ local function makedirs(dirname)
     local to_make = {}
     local dir
     repeat
-        dirname, dir = pl.path.splitpath(dirname)
+        dirname, dir = path.splitpath(dirname)
         table.insert(to_make, dir)
     until lfs.attributes(dirname, 'mode') ~= nil
     -- Make the directories
     for i=#to_make,1,-1 do
-        dirname = pl.path.join(dirname, to_make[i])
+        dirname = path.join(dirname, to_make[i])
         local success, err = lfs.mkdir(dirname)
         if not success then return nil, err end
     end
@@ -66,6 +66,7 @@ local function do_download(url, callback, opts)
     c:setopt(curl.OPT_PROGRESSFUNCTION, progress)
     c:setopt(curl.OPT_NOPROGRESS, 0)
     c:setopt(curl.OPT_FAILONERROR, 1) -- e.g. 404 errors
+    c:setopt(curl.OPT_SSL_VERIFYPEER, 0) -- Authentication doesn't really work
 
     -- Set user-defined options
     for k,v in pairs(opts or {}) do c:setopt(k, v) end
@@ -91,7 +92,7 @@ end
 
 local function download_to_file(url, filename, opts)
     local f, rc, err
-    makedirs(pl.path.dirname(filename))
+    makedirs(path.dirname(filename))
     f, err = io.open(filename, 'wb')
     if not f then
         return nil, err
@@ -137,7 +138,7 @@ local function download_to_string(url, opts)
 end
 
 --[[
-    Downlod something
+    Download something
     -----------------
 
     To a file
@@ -208,7 +209,7 @@ function download.download(opts, filename, curlopts)
 end
 
 local deepcopy = require 'pl.tablex'.deepcopy
-local function do_download(puzzle)
+local function download_puzzle(puzzle)
     -- If we don't copy the date, we could accidentally set the metatable
     -- twice (the date mt is "protected" and doesn't allow that).
     puzzle = deepcopy(puzzle)
@@ -260,4 +261,4 @@ local function do_download(puzzle)
     task.post(1, {puzzle, err}, download.END)
 end
 
-loop_through_queue(do_download, function(t) return t.filename end)
+loop_through_queue(download_puzzle, function(t) return t.filename end)
