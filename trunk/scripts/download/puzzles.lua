@@ -19,7 +19,7 @@ local sources = {
     local function has_cookie()
         local f = io.open(cookies_filename, 'rb')
         if not f then return false end
-        local has_cookie = f:read("*a"):match("NYT-S")
+        local has_cookie = f:read("*all"):match("NYT%-S")
         f:close()
         return has_cookie and true or false
     end
