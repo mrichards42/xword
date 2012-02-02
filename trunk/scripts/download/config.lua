@@ -686,10 +686,10 @@ local function get_download_fields(parent, puzzle)
         return name:gsub('%s', '_'):lower()
     end
 
-    local fields = {}
+    local ctrls = {}
     for _, name in ipairs(puzzle.fields or {}) do
-        table.insert(fields, name)
-        fields[name] = true
+        table.insert(ctrls, name)
+        ctrls[name] = true
     end
 
     local scroller = scrolled_panel(parent)
@@ -705,15 +705,22 @@ local function get_download_fields(parent, puzzle)
     border:Add(sizer, 1, wx.wxEXPAND + wx.wxALL, 5)
     sizer:AddGrowableCol(1)
 
-    for _, name in ipairs(fields) do
+    for _, name in ipairs(ctrls) do
         sizer:Add(wx.wxStaticText(scroller.panel, wx.wxID_ANY, name), 0, wx.wxALIGN_CENTER_VERTICAL)
-        fields[name] = wx.wxTextCtrl(scroller.panel, wx.wxID_ANY, puzzle[field_key(name)] or '')
-        sizer:Add(fields[name], 1, wx.wxEXPAND)
+        local flags = 0
+        if name:lower():match("password") then
+            flags = wx.wxTE_PASSWORD
+        end
+        local ctrl = wx.wxTextCtrl(
+            scroller.panel, wx.wxID_ANY, puzzle[field_key(name)] or '',
+            wx.wxDefaultPosition, wx.wxDefaultSize, flags)
+        sizer:Add(ctrl, 1, wx.wxEXPAND)
+        ctrls[name] = ctrl
     end
 
     function scroller:apply()
-        for _, name in ipairs(fields) do
-            local ctrl = fields[name]
+        for _, name in ipairs(ctrls) do
+            local ctrl = ctrls[name]
             puzzle[field_key(name)] = ctrl.Value
         end
         download.disabled[puzzle.id] = not enabled.Value
@@ -847,7 +854,7 @@ function download.get_config_panel(parent)
             local id = table.remove(puzzles._order, idx)
             table.insert(puzzles._order, idx-1, id)
             puzzle_list:Delete(idx - 1)
-            puzzle_list:Insert(id, idx - 2)
+            puzzle_list:Insert(puzzles[id].name, idx - 2)
             puzzle_list.Selection = idx - 2
         end
     end)
@@ -861,7 +868,7 @@ function download.get_config_panel(parent)
             local id = table.remove(puzzles._order, idx)
             table.insert(puzzles._order, idx+1, id)
             puzzle_list:Delete(idx - 1)
-            puzzle_list:Insert(id, idx)
+            puzzle_list:Insert(puzzles[id].name, idx)
             puzzle_list.Selection = idx
         end
     end)
