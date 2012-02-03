@@ -44,7 +44,6 @@ local function start_task(downloads)
         end,
         [download.UPDATE_STATUS] = function(data)
             local status = unpack(data)
-            print(status)
             if download.dialog then
                 download.dialog:update_status(status)
             end
