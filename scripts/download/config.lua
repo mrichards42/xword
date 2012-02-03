@@ -1,11 +1,9 @@
 local join = require 'pl.path'.join
-local deepcopy = require 'pl.tablex'.deepcopy
-local clear = require 'pl.tablex'.clear
+local tablex = require 'pl.tablex'
+local stringx = require 'pl.stringx'
 require 'safe_exec'
 require 'os'
 require 'lfs'
-
-download.puzzle_directory = join(xword.userdatadir, "puzzles")
 
 require 'luacurl'
 local curl_opt_names = {}
@@ -21,8 +19,11 @@ end
 -- ============================================================================
 -- Default config
 -- ============================================================================
-download.puzzle_directory = xword.userdatadir.."\\puzzles"
+download.puzzle_directory = join(xword.userdatadir, "puzzles")
 download.separate_directories = true
+download.auto_download = 0
+download.default_view = "Day"
+download.previous_view = {}
 download.disabled = {
     "NY Times Premium",
     "NY Times (XWord Info)",
@@ -35,7 +36,6 @@ download.disabled = {
     "I Swear",
     "Washington Post Puzzler"
 }
-download.auto_download = 0
 download.styles = {
     missing = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxBLUE },
     downloaded = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(128, 0, 128) },
@@ -45,7 +45,10 @@ download.styles = {
 
 download.styles.progress.font.Weight = wx.wxFONTWEIGHT_BOLD
 
--- Load the config file
+
+-- ============================================================================
+-- Load config
+-- ============================================================================
 local function get_config_filename()
     return join(xword.configdir, 'download', 'config.lua')
 end
@@ -68,13 +71,23 @@ if type(config) ~= 'table' then
     config = {}
 end
 
--- ============================================================================
--- Load config
--- ============================================================================
-for _, name in ipairs({'puzzle_directory', 'separate_directories', 'auto_download'}) do
+-- Basic options
+local basic_options = {
+    'puzzle_directory', 'separate_directories',
+    'auto_download','default_view', 'previous_view'}
+
+for _, name in ipairs(basic_options) do
     if config[name] ~= nil then
         download[name] = config[name]
     end
+end
+
+-- Previous view
+if config.previous_view.start_date then
+    config.previous_view.start_date = date(config.previous_view.start_date)
+end
+if config.previous_view.end_date then
+    config.previous_view.end_date = date(config.previous_view.end_date)
 end
 
 -- Styles
@@ -90,16 +103,19 @@ for k, style in pairs(download.styles) do
         end
     end
 end
+
 -- Disabled
 local dl_list = config.disabled or download.disabled
 download.disabled = {}
 for _, id in ipairs(dl_list) do
     download.disabled[id] = true
 end
+
 -- Add download sources
 for _, puzzle in ipairs(config.added or {}) do
     download.puzzles:insert(puzzle)
 end
+
 -- Changed sources
 for key, data in pairs(config.changed or {}) do
     local function update(puz1, puz2)
@@ -125,8 +141,8 @@ for key, data in pairs(config.changed or {}) do
     if puzzle then
         -- Make string curl options into numbers
         if data.curlopts then
-            local curlopts = deepcopy(data.curlopts)
-            clear(data.curlopts)
+            local curlopts = tablex.deepcopy(data.curlopts)
+            tablex.clear(data.curlopts)
             for id, value in pairs(curlopts) do
                 if type(id) == 'string' then
                     data.curlopts[curl_opt_table[id]] = value
@@ -138,6 +154,7 @@ for key, data in pairs(config.changed or {}) do
         update(puzzle, data)
     end
 end
+
 -- Adjust the order
 local oldorder = download.puzzles._order
 download.puzzles._order = {}
@@ -150,6 +167,7 @@ for _, id in ipairs(config.order or {}) do
         end
     end
 end
+
 -- Add the rest of the puzzles in order
 for _, id in ipairs(oldorder) do
     table.insert(download.puzzles._order, id)
@@ -164,12 +182,23 @@ function download.save_config()
         puzzle_directory = download.puzzle_directory,
         separate_directories = download.separate_directories,
         auto_download = download.auto_download,
+        default_view = download.default_view,
+        previous_view = {
+            kind = download.previous_view.kind,
+        },
         disabled = {},
         added = {},
         changed = {},
         order = download.puzzles._order,
         styles = {}
     }
+    -- Previous view
+    if download.previous_view.start_date then
+        config.previous_view.start_date = download.previous_view.start_date:fmt("%m/%d/%Y")
+    end
+    if download.previous_view.end_date then
+        config.previous_view.end_date = download.previous_view.end_date:fmt("%m/%d/%Y")
+    end
     -- disabled
     for id, disabled in pairs(download.disabled or {}) do
         if disabled then
@@ -217,11 +246,11 @@ function download.save_config()
             config.changed[puzzle.id] = get_changes(puzzle, default)
             -- Make curl options into strings
             if config.changed[puzzle.id] then
-                config.changed[puzzle.id] = deepcopy(config.changed[puzzle.id])
+                config.changed[puzzle.id] = tablex.deepcopy(config.changed[puzzle.id])
                 local opts = config.changed[puzzle.id].curlopts
                 if opts then
-                    local curlopts = deepcopy(opts)
-                    clear(opts)
+                    local curlopts = tablex.deepcopy(opts)
+                    tablex.clear(opts)
                     for id, value in pairs(curlopts) do
                         opts[curl_opt_names[id]] = value
                     end
@@ -234,6 +263,8 @@ function download.save_config()
 
     serialize.pdump(config, get_config_filename())
 end
+
+xword.OnCleanup(download.save_config)
 
 -- ============================================================================
 -- GUI
@@ -397,7 +428,7 @@ function get_curl_options_panel(parent, puzzle)
         if not puzzle.curlopts then
             puzzle.curlopts = {}
         end
-        clear(puzzle.curlopts)
+        tablex.clear(puzzle.curlopts)
         for _, ctrls in ipairs(opts) do
             puzzle.curlopts[curl['OPT_' .. ctrls[1].StringSelection]] = ctrls[2].Value
         end
@@ -413,7 +444,7 @@ function get_curl_options_panel(parent, puzzle)
             grid:Detach(0)
             window:Destroy()
         end
-        clear(opts)
+        tablex.clear(opts)
         for k, v in pairs(p.curlopts or {}) do
             if type(v) == 'string' and curl_opt_names[k] then
                 add_option(k, v)
@@ -482,7 +513,7 @@ function get_download_fields_panel(parent, puzzle)
         if not puzzle.fields then
             puzzle.fields = {}
         end
-        clear(puzzle.fields)
+        tablex.clear(puzzle.fields)
         for _, ctrl in ipairs(fields) do
             local value = ctrl.Value
             if value ~= '' then
@@ -501,7 +532,7 @@ function get_download_fields_panel(parent, puzzle)
             grid:Detach(0)
             window:Destroy()
         end
-        clear(fields)
+        tablex.clear(fields)
         for _, name in ipairs(p.fields or {}) do
             add_field(name)
         end
@@ -758,18 +789,21 @@ end
 function download.get_config_panel(parent)
     local panel = wx.wxPanel(parent, wx.wxID_ANY)
 
-    local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
+    local sizer = wx.wxGridBagSizer(5,5)
+    sizer:AddGrowableCol(1)
     panel:SetSizer(sizer)
+    local function sizerAdd(obj, pos, span, flags, border)
+        return sizer:Add(obj,
+            wx.wxGBPosition(unpack(pos)), wx.wxGBSpan(unpack(span or {1,1})),
+            flags or 0, border or 0)
+    end
 
     local sizer1 = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizer:Add(sizer1, 0, wx.wxEXPAND + wx.wxBOTTOM, 10)
+    sizerAdd(sizer1, {0,0}, {1,2}, wx.wxEXPAND)
 
     local puzzle_directory = wx.wxDirPickerCtrl(panel, wx.wxID_ANY, download.puzzle_directory)
     sizer1:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Download Directory:"), 0, wx.wxALIGN_CENTER)
     sizer1:Add(puzzle_directory, 1, wx.wxEXPAND)
-
-    local sizer2 = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizer:Add(sizer2, 0, wx.wxEXPAND)
 
     local separate_directories = wx.wxRadioBox(
         panel, wx.wxID_ANY, "Download puzzles to",
@@ -777,24 +811,35 @@ function download.get_config_panel(parent)
         {"One directory", "Directories by source"}, 2
     )
     separate_directories.Selection = download.separate_directories and 1 or 0
-    sizer2:Add(separate_directories)
+    sizerAdd(separate_directories, {1,0}, {1,1}, wx.wxEXPAND)
 
     -- Auto download
     local autosizer = wx.wxStaticBoxSizer(wx.wxHORIZONTAL, panel, "Automatically download")
-    sizer2:Add(autosizer, 0, wx.wxLEFT, 10)
+    sizerAdd(autosizer, {2,0}, {1,1}, wx.wxEXPAND)
     autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Last"), 0, wx.wxALIGN_CENTER_VERTICAL)
     local auto_download = wx.wxSpinCtrl(
-        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(50, -1),
+        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(100, -1),
         wx.wxSP_ARROW_KEYS, 0, 30, download.auto_download or 0)
     autosizer:Add(auto_download, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxLEFT + wx.wxRIGHT, 5)
     autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "day(s) [0 = disabled]"), 0, wx.wxALIGN_CENTER_VERTICAL)
 
+    -- Default view
+    local viewsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    sizerAdd(viewsizer, {3,0}, {1,1}, wx.wxEXPAND + wx.wxLEFT + wx.wxRIGHT, 5)
+    viewsizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Default dialog view:"),
+                  0, wx.wxALIGN_CENTER_VERTICAL)
+    viewsizer:AddStretchSpacer()
+    local default_view = wx.wxChoice(panel, wx.wxID_ANY, wx.wxDefaultPosition,
+        wx.wxDefaultSize, {"Day", "Week", "Month", "Previous view"})
+    default_view:SetStringSelection(stringx.capitalize(download.default_view))
+    viewsizer:Add(default_view, 0, wx.wxALIGN_CENTER_VERTICAL)
+
     -- Text styles
     local stylesizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Text styles")
-    sizer:Add(stylesizer)
+    sizerAdd(stylesizer, {1,1}, {3,1}, wx.wxEXPAND)
 
     local stylegrid = wx.wxGridSizer(0, 3, 5, 5)
-    stylesizer:Add(stylegrid, 1, wx.wxEXPAND + wx.wxALL, 5)
+    stylesizer:Add(stylegrid, 1, wx.wxALL, 5)
 
     local function make_style(label, style)
         local text = wx.wxStaticText(panel, wx.wxID_ANY, label)
@@ -822,17 +867,16 @@ function download.get_config_panel(parent)
 
     -- Puzzle Sources
     local srcsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizer:Add(srcsizer, 1, wx.wxEXPAND + wx.wxTOP, 10)
 
     local listsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Puzzle sources")
-    srcsizer:Add(listsizer, 0, wx.wxEXPAND)
+    sizerAdd(listsizer, {4,0}, {1,1}, wx.wxEXPAND)
 
     local puzzle_list = wx.wxListBox(panel, wx.wxID_ANY, wx.wxDefaultPosition,
                                      wx.wxSize(-1, 150))
     panel.list = puzzle_list
     listsizer:Add(puzzle_list, 1, wx.wxEXPAND)
     
-    local puzzles = deepcopy(download.puzzles)
+    local puzzles = tablex.deepcopy(download.puzzles)
     function puzzle_list:update_sources()
         local names = {}
         for key, puzzle in puzzles:iterall() do
@@ -911,7 +955,7 @@ function download.get_config_panel(parent)
 
     -- Details panel
     local detailsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Configuration")
-    srcsizer:Add(detailsizer, 1, wx.wxEXPAND + wx.wxLEFT, 10)
+    sizerAdd(detailsizer, {4,1}, {1,1}, wx.wxEXPAND)
     local details
 
     local text = wx.wxStaticText(panel, wx.wxID_ANY, "Select a Puzzle",
@@ -931,7 +975,7 @@ function download.get_config_panel(parent)
         else
             detailsizer:Show(text, false)
             details = get_download_options_panel(panel, puzzles:get(puzzle_list.Selection + 1))
-            detailsizer:Add(details, 1, wx.wxEXPAND + wx.wxLEFT, 5)
+            detailsizer:Add(details, 1, wx.wxEXPAND)
             detailsizer:Show(details, true)
         end
         detailsizer:Layout()
@@ -956,8 +1000,9 @@ function download.get_config_panel(parent)
     function panel:apply()
         download.puzzle_directory = puzzle_directory.Path
         download.separate_directories = separate_directories.Selection == 1
+        download.default_view = default_view:GetStringSelection():lower()
         if details then details:apply() end
-        download.puzzles = deepcopy(puzzles)
+        download.puzzles = tablex.deepcopy(puzzles)
         download.auto_download = auto_download.Value
         if download.dialog then
             download.dialog:update()
@@ -972,7 +1017,7 @@ end
 function download.show_config_dialog(parent)
     xword.showerrors = false
     local dlg = wx.wxDialog(parent or xword.frame, wx.wxID_ANY, "Download Config",
-                            wx.wxDefaultPosition, wx.wxSize(500,500))
+                            wx.wxDefaultPosition, wx.wxSize(500,500), wx.wxDEFAULT_FRAME_STYLE)
 
     -- Layout
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)

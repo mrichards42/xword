@@ -2,6 +2,7 @@ require 'date'
 local bmp = require 'download.bmp'
 local BmpButton = require 'download.bmp_button'
 local TextButton = require 'download.text_button'
+local stringx = require 'pl.stringx'
 
 local function DownloadHeader(parent)
     local header = wx.wxPanel(parent, wx.wxID_ANY)
@@ -122,7 +123,7 @@ local function DownloadHeader(parent)
     end
 
     -- Update kind
-    local function update_kind(kind)
+    local function update_kind()
         local kind = header:get_kind()
         -- Show or hide controls
         top:Show(prev_week, (kind == 'day'))
@@ -206,8 +207,20 @@ local function DownloadHeader(parent)
     end)
 
     -- Functions
-    function header:set_kind(kind_)
-        kind:SetStringSelection(kind_:sub(1,1):upper() .. kind_:sub(2))
+    function header:set_data(kind_, start_date_, end_date_)
+        if kind_ then
+            kind:SetStringSelection(stringx.capitalize(kind_))
+        end
+        if start_date_ then
+            print("start_date", start_date_)
+            start_date.Value = wx.wxDateTimeFromDMY(
+                start_date_:getday(), start_date_:getmonth()-1, start_date_:getyear())
+            real_start = start_date.Value
+        end
+        if end_date_ then
+            end_date.Value = wx.wxDateTimeFromDMY(
+                end_date_:getday(), end_date_:getmonth()-1, end_date_:getyear())
+        end
         update_kind()
     end
 

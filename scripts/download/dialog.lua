@@ -115,7 +115,13 @@ local function DownloadDialog(parent, id, title, pos, size)
 
     -- functions
     function panel:update_puzzles()
-        puzzle_panel:set_dates(header:get_kind(), header:get_start_date(), header:get_end_date())
+        local kind = header:get_kind()
+        local start_date = header:get_start_date()
+        local end_date = header:get_end_date()
+        puzzle_panel:set_dates(kind, start_date, end_date)
+        download.previous_view.kind = kind
+        download.previous_view.start_date = start_date
+        download.previous_view.end_date = end_date
     end
 
     function panel:download_puzzles()
@@ -133,7 +139,12 @@ local function DownloadDialog(parent, id, title, pos, size)
         self:Thaw()
     end
 
-    header:set_kind('day')
+    if download.default_view == "previous view" then
+        local v = download.previous_view
+        header:set_data(v.kind, v.start_date, v.end_date)
+    else
+        header:set_data(download.default_view)
+    end
 
     return dialog
 end
