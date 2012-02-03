@@ -8,8 +8,8 @@ function download.get_default_puzzles()
 local sources = {
     {
         name = "NY Times Premium",
-        url = "http://select.nytimes.com/premium/xword/%Y/%m/%d/%a%d%y.puz",
-        directoryname = "NY_Times",
+        url = "http://select.nytimes.com/premium/xword/%Y/%m/%d/%b%d%y.puz",
+        directoryname = "NY Times",
         filename = "nyt%Y%m%d.puz",
         days = { true, true, true, true, true, true, true },
         fields = { "User Name", "Password", },
@@ -27,6 +27,7 @@ local sources = {
         if not puzzle.user_name or not puzzle.password then
             return "User name or password not specified"
         end
+        set_status("Logging in to NY Times")
         -- Download authentication page
         local auth = download("https://myaccount.nytimes.com/auth/login")
         -- Find the form
@@ -42,17 +43,22 @@ local sources = {
         end
         table.insert(postdata, "userid=" .. curl.escape(puzzle.user_name))
         table.insert(postdata, "password=" .. curl.escape(puzzle.password))
-        task.debug(table.concat(postdata, "&"))
         -- Send the POST request and save the cookie
-        download("https://myaccount.nytimes.com/auth/login",
+        local str, c = download("https://myaccount.nytimes.com/auth/login",
                 { [curl.OPT_POST] = 1,
                   [curl.OPT_POSTFIELDS] = table.concat(postdata, "&"),
                   [curl.OPT_COOKIEJAR] = cookies_filename })
-        if not has_cookie() then
-            return "Unable to login"
+        -- Flush the cookies
+        -- Old versions of luacurl don't let you use OPT_COOKIELIST, so
+        -- it's OK if this fails.
+        if pcall(function () c:setopt(curl.OPT_COOKIELIST, "FLUSH") end) then
+            if not has_cookie() then
+                return "Unable to login"
+            end
         end
     end
     -- Download the puzzle, using the supplied cookies
+    set_status()
     download(puzzle.url, puzzle.filename,
              { [curl.OPT_COOKIEFILE] = cookies_filename })
 ]]
@@ -61,7 +67,7 @@ local sources = {
     {
         name = "NY Times (XWord Info)",
         url = "http://www.xwordinfo.com/XPF/?date=%m/%d/%Y",
-        directoryname = "NY_Times",
+        directoryname = "NY Times",
         filename = "nyt%Y%m%d.xml",
         days = { true, true, true, true, true, true, true },
         curlopts =
@@ -343,7 +349,8 @@ local deepcopy = require 'pl.tablex'.deepcopy
 local join = require 'pl.path'.join
 
 function download.sanitize_name(text)
-    local text = text:gsub('[?<>:*|"\']', ""):gsub("%s", "_")
+    -- Remove characters that are not allowed in filenames
+    local text = text:gsub('[?<>:*|"%%]\t\r\n\v\f', "")
     return text
 end
 

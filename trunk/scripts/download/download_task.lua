@@ -60,6 +60,7 @@ end
 local function do_download(url, callback, opts)
     -- Setup the cURL object
     local c = curl.easy_init()
+
     c:setopt(curl.OPT_URL, url)
     c:setopt(curl.OPT_FOLLOWLOCATION, 1)
     c:setopt(curl.OPT_WRITEFUNCTION, callback)
@@ -86,12 +87,12 @@ local function do_download(url, callback, opts)
         end
         return nil, err
     else
-        return true
+        return c
     end
 end
 
 local function download_to_file(url, filename, opts)
-    local f, rc, err
+    local f, result, err
     makedirs(path.dirname(filename))
     f, err = io.open(filename, 'wb')
     if not f then
@@ -105,16 +106,17 @@ local function download_to_file(url, filename, opts)
     end
 
     -- Download
-    rc, err = do_download(url, write_to_file, opts)
+    result, err = do_download(url, write_to_file, opts)
 
     -- Cleanup
     f:close()
 
-    if not rc then
+    if not result then
         os.remove(filename)
+        return nil, err
+    else
+        return result
     end
-
-    return rc, err
 end
 
 local function download_to_string(url, opts)
@@ -127,13 +129,13 @@ local function download_to_string(url, opts)
     end
 
     -- Download
-    local success, err = do_download(url, write_to_table, opts)
+    local result, err = do_download(url, write_to_table, opts)
 
     -- Return the string
-    if success then
-        return table.concat(t)
+    if result then
+        return table.concat(t), result
     else
-        return success, err
+        return nil, err
     end
 end
 
@@ -146,7 +148,7 @@ end
     download.download{url = url, filename = filename, [curl]opts = opts}
         or
     download.download(url, filename, opts)
-        -> true or nil, err
+        -> curl_handle or nil, err
 
     With a callback function
     ------------------------
@@ -158,14 +160,14 @@ end
     download.download{url = url, callback = callback, [curl]opts = opts}
         or 
     download.download(url, callback, opts)
-        -> true or nil, err
+        -> curl_handle or nil, err
 
     To a string
     -----------
     download.download{url = url, [curl]opts = opts}
         or 
     download.download(url, opts)
-        -> str or nil, err
+        -> str or nil, curl_handle or err
 ]]
 function download.download(opts, filename, curlopts)
     -- Gather the arguments
@@ -189,23 +191,28 @@ function download.download(opts, filename, curlopts)
     assert(url)
 
     -- Figure out which variant to call
-    local success, err
+    local result, err
     if callback then
-        success, err = do_download(url, callback, curlopts)
+        result, err = do_download(url, callback, curlopts)
     elseif filename then
-        success, err = download_to_file(url, filename, curlopts)
+        result, err = download_to_file(url, filename, curlopts)
     else
-        success, err = download_to_string(url, curlopts)
+        result, err = download_to_string(url, curlopts)
     end
     -- Check for abort
-    if success == 'abort' then
+    if result == 'abort' then
         -- wrapped in a table so that location info isn't added
         error({'abort'})
-    elseif not success then
+    elseif not result then
         error({err})
     else
-        return success
+        return result, err
     end
+end
+
+-- This can be called from custom functions to update the status pane
+function set_status(text)
+    task.post(1, {text}, download.UPDATE_STATUS)
 end
 
 local deepcopy = require 'pl.tablex'.deepcopy
