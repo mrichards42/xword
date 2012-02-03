@@ -10,9 +10,9 @@ project "luacurl"
 
     -- Platform-specific
     configuration "windows"
-        includedirs { LIBCURL.."/include" }
+        includedirs { "../../deps/curl/include" }
         links { "wldap32", "winmm", "ws2_32" } -- For curl
-        libdirs { LIBCURL.."/lib/DLL-Release" }
+        libdirs { "../../deps/curl/lib" }
         links { "libcurl_imp" } -- for luacurl
 
     configuration "linux or macosx"
@@ -21,7 +21,7 @@ project "luacurl"
     -- Postbuild: copy libcurl.dll to XWord directory
 
     configuration { "windows", "Debug" }
-       postbuildcommands { [[copy "%LIBCURL%\lib\DLL-Release\libcurl.dll" ..\..\bin\Debug /Y]] }
+       postbuildcommands { [[copy "..\..\deps\curl\lib\*.dll" ..\..\bin\Debug /Y]] }
 
     configuration { "windows", "Release" }
-       postbuildcommands { [[copy "%LIBCURL%\lib\DLL-Release\libcurl.dll" ..\..\bin\Release /Y]] }
+       postbuildcommands { [[copy "..\..\deps\curl\lib\*.dll" ..\..\bin\Release /Y]] }

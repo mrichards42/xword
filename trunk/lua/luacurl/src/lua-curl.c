@@ -8,6 +8,7 @@
    - Add support for cURL's progress callback
    - Remove support for curl http forms (not important for XWord, and I
      couldn't get it to compile)
+   - Add support for CURLOPT_COOKIELIST
 
    All changes to the original file are marked with 
    XWORD START
@@ -105,27 +106,30 @@
         #define STR_COOKIE 		1
         #define STR_COOKIEFILE 		2
         #define STR_COOKIEJAR 		3
-        #define STR_CUSTOMREQUEST 	4
-        #define STR_EGDSOCKET 		5
-        #define STR_FTPPORT 		6
-        #define STR_INTERFACE 		7
-        #define STR_KRB4LEVEL 		8
-        #define STR_POSTFIELDS 		9
-        #define STR_PROXY 		10
-        #define STR_PROXYUSERPWD 	11
-        #define STR_RANDOM_FILE 	12
-        #define STR_RANGE 		13
-        #define STR_REFERER 		14
-        #define STR_SSLCERT 		15
-        #define STR_SSLCERTPASSWD 	16
-        #define STR_SSLCERTTYPE 	17
-        #define STR_SSLENGINE 		18	
-        #define STR_SSLKEY 		19
-        #define STR_SSLKEYTYPE 		20
-        #define STR_SSL_CIPHER_LIST 	21
-        #define STR_URL 		22
-        #define STR_USERAGENT 		23
-        #define STR_USERPWD 		24
+/* XWORD START */
+        #define STR_COOKIELIST 		4
+/* XWORD END */
+        #define STR_CUSTOMREQUEST 	5
+        #define STR_EGDSOCKET 		6
+        #define STR_FTPPORT 		7
+        #define STR_INTERFACE 		8
+        #define STR_KRB4LEVEL 		9
+        #define STR_POSTFIELDS 		10
+        #define STR_PROXY 		    11
+        #define STR_PROXYUSERPWD 	12
+        #define STR_RANDOM_FILE 	13
+        #define STR_RANGE 		    14
+        #define STR_REFERER 		15
+        #define STR_SSLCERT 		16
+        #define STR_SSLCERTPASSWD 	17
+        #define STR_SSLCERTTYPE 	18
+        #define STR_SSLENGINE 		19	
+        #define STR_SSLKEY 		    20
+        #define STR_SSLKEYTYPE 		21
+        #define STR_SSL_CIPHER_LIST 22
+        #define STR_URL 		    23
+        #define STR_USERAGENT 		24
+        #define STR_USERPWD 		25
 
 	#define STR_LAST STR_USERPWD
 
@@ -345,6 +349,9 @@ switch (opt) {
         case CURLOPT_COOKIE: return STR_COOKIE;
         case CURLOPT_COOKIEFILE: return STR_COOKIEFILE;
         case CURLOPT_COOKIEJAR: return STR_COOKIEJAR;
+/* XWORD START */
+        case CURLOPT_COOKIELIST: return STR_COOKIELIST;
+/* XWORD END */
         case CURLOPT_CUSTOMREQUEST: return STR_CUSTOMREQUEST;
         case CURLOPT_EGDSOCKET: return STR_EGDSOCKET;
         case CURLOPT_FTPPORT: return STR_FTPPORT;
