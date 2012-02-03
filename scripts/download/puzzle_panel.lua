@@ -219,7 +219,7 @@ local function PuzzlePanel(parent, puzzle)
             header_puzzle = nil
         end
         header_sizer:Show(download_button, true)
-        if #dates <= 1 then
+        if #dates <= 1 and kind ~= 'month' then
             header_sizer:Show(button, false)
             if #dates == 1 then
                 local d = dates[1]
