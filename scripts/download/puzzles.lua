@@ -200,12 +200,13 @@ local sources = {
         id, name = a,b
     end
     if id and name then
-        return download(
+        download(
             string.format("http://icrossword.com/publish/server/puzzle/index.php/%s?id=%s%s",
                           name, id, name),
             puzzle.filename)
+    else
+        return "Could not find a puzzle."
     end
-    return "Could not find a puzzle."
 ]]
     },
 
@@ -225,12 +226,13 @@ local sources = {
         id, name = a,b
     end
     if id and name then
-        return download(
+        download(
             string.format("http://icrossword.com/publish/server/puzzle/index.php/%s?id=%s%s",
                           name, id, name),
             puzzle.filename)
+    else
+        return "Could not find a puzzle."
     end
-    return "Could not find a puzzle."
 ]]
     },
 
@@ -249,10 +251,25 @@ local sources = {
 
     -- Download the puzzle
     if url then
-        return download(url, puzzle.filename)
+        download(url, puzzle.filename)
+    else
+        return "Could not find a download link"
     end
-    return "Could not find a download link"
 ]]
+    },
+
+    {
+        name = "I Swear",
+        url = "http://wij.theworld.com/puzzles/dailyrecord/DR%y%m%d.puz",
+        filename = "dr%Y%m%d.puz",
+        days = { false, false, false, false, true, false, false },
+    },
+
+    {
+        name = "Washington Post Puzzler",
+        url = "http://crosswords.washingtonpost.com/wp-srv/style/crosswords/util/csserve2.cgi/cs%y%m%d.puz?t=pimage&z=puzzler&f=cs%y%m%d.puz",
+        filename = "wp%Y%m%d.puz",
+        days = { false, false, false, false, false, false, true },
     },
 }
 

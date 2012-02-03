@@ -32,6 +32,8 @@ download.disabled = {
     "Matt Gaffney's Weekly Crossword Contest",
     "Matt Gaffney's Daily Crossword",
     "Brendan Emmett Quigley",
+    "I Swear",
+    "Washington Post Puzzler"
 }
 download.auto_download = 0
 download.styles = {
