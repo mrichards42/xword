@@ -122,8 +122,8 @@ local function DownloadDialog(parent, id, title, pos, size)
         puzzle_panel:download_puzzles()
     end
 
-    function dialog:update_status()
-        status:update_status()
+    function dialog:update_status(text)
+        status:update_status(text)
     end
 
     function dialog:update()

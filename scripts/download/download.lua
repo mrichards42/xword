@@ -33,7 +33,7 @@ local function start_task(downloads)
             end
             clear(queued_messages)
         end,
-        [download.START] = function (data)
+        [download.START] = function(data)
             local puzzle = unpack(data)
             puzzle.date = setmetatable(puzzle.date, getmetatable(date()))
             download.current = puzzle
@@ -42,7 +42,14 @@ local function start_task(downloads)
                 download.dialog:update_status()
             end
         end,
-        [download.END] = function (data)
+        [download.UPDATE_STATUS] = function(data)
+            local status = unpack(data)
+            print(status)
+            if download.dialog then
+                download.dialog:update_status(status)
+            end
+        end,
+        [download.END] = function(data)
             local puzzle, err = unpack(data)
             puzzle.date = setmetatable(puzzle.date, getmetatable(date()))
             download.fetch_stats{{puzzle.filename}, force = true}
@@ -64,7 +71,7 @@ local function start_task(downloads)
                 end
             end
         end,
-        [task.END] = function ()
+        [task.END] = function()
             download.current = nil
             task_id = nil
             if download.dialog then

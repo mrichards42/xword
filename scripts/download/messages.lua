@@ -6,6 +6,7 @@ download.APPEND = 11
 download.START = 100
 download.END = 101
 download.STATS = 102
+download.UPDATE_STATUS = 103
 
 -- stats enum
 download.MISSING = 1

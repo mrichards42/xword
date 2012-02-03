@@ -205,8 +205,10 @@ local function Status(parent)
         evt:Skip()
     end)
 
-    function panel:update_status()
-        if download.current then
+    function panel:update_status(text)
+        if text then
+            self.current:SetLabel(text)
+        elseif download.current then
             self.current:SetLabel(display_text(download.current))
         else
             self.current:SetLabel("Ready")
