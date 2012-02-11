@@ -274,6 +274,10 @@ private:
     void OnDeletePuzzle(wxCommandEvent & WXUNUSED(evt));
     void OnQuit        (wxCommandEvent & WXUNUSED(evt))   { Close(); }
 
+    // Edit
+    void OnCopy        (wxCommandEvent & WXUNUSED(evt));
+    void OnPaste       (wxCommandEvent & WXUNUSED(evt));
+
     // Zoom
     void OnZoomIn      (wxCommandEvent & WXUNUSED(evt));
     void OnZoomFit     (wxCommandEvent & WXUNUSED(evt));
