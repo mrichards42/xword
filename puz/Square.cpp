@@ -108,12 +108,15 @@ char Square::ToPlain(const string_t & str)
 {
     if (str.empty())
         return ToPlain(Blank);
-    return ToPlain(to_unicode(str).at(0));
+    char ch = ToPlain(to_unicode(str).at(0));
+    if (ch == 0)
+        return ToPlain(Blank);
+    return ch;
 }
 
 char_t Square::ToGrid(int ch)
 {
-    if (ch == Black[0] || ch == puzT('['))
+    if (ch == Black[0] || ch == puzT('[') || ch == puzT('*'))
         return 0;
 
 #if PUZ_UNICODE
