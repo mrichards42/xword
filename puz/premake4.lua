@@ -31,8 +31,8 @@ project "puz"
             "PUZ_API=__declspec(dllexport)",
         }
         -- zlib
-        includedirs { "../zlib/include" }
-        libdirs { "../zlib/lib" }
+        includedirs { "../deps/zlib/include" }
+        libdirs { "../deps/zlib/lib" }
         links { "zdll" }
 
     configuration "linux"
@@ -57,7 +57,7 @@ project "puz"
     -- Postbuild: copy zlib1.dll to XWord directory
 
     configuration { "windows", "Debug" }
-       postbuildcommands { [[copy "..\..\zlib\zlib1.dll" ..\..\bin\Debug /Y]] }
+       postbuildcommands { [[copy "..\..\deps\zlib\zlib1.dll" ..\..\bin\Debug /Y]] }
 
     configuration { "windows", "Release" }
-       postbuildcommands { [[copy "..\..\zlib\zlib1.dll" ..\..\bin\Release /Y]] }
+       postbuildcommands { [[copy "..\..\deps\zlib\zlib1.dll" ..\..\bin\Release /Y]] }
