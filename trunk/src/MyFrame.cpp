@@ -39,7 +39,6 @@
 #include "dialogs/wxFB_Dialogs.h"
 #include <wx/aboutdlg.h>
 
-
 // Windows
 #include "widgets/SizedText.hpp"
 #include "ClueListBox.hpp"
@@ -58,6 +57,10 @@
 // For the scrambling dialogs
 #include <wx/numdlg.h>
 
+// Clipboard stuff
+#include "utils/clipboard.hpp"
+
+// Debug
 #include "utils/SizerPrinter.hpp"
 
 #if !defined(__WXMSW__) && !defined(__WXPM__)
@@ -83,6 +86,9 @@ enum toolIds
     //wxID_ZOOM_IN,
     //wxID_ZOOM_FIT,
     //wxID_ZOOM_OUT,
+
+    //wxID_COPY,
+    //wxID_PASTE,
 
     ID_CHECK_LETTER,
     ID_CHECK_WORD,
@@ -229,6 +235,12 @@ MyFrame::ManageTools()
 
         { wxID_EXIT,         wxITEM_NORMAL, _T("&Quit\tCtrl+Q"), NULL, NULL,
                      _handler(MyFrame::OnQuit) },
+
+        { wxID_COPY,       wxITEM_NORMAL, _T("&Copy\tCtrl+C"), NULL, NULL,
+                     _handler(MyFrame::OnCopy) },
+
+        { wxID_PASTE,       wxITEM_NORMAL, _T("&Paste\tCtrl+V"), NULL, NULL,
+                     _handler(MyFrame::OnPaste) },
 
 
         { wxID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom &In\tCtrl+="),  _T("zoom_in"), NULL,
@@ -1067,6 +1079,11 @@ MyFrame::CreateMenuBar()
     mb->Append(menu, _T("&File"));
 
     menu = new wxMenu();
+        m_toolMgr.Add(menu, wxID_COPY);
+        m_toolMgr.Add(menu, wxID_PASTE);
+    mb->Append(menu, _T("&Edit"));
+
+    menu = new wxMenu();
         m_toolMgr.Add(menu, wxID_ZOOM_IN);
         m_toolMgr.Add(menu, wxID_ZOOM_FIT);
         m_toolMgr.Add(menu, wxID_ZOOM_OUT);
@@ -1643,6 +1660,64 @@ MyFrame::OnDeletePuzzle(wxCommandEvent & WXUNUSED(evt))
         wxRemoveFile(m_filename);
 }
 
+
+// Edit
+// -----
+void
+MyFrame::OnCopy(wxCommandEvent & evt)
+{
+    if (wxTheClipboard->Open())
+    {
+        wxTheClipboard->SetData(new WordDataObject(GetFocusedWord()));
+        wxTheClipboard->Close();
+    }
+}
+
+void
+MyFrame::OnPaste(wxCommandEvent & evt)
+{
+    if (wxTheClipboard->Open())
+    {
+        // First look for an XWord clipboard object
+        WordDataObject data;
+        if (wxTheClipboard->IsSupported(data.GetFormat()))
+        {
+            wxTheClipboard->GetData(data);
+            wxLogDebug(_T("Got data"));
+            wxLogDebug(data.GetText());
+            wxStringTokenizer letters = data.GetTokens();
+            puz::Word * word = GetFocusedWord();
+            if (word)
+            {
+                puz::square_iterator square = word->find(GetFocusedSquare());
+                for (; square != word->end() && letters.HasMoreTokens(); ++square)
+                {
+                    m_XGridCtrl->SetSquareText(*square, letters.GetNextToken());
+                }
+            }
+            m_XGridCtrl->Refresh();
+        }
+        // Next check for a text clipboard object
+        else if (wxTheClipboard->IsSupported(wxDF_TEXT))
+        {
+            wxTextDataObject data;
+            wxTheClipboard->GetData(data);
+            wxString letters = data.GetText();
+            puz::Word * word = GetFocusedWord();
+            if (word)
+            {
+                wxString::const_iterator letter = letters.begin();
+                puz::square_iterator square = word->find(GetFocusedSquare());
+                for (; square != word->end() && letter != letters.end(); ++square)
+                    m_XGridCtrl->SetSquareText(*square, wx2puz(*(letter++)));
+            }
+            m_XGridCtrl->Refresh();
+        }
+        else
+            wxLogDebug(_T("No data"));
+        wxTheClipboard->Close();
+    }
+}
 
 // Zoom
 //---------------
