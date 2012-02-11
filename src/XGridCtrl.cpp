@@ -835,6 +835,14 @@ XGridCtrl::MakeVisible(const puz::Square & square)
 bool
 XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
 {
+    // Are we allowed to enter this text?
+    if (text == _T("."))
+        if (! GetGrid()->IsDiagramless())
+            return false;
+    for (wxString::const_iterator it = text.begin(); it != text.end(); ++it)
+        if (! IsValidChar(*it))
+            return false;
+
     // Not allowed to overwrite revealed letters or checked letters
     if (square.HasFlag(puz::FLAG_REVEALED | puz::FLAG_CORRECT))
         return false;
