@@ -276,7 +276,9 @@ private:
 
     // Edit
     void OnCopy        (wxCommandEvent & WXUNUSED(evt));
+    void OnCopySquare  (wxCommandEvent & WXUNUSED(evt));
     void OnPaste       (wxCommandEvent & WXUNUSED(evt));
+    void OnPasteRebus  (wxCommandEvent & WXUNUSED(evt));
 
     // Zoom
     void OnZoomIn      (wxCommandEvent & WXUNUSED(evt));

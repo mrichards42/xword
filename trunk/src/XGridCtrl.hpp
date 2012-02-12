@@ -73,9 +73,17 @@ enum GridStyle
 
 enum CorrectStatus
 {
-    INCOMPLETE_PUZZLE,
-    INCORRECT_PUZZLE,
-    CORRECT_PUZZLE
+    INCOMPLETE_PUZZLE = -1,
+    INCORRECT_PUZZLE, // = false
+    CORRECT_PUZZLE // = true
+};
+
+struct GridStats
+{
+    CorrectStatus correct;
+    int blank;
+    int black;
+    int white;
 };
 
 
@@ -303,7 +311,8 @@ public:
     const puz::Square & At(int col, int row) const { return m_grid->At(col, row); }
           puz::Square & At(int col, int row)       { return m_grid->At(col, row); }
 
-    CorrectStatus IsCorrect();
+    CorrectStatus IsCorrect() const;
+    void GetStats(GridStats * stats) const;
 
     puz::Square * GetClueNumber     (const wxString & num);
 

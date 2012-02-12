@@ -26,7 +26,7 @@
 #include "utils/string.hpp"
 
 // A class for copying the text from a word of squares.
-// Data is stored as a series of null-terminated strings and converted
+// Data is stored as a series of tab-delimited strings and converted
 // to a series of tokens on the fly.
 
 class WordDataObject : public wxTextDataObject
@@ -40,12 +40,15 @@ public:
             wxString str;
             puz::square_iterator square;
             for (square = word->begin(); square != word->end(); ++square)
-            {
                 str << puz2wx(square->GetText()) << _T('\t');
-                wxLogDebug(str);
-            }
             SetText(str);
         }
+    }
+
+    WordDataObject(const puz::Square * square)
+        : wxTextDataObject(square->GetText() + _T('\t'))
+    {
+        SetFormat(wxDataFormat(_T("XWord 0.5 word")));
     }
 
     wxStringTokenizer GetTokens() const
@@ -71,6 +74,11 @@ public:
         }
     }
 
+    XWordTextDataObject(const puz::Square * square)
+    {
+        Add(new WordDataObject(square), true);
+        Add(new wxTextDataObject(square->GetText()));
+    }
 };
 
 #endif // MY_CLIPBOARD_H
