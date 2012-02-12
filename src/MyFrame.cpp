@@ -88,6 +88,7 @@ enum toolIds
     //wxID_ZOOM_OUT,
 
     //wxID_COPY,
+    ID_COPY_SQUARE,
     //wxID_PASTE,
 
     ID_CHECK_LETTER,
@@ -239,9 +240,11 @@ MyFrame::ManageTools()
         { wxID_COPY,       wxITEM_NORMAL, _T("&Copy\tCtrl+C"), NULL, NULL,
                      _handler(MyFrame::OnCopy) },
 
+        { ID_COPY_SQUARE,       wxITEM_NORMAL, _T("Copy &Square\tCtrl+Shift+C"), NULL, NULL,
+                     _handler(MyFrame::OnCopySquare) },
+
         { wxID_PASTE,       wxITEM_NORMAL, _T("&Paste\tCtrl+V"), NULL, NULL,
                      _handler(MyFrame::OnPaste) },
-
 
         { wxID_ZOOM_IN,  wxITEM_NORMAL, _T("Zoom &In\tCtrl+="),  _T("zoom_in"), NULL,
                     _handler(MyFrame::OnZoomIn) },
@@ -919,7 +922,9 @@ MyFrame::ShowNotes()
 void
 MyFrame::CheckPuzzle()
 {
-    switch(m_XGridCtrl->IsCorrect())
+    GridStats stats;
+    m_XGridCtrl->GetStats(&stats);
+    switch (stats.correct)
     {
         case CORRECT_PUZZLE:
             StopTimer();
@@ -928,13 +933,14 @@ MyFrame::CheckPuzzle()
             break;
         case INCORRECT_PUZZLE:
             m_status->SetAlert(
-                _T("The puzzle is completely filled, ")
-                _T("but some letters are incorrect."),
+                _T("The puzzle contains incorrect letters."),
                 *wxWHITE, *wxRED);
             break;
         default:
         case INCOMPLETE_PUZZLE:
-            m_status->SetAlert(_T(""));
+            m_status->SetAlert(wxString::Format(_T("%d/%d filled (%d%%)"),
+                stats.white - stats.blank, stats.white,
+                (double(100) * (stats.white - stats.blank) + .5) / stats.white));
             break;
     }
 }
@@ -982,6 +988,7 @@ MyFrame::CreateWindows()
 
     m_status = new MyStatusBar(this);
     SetStatusBar(m_status);
+    SetStatusBarPane(-1); // Disable menu help: it's buggy
 
     // Fonts
     wxFont clueFont(12, wxFONTFAMILY_SWISS,
@@ -1080,6 +1087,7 @@ MyFrame::CreateMenuBar()
 
     menu = new wxMenu();
         m_toolMgr.Add(menu, wxID_COPY);
+        m_toolMgr.Add(menu, ID_COPY_SQUARE);
         m_toolMgr.Add(menu, wxID_PASTE);
     mb->Append(menu, _T("&Edit"));
 
@@ -1318,6 +1326,9 @@ MyFrame::EnableTools(bool enable)
 
     // Tools that are only enabled or disabled when a puzzle
     // is shown or closed.  These don't have any special logic.
+    m_toolMgr.Enable(wxID_COPY, enable);
+    m_toolMgr.Enable(wxID_PASTE, enable);
+    m_toolMgr.Enable(ID_COPY_SQUARE, enable);
     m_toolMgr.Enable(ID_UNSCRAMBLE, enable);
     m_toolMgr.Enable(ID_SCRAMBLE,   enable);
     m_toolMgr.Enable(ID_ERASE_GRID, enable);
@@ -1668,7 +1679,17 @@ MyFrame::OnCopy(wxCommandEvent & evt)
 {
     if (wxTheClipboard->Open())
     {
-        wxTheClipboard->SetData(new WordDataObject(GetFocusedWord()));
+        wxTheClipboard->SetData(new XWordTextDataObject(GetFocusedWord()));
+        wxTheClipboard->Close();
+    }
+}
+
+void
+MyFrame::OnCopySquare(wxCommandEvent & evt)
+{
+    if (wxTheClipboard->Open())
+    {
+        wxTheClipboard->SetData(new XWordTextDataObject(GetFocusedSquare()));
         wxTheClipboard->Close();
     }
 }
@@ -2703,6 +2724,11 @@ MyFrame::OnClose(wxCloseEvent & evt)
             }
         }
 #endif
+        if (wxTheClipboard->Open())
+        {
+            wxTheClipboard->Flush();
+            wxTheClipboard->Close();
+        }
         Destroy();
         return;
     }

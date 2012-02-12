@@ -321,7 +321,7 @@ XGridCtrl::UnscrambleSolution(unsigned short key)
 }
 
 CorrectStatus
-XGridCtrl::IsCorrect()
+XGridCtrl::IsCorrect() const
 {
     bool strictRebus = HasStyle(STRICT_REBUS);
     bool incorrect = false;
@@ -341,6 +341,50 @@ XGridCtrl::IsCorrect()
         return INCORRECT_PUZZLE;
     else
         return CORRECT_PUZZLE;
+}
+
+void
+XGridCtrl::GetStats(GridStats * stats) const
+{
+    stats->blank = 0;
+    stats->black = 0;
+    stats->white = 0;
+
+    bool strictRebus = HasStyle(STRICT_REBUS);
+    bool incorrect = false;
+    puz::Square * square;
+    for (square = m_grid->First(); square != NULL; square = square->Next())
+    {
+        if (square->IsBlack())
+        {
+            ++stats->black;
+        }
+        else
+        {
+            ++stats->white;
+            if (square->IsBlank())
+            {
+                ++stats->blank;
+                stats->correct = INCOMPLETE_PUZZLE;
+            }
+            else if (stats->blank == 0 && ! incorrect
+                     && ! square->Check(puz::NO_CHECK_BLANK, strictRebus))
+            {
+                incorrect = true;
+            }
+        }
+    }
+    // We *can* test scrambled puzzles!  Not sure why I didn't think of
+    // this before.  (Inspired by Alex Boisvert:
+    // http://alexboisvert.com/software.html#check)
+    if (stats->blank == 0)
+    {
+        if (incorrect
+            || (m_grid->IsScrambled() && ! m_grid->CheckScrambledGrid()))
+            stats->correct = INCORRECT_PUZZLE;
+        else
+            stats->correct = CORRECT_PUZZLE;
+    }
 }
 
 //-------------------------------------------------------
