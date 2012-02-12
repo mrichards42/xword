@@ -104,6 +104,8 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             if (row_n >= height)
                 throw LoadError("Too many rows in grid");
             string_t text = GetText(row);
+            if (text.size() < width) // Pad this string with blanks
+                text.append(width - text.size(), puzT(' '));
             if (text.size() != width)
                 throw LoadError("Wrong number of squares in Row");
             string_t::iterator it;
@@ -229,18 +231,14 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             if (row_n >= height)
                 break;
             string_t text = GetText(row);
+            if (text.size() < width) // Pad this string with blanks
+                text.append(width - text.size(), puzT(' '));
             string_t::iterator it;
             for (it = text.begin(); it != text.end(); ++it)
             {
                 assert(square);
-                square->SetText(string_t(1, *it));
-                square = square->Next();
-            }
-            // Advance to the next row . . . in case there are not enough
-            // squares in the row
-            while (square && ! square->IsFirst(ACROSS))
-            {
-                square->SetText(puzT(""));
+                if (grid.IsDiagramless() || square->IsWhite())
+                    square->SetText(string_t(1, *it));
                 square = square->Next();
             }
             ++row_n;
