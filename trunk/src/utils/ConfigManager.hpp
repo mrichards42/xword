@@ -51,18 +51,18 @@ public:
             parent->m_children.push_back(this);
     }
 
-    virtual void Update()
+    virtual void Update(wxEvtHandler * h = NULL)
     {
         std::list<ConfigGroup *>::iterator it;
         for (it = m_children.begin(); it != m_children.end(); ++it)
-            (*it)->Update();
+            (*it)->Update(h);
     }
 
-    virtual void RemoveCallbacks(wxWindow * win)
+    virtual void RemoveCallbacks(wxEvtHandler * h)
     {
         std::list<ConfigGroup *>::iterator it;
         for (it = m_children.begin(); it != m_children.end(); ++it)
-            (*it)->RemoveCallbacks(win);
+            (*it)->RemoveCallbacks(h);
     }
 
     wxString m_name;
@@ -121,7 +121,7 @@ public:
         long val = config.Group.MyLong();
         config.Group.MyLong = 100000L;
 
-    wxWindow-derived classes can attach callbacks that will be called when
+    wxEvtHandler-derived classes can attach callbacks that will be called when
     a value is Set().
         MyFrame * frame;
         config.Group.MyBool.AddCallback(frame, &MyFrame::Maximize);
@@ -204,8 +204,8 @@ public:
         m_config->Write(path, Convert<T, typename AdaptedType<T>::type>(val));
     }
 
-    inline void Update() { m_group.Update(); }
-    inline void RemoveCallbacks(wxWindow * win) { m_group.RemoveCallbacks(win); }
+    inline void Update(wxEvtHandler * h = NULL) { m_group.Update(h); }
+    inline void RemoveCallbacks(wxEvtHandler * h) { m_group.RemoveCallbacks(h); }
 
 protected:
     wxConfigBase * m_config;
@@ -284,34 +284,37 @@ public:
     void AddCallback(OBJ * obj, FUNC func)
     {
         // Add a callback to the callbacks multimap.
-        wxWindow * win = static_cast<wxWindow*>(obj);
-        m_callbacks.insert(pair_t(win, new Callback<OBJ, FUNC>(obj, func)));
+        wxEvtHandler * h = static_cast<wxEvtHandler*>(obj);
+        m_callbacks.insert(pair_t(h, new Callback<OBJ, FUNC>(obj, func)));
     }
 
-    void RemoveCallbacks(wxWindow * win)
+    void RemoveCallbacks(wxEvtHandler * handler)
     {
         // Delete the callbacks and erase the map entries for this window.
         std::pair<typename map_t::iterator, typename map_t::iterator> range =
-            m_callbacks.equal_range(win);
+            m_callbacks.equal_range(handler);
         for (typename map_t::iterator it = range.first; it != range.second; ++it)
             delete it->second;
         m_callbacks.erase(range.first, range.second);
     }
 
     // Run the callbacks for this value
-    inline void Update() { Update(Get()); }
-    inline void Update(T val)
+    inline void Update(wxEvtHandler * h = NULL) { Update(Get(), h); }
+    inline void Update(T val, wxEvtHandler * h = NULL)
     {
         typename map_t::iterator it;
         for (it = m_callbacks.begin(); it != m_callbacks.end(); ++it)
-            it->second->Call(val);
+        {
+            if (h == NULL || it->first == h)
+                it->second->Call(val);
+        }
     }
 
 protected:
     ConfigManagerBase * GetConfig() { return m_cfg; }
     T m_default;
-    typedef std::multimap<wxWindow *, CallbackBase*> map_t;
-    typedef std::pair<wxWindow *, CallbackBase*> pair_t;
+    typedef std::multimap<wxEvtHandler *, CallbackBase*> map_t;
+    typedef std::pair<wxEvtHandler *, CallbackBase*> pair_t;
     map_t m_callbacks;
 };
 
