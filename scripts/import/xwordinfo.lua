@@ -21,6 +21,19 @@ local function izip(...)
     end
 end
 
+-- Decode xml entities
+local entities = {
+    lt = "<",
+    gt = ">",
+    apos = "'",
+    quot = '"',
+    amp = "&"
+}
+
+local function decode_entities(str)
+    return str:gsub("&(.-);", entities)
+end
+
 
 function import.xwordinfoJSON(p, filename)
     -- Open the file and parse it
@@ -50,12 +63,17 @@ function import.xwordinfoJSON(p, filename)
     g:SetSize(doc.size.cols, doc.size.rows)
 
     local s = g:First()
-    for _, letter, number, circle, shade in izip(doc.grid, doc.gridnums,
-                                                 doc.circles or {},
-                                                 doc.shadecircles or {}) do
+    local shade = doc.shadecircles or false
+    for _, letter, number, circle in izip(doc.grid, doc.gridnums,
+                                                 doc.circles) do
         s.Solution = letter
-        s:SetCircle(circle == 1 and true or false)
-        s:SetHighlight(shade == 1 and true or false)
+        if circle == 1 then
+            if shade then
+                s:SetHighlight(true)
+            else
+                s:SetCircle(true)
+            end
+        end
         if number > 0 then s.Number = number end
         s = s:Next()
     end
@@ -65,7 +83,7 @@ function import.xwordinfoJSON(p, filename)
         local list = {}
         for _, clue in ipairs(clues) do
             local number, text = clue:match("(.-)%. (.*)")
-            list[tonumber(number)] = text
+            list[tonumber(number)] = decode_entities(text)
         end
         p:SetClueList(name == "across" and "Across" or "Down", list)
     end
