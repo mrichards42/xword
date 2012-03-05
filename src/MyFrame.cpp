@@ -35,7 +35,6 @@
 // Dialogs
 #include "dialogs/Layout.hpp"
 #include "dialogs/Preferences.hpp"
-#include "dialogs/Characters.hpp"
 #include "dialogs/wxFB_Dialogs.h"
 #include <wx/aboutdlg.h>
 
@@ -119,8 +118,6 @@ enum toolIds
     ID_TIMER,
     ID_RESET_TIMER,
 
-    ID_CHARACTER_MAP,
-
     //wxID_PREFERENCES,
 
     ID_PAGE_SETUP,
@@ -174,7 +171,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_AUI_PANE_CLOSE (                      MyFrame::OnPaneClose)
 
     EVT_UPDATE_UI      (ID_SHOW_NOTES,        MyFrame::OnUpdateUI)
-    EVT_UPDATE_UI      (ID_CHARACTER_MAP,     MyFrame::OnUpdateUI)
     EVT_UPDATE_UI      (ID_REBUS_ENTRY,       MyFrame::OnUpdateUI)
 
     EVT_MENU_RANGE     (ID_FILE_HISTORY_1,
@@ -240,7 +236,7 @@ MyFrame::ManageTools()
         { wxID_COPY,       wxITEM_NORMAL, _T("&Copy\tCtrl+C"), NULL, NULL,
                      _handler(MyFrame::OnCopy) },
 
-        { ID_COPY_SQUARE,       wxITEM_NORMAL, _T("Copy &Square\tCtrl+Shift+C"), NULL, NULL,
+        { ID_COPY_SQUARE,       wxITEM_NORMAL, _T("Copy &Square"), NULL, NULL,
                      _handler(MyFrame::OnCopySquare) },
 
         { wxID_PASTE,       wxITEM_NORMAL, _T("&Paste\tCtrl+V"), NULL, NULL,
@@ -318,9 +314,6 @@ MyFrame::ManageTools()
                    _handler(MyFrame::OnTimer) },
         { ID_RESET_TIMER,    wxITEM_NORMAL, _T("&Reset"), NULL, NULL,
                    _handler(MyFrame::OnResetTimer) },
-
-        { ID_CHARACTER_MAP,  wxITEM_CHECK, _T("&Character Map\tCtrl+M"), NULL, NULL,
-                   _handler(MyFrame::OnCharacterMap) },
 
 #ifdef __WXMSW__
         { wxID_HELP_CONTENTS, wxITEM_NORMAL, _T("&Help Contents\tF1"), NULL, NULL,
@@ -404,7 +397,6 @@ MyFrame::MyFrame()
       m_autoSaveTimer(this, ID_AUTOSAVE_TIMER),
       m_autoSaveInterval(0),
       m_preferencesDialog(NULL),
-      m_charactersPanel(NULL),
       m_mgr(this),
       m_isIdleConnected(false),
       m_fileHistory(10, ID_FILE_HISTORY_1)
@@ -447,10 +439,6 @@ MyFrame::MyFrame()
     LoadConfig();
 
     LoadLayout(_T("(Previous)"));
-
-    // Check to see if we know about some windows.
-    if (m_mgr.HasCachedPane(_T("Characters")))
-        ShowCharacterMap();
 
 #if defined(__WXMSW__) && !defined(__WXPM__)
     SetIcon(wxIcon(_T("aa_main_icon")));
@@ -940,7 +928,7 @@ MyFrame::CheckPuzzle()
         case INCOMPLETE_PUZZLE:
             m_status->SetAlert(wxString::Format(_T("%d/%d filled (%d%%)"),
                 stats.white - stats.blank, stats.white,
-                (double(100) * (stats.white - stats.blank) + .5) / stats.white));
+                int((100 * (stats.white - stats.blank) + .5) / stats.white)));
             break;
     }
 }
@@ -1140,7 +1128,6 @@ MyFrame::CreateMenuBar()
             m_toolMgr.Add(submenu, ID_TIMER);
             m_toolMgr.Add(submenu, ID_RESET_TIMER);
         menu->AppendSubMenu(submenu, _T("&Timer"));
-        m_toolMgr.Add(menu, ID_CHARACTER_MAP);
     mb->Append(menu, _T("&Tools"));
 
     // Help Menu
@@ -1855,6 +1842,7 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
     m_XGridCtrl->Refresh();
     SetTime(0);
 	wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
+    evt.SetSquare(m_XGridCtrl->GetFocusedSquare());
     GetEventHandler()->ProcessEvent(evt);
 }
 
@@ -2143,12 +2131,6 @@ MyFrame::OnUpdateUI(wxUpdateUIEvent & evt)
         case ID_SHOW_NOTES:
             evt.Check(m_mgr.GetPane(_T("Notes")).IsShown());
             break;
-        case ID_CHARACTER_MAP:
-        {
-            wxAuiPaneInfo & pane = m_mgr.GetPane(_T("Characters"));
-            evt.Check(pane.IsOk() && pane.IsShown());
-            break;
-        }
         case ID_REBUS_ENTRY:
             evt.Check(m_XGridCtrl->IsRebusEntry());
             break;
@@ -2221,38 +2203,6 @@ MyFrame::OnAutoSaveNotify(wxTimerEvent & WXUNUSED(evt))
             SetStatus(_T("Auto save faield"));
             // If it doesn't work, don't show a message box
         }
-    }
-}
-
-// Character Map
-//--------------
-void
-MyFrame::OnCharacterMap(wxCommandEvent & evt)
-{
-    if (evt.IsChecked())
-        ShowCharacterMap();
-    else
-        ShowPane(_T("Characters"), false);
-}
-
-// Show the character map, creating the panel if necessary
-void
-MyFrame::ShowCharacterMap()
-{
-    if (m_charactersPanel == NULL)
-    {
-        m_charactersPanel = new CharactersPanel(this);
-        AddPane(m_charactersPanel, wxAuiPaneInfo()
-                                    .Name(_T("Characters"))
-                                    .Caption(_T("Character Map"))
-                                    .FloatingSize(250,250)
-                                    .Float());
-    }
-    wxAuiPaneInfo & pane = m_mgr.GetPane(m_charactersPanel);
-    if (m_mgr.IsPaneClosed(pane))
-    {
-        pane.Show();
-        m_mgr.Update();
     }
 }
 
@@ -2512,6 +2462,7 @@ MyFrame::OnGridFocus(wxPuzEvent & evt)
 {
     // Update clue lists and clue prompt
     UpdateClues();
+    evt.Skip();
 }
 
 
@@ -2522,6 +2473,7 @@ MyFrame::OnClueFocus(wxPuzEvent & evt)
     m_XGridCtrl->SetFocusedWord(&focusedClue->GetWord());
     UpdateClues();
     m_XGridCtrl->SetFocus();
+    evt.Skip();
 }
 
 void
@@ -2608,7 +2560,7 @@ MyFrame::UpdateClues()
 }
 
 void
-MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
+MyFrame::OnGridLetter(wxPuzEvent & evt)
 {
     // Change the save/save as button
     if (! m_isModified)
@@ -2623,6 +2575,7 @@ MyFrame::OnGridLetter(wxPuzEvent & WXUNUSED(evt))
         wxLogDebug(_T("AutoSave in %d seconds"), m_autoSaveInterval);
         m_autoSaveTimer.Start(m_autoSaveInterval * 1000, wxTIMER_ONE_SHOT);
     }
+    evt.Skip();
 }
 
 

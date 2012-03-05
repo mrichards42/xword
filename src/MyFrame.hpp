@@ -39,7 +39,6 @@ class SizedText;
 class CluePanel;
 class LayoutDialog;
 class PreferencesDialog;
-class CharactersPanel;
 class wxHtmlWindow;
 class wxHtmlLinkEvent;
 
@@ -71,7 +70,6 @@ class ConfigManager;
 class MyFrame : public wxFrame
 {
     friend class PreferencesDialog;
-    friend class CharactersDialog;
     friend class MyPrintout;
     friend class ConfigManager;
 public:
@@ -251,7 +249,6 @@ private:
     wxFileConfig * GetConfig();
 
     PreferencesDialog * m_preferencesDialog;
-    CharactersPanel * m_charactersPanel;
 
 
 private:
@@ -323,10 +320,6 @@ private:
 
     // AutoSave
     void OnAutoSaveNotify(wxTimerEvent   & WXUNUSED(evt));
-
-    // Char Map
-    void OnCharacterMap(wxCommandEvent & WXUNUSED(evt));
-    void ShowCharacterMap();
 
     // Preferences
     void OnPreferences(wxCommandEvent & WXUNUSED(evt));
