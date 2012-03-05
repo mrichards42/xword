@@ -25,7 +25,6 @@ END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(SizedText, wxControl)
 
-
 bool
 SizedText::Create(wxWindow * parent,
                   wxWindowID id,

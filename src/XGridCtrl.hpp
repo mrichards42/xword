@@ -93,7 +93,7 @@ namespace puz {
 }
 extern const wxChar * XGridCtrlNameStr;
 
-class GridRebusHandler;
+class XGridRebusCtrl;
 class GridSelectionHandler;
 class GridSelectionEvent;
 class GridCheckSelectionClass;
@@ -102,7 +102,7 @@ class ConfigManager;
 class XGridCtrl
     : public wxScrolledWindow
 {
-    friend class GridRebusHandler;
+    friend class XGridRebusCtrl;
     friend class GridSelectionHandler;
     friend class GridCheckSelectionClass;
 
@@ -153,7 +153,7 @@ public:
             Refresh();
     }
 
-    void SetFocus() { SetFocusIgnoringChildren(); }
+    void SetFocus();
 
     void SetPuzzle(puz::Puzzle * puz);
           puz::Grid * GetGrid()       { return m_grid; }
@@ -179,7 +179,7 @@ public:
     puz::Square * MoveFocusedWord(puz::Word * word)
         { return MoveFocusedSquare(word->front(), word, m_focusedDirection); }
 
-    void SendEvent();
+    void SendEvent(int type);
 
     short GetDirection() const;
 
@@ -226,6 +226,8 @@ public:
     void CheckSelection(int options = NO_REVEAL_ANSWER | MESSAGE_BOX);
     void CheckWord  (int options = NO_REVEAL_ANSWER | MESSAGE_BOX);
     void CheckLetter(int options = NO_REVEAL_ANSWER | MESSAGE_BOX);
+
+    XGridDrawer & GetDrawer() { return m_drawer; }
 
     // Fonts
     bool SetFont(const wxFont & font);
@@ -328,15 +330,15 @@ public:
 
     // Rebus
     void StartRebusEntry();
-    void EndRebusEntry();
-    bool IsRebusEntry() const { return m_rebusHandler != NULL; }
-
-protected:
-    void Init();
+    void EndRebusEntry(bool success = true);
+    bool IsRebusEntry() const { return m_rebusCtrl != NULL; }
 
     // Misc
     static bool IsValidChar(wxChar ch)
-        { return ch < 256 && puz::Square::IsValidChar(static_cast<char>(ch)); }
+        { return puz::Square::IsValidChar(static_cast<int>(ch)); }
+
+protected:
+    void Init();
 
     // Common CheckXXX function
     void DoCheckSelection(puz::Square * start, puz::Square * end, int options);
@@ -398,7 +400,7 @@ protected:
     wxColor m_colors[COLOR_COUNT];
 
     // Rebus
-    GridRebusHandler * m_rebusHandler;
+    XGridRebusCtrl * m_rebusCtrl;
 
     void ConnectEvents();
     void DisconnectEvents();

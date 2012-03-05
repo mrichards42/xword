@@ -380,6 +380,26 @@ XGridDrawer::SetNumberFont(const wxFont & font)
 //-----------------------------------------------------------------------------
 // Drawing
 //-----------------------------------------------------------------------------
+wxRect
+XGridDrawer::GetSquareRect(const puz::Square & square) const
+{
+    const int squareSize = GetSquareSize();
+    return wxRect(
+        m_rect.x + m_borderSize + square.GetCol() * squareSize,
+        m_rect.y + m_borderSize + square.GetRow() * squareSize,
+        m_boxSize,
+        m_boxSize);
+}
+
+wxRect
+XGridDrawer::GetTextRect(const wxRect & square) const
+{
+    return wxRect(square.x,
+                  square.y + m_boxSize - GetLetterHeight(),
+                  m_boxSize,
+                  GetLetterHeight());
+}
+
 void
 XGridDrawer::DrawSquare(wxDC & dc, const puz::Square & square)
 {
@@ -415,9 +435,9 @@ XGridDrawer::DrawSquare(wxDC & adc,
 #else
     wxDC & dc = adc;
 #endif
-    const int x = m_rect.x + m_borderSize + square.GetCol() * GetSquareSize();
-    const int y = m_rect.y + m_borderSize + square.GetRow() * GetSquareSize();
-
+    wxRect rect = GetSquareRect(square);
+    const int x = rect.x;
+    const int y = rect.y;
     // Draw the square using the square's own background color,
     // and Black as the pen
 
@@ -636,11 +656,11 @@ XGridDrawer::DrawSquare(wxDC & adc,
             else
                 dc.SetFont(m_symbolFont);
         }
-
-        dc.DrawLabel(text,
-                     wxRect(x, y + m_boxSize - GetLetterHeight(),
-                            m_boxSize, GetLetterHeight()),
-                     wxALIGN_CENTER);
+/*
+        dc.SetPen(*wxRED_PEN);
+        dc.DrawRectangle(GetTextRect(rect));
+        */
+        dc.DrawLabel(text, GetTextRect(rect), wxALIGN_CENTER);
     }
 
     // Draw an X across the square

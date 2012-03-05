@@ -63,6 +63,8 @@ public:
     //------
 
     const wxRect & GetRect() const { return m_rect; }
+    wxRect GetSquareRect(const puz::Square & square) const;
+    wxRect GetTextRect(const wxRect & square) const;
     int    GetWidth()        const { return m_rect.GetWidth(); }
     int    GetHeight()       const { return m_rect.GetHeight(); }
     int    GetTop()          const { return m_rect.GetTop(); }
