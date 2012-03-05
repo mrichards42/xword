@@ -3834,6 +3834,14 @@ xword_dataTypeTable =
     Name = "wxProtocolError",
     ValueType = "enum",
   },
+  wxPuzEvent = {
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
+    IsNumber = false,
+    Name = "wxPuzEvent",
+    ValueType = "class",
+  },
   wxQuantize = {
     BaseClasses = {
       [1] = "wxObject",

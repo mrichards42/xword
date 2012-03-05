@@ -698,6 +698,40 @@ wxLuaBindMethod MyFrame_methods[] = {
 int MyFrame_methodCount = sizeof(MyFrame_methods)/sizeof(wxLuaBindMethod) - 1;
 
 
+// ---------------------------------------------------------------------------
+// Bind class wxPuzEvent
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxPuzEvent'
+int wxluatype_wxPuzEvent = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxPuzEvent_GetSquare[] = { &wxluatype_wxPuzEvent, NULL };
+static int LUACALL wxLua_wxPuzEvent_GetSquare(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxPuzEvent_GetSquare[1] = {{ wxLua_wxPuzEvent_GetSquare, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxPuzEvent_GetSquare }};
+// %override wxLua_wxPuzEvent_GetSquare
+// puz::Square * GetSquare()
+static int LUACALL wxLua_wxPuzEvent_GetSquare(lua_State *L)
+{
+    // get this
+    wxPuzEvent * self = (wxPuzEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPuzEvent);
+
+    puz::Square * returns = const_cast<puz::Square *>(self->GetSquare());
+    luapuz_pushSquare(L, returns);
+    return 1;
+}
+
+
+
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxPuzEvent_methods[] = {
+    { "GetSquare", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxPuzEvent_GetSquare, 1, NULL },
+    { 0, 0, 0, 0 },
+};
+
+int wxPuzEvent_methodCount = sizeof(wxPuzEvent_methods)/sizeof(wxLuaBindMethod) - 1;
+
+
 
 
 // ---------------------------------------------------------------------------
@@ -715,6 +749,9 @@ wxLuaBindEvent* wxLuaGetEventList_xword(size_t &count)
 {
     static wxLuaBindEvent eventList[] =
     {
+        { "wxEVT_PUZ_CLUE_FOCUS", &wxEVT_PUZ_CLUE_FOCUS, &wxluatype_wxPuzEvent },
+        { "wxEVT_PUZ_GRID_FOCUS", &wxEVT_PUZ_GRID_FOCUS, &wxluatype_wxPuzEvent },
+        { "wxEVT_PUZ_LETTER", &wxEVT_PUZ_LETTER, &wxluatype_wxPuzEvent },
 
         { 0, 0, 0 },
     };
@@ -829,16 +866,22 @@ wxLuaBindMethod* wxLuaGetFunctionList_xword(size_t &count)
 // ---------------------------------------------------------------------------
 
 static const char* wxluaclassname_MyFrame = "MyFrame";
+static const char* wxluaclassname_wxCommandEvent = "wxCommandEvent";
 static const char* wxluaclassname_wxFrame = "wxFrame";
+static const char* wxluaclassname_wxPuzEvent = "wxPuzEvent";
 
 static const char* wxluabaseclassnames_MyFrame[] = { wxluaclassname_wxFrame, NULL };
 static wxLuaBindClass* wxluabaseclassbinds_MyFrame[] = { NULL };
+static const char* wxluabaseclassnames_wxPuzEvent[] = { wxluaclassname_wxCommandEvent, NULL };
+static wxLuaBindClass* wxluabaseclassbinds_wxPuzEvent[] = { NULL };
 // ---------------------------------------------------------------------------
 // Lua Tag Method Values and Tables for each Class
 // ---------------------------------------------------------------------------
 
 extern wxLuaBindMethod MyFrame_methods[];
 extern int MyFrame_methodCount;
+extern wxLuaBindMethod wxPuzEvent_methods[];
+extern int wxPuzEvent_methodCount;
 
 
 
@@ -848,6 +891,7 @@ wxLuaBindClass* wxLuaGetClassList_xword(size_t &count)
     static wxLuaBindClass classList[] =
     {
         { wxluaclassname_MyFrame, MyFrame_methods, MyFrame_methodCount, CLASSINFO(MyFrame), &wxluatype_MyFrame, wxluabaseclassnames_MyFrame, wxluabaseclassbinds_MyFrame, g_wxluanumberArray_None, 0, }, 
+        { wxluaclassname_wxPuzEvent, wxPuzEvent_methods, wxPuzEvent_methodCount, CLASSINFO(wxPuzEvent), &wxluatype_wxPuzEvent, wxluabaseclassnames_wxPuzEvent, wxluabaseclassbinds_wxPuzEvent, g_wxluanumberArray_None, 0, }, 
 
         { 0, 0, 0, 0, 0, 0, 0 }, 
     };
