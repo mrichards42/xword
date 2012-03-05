@@ -17,6 +17,7 @@
 
 
 #include "XGridCtrl.hpp"
+#include "XGridRebus.hpp"
 #include <wx/dcbuffer.h>
 #include <wx/tooltip.h>
 #include <list>
@@ -30,26 +31,6 @@
 #include "utils/string.hpp"
 #include "utils/timeit.hpp"
 #include "puz/Puzzle.hpp"
-
-// This class will take over the XGridCtrl's event processing
-// for rebus entries.  It must be created on the heap, and it
-// will destroy itself when it is done.
-class GridRebusHandler : wxEvtHandler
-{
-public:
-    GridRebusHandler(XGridCtrl & grid);
-    ~GridRebusHandler();
-
-    DECLARE_EVENT_TABLE()
-
-private:
-    XGridCtrl & m_grid;
-
-    // The event handling
-    void OnKeyDown(wxKeyEvent & evt);
-    void OnChar   (wxKeyEvent & evt);
-};
-
 
 // This class will take over the XGridCtrl's event processing
 // for selections.  It must be created on the heap, and it
@@ -200,7 +181,7 @@ void XGridCtrl::Init()
 
     m_lastBoxSize = UNDEFINED_BOX_SIZE;
 
-    m_rebusHandler = NULL;
+    m_rebusCtrl = NULL;
 
     m_areEventsConnected = false;
 
@@ -601,6 +582,10 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
     else
         oldWord = m_focusedWord;
 
+    const bool isrebus = IsRebusEntry();
+    if (isrebus)
+        EndRebusEntry();
+
     wxClientDC dc(this); DoPrepareDC(dc);
 
     // If this was an invented focused word, it will be deleted before
@@ -616,6 +601,8 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
     // Set new state
     //--------------
     m_focusedSquare = square;
+    if (isrebus)
+        StartRebusEntry();
     DoSetFocusedWord(square, word, direction);
     wxASSERT(m_focusedWord != NULL);
 
@@ -650,7 +637,7 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
     }
 
     RecalcDirection();
-    SendEvent();
+    SendEvent(wxEVT_PUZ_GRID_FOCUS);
     return m_focusedSquare;
 }
 
@@ -702,9 +689,9 @@ XGridCtrl::MoveFocusedSquare(puz::Square * square,
 
 
 void
-XGridCtrl::SendEvent()
+XGridCtrl::SendEvent(int type)
 {
-    wxPuzEvent evt(wxEVT_PUZ_GRID_FOCUS, GetId());
+    wxPuzEvent evt(type, GetId());
     evt.SetSquare(m_focusedSquare);
     evt.SetWord(m_focusedWord);
     GetEventHandler()->ProcessEvent(evt);
@@ -881,11 +868,16 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
 {
     // Are we allowed to enter this text?
     if (text == _T("."))
+    {
         if (! GetGrid()->IsDiagramless())
             return false;
-    for (wxString::const_iterator it = text.begin(); it != text.end(); ++it)
-        if (! IsValidChar(*it))
-            return false;
+    }
+    else
+    {
+        for (wxString::const_iterator it = text.begin(); it != text.end(); ++it)
+            if (! IsValidChar(*it))
+                return false;
+    }
 
     // Not allowed to overwrite revealed letters or checked letters
     if (square.HasFlag(puz::FLAG_REVEALED | puz::FLAG_CORRECT))
@@ -910,9 +902,7 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
         if (HasStyle(CHECK_WHILE_TYPING) && ! m_grid->IsScrambled())
             CheckLetter(NO_REVEAL_ANSWER | NO_MESSAGE_BOX);
 
-        wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
-        evt.SetString(text);
-        GetEventHandler()->ProcessEvent(evt);
+        SendEvent(wxEVT_PUZ_LETTER);
     }
 
     if (numberGrid)
@@ -1038,6 +1028,8 @@ XGridCtrl::Scale(double factor)
     SetVirtualSize(m_drawer.GetWidth()  - m_drawer.GetBorderSize(),
                    m_drawer.GetHeight() - m_drawer.GetBorderSize());
     SetScrollRate(m_drawer.GetSquareSize(), m_drawer.GetSquareSize());
+    if (m_rebusCtrl)
+        m_rebusCtrl->UpdateSize();
 }
 
 
@@ -1688,7 +1680,7 @@ void
 XGridCtrl::OnInsert(int WXUNUSED(mod))
 {
     wxASSERT(! IsEmpty());
-    if (! m_rebusHandler)
+    if (! m_rebusCtrl)
         StartRebusEntry();
     else
         EndRebusEntry();
@@ -1697,35 +1689,41 @@ XGridCtrl::OnInsert(int WXUNUSED(mod))
 void
 XGridCtrl::StartRebusEntry()
 {
-    if (m_rebusHandler)
+    if (m_rebusCtrl
+        || ! m_focusedSquare
+        || m_focusedSquare->HasFlag(puz::FLAG_REVEALED | puz::FLAG_CORRECT))
         return;
 
-    // GridRebusHandler will capture keyboard until it is destroyed.
-    // When GridRebusHandler recieves a key event that indicates that
-    // the user is done entering a rebus square, it will destroy itself.
-    m_rebusHandler = new GridRebusHandler(*this);
+    m_rebusCtrl = new XGridRebusCtrl(this);
+    m_rebusCtrl->Show();
+    if (! m_focusedSquare->IsBlank())
+        m_rebusCtrl->SetValue(m_focusedSquare->GetText());
+    m_rebusCtrl->GetTextCtrl()->SelectAll();
+    m_rebusCtrl->SetFocus();
+}
 
+void
+XGridCtrl::EndRebusEntry(bool success)
+{
+    if (! m_rebusCtrl)
+        return;
+
+    wxString text = m_rebusCtrl->GetValue();
+    m_rebusCtrl->Destroy();
+    m_rebusCtrl = NULL;
+    if (success)
+        SetSquareText(*m_focusedSquare, text);
     RefreshSquare();
 }
 
 void
-XGridCtrl::EndRebusEntry()
+XGridCtrl::SetFocus()
 {
-    if (! m_rebusHandler)
-        return;
-
-    delete m_rebusHandler;
-    m_rebusHandler = NULL;
-    // Force checking the square since checking has been prevented by
-    // GridRebusHandler.
-    SetSquareText(*m_focusedSquare, puz2wx(m_focusedSquare->GetText()));
-
-    if (! m_focusedSquare->IsBlank())
-        MoveAfterLetter();
+    if (m_rebusCtrl)
+        m_rebusCtrl->SetFocus();
     else
-        RefreshSquare();
+        SetFocusIgnoringChildren();
 }
-
 
 
 //-------------------------------------------------------
@@ -1818,98 +1816,6 @@ XGridCtrl::RecalcDirection()
     if (m_focusedWord->front() != m_focusedWord->back())
         m_focusedDirection = m_focusedWord->GetDirection();
 }
-
-
-
-
-
-
-
-
-//------------------------------------------------------------------------------
-// GridRebusHandler implementation
-//------------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(GridRebusHandler, wxEvtHandler)
-    EVT_KEY_DOWN    (GridRebusHandler::OnKeyDown)
-    EVT_CHAR        (GridRebusHandler::OnChar)
-END_EVENT_TABLE()
-
-GridRebusHandler::GridRebusHandler(XGridCtrl & grid)
-    : m_grid(grid)
-{
-    m_grid.PushEventHandler(this);
-    // Kill the grid's own event handling
-    m_grid.DisconnectEvents();
-}
-
-GridRebusHandler::~GridRebusHandler()
-{
-    m_grid.RemoveEventHandler(this);
-    // Restore the grid's own key handling
-    m_grid.ConnectEvents();
-}
-
-void
-GridRebusHandler::OnKeyDown(wxKeyEvent & evt)
-{
-    // Skip this event by default so that we recieve EVT_CHAR events.
-    evt.Skip();
-
-    const int key = evt.GetKeyCode();
-    const int mod = evt.GetModifiers();
-    if      (key == WXK_INSERT || key == WXK_NUMPAD_INSERT ||
-             key == WXK_RETURN || key == WXK_NUMPAD_ENTER ||
-             key == WXK_ESCAPE)
-    {
-        evt.Skip(false);
-        m_grid.EndRebusEntry();
-    }
-    else if (key == WXK_BACK)
-    {
-        puz::Square * square = m_grid.GetFocusedSquare();
-        if (square->IsBlank())
-            return;
-        if ((mod & (wxMOD_CONTROL | wxMOD_SHIFT)) != 0)
-            m_grid.SetSquareText(*square, _T(""));
-        else
-            m_grid.SetSquareText(*square,
-                puz2wx(square->GetText().substr(0, square->GetText().length() - 1)));
-        m_grid.RefreshSquare();
-    }
-    else if (key == WXK_DELETE || key == WXK_NUMPAD_DELETE)
-    {
-        puz::Square * square = m_grid.GetFocusedSquare();
-        if (square->IsBlank())
-            return;
-        if ((mod & (wxMOD_CONTROL | wxMOD_SHIFT)) != 0)
-            m_grid.SetSquareText(*square, _T(""));
-        else
-            m_grid.SetSquareText(*square, puz2wx(square->GetText().substr(1)));
-        m_grid.RefreshSquare();
-    }
-
-}
-
-
-void
-GridRebusHandler::OnChar(wxKeyEvent & evt)
-{
-    evt.Skip();
-
-    const wxChar key = static_cast<wxChar>(evt.GetKeyCode());
-
-    if (! XGridCtrl::IsValidChar(key))
-        return;
-
-    puz::Square * square = m_grid.GetFocusedSquare();
-
-    if (square->IsBlank())
-        m_grid.SetSquareText(*square, key);
-    else
-        m_grid.SetSquareText(*square, puz2wx(square->GetText()) + key);
-    m_grid.RefreshSquare();
-}
-
 
 
 //------------------------------------------------------------------------------
