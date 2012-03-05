@@ -88,7 +88,7 @@ RebusTextCtrl::~RebusTextCtrl()
     wxGetApp().GetConfigManager().RemoveCallbacks(m_text);
 }
 
-const int textBorder = 2;
+const int textBorder = 1;
 
 wxSize RebusTextCtrl::GetTextSize() const
 {
@@ -101,12 +101,12 @@ void RebusTextCtrl::UpdateSize(const wxRect & rect)
 {
     if (rect != GetRect())
     {
+        SetSize(rect);
         // Center the text box.
         m_text->SetSize(textBorder,
                         textBorder,
                         rect.width - textBorder * 2,
                         rect.height - textBorder * 2);
-        SetSize(rect);
     }
 }
 
@@ -193,11 +193,11 @@ void XGridRebusCtrl::UpdateSize()
     // Size the TextCtrl
     // ----
     wxTextCtrl * ctrl = GetTextCtrl();
-    const int outline = ctrl->GetFont().GetPointSize() / 3;
+    const int outline = ctrl->GetFont().GetPointSize() / 4;
     wxSize borderSize(
         outline * 2 + wxSystemSettings::GetMetric(wxSYS_BORDER_X),
         outline * 2 + wxSystemSettings::GetMetric(wxSYS_BORDER_Y));
-    wxSize minTextSize(m_text->GetTextSize().x + ctrl->GetCharWidth() * 2,
+    wxSize minTextSize(m_text->GetTextSize().x + ctrl->GetCharWidth(),
                        ctrl->GetEffectiveMinSize().y);
     // Minimum is the size of the square or the size of the textctrl.
     wxSize ownSize(std::max(squareRect.width, minTextSize.x + borderSize.y),
@@ -205,9 +205,9 @@ void XGridRebusCtrl::UpdateSize()
     // Max width is four times the height.
     if (ownSize.x > ownSize.y * 4)
         ownSize.x = ownSize.y * 4;
-    // Shrink the text size by the border size
-    wxSize textSize = ownSize - borderSize;
-    m_text->UpdateSize(wxRect(wxPoint(outline, outline), textSize));
+    // Min width is the height
+    else if (ownSize.x < ownSize.y)
+        ownSize.x = ownSize.y;
     // Center on the square
     wxRect rect(wxPoint(0,0), ownSize);
     rect = rect.CenterIn(squareRect);
@@ -225,6 +225,9 @@ void XGridRebusCtrl::UpdateSize()
         rect.y = gridRect.GetBottom() - rect.height - drawer.GetBorderSize();
 
     SetSize(rect);
+    // Shrink the text size by the border size
+    wxSize textSize = ownSize - borderSize;
+    m_text->UpdateSize(wxRect(wxPoint(outline, outline), textSize));
 }
 
 void XGridRebusCtrl::OnTextChanged(wxCommandEvent & evt)
