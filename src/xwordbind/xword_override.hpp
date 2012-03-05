@@ -309,6 +309,24 @@ static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L)
 
 
 
+//-----------------------------------------------------------------------------
+// wxPuzEvent overrides
+//-----------------------------------------------------------------------------
+
+%override wxLua_wxPuzEvent_GetSquare
+// puz::Square * GetSquare()
+static int LUACALL wxLua_wxPuzEvent_GetSquare(lua_State *L)
+{
+    // get this
+    wxPuzEvent * self = (wxPuzEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPuzEvent);
+
+    puz::Square * returns = const_cast<puz::Square *>(self->GetSquare());
+    luapuz_pushSquare(L, returns);
+    return 1;
+}
+%end
+
+
 
 //-----------------------------------------------------------------------------
 // Global overrides

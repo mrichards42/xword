@@ -7,6 +7,7 @@
 %include <vector>
 
 %include "../MyFrame.hpp"
+%include "../PuzEvent.hpp"
 %include "../App.hpp"
 %include "../paths.hpp"
 %include "../../lua/luapuz/bind/luapuz.hpp"
@@ -91,3 +92,19 @@
 
 // %override void logerror()
 %function void logerror()
+
+
+//----------------------------------------------------------------------------
+// Events
+//----------------------------------------------------------------------------
+
+%class wxPuzEvent, wxCommandEvent
+
+    // %override puz::Square * GetSquare()
+    int GetSquare()
+
+    %define_event wxEVT_PUZ_GRID_FOCUS
+    %define_event wxEVT_PUZ_CLUE_FOCUS
+    %define_event wxEVT_PUZ_LETTER
+
+%endclass

@@ -46,6 +46,7 @@ extern WXLUA_NO_DLLIMPEXP bool wxLuaBinding_xword_init();
 #include "../../lua/wxbind/include/wxaui_bind.h"
 #include "../App.hpp"
 #include "../MyFrame.hpp"
+#include "../PuzEvent.hpp"
 #include "../paths.hpp"
 #include <vector>
 
@@ -54,6 +55,7 @@ extern WXLUA_NO_DLLIMPEXP bool wxLuaBinding_xword_init();
 // ---------------------------------------------------------------------------
 
 extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_MyFrame;
+extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_wxPuzEvent;
 
 
 // ---------------------------------------------------------------------------
