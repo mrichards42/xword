@@ -163,6 +163,8 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     puz->SetTitle(GetInnerXML(meta, "title"));
     puz->SetAuthor(GetInnerXML(meta, "creator"));
     puz->SetCopyright(GetInnerXML(meta, "copyright"));
+    puz->SetMeta(puzT("editor"), GetInnerXML(meta, "editor"));
+    puz->SetMeta(puzT("publisher"), GetInnerXML(meta, "publisher"));
 
     if (puz->GetTitle().empty())
         puz->SetTitle(GetInnerXML(applet, "title"));

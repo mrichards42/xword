@@ -232,21 +232,24 @@ class{"Puzzle", header="puz/Puzzle.hpp", cppheader="luapuz_puz_Puzzle_helpers.hp
     func{"Clear"}
 
     -- Misc
-    func{"GetVersion", returns="short"}
+    func{"IsDiagramless", returns="short"}
     func{"IsScrambled", returns="bool"}
     func{"IsOk", returns="bool"}
     func{"SetOk", arg("bool", "ok")}
     func{"TestOk", throws=true}
 
     -- Data
+    property{"Grid &", "Grid"}
+    func{"GetMeta", arg("puz::string_t", "name"), returns="puz::string_t"}
+    func{"SetMeta", arg("puz::string_t", "name"), arg("puz::string_t", "value")}
+    func{"HasMeta", arg("puz::string_t", "name"), returns="bool"}
     property{"puz::string_t", "Author"}
     property{"puz::string_t", "Title"}
     property{"puz::string_t", "Copyright"}
-    property{"Grid &", "Grid"}
+    property{"puz::string_t", "Notes"}
     property{"int", "Time"}
     func{"IsTimerRunning", returns="bool"}
     func{"SetTimerRunning", arg("bool", "running")}
-    property{"puz::string_t", "Notes"}
 
     func{"GetClueList", arg("puz::string_t", "name"), returns="ClueList &", throws=true}
     func{"SetClueList", arg("puz::string_t", "name"), arg("ClueList &", "cluelist"), returns="ClueList &"}

@@ -57,15 +57,15 @@ Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
       m_version  (version)
 {
     // Solution and Text
-    m_solution.reserve(puz.m_grid.GetWidth() * puz.m_grid.GetHeight());
-    m_gridText.reserve(puz.m_grid.GetWidth() * puz.m_grid.GetHeight());
-    for (const Square * square = puz.m_grid.First();
+    m_solution.reserve(puz.GetGrid().GetWidth() * puz.GetGrid().GetHeight());
+    m_gridText.reserve(puz.GetGrid().GetWidth() * puz.GetGrid().GetHeight());
+    for (const Square * square = puz.GetGrid().First();
          square != NULL;
          square = square->Next())
     {
         if (square->IsSolutionBlack())
         {
-            if (puz.GetGrid().IsDiagramless())
+            if (puz.IsDiagramless())
                 m_solution.push_back(':');
             else
                 m_solution.push_back('.');
@@ -91,10 +91,10 @@ Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
     SetClues(clues);
 
     // Setup CIB manually
-    SetWidth     (puz.m_grid.GetWidth());
-    SetHeight    (puz.m_grid.GetHeight());
-    SetGridType  (puz.m_grid.m_type);
-    SetGridFlag  (puz.m_grid.m_flag);
+    SetWidth     (puz.GetGrid().GetWidth());
+    SetHeight    (puz.GetGrid().GetHeight());
+    SetGridType  (puz.GetGrid().GetType());
+    SetGridFlag  (puz.GetGrid().GetFlag());
 }
 
 

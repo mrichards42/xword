@@ -235,20 +235,20 @@ MyPrintout::GetHTML()
     wxString html;
 
     // Title
-    if (! m_puz->m_title.empty())
+    if (! m_puz->HasMeta(puzT("title")))
     {
         SetFontSize(dc, base_font_size, 2);
         html << _T("<font size=\"+2\"><b>") 
-                    << BreakLine(dc, puz2wx(m_puz->m_title), m_columnWidth)
+                    << BreakLine(dc, puz2wx(m_puz->GetTitle()), m_columnWidth)
                 << _T("<b></font>")
                 << _T("<br>");
     }
     // Author
-    if (! m_puz->m_author.empty())
+    if (! m_puz->HasMeta(puzT("author")))
     {
         SetFontSize(dc, base_font_size, 1);
         html << _T("<font size=\"+1\">")
-                << BreakLine(dc, puz2wx(m_puz->m_author), m_columnWidth)
+                << BreakLine(dc, puz2wx(m_puz->GetAuthor()), m_columnWidth)
              << _T("</font>")
              << _T("<br>");
     }
@@ -295,7 +295,7 @@ MyPrintout::GetHTML()
 
 MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, int options,
                        int numPages)
-    : wxPrintout(puz2wx(puz->m_title)),
+    : wxPrintout(puz2wx(puz->GetTitle())),
       m_frame(frame),
       m_puz(puz),
       m_drawer(puz),
@@ -421,7 +421,7 @@ MyPrintout::HasPage(int pageNum)
 wxString
 MyPrintout::GetTitle()
 {
-    return puz2wx(m_puz->m_title);
+    return puz2wx(m_puz->GetTitle());
 }
 
 void
@@ -692,8 +692,8 @@ MyPrintout::LayoutGrid(double gridScale)
 
     // Calculate the size of each square
     const int borderSize = m_drawer.GetBorderSize();
-    const int gridWidth  = m_puz->m_grid.GetWidth();
-    const int gridHeight = m_puz->m_grid.GetHeight();
+    const int gridWidth  = m_puz->GetGrid().GetWidth();
+    const int gridHeight = m_puz->GetGrid().GetHeight();
 
     // The largest a square can be is the total allowed space less the borders
     // divided by the number of squares in a row / col.

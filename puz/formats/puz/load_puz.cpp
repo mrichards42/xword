@@ -82,7 +82,7 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
          square = square->Next())
     {
         // Solution
-        if (*sol_it == '.' || *sol_it == ':' && puz->m_grid.IsDiagramless())
+        if (*sol_it == '.' || *sol_it == ':' && puz->IsDiagramless())
             square->SetSolution(puz::Square::Black);
         else if (*sol_it == '-')
             square->SetSolution(puz::Square::Blank);
@@ -91,11 +91,11 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
         ++sol_it;
 
         // Text
-        if (square->IsBlack() && ! puz->m_grid.IsDiagramless())
+        if (square->IsBlack() && ! puz->IsDiagramless())
             square->SetText(puz::Square::Black);
         else if (*text_it == '-' || *text_it == 0)
             square->SetText(puz::Square::Blank);
-        else if (puz->m_grid.IsDiagramless() && (*text_it == '.' || *text_it == ':'))
+        else if (puz->IsDiagramless() && (*text_it == '.' || *text_it == ':'))
         {
             // Black squares in a diagramless puzzle.
             if (*text_it == '.')
@@ -159,6 +159,8 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
 static bool LoadGEXT(Puzzle * puz, const std::string & data);
 static void UnLoadGEXT(Puzzle * puz);
+static bool LoadMETA(Puzzle * puz, const std::string & data);
+static void UnLoadMETA(Puzzle * puz);
 static bool LoadCHKD(Puzzle * puz, const std::string & data);
 static void UnLoadCHKD(Puzzle * puz);
 static bool LoadLTIM(Puzzle * puz, const std::string & data);
@@ -218,6 +220,7 @@ void LoadSections(Puzzle * puz, istream_wrapper & f)
     std::string data;
 
     LOAD_SECTION(GEXT)
+    LOAD_SECTION(META)
     LOAD_SECTION(CHKD)
     LOAD_SECTION(LTIM)
     LOAD_SECTION(RUSR)
@@ -259,7 +262,7 @@ bool LoadGEXT(Puzzle * puz, const std::string & data)
     istream_wrapper f(stream);
 
     std::string::const_iterator it = data.begin();
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -273,13 +276,34 @@ bool LoadGEXT(Puzzle * puz, const std::string & data)
 // Rollback changes
 void UnLoadGEXT(Puzzle * puz)
 {
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
         square->SetFlag(FLAG_CLEAR);
     }
 }
+
+//------------------------------------------------------------------------------
+// META (additional metadata) // This is my own extension
+//------------------------------------------------------------------------------
+
+bool LoadMETA(Puzzle * puz, const std::string & data)
+{
+    std::istringstream stream(data);
+    istream_wrapper f(stream);
+
+    while (! f.CheckEof())
+        puz->SetMeta(decode_utf8(f.ReadString()), decode_utf8(f.ReadString()));
+    return true;
+}
+
+// Rollback changes
+void UnLoadMETA(Puzzle * puz)
+{
+    // Do nothing
+}
+
 
 //------------------------------------------------------------------------------
 // CHKD (correct squares) // This is my own extension
@@ -291,7 +315,7 @@ bool LoadCHKD(Puzzle * puz, const std::string & data)
     istream_wrapper f(stream);
 
     std::string::const_iterator it = data.begin();
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -306,7 +330,7 @@ bool LoadCHKD(Puzzle * puz, const std::string & data)
 // Rollback changes
 void UnLoadCHKD(Puzzle * puz)
 {
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -335,16 +359,16 @@ bool LoadLTIM(Puzzle * puz, const std::string & data)
     if (isTimerRunning == 0 && ! runningstring.empty() && runningstring[0] != '0')
         return false;
 
-    puz->m_isTimerRunning = (isTimerRunning == 0);
-    puz->m_time = time;
+    puz->SetTimerRunning(isTimerRunning == 0);
+    puz->SetTime(time);
     return true;
 }
 
 // Rollback changes
 void UnLoadLTIM(Puzzle * puz)
 {
-    puz->m_isTimerRunning = false;
-    puz->m_time = 0;
+    puz->SetTimerRunning(false);
+    puz->SetTime(0);
 }
 
 
@@ -360,7 +384,7 @@ bool LoadRUSR(Puzzle * puz, const std::string & data)
     std::istringstream stream(data);
     istream_wrapper f(stream);
 
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -394,7 +418,7 @@ bool LoadSolutionRebus(Puzzle * puz,
     // NB: In the grid rebus section (GRBS), the index is 1 greater than the
     // index in the rebus table section (RTBL).
 
-    if (grid.size() !=  puz->m_grid.GetWidth() * puz->m_grid.GetHeight())
+    if (grid.size() !=  puz->GetGrid().GetWidth() * puz->GetGrid().GetHeight())
         return false;
 
     // Read the rebus table (RTBL)
@@ -437,7 +461,7 @@ bool LoadSolutionRebus(Puzzle * puz,
     std::istringstream gstream(grid);
     istream_wrapper grid_stream(gstream);
 
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -461,7 +485,7 @@ bool LoadSolutionRebus(Puzzle * puz,
 
 void UnLoadSolutionRebus(Puzzle * puz)
 {
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {

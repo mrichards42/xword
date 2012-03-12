@@ -47,7 +47,7 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     if (! puz->UsesNumberAlgorithm())
         throw ConversionError("This puzzle uses features not supported in a .puz file.");
 
-    for (const Square * square = puz->m_grid.First();
+    for (const Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -82,24 +82,24 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     f.Write(&c_masked[0], 8);
     f.Write(SAVE_VERSION_STRING, 4);
     f.Skip(2); // 1 unknown short
-    f.Write(puz->m_grid.GetCksum());
+    f.Write(puz->GetGrid().GetCksum());
     f.Skip(12); // 6 noise shorts
 
     // Puzzle information
-    f.Put(puz->m_grid.GetWidth());
-    f.Put(puz->m_grid.GetHeight());
+    f.Put(puz->GetGrid().GetWidth());
+    f.Put(puz->GetGrid().GetHeight());
 
     f.Write(clues.size());
 
-    f.Write(puz->m_grid.GetType());
-    f.Write(puz->m_grid.GetFlag());
+    f.Write(puz->GetGrid().GetType());
+    f.Write(puz->GetGrid().GetFlag());
 
     // Puzzle data
     f.Write(cksum.GetSolution()); // Checksummer has already calculated
     f.Write(cksum.GetGridText()); // these, so we'll reused them.
-    f.WriteNulTerminated(encode_puz(puz->m_title));
-    f.WriteNulTerminated(encode_puz(puz->m_author));
-    f.WriteNulTerminated(encode_puz(puz->m_copyright));
+    f.WriteNulTerminated(encode_puz(puz->GetTitle()));
+    f.WriteNulTerminated(encode_puz(puz->GetAuthor()));
+    f.WriteNulTerminated(encode_puz(puz->GetCopyright()));
 
     std::vector<std::string>::const_iterator it;
     for (it = clues.begin(); it != clues.end(); ++it)
@@ -112,6 +112,7 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
 
 static void WriteGEXT(Puzzle * puz, ostream_wrapper & f);
+static void WriteMETA(Puzzle * puz, ostream_wrapper & f);
 static void WriteCHKD(Puzzle * puz, ostream_wrapper & f);
 static void WriteLTIM(Puzzle * puz, ostream_wrapper & f);
 static void WriteRUSR(Puzzle * puz, ostream_wrapper & f);
@@ -123,6 +124,7 @@ static void WriteSection(ostream_wrapper & f,
 void SaveSections(Puzzle * puz, ostream_wrapper & f)
 {
     WriteGEXT(puz, f);
+    WriteMETA(puz, f);
     WriteCHKD(puz, f);
     WriteLTIM(puz, f);
     WriteRUSR(puz, f);
@@ -157,10 +159,10 @@ void WriteSection(ostream_wrapper & f,
 void WriteGEXT(Puzzle * puz, ostream_wrapper & f)
 {
     std::string data;
-    data.reserve(puz->m_grid.GetWidth() * puz->m_grid.GetHeight());
+    data.reserve(puz->GetGrid().GetWidth() * puz->GetGrid().GetHeight());
     bool hasData = false;
 
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -174,13 +176,40 @@ void WriteGEXT(Puzzle * puz, ostream_wrapper & f)
 }
 
 
+void WriteMETA(Puzzle * puz, ostream_wrapper & f)
+{
+    // Additional metadata
+    // This is stored as a series of null-terminated strings
+    std::string data;
+
+    const Puzzle::metamap_t & metadata = puz->GetMetadata();
+    Puzzle::metamap_t::const_iterator it;
+    for (it = metadata.begin(); it != metadata.end(); ++it)
+    {
+        if (it->first != puzT("author")
+            && it->first != puzT("title")
+            && it->first != puzT("notes")
+            && it->first != puzT("copyright")
+            && ! it->first.empty())
+        {
+            data.append(encode_utf8(it->first)).append(1, '\0');
+            data.append(encode_utf8(it->second)).append(1, '\0');
+        }
+    }
+    if (! data.empty())
+        WriteSection(f, "META", data);
+}
+
+
+
 void WriteCHKD(Puzzle * puz, ostream_wrapper & f)
 {
+    // Checked square data
     std::string data;
-    data.reserve(puz->m_grid.GetWidth() * puz->m_grid.GetHeight());
+    data.reserve(puz->GetGrid().GetWidth() * puz->GetGrid().GetHeight());
     bool hasData = false;
 
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -197,10 +226,10 @@ void WriteCHKD(Puzzle * puz, ostream_wrapper & f)
 
 void WriteLTIM(Puzzle * puz, ostream_wrapper & f)
 {
-    if (puz->m_time == 0 && ! puz->m_isTimerRunning)
+    if (puz->GetTime() == 0 && ! puz->IsTimerRunning())
         return;
     std::ostringstream data;
-    data << puz->m_time << "," << (puz->m_isTimerRunning ? 0 : 1);
+    data << puz->GetTime() << "," << (puz->IsTimerRunning() ? 0 : 1);
     WriteSection(f, "LTIM", data.str());
 }
 
@@ -210,7 +239,7 @@ void WriteRUSR(Puzzle * puz, ostream_wrapper & f)
     std::string data;
     bool hasData = false;
 
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -246,7 +275,7 @@ void WriteSolutionRebus(Puzzle * puz, ostream_wrapper & f)
 
 
     // Assemble the grid rebus string
-    for (Square * square = puz->m_grid.First();
+    for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
