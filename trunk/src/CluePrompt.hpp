@@ -18,8 +18,7 @@
 #ifndef CLUE_PROMPT_H
 #define CLUE_PROMPT_H
 
-#include <wx/control.h>
-#include <wx/html/htmlwin.h>
+#include "widgets/HtmlText.hpp"
 
 #include "puz/Clue.hpp"
 
@@ -27,21 +26,19 @@ class wxHtmlCell;
 class wxHtmlWinParser;
 
 class CluePrompt
-    : public wxControl,
-      public wxHtmlWindowInterface
+    : public HtmlText
 {
 public:
-    CluePrompt() : m_parser(NULL), m_cell(NULL), m_padding(5) {}
+    CluePrompt() {}
 
     CluePrompt(wxWindow * parent,
-              wxWindowID id,
-              const wxString & label = wxEmptyString,
-              const wxString & displayFormat = _T("%N. %T"),
-              const wxPoint & position = wxDefaultPosition,
-              const wxSize & size = wxDefaultSize,
-              long style = wxBORDER_NONE,
-              const wxString & name = _T("CluePrompt"))
-        : m_parser(NULL), m_cell(NULL), m_padding(5)
+               wxWindowID id,
+               const wxString & label = wxEmptyString,
+               const wxString & displayFormat = _T("%N. %T"),
+               const wxPoint & position = wxDefaultPosition,
+               const wxSize & size = wxDefaultSize,
+               long style = 0,
+               const wxString & name = _T("CluePrompt"))
     {
         Create(parent, id, label, displayFormat, position, size, style, name);
     }
@@ -54,66 +51,20 @@ public:
                 const wxString & displayFormat = _T("%N. %T"),
                 const wxPoint & position = wxDefaultPosition,
                 const wxSize & size = wxDefaultSize,
-                long style = wxBORDER_NONE,
+                long style = 0,
                 const wxString & name = _T("CluePrompt"));
 
     const wxString & GetDisplayFormat() const { return m_displayFormat; }
     void SetDisplayFormat(const wxString & format)
         { m_displayFormat = format; }
 
-    void Clear()
-    {
-        wxControl::SetLabel(wxEmptyString);
-        LayoutCell();
-        Refresh();
-    }
-
     void SetClue(const puz::Clue * clue);
-
-    bool SetFont(const wxFont & font);
-    wxCoord GetPadding() const { return m_padding; }
-    void SetPadding(wxCoord padding) { m_padding = padding; }
-
 
 protected:
     wxString m_displayFormat;
-    wxCoord m_padding;
-    wxHtmlCell *m_cell;
-    wxHtmlWinParser *m_parser;
 
-    void LayoutCell();
-    void Parse(const wxString & label, int pointSize, const wxString & faceName);
-
-    void OnPaint(wxPaintEvent & evt);
-    void OnSize(wxSizeEvent & evt)
-    {
-        LayoutCell();
-        Refresh();
-        evt.Skip();
-    }
-
-    virtual wxBorder GetDefaultBorder() const { return wxBORDER_NONE; }
-
-    DECLARE_EVENT_TABLE()
     DECLARE_NO_COPY_CLASS(CluePrompt)
     DECLARE_DYNAMIC_CLASS(CluePrompt)
-
-private:
-    // wxHtmlWindowInterface methods:
-    virtual void SetHTMLWindowTitle(const wxString& title);
-    virtual void OnHTMLLinkClicked(const wxHtmlLinkInfo& link);
-    virtual wxHtmlOpeningStatus OnHTMLOpeningURL(wxHtmlURLType type,
-                                                 const wxString& url,
-                                                 wxString *redirect) const;
-    virtual wxPoint HTMLCoordsToWindow(wxHtmlCell *cell,
-                                       const wxPoint& pos) const;
-    virtual wxWindow* GetHTMLWindow();
-    virtual wxColour GetHTMLBackgroundColour() const;
-    virtual void SetHTMLBackgroundColour(const wxColour& clr);
-    virtual void SetHTMLBackgroundImage(const wxBitmap& bmpBg);
-    virtual void SetHTMLStatusText(const wxString& text);
-    virtual wxCursor GetHTMLCursor(HTMLCursor type) const;
-
 };
 
 #endif // CLUE_PROMPT_H
