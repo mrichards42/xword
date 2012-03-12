@@ -1143,6 +1143,24 @@ MyAuiManager::Update()
     ConstrainPanes(horizontal_clue_panes);
     ConstrainPanes(vertical_clue_panes);
 
+    // Find all the fixed docks and distribute extra pane space proportionally
+    for (size_t i = 0; i < m_docks.Count(); ++i)
+    {
+        wxAuiDockInfo & dock = m_docks.Item(i);
+        if (dock.fixed)
+        {
+            wxArrayInt pane_positions, pane_sizes;
+            GetPanePositionsAndSizes(dock, pane_positions, pane_sizes);
+            int offset = 0;
+            for (size_t j = 0; j < dock.panes.Count(); ++j)
+            {
+                wxAuiPaneInfo * pane = dock.panes.Item(j);
+                pane->dock_pos = offset;
+                offset += pane_sizes.Item(j);
+            }
+        }
+    }
+
     wxAuiManager::Update();
 }
 
@@ -1422,13 +1440,22 @@ MyAuiManager::RemoveContextWindow(wxWindow * window)
 //   * Dock
 //   * Hide ( = Pin / unpin)
 //   -------
+//   * Fixed
+//   * Resizable
+//   -------
+//   X Border
+//   -------
 //     Close
+//   -------
 
 enum MyAuiManagerContextId
 {
     ID_AUI_CONTEXT_FLOATING = wxID_HIGHEST,
     ID_AUI_CONTEXT_DOCKED,
     ID_AUI_CONTEXT_HIDDEN,
+    ID_AUI_CONTEXT_RESIZABLE,
+    ID_AUI_CONTEXT_FIXED,
+    ID_AUI_CONTEXT_BORDER,
     ID_AUI_CONTEXT_CLOSE
 };
 
@@ -1454,6 +1481,21 @@ MyAuiManager::NewContextMenu(wxAuiPaneInfo & pane)
                     pane.dock_direction == wxAUI_DOCK_NONE ||
                     pane.IsFloating()));
     item->Check(IsInTabs(pane));
+
+    menu->AppendSeparator();
+
+    item = menu->AppendRadioItem(ID_AUI_CONTEXT_RESIZABLE, _T("Resizable"));
+    item->Check(pane.IsResizable());
+    item->Enable(pane.IsDocked());
+
+    item = menu->AppendRadioItem(ID_AUI_CONTEXT_FIXED, _T("Fixed"));
+    item->Check(pane.IsFixed());
+    item->Enable(pane.IsDocked());
+
+    menu->AppendSeparator();
+
+    item = menu->AppendCheckItem(ID_AUI_CONTEXT_BORDER, _T("Border"));
+    item->Check(pane.HasBorder());
 
     menu->AppendSeparator();
 
@@ -1503,6 +1545,21 @@ MyAuiManager::OnContextMenuClick(wxCommandEvent & evt)
 
         case ID_AUI_CONTEXT_HIDDEN:
             AddToTabs(pane);
+            Update();
+            break;
+
+        case ID_AUI_CONTEXT_RESIZABLE:
+            pane.Resizable();
+            Update();
+            break;
+
+        case ID_AUI_CONTEXT_FIXED:
+            pane.Fixed();
+            Update();
+            break;
+
+        case ID_AUI_CONTEXT_BORDER:
+            pane.PaneBorder(evt.IsChecked());
             Update();
             break;
 
@@ -1704,6 +1761,8 @@ MyAuiManager::ResizeDocks(const wxSize & oldSize, const wxSize & newSize)
     for (size_t i = 0; i < m_docks.Count(); ++i)
     {
         wxAuiDockInfo & dock = m_docks.Item(i);
+        if (dock.fixed)
+            continue;
         if (dock.IsVertical())
             dock.size = floor(dock.size * x + 0.5);
         else
