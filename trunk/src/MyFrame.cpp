@@ -599,8 +599,8 @@ MyFrame::DoSavePuzzle(const wxString & filename,
 {
     // We can't save notes now that notes are XHTML.
     //m_puz.m_notes = wx2puz(m_notes->GetValue());
-    m_puz.m_time = m_time;
-    m_puz.m_isTimerRunning = IsTimerRunning();
+    m_puz.SetTime(m_time);
+    m_puz.SetTimerRunning(IsTimerRunning());
 
     std::string fn = puz::encode_utf8(wx2puz(filename));
     if (! puz::Puzzle::CanSave(fn))
@@ -731,8 +731,8 @@ MyFrame::ShowPuzzle(bool update)
 
     // Timer
     StopTimer();
-    SetTime(m_puz.m_time);
-    if (m_puz.m_isTimerRunning)
+    SetTime(m_puz.GetTime());
+    if (m_puz.IsTimerRunning())
         StartTimer();
 
     if (update)
@@ -874,24 +874,27 @@ MyFrame::ShowTitle()
     }
     else
     {
-        SetTitle(puz2wx(m_puz.m_title) + _T(" - ") XWORD_APP_NAME);
-        m_title->SetLabel(puz2wx(m_puz.m_title));
-        m_title->SetToolTip(puz2wx(m_puz.m_title));
+        wxString title = puz2wx(m_puz.GetTitle());
+        SetTitle(title + _T(" - ") XWORD_APP_NAME);
+        m_title->SetLabel(title);
+        m_title->SetToolTip(title);
     }
 }
 
 void
 MyFrame::ShowAuthor()
 {
-    m_author->SetLabel(puz2wx(m_puz.m_author));
-    m_author->SetToolTip(puz2wx(m_puz.m_author));
+    wxString author = puz2wx(m_puz.GetAuthor());
+    m_author->SetLabel(author);
+    m_author->SetToolTip(author);
 }
 
 void
 MyFrame::ShowCopyright()
 {
-    m_copyright->SetLabel(puz2wx(m_puz.m_copyright));
-    m_copyright->SetToolTip(puz2wx(m_puz.m_copyright));
+    wxString copyright = puz2wx(m_puz.GetCopyright());
+    m_copyright->SetLabel(copyright);
+    m_copyright->SetToolTip(copyright);
 }
 
 
@@ -1822,8 +1825,8 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
                             _T("and reset the timer.  Continue?")))
         return;
 
-    const bool is_diagramless = m_puz.m_grid.IsDiagramless();
-    for (puz::Square * square = m_puz.m_grid.First();
+    const bool is_diagramless = m_puz.IsDiagramless();
+    for (puz::Square * square = m_puz.GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -1837,7 +1840,7 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
         }
     }
     if (is_diagramless)
-        m_puz.m_grid.NumberGrid();
+        m_puz.GetGrid().NumberGrid();
     m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite(), puz::ACROSS);
     m_XGridCtrl->Refresh();
     SetTime(0);
@@ -2374,7 +2377,7 @@ const int PRINT_SOLUTION = XGridDrawer::DRAW_CIRCLE
 void
 MyFrame::OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! m_puz.GetGrid().IsDiagramless())
+    if (! m_puz.IsDiagramless())
         DoPrint(PRINT_BLANK);
     else
         DoPrint(PRINT_BLANK & ~XGridDrawer::DRAW_NUMBER
@@ -2384,7 +2387,7 @@ MyFrame::OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnPrintCurrent(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! m_puz.GetGrid().IsDiagramless())
+    if (! m_puz.IsDiagramless())
         DoPrint(PRINT_CURRENT);
     else
         DoPrint(PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER);
@@ -2393,7 +2396,7 @@ MyFrame::OnPrintCurrent(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnPrintSolution(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! m_puz.GetGrid().IsDiagramless())
+    if (! m_puz.IsDiagramless())
         DoPrint(PRINT_SOLUTION);
     else
         DoPrint(PRINT_SOLUTION & ~XGridDrawer::DRAW_NUMBER);
@@ -2427,7 +2430,7 @@ MyFrame::DoPrintPreview(int options)
 void
 MyFrame::OnPreviewBlankGrid(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! m_puz.GetGrid().IsDiagramless())
+    if (! m_puz.IsDiagramless())
         DoPrintPreview(PRINT_BLANK);
     else
         DoPrintPreview(PRINT_BLANK & ~XGridDrawer::DRAW_NUMBER
@@ -2437,7 +2440,7 @@ MyFrame::OnPreviewBlankGrid(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnPreviewCurrent(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! m_puz.GetGrid().IsDiagramless())
+    if (! m_puz.IsDiagramless())
         DoPrintPreview(PRINT_CURRENT);
     else
         DoPrintPreview(PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER);
@@ -2446,7 +2449,7 @@ MyFrame::OnPreviewCurrent(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnPreviewSolution(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! m_puz.GetGrid().IsDiagramless())
+    if (! m_puz.IsDiagramless())
         DoPrintPreview(PRINT_SOLUTION);
     else
         DoPrintPreview(PRINT_SOLUTION & ~XGridDrawer::DRAW_NUMBER);
@@ -2483,7 +2486,7 @@ MyFrame::UpdateClues()
     const puz::Word * focusedWord = GetFocusedWord();
     const puz::Clue * focusedClue = NULL;
 
-    if (! m_puz.GetGrid().IsDiagramless())
+    if (! m_puz.IsDiagramless())
     {
         puz::Clues::const_iterator it;
         for (it = m_puz.GetClues().begin(); it != m_puz.GetClues().end(); ++it)
@@ -2932,7 +2935,7 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
 
     UnscrambleDialog * dlg = new UnscrambleDialog(this);
     dlg->Show();
-    puz::Scrambler scrambler(m_puz.m_grid);
+    puz::Scrambler scrambler(m_puz.GetGrid());
     unsigned short key = 0;
     wxStopWatch sw;
     dlg->StartTimer();

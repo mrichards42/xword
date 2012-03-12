@@ -106,11 +106,11 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     xml::SetInnerXML(metadata.append_child("title"), puz->GetTitle());
     xml::SetInnerXML(metadata.append_child("creator"), puz->GetAuthor());
     xml::SetInnerXML(metadata.append_child("copyright"), puz->GetCopyright());
+    xml::SetInnerXML(metadata.append_child("editor"), puz->GetMeta(puzT("editor")));
+    xml::SetInnerXML(metadata.append_child("publisher"), puz->GetMeta(puzT("publisher")));
     // Unused metadata
     metadata.append_child("created");
-    metadata.append_child("editor");
     metadata.append_child("rights");
-    metadata.append_child("published");
     metadata.append_child("identifier");
     metadata.append_child("description");
 

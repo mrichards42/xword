@@ -35,7 +35,7 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
         throw ConversionError("XPF does not support scrambled puzzles");
     if (! grid.HasSolution())
         throw ConversionError("XPF does not support puzzles without a solution");
-    for (const Square * square = puz->m_grid.First();
+    for (const Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
     {
@@ -52,6 +52,9 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
     xml::Append(puzzle, "Author", puz->GetAuthor());
     xml::Append(puzzle, "Copyright", puz->GetCopyright());
     xml::Append(puzzle, "Notepad", puz->GetNotes());
+    xml::Append(puzzle, "Publisher", puz->GetMeta(puzT("publisher")));
+    xml::Append(puzzle, "Editor", puz->GetMeta(puzT("editor")));
+    xml::Append(puzzle, "Date", puz->GetMeta(puzT("date")));
 
     // Grid
     if (grid.GetType() == TYPE_DIAGRAMLESS)
@@ -160,7 +163,7 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
             {
                 xml::node clue = clues_node.append_child("Clue");
                 // Find the clue direction
-                if (! puz->GetGrid().IsDiagramless())
+                if (! puz->IsDiagramless())
                 {
                     const Word & word = it->GetWord();
                     switch (word.GetDirection())

@@ -82,6 +82,9 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     puz->SetAuthor(GetText(puzzle, "Author"));
     puz->SetCopyright(GetText(puzzle, "Copyright"));
     puz->SetNotes(GetText(puzzle, "Notepad"));
+    puz->SetMeta(puzT("publisher"), GetText(puzzle, "Publisher"));
+    puz->SetMeta(puzT("editor"), GetText(puzzle, "Editor"));
+    puz->SetMeta(puzT("date"), GetText(puzzle, "Date"));
 
     // Grid
     if (GetText(puzzle, "Type") == puzT("diagramless"))

@@ -224,11 +224,11 @@ static int Puzzle_Clear(lua_State * L)
     puzzle->Clear();
     return 0;
 }
-// short GetVersion()
-static int Puzzle_GetVersion(lua_State * L)
+// short IsDiagramless()
+static int Puzzle_IsDiagramless(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    short returns = puzzle->GetVersion();
+    short returns = puzzle->IsDiagramless();
     lua_pushnumber(L, returns);
     return 1;
 }
@@ -269,6 +269,49 @@ static int Puzzle_TestOk(lua_State * L)
     }
     lua_error(L); // We should have returned by now
     return 0;
+}
+// Grid & GetGrid()
+static int Puzzle_GetGrid(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::Grid * returns = &puzzle->GetGrid();
+    luapuz_pushGrid(L, returns);
+    return 1;
+}
+// void SetGrid(puz::Grid & grid)
+static int Puzzle_SetGrid(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::Grid * grid = luapuz_checkGrid(L, 2);
+    puzzle->SetGrid(*grid);
+    return 0;
+}
+// puz::string_t GetMeta(puz::string_t name)
+static int Puzzle_GetMeta(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::string_t name = luapuz_checkstring_t(L, 2);
+    puz::string_t returns = puzzle->GetMeta(name);
+    luapuz_pushstring_t(L, returns);
+    return 1;
+}
+// void SetMeta(puz::string_t name, puz::string_t value)
+static int Puzzle_SetMeta(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::string_t name = luapuz_checkstring_t(L, 2);
+    puz::string_t value = luapuz_checkstring_t(L, 3);
+    puzzle->SetMeta(name, value);
+    return 0;
+}
+// bool HasMeta(puz::string_t name)
+static int Puzzle_HasMeta(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::string_t name = luapuz_checkstring_t(L, 2);
+    bool returns = puzzle->HasMeta(name);
+    lua_pushboolean(L, returns);
+    return 1;
 }
 // puz::string_t GetAuthor()
 static int Puzzle_GetAuthor(lua_State * L)
@@ -318,20 +361,20 @@ static int Puzzle_SetCopyright(lua_State * L)
     puzzle->SetCopyright(copyright);
     return 0;
 }
-// Grid & GetGrid()
-static int Puzzle_GetGrid(lua_State * L)
+// puz::string_t GetNotes()
+static int Puzzle_GetNotes(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::Grid * returns = &puzzle->GetGrid();
-    luapuz_pushGrid(L, returns);
+    puz::string_t returns = puzzle->GetNotes();
+    luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetGrid(puz::Grid & grid)
-static int Puzzle_SetGrid(lua_State * L)
+// void SetNotes(puz::string_t notes)
+static int Puzzle_SetNotes(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::Grid * grid = luapuz_checkGrid(L, 2);
-    puzzle->SetGrid(*grid);
+    puz::string_t notes = luapuz_checkstring_t(L, 2);
+    puzzle->SetNotes(notes);
     return 0;
 }
 // int GetTime()
@@ -364,22 +407,6 @@ static int Puzzle_SetTimerRunning(lua_State * L)
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     bool running = luapuz_checkboolean(L, 2);
     puzzle->SetTimerRunning(running);
-    return 0;
-}
-// puz::string_t GetNotes()
-static int Puzzle_GetNotes(lua_State * L)
-{
-    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::string_t returns = puzzle->GetNotes();
-    luapuz_pushstring_t(L, returns);
-    return 1;
-}
-// void SetNotes(puz::string_t notes)
-static int Puzzle_SetNotes(lua_State * L)
-{
-    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
-    puz::string_t notes = luapuz_checkstring_t(L, 2);
-    puzzle->SetNotes(notes);
     return 0;
 }
 // ClueList & GetClueList(puz::string_t name)
@@ -459,25 +486,28 @@ static const luaL_reg Puzzlelib[] = {
     {"CanLoad", Puzzle_CanLoad},
     {"CanSave", Puzzle_CanSave},
     {"Clear", Puzzle_Clear},
-    {"GetVersion", Puzzle_GetVersion},
+    {"IsDiagramless", Puzzle_IsDiagramless},
     {"IsScrambled", Puzzle_IsScrambled},
     {"IsOk", Puzzle_IsOk},
     {"SetOk", Puzzle_SetOk},
     {"TestOk", Puzzle_TestOk},
+    {"GetGrid", Puzzle_GetGrid},
+    {"SetGrid", Puzzle_SetGrid},
+    {"GetMeta", Puzzle_GetMeta},
+    {"SetMeta", Puzzle_SetMeta},
+    {"HasMeta", Puzzle_HasMeta},
     {"GetAuthor", Puzzle_GetAuthor},
     {"SetAuthor", Puzzle_SetAuthor},
     {"GetTitle", Puzzle_GetTitle},
     {"SetTitle", Puzzle_SetTitle},
     {"GetCopyright", Puzzle_GetCopyright},
     {"SetCopyright", Puzzle_SetCopyright},
-    {"GetGrid", Puzzle_GetGrid},
-    {"SetGrid", Puzzle_SetGrid},
+    {"GetNotes", Puzzle_GetNotes},
+    {"SetNotes", Puzzle_SetNotes},
     {"GetTime", Puzzle_GetTime},
     {"SetTime", Puzzle_SetTime},
     {"IsTimerRunning", Puzzle_IsTimerRunning},
     {"SetTimerRunning", Puzzle_SetTimerRunning},
-    {"GetNotes", Puzzle_GetNotes},
-    {"SetNotes", Puzzle_SetNotes},
     {"GetClueList", Puzzle_GetClueList},
     {"SetClueList", Puzzle_SetClueList},
     {"NumberClues", Puzzle_NumberClues},

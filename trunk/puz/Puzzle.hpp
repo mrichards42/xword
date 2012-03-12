@@ -26,18 +26,19 @@
 #include <vector>
 #include <cassert>
 #include <memory>
+#include <map>
 
 namespace puz {
 
 class PUZ_API Puzzle
 {
 public:
+    typedef std::map<string_t, string_t> metamap_t;
     struct PUZ_API FileHandlerDesc;
 
     explicit Puzzle()
         : m_time(0),
           m_isTimerRunning(false),
-          m_version(13),
           m_isOk(false),
           m_formatData(NULL)
     {}
@@ -46,7 +47,6 @@ public:
                     const FileHandlerDesc * desc = NULL)
         : m_time(0),
           m_isTimerRunning(false),
-          m_version(13),
           m_isOk(false),
           m_formatData(NULL)
     {
@@ -65,7 +65,6 @@ public:
     bool IsOk()        const { return m_isOk; }
     void SetOk(bool ok=true) { m_isOk = ok; }
     bool IsScrambled() const { return m_grid.IsScrambled(); }
-    short GetVersion() const { return m_version; }
 
     // Verify that the puzzle is valid and raise an exception if it is not.
     void TestOk();
@@ -78,17 +77,42 @@ public:
     bool IsTimerRunning() const { return m_isTimerRunning; }
     void SetTimerRunning(bool doit) { m_isTimerRunning = doit; }
 
-    const string_t & GetTitle() const { return m_title; }
-    void SetTitle(const string_t & title) { m_title = title; }
+    const string_t & GetMeta(const string_t & name) const
+    {
+        metamap_t::const_iterator it = m_metadata.find(name);
+        if (it == m_metadata.end())
+        {
+            // Return an empty string (created on demand).
+            return (const_cast<Puzzle *>(this)->m_metadata)[puzT("")];
+        }
+        return it->second;
+    }
+    bool HasMeta(const string_t & name) const
+    {
+        metamap_t::const_iterator it = m_metadata.find(name);
+        return it != m_metadata.end();
+    }
+    void SetMeta(const string_t & name, const string_t & value)
+    {
+        if (value.empty())
+            m_metadata.erase(name);
+        else
+            m_metadata[name] = value;
+    }
+    const metamap_t & GetMetadata() const { return m_metadata; }
+    metamap_t & GetMetadata() { return m_metadata; }
 
-    const string_t & GetAuthor() const { return m_author; }
-    void SetAuthor(const string_t & author) { m_author = author; }
+    const string_t & GetTitle() const { return GetMeta(puzT("title")); }
+    void SetTitle(const string_t & title) { SetMeta(puzT("title"), title); }
 
-    const string_t & GetCopyright() const { return m_copyright; }
-    void SetCopyright(const string_t & copyright) { m_copyright = copyright; }
+    const string_t & GetAuthor() const { return GetMeta(puzT("author")); }
+    void SetAuthor(const string_t & author) { SetMeta(puzT("author"), author); }
 
-    const string_t & GetNotes() const { return m_notes; }
-    void SetNotes(const string_t & notes) { m_notes = notes; }
+    const string_t & GetCopyright() const { return GetMeta(puzT("copyright")); }
+    void SetCopyright(const string_t & copyright) { SetMeta(puzT("copyright"), copyright); }
+
+    const string_t & GetNotes() const { return GetMeta(puzT("notes")); }
+    void SetNotes(const string_t & notes) { SetMeta(puzT("notes"), notes); }
 
     // Words
     const Word * FindWord(const puz::Square * square) const;
@@ -123,6 +147,7 @@ public:
     const Grid & GetGrid() const { return m_grid; }
           Grid & GetGrid()       { return m_grid; }
     void SetGrid(const Grid & grid) { m_grid = grid; }
+    bool IsDiagramless() const { return m_grid.IsDiagramless(); }
 
     // Grid / clue / word numbering algorithms
     //----------------------------------------
@@ -138,20 +163,6 @@ public:
     // Clues may only be "Across" and "Down", words must start and end
     // where they are expected to, and there must be no unclued words.
     bool UsesNumberAlgorithm() const;
-
-    // -------------------------------------------------------------------
-    // Members
-    // -------------------------------------------------------------------
-    int m_time;
-    bool m_isTimerRunning;
-
-    string_t m_title;
-    string_t m_author;
-    string_t m_copyright;
-    string_t m_notes;
-
-    Clues m_clues;
-    Grid m_grid;
 
     // -------------------------------------------------------------------
     // Load / Save
@@ -198,8 +209,18 @@ public:
 
 
 protected:
+    // -------------------------------------------------------------------
+    // Members
+    // -------------------------------------------------------------------
+    int m_time;
+    bool m_isTimerRunning;
+
+    metamap_t m_metadata;
+
+    Clues m_clues;
+    Grid m_grid;
+
     bool m_isOk;
-    short m_version;
     std::auto_ptr<FormatData> m_formatData;
 
 private:
@@ -213,12 +234,9 @@ inline void
 Puzzle::Clear()
 {
     m_isOk = false;
+    m_metadata.clear();
     m_grid.Clear();
     m_clues.clear();
-    m_title.clear();
-    m_author.clear();
-    m_copyright.clear();
-    m_notes.clear();
     m_time = 0;
     m_isTimerRunning = false;
 }

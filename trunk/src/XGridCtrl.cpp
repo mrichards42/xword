@@ -382,9 +382,17 @@ XGridCtrl::OnPaint(wxPaintEvent & WXUNUSED(evt))
     dc.SetBackground(wxBrush(GetBackgroundColour()));
     dc.Clear();
     if (! m_isPaused)
+    {
+        if (m_rebusCtrl && ! m_rebusCtrl->IsShown())
+            m_rebusCtrl->Show();
         DrawGrid(dc, GetUpdateRegion());
+    }
     else
+    {
+        if (m_rebusCtrl && m_rebusCtrl->IsShown())
+            m_rebusCtrl->Hide();
         DrawPauseMessage(dc);
+    }
 
     //wxScrolledWindow::SetFocus();
 }
@@ -1396,7 +1404,7 @@ XGridCtrl::OnChar(wxKeyEvent & evt)
             SetSquareText(*GetFocusedSquare(), puz2wx(puz::Square::Black));
         MoveAfterLetter();
     }
-    else if (IsValidChar(key))
+    else if (IsValidChar(key) && key < WXK_START)
     {
         OnLetter(key, mod);
     }
