@@ -132,13 +132,15 @@ string_t Square::ToGrid(const string_t & str)
     if (str.length() > REBUS_ENTRY_LENGTH)
         throw LongString();
 #endif 
-    string_t ret = str;
-    string_t::iterator it;
-    for (it = ret.begin(); it != ret.end(); ++it)
+    string_t ret;
+    string_t::const_iterator it;
+    for (it = str.begin(); it != str.end(); ++it)
     {
-        *it = ToGrid(*it);
+        char_t ch = ToGrid(*it);
+        if (ch != 0)
+            ret.append(1, ch);
 #ifdef PUZ_CHECK_STRINGS
-        if (*it == 0)
+        else
             throw InvalidString();
 #endif
     }
