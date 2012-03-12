@@ -17,6 +17,10 @@ local function wxbindproject(name)
             buildoptions {
                 "/wd4996", -- deprecation
             }
+            linkoptions {
+                "/ignore:4006", -- object already defined
+                "/ignore:4221", -- no public symbols
+            }
 
         dofile "../../premake4_wxdefs.lua"
 end
