@@ -97,6 +97,7 @@ protected:
         // cells.
         if (tag.GetName() == _T("TABLE"))
         {
+#if 0 // This became buggy (at least between wx 2.8.10 and 2.8.12
             // Remove the header and first table row (number and clue)
             // and make them children of m_firstTableCell.  This will prevent
             // the header from being separated from the first row.
@@ -126,6 +127,7 @@ protected:
             // m_firstTableCell doesn't have any size yet, but its children
             // do, so calculate our own size.
             m_firstTableCell->Layout(th->GetWidth());
+#endif // 0
 
             // Loop through the table cells and prevent them from being
             // broken across pages.
