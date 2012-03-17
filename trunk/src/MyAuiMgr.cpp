@@ -633,8 +633,6 @@ MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
     Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MyAuiManager::OnContextMenu));
     Connect(wxEVT_SIZE, wxSizeEventHandler(MyAuiManager::OnFrameSize));
     // We're going to assume that managed_wnd is not NULL
-    m_frameSize = managed_wnd->GetClientSize();
-    m_defaultFrameSize = m_frameSize;
 }
 
 
@@ -803,7 +801,7 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
         processed_layout.Replace(_T("\b"), _T("\\;"));
     }
 
-    wxSize frameSize = m_defaultFrameSize;
+    wxSize frameSize = m_frame->GetClientSize();
 
     if (! wxAuiManager::LoadPerspective(processed_layout, false))
         return false;
@@ -891,7 +889,9 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
         }
     }
 
-    ResizeDocks(frameSize, m_frameSize);
+    m_frameSize = m_frame->GetClientSize();
+    if (frameSize != m_frameSize)
+        ResizeDocks(frameSize, m_frameSize);
 
     UpdateMenu();
     if (update)
@@ -1094,6 +1094,8 @@ MyAuiManager::ConstrainPanes(std::list<wxAuiPaneInfo *> & panes)
 void
 MyAuiManager::Update()
 {
+    wxAuiManager::Update();
+    return;
     // Check for newly floating panes and remove them from the tabs.
     // Check for newly hidden panes and kill their focus.
     // Transfer pane size to pane best_size, so that the user's layout
@@ -1118,7 +1120,6 @@ MyAuiManager::Update()
                 GetManagedWindow()->SetFocus();
         }
     }
-
     // Force Clue panes to be the same size
     // This used to only work on Across and Down panes, which was much
     // simpler.
@@ -1142,24 +1143,6 @@ MyAuiManager::Update()
     }
     ConstrainPanes(horizontal_clue_panes);
     ConstrainPanes(vertical_clue_panes);
-
-    // Find all the fixed docks and distribute extra pane space proportionally
-    for (size_t i = 0; i < m_docks.Count(); ++i)
-    {
-        wxAuiDockInfo & dock = m_docks.Item(i);
-        if (dock.fixed)
-        {
-            wxArrayInt pane_positions, pane_sizes;
-            GetPanePositionsAndSizes(dock, pane_positions, pane_sizes);
-            int offset = 0;
-            for (size_t j = 0; j < dock.panes.Count(); ++j)
-            {
-                wxAuiPaneInfo * pane = dock.panes.Item(j);
-                pane->dock_pos = offset;
-                offset += pane_sizes.Item(j);
-            }
-        }
-    }
 
     wxAuiManager::Update();
 }
@@ -1226,6 +1209,8 @@ MyAuiManager::GetTabs(int direction)
                             .Bottom());
             }
             return m_bottom;
+        case wxAUI_DOCK_CENTER:
+            return NULL; // No tabs for the content pane
     }
     wxFAIL_MSG(_T("Tabs do not exist"));
     return NULL;
@@ -1440,8 +1425,7 @@ MyAuiManager::RemoveContextWindow(wxWindow * window)
 //   * Dock
 //   * Hide ( = Pin / unpin)
 //   -------
-//   * Fixed
-//   * Resizable
+//   X Resizable
 //   -------
 //   X Border
 //   -------
@@ -1454,7 +1438,6 @@ enum MyAuiManagerContextId
     ID_AUI_CONTEXT_DOCKED,
     ID_AUI_CONTEXT_HIDDEN,
     ID_AUI_CONTEXT_RESIZABLE,
-    ID_AUI_CONTEXT_FIXED,
     ID_AUI_CONTEXT_BORDER,
     ID_AUI_CONTEXT_CLOSE
 };
@@ -1484,12 +1467,8 @@ MyAuiManager::NewContextMenu(wxAuiPaneInfo & pane)
 
     menu->AppendSeparator();
 
-    item = menu->AppendRadioItem(ID_AUI_CONTEXT_RESIZABLE, _T("Resizable"));
+    item = menu->AppendCheckItem(ID_AUI_CONTEXT_RESIZABLE, _T("Resizable"));
     item->Check(pane.IsResizable());
-    item->Enable(pane.IsDocked());
-
-    item = menu->AppendRadioItem(ID_AUI_CONTEXT_FIXED, _T("Fixed"));
-    item->Check(pane.IsFixed());
     item->Enable(pane.IsDocked());
 
     menu->AppendSeparator();
@@ -1549,12 +1528,7 @@ MyAuiManager::OnContextMenuClick(wxCommandEvent & evt)
             break;
 
         case ID_AUI_CONTEXT_RESIZABLE:
-            pane.Resizable();
-            Update();
-            break;
-
-        case ID_AUI_CONTEXT_FIXED:
-            pane.Fixed();
+            pane.Resizable(evt.IsChecked());
             Update();
             break;
 
@@ -1679,16 +1653,15 @@ MyAuiManager::CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo & pane)
 void
 MyAuiManager::SavePaneSize(wxAuiPaneInfo & pane)
 {
-    if (pane.rect.IsEmpty())
-    {
-        if (pane.floating_size.IsFullySpecified())
-            pane.best_size = pane.floating_size;
-    }
-    else
+    if (! pane.rect.IsEmpty())
     {
         pane.best_size = pane.rect.GetSize();
         if (! pane.floating_size.IsFullySpecified())
-            pane.floating_size = pane.best_size;
+            pane.floating_size = pane.rect.GetSize();
+    }
+    else if (pane.floating_size.IsFullySpecified())
+    {
+        pane.best_size = pane.floating_size;
     }
 }
 
@@ -1753,6 +1726,7 @@ MyAuiManager::OnFrameSize(wxSizeEvent & evt)
 void
 MyAuiManager::ResizeDocks(const wxSize & oldSize, const wxSize & newSize)
 {
+    return;
     // Calculate percent difference
     double x = double(newSize.x) / oldSize.x;
     double y = double(newSize.y) / oldSize.y;
