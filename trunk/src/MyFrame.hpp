@@ -24,9 +24,6 @@
 #    include <wx/frame.h>
 #endif
 
-//#include <wx/aui/aui.h>
-#include "MyAuiMgr.hpp"
-
 
 // XWord library
 #include "puz/Puzzle.hpp"
@@ -61,6 +58,13 @@ class ConfigManager;
 #endif // XWORD_USE_LUA
 
 //#define USE_AUI_TOOLBAR
+#define USE_MY_AUI_MANAGER 1
+
+#if USE_MY_AUI_MANAGER
+#   include "MyAuiMgr.hpp"
+#else
+#   include <wx/aui/aui.h>
+#endif
 
 
 //------------------------------------------------------------------------------
@@ -198,7 +202,11 @@ private:
     void ManageWindows();
     void OnPaneClose(wxAuiManagerEvent & evt);
 
+#if USE_MY_AUI_MANAGER
     MyAuiManager m_mgr;
+#else
+    wxAuiManager m_mgr;
+#endif
 
 
     // Tool Management
@@ -305,7 +313,7 @@ private:
 
     // Window layout
     void OnEditLayout (wxCommandEvent & WXUNUSED(evt));
-    std::map<wxString, bool> m_hasPaneCaption;
+    std::map<wxString, wxAuiPaneInfo> m_paneCache;
     void OnLoadLayout (wxCommandEvent & WXUNUSED(evt));
     void OnSaveLayout (wxCommandEvent & WXUNUSED(evt));
     void OnShowNotes  (wxCommandEvent & WXUNUSED(evt));

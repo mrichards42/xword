@@ -773,8 +773,25 @@ MyFrame::ShowClues()
         std::map<wxString, CluePanel *>::iterator it;
         for (it = m_clues.begin(); it != m_clues.end(); ++it)
         {
+#if USE_MY_AUI_MANAGER
             wxAuiPaneInfo & info = m_mgr.FindPane(it->second);
             old_panels[info.name] = it->second;
+#else
+            // The equivalent of FindPane()
+            wxWindow * window = it->second;
+            for (;;)
+            {
+                // We're at the top of the hierarchy.
+                if (! window || window == this)
+                    break;
+                // Check this window
+                wxAuiPaneInfo & pane = m_mgr.GetPane(window);
+                if (pane.IsOk())
+                    old_panels[pane.name] = it->second;
+                // Next parent window
+                window = window->GetParent();
+            }
+#endif // USE_MY_AUI_MANAGER
         }
         m_clues.clear();
     }
@@ -844,7 +861,9 @@ MyFrame::ShowClues()
             clues->SetHeading(label);
             clues->SetClueList(&it->second);
             m_clues[label] = clues;
+#if USE_MY_AUI_MANAGER
             m_mgr.SetContextWindow(m_mgr.GetPane(clues), clues->m_heading);
+#endif
         }
     }
 
@@ -1092,9 +1111,11 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, ID_LAYOUT_PANES);
         m_toolMgr.Add(menu, ID_LOAD_LAYOUT);
         m_toolMgr.Add(menu, ID_SAVE_LAYOUT);
+#if USE_MY_AUI_MANAGER
         wxMenu * paneMenu = new wxMenu();
         m_mgr.SetManagedMenu(paneMenu);
         menu->AppendSubMenu(paneMenu, _T("Panes"));
+#endif
     mb->Append(menu, _T("&View"));
 
     // Solution Menu
@@ -1214,6 +1235,8 @@ MyFrame::ManageWindows()
     baseInfo.CaptionVisible(false)
             .PinButton()
             .CloseButton()
+            .Resizable(false)
+            .PaneBorder(false)
             .MinSize(15,15);
 
     // Give everything a name so we can save and load the layout
@@ -1244,7 +1267,6 @@ MyFrame::ManageWindows()
                   .Top()
                   .Caption(_T("Title"))
                   .Name(_T("Title")) );
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_title), m_title);
 
     m_mgr.AddPane(m_author,
                   wxAuiPaneInfo(baseInfo)
@@ -1252,7 +1274,6 @@ MyFrame::ManageWindows()
                   .Top()
                   .Caption(_T("Author"))
                   .Name(_T("Author")) );
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_author), m_author);
 
     m_mgr.AddPane(m_copyright,
                   wxAuiPaneInfo(baseInfo)
@@ -1260,7 +1281,6 @@ MyFrame::ManageWindows()
                   .Top()
                   .Caption(_T("Copyright"))
                   .Name(_T("Copyright")) );
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_copyright), m_copyright);
 
     m_mgr.AddPane(m_cluePrompt,
                   wxAuiPaneInfo(baseInfo)
@@ -1269,7 +1289,6 @@ MyFrame::ManageWindows()
                   .Top()
                   .Caption(_T("Clue Prompt"))
                   .Name(_T("Clue")) );
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_cluePrompt), m_cluePrompt);
 
     m_mgr.AddPane(m_notes,
                   wxAuiPaneInfo(baseInfo)
@@ -1279,6 +1298,13 @@ MyFrame::ManageWindows()
                   .Hide()
                   .Caption(_T("Notes"))
                   .Name(_T("Notes")));
+
+#if USE_MY_AUI_MANAGER
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_title), m_title);
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_author), m_author);
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_copyright), m_copyright);
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_cluePrompt), m_cluePrompt);
+#endif
 }
 
 
@@ -1433,7 +1459,9 @@ MyFrame::LoadConfig()
     else
         SetSize( config.Window.left(), config.Window.top(),
                  config.Window.width(), config.Window.height() );
+#if USE_MY_AUI_MANAGER
     m_mgr.SetDefaultFrameSize(GetClientSize());
+#endif
 
     // Grid
     //-----
@@ -2019,37 +2047,44 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnEditLayout(wxCommandEvent & evt)
 {
-    // Save which panes have captions so we can restore them
-    if (evt.IsChecked())
+    if (evt.IsChecked()) // Start Layout
     {
-        // Make all the captions visible
-        m_hasPaneCaption.clear();
+        // Cache the state of all our panes
+        m_paneCache.clear();
         wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
         for (size_t i = 0; i < panes.Count(); ++i)
         {
             wxAuiPaneInfo & pane = panes.Item(i);
-            if (pane.name.StartsWith(_T("__")))
+            if (pane.name.StartsWith(_T("__")))  // Private panes
                 continue;
-            m_hasPaneCaption[pane.name] = pane.HasCaption();
-            pane.CaptionVisible(true);
+            m_paneCache[pane.name] = pane; // Cache the old wxAuiPaneInfos
+            pane.CaptionVisible(true); // Show captions
+            pane.Resizable(true);      // Make all panes resizable
+            pane.PaneBorder(true);     // Show borders
         }
     }
-    else
+    else // End Layout
     {
-        // Restore the captions to their previous state
+        // Restore the panes to their previous state
         wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
         for (size_t i = 0; i < panes.Count(); ++i)
         {
             wxAuiPaneInfo & pane = panes.Item(i);
-            if (pane.name.StartsWith(_T("__")))
+            if (pane.name.StartsWith(_T("__"))) // Private panes
                 continue;
-            std::map<wxString, bool>::iterator it = m_hasPaneCaption.find(pane.name);
-            if (it == m_hasPaneCaption.end())
-                pane.CaptionVisible(true);
-            else
-                pane.CaptionVisible(it->second);
+            // Find the pane in the cache
+            std::map<wxString, wxAuiPaneInfo>::iterator it
+                = m_paneCache.find(pane.name);
+            if (it != m_paneCache.end())
+            {
+                // Restore old settings
+                wxAuiPaneInfo & oldPane = it->second;
+                pane.CaptionVisible(false);
+                pane.Resizable(false);
+                pane.PaneBorder(false);
+            }
         }
-        m_hasPaneCaption.clear();
+        m_paneCache.clear();
     }
     m_mgr.Update();
 }
