@@ -23,21 +23,16 @@
 #include <list>
 
 // Enhancements to the wxAuiManager class:
-// * Tabs along each side for hidden windows
-//     * class MyAuiManagerTabs to draw tabs
-//     * OnPaneButton() event for a custom Pin Button action
-//     * ProcessDockResult() override to disallow docking outside tabs
 // * Panes retain their size as best possible by setting best_size whenever
 //   their docking / floating / hiding state changes.
 //     * CreateFloatingFrame() override sets best_size
 //     * OnPaneButton() event sets best_size on Close Button
-//     * Panes hidden to tabs set best_size
 // * Across and Down panes retain the same size whenever possible.
 //     * OnRender() event sets dock_proportion, or dock.size
 // * LoadPerspective() caches panes that have not yet been added to the manager.
 //     * AddPane() checks to see if this pane has been cached;
 //       the wxAuiPaneInfo parameters can be thought of as default values.
-// * Context menus allow for docking, floating, hiding, and closing panes.
+// * Context menus allow for docking, floating, and closing panes.
 //     * SetContextWindow() sets the window that can be right clicked to
 //       pop up a context menu.
 //     * Context menus are always allowed on pane captions.
@@ -49,11 +44,8 @@
 // * AuiManager keeps track of the frame size and resizes panes proportionally
 //   when the frame is resized.
 
-class MyAuiManagerTabs;
-
 class MyAuiManager : public wxAuiManager
 {
-    friend class MyAuiManagerTabs;
 public:
     MyAuiManager(wxWindow* managed_wnd = NULL, unsigned int flags = wxAUI_MGR_DEFAULT);
 
@@ -117,13 +109,8 @@ protected:
     bool FireCloseEvent(wxAuiPaneInfo & pane);
 
     // Custom button actions:
-    // * Pin button hides pane to a tab
     // * Close button sets best_size
     void OnPaneButton(wxAuiManagerEvent & evt);
-
-    // Don't let panes dock outside the tabs.
-    virtual bool ProcessDockResult(wxAuiPaneInfo& target,
-                                   const wxAuiPaneInfo& new_pos);
 
     // Set floating_size and best_size
     wxAuiFloatingFrame* CreateFloatingFrame(wxWindow* parent,
@@ -135,17 +122,6 @@ protected:
     bool IsPaneActive(wxAuiPaneInfo & pane);
     bool HasPane(wxAuiDockUIPart * part, wxAuiPaneInfo & pane);
     wxAuiPaneInfo & HitTestPane(int x, int y);
-
-    // Tabs
-    MyAuiManagerTabs * m_top;
-    MyAuiManagerTabs * m_bottom;
-    MyAuiManagerTabs * m_left;
-    MyAuiManagerTabs * m_right;
-    MyAuiManagerTabs * GetTabs(int direction);
-    MyAuiManagerTabs * GetTabs(const wxAuiPaneInfo & pane) { return GetTabs(pane.dock_direction); }
-    void AddToTabs(wxAuiPaneInfo & pane, bool hide = true);
-    void RemoveFromTabs(wxAuiPaneInfo & pane, bool show = true);
-    bool IsInTabs(wxAuiPaneInfo & pane);
 
     // Utils
     wxAuiDockInfo & FindDock(wxAuiPaneInfo & info);
@@ -168,19 +144,7 @@ protected:
     void ShowContextMenu(wxAuiPaneInfo & pane);
     void OnContextMenuClick(wxCommandEvent & evt);
 
-    // Cached pane stuff
-    struct CachedPane
-    {
-        CachedPane(const wxString & _perspective = wxEmptyString,
-                   wxAuiManagerDock _tab = wxAUI_DOCK_NONE)
-            : perspective(_perspective),
-              tab(_tab)
-        {}
-        wxString perspective;
-        wxAuiManagerDock tab;
-    };
-
-    std::map<wxString, CachedPane> m_paneCache;
+    std::map<wxString, wxString> m_paneCache;
 
     // Frame size
     wxSize m_frameSize;
