@@ -1726,20 +1726,26 @@ MyAuiManager::OnFrameSize(wxSizeEvent & evt)
 void
 MyAuiManager::ResizeDocks(const wxSize & oldSize, const wxSize & newSize)
 {
-    return;
     // Calculate percent difference
     double x = double(newSize.x) / oldSize.x;
     double y = double(newSize.y) / oldSize.y;
 
-    // Go through the docks and adjust their sizes
+    // Go through the clue docks and adjust their sizes
     for (size_t i = 0; i < m_docks.Count(); ++i)
     {
         wxAuiDockInfo & dock = m_docks.Item(i);
-        if (dock.fixed)
-            continue;
-        if (dock.IsVertical())
-            dock.size = floor(dock.size * x + 0.5);
-        else
-            dock.size = floor(dock.size * y + 0.5);
+        // Look for docks with a clue list in them
+        for (size_t j = 0; j < dock.panes.Count(); ++j)
+        {
+            if (dock.panes.Item(j)->name.StartsWith(_T("ClueList")))
+            {
+                // Resize the dock
+                if (dock.IsVertical())
+                    dock.size = floor(dock.size * x + 0.5);
+                else
+                    dock.size = floor(dock.size * y + 0.5);
+                break;
+            }
+        }
     }
 }
