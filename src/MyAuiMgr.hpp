@@ -23,12 +23,10 @@
 #include <list>
 
 // Enhancements to the wxAuiManager class:
-// * Panes retain their size as best possible by setting best_size whenever
-//   their docking / floating / hiding state changes.
-//     * CreateFloatingFrame() override sets best_size
-//     * OnPaneButton() event sets best_size on Close Button
-// * Across and Down panes retain the same size whenever possible.
-//     * OnRender() event sets dock_proportion, or dock.size
+// * Panes retain their size as best possible by setting best_size on Update()
+//     * Update() override sets best_size
+// * CluePanel panes retain the same size whenever possible.
+//     * Update() sets dock_proportion or dock.size
 // * LoadPerspective() caches panes that have not yet been added to the manager.
 //     * AddPane() checks to see if this pane has been cached;
 //       the wxAuiPaneInfo parameters can be thought of as default values.
@@ -38,19 +36,29 @@
 //     * Context menus are always allowed on pane captions.
 //     * Override DetachPane() so that RemoveContextWindow() is called
 //       first.
+//     * CreateFloatingFrame() override adds a context window
 // * The user can supply a menu that gets filled with panes and their state.
 //     * public function UpdateMenu()
 //     * UpdateMenu() is called in AddPane() and DetachPane()
 // * AuiManager keeps track of the frame size and resizes panes proportionally
 //   when the frame is resized.
+// * An AuiPaneClose event is fired when panes are closed
+
+// NB: Many of these changes require a hacked version of wxAuiManager
+//     which is supplied in trunk/wxpatches
+// Enhancements via wxAuiManager hacks:
+// * wxAuiPaneInfo ::resizable and ::fixed are independent values.
+//     * Fixed panes work with absolute coordinates, while non-Resizable
+//       panes merely omit the resize sash, and maintain relative coordinates.
+// * Various wxAuiManager functions are made virtual
 
 class MyAuiManager : public wxAuiManager
 {
 public:
     MyAuiManager(wxWindow* managed_wnd = NULL, unsigned int flags = wxAUI_MGR_DEFAULT);
 
-
-    // Menus
+    // Managed Pane Menu
+    //------------------
     wxMenu * SetManagedMenu(wxMenu * menu)
     {
         wxMenu * oldmenu = m_menu;
@@ -61,11 +69,14 @@ public:
 
     void UpdateMenu();
 
+    // Pane Cache
+    //-----------
+    bool GetCachedPane(const wxString & name, wxAuiPaneInfo & pane);
+    bool HasCachedPane(const wxString & name);
+
     // Instead of skipping unknown panes, we'll cache them
     // in m_paneMap.
-    // I've hacked wx/aui/framemanager.hpp to make this virtual.
     virtual bool LoadPerspective(const wxString & layout, bool update = true);
-
     virtual wxString SavePerspective();
 
     // If the pane is present in m_paneMap, use that pane info instead of
@@ -73,7 +84,8 @@ public:
     virtual bool AddPane(wxWindow * window, const wxAuiPaneInfo & pane_info);
     // InsertPane uses AddPane in the implementation already
 
-    // Context menu windows
+    // Context Menu
+    //-------------
     void SetContextWindow(wxWindow * pane_window, wxWindow * window)
     {
         SetContextWindow(GetPane(pane_window), window);
@@ -87,41 +99,30 @@ public:
     void RemoveContextWindow(wxWindow * window);
     void RemoveContextWindow(wxAuiPaneInfo & info);
 
-    // call RemoveContextWindow() and UpdateMenu()
+    // Misc
+    //-----
+
+    // Clean up context and pane menus
     virtual bool DetachPane(wxWindow * window);
+
+    wxAuiPaneInfo & GetPaneByCaption(const wxString & caption);
 
     // Find the pane that this window belongs to.  Window can be
     // any child of a pane.
     wxAuiPaneInfo & FindPane(wxWindow * window);
     wxAuiPaneInfo & FindPane(int id);
 
-    bool GetCachedPane(const wxString & name, wxAuiPaneInfo & pane);
-    bool HasCachedPane(const wxString & name);
-
-    wxAuiPaneInfo & GetPaneByCaption(const wxString & caption);
-
-    bool IsPaneClosed(const wxAuiPaneInfo & pane);
-
     virtual void Update();
 
-
 protected:
+    // Close Event
     bool FireCloseEvent(wxAuiPaneInfo & pane);
-
-    // Custom button actions:
-    // * Close button sets best_size
     void OnPaneButton(wxAuiManagerEvent & evt);
 
-    // Set floating_size and best_size
+    // Context Menu
+    wxAuiPaneInfo & HitTestPane(int x, int y);
     wxAuiFloatingFrame* CreateFloatingFrame(wxWindow* parent,
                                             const wxAuiPaneInfo& pane_info);
-
-    void SavePaneSize(wxAuiPaneInfo & pane);
-
-    // Is this pane part of any action?
-    bool IsPaneActive(wxAuiPaneInfo & pane);
-    bool HasPane(wxAuiDockUIPart * part, wxAuiPaneInfo & pane);
-    wxAuiPaneInfo & HitTestPane(int x, int y);
 
     // Utils
     wxAuiDockInfo & FindDock(wxAuiPaneInfo & info);
@@ -144,17 +145,17 @@ protected:
     void ShowContextMenu(wxAuiPaneInfo & pane);
     void OnContextMenuClick(wxCommandEvent & evt);
 
+    // Cache
     std::map<wxString, wxString> m_paneCache;
 
-    // Frame size
+    // Proportional resizing
     wxSize m_frameSize;
-    // The size to use if a perspective doesn't specify a size.
-    wxSize m_defaultFrameSize;
     void OnFrameSize(wxSizeEvent & evt);
     void ResizeDocks(const wxSize & oldSize, const wxSize & newSize);
 
-public:
-    void SetDefaultFrameSize(const wxSize & size) { m_defaultFrameSize = size; }
+    void SavePaneSize(wxAuiPaneInfo & pane);
+
+    DECLARE_EVENT_TABLE();
 };
 
 #endif // MY_AUI_MGR_H

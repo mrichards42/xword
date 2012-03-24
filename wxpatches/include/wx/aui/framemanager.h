@@ -452,7 +452,7 @@ public:
     wxAuiPaneInfo& GetPane(const wxString& name);
     wxAuiPaneInfoArray& GetAllPanes();
 
-    bool AddPane(wxWindow* window,
+    virtual bool AddPane(wxWindow* window,
                  const wxAuiPaneInfo& pane_info);
 
     bool AddPane(wxWindow* window,
@@ -467,14 +467,14 @@ public:
                  const wxAuiPaneInfo& insert_location,
                  int insert_level = wxAUI_INSERT_PANE);
 
-    bool DetachPane(wxWindow* window);
+    virtual bool DetachPane(wxWindow* window);
 
-    void Update();
+    virtual void Update();
 
     wxString SavePaneInfo(wxAuiPaneInfo& pane);
     void LoadPaneInfo(wxString pane_part, wxAuiPaneInfo &pane);
-    wxString SavePerspective();
-    bool LoadPerspective(const wxString& perspective, bool update = true);
+    virtual wxString SavePerspective();
+    virtual bool LoadPerspective(const wxString& perspective, bool update = true);
 
     void SetDockSizeConstraint(double width_pct, double height_pct);
     void GetDockSizeConstraint(double* width_pct, double* height_pct) const;
