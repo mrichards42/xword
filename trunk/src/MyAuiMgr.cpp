@@ -16,7 +16,6 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "MyAuiMgr.hpp"
-#include <vector>
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -27,14 +26,17 @@
 // MyAuiManager
 // ----------------------------------------------------------------
 
+BEGIN_EVENT_TABLE(MyAuiManager, wxAuiManager)
+    EVT_AUI_PANE_BUTTON    (MyAuiManager::OnPaneButton)
+    EVT_CONTEXT_MENU       (MyAuiManager::OnContextMenu)
+    EVT_SIZE               (MyAuiManager::OnFrameSize)
+END_EVENT_TABLE()
+
 MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
         : wxAuiManager(managed_wnd, flags),
           m_menu(NULL),
           m_contextPane(NULL)
 {
-    Connect(wxEVT_AUI_PANE_BUTTON, wxAuiManagerEventHandler(MyAuiManager::OnPaneButton));
-    Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MyAuiManager::OnContextMenu));
-    Connect(wxEVT_SIZE, wxSizeEventHandler(MyAuiManager::OnFrameSize));
 }
 
 
@@ -809,26 +811,6 @@ MyAuiManager::HitTestPane(int x, int y)
         return *(part->pane);
     return wxAuiNullPaneInfo;
 }
-
-bool
-MyAuiManager::HasPane(wxAuiDockUIPart * part, wxAuiPaneInfo & pane)
-{
-    wxASSERT(part);
-    if (part->pane)
-        return part->pane == &pane;
-    if (part->dock)
-        return part->dock->panes.Index(&pane) != -1;
-    return false;
-}
-
-bool
-MyAuiManager::IsPaneActive(wxAuiPaneInfo & pane)
-{
-    if (m_action == actionNone || ! m_action_part)
-        return false;
-    return HasPane(m_action_part, pane);
-}
-
 
 
 // ----------------------------------------------------------------------------

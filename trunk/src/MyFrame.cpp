@@ -1459,10 +1459,6 @@ MyFrame::LoadConfig()
     else
         SetSize( config.Window.left(), config.Window.top(),
                  config.Window.width(), config.Window.height() );
-#if USE_MY_AUI_MANAGER
-    m_mgr.SetDefaultFrameSize(GetClientSize());
-#endif
-
     // Grid
     //-----
     if (config.Grid.fit())
