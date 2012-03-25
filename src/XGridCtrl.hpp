@@ -337,6 +337,9 @@ public:
     static bool IsValidChar(wxChar ch)
         { return puz::Square::IsValidChar(static_cast<int>(ch)); }
 
+    void ConnectEvents();
+    void DisconnectEvents();
+
 protected:
     void Init();
 
@@ -401,9 +404,6 @@ protected:
 
     // Rebus
     XGridRebusCtrl * m_rebusCtrl;
-
-    void ConnectEvents();
-    void DisconnectEvents();
 
 private:
     // Events
