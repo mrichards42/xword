@@ -42,6 +42,7 @@
 #include "widgets/SizedText.hpp"
 #include "ClueListBox.hpp"
 #include "CluePanel.hpp"
+#include "MetadataCtrl.hpp"
 #include "CluePrompt.hpp"
 #include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
@@ -887,32 +888,79 @@ MyFrame::ShowTitle()
     if (! m_puz.IsOk())
     {
         SetTitle(XWORD_APP_NAME);
-        m_title->SetLabel(_T(""));
-        m_title->SetToolTip(_T(""));
+        m_title->UpdateLabel();
     }
     else
     {
-        wxString title = puz2wx(m_puz.GetTitle());
-        SetTitle(title + _T(" - ") XWORD_APP_NAME);
-        m_title->SetLabel(title);
-        m_title->SetToolTip(title);
+        SetTitle(puz2wx(m_puz.GetTitle()) + _T(" - ") XWORD_APP_NAME);
+        m_title->UpdateLabel();
+    }
+    // Hide if there is no text
+    wxAuiPaneInfo & pane = m_mgr.GetPane(m_title);
+    if (m_title->GetLabel().empty())
+    {
+        if (pane.IsShown())
+        {
+            pane.Hide();
+            m_mgr.Update();
+        }
+    }
+    else
+    {
+        if (! pane.IsShown())
+        {
+            pane.Show();
+            m_mgr.Update();
+        }
     }
 }
 
 void
 MyFrame::ShowAuthor()
 {
-    wxString author = puz2wx(m_puz.GetAuthor());
-    m_author->SetLabel(author);
-    m_author->SetToolTip(author);
+    m_author->UpdateLabel();
+    // Hide if there is no text
+    wxAuiPaneInfo & pane = m_mgr.GetPane(m_author);
+    if (m_author->GetLabel().empty())
+    {
+        if (pane.IsShown())
+        {
+            pane.Hide();
+            m_mgr.Update();
+        }
+    }
+    else
+    {
+        if (! pane.IsShown())
+        {
+            pane.Show();
+            m_mgr.Update();
+        }
+    }
 }
 
 void
 MyFrame::ShowCopyright()
 {
-    wxString copyright = puz2wx(m_puz.GetCopyright());
-    m_copyright->SetLabel(copyright);
-    m_copyright->SetToolTip(copyright);
+    m_copyright->UpdateLabel();
+    // Hide if there is no text
+    wxAuiPaneInfo & pane = m_mgr.GetPane(m_copyright);
+    if (m_copyright->GetLabel().empty())
+    {
+        if (pane.IsShown())
+        {
+            pane.Hide();
+            m_mgr.Update();
+        }
+    }
+    else
+    {
+        if (! pane.IsShown())
+        {
+            pane.Show();
+            m_mgr.Update();
+        }
+    }
 }
 
 
@@ -971,10 +1019,23 @@ MyFrame::CreateWindows()
 	m_XGridCtrl->SetDropTarget(new XWordFileDropTarget(this));
 #endif
 
-    m_title      = new SizedText (this, wxID_ANY);
-    m_author     = new SizedText (this, wxID_ANY);
-    m_copyright  = new SizedText (this, wxID_ANY);
-    m_cluePrompt = new CluePrompt (this, wxID_ANY);
+    m_title      = new MetadataCtrl(this, wxID_ANY, _T("%title%"));
+    m_author     = new MetadataCtrl(this, wxID_ANY, _T("%author%"));
+    m_copyright  = new MetadataCtrl(this, wxID_ANY, _T("%copyright%"));
+    m_cluePrompt = new CluePrompt(this, wxID_ANY);
+
+#ifdef XWORD_USE_LUA // Custom author display script
+    m_author->SetDisplayFormat(
+        _T("if puzzle:HasMeta('author') then\n\
+                if puzzle:HasMeta('editor') then\n\
+                    return %author% .. ' / edited by ' .. %editor%\n\
+                else\n\
+                    return %author%\n\
+                end\n\
+            elseif puzzle:HasMeta('editor') then\n\
+                return 'Edited by ' .. %editor%\n\
+            end"));
+#endif
 
     m_notes      = new wxHtmlWindow(this, wxID_ANY);
 
