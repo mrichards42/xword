@@ -32,7 +32,7 @@ class wxPuzEvent;
 // Windows
 class ClueListBox;
 class CluePrompt;
-class SizedText;
+class MetadataCtrl;
 class CluePanel;
 class LayoutDialog;
 class PreferencesDialog;
@@ -179,9 +179,9 @@ private:
 
     std::map<wxString, CluePanel *> m_clues;
 
-    SizedText *  m_title;
-    SizedText *  m_author;
-    SizedText *  m_copyright;
+    MetadataCtrl *  m_title;
+    MetadataCtrl *  m_author;
+    MetadataCtrl *  m_copyright;
     CluePrompt *  m_cluePrompt;
     wxHtmlWindow * m_notes;
 
@@ -246,7 +246,6 @@ private:
     puz::Puzzle m_puz;
     wxString m_filename;
     bool m_isModified;
-
 
     // Config
     //-------
