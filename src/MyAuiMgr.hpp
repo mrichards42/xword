@@ -107,7 +107,7 @@ public:
     // ---------
     void StartEdit();
     void EndEdit();
-    bool IsEditing() const { return m_editState > editNone; }
+    bool IsEditing() const { return m_isEditing; }
 
     // Misc
     //-----
@@ -168,12 +168,8 @@ protected:
     void OnEditContextMenu(wxContextMenuEvent & evt);
     void OnSetCursor(wxSetCursorEvent & evt);
     void OnCaptureLost(wxMouseCaptureLostEvent & evt);
-    enum editState {
-        editNone = 0,   // Not in edit mode
-        editPassive,    // Waiting to do something
-        editPaneHover,  // Hovered over a pane (mouse is captured)
-        editActive      // wxAuiManager is handling some action
-    } m_editState;
+    bool m_isEditing;
+    std::map<wxString, wxAuiPaneInfo> m_editCache;
 
     DECLARE_EVENT_TABLE();
 };
