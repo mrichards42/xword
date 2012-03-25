@@ -30,6 +30,7 @@ BEGIN_EVENT_TABLE(MyAuiManager, wxAuiManager)
     EVT_AUI_PANE_BUTTON    (MyAuiManager::OnPaneButton)
     EVT_CONTEXT_MENU       (MyAuiManager::OnContextMenu)
     EVT_SIZE               (MyAuiManager::OnFrameSize)
+    EVT_MOUSE_CAPTURE_LOST (MyAuiManager::OnCaptureLost)
 END_EVENT_TABLE()
 
 MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
@@ -332,6 +333,58 @@ MyAuiManager::DetachPane(wxWindow * window)
 // Update functions
 // ----------------------------------------------------------------------------
 
+void
+MyAuiManager::Update()
+{
+    // Transfer pane size to pane best_size, so that the user's layout
+    // changes are persistent.
+    wxAuiPaneInfo & focused_pane = FindPane(wxWindow::FindFocus());
+    for (size_t i = 0; i < m_panes.Count(); ++i)
+        SavePaneSize(m_panes.Item(i));
+    // Force Clue panes to be the same size
+    std::list<wxAuiPaneInfo *> horizontal_clue_panes;
+    std::list<wxAuiPaneInfo *> vertical_clue_panes;
+    for (size_t i = 0; i < m_panes.Count(); ++i)
+    {
+        wxAuiPaneInfo & pane = m_panes.Item(i);
+        if (pane.name.StartsWith(_T("ClueList")))
+        {
+            if (pane.dock_direction == wxAUI_DOCK_TOP ||
+                pane.dock_direction == wxAUI_DOCK_BOTTOM)
+            {
+                horizontal_clue_panes.push_back(&pane);
+            }
+            else
+            {
+                vertical_clue_panes.push_back(&pane);
+            }
+        }
+    }
+    ConstrainPanes(horizontal_clue_panes);
+    ConstrainPanes(vertical_clue_panes);
+
+    wxAuiManager::Update();
+}
+
+
+void
+MyAuiManager::SavePaneSize(wxAuiPaneInfo & pane)
+{
+    if (! pane.rect.IsEmpty())
+    {
+        pane.best_size = pane.rect.GetSize();
+        if (! pane.floating_size.IsFullySpecified())
+            pane.floating_size = pane.rect.GetSize();
+    }
+    else if (pane.floating_size.IsFullySpecified())
+    {
+        pane.best_size = pane.floating_size;
+    }
+    // Make sure the floating size is at least the min size.
+    pane.floating_size.IncTo(pane.window->GetEffectiveMinSize());
+}
+
+
 // Make all panes in the given list the same size, assuming that all panes
 // are in docks of the same direction.
 // Docks that only contain panes in the list are made the same size.
@@ -395,39 +448,6 @@ MyAuiManager::ConstrainPanes(std::list<wxAuiPaneInfo *> & panes)
         for (pane = it->second.begin(); pane != it->second.end(); ++pane)
             (*pane)->dock_proportion = average_proportion;
     }
-}
-
-void
-MyAuiManager::Update()
-{
-    // Transfer pane size to pane best_size, so that the user's layout
-    // changes are persistent.
-    wxAuiPaneInfo & focused_pane = FindPane(wxWindow::FindFocus());
-    for (size_t i = 0; i < m_panes.Count(); ++i)
-        SavePaneSize(m_panes.Item(i));
-    // Force Clue panes to be the same size
-    std::list<wxAuiPaneInfo *> horizontal_clue_panes;
-    std::list<wxAuiPaneInfo *> vertical_clue_panes;
-    for (size_t i = 0; i < m_panes.Count(); ++i)
-    {
-        wxAuiPaneInfo & pane = m_panes.Item(i);
-        if (pane.name.StartsWith(_T("ClueList")))
-        {
-            if (pane.dock_direction == wxAUI_DOCK_TOP ||
-                pane.dock_direction == wxAUI_DOCK_BOTTOM)
-            {
-                horizontal_clue_panes.push_back(&pane);
-            }
-            else
-            {
-                vertical_clue_panes.push_back(&pane);
-            }
-        }
-    }
-    ConstrainPanes(horizontal_clue_panes);
-    ConstrainPanes(vertical_clue_panes);
-
-    wxAuiManager::Update();
 }
 
 
@@ -786,23 +806,6 @@ MyAuiManager::CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo & pane)
 // Pane state and position
 // ----------------------------------------------------------------------------
 
-void
-MyAuiManager::SavePaneSize(wxAuiPaneInfo & pane)
-{
-    if (! pane.rect.IsEmpty())
-    {
-        pane.best_size = pane.rect.GetSize();
-        if (! pane.floating_size.IsFullySpecified())
-            pane.floating_size = pane.rect.GetSize();
-    }
-    else if (pane.floating_size.IsFullySpecified())
-    {
-        pane.best_size = pane.floating_size;
-    }
-    // Make sure the floating size is at least the min size.
-    pane.floating_size.IncTo(pane.window->GetEffectiveMinSize());
-}
-
 wxAuiPaneInfo &
 MyAuiManager::HitTestPane(int x, int y)
 {
@@ -854,4 +857,119 @@ MyAuiManager::ResizeDocks(const wxSize & oldSize, const wxSize & newSize)
             }
         }
     }
+}
+
+
+
+// ----------------------------------------------------------------------------
+// Edit Mode
+// ----------------------------------------------------------------------------
+
+void ConnectRecursive(wxWindow * w,
+    wxEventType eventType, wxObjectEventFunction function,
+    wxObject * userData = NULL, wxEvtHandler * eventSink = NULL)
+{
+    w->Connect(eventType, function, userData, eventSink);
+    wxWindowList & children = w->GetChildren();
+    for (wxWindowList::iterator c = children.begin(); c != children.end(); ++c)
+    {
+        ConnectRecursive(*c, eventType, function, userData, eventSink);
+    }
+}
+
+void DisconnectRecursive(wxWindow * w,
+    wxEventType eventType, wxObjectEventFunction function,
+    wxObject * userData = NULL, wxEvtHandler * eventSink = NULL)
+{
+    w->Disconnect(eventType, function, userData, eventSink);
+    wxWindowList & children = w->GetChildren();
+    for (wxWindowList::iterator c = children.begin(); c != children.end(); ++c)
+    {
+        DisconnectRecursive(*c, eventType, function, userData, eventSink);
+    }
+}
+
+void
+MyAuiManager::StartEdit()
+{
+    m_editState = editPassive;
+    for (size_t i = 0; i < m_panes.Count(); ++i)
+    {
+        ConnectRecursive(m_panes.Item(i).window, wxEVT_LEFT_DOWN,
+            wxMouseEventHandler(MyAuiManager::OnLeftDown),  NULL, this);
+        ConnectRecursive(m_panes.Item(i).window, wxEVT_SET_CURSOR,
+            wxSetCursorEventHandler(MyAuiManager::OnSetCursor),  NULL, this);
+        ConnectRecursive(m_panes.Item(i).window, wxEVT_CONTEXT_MENU,
+            wxContextMenuEventHandler(MyAuiManager::OnEditContextMenu),  NULL, this);
+    }
+}
+
+void
+MyAuiManager::EndEdit()
+{
+    m_editState = editNone;
+    if (m_frame->HasCapture())
+        m_frame->ReleaseMouse();
+    for (size_t i = 0; i < m_panes.Count(); ++i)
+    {
+        DisconnectRecursive(m_panes.Item(i).window, wxEVT_LEFT_DOWN,
+            wxMouseEventHandler(MyAuiManager::OnLeftDown),  NULL, this);
+        DisconnectRecursive(m_panes.Item(i).window, wxEVT_SET_CURSOR,
+            wxSetCursorEventHandler(MyAuiManager::OnSetCursor),  NULL, this);
+        DisconnectRecursive(m_panes.Item(i).window, wxEVT_CONTEXT_MENU,
+            wxContextMenuEventHandler(MyAuiManager::OnEditContextMenu),  NULL, this);
+    }
+}
+
+void
+MyAuiManager::OnLeftDown(wxMouseEvent & evt)
+{
+    wxPoint pos = m_frame->ScreenToClient(wxDynamicCast(evt.GetEventObject(), wxWindow)->ClientToScreen(evt.GetPosition()));
+    wxAuiDockUIPart * part = HitTest(pos.x, pos.y);
+    if (part && part->pane && ! part->pane->IsFloating() && part->pane->IsFloatable())
+    {
+        // Start dragging the pane
+        m_action = actionClickCaption;
+        m_action_part = part;
+        m_action_start = pos;
+        m_action_offset = pos - part->rect.GetTopLeft();
+        if (! m_frame->HasCapture())
+            m_frame->CaptureMouse();
+    }
+    else
+    {
+        evt.Skip();
+    }
+}
+
+void
+MyAuiManager::OnEditContextMenu(wxContextMenuEvent & evt)
+{
+    wxAuiPaneInfo & pane = FindPane(wxDynamicCast(evt.GetEventObject(), wxWindow));
+    if (pane.IsOk())
+        ShowContextMenu(pane);
+    else
+        evt.Skip();
+}
+
+
+void
+MyAuiManager::OnCaptureLost(wxMouseCaptureLostEvent & evt)
+{
+    if (m_frame->HasCapture())
+        m_frame->ReleaseMouse();
+    // Reset the action variables
+    m_action = actionNone;
+    m_last_mouse_move = wxPoint();
+    EndEdit();
+}
+
+void
+MyAuiManager::OnSetCursor(wxSetCursorEvent & evt)
+{
+    wxAuiPaneInfo & pane = FindPane(wxDynamicCast(evt.GetEventObject(), wxWindow));
+    if (! pane.IsFloating() && pane.IsFloatable())
+        evt.SetCursor(wxCursor(wxCURSOR_SIZING));
+    else
+        evt.SetCursor(wxNullCursor);
 }

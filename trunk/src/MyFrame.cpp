@@ -109,7 +109,7 @@ enum toolIds
     ID_SCRAMBLE,
     ID_UNSCRAMBLE,
 
-    ID_LAYOUT_PANES,
+    ID_EDIT_LAYOUT,
     ID_LOAD_LAYOUT,
     ID_SAVE_LAYOUT,
 
@@ -172,6 +172,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
     EVT_UPDATE_UI      (ID_SHOW_NOTES,        MyFrame::OnUpdateUI)
     EVT_UPDATE_UI      (ID_REBUS_ENTRY,       MyFrame::OnUpdateUI)
+    EVT_UPDATE_UI      (ID_EDIT_LAYOUT,       MyFrame::OnUpdateUI)
 
     EVT_MENU_RANGE     (ID_FILE_HISTORY_1,
                         ID_FILE_HISTORY_1 + 10, MyFrame::OnOpenRecentPuzzle)
@@ -297,7 +298,7 @@ MyFrame::ManageTools()
         { ID_REBUS_ENTRY,  wxITEM_CHECK, _T("Enter Multiple Letters\tCtrl+R"), _T("rebus"), NULL,
                    _handler(MyFrame::OnRebusEntry) },
                    
-        { ID_LAYOUT_PANES, wxITEM_CHECK,  _T("&Edit Layout"), _T("layout"), NULL,
+        { ID_EDIT_LAYOUT, wxITEM_CHECK,  _T("&Edit Layout"), _T("layout"), NULL,
                    _handler(MyFrame::OnEditLayout) },
 
         { ID_LOAD_LAYOUT,  wxITEM_NORMAL, _T("&Load Layout"), NULL, NULL,
@@ -1043,7 +1044,7 @@ MyFrame::CreateToolBar()
     m_toolMgr.Add(tb, ID_CHECK_WORD);
     m_toolMgr.Add(tb, ID_CHECK_GRID);
     tb->AddSeparator();
-    m_toolMgr.Add(tb, ID_LAYOUT_PANES);
+    m_toolMgr.Add(tb, ID_EDIT_LAYOUT);
     m_toolMgr.Add(tb, ID_SHOW_NOTES);
     tb->AddSeparator();
     m_toolMgr.Add(tb, ID_REBUS_ENTRY);
@@ -1108,7 +1109,7 @@ MyFrame::CreateMenuBar()
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_SHOW_NOTES);
         menu->AppendSeparator();
-        m_toolMgr.Add(menu, ID_LAYOUT_PANES);
+        m_toolMgr.Add(menu, ID_EDIT_LAYOUT);
         m_toolMgr.Add(menu, ID_LOAD_LAYOUT);
         m_toolMgr.Add(menu, ID_SAVE_LAYOUT);
 #if USE_MY_AUI_MANAGER
@@ -2051,13 +2052,12 @@ MyFrame::OnEditLayout(wxCommandEvent & evt)
         for (size_t i = 0; i < panes.Count(); ++i)
         {
             wxAuiPaneInfo & pane = panes.Item(i);
-            if (pane.name.StartsWith(_T("__")))  // Private panes
-                continue;
             m_paneCache[pane.name] = pane; // Cache the old wxAuiPaneInfos
-            pane.CaptionVisible(true); // Show captions
             pane.Resizable(true);      // Make all panes resizable
             pane.PaneBorder(true);     // Show borders
         }
+        m_mgr.StartEdit();
+        m_XGridCtrl->DisconnectEvents();
     }
     else // End Layout
     {
@@ -2066,8 +2066,6 @@ MyFrame::OnEditLayout(wxCommandEvent & evt)
         for (size_t i = 0; i < panes.Count(); ++i)
         {
             wxAuiPaneInfo & pane = panes.Item(i);
-            if (pane.name.StartsWith(_T("__"))) // Private panes
-                continue;
             // Find the pane in the cache
             std::map<wxString, wxAuiPaneInfo>::iterator it
                 = m_paneCache.find(pane.name);
@@ -2075,12 +2073,13 @@ MyFrame::OnEditLayout(wxCommandEvent & evt)
             {
                 // Restore old settings
                 wxAuiPaneInfo & oldPane = it->second;
-                pane.CaptionVisible(false);
-                pane.Resizable(false);
-                pane.PaneBorder(false);
+                pane.Resizable(oldPane.IsResizable());
+                pane.PaneBorder(oldPane.HasBorder());
             }
         }
         m_paneCache.clear();
+        m_mgr.EndEdit();
+        m_XGridCtrl->ConnectEvents();
     }
     m_mgr.Update();
 }
@@ -2167,6 +2166,9 @@ MyFrame::OnUpdateUI(wxUpdateUIEvent & evt)
             break;
         case ID_REBUS_ENTRY:
             evt.Check(m_XGridCtrl->IsRebusEntry());
+            break;
+        case ID_EDIT_LAYOUT:
+            evt.Check(m_mgr.IsEditing());
             break;
     }
 }

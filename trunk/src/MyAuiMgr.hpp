@@ -99,6 +99,16 @@ public:
     void RemoveContextWindow(wxWindow * window);
     void RemoveContextWindow(wxAuiPaneInfo & info);
 
+    // Proportional resizing
+    //--------------------
+    virtual void Update();
+
+    // Edit Mode
+    // ---------
+    void StartEdit();
+    void EndEdit();
+    bool IsEditing() const { return m_editState > editNone; }
+
     // Misc
     //-----
 
@@ -112,8 +122,6 @@ public:
     wxAuiPaneInfo & FindPane(wxWindow * window);
     wxAuiPaneInfo & FindPane(int id);
 
-    virtual void Update();
-
 protected:
     // Close Event
     bool FireCloseEvent(wxAuiPaneInfo & pane);
@@ -126,7 +134,6 @@ protected:
 
     // Utils
     wxAuiDockInfo & FindDock(wxAuiPaneInfo & info);
-    void ConstrainPanes(std::list<wxAuiPaneInfo *> & panes);
 
     // Menu
     wxMenu * m_menu;
@@ -152,8 +159,21 @@ protected:
     wxSize m_frameSize;
     void OnFrameSize(wxSizeEvent & evt);
     void ResizeDocks(const wxSize & oldSize, const wxSize & newSize);
+    void ConstrainPanes(std::list<wxAuiPaneInfo *> & panes);
 
     void SavePaneSize(wxAuiPaneInfo & pane);
+
+    // Edit Mode
+    void OnLeftDown(wxMouseEvent & evt);
+    void OnEditContextMenu(wxContextMenuEvent & evt);
+    void OnSetCursor(wxSetCursorEvent & evt);
+    void OnCaptureLost(wxMouseCaptureLostEvent & evt);
+    enum editState {
+        editNone = 0,   // Not in edit mode
+        editPassive,    // Waiting to do something
+        editPaneHover,  // Hovered over a pane (mouse is captured)
+        editActive      // wxAuiManager is handling some action
+    } m_editState;
 
     DECLARE_EVENT_TABLE();
 };
