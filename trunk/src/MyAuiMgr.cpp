@@ -36,7 +36,8 @@ END_EVENT_TABLE()
 MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
         : wxAuiManager(managed_wnd, flags),
           m_menu(NULL),
-          m_contextPane(NULL)
+          m_contextPane(NULL),
+          m_isEditing(false)
 {
 }
 
@@ -134,6 +135,19 @@ MyAuiManager::SavePerspective()
     for (pane_i = 0; pane_i < pane_count; ++pane_i)
     {
         wxAuiPaneInfo& pane = m_panes.Item(pane_i);
+        if (IsEditing())
+        {
+            // Find the pane in the edit cache
+            std::map<wxString, wxAuiPaneInfo>::iterator it
+                = m_editCache.find(pane.name);
+            if (it != m_editCache.end())
+            {
+                // Restore old settings
+                wxAuiPaneInfo & oldPane = it->second;
+                pane.Resizable(oldPane.IsResizable());
+                pane.PaneBorder(oldPane.HasBorder());
+            }
+        }
         result += SavePaneInfo(pane)+wxT("|");
     }
 
@@ -238,6 +252,12 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
         ResizeDocks(frameSize, m_frameSize);
 
     UpdateMenu();
+    // Reset the edit status to reflect change in borders, etc.
+    if (IsEditing())
+    {
+        EndEdit();
+        StartEdit();
+    }
     if (update)
         Update();
     return true;
@@ -632,13 +652,19 @@ MyAuiManager::NewContextMenu(wxAuiPaneInfo & pane)
     menu->AppendSeparator();
 
     item = menu->AppendCheckItem(ID_AUI_CONTEXT_RESIZABLE, _T("Resizable"));
-    item->Check(pane.IsResizable());
+    if (! IsEditing())
+        item->Check(pane.IsResizable());
+    else
+        item->Check(m_editCache[pane.name].IsResizable());
     item->Enable(pane.IsDocked());
 
     menu->AppendSeparator();
 
     item = menu->AppendCheckItem(ID_AUI_CONTEXT_BORDER, _T("Border"));
-    item->Check(pane.HasBorder());
+    if (! IsEditing())
+        item->Check(pane.HasBorder());
+    else
+        item->Check(m_editCache[pane.name].HasBorder());
 
     menu->AppendSeparator();
 
@@ -685,12 +711,18 @@ MyAuiManager::OnContextMenuClick(wxCommandEvent & evt)
             break;
 
         case ID_AUI_CONTEXT_RESIZABLE:
-            pane.Resizable(evt.IsChecked());
+            if (! IsEditing())
+                pane.Resizable(evt.IsChecked());
+            else
+                m_editCache[pane.name].Resizable(evt.IsChecked());
             Update();
             break;
 
         case ID_AUI_CONTEXT_BORDER:
-            pane.PaneBorder(evt.IsChecked());
+            if (! IsEditing())
+                pane.PaneBorder(evt.IsChecked());
+            else
+                m_editCache[pane.name].PaneBorder(evt.IsChecked());
             Update();
             break;
 
@@ -892,7 +924,17 @@ void DisconnectRecursive(wxWindow * w,
 void
 MyAuiManager::StartEdit()
 {
-    m_editState = editPassive;
+    m_isEditing = true;
+    // Save the pane states before edit.
+    m_editCache.clear();
+    for (size_t i = 0; i < m_panes.Count(); ++i)
+    {
+        wxAuiPaneInfo & pane = m_panes.Item(i);
+        m_editCache[pane.name] = pane; // Cache the old wxAuiPaneInfos
+        pane.Resizable(true);          // Make all panes resizable
+        pane.PaneBorder(true);         // Show borders
+    }
+    // Connect mouse events to the panes
     for (size_t i = 0; i < m_panes.Count(); ++i)
     {
         ConnectRecursive(m_panes.Item(i).window, wxEVT_LEFT_DOWN,
@@ -907,9 +949,26 @@ MyAuiManager::StartEdit()
 void
 MyAuiManager::EndEdit()
 {
-    m_editState = editNone;
+    m_isEditing = false;
     if (m_frame->HasCapture())
         m_frame->ReleaseMouse();
+    // Restore the pane states after edit.
+    for (size_t i = 0; i < m_panes.Count(); ++i)
+    {
+        wxAuiPaneInfo & pane = m_panes.Item(i);
+        // Find the pane in the cache
+        std::map<wxString, wxAuiPaneInfo>::iterator it
+            = m_editCache.find(pane.name);
+        if (it != m_editCache.end())
+        {
+            // Restore old settings
+            wxAuiPaneInfo & oldPane = it->second;
+            pane.Resizable(oldPane.IsResizable());
+            pane.PaneBorder(oldPane.HasBorder());
+        }
+    }
+    m_editCache.clear();
+    // Disconnect mouse events
     for (size_t i = 0; i < m_panes.Count(); ++i)
     {
         DisconnectRecursive(m_panes.Item(i).window, wxEVT_LEFT_DOWN,

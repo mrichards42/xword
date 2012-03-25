@@ -412,7 +412,6 @@ MyFrame::MyFrame()
     m_mgr.AddPane(logctrl,
                   wxAuiPaneInfo()
                   .BestSize(350, 300)
-                  .PinButton()
                   .CloseButton()
                   .Layer(900)
                   .Left()
@@ -804,7 +803,6 @@ MyFrame::ShowClues()
 
     wxAuiPaneInfo baseInfo;
     baseInfo.CaptionVisible(false)
-            .PinButton()
             .CloseButton()
             .MinSize(15,15);
 
@@ -1208,11 +1206,7 @@ MyFrame::SetupWindowManager()
 void
 MyFrame::AddPane(wxWindow * window, const wxAuiPaneInfo & info)
 {
-    // The default wxAuiPaneInfo is good, except all panes should
-    // have a pin button.
-    wxAuiPaneInfo the_info = info;
-    the_info.PinButton();
-    m_mgr.AddPane(window, the_info);
+    m_mgr.AddPane(window, info);
     m_mgr.Update();
 }
 
@@ -1234,7 +1228,6 @@ MyFrame::ManageWindows()
     // or they won't ever show up!
     wxAuiPaneInfo baseInfo;
     baseInfo.CaptionVisible(false)
-            .PinButton()
             .CloseButton()
             .Resizable(false)
             .PaneBorder(false)
@@ -2046,38 +2039,11 @@ MyFrame::OnEditLayout(wxCommandEvent & evt)
 {
     if (evt.IsChecked()) // Start Layout
     {
-        // Cache the state of all our panes
-        m_paneCache.clear();
-        wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
-        for (size_t i = 0; i < panes.Count(); ++i)
-        {
-            wxAuiPaneInfo & pane = panes.Item(i);
-            m_paneCache[pane.name] = pane; // Cache the old wxAuiPaneInfos
-            pane.Resizable(true);      // Make all panes resizable
-            pane.PaneBorder(true);     // Show borders
-        }
         m_mgr.StartEdit();
         m_XGridCtrl->DisconnectEvents();
     }
     else // End Layout
     {
-        // Restore the panes to their previous state
-        wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
-        for (size_t i = 0; i < panes.Count(); ++i)
-        {
-            wxAuiPaneInfo & pane = panes.Item(i);
-            // Find the pane in the cache
-            std::map<wxString, wxAuiPaneInfo>::iterator it
-                = m_paneCache.find(pane.name);
-            if (it != m_paneCache.end())
-            {
-                // Restore old settings
-                wxAuiPaneInfo & oldPane = it->second;
-                pane.Resizable(oldPane.IsResizable());
-                pane.PaneBorder(oldPane.HasBorder());
-            }
-        }
-        m_paneCache.clear();
         m_mgr.EndEdit();
         m_XGridCtrl->ConnectEvents();
     }
