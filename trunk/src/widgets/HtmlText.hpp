@@ -68,12 +68,7 @@ public:
                 long style = 0,
                 const wxString & name = _T("HtmlText"));
 
-    void Clear()
-    {
-        wxControl::SetLabel(wxEmptyString);
-        LayoutCell();
-        Refresh();
-    }
+    void Clear() { SetLabel(wxEmptyString); }
 
     bool SetFont(const wxFont & font);
     void SetMinFontSize(int size) { m_minFontSize = size; }
@@ -84,6 +79,12 @@ public:
     wxCoord GetPadding() const { return m_padding; }
     void SetPadding(wxCoord padding) { m_padding = padding; }
 
+    virtual void SetLabel(const wxString & label)
+    {
+        wxControl::SetLabel(label);
+        LayoutCell();
+        Refresh();
+    }
 
 protected:
     wxCoord m_padding;

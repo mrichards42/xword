@@ -101,6 +101,4 @@ CluePrompt::SetClue(const puz::Clue * clue)
     }
 
     SetLabel(result);
-    LayoutCell();
-    Refresh();
 }
