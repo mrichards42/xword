@@ -1401,8 +1401,16 @@ XGridCtrl::OnChar(wxKeyEvent & evt)
         if (GetFocusedSquare()->IsBlack())
             SetSquareText(*GetFocusedSquare(), _T(""));
         else
+        {
             SetSquareText(*GetFocusedSquare(), puz2wx(puz::Square::Black));
-        MoveAfterLetter();
+            MoveAfterLetter();
+            // Invalidate the current focused word
+            if (m_ownsFocusedWord)
+                delete m_focusedWord;
+            m_focusedWord = NULL;
+            // Make a new word
+            SetFocusedSquare();
+        }
     }
     else if (IsValidChar(key) && key < WXK_START)
     {
@@ -1720,7 +1728,10 @@ XGridCtrl::EndRebusEntry(bool success)
     m_rebusCtrl->Destroy();
     m_rebusCtrl = NULL;
     if (success)
+    {
         SetSquareText(*m_focusedSquare, text);
+        MoveAfterLetter();
+    }
     RefreshSquare();
 }
 
