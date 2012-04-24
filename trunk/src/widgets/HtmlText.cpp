@@ -135,6 +135,14 @@ void HtmlText::LayoutCell()
     SetToolTip(wxEmptyString);
     if (label.empty() || width < 10)
         return;
+
+    // Alignment
+    int align = GetAlignment();
+    if (align & wxALIGN_CENTER_HORIZONTAL)
+        label = _T("<DIV ALIGN=CENTER>") + label + _T("</DIV>");
+    else if (align & wxALIGN_RIGHT)
+        label = _T("<DIV ALIGN=RIGHT>") + label + _T("</DIV>");
+
     Parse(label, pointSize, faceName);
 
     // Layout the cell

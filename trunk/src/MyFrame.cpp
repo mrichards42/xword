@@ -1022,7 +1022,9 @@ MyFrame::CreateWindows()
     m_title      = new MetadataCtrl(this, wxID_ANY, _T("%title%"));
     m_author     = new MetadataCtrl(this, wxID_ANY, _T("%author%"));
     m_copyright  = new MetadataCtrl(this, wxID_ANY, _T("%copyright%"));
-    m_cluePrompt = new CluePrompt(this, wxID_ANY);
+    m_cluePrompt = new CluePrompt(
+        this, wxID_ANY, wxEmptyString, _T("%N. %T"),
+        wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 
 #ifdef XWORD_USE_LUA // Custom author display script
     m_author->SetDisplayFormat(
