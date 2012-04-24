@@ -33,7 +33,7 @@ public:
                const wxString & displayFormat = wxEmptyString,
                const wxPoint & position = wxDefaultPosition,
                const wxSize & size = wxDefaultSize,
-               long style = 0,
+               long style = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL,
                const wxString & name = _T("MetadataCtrl"))
         : m_frame(NULL)
     {
@@ -47,7 +47,7 @@ public:
                 const wxString & displayFormat = wxEmptyString,
                 const wxPoint & position = wxDefaultPosition,
                 const wxSize & size = wxDefaultSize,
-                long style = 0,
+                long style = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL,
                 const wxString & name = _T("MetadataCtrl"));
 
     const wxString & GetDisplayFormat() const { return m_displayFormat; }

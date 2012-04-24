@@ -82,10 +82,16 @@ HtmlText::OnPaint(wxPaintEvent & evt)
 {
     wxPaintDC dc(this);
     wxHtmlRenderingInfo info;
-    m_cell->Draw(dc,
-                 m_padding, (GetClientSize().y - m_cell->GetHeight()) / 2,
-                 0, INT_MAX,
-                 info);
+    // Vertical align
+    // Horizontal align is taken care of in LayoutCell()
+    int y = m_padding;
+    int align = GetAlignment();
+    if (align & wxALIGN_CENTER_VERTICAL)
+        y = (GetClientSize().y - m_cell->GetHeight()) / 2;
+    else if (align & wxALIGN_BOTTOM)
+        y = GetClientSize().y - m_padding - m_cell->GetHeight();
+    // Draw the cell
+    m_cell->Draw(dc, m_padding, y, 0, INT_MAX, info);
 }
 
 static wxString ToText(wxHtmlContainerCell * cell);
@@ -136,7 +142,8 @@ void HtmlText::LayoutCell()
     if (label.empty() || width < 10)
         return;
 
-    // Alignment
+    // Horizontal Alignment
+    // Vertical Alignment is taken care of in the drawing stage.
     int align = GetAlignment();
     if (align & wxALIGN_CENTER_HORIZONTAL)
         label = _T("<DIV ALIGN=CENTER>") + label + _T("</DIV>");
