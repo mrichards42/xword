@@ -37,7 +37,7 @@ public:
                const wxString & displayFormat = _T("%N. %T"),
                const wxPoint & position = wxDefaultPosition,
                const wxSize & size = wxDefaultSize,
-               long style = 0,
+               long style = wxALIGN_CENTER,
                const wxString & name = _T("CluePrompt"))
     {
         Create(parent, id, label, displayFormat, position, size, style, name);
@@ -51,7 +51,7 @@ public:
                 const wxString & displayFormat = _T("%N. %T"),
                 const wxPoint & position = wxDefaultPosition,
                 const wxSize & size = wxDefaultSize,
-                long style = 0,
+                long style = wxALIGN_CENTER,
                 const wxString & name = _T("CluePrompt"));
 
     const wxString & GetDisplayFormat() const { return m_displayFormat; }
