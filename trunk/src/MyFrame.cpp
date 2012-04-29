@@ -398,7 +398,6 @@ MyFrame::MyFrame()
       m_autoStartTimer(false),
       m_autoSaveTimer(this, ID_AUTOSAVE_TIMER),
       m_autoSaveInterval(0),
-      m_preferencesDialog(NULL),
       m_mgr(this),
       m_isIdleConnected(false),
       m_fileHistory(10, ID_FILE_HISTORY_1)
