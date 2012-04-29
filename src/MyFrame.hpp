@@ -256,8 +256,6 @@ private:
 
     wxFileConfig * GetConfig();
 
-    PreferencesDialog * m_preferencesDialog;
-
 
 private:
     // Load / save exception handling.
