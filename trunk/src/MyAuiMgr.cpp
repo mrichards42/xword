@@ -862,6 +862,7 @@ MyAuiManager::OnFrameSize(wxSizeEvent & evt)
         m_frameSize = newSize;
         Update();
     }
+    evt.Skip();
 }
 
 void

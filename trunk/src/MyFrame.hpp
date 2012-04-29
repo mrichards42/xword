@@ -252,6 +252,7 @@ private:
     void LoadConfig();
     void UpdateCluePanelConfig();
     void SaveConfig();
+    void SaveWindowConfig();
 
     wxFileConfig * GetConfig();
 
@@ -364,6 +365,7 @@ private:
     bool m_isIdleConnected;
     void OnClose       (wxCloseEvent & evt);
     void OnLinkClicked (wxHtmlLinkEvent & evt);
+    void OnSize        (wxSizeEvent & evt);
 
 #ifdef XWORD_USE_LUA
     wxLuaState m_lua;

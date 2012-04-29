@@ -438,6 +438,8 @@ MyFrame::MyFrame()
     ManageWindows();
 
     LoadConfig();
+    // Save window state on size
+    Connect(wxEVT_SIZE, wxSizeEventHandler(MyFrame::OnSize));
 
     LoadLayout(_T("(Previous)"));
 
@@ -1588,6 +1590,34 @@ MyFrame::UpdateCluePanelConfig()
 
 
 void
+MyFrame::SaveWindowConfig()
+{
+    ConfigManager & config = wxGetApp().GetConfigManager();
+    // Only save window position if it is not maximized
+    if (! IsIconized()) // If iconized, window position and size are wrong
+    {
+        if (! IsMaximized())
+        {
+            int x, y, w, h;
+            GetSize(&w, &h);
+            GetPosition(&x, &y);
+
+            // Make sure the sizes are within acceptable bounds
+            if (w < 200) w = 500;
+            if (h < 200) h = 500;
+            if (x < 0 || x >= wxSystemSettings::GetMetric(wxSYS_SCREEN_X)) x = 20;
+            if (y < 0 || y >= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)) y = 20;
+            config.Window.width = w;
+            config.Window.height = h;
+            config.Window.top = y;
+            config.Window.left = x;
+        }
+        config.Window.maximized = IsMaximized();
+    }
+
+}
+
+void
 MyFrame::SaveConfig()
 {
     ConfigManager & config = wxGetApp().GetConfigManager();
@@ -1595,24 +1625,7 @@ MyFrame::SaveConfig()
 
     // Window settings
     //----------------
-    // Only save window position if it is not maximized
-    if (! IsMaximized())
-    {
-        int x, y, w, h;
-        GetSize(&w, &h);
-        GetPosition(&x, &y);
-
-        // Make sure the sizes are within acceptable bounds
-        if (w < 200) w = 500;
-        if (h < 200) h = 500;
-        if (x < 0 || x >= wxSystemSettings::GetMetric(wxSYS_SCREEN_X)) x = 20;
-        if (y < 0 || y >= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)) y = 20;
-        config.Window.width = w;
-        config.Window.height = h;
-        config.Window.top = y;
-        config.Window.left = x;
-    }
-    config.Window.maximized = IsMaximized();
+    SaveWindowConfig();
 
     // Grid
     //-----
@@ -1629,6 +1642,15 @@ MyFrame::SaveConfig()
     // The rest of the config has only changed if the user used the
     // preferences dialog, in which case the prefs dialog has already
     // written the rest of the config settings.
+}
+
+
+void
+MyFrame::OnSize(wxSizeEvent & evt)
+{
+    // Save window state when we're resized
+    SaveWindowConfig();
+    evt.Skip();
 }
 
 
@@ -2322,9 +2344,8 @@ MyFrame::OnLuaError(wxLuaEvent & evt)
 void
 MyFrame::OnPreferences(wxCommandEvent & WXUNUSED(evt))
 {
-    if (m_preferencesDialog == NULL)
-        m_preferencesDialog = new PreferencesDialog(this);
-    m_preferencesDialog->Show();
+    // PreferencesDialog will destroy itself.
+    (new PreferencesDialog(this))->Show();
 }
 
 
@@ -2711,6 +2732,7 @@ MyFrame::OnClose(wxCloseEvent & evt)
     {
         SaveLayout(_T("(Previous)"));
         SaveConfig();
+        Disconnect(wxEVT_SIZE, wxSizeEventHandler(MyFrame::OnSize));
         // Hide all the top level windows
         wxWindowList::iterator it;
         wxWindowList::iterator begin = wxTopLevelWindows.begin();
