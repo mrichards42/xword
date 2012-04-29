@@ -142,6 +142,14 @@ void HtmlText::LayoutCell()
     if (label.empty() || width < 10)
         return;
 
+    // Font style
+    if (GetFont().GetStyle() == wxFONTSTYLE_ITALIC)
+        label = _T("<I>") + label + _T("</I>");
+    if (GetFont().GetWeight() == wxFONTWEIGHT_BOLD)
+        label = _T("<B>") + label + _T("</B>");
+    if (GetFont().GetUnderlined())
+        label = _T("<U>") + label + _T("</U>");
+
     // Horizontal Alignment
     // Vertical Alignment is taken care of in the drawing stage.
     int align = GetAlignment();
