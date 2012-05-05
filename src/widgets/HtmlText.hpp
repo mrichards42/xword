@@ -86,6 +86,17 @@ public:
         Refresh();
     }
 
+    virtual void SetAlignment(long alignment)
+    {
+        SetWindowStyle(GetWindowStyle() & ~ wxALIGN_MASK | alignment);
+        LayoutCell();
+    }
+
+    virtual long GetAlignment() const
+    {
+        return GetWindowStyle() & wxALIGN_MASK;
+    }
+
 protected:
     wxCoord m_padding;
     wxHtmlCell *m_cell;

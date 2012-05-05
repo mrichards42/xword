@@ -48,6 +48,7 @@ CluePrompt::Create(wxWindow * parent,
     prompt.backgroundColor.AddCallback(this, &CluePrompt::SetBackgroundColour);
     prompt.foregroundColor.AddCallback(this, &CluePrompt::SetForegroundColour);
     prompt.displayFormat.AddCallback(this, &CluePrompt::SetDisplayFormat);
+    prompt.alignment.AddCallback(this, &CluePrompt::SetAlignment);
     return true;
 }
 
