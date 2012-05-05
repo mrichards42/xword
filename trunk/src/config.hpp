@@ -98,6 +98,7 @@ public:
         ConfigColor foregroundColor;
         ConfigColor backgroundColor;
         ConfigString displayFormat;
+        ConfigLong alignment;
     } CluePrompt;
 
     // Printing
