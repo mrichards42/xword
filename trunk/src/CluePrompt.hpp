@@ -18,51 +18,36 @@
 #ifndef CLUE_PROMPT_H
 #define CLUE_PROMPT_H
 
-#include "widgets/HtmlText.hpp"
-
-#include "puz/Clue.hpp"
-
-class wxHtmlCell;
-class wxHtmlWinParser;
+#include "MetadataCtrl.hpp"
 
 class CluePrompt
-    : public HtmlText
+    : public MetadataCtrl
 {
 public:
     CluePrompt() {}
 
     CluePrompt(wxWindow * parent,
                wxWindowID id,
-               const wxString & label = wxEmptyString,
-               const wxString & displayFormat = _T("%N. %T"),
+               const wxString & displayFormat = _T("%number%. %clue%"),
                const wxPoint & position = wxDefaultPosition,
                const wxSize & size = wxDefaultSize,
                long style = wxALIGN_CENTER,
                const wxString & name = _T("CluePrompt"))
     {
-        Create(parent, id, label, displayFormat, position, size, style, name);
+        Create(parent, id, displayFormat, position, size, style, name);
     }
 
     ~CluePrompt();
 
     bool Create(wxWindow * parent,
                 wxWindowID id,
-                const wxString & label = wxEmptyString,
-                const wxString & displayFormat = _T("%N. %T"),
+                const wxString & displayFormat = _T("%number%. %clue%"),
                 const wxPoint & position = wxDefaultPosition,
                 const wxSize & size = wxDefaultSize,
                 long style = wxALIGN_CENTER,
                 const wxString & name = _T("CluePrompt"));
 
-    const wxString & GetDisplayFormat() const { return m_displayFormat; }
-    void SetDisplayFormat(const wxString & format)
-        { m_displayFormat = format; }
-
-    void SetClue(const puz::Clue * clue);
-
 protected:
-    wxString m_displayFormat;
-
     DECLARE_NO_COPY_CLASS(CluePrompt)
     DECLARE_DYNAMIC_CLASS(CluePrompt)
 };
