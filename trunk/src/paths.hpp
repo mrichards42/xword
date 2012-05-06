@@ -19,6 +19,8 @@
 #define MY_PATHS_H
 
 #include <wx/string.h>
+#include <wx/image.h>
+#include <wx/bitmap.h>
 
 // Locations where the application expects to find its files.
 // It is up to the caller to determine whether or not the path exists.
@@ -29,6 +31,10 @@ wxString GetImagesDir();   // Images
 wxString GetScriptsDir();  // Scripts
 wxString exedir();
 wxChar sep();
+
+
+wxImage LoadXWordImage(const wxString & name, int size = -1);
+wxBitmap LoadXWordBitmap(const wxString & name, int size = -1);
 
 #ifdef XWORD_USE_LUA
 #include <wx/arrstr.h>
