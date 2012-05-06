@@ -79,7 +79,8 @@ ConfigManager::CluePrompt_t::CluePrompt_t(ConfigGroup * parent)
       foregroundColor(this, _T("foregroundColor"), *wxBLACK),
       backgroundColor(this, _T("backgroundColor"), *wxWHITE),
       displayFormat(this, _T("displayFormat"), _T("<center>%N. %T</center>")),
-      alignment(this, _T("alignment"), wxALIGN_CENTER_HORIZONTAL)
+      alignment(this, _T("alignment"), wxALIGN_CENTER_HORIZONTAL),
+      useLua(this, _T("useLua"), false)
 {}
 
 

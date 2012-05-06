@@ -64,7 +64,7 @@ public:
     void UpdateLabel() { SetLabel(FormatLabel()); }
 
     bool HasaLuaFormat() const { return m_useLua; }
-    bool SetLuaFormat(bool lua) { m_useLua = lua; }
+    void SetLuaFormat(bool lua) { m_useLua = lua; UpdateLabel(); }
 
     // Format a label
 #if XWORD_USE_LUA

@@ -99,6 +99,7 @@ public:
         ConfigColor backgroundColor;
         ConfigString displayFormat;
         ConfigLong alignment;
+        ConfigBool useLua;
     } CluePrompt;
 
     // Printing
