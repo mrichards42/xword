@@ -22,6 +22,11 @@
 #include "puz/Puzzle.hpp"
 class MyFrame;
 
+enum
+{
+    META_USE_LUA = 1 << 4
+};
+
 class MetadataCtrl
     : public HtmlText
 {
@@ -33,7 +38,7 @@ public:
                const wxString & displayFormat = wxEmptyString,
                const wxPoint & position = wxDefaultPosition,
                const wxSize & size = wxDefaultSize,
-               long style = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL,
+               long style = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | META_USE_LUA,
                const wxString & name = _T("MetadataCtrl"))
         : m_frame(NULL)
     {
@@ -58,10 +63,29 @@ public:
     }
     void UpdateLabel() { SetLabel(FormatLabel()); }
 
+    bool HasaLuaFormat() const { return m_useLua; }
+    bool SetLuaFormat(bool lua) { m_useLua = lua; }
+
+    // Format a label
+#if XWORD_USE_LUA
+    static wxString FormatLabel(const wxString & str, MyFrame * frame, bool useLua = false);
+#else
+    static wxString FormatLabel(const wxString & str, MyFrame * frame);
+#endif
+
+    // Get a metadata value
+    static wxString GetMeta(const wxString & str, MyFrame * frame);
+
 protected:
-    wxString FormatLabel(); // Interpret m_displayFormat
+#if XWORD_USE_LUA
+    wxString FormatLabel() { return FormatLabel(m_displayFormat, m_frame, m_useLua); }
+#else
+    wxString FormatLabel() { return FormatLabel(m_displayFormat, m_frame); }
+#endif
+
     wxString m_displayFormat;
     MyFrame * m_frame;
+    bool m_useLua;
 
     DECLARE_NO_COPY_CLASS(MetadataCtrl)
     DECLARE_DYNAMIC_CLASS(MetadataCtrl)

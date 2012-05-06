@@ -38,6 +38,8 @@ MetadataCtrl::Create(wxWindow * parent,
                    long style,
                    const wxString & name)
 {
+    m_useLua = style & META_USE_LUA;
+    style = style & ~ META_USE_LUA;
     if (! HtmlText::Create(parent, id, wxEmptyString, position, size, style, name))
         return false;
     // Find a MyFrame instance somewhere in the parent hierarchy
@@ -62,13 +64,30 @@ MetadataCtrl::~MetadataCtrl()
 }
 
 wxString
-MetadataCtrl::FormatLabel()
+MetadataCtrl::GetMeta(const wxString & str_, MyFrame * frame)
 {
-    if (! m_frame)
+    wxString str = str_.Lower();
+    if (str == _T("number"))
+        return puz2wx(frame->GetFocusedClue()->GetNumber());
+    else if (str == _T("text"))
+        return puz2wx(frame->GetFocusedClue()->GetText());
+    else
+        return puz2wx(frame->GetPuzzle().GetMeta(wx2puz(str)));
+}
+
+#if XWORD_USE_LUA
+wxString
+MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame, bool useLua)
+#else // ! XWORD_USE_LUA
+wxString
+MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame)
+#endif // XWORD_USE_LUA
+{
+    if (! frame)
         return wxEmptyString;
     wxString result;
-    const puz::Puzzle & puz = m_frame->GetPuzzle();
-    wxStringTokenizer tok(m_displayFormat, _T("%"), wxTOKEN_RET_EMPTY_ALL);
+    const puz::Puzzle & puz = frame->GetPuzzle();
+    wxStringTokenizer tok(format, _T("%"), wxTOKEN_RET_EMPTY_ALL);
     bool ismeta = false; // Is the current token a metadata value?
     while (tok.HasMoreTokens())
     {
@@ -86,21 +105,30 @@ MetadataCtrl::FormatLabel()
             }
             else // This is a metadata value
             {
-#ifdef XWORD_USE_LUA
-                // Replace %meta% with puzzle:GetMeta("meta")
-                // while escaping quotes
-                str.Replace(_T("\""), _T("\\\""));
-                result << _T("puzzle:GetMeta(\"") << str << _T("\")");
-#else
-                result << puz2wx(puz.GetMeta(wx2puz(str)));
-#endif
+#if XWORD_USE_LUA
+                if (useLua)
+                {
+                    str = GetMeta(str, frame);
+                    if (str.empty())
+                        str = _T("nil");
+                    else
+                        str = _T("'") + str + _T("'");
+                    result << str;
+                }
+                else // plain text
+                    result << GetMeta(str, frame);
+#else // ! XWORD_USE_LUA
+                result << GetMeta(str, frame);
+#endif // XWORD_USE_LUA
             }
             ismeta = false; // The next token is plain text
         }
     }
-#ifdef XWORD_USE_LUA
+#if XWORD_USE_LUA
+    if (! useLua)
+        return result;
     // Process this with lua
-    wxLuaState & luastate = m_frame->GetwxLuaState();
+    wxLuaState & luastate = frame->GetwxLuaState();
     if (! luastate.Ok())
         return wxEmptyString;
     lua_State * L = luastate.GetLuaState();
@@ -116,7 +144,7 @@ MetadataCtrl::FormatLabel()
             if (lua_isfunction(L, -1)) // Make sure we got a function
             {
                 // Call this function
-                luapuz_pushPuzzle(L, &m_frame->GetPuzzle());
+                luapuz_pushPuzzle(L, &frame->GetPuzzle());
                 if (lua_pcall(L, 1, 1, 0) == 0)
                 {
                     // Check the result
