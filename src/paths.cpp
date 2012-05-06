@@ -105,6 +105,27 @@ wxString GetScriptsDir()
 #endif // __WXDEBUG__ && __WXMSW__
 
 
+wxImage LoadXWordImage(const wxString & name, int size)
+{
+    wxString icon;
+    if (size != -1)
+        icon.Printf(_T("%s_%d.png"), name, size);
+    else
+        icon = name;
+
+    wxFileName iconPath(icon);
+    iconPath.MakeAbsolute(GetImagesDir());
+
+    return wxImage(iconPath.GetFullPath());
+}
+
+
+wxBitmap LoadXWordBitmap(const wxString & name, int size)
+{
+    return wxBitmap(LoadXWordImage(name, size));
+}
+
+
 #ifdef XWORD_USE_LUA
 
 #include <luaconf.h>
