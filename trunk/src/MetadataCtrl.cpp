@@ -63,14 +63,27 @@ MetadataCtrl::~MetadataCtrl()
     wxGetApp().GetConfigManager().RemoveCallbacks(this);
 }
 
+
 wxString
 MetadataCtrl::GetMeta(const wxString & str_, MyFrame * frame)
 {
     wxString str = str_.Lower();
-    if (str == _T("number"))
-        return puz2wx(frame->GetFocusedClue()->GetNumber());
-    else if (str == _T("text"))
-        return puz2wx(frame->GetFocusedClue()->GetText());
+    if (str == _T("cluenumber"))
+    {
+        puz::Clue * clue = frame->GetFocusedClue();
+        if (clue)
+            return puz2wx(clue->GetNumber());
+        else
+            return wxEmptyString;
+    }
+    else if (str == _T("clue"))
+    {
+        puz::Clue * clue = frame->GetFocusedClue();
+        if (clue)
+            return puz2wx(clue->GetText());
+        else
+            return wxEmptyString;
+    }
     else
         return puz2wx(frame->GetPuzzle().GetMeta(wx2puz(str)));
 }
