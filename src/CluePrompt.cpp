@@ -17,7 +17,6 @@
 
 
 #include "CluePrompt.hpp"
-#include "utils/string.hpp"
 #include "App.hpp" // GetApp
 
 // For compilers that support precompilation, includes "wx.h".
@@ -29,17 +28,14 @@ IMPLEMENT_DYNAMIC_CLASS(CluePrompt, HtmlText)
 bool
 CluePrompt::Create(wxWindow * parent,
                    wxWindowID id,
-                   const wxString & label,
                    const wxString & displayFormat,
                    const wxPoint & position,
                    const wxSize & size,
                    long style,
                    const wxString & name)
 {
-    if (! HtmlText::Create(parent, id, label, position, size, style, name))
+    if (! MetadataCtrl::Create(parent, id, displayFormat, position, size, style, name))
         return false;
-
-    SetDisplayFormat(displayFormat);
 
     // Config
     ConfigManager::CluePrompt_t & prompt =
@@ -55,51 +51,4 @@ CluePrompt::Create(wxWindow * parent,
 CluePrompt::~CluePrompt()
 {
     wxGetApp().GetConfigManager().RemoveCallbacks(this);
-}
-
-void
-CluePrompt::SetClue(const puz::Clue * clue)
-{
-    wxString result;
-    if (clue)
-    {
-        wxString number = puz2wx(clue->GetNumber());
-        wxString text = puz2wx(clue->GetText());
-        if (! number.empty())
-        {
-            result = m_displayFormat;
-
-            // Deal with literal "%" (not that anyone would really want a literal
-            // percent sign in their clue prompt . . .)
-            result.Replace(_T("%%"), _T("%Z"));
-            // Just in case the text has any literal "%"s, make sure we don't
-            // accidentally overwrite them.
-            text.Replace(_T("%"), _T("%Z"));
-
-            // Clue Number
-            result.Replace(_T("%N"), number);
-
-            // Clue Direction
-            /*
-            if (direction == puz::ACROSS)
-            {
-                result.Replace(_T("%D"), _T("Across"));
-                result.Replace(_T("%d"), _T("A"));
-            }
-            else
-            {
-                result.Replace(_T("%D"), _T("Down"));
-                result.Replace(_T("%d"), _T("D"));
-            }
-            */
-
-            // Clue Text
-            result.Replace(_T("%T"), text);
-
-            // Literal "%"
-            result.Replace(_T("%Z"), _T("%"));
-        }
-    }
-
-    SetLabel(result);
 }
