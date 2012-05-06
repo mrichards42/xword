@@ -1547,6 +1547,13 @@ MyFrame::LoadConfig()
     m_fileHistory.Load(*raw_cfg);
     raw_cfg->SetPath(_T(""));
 
+    // CluePrompt
+    // Update some deprecated formatting values
+    wxString format = config.CluePrompt.displayFormat();
+    format.Replace(_T("%N"), _T("%cluenumber%"));
+    format.Replace(_T("%T"), _T("%clue%"));
+    config.CluePrompt.displayFormat = format;
+
     // Update the config of our controls
     config.Update();
 }
@@ -2639,7 +2646,7 @@ MyFrame::UpdateClues()
             }
         }
     }
-    m_cluePrompt->SetClue(focusedClue);
+    m_cluePrompt->UpdateLabel();
 }
 
 void
