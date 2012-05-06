@@ -1,5 +1,5 @@
 // This file is part of XWord
-// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2012 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1027,13 +1027,13 @@ MyFrame::CreateWindows()
 
 #ifdef XWORD_USE_LUA // Custom author display script
     m_author->SetDisplayFormat(
-        _T("if puzzle:HasMeta('author') then\n\
-                if puzzle:HasMeta('editor') then\n\
+        _T("if %author% then\n\
+                if %editor% then\n\
                     return %author% .. ' / edited by ' .. %editor%\n\
                 else\n\
                     return %author%\n\
                 end\n\
-            elseif puzzle:HasMeta('editor') then\n\
+            elseif %editor% then\n\
                 return 'Edited by ' .. %editor%\n\
             end"));
 #endif
