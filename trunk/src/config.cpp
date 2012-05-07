@@ -72,15 +72,24 @@ ConfigManager::Clue_t::Clue_t(ConfigGroup * parent)
       headingBackgroundColor(this, _T("headingBackgroundColor"), wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE ) )
 {}
 
+// Metadata
+ConfigManager::Metadata_t::Metadata_t(
+    ConfigGroup * parent, const wxString & name,
+    const wxString & displayFormat_, bool useLua_, long alignment_,
+    const wxFont & font_, const wxColour & foregroundColor_,
+    const wxColour & backgroundColor_)
+    : ConfigGroup(parent, name),
+      displayFormat(this, _T("displayFormat"), displayFormat_),
+      useLua(this, _T("useLua"), useLua_),
+      alignment(this, _T("alignment"), alignment_),
+      font(this, _T("font"), font_),
+      foregroundColor(this, _T("foregroundColor"), foregroundColor_),
+      backgroundColor(this, _T("backgroundColor"), backgroundColor_)
+{}
+
 // Clue prompt
 ConfigManager::CluePrompt_t::CluePrompt_t(ConfigGroup * parent)
-    : ConfigGroup(parent, _T("Clue Prompt")),
-      font(this, _T("font"), *wxSWISS_FONT),
-      foregroundColor(this, _T("foregroundColor"), *wxBLACK),
-      backgroundColor(this, _T("backgroundColor"), *wxWHITE),
-      displayFormat(this, _T("displayFormat"), _T("<center>%N. %T</center>")),
-      alignment(this, _T("alignment"), wxALIGN_CENTER_HORIZONTAL),
-      useLua(this, _T("useLua"), false)
+    : Metadata_t(parent, _T("Clue Prompt"), _T("%cluenumber%. %clue%"), false)
 {}
 
 
