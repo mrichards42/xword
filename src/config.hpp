@@ -90,16 +90,28 @@ public:
     } Clue;
 
     // Clue prompt
-    class CluePrompt_t : public ConfigGroup {
+    class Metadata_t : public ConfigGroup {
     public:
-        CluePrompt_t(ConfigGroup * parent);
+        Metadata_t(ConfigGroup * parent,
+            const wxString & name,
+            const wxString & displayFormat_,
+            bool useLua_ = true,
+            long alignment_ = wxALIGN_CENTER,
+            const wxFont & font_ = *wxSWISS_FONT,
+            const wxColour & foregroundColor_ = *wxBLACK,
+            const wxColour & backgroundColor_ = *wxWHITE);
 
+        ConfigString displayFormat;
+        ConfigBool useLua;
         ConfigFont font;
         ConfigColor foregroundColor;
         ConfigColor backgroundColor;
-        ConfigString displayFormat;
         ConfigLong alignment;
-        ConfigBool useLua;
+    };
+
+    class CluePrompt_t : public Metadata_t {
+    public:
+        CluePrompt_t(ConfigGroup * parent);
     } CluePrompt;
 
     // Printing
