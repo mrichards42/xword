@@ -1,13 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 22 2011)
+// C++ code generated with wxFormBuilder (version Apr 10 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __wxFB_Dialogs__
-#define __wxFB_Dialogs__
+#ifndef __WXFB_DIALOGS_H__
+#define __WXFB_DIALOGS_H__
 
+#include <wx/artprov.h>
+#include <wx/xrc/xmlres.h>
 #include <wx/string.h>
 #include <wx/radiobox.h>
 #include <wx/gdicmn.h>
@@ -23,25 +25,22 @@
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
-#include <wx/clrpicker.h>
-#include <wx/fontpicker.h>
+#include <wx/treectrl.h>
 #include <wx/textctrl.h>
-#include <wx/gbsizer.h>
+#include "StyleEditors.hpp"
 #include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
-#include <wx/listctrl.h>
-#include <wx/radiobut.h>
-#include <wx/filepicker.h>
-#include <wx/scrolwin.h>
+#include <wx/statline.h>
+#include <wx/frame.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxFB_PreferencesDialog
+/// Class PreferencesDialogBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxFB_PreferencesDialog : public wxDialog 
+class PreferencesDialogBase : public wxDialog 
 {
 	private:
 		wxStdDialogButtonSizer* m_buttons;
@@ -62,48 +61,28 @@ class wxFB_PreferencesDialog : public wxDialog
 		wxStaticText* m_staticText36;
 		wxSpinCtrl* m_autoSave;
 		wxStaticText* m_staticText351;
-		wxStaticBoxSizer* sbSizer36;
-		wxColourPickerCtrl* m_penColor;
-		wxColourPickerCtrl* m_selectedLetterColor;
-		wxColourPickerCtrl* m_selectedWordColor;
-		wxColourPickerCtrl* m_gridSelectionColor;
-		wxColourPickerCtrl* m_gridBackgroundColor;
-		wxColourPickerCtrl* m_whiteSquareColor;
-		wxColourPickerCtrl* m_blackSquareColor;
-		wxColourPickerCtrl* m_cluePromptText;
-		wxColourPickerCtrl* m_cluePromptBackground;
-		wxColourPickerCtrl* m_clueText;
-		wxColourPickerCtrl* m_clueBackground;
-		wxColourPickerCtrl* m_selectedClueText;
-		wxColourPickerCtrl* m_selectedClueBackground;
-		wxColourPickerCtrl* m_crossingClueText;
-		wxColourPickerCtrl* m_crossingClueBackground;
-		wxColourPickerCtrl* m_clueHeadingText;
-		wxColourPickerCtrl* m_clueHeadingBackground;
-		wxFontPickerCtrl* m_gridLetterFont;
-		wxFontPickerCtrl* m_gridNumberFont;
-		wxFontPickerCtrl* m_cluePromptFont;
-		wxFontPickerCtrl* m_clueFont;
-		wxFontPickerCtrl* m_clueHeadingFont;
+		wxPanel* styleTreePanel;
+		wxTreeCtrl* m_styleTree;
+		wxPanel* m_stylePanel;
+		wxBoxSizer* m_styleSizer;
 		wxPanel* miscPanel;
 		wxCheckBox* m_saveFileHistory;
 		wxCheckBox* m_reopenLastPuzzle;
 		wxTextCtrl* m_cluePromptFormat;
-		wxSpinCtrl* m_letterScale;
-		wxSpinCtrl* m_numberScale;
-		wxSpinCtrl* m_lineThickness;
 		wxPanel* printPanel;
 		wxCheckBox* m_printCustomFonts;
-		wxFontPickerCtrl* m_printGridLetterFont;
-		wxFontPickerCtrl* m_printGridNumberFont;
-		wxFontPickerCtrl* m_printClueFont;
+		FontPanel * m_printGridLetterFont;
+		FontPanel * m_printGridNumberFont;
+		FontPanel * m_printClueFont;
 		wxRadioBox* m_printGridAlignment;
 		wxSlider* m_printBlackSquareBrightness;
 		wxPanel* m_panel8;
 		wxPanel* m_printBlackSquarePreview;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) = 0;
 		virtual void OnInit( wxInitDialogEvent& event ) = 0;
+		virtual void OnStyleTreeSelection( wxTreeEvent& event ) = 0;
 		virtual void OnSaveFileHistory( wxCommandEvent& event ) = 0;
 		virtual void OnPrintCustomFonts( wxCommandEvent& event ) = 0;
 		virtual void OnBlackSquareBrightness( wxScrollEvent& event ) = 0;
@@ -113,48 +92,8 @@ class wxFB_PreferencesDialog : public wxDialog
 	
 	public:
 		
-		wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
-		~wxFB_PreferencesDialog();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxFB_ConvertDialog
-///////////////////////////////////////////////////////////////////////////////
-class wxFB_ConvertDialog : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxBoxSizer* m_mainSizer;
-		wxListCtrl* m_list;
-		wxButton* m_optionsButton;
-		wxButton* m_add;
-		wxButton* m_remove;
-		wxButton* m_runButton;
-		wxStaticBoxSizer* m_optionsSizer;
-		wxRadioBox* m_overwrite;
-		wxRadioBox* m_errorHandling;
-		wxRadioButton* m_useInput;
-		wxRadioButton* m_specifyDirectory;
-		wxDirPickerCtrl* m_outputDirectory;
-		wxCheckBox* m_useLog;
-		wxFilePickerCtrl* m_logfile;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnDoubleClick( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnShowOptions( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRemove( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRunButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSpecifyDirectory( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUseLog( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		wxFB_ConvertDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Convert"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
-		~wxFB_ConvertDialog();
+		PreferencesDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~PreferencesDialogBase();
 	
 };
 
@@ -178,22 +117,66 @@ class LicenseDialog : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxFB_CharactersPanel
+/// Class MetadataFormatHelpDialog
 ///////////////////////////////////////////////////////////////////////////////
-class wxFB_CharactersPanel : public wxPanel 
+class MetadataFormatHelpDialog : public wxFrame 
 {
 	private:
 	
 	protected:
+		wxStaticText* m_staticText47;
+		wxStaticText* m_staticText15;
+		wxStaticText* m_staticText16;
+		wxStaticLine* m_staticline1;
+		wxStaticLine* m_staticline2;
+		wxStaticLine* m_staticline13;
+		wxStdDialogButtonSizer* m_sdbSizer3;
+		wxButton* m_sdbSizer3OK;
+		
+		// Virtual event handlers, overide them in your derived class
+		void OnClose( wxCloseEvent& event );
+		void OnOk( wxCommandEvent& event );
+		
 	
 	public:
-		wxScrolledWindow* m_scroller;
 		wxPanel* m_panel;
-		wxGridSizer* m_sizer;
+		wxFlexGridSizer* m_sizer;
 		
-		wxFB_CharactersPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxFB_CharactersPanel();
+		MetadataFormatHelpDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Display Format Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_TOOL_WINDOW|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		
+		~MetadataFormatHelpDialog();
 	
 };
 
-#endif //__wxFB_Dialogs__
+///////////////////////////////////////////////////////////////////////////////
+/// Class DisplayFormatDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class DisplayFormatDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxBoxSizer* m_sizer;
+		wxStaticText* m_functionStart;
+		wxStaticText* m_functionEnd;
+		wxStaticText* m_result;
+		wxStaticLine* m_staticline4;
+		wxStdDialogButtonSizer* m_sdbSizer4;
+		wxButton* m_sdbSizer4OK;
+		wxButton* m_sdbSizer4Cancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnTextUpdated( wxCommandEvent& event ) = 0;
+		virtual void OnUseLua( wxCommandEvent& event ) = 0;
+		
+	
+	public:
+		wxTextCtrl* m_format;
+		wxCheckBox* m_useLua;
+		
+		DisplayFormatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Display Format"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,393 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		~DisplayFormatDialogBase();
+	
+};
+
+#endif //__WXFB_DIALOGS_H__

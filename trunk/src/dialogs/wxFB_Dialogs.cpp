@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 22 2011)
+// C++ code generated with wxFormBuilder (version Apr 10 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -9,7 +9,7 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
@@ -43,6 +43,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_blankOnNewWord = new wxCheckBox( solvePanel, wxID_ANY, wxT("After moving to a new word"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer5->Add( m_blankOnNewWord, 0, wxALL, 5 );
 	
+	
 	sbSizer3->Add( sbSizer5, 1, wxALL|wxEXPAND, 5 );
 	
 	wxString m_pauseOnSwitchChoices[] = { wxT("Move cursor"), wxT("Keep cursor on current square") };
@@ -51,7 +52,9 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_pauseOnSwitch->SetSelection( 0 );
 	sbSizer3->Add( m_pauseOnSwitch, 0, wxALL|wxEXPAND, 5 );
 	
+	
 	bSizer4->Add( sbSizer3, 0, wxALL|wxEXPAND, 5 );
+	
 	
 	bSizer3->Add( bSizer4, 1, wxALL|wxEXPAND, 5 );
 	
@@ -67,6 +70,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_strictRebus = new wxCheckBox( solvePanel, wxID_ANY, wxT("Strict rebus checking"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer41->Add( m_strictRebus, 0, wxALL, 5 );
 	
+	
 	bSizer5->Add( sbSizer41, 0, wxALL|wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer4;
@@ -75,6 +79,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_moveOnRightClick = new wxCheckBox( solvePanel, wxID_ANY, wxT("Move to mouse position"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer4->Add( m_moveOnRightClick, 0, wxALL, 5 );
 	
+	
 	bSizer5->Add( sbSizer4, 0, wxALL|wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer411;
@@ -82,6 +87,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	
 	m_startTimer = new wxCheckBox( solvePanel, wxID_ANY, wxT("Start when a puzzle is opened"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer411->Add( m_startTimer, 0, wxALL, 5 );
+	
 	
 	bSizer5->Add( sbSizer411, 0, wxEXPAND|wxALL, 5 );
 	
@@ -102,303 +108,49 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_staticText351->Wrap( -1 );
 	bSizer24->Add( m_staticText351, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	
+	
 	sbSizer4111->Add( bSizer24, 1, wxEXPAND, 5 );
+	
 	
 	bSizer5->Add( sbSizer4111, 0, wxEXPAND|wxALL, 5 );
 	
+	
 	bSizer3->Add( bSizer5, 1, wxALL|wxEXPAND, 5 );
+	
 	
 	solvePanel->SetSizer( bSizer3 );
 	solvePanel->Layout();
 	bSizer3->Fit( solvePanel );
 	m_notebook->AddPage( solvePanel, wxT("Solving"), true );
-	wxPanel* colorPanel;
-	colorPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer35;
-	bSizer35 = new wxBoxSizer( wxHORIZONTAL );
+	styleTreePanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bsizer26;
+	bsizer26 = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* bSizer33;
-	bSizer33 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* treesizer;
+	treesizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	sbSizer36 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Grid") ), wxVERTICAL );
+	m_styleTree = new wxTreeCtrl( styleTreePanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_FULL_ROW_HIGHLIGHT|wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_SINGLE );
+	m_styleTree->SetMinSize( wxSize( 130,-1 ) );
 	
-	wxFlexGridSizer* fgSizer3;
-	fgSizer3 = new wxFlexGridSizer( 0, 2, 3, 5 );
-	fgSizer3->SetFlexibleDirection( wxBOTH );
-	fgSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	treesizer->Add( m_styleTree, 0, wxALL|wxEXPAND, 5 );
 	
-	m_penColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer3->Add( m_penColor, 0, 0, 5 );
+	m_stylePanel = new wxPanel( styleTreePanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_styleSizer = new wxBoxSizer( wxVERTICAL );
 	
-	wxStaticText* m_staticText12;
-	m_staticText12 = new wxStaticText( colorPanel, wxID_ANY, wxT("Pen"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText12->Wrap( -1 );
-	fgSizer3->Add( m_staticText12, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_selectedLetterColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer3->Add( m_selectedLetterColor, 0, 0, 5 );
+	m_stylePanel->SetSizer( m_styleSizer );
+	m_stylePanel->Layout();
+	m_styleSizer->Fit( m_stylePanel );
+	treesizer->Add( m_stylePanel, 1, wxEXPAND | wxALL, 5 );
 	
-	wxStaticText* m_staticText1;
-	m_staticText1 = new wxStaticText( colorPanel, wxID_ANY, wxT("Focused square"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1->Wrap( -1 );
-	fgSizer3->Add( m_staticText1, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_selectedWordColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer3->Add( m_selectedWordColor, 0, 0, 5 );
+	bsizer26->Add( treesizer, 1, wxALL|wxEXPAND, 5 );
 	
-	wxStaticText* m_staticText11;
-	m_staticText11 = new wxStaticText( colorPanel, wxID_ANY, wxT("Focused word"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText11->Wrap( -1 );
-	fgSizer3->Add( m_staticText11, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_gridSelectionColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer3->Add( m_gridSelectionColor, 0, 0, 5 );
-	
-	wxStaticText* m_staticText114;
-	m_staticText114 = new wxStaticText( colorPanel, wxID_ANY, wxT("Multi-square selection"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText114->Wrap( -1 );
-	fgSizer3->Add( m_staticText114, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_gridBackgroundColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer3->Add( m_gridBackgroundColor, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	wxStaticText* m_staticText111;
-	m_staticText111 = new wxStaticText( colorPanel, wxID_ANY, wxT("Background"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText111->Wrap( -1 );
-	fgSizer3->Add( m_staticText111, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_whiteSquareColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer3->Add( m_whiteSquareColor, 0, 0, 5 );
-	
-	wxStaticText* m_staticText112;
-	m_staticText112 = new wxStaticText( colorPanel, wxID_ANY, wxT("White square"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText112->Wrap( -1 );
-	fgSizer3->Add( m_staticText112, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_blackSquareColor = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer3->Add( m_blackSquareColor, 0, 0, 5 );
-	
-	wxStaticText* m_staticText113;
-	m_staticText113 = new wxStaticText( colorPanel, wxID_ANY, wxT("Black square"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText113->Wrap( -1 );
-	fgSizer3->Add( m_staticText113, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	sbSizer36->Add( fgSizer3, 1, wxEXPAND, 5 );
-	
-	bSizer33->Add( sbSizer36, 0, wxALL|wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer7;
-	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Clue Prompt") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer6;
-	fgSizer6 = new wxFlexGridSizer( 0, 2, 3, 5 );
-	fgSizer6->SetFlexibleDirection( wxBOTH );
-	fgSizer6->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_cluePromptText = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer6->Add( m_cluePromptText, 0, 0, 5 );
-	
-	wxStaticText* m_staticText13512;
-	m_staticText13512 = new wxStaticText( colorPanel, wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText13512->Wrap( -1 );
-	fgSizer6->Add( m_staticText13512, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_cluePromptBackground = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer6->Add( m_cluePromptBackground, 0, 0, 5 );
-	
-	wxStaticText* m_staticText13511;
-	m_staticText13511 = new wxStaticText( colorPanel, wxID_ANY, wxT("Background"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText13511->Wrap( -1 );
-	fgSizer6->Add( m_staticText13511, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	sbSizer7->Add( fgSizer6, 1, wxEXPAND, 5 );
-	
-	bSizer33->Add( sbSizer7, 0, wxALL|wxEXPAND, 5 );
-	
-	bSizer35->Add( bSizer33, 1, wxEXPAND|wxALL, 5 );
-	
-	wxBoxSizer* bSizer37;
-	bSizer37 = new wxBoxSizer( wxHORIZONTAL );
-	
-	wxStaticBoxSizer* sbSizer6;
-	sbSizer6 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Clue List") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer7;
-	fgSizer7 = new wxFlexGridSizer( 0, 2, 3, 5 );
-	fgSizer7->SetFlexibleDirection( wxBOTH );
-	fgSizer7->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_clueText = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer7->Add( m_clueText, 0, 0, 5 );
-	
-	wxStaticText* m_staticText132;
-	m_staticText132 = new wxStaticText( colorPanel, wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText132->Wrap( -1 );
-	fgSizer7->Add( m_staticText132, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_clueBackground = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer7->Add( m_clueBackground, 0, 0, 5 );
-	
-	wxStaticText* m_staticText131;
-	m_staticText131 = new wxStaticText( colorPanel, wxID_ANY, wxT("Background"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText131->Wrap( -1 );
-	fgSizer7->Add( m_staticText131, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	sbSizer6->Add( fgSizer7, 0, wxEXPAND|wxRIGHT|wxLEFT, 7 );
-	
-	wxStaticBoxSizer* sbSizer16;
-	sbSizer16 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Current clue") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer8;
-	fgSizer8 = new wxFlexGridSizer( 2, 2, 3, 5 );
-	fgSizer8->SetFlexibleDirection( wxBOTH );
-	fgSizer8->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_selectedClueText = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer8->Add( m_selectedClueText, 0, 0, 5 );
-	
-	wxStaticText* m_staticText134;
-	m_staticText134 = new wxStaticText( colorPanel, wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText134->Wrap( -1 );
-	fgSizer8->Add( m_staticText134, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_selectedClueBackground = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer8->Add( m_selectedClueBackground, 0, 0, 5 );
-	
-	wxStaticText* m_staticText133;
-	m_staticText133 = new wxStaticText( colorPanel, wxID_ANY, wxT("Background"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText133->Wrap( -1 );
-	fgSizer8->Add( m_staticText133, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	sbSizer16->Add( fgSizer8, 0, wxEXPAND, 5 );
-	
-	sbSizer6->Add( sbSizer16, 0, wxEXPAND|wxALL, 3 );
-	
-	wxStaticBoxSizer* sbSizer17;
-	sbSizer17 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Crossing clue") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer9;
-	fgSizer9 = new wxFlexGridSizer( 2, 2, 3, 5 );
-	fgSizer9->SetFlexibleDirection( wxBOTH );
-	fgSizer9->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_crossingClueText = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer9->Add( m_crossingClueText, 0, 0, 5 );
-	
-	wxStaticText* m_staticText1351;
-	m_staticText1351 = new wxStaticText( colorPanel, wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1351->Wrap( -1 );
-	fgSizer9->Add( m_staticText1351, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_crossingClueBackground = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer9->Add( m_crossingClueBackground, 0, 0, 5 );
-	
-	wxStaticText* m_staticText135;
-	m_staticText135 = new wxStaticText( colorPanel, wxID_ANY, wxT("Background"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText135->Wrap( -1 );
-	fgSizer9->Add( m_staticText135, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	sbSizer17->Add( fgSizer9, 0, wxEXPAND, 5 );
-	
-	sbSizer6->Add( sbSizer17, 0, wxEXPAND|wxALL, 3 );
-	
-	wxStaticBoxSizer* sbSizer18;
-	sbSizer18 = new wxStaticBoxSizer( new wxStaticBox( colorPanel, wxID_ANY, wxT("Heading") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer10;
-	fgSizer10 = new wxFlexGridSizer( 2, 2, 3, 5 );
-	fgSizer10->SetFlexibleDirection( wxBOTH );
-	fgSizer10->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_clueHeadingText = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer10->Add( m_clueHeadingText, 0, 0, 5 );
-	
-	wxStaticText* m_staticText135131;
-	m_staticText135131 = new wxStaticText( colorPanel, wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText135131->Wrap( -1 );
-	fgSizer10->Add( m_staticText135131, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_clueHeadingBackground = new wxColourPickerCtrl( colorPanel, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer10->Add( m_clueHeadingBackground, 0, 0, 5 );
-	
-	wxStaticText* m_staticText13513;
-	m_staticText13513 = new wxStaticText( colorPanel, wxID_ANY, wxT("Background"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText13513->Wrap( -1 );
-	fgSizer10->Add( m_staticText13513, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	sbSizer18->Add( fgSizer10, 0, wxEXPAND, 5 );
-	
-	sbSizer6->Add( sbSizer18, 1, wxEXPAND|wxALL, 3 );
-	
-	bSizer37->Add( sbSizer6, 1, wxALL|wxEXPAND, 5 );
-	
-	bSizer35->Add( bSizer37, 1, wxEXPAND|wxALL, 5 );
-	
-	colorPanel->SetSizer( bSizer35 );
-	colorPanel->Layout();
-	bSizer35->Fit( colorPanel );
-	m_notebook->AddPage( colorPanel, wxT("Colors"), false );
-	wxPanel* fontPanel;
-	fontPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer30;
-	bSizer30 = new wxBoxSizer( wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer4;
-	fgSizer4 = new wxFlexGridSizer( 2, 2, 10, 10 );
-	fgSizer4->SetFlexibleDirection( wxBOTH );
-	fgSizer4->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_gridLetterFont = new wxFontPickerCtrl( fontPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_gridLetterFont->SetMaxPointSize( 100 ); 
-	fgSizer4->Add( m_gridLetterFont, 0, 0, 5 );
-	
-	wxStaticText* m_staticText14;
-	m_staticText14 = new wxStaticText( fontPanel, wxID_ANY, wxT("Grid text (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText14->Wrap( -1 );
-	fgSizer4->Add( m_staticText14, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_gridNumberFont = new wxFontPickerCtrl( fontPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_gridNumberFont->SetMaxPointSize( 100 ); 
-	fgSizer4->Add( m_gridNumberFont, 0, 0, 5 );
-	
-	wxStaticText* m_staticText143;
-	m_staticText143 = new wxStaticText( fontPanel, wxID_ANY, wxT("Grid numbers (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText143->Wrap( -1 );
-	fgSizer4->Add( m_staticText143, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_cluePromptFont = new wxFontPickerCtrl( fontPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_cluePromptFont->SetMaxPointSize( 100 ); 
-	fgSizer4->Add( m_cluePromptFont, 0, 0, 5 );
-	
-	wxStaticText* m_staticText142;
-	m_staticText142 = new wxStaticText( fontPanel, wxID_ANY, wxT("Clue prompt (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText142->Wrap( -1 );
-	fgSizer4->Add( m_staticText142, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_clueFont = new wxFontPickerCtrl( fontPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_clueFont->SetMaxPointSize( 100 ); 
-	fgSizer4->Add( m_clueFont, 0, 0, 5 );
-	
-	wxStaticText* m_staticText141;
-	m_staticText141 = new wxStaticText( fontPanel, wxID_ANY, wxT("Clue list"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText141->Wrap( -1 );
-	fgSizer4->Add( m_staticText141, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_clueHeadingFont = new wxFontPickerCtrl( fontPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_clueHeadingFont->SetMaxPointSize( 100 ); 
-	fgSizer4->Add( m_clueHeadingFont, 0, 0, 5 );
-	
-	wxStaticText* m_staticText1411;
-	m_staticText1411 = new wxStaticText( fontPanel, wxID_ANY, wxT("Clue list heading"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1411->Wrap( -1 );
-	fgSizer4->Add( m_staticText1411, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	bSizer30->Add( fgSizer4, 1, wxEXPAND|wxALL, 15 );
-	
-	fontPanel->SetSizer( bSizer30 );
-	fontPanel->Layout();
-	bSizer30->Fit( fontPanel );
-	m_notebook->AddPage( fontPanel, wxT("Fonts"), false );
+	styleTreePanel->SetSizer( bsizer26 );
+	styleTreePanel->Layout();
+	bsizer26->Fit( styleTreePanel );
+	m_notebook->AddPage( styleTreePanel, wxT("Styles"), false );
 	miscPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer42;
 	bSizer42 = new wxBoxSizer( wxVERTICAL );
@@ -412,6 +164,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_reopenLastPuzzle = new wxCheckBox( miscPanel, wxID_ANY, wxT("Open last puzzle when XWord starts"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_reopenLastPuzzle->SetValue(true); 
 	sbSizer22->Add( m_reopenLastPuzzle, 0, wxALL, 5 );
+	
 	
 	bSizer42->Add( sbSizer22, 1, wxEXPAND|wxALL, 5 );
 	
@@ -431,6 +184,7 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	
 	m_cluePromptFormat = new wxTextCtrl( miscPanel, wxID_ANY, wxT("<center>%N. %T</center>"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_cluePromptFormat, 0, wxEXPAND, 5 );
+	
 	
 	sbSizer13->Add( fgSizer1, 0, wxALL|wxEXPAND, 5 );
 	
@@ -464,54 +218,15 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_staticText35->Wrap( -1 );
 	fgSizer2->Add( m_staticText35, 0, wxALL, 5 );
 	
+	
 	sbSizer12->Add( fgSizer2, 1, wxEXPAND, 5 );
+	
 	
 	sbSizer13->Add( sbSizer12, 0, wxEXPAND|wxALL, 5 );
 	
+	
 	bSizer42->Add( sbSizer13, 0, wxEXPAND|wxALL, 10 );
 	
-	wxStaticBoxSizer* sbSizer191;
-	sbSizer191 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("Grid tweaks") ), wxVERTICAL );
-	
-	wxGridBagSizer* gbSizer1;
-	gbSizer1 = new wxGridBagSizer( 3, 8 );
-	gbSizer1->SetFlexibleDirection( wxBOTH );
-	gbSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticText* m_staticText330;
-	m_staticText330 = new wxStaticText( miscPanel, wxID_ANY, wxT("Percent of square for text:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText330->Wrap( -1 );
-	gbSizer1->Add( m_staticText330, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_letterScale = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 5, 95, 42 );
-	gbSizer1->Add( m_letterScale, wxGBPosition( 0, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
-	
-	wxStaticText* m_staticText331;
-	m_staticText331 = new wxStaticText( miscPanel, wxID_ANY, wxT("Percent of square for clue number:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText331->Wrap( -1 );
-	gbSizer1->Add( m_staticText331, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_numberScale = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 5, 95, 75 );
-	gbSizer1->Add( m_numberScale, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
-	
-	wxStaticText* m_staticText341;
-	m_staticText341 = new wxStaticText( miscPanel, wxID_ANY, wxT("Note: these numbers do not have to add up to 100%"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText341->Wrap( -1 );
-	m_staticText341->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 90, false, wxEmptyString ) );
-	
-	gbSizer1->Add( m_staticText341, wxGBPosition( 2, 0 ), wxGBSpan( 1, 2 ), wxALIGN_CENTER_VERTICAL|wxBOTTOM, 10 );
-	
-	wxStaticText* m_staticText41;
-	m_staticText41 = new wxStaticText( miscPanel, wxID_ANY, wxT("Line thickness:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText41->Wrap( -1 );
-	gbSizer1->Add( m_staticText41, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_lineThickness = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 10, 1 );
-	gbSizer1->Add( m_lineThickness, wxGBPosition( 3, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
-	
-	sbSizer191->Add( gbSizer1, 1, wxEXPAND|wxALL, 5 );
-	
-	bSizer42->Add( sbSizer191, 0, wxEXPAND|wxALL, 10 );
 	
 	miscPanel->SetSizer( bSizer42 );
 	miscPanel->Layout();
@@ -532,34 +247,33 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	fgSizer5->SetFlexibleDirection( wxBOTH );
 	fgSizer5->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_printGridLetterFont = new wxFontPickerCtrl( printPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_printGridLetterFont->SetMaxPointSize( 100 ); 
-	fgSizer5->Add( m_printGridLetterFont, 0, 0, 5 );
-	
 	wxStaticText* m_staticText144;
-	m_staticText144 = new wxStaticText( printPanel, wxID_ANY, wxT("Grid text (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText144 = new wxStaticText( printPanel, wxID_ANY, wxT("Grid Text:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText144->Wrap( -1 );
 	fgSizer5->Add( m_staticText144, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_printGridNumberFont = new wxFontPickerCtrl( printPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_printGridNumberFont->SetMaxPointSize( 100 ); 
-	fgSizer5->Add( m_printGridNumberFont, 0, 0, 5 );
+	m_printGridLetterFont = new FontPanel(printPanel, wxID_ANY, wxNullFont, FP_DEFAULT & ~ FP_POINTSIZE);
+	fgSizer5->Add( m_printGridLetterFont, 0, wxALL, 5 );
 	
 	wxStaticText* m_printGridNumberFontLabel;
-	m_printGridNumberFontLabel = new wxStaticText( printPanel, wxID_ANY, wxT("Grid numbers (font size is ignored)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_printGridNumberFontLabel = new wxStaticText( printPanel, wxID_ANY, wxT("Grid Numbers:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_printGridNumberFontLabel->Wrap( -1 );
 	fgSizer5->Add( m_printGridNumberFontLabel, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_printClueFont = new wxFontPickerCtrl( printPanel, wxID_ANY, wxNullFont, wxDefaultPosition, wxDefaultSize, wxFNTP_FONTDESC_AS_LABEL );
-	m_printClueFont->SetMaxPointSize( 100 ); 
-	fgSizer5->Add( m_printClueFont, 0, 0, 5 );
+	m_printGridNumberFont = new FontPanel(printPanel, wxID_ANY, wxNullFont, FP_DEFAULT & ~ FP_POINTSIZE);
+	fgSizer5->Add( m_printGridNumberFont, 0, wxALL, 5 );
 	
 	wxStaticText* m_staticText1412;
-	m_staticText1412 = new wxStaticText( printPanel, wxID_ANY, wxT("Clue list"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1412 = new wxStaticText( printPanel, wxID_ANY, wxT("Clues:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1412->Wrap( -1 );
 	fgSizer5->Add( m_staticText1412, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
+	m_printClueFont = new FontPanel(printPanel, wxID_ANY);
+	fgSizer5->Add( m_printClueFont, 0, wxALL, 5 );
+	
+	
 	sbSizer14->Add( fgSizer5, 1, wxALL|wxEXPAND, 5 );
+	
 	
 	bSizer371->Add( sbSizer14, 0, wxEXPAND|wxALL, 5 );
 	
@@ -590,14 +304,18 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	
 	bSizer21->Add( m_printBlackSquarePreview, 1, wxEXPAND|wxALL, 5 );
 	
+	
 	m_panel8->SetSizer( bSizer21 );
 	m_panel8->Layout();
 	bSizer21->Fit( m_panel8 );
 	sbSizer19->Add( m_panel8, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
+	
 	bSizer58->Add( sbSizer19, 1, wxALL|wxEXPAND, 5 );
 	
+	
 	bSizer371->Add( bSizer58, 0, wxEXPAND, 5 );
+	
 	
 	printPanel->SetSizer( bSizer371 );
 	printPanel->Layout();
@@ -614,183 +332,52 @@ wxFB_PreferencesDialog::wxFB_PreferencesDialog( wxWindow* parent, wxWindowID id,
 	m_buttonsCancel = new wxButton( this, wxID_CANCEL );
 	m_buttons->AddButton( m_buttonsCancel );
 	m_buttons->Realize();
+	
 	sizer->Add( m_buttons, 0, wxALL|wxEXPAND, 5 );
+	
 	
 	this->SetSizer( sizer );
 	this->Layout();
 	sizer->Fit( this );
 	
 	// Connect Events
-	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
-	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnSaveFileHistory ), NULL, this );
-	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_buttonsApply->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnApply ), NULL, this );
-	m_buttonsOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnOK ), NULL, this );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( PreferencesDialogBase::OnClose ) );
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PreferencesDialogBase::OnInit ) );
+	m_styleTree->Connect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( PreferencesDialogBase::OnStyleTreeSelection ), NULL, this );
+	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnSaveFileHistory ), NULL, this );
+	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnPrintCustomFonts ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_buttonsApply->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnApply ), NULL, this );
+	m_buttonsOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnOK ), NULL, this );
 }
 
-wxFB_PreferencesDialog::~wxFB_PreferencesDialog()
+PreferencesDialogBase::~PreferencesDialogBase()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxFB_PreferencesDialog::OnInit ) );
-	m_saveFileHistory->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnSaveFileHistory ), NULL, this );
-	m_printCustomFonts->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnPrintCustomFonts ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( wxFB_PreferencesDialog::OnBlackSquareBrightness ), NULL, this );
-	m_buttonsApply->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnApply ), NULL, this );
-	m_buttonsOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_PreferencesDialog::OnOK ), NULL, this );
-	
-}
-
-wxFB_ConvertDialog::wxFB_ConvertDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	m_mainSizer = new wxBoxSizer( wxVERTICAL );
-	
-	wxBoxSizer* bSizer1;
-	bSizer1 = new wxBoxSizer( wxVERTICAL );
-	
-	wxStaticBoxSizer* sbSizer2;
-	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Files") ), wxVERTICAL );
-	
-	m_list = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxSize( 400,150 ), wxLC_REPORT );
-	sbSizer2->Add( m_list, 1, wxALL|wxEXPAND, 5 );
-	
-	bSizer1->Add( sbSizer2, 1, wxALL|wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer33;
-	bSizer33 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_optionsButton = new wxButton( this, wxID_ANY, wxT("Options <<<"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer33->Add( m_optionsButton, 0, wxALL, 5 );
-	
-	wxBoxSizer* bSizer34;
-	bSizer34 = new wxBoxSizer( wxVERTICAL );
-	
-	wxBoxSizer* bSizer35;
-	bSizer35 = new wxBoxSizer( wxVERTICAL );
-	
-	wxBoxSizer* bSizer32;
-	bSizer32 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_add = new wxButton( this, wxID_ANY, wxT("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer32->Add( m_add, 0, wxALL, 5 );
-	
-	m_remove = new wxButton( this, wxID_ANY, wxT("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer32->Add( m_remove, 0, wxALL, 5 );
-	
-	m_runButton = new wxButton( this, wxID_ANY, wxT("Start"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer32->Add( m_runButton, 0, wxALL, 5 );
-	
-	bSizer35->Add( bSizer32, 0, wxALIGN_RIGHT, 5 );
-	
-	bSizer34->Add( bSizer35, 1, wxEXPAND, 5 );
-	
-	bSizer33->Add( bSizer34, 1, wxEXPAND, 5 );
-	
-	bSizer1->Add( bSizer33, 0, wxEXPAND, 5 );
-	
-	m_mainSizer->Add( bSizer1, 1, wxEXPAND, 5 );
-	
-	m_optionsSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Options") ), wxVERTICAL );
-	
-	wxBoxSizer* bSizer351;
-	bSizer351 = new wxBoxSizer( wxHORIZONTAL );
-	
-	wxString m_overwriteChoices[] = { wxT("Rename"), wxT("Overwrite") };
-	int m_overwriteNChoices = sizeof( m_overwriteChoices ) / sizeof( wxString );
-	m_overwrite = new wxRadioBox( this, wxID_ANY, wxT("Name Collisions"), wxDefaultPosition, wxDefaultSize, m_overwriteNChoices, m_overwriteChoices, 1, wxRA_SPECIFY_ROWS );
-	m_overwrite->SetSelection( 0 );
-	bSizer351->Add( m_overwrite, 0, wxALL|wxEXPAND, 5 );
-	
-	wxString m_errorHandlingChoices[] = { wxT("Ignore if possible"), wxT("Always fail") };
-	int m_errorHandlingNChoices = sizeof( m_errorHandlingChoices ) / sizeof( wxString );
-	m_errorHandling = new wxRadioBox( this, wxID_ANY, wxT("Error Handling"), wxDefaultPosition, wxDefaultSize, m_errorHandlingNChoices, m_errorHandlingChoices, 1, wxRA_SPECIFY_ROWS );
-	m_errorHandling->SetSelection( 1 );
-	bSizer351->Add( m_errorHandling, 0, wxALL|wxEXPAND, 5 );
-	
-	m_optionsSizer->Add( bSizer351, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer4;
-	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Output Directory") ), wxVERTICAL );
-	
-	wxBoxSizer* bSizer3;
-	bSizer3 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_useInput = new wxRadioButton( this, wxID_ANY, wxT("Use input folder"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
-	m_useInput->SetValue( true ); 
-	bSizer3->Add( m_useInput, 0, wxALL, 5 );
-	
-	m_specifyDirectory = new wxRadioButton( this, wxID_ANY, wxT("Specify a directory"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer3->Add( m_specifyDirectory, 0, wxALL, 5 );
-	
-	sbSizer4->Add( bSizer3, 0, 0, 5 );
-	
-	m_outputDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Default output folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
-	m_outputDirectory->Enable( false );
-	
-	sbSizer4->Add( m_outputDirectory, 1, wxALL|wxEXPAND, 5 );
-	
-	m_optionsSizer->Add( sbSizer4, 0, wxALL|wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer5;
-	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Log") ), wxHORIZONTAL );
-	
-	m_useLog = new wxCheckBox( this, wxID_ANY, wxT("Use log"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_useLog->Hide();
-	
-	sbSizer5->Add( m_useLog, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_logfile = new wxFilePickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_SAVE|wxFLP_USE_TEXTCTRL );
-	m_logfile->Enable( false );
-	m_logfile->Hide();
-	
-	sbSizer5->Add( m_logfile, 1, wxALL|wxEXPAND, 5 );
-	
-	m_optionsSizer->Add( sbSizer5, 0, wxEXPAND|wxALL, 5 );
-	
-	m_mainSizer->Add( m_optionsSizer, 0, wxALL|wxEXPAND, 5 );
-	
-	this->SetSizer( m_mainSizer );
-	this->Layout();
-	m_mainSizer->Fit( this );
-	
-	// Connect Events
-	m_list->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( wxFB_ConvertDialog::OnDoubleClick ), NULL, this );
-	m_optionsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnShowOptions ), NULL, this );
-	m_add->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnAdd ), NULL, this );
-	m_remove->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnRemove ), NULL, this );
-	m_runButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnRunButton ), NULL, this );
-	m_specifyDirectory->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxFB_ConvertDialog::OnSpecifyDirectory ), NULL, this );
-	m_useLog->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnUseLog ), NULL, this );
-}
-
-wxFB_ConvertDialog::~wxFB_ConvertDialog()
-{
-	// Disconnect Events
-	m_list->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( wxFB_ConvertDialog::OnDoubleClick ), NULL, this );
-	m_optionsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnShowOptions ), NULL, this );
-	m_add->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnAdd ), NULL, this );
-	m_remove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnRemove ), NULL, this );
-	m_runButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnRunButton ), NULL, this );
-	m_specifyDirectory->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxFB_ConvertDialog::OnSpecifyDirectory ), NULL, this );
-	m_useLog->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_ConvertDialog::OnUseLog ), NULL, this );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( PreferencesDialogBase::OnClose ) );
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PreferencesDialogBase::OnInit ) );
+	m_styleTree->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( PreferencesDialogBase::OnStyleTreeSelection ), NULL, this );
+	m_saveFileHistory->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnSaveFileHistory ), NULL, this );
+	m_printCustomFonts->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnPrintCustomFonts ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
+	m_buttonsApply->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnApply ), NULL, this );
+	m_buttonsOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnOK ), NULL, this );
 	
 }
 
@@ -808,7 +395,9 @@ LicenseDialog::LicenseDialog( wxWindow* parent, wxWindowID id, const wxString& t
 	m_sdbSizer2OK = new wxButton( this, wxID_OK );
 	m_sdbSizer2->AddButton( m_sdbSizer2OK );
 	m_sdbSizer2->Realize();
+	
 	bSizer22->Add( m_sdbSizer2, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	
 	
 	this->SetSizer( bSizer22 );
 	this->Layout();
@@ -818,36 +407,146 @@ LicenseDialog::~LicenseDialog()
 {
 }
 
-wxFB_CharactersPanel::wxFB_CharactersPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+MetadataFormatHelpDialog::MetadataFormatHelpDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
-	wxBoxSizer* bSizer24;
-	bSizer24 = new wxBoxSizer( wxVERTICAL );
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
-	m_scroller = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL );
-	m_scroller->SetScrollRate( 0, 10 );
-	wxBoxSizer* bSizer241;
-	bSizer241 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizer18;
+	bSizer18 = new wxBoxSizer( wxVERTICAL );
 	
-	m_panel = new wxPanel( m_scroller, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	m_panel->SetBackgroundColour( wxColour( 0, 0, 0 ) );
+	m_panel = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizer14;
+	bSizer14 = new wxBoxSizer( wxVERTICAL );
 	
-	m_sizer = new wxGridSizer( 0, 8, 1, 1 );
+	m_staticText47 = new wxStaticText( m_panel, wxID_ANY, wxT("Plain text is displayed as-is.\n\nText that is enclosed in percent signs (%) is replaced with\nmetadata for the puzzle.  The most common metadata fields\nare displayed below with the values from the current puzzle."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText47->Wrap( -1 );
+	bSizer14->Add( m_staticText47, 0, wxALL, 5 );
 	
-	m_panel->SetSizer( m_sizer );
+	m_sizer = new wxFlexGridSizer( 0, 2, 5, 20 );
+	m_sizer->SetFlexibleDirection( wxBOTH );
+	m_sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText15 = new wxStaticText( m_panel, wxID_ANY, wxT("Field"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText15->Wrap( -1 );
+	m_sizer->Add( m_staticText15, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText16 = new wxStaticText( m_panel, wxID_ANY, wxT("Value"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText16->Wrap( -1 );
+	m_sizer->Add( m_staticText16, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticline1 = new wxStaticLine( m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	m_sizer->Add( m_staticline1, 0, wxEXPAND, 5 );
+	
+	m_staticline2 = new wxStaticLine( m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	m_sizer->Add( m_staticline2, 0, wxEXPAND, 5 );
+	
+	
+	bSizer14->Add( m_sizer, 0, wxALL, 5 );
+	
+	m_staticline13 = new wxStaticLine( m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	bSizer14->Add( m_staticline13, 0, wxEXPAND | wxALL, 5 );
+	
+	m_sdbSizer3 = new wxStdDialogButtonSizer();
+	m_sdbSizer3OK = new wxButton( m_panel, wxID_OK );
+	m_sdbSizer3->AddButton( m_sdbSizer3OK );
+	m_sdbSizer3->Realize();
+	
+	bSizer14->Add( m_sdbSizer3, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	m_panel->SetSizer( bSizer14 );
 	m_panel->Layout();
-	m_sizer->Fit( m_panel );
-	bSizer241->Add( m_panel, 0, 0, 5 );
+	bSizer14->Fit( m_panel );
+	bSizer18->Add( m_panel, 1, wxEXPAND, 5 );
 	
-	m_scroller->SetSizer( bSizer241 );
-	m_scroller->Layout();
-	bSizer241->Fit( m_scroller );
-	bSizer24->Add( m_scroller, 1, wxEXPAND, 5 );
 	
-	this->SetSizer( bSizer24 );
+	this->SetSizer( bSizer18 );
 	this->Layout();
-	bSizer24->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MetadataFormatHelpDialog::OnClose ) );
+	m_sdbSizer3OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MetadataFormatHelpDialog::OnOk ), NULL, this );
 }
 
-wxFB_CharactersPanel::~wxFB_CharactersPanel()
+MetadataFormatHelpDialog::~MetadataFormatHelpDialog()
 {
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MetadataFormatHelpDialog::OnClose ) );
+	m_sdbSizer3OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MetadataFormatHelpDialog::OnOk ), NULL, this );
+	
+}
+
+DisplayFormatDialogBase::DisplayFormatDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer17;
+	bSizer17 = new wxBoxSizer( wxVERTICAL );
+	
+	m_sizer = new wxBoxSizer( wxVERTICAL );
+	
+	m_functionStart = new wxStaticText( this, wxID_ANY, wxT("function(puzzle)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_functionStart->Wrap( -1 );
+	m_functionStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
+	
+	m_sizer->Add( m_functionStart, 0, wxBOTTOM, 5 );
+	
+	m_format = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_DONTWRAP|wxTE_MULTILINE );
+	m_format->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
+	
+	m_sizer->Add( m_format, 1, wxEXPAND|wxLEFT, 15 );
+	
+	m_functionEnd = new wxStaticText( this, wxID_ANY, wxT("end"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_functionEnd->Wrap( -1 );
+	m_functionEnd->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
+	
+	m_sizer->Add( m_functionEnd, 0, wxTOP, 5 );
+	
+	m_useLua = new wxCheckBox( this, wxID_ANY, wxT("Format as a lua script"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_sizer->Add( m_useLua, 0, wxTOP|wxBOTTOM, 10 );
+	
+	wxStaticBoxSizer* sbSizer12;
+	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Result") ), wxVERTICAL );
+	
+	m_result = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_result->Wrap( -1 );
+	sbSizer12->Add( m_result, 0, wxALL, 5 );
+	
+	
+	m_sizer->Add( sbSizer12, 0, wxEXPAND|wxTOP|wxBOTTOM, 5 );
+	
+	
+	bSizer17->Add( m_sizer, 1, wxEXPAND|wxALL, 10 );
+	
+	m_staticline4 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	bSizer17->Add( m_staticline4, 0, wxEXPAND | wxALL, 5 );
+	
+	m_sdbSizer4 = new wxStdDialogButtonSizer();
+	m_sdbSizer4OK = new wxButton( this, wxID_OK );
+	m_sdbSizer4->AddButton( m_sdbSizer4OK );
+	m_sdbSizer4Cancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer4->AddButton( m_sdbSizer4Cancel );
+	m_sdbSizer4->Realize();
+	
+	bSizer17->Add( m_sdbSizer4, 0, wxEXPAND|wxALL, 5 );
+	
+	
+	this->SetSizer( bSizer17 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_format->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( DisplayFormatDialogBase::OnTextUpdated ), NULL, this );
+	m_useLua->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( DisplayFormatDialogBase::OnUseLua ), NULL, this );
+}
+
+DisplayFormatDialogBase::~DisplayFormatDialogBase()
+{
+	// Disconnect Events
+	m_format->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( DisplayFormatDialogBase::OnTextUpdated ), NULL, this );
+	m_useLua->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( DisplayFormatDialogBase::OnUseLua ), NULL, this );
+	
 }
