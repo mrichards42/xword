@@ -88,13 +88,8 @@ MetadataCtrl::GetMeta(const wxString & str_, MyFrame * frame)
         return puz2wx(frame->GetPuzzle().GetMeta(wx2puz(str)));
 }
 
-#if XWORD_USE_LUA
 wxString
 MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame, bool useLua)
-#else // ! XWORD_USE_LUA
-wxString
-MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame)
-#endif // XWORD_USE_LUA
 {
     if (! frame)
         return wxEmptyString;
