@@ -179,9 +179,6 @@ private:
 
     std::map<wxString, CluePanel *> m_clues;
 
-    MetadataCtrl *  m_title;
-    MetadataCtrl *  m_author;
-    MetadataCtrl *  m_copyright;
     CluePrompt *  m_cluePrompt;
     wxHtmlWindow * m_notes;
 

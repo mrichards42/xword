@@ -36,6 +36,7 @@ class ConfigManagerBase;
 //    responsible for getting and setting the config value.
 class ConfigGroup
 {
+    friend class ConfigManagerBase;
 public:
     ConfigGroup(ConfigManagerBase * cfg)
         : m_name(_T("")),
@@ -51,6 +52,8 @@ public:
             parent->m_children.push_back(this);
     }
 
+    virtual ~ConfigGroup() {}
+
     virtual void Update(wxEvtHandler * h = NULL)
     {
         std::list<ConfigGroup *>::iterator it;
@@ -65,9 +68,161 @@ public:
             (*it)->RemoveCallbacks(h);
     }
 
+    // Copy values from other config to this config
+    virtual void Copy(const ConfigGroup & other);
+
+    ConfigGroup * FindChild(const wxString & name)
+    {
+        std::list<ConfigGroup *>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); ++it)
+        {
+            if ((*it)->m_name == name)
+                return *it;
+        }
+        return NULL;
+    }
+
     wxString m_name;
     std::list<ConfigGroup *> m_children;
     ConfigManagerBase * m_cfg;
+
+protected:
+    // Update our ConfigLists
+    virtual void UpdateLists()
+    {
+        std::list<ConfigGroup *>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); ++it)
+            (*it)->UpdateLists();
+    }
+
+private: // Can't assign or copy
+    ConfigGroup(ConfigGroup &);
+    ConfigGroup & operator=(const ConfigGroup &);
+};
+
+
+template <typename T>
+class ConfigList : public ConfigGroup
+{
+public:
+    ConfigList(ConfigManagerBase * cfg)
+        : ConfigGroup(cfg)
+    {}
+
+    ConfigList(ConfigGroup * parent, const wxString & name)
+        : ConfigGroup(parent, name)
+    {}
+
+    virtual ~ConfigList()
+    {
+        clear();
+    }
+
+public:
+    // Copy values from other config to this config
+    virtual void Copy(const ConfigGroup & other)
+    {
+        if (m_name != other.m_name)
+            throw ConfigManagerBase::CopyError();
+        clear();
+        std::list<ConfigGroup *>::const_iterator it;
+        for (it = other.m_children.begin(); it != other.m_children.end(); ++it)
+        {
+            // Create a new entry
+            // Get the name of this entry by removing the prefix of the
+            // parent's name.
+            wxString name;
+            (*it)->m_name.StartsWith(other.m_name + _T("/"), &name);
+            T * entry = push_back(name);
+            // Fill it with values from the other config
+            entry->Copy(**it);
+        }
+    }
+
+protected:
+    // An iterator that automatically casts its pointers
+    template <class ITERATOR>
+    class iterator_t : public ITERATOR
+    {
+    public:
+        iterator_t() : ITERATOR() {}
+        iterator_t(ITERATOR & it) : ITERATOR(it) {}
+
+        T & operator *() { return *cast(ITERATOR::operator *()); }
+        const T & operator *() const { return *cast(ITERATOR::operator *()); }
+
+        T * operator->() { return cast(*ITERATOR::operator->()); }
+        const T * operator->() const { return cast(*ITERATOR::operator->()); }
+
+    protected:
+        T * cast(ConfigGroup * group) { return dynamic_cast<T *>(group); }
+        const T * cast(ConfigGroup * group) const { return dynamic_cast<const T *>(group); }
+    };
+
+public:
+    typedef iterator_t<std::list<ConfigGroup *>::iterator> iterator;
+    typedef iterator_t<std::list<ConfigGroup *>::const_iterator> const_iterator;
+
+    iterator begin() { return iterator(m_children.begin()); }
+    const_iterator begin() const { return const_iterator(m_children.begin()); }
+    iterator end() { return iterator(m_children.end()); }
+    const_iterator end() const { return const_iterator(m_children.end()); }
+
+    T * push_back(const wxString & name)
+    {
+        // This constructor automatically adds it to m_children
+        return new T(this, name);
+    }
+
+    bool remove(const wxString & name_)
+    {
+        wxString name = m_name + _T("/") + name_;
+        m_cfg->GetConfig()->DeleteEntry(name);
+        std::list<ConfigGroup *>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); ++it)
+        {
+            if ((*it)->m_name == name)
+            {
+                ConfigGroup * group = *it;
+                m_children.erase(it);
+                delete group;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void clear()
+    {
+        // We own the pointers in m_children
+        std::list<ConfigGroup *>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); ++it)
+            delete *it;
+        m_children.clear();
+    }
+
+    bool empty() const { return m_children.empty(); }
+
+protected:
+    // Update m_children to reflect the current config state
+    virtual void UpdateLists()
+    {
+        clear();
+        wxConfigBase * cfg = m_cfg->GetConfig();
+        // Enumeration variables
+        long index;
+        wxString name;
+        cfg->SetPath(m_name);
+        if (cfg->GetFirstGroup(name, index))
+        {
+            do
+            {
+                push_back(name);
+            }
+            while (cfg->GetNextGroup(name, index));
+        }
+        cfg->SetPath(_T("/"));
+    }
 };
 
 
@@ -145,11 +300,20 @@ public:
     {
     }
 
-    void SetConfig(wxConfigBase * cfg) { m_config = cfg; }
+    void SetConfig(wxConfigBase * cfg)
+    {
+        m_config = cfg;
+        // If we have ConfigLists, update their values.
+        m_group.UpdateLists();
+    }
+    wxConfigBase * GetConfig() { return m_config; }
+    const wxConfigBase * GetConfig() const { return m_config; }
     void AutoUpdate(bool doit) { m_autoUpdate = doit; }
     bool AutoUpdate() const { return m_autoUpdate; }
+    const ConfigGroup & GetGroup() const { return m_group; }
 
     class ConversionError : public std::exception {};
+    class CopyError : public std::exception {};
 
 protected:
     // A little metaprogramming :)
@@ -176,7 +340,7 @@ protected:
     //              { return the native type converted to your type; }
 
     template <typename IN_T, typename OUT_T>
-    inline OUT_T Convert(const IN_T & val) { return val; }
+    inline OUT_T Convert(const IN_T & val) const { return val; }
 
 public:
     // Get and Set template functions.
@@ -184,7 +348,7 @@ public:
     // the proper conversion (if any) using the value type to the function.
 
     template <typename T>
-    inline T Get(const wxString & path, const T & default_val)
+    inline T Get(const wxString & path, const T & default_val) const
     {
         typename AdaptedType<T>::type ret;
         if (m_config->Read(path, &ret))
@@ -207,11 +371,40 @@ public:
     inline void Update(wxEvtHandler * h = NULL) { m_group.Update(h); }
     inline void RemoveCallbacks(wxEvtHandler * h) { m_group.RemoveCallbacks(h); }
 
+    inline void Copy(const ConfigManagerBase & other)
+    {
+        m_group.Copy(other.m_group);
+    }
+
 protected:
     wxConfigBase * m_config;
     bool m_autoUpdate;
     ConfigGroup m_group;
 };
+
+
+
+// ConfigGroup functions (that use ConfigManagerBase)
+
+inline void ConfigGroup::Copy(const ConfigGroup & other)
+{
+    if (m_name != other.m_name ||
+        m_children.size() != other.m_children.size())
+    {
+        throw ConfigManagerBase::CopyError();
+    }
+    // Iterate all the groups within and copy the values over
+    std::list<ConfigGroup *>::iterator group;
+    std::list<ConfigGroup *>::const_iterator otherGroup;
+    group = m_children.begin();
+    otherGroup = other.m_children.begin();
+    for (;
+        group != m_children.end();
+        ++group, ++otherGroup)
+    {
+        (*group)->Copy(**otherGroup);
+    }
+}
 
 
 /*  ***************************************************************************
@@ -264,7 +457,7 @@ public:
     }
 
     // Get and set functions
-    inline T Get() { return GetConfig()->Get(m_name, m_default); }
+    inline T Get() const { return GetConfig()->Get(m_name, m_default); }
 
     inline void Set(const T & val)
     {
@@ -275,7 +468,7 @@ public:
     }
 
     // operators that substitute for Get and Set
-    inline T operator()() { return Get(); }
+    inline T operator()() const { return Get(); }
     inline void operator=(const T & val) { Set(val); }
 
 
@@ -310,8 +503,18 @@ public:
         }
     }
 
+    // Copy values from other to this
+    inline void Copy(const ConfigGroup & other_)
+    {
+        const ConfigValue<T> * other = dynamic_cast<const ConfigValue<T> *>(&other_);
+        if (! other || m_name != other->m_name)
+            throw ConfigManagerBase::CopyError();
+        Set(other->Get());
+    }
+
 protected:
     ConfigManagerBase * GetConfig() { return m_cfg; }
+    const ConfigManagerBase * GetConfig() const { return m_cfg; }
     T m_default;
     typedef std::multimap<wxEvtHandler *, CallbackBase*> map_t;
     typedef std::pair<wxEvtHandler *, CallbackBase*> pair_t;
@@ -338,7 +541,7 @@ struct ConfigManagerBase::AdaptedType<wxFont> { typedef wxString type; };
 // Font to String conversion
 template <>
 inline wxString
-ConfigManagerBase::Convert<wxFont, wxString>(const wxFont & font)
+ConfigManagerBase::Convert<wxFont, wxString>(const wxFont & font) const
 {
     return font.GetNativeFontInfoDesc();
 }
@@ -346,7 +549,7 @@ ConfigManagerBase::Convert<wxFont, wxString>(const wxFont & font)
 // String to Font conversion
 template <>
 inline wxFont
-ConfigManagerBase::Convert<wxString, wxFont>(const wxString & str)
+ConfigManagerBase::Convert<wxString, wxFont>(const wxString & str) const
 {
     wxFont font;
     // We user to user NativeFontInfoUserDesc instead of NativeFontInfoDesc,
@@ -376,7 +579,7 @@ struct ConfigManagerBase::AdaptedType<wxColour> { typedef wxString type; };
 // Color to String conversion
 template <>
 inline wxString
-ConfigManagerBase::Convert<wxColour, wxString>(const wxColour & color)
+ConfigManagerBase::Convert<wxColour, wxString>(const wxColour & color) const
 {
     return color.GetAsString();
 }
@@ -384,7 +587,7 @@ ConfigManagerBase::Convert<wxColour, wxString>(const wxColour & color)
 // String to Color conversion
 template <>
 inline wxColour
-ConfigManagerBase::Convert<wxString, wxColour>(const wxString & str)
+ConfigManagerBase::Convert<wxString, wxColour>(const wxString & str) const
 {
     return wxColour(str);
 }
@@ -404,7 +607,7 @@ struct ConfigManagerBase::AdaptedType<wxPoint> { typedef wxString type; };
 // Point to String conversion
 template <>
 inline wxString
-ConfigManagerBase::Convert<wxPoint, wxString>(const wxPoint & pt)
+ConfigManagerBase::Convert<wxPoint, wxString>(const wxPoint & pt) const
 {
     return wxString::Format(_T("%d, %d"), pt.x, pt.y);
 }
@@ -412,7 +615,7 @@ ConfigManagerBase::Convert<wxPoint, wxString>(const wxPoint & pt)
 // String to Point conversion
 template <>
 inline wxPoint
-ConfigManagerBase::Convert<wxString, wxPoint>(const wxString & str)
+ConfigManagerBase::Convert<wxString, wxPoint>(const wxString & str) const
 {
     wxArrayString tokens = wxStringTokenize(str, _T(", "), wxTOKEN_STRTOK);
     long x, y;
