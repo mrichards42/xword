@@ -67,21 +67,13 @@ public:
     void SetLuaFormat(bool lua) { m_useLua = lua; UpdateLabel(); }
 
     // Format a label
-#if XWORD_USE_LUA
     static wxString FormatLabel(const wxString & str, MyFrame * frame, bool useLua = false);
-#else
-    static wxString FormatLabel(const wxString & str, MyFrame * frame);
-#endif
 
     // Get a metadata value
     static wxString GetMeta(const wxString & str, MyFrame * frame);
 
 protected:
-#if XWORD_USE_LUA
     wxString FormatLabel() { return FormatLabel(m_displayFormat, m_frame, m_useLua); }
-#else
-    wxString FormatLabel() { return FormatLabel(m_displayFormat, m_frame); }
-#endif
 
     wxString m_displayFormat;
     MyFrame * m_frame;
