@@ -31,7 +31,8 @@ public:
           Printing(&m_group),
           Timer(&m_group),
           FileHistory(&m_group),
-          autoSaveInterval(&m_group, _T("autoSaveInterval"), 0)
+          autoSaveInterval(&m_group, _T("autoSaveInterval"), 0),
+          MetadataCtrls(&m_group, _T("Metadata"))
     {}
 
     // Frame position
@@ -89,13 +90,13 @@ public:
         ConfigColor headingBackgroundColor;
     } Clue;
 
-    // Clue prompt
+    // Metadata
     class Metadata_t : public ConfigGroup {
     public:
         Metadata_t(ConfigGroup * parent,
             const wxString & name,
-            const wxString & displayFormat_,
-            bool useLua_ = true,
+            const wxString & displayFormat_ = wxEmptyString,
+            bool useLua_ = false,
             long alignment_ = wxALIGN_CENTER,
             const wxFont & font_ = *wxSWISS_FONT,
             const wxColour & foregroundColor_ = *wxBLACK,
@@ -109,6 +110,10 @@ public:
         ConfigLong alignment;
     };
 
+    typedef ConfigList<Metadata_t> MetadataCtrls_t;
+    MetadataCtrls_t MetadataCtrls;
+
+    // CluePrompt
     class CluePrompt_t : public Metadata_t {
     public:
         CluePrompt_t(ConfigGroup * parent);

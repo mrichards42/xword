@@ -731,6 +731,16 @@ MyFrame::ShowPuzzle(bool update)
     ShowNotes();
     ShowGrid();
 
+    // Update the metadata panels
+    wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
+    for (size_t i = 0; i < panes.size(); ++i)
+    {
+        wxAuiPaneInfo & pane = panes.Item(i);
+        MetadataCtrl * meta = wxDynamicCast(pane.window, MetadataCtrl);
+        if (meta)
+            meta->UpdateLabel();
+    }
+
     // Timer
     StopTimer();
     SetTime(m_puz.GetTime());
@@ -887,81 +897,19 @@ void
 MyFrame::ShowTitle()
 {
     if (! m_puz.IsOk())
-    {
         SetTitle(XWORD_APP_NAME);
-        m_title->UpdateLabel();
-    }
     else
-    {
         SetTitle(puz2wx(m_puz.GetTitle()) + _T(" - ") XWORD_APP_NAME);
-        m_title->UpdateLabel();
-    }
-    // Hide if there is no text
-    wxAuiPaneInfo & pane = m_mgr.GetPane(m_title);
-    if (m_title->GetLabel().empty())
-    {
-        if (pane.IsShown())
-        {
-            pane.Hide();
-            m_mgr.Update();
-        }
-    }
-    else
-    {
-        if (! pane.IsShown())
-        {
-            pane.Show();
-            m_mgr.Update();
-        }
-    }
 }
 
 void
 MyFrame::ShowAuthor()
 {
-    m_author->UpdateLabel();
-    // Hide if there is no text
-    wxAuiPaneInfo & pane = m_mgr.GetPane(m_author);
-    if (m_author->GetLabel().empty())
-    {
-        if (pane.IsShown())
-        {
-            pane.Hide();
-            m_mgr.Update();
-        }
-    }
-    else
-    {
-        if (! pane.IsShown())
-        {
-            pane.Show();
-            m_mgr.Update();
-        }
-    }
 }
 
 void
 MyFrame::ShowCopyright()
 {
-    m_copyright->UpdateLabel();
-    // Hide if there is no text
-    wxAuiPaneInfo & pane = m_mgr.GetPane(m_copyright);
-    if (m_copyright->GetLabel().empty())
-    {
-        if (pane.IsShown())
-        {
-            pane.Hide();
-            m_mgr.Update();
-        }
-    }
-    else
-    {
-        if (! pane.IsShown())
-        {
-            pane.Show();
-            m_mgr.Update();
-        }
-    }
 }
 
 
@@ -1020,25 +968,10 @@ MyFrame::CreateWindows()
 	m_XGridCtrl->SetDropTarget(new XWordFileDropTarget(this));
 #endif
 
-    m_title      = new MetadataCtrl(this, wxID_ANY, _T("%title%"));
-    m_author     = new MetadataCtrl(this, wxID_ANY, _T("%author%"));
-    m_copyright  = new MetadataCtrl(this, wxID_ANY, _T("%copyright%"));
     m_cluePrompt = new CluePrompt(this, wxID_ANY);
-
-#ifdef XWORD_USE_LUA // Custom author display script
-    m_author->SetDisplayFormat(
-        _T("if %author% then\n\
-                if %editor% then\n\
-                    return %author% .. ' / edited by ' .. %editor%\n\
-                else\n\
-                    return %author%\n\
-                end\n\
-            elseif %editor% then\n\
-                return 'Edited by ' .. %editor%\n\
-            end"));
-#endif
-
     m_notes      = new wxHtmlWindow(this, wxID_ANY);
+
+    // Metadata panels are created in LoadConfig
 
     if (m_toolMgr.GetIconLocation() != wxEmptyString)
     {
@@ -1286,8 +1219,6 @@ void
 MyFrame::ManageWindows()
 {
     // The default wxAuiPaneInfo.
-    // ** We have to "declare" all the buttons we want to use here
-    // or they won't ever show up!
     wxAuiPaneInfo baseInfo;
     baseInfo.CaptionVisible(false)
             .CloseButton()
@@ -1317,27 +1248,6 @@ MyFrame::ManageWindows()
                       .Name(_T("Tools")));
 #endif // USE_AUI_TOOLBAR
 
-    m_mgr.AddPane(m_title,
-                  wxAuiPaneInfo(baseInfo)
-                  .Layer(3)
-                  .Top()
-                  .Caption(_T("Title"))
-                  .Name(_T("Title")) );
-
-    m_mgr.AddPane(m_author,
-                  wxAuiPaneInfo(baseInfo)
-                  .Layer(3)
-                  .Top()
-                  .Caption(_T("Author"))
-                  .Name(_T("Author")) );
-
-    m_mgr.AddPane(m_copyright,
-                  wxAuiPaneInfo(baseInfo)
-                  .Layer(3)
-                  .Top()
-                  .Caption(_T("Copyright"))
-                  .Name(_T("Copyright")) );
-
     m_mgr.AddPane(m_cluePrompt,
                   wxAuiPaneInfo(baseInfo)
                   .BestSize(-1, 75)
@@ -1356,9 +1266,6 @@ MyFrame::ManageWindows()
                   .Name(_T("Notes")));
 
 #if USE_MY_AUI_MANAGER
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_title), m_title);
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_author), m_author);
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_copyright), m_copyright);
     m_mgr.SetContextWindow(m_mgr.GetPane(m_cluePrompt), m_cluePrompt);
 #endif
 }
@@ -1553,6 +1460,59 @@ MyFrame::LoadConfig()
     format.Replace(_T("%N"), _T("%cluenumber%"));
     format.Replace(_T("%T"), _T("%clue%"));
     config.CluePrompt.displayFormat = format;
+
+    // Load the Metadata panels
+    ConfigManager::MetadataCtrls_t & metadata = config.MetadataCtrls;
+    if (metadata.empty())
+    {
+        // If we have no metadata panels, create Title, Author, and Copyright
+        // panels.
+        // Title
+        ConfigManager::Metadata_t * title = metadata.push_back(_T("Title"));
+        title->displayFormat = _T("%title%");
+        // Author
+        ConfigManager::Metadata_t * author = metadata.push_back(_T("Author"));
+        author->displayFormat = _T("%author%");
+        // Copyright
+        ConfigManager::Metadata_t * copyright = metadata.push_back(_T("Copyright"));
+        copyright->displayFormat = _T("%copyright%");
+        // If we're using lua, make the author format smarter
+#if XWORD_USE_LUA
+        author->displayFormat =
+        _T("if %author% then\n\
+                if %editor% then\n\
+                    return %author% .. ' / edited by ' .. %editor%\n\
+                else\n\
+                    return %author%\n\
+                end\n\
+            elseif %editor% then\n\
+                return 'Edited by ' .. %editor%\n\
+            end");
+        author->useLua = true;
+#endif
+    }
+
+    // Add the panels to our configuration
+    ConfigManager::MetadataCtrls_t::iterator meta;
+    for (meta = metadata.begin(); meta != metadata.end(); ++meta)
+    {
+        MetadataCtrl * ctrl = new MetadataCtrl(
+            this, wxID_ANY, meta->displayFormat(),
+            wxDefaultPosition, wxDefaultSize,
+            meta->alignment() | (meta->useLua() ? META_USE_LUA : 0));
+        // Chop the metadata part of the name off
+        wxString name;
+        if (! meta->m_name.StartsWith(_T("/Metadata/"), &name))
+            name = meta->m_name;
+        m_mgr.AddPane(ctrl,
+                      wxAuiPaneInfo().Name(meta->m_name)
+                      .Caption(name).CaptionVisible(false)
+                      .CloseButton().Resizable(false).PaneBorder(false)
+                      .MinSize(15,15));
+#if USE_MY_AUI_MANAGER
+        m_mgr.SetContextWindow(m_mgr.GetPane(ctrl), ctrl);
+#endif
+    }
 
     // Update the config of our controls
     config.Update();
