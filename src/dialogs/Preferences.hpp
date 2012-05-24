@@ -20,28 +20,40 @@
 #define PREFERENCES_DLG_H
 
 #include "wxFB_Dialogs.h"
+#include "../config.hpp" // For ConfigManager
 
-class PreferencesDialog : public wxFB_PreferencesDialog
+class PreferencesDialog : public PreferencesDialogBase
 {
 public:
     PreferencesDialog(wxWindow * parent);
+    ~PreferencesDialog();
 
 protected:
     // Load the window / config states
     void LoadConfig();
     void SaveConfig();
+    void SetupStyleTree();
+    void SaveStyleTreeConfig();
 
     // Event Handlers
     virtual void OnInit(wxInitDialogEvent & evt)
-        { LoadConfig(); evt.Skip(); }
+        { LoadConfig(); SetupStyleTree(); evt.Skip(); }
     virtual void OnOK(wxCommandEvent & evt)
-        { SaveConfig(); GetParent()->Refresh(); evt.Skip(); }
+        { SaveConfig(); Close(); GetParent()->Refresh(); evt.Skip(); }
     virtual void OnApply(wxCommandEvent & evt)
         { SaveConfig(); GetParent()->Refresh(); evt.Skip(); }
+    virtual void OnCancel(wxCommandEvent & evt)
+        { Close(); evt.Skip(); }
+
+    virtual void OnClose(wxCloseEvent & evt) { Destroy(); }
 
     virtual void OnSaveFileHistory(wxCommandEvent & evt);
     virtual void OnPrintCustomFonts(wxCommandEvent & evt);
     virtual void OnBlackSquareBrightness(wxScrollEvent & evt);
+
+    virtual void OnStyleTreeSelection(wxTreeEvent & evt);
+
+    ConfigManager m_config;
 };
 
 

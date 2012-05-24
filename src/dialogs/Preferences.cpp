@@ -1,5 +1,5 @@
 // This file is part of XWord    
-// Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
+// Copyright (C) 2012 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -23,10 +23,24 @@
 #include "../XGridCtrl.hpp"
 #include "../widgets/SizedText.hpp"
 #include "../App.hpp" // For the ConfigManager
+#include "StyleEditors.hpp"
 
 PreferencesDialog::PreferencesDialog(wxWindow * parent)
-    : wxFB_PreferencesDialog(parent, wxID_ANY)
+    : PreferencesDialogBase(parent, wxID_ANY),
+      m_config()
 {
+    // Set a dummy config so that we can use this variable.
+    m_config.SetConfig(new wxFileConfig);
+    // Enumerate the font faces
+    FontFaceCtrl::InitFaceNames();
+}
+
+
+PreferencesDialog::~PreferencesDialog()
+{
+    delete m_config.GetConfig();
+    // Clear the font faces
+    FontFaceCtrl::ClearFaceNames();
 }
 
 //------------------------------------------------------------------------------
@@ -36,9 +50,16 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
 void
 PreferencesDialog::LoadConfig()
 {
+    try {
+        m_config.Copy(wxGetApp().GetConfigManager());
+    }
+    catch (ConfigManager::CopyError &) {
+        wxFAIL_MSG(_T("Error copying config"));
+        // Can't really do anything here . . .
+    }
+
     // Grid Style
-    ConfigManager & config = wxGetApp().GetConfigManager();
-    const int gridStyle = config.Grid.style();
+    const int gridStyle = m_config.Grid.style();
 
     if (gridStyle & MOVE_AFTER_LETTER)
     {
@@ -57,43 +78,11 @@ PreferencesDialog::LoadConfig()
     m_checkWhileTyping->SetValue((gridStyle & CHECK_WHILE_TYPING) != 0);
     m_strictRebus->SetValue((gridStyle & STRICT_REBUS) != 0);
 
-    // Colors
-    m_selectedLetterColor->SetColour(config.Grid.focusedLetterColor());
-    m_selectedWordColor  ->SetColour(config.Grid.focusedWordColor());
-    m_penColor           ->SetColour(config.Grid.penColor());
-    //m_pencilColor        ->SetColour(config.Grid.pcencilColor());
-    m_gridBackgroundColor->SetColour(config.Grid.backgroundColor());
-    m_whiteSquareColor   ->SetColour(config.Grid.whiteSquareColor());
-    m_blackSquareColor   ->SetColour(config.Grid.blackSquareColor());
-    m_gridSelectionColor ->SetColour(config.Grid.selectionColor());
-
-    m_cluePromptBackground->SetColour(config.CluePrompt.backgroundColor());
-    m_cluePromptText      ->SetColour(config.CluePrompt.foregroundColor());
-
-    m_clueBackground        ->SetColour(config.Clue.listBackgroundColor());
-    m_clueText              ->SetColour(config.Clue.listForegroundColor());
-    m_selectedClueBackground->SetColour(config.Clue.selectedBackgroundColor());
-    m_selectedClueText      ->SetColour(config.Clue.selectedForegroundColor());
-    m_crossingClueBackground->SetColour(config.Clue.crossingBackgroundColor());
-    m_crossingClueText      ->SetColour(config.Clue.crossingForegroundColor());
-    m_clueHeadingBackground  ->SetColour(config.Clue.headingBackgroundColor());
-    m_clueHeadingText       ->SetColour(config.Clue.headingForegroundColor());
-
-    // Fonts
-    m_gridLetterFont->SetSelectedFont(config.Grid.letterFont());
-    m_gridNumberFont->SetSelectedFont(config.Grid.numberFont());
-    m_clueFont      ->SetSelectedFont(config.Clue.font());
-    m_clueHeadingFont->SetSelectedFont(config.Clue.headingFont());
-    m_cluePromptFont->SetSelectedFont(config.CluePrompt.font());
-
     // Misc
-    m_cluePromptFormat->ChangeValue(config.CluePrompt.displayFormat());
-    m_letterScale->SetValue(config.Grid.letterScale());
-    m_numberScale->SetValue(config.Grid.numberScale());
-    m_lineThickness->SetValue(config.Grid.lineThickness());
+    m_cluePromptFormat->ChangeValue(m_config.CluePrompt.displayFormat());
 
     // Printing
-    ConfigManager::Printing_t & printing = config.Printing;
+    ConfigManager::Printing_t & printing = m_config.Printing;
     const long brightness = printing.blackSquareBrightness();
     m_printBlackSquareBrightness->SetValue(brightness);
     m_printBlackSquarePreview->SetBackgroundColour(
@@ -131,14 +120,14 @@ PreferencesDialog::LoadConfig()
     m_printClueFont->Enable(customFonts);
 
     // Timer
-    m_startTimer->SetValue(config.Timer.autoStart());
+    m_startTimer->SetValue(m_config.Timer.autoStart());
 
     // Auto Save
-    m_autoSave->SetValue(config.autoSaveInterval());
+    m_autoSave->SetValue(m_config.autoSaveInterval());
 
     // File History
-    m_saveFileHistory->SetValue(config.FileHistory.saveFileHistory());
-    m_reopenLastPuzzle->SetValue(config.FileHistory.reopenLastPuzzle());
+    m_saveFileHistory->SetValue(m_config.FileHistory.saveFileHistory());
+    m_reopenLastPuzzle->SetValue(m_config.FileHistory.reopenLastPuzzle());
 }
 
 
@@ -149,9 +138,6 @@ PreferencesDialog::LoadConfig()
 void
 PreferencesDialog::SaveConfig()
 {
-    ConfigManager & config = wxGetApp().GetConfigManager();
-    config.AutoUpdate(true);
-
     long gridStyle = 0;
     switch (m_afterLetter->GetSelection())
     {
@@ -175,46 +161,14 @@ PreferencesDialog::SaveConfig()
     if (m_strictRebus->GetValue())
         gridStyle |= STRICT_REBUS;
 
-    config.Grid.style = gridStyle;
-
-    // Colors
-    config.Grid.focusedLetterColor = m_selectedLetterColor->GetColour();
-    config.Grid.focusedWordColor = m_selectedWordColor->GetColour();
-    config.Grid.penColor = m_penColor->GetColour();
-    //config.Grid.pencilColor = m_pencilColor->GetColour();
-    config.Grid.backgroundColor = m_gridBackgroundColor->GetColour();
-    config.Grid.whiteSquareColor = m_whiteSquareColor->GetColour();
-    config.Grid.blackSquareColor = m_blackSquareColor->GetColour();
-    config.Grid.selectionColor = m_gridSelectionColor->GetColour();
-
-    config.CluePrompt.backgroundColor = m_cluePromptBackground->GetColour();
-    config.CluePrompt.foregroundColor = m_cluePromptText->GetColour();
-
-    config.Clue.listBackgroundColor = m_clueBackground->GetColour();
-    config.Clue.listForegroundColor = m_clueText->GetColour();
-    config.Clue.selectedBackgroundColor = m_selectedClueBackground->GetColour();
-    config.Clue.selectedForegroundColor = m_selectedClueText->GetColour();
-    config.Clue.crossingBackgroundColor = m_crossingClueBackground->GetColour();
-    config.Clue.crossingForegroundColor = m_crossingClueText->GetColour();
-    config.Clue.headingBackgroundColor = m_clueHeadingBackground->GetColour();
-    config.Clue.headingForegroundColor = m_clueHeadingText->GetColour();
-
-    // Fonts
-    config.Grid.letterFont = m_gridLetterFont->GetSelectedFont();
-    config.Grid.numberFont = m_gridNumberFont->GetSelectedFont();
-    config.Clue.font = m_clueFont->GetSelectedFont();
-    config.Clue.headingFont = m_clueHeadingFont->GetSelectedFont();
-    config.CluePrompt.font = m_cluePromptFont->GetSelectedFont();
+    m_config.Grid.style = gridStyle;
 
     // Misc
-    config.CluePrompt.displayFormat = m_cluePromptFormat->GetValue();
-    config.Grid.letterScale = m_letterScale->GetValue();
-    config.Grid.numberScale = m_numberScale->GetValue();
-    config.Grid.lineThickness = m_lineThickness->GetValue();
+    m_config.CluePrompt.displayFormat = m_cluePromptFormat->GetValue();
 
     // Printing settings
     //------------------
-    ConfigManager::Printing_t & printing = config.Printing;
+    ConfigManager::Printing_t & printing = m_config.Printing;
     printing.blackSquareBrightness = m_printBlackSquareBrightness->GetValue();
 
     // The alignment options
@@ -230,12 +184,17 @@ PreferencesDialog::SaveConfig()
     printing.Fonts.gridNumberFont = m_printGridNumberFont->GetSelectedFont();
     printing.Fonts.clueFont = m_printClueFont->GetSelectedFont();
 
-    config.Timer.autoStart = m_startTimer->GetValue();
-    config.autoSaveInterval = m_autoSave->GetValue();
+    m_config.Timer.autoStart = m_startTimer->GetValue();
+    m_config.autoSaveInterval = m_autoSave->GetValue();
 
     // File History
-    config.FileHistory.saveFileHistory = m_saveFileHistory->IsChecked();
-    config.FileHistory.reopenLastPuzzle = m_reopenLastPuzzle->IsChecked();
+    m_config.FileHistory.saveFileHistory = m_saveFileHistory->IsChecked();
+    m_config.FileHistory.reopenLastPuzzle = m_reopenLastPuzzle->IsChecked();
+
+    // If we have a selected styleTree panel, save that config too
+    SaveStyleTreeConfig();
+
+    wxGetApp().GetConfigManager().Copy(m_config);
 }
 
 //------------------------------------------------------------------------------
@@ -265,4 +224,121 @@ PreferencesDialog::OnSaveFileHistory(wxCommandEvent & evt)
     m_reopenLastPuzzle->Enable(evt.IsChecked());
     if (! evt.IsChecked())
         m_reopenLastPuzzle->SetValue(false);
+}
+
+
+//------------------------------------------------------------------------------
+// StyleTree
+//------------------------------------------------------------------------------
+#include "StylePanel.hpp"
+
+void
+PreferencesDialog::SetupStyleTree()
+{
+    wxTreeItemId root = m_styleTree->AddRoot(_T("All Styles"));
+
+    wxTreeItemId grid = m_styleTree->AppendItem(root, _T("Grid"));
+    m_styleTree->SetItemData(grid, new GridBaseStyle(m_config.Grid));
+
+    wxTreeItemId gridSelection = m_styleTree->AppendItem(grid, _T("Cursor/Selection"));
+    m_styleTree->SetItemData(gridSelection, new GridSelectionStyle(m_config.Grid));
+
+    wxTreeItemId gridTweaks = m_styleTree->AppendItem(grid, _T("Display Tweaks"));
+    m_styleTree->SetItemData(gridTweaks, new GridTweaksStyle(m_config.Grid));
+
+    wxTreeItemId cluePrompt = m_styleTree->AppendItem(root, _T("Clue Prompt"));
+    m_styleTree->SetItemData(cluePrompt, new CluePromptStyle(m_config.CluePrompt));
+
+    wxTreeItemId metaroot = m_styleTree->AppendItem(root, _T("Metadata"));
+
+    // Add the other metadata ctrls
+    ConfigManager::MetadataCtrls_t & metadata = m_config.MetadataCtrls;
+    ConfigManager::MetadataCtrls_t::iterator meta;
+    for (meta = metadata.begin(); meta != metadata.end(); ++meta)
+    {
+        // Chop the metadata part of the name off
+        wxString name;
+        if (! meta->m_name.StartsWith(_T("/Metadata/"), &name))
+            name = meta->m_name;
+        wxTreeItemId item = m_styleTree->AppendItem(metaroot, name);
+        m_styleTree->SetItemData(item, new MetadataStyle(*meta));
+    }
+
+    wxTreeItemId clueList = m_styleTree->AppendItem(root, _T("Clue List"));
+    m_styleTree->SetItemData(clueList, new ClueListStyle(m_config.Clue));
+
+    wxTreeItemId clueListSelection = m_styleTree->AppendItem(clueList, _T("Selected Clue"));
+    m_styleTree->SetItemData(clueListSelection, new ClueListSelectionStyle(m_config.Clue));
+
+    wxTreeItemId clueListCrossing = m_styleTree->AppendItem(clueList, _T("Crossing Clue"));
+    m_styleTree->SetItemData(clueListCrossing, new ClueListCrossingStyle(m_config.Clue));
+
+    wxTreeItemId clueListHeading = m_styleTree->AppendItem(clueList, _T("Heading"));
+    m_styleTree->SetItemData(clueListHeading, new ClueListHeadingStyle(m_config.Clue));
+
+    m_styleTree->ExpandAll();
+    m_styleTree->SelectItem(grid);
+}
+
+// Helper functions
+StyleBase * GetStyleData(wxTreeCtrl * ctrl, const wxTreeItemId & id)
+{
+    if (! id.IsOk())
+        return NULL;
+    return dynamic_cast<StyleBase *>(ctrl->GetItemData(id));
+}
+
+StyleBase * GetStyleData(wxTreeCtrl * ctrl)
+{
+    return GetStyleData(ctrl, ctrl->GetSelection());
+}
+
+void
+PreferencesDialog::OnStyleTreeSelection(wxTreeEvent & evt)
+{
+    m_stylePanel->Freeze();
+    // Destroy the old panel
+    if (! m_styleSizer->GetChildren().empty())
+    {
+        // If we had an old panel, save the config from it
+        StyleBase * data = GetStyleData(m_styleTree, evt.GetOldItem());
+        if (data)
+            data->SaveConfig();
+        m_styleSizer->Clear(true); // Clear and destroy windows
+    }
+
+    // Make a new one
+    wxWindow * newPanel = NULL;
+    // See if this item has a custom style panel associated with it.
+    StyleBase * data = GetStyleData(m_styleTree, evt.GetItem());
+    if (data)
+    {
+        // Update the colors
+        ColorChoice::ClearColors();
+        ColorChoice::InitColors(&m_config);
+        newPanel = data->NewStylePanel(m_stylePanel);
+        data->LoadConfig();
+    }
+    else
+    {
+        newPanel = new wxPanel(m_stylePanel, wxID_ANY);
+        wxSizer * hsizer = new wxBoxSizer(wxHORIZONTAL);
+        hsizer->Add(new wxStaticText(newPanel, wxID_ANY, _T("Select a window to configure")), 1, wxALIGN_CENTER);
+        wxSizer * vsizer = new wxBoxSizer(wxVERTICAL);
+        vsizer->Add(hsizer, 1, wxALIGN_CENTER);
+        newPanel->SetSizer(vsizer);
+    }
+
+    m_styleSizer->Add(newPanel, 1, wxEXPAND);
+
+    m_styleSizer->Layout();
+    m_stylePanel->Thaw();
+}
+
+void
+PreferencesDialog::SaveStyleTreeConfig()
+{
+    StyleBase * data = GetStyleData(m_styleTree);
+    if (data)
+        data->SaveConfig();
 }
