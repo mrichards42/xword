@@ -436,18 +436,18 @@ public:
         SetFaceName(m_config.CluePrompt.font, font);
 
         // Colors
-        wxColour bgColor = m_textColor->GetColor();
-        m_config.Clue.headingForegroundColor = bgColor;
-        m_config.Clue.listForegroundColor = bgColor;
-        m_config.Grid.penColor = bgColor;
-        m_config.CluePrompt.foregroundColor = bgColor;
+        wxColour fgColor = m_textColor->GetColor();
+        m_config.Clue.headingForegroundColor = fgColor;
+        m_config.Clue.listForegroundColor = fgColor;
+        m_config.Grid.penColor = fgColor;
+        m_config.CluePrompt.foregroundColor = fgColor;
 
-        wxColour fgColor = m_bgColor->GetColor();
-        m_config.Clue.listBackgroundColor = fgColor;
-        m_config.Clue.crossingBackgroundColor = fgColor;
-        m_config.Clue.selectedForegroundColor = fgColor;
-        m_config.Grid.backgroundColor = fgColor;
-        m_config.CluePrompt.backgroundColor = fgColor;
+        wxColour bgColor = m_bgColor->GetColor();
+        m_config.Clue.listBackgroundColor = bgColor;
+        m_config.Clue.crossingBackgroundColor = bgColor;
+        m_config.Clue.selectedForegroundColor = bgColor;
+        m_config.Grid.backgroundColor = bgColor;
+        m_config.CluePrompt.backgroundColor = bgColor;
 
         wxColour highlightColor = m_listHighlight->GetColor();
         m_config.Clue.selectedBackgroundColor = highlightColor;
