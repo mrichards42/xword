@@ -235,49 +235,68 @@ PreferencesDialog::OnSaveFileHistory(wxCommandEvent & evt)
 void
 PreferencesDialog::SetupStyleTree()
 {
+    m_styleTree->DeleteAllItems();
+
     wxTreeItemId root = m_styleTree->AddRoot(_T("All Styles"));
 
-    wxTreeItemId grid = m_styleTree->AppendItem(root, _T("Grid"));
-    m_styleTree->SetItemData(grid, new GridBaseStyle(m_config.Grid));
+    wxTreeItemId metaroot;
 
-    wxTreeItemId gridSelection = m_styleTree->AppendItem(grid, _T("Cursor/Selection"));
-    m_styleTree->SetItemData(gridSelection, new GridSelectionStyle(m_config.Grid));
-
-    wxTreeItemId gridTweaks = m_styleTree->AppendItem(grid, _T("Display Tweaks"));
-    m_styleTree->SetItemData(gridTweaks, new GridTweaksStyle(m_config.Grid));
-
-    wxTreeItemId cluePrompt = m_styleTree->AppendItem(root, _T("Clue Prompt"));
-    m_styleTree->SetItemData(cluePrompt, new CluePromptStyle(m_config.CluePrompt));
-
-    wxTreeItemId metaroot = m_styleTree->AppendItem(root, _T("Metadata"));
-
-    // Add the other metadata ctrls
-    ConfigManager::MetadataCtrls_t & metadata = m_config.MetadataCtrls;
-    ConfigManager::MetadataCtrls_t::iterator meta;
-    for (meta = metadata.begin(); meta != metadata.end(); ++meta)
+    if (m_config.useSimpleStyle())
     {
-        // Chop the metadata part of the name off
-        wxString name;
-        if (! meta->m_name.StartsWith(_T("/Metadata/"), &name))
-            name = meta->m_name;
-        wxTreeItemId item = m_styleTree->AppendItem(metaroot, name);
-        m_styleTree->SetItemData(item, new MetadataStyle(*meta));
+        wxTreeItemId styles = m_styleTree->AppendItem(root, _T("Styles"));
+        m_styleTree->SetItemData(styles, new SimpleStyle(m_config));
+        metaroot = m_styleTree->AppendItem(root, _T("Metadata"));
+        m_styleTree->SelectItem(styles);
+    }
+    else
+    {
+        wxTreeItemId grid = m_styleTree->AppendItem(root, _T("Grid"));
+        m_styleTree->SetItemData(grid, new GridBaseStyle(m_config.Grid));
+
+        wxTreeItemId gridSelection = m_styleTree->AppendItem(grid, _T("Cursor/Selection"));
+        m_styleTree->SetItemData(gridSelection, new GridSelectionStyle(m_config.Grid));
+
+        wxTreeItemId gridTweaks = m_styleTree->AppendItem(grid, _T("Display Tweaks"));
+        m_styleTree->SetItemData(gridTweaks, new GridTweaksStyle(m_config.Grid));
+
+        wxTreeItemId cluePrompt = m_styleTree->AppendItem(root, _T("Clue Prompt"));
+        m_styleTree->SetItemData(cluePrompt, new CluePromptStyle(m_config.CluePrompt));
+
+        metaroot = m_styleTree->AppendItem(root, _T("Metadata"));
+
+        wxTreeItemId clueList = m_styleTree->AppendItem(root, _T("Clue List"));
+        m_styleTree->SetItemData(clueList, new ClueListStyle(m_config.Clue));
+
+        wxTreeItemId clueListSelection = m_styleTree->AppendItem(clueList, _T("Selected Clue"));
+        m_styleTree->SetItemData(clueListSelection, new ClueListSelectionStyle(m_config.Clue));
+
+        wxTreeItemId clueListCrossing = m_styleTree->AppendItem(clueList, _T("Crossing Clue"));
+        m_styleTree->SetItemData(clueListCrossing, new ClueListCrossingStyle(m_config.Clue));
+
+        wxTreeItemId clueListHeading = m_styleTree->AppendItem(clueList, _T("Heading"));
+        m_styleTree->SetItemData(clueListHeading, new ClueListHeadingStyle(m_config.Clue));
+
+        m_styleTree->SelectItem(grid);
     }
 
-    wxTreeItemId clueList = m_styleTree->AppendItem(root, _T("Clue List"));
-    m_styleTree->SetItemData(clueList, new ClueListStyle(m_config.Clue));
-
-    wxTreeItemId clueListSelection = m_styleTree->AppendItem(clueList, _T("Selected Clue"));
-    m_styleTree->SetItemData(clueListSelection, new ClueListSelectionStyle(m_config.Clue));
-
-    wxTreeItemId clueListCrossing = m_styleTree->AppendItem(clueList, _T("Crossing Clue"));
-    m_styleTree->SetItemData(clueListCrossing, new ClueListCrossingStyle(m_config.Clue));
-
-    wxTreeItemId clueListHeading = m_styleTree->AppendItem(clueList, _T("Heading"));
-    m_styleTree->SetItemData(clueListHeading, new ClueListHeadingStyle(m_config.Clue));
+    // Metadata
+    if (metaroot.IsOk())
+    {
+        // Add the metadata ctrls
+        ConfigManager::MetadataCtrls_t & metadata = m_config.MetadataCtrls;
+        ConfigManager::MetadataCtrls_t::iterator meta;
+        for (meta = metadata.begin(); meta != metadata.end(); ++meta)
+        {
+            // Chop the metadata part of the name off
+            wxString name;
+            if (! meta->m_name.StartsWith(_T("/Metadata/"), &name))
+                name = meta->m_name;
+            wxTreeItemId item = m_styleTree->AppendItem(metaroot, name);
+            m_styleTree->SetItemData(item, new MetadataStyle(*meta));
+        }
+    }
 
     m_styleTree->ExpandAll();
-    m_styleTree->SelectItem(grid);
 }
 
 // Helper functions

@@ -218,7 +218,6 @@ protected:
     }
 };
 
-
 //----------------------------------------------------------------------------
 // A metadata ctrl
 //      Includes the basics plus display format.
@@ -405,6 +404,141 @@ void MetadataFormatHelpDialog::OnClose(wxCloseEvent & evt)
 // ---------------------------------------------------------------------------
 // Custom panels for each style
 // ---------------------------------------------------------------------------
+
+#include "../utils/color.hpp"
+
+// Simple style
+class SimpleStyle : public BasicStyle
+{
+public:
+    SimpleStyle(ConfigManager & config)
+        : BasicStyle(FP_FACENAME | STYLE_COLOR),
+          m_config(config)
+    {}
+
+    void LoadConfig()
+    {
+        m_font->SetSelectedFont(m_config.Grid.letterFont());
+        m_textColor->SetColor(m_config.Grid.penColor());
+        m_bgColor->SetColor(m_config.Grid.backgroundColor());
+        m_listHighlight->SetColor(m_config.Clue.selectedBackgroundColor());
+        m_gridHighlight->SetColor(m_config.Grid.focusedLetterColor());
+    }
+
+    void SaveConfig()
+    {
+        // Fonts
+        wxFont font = m_font->GetSelectedFont();
+        SetFaceName(m_config.Clue.font, font);
+        SetFaceName(m_config.Clue.headingFont, font);
+        SetFaceName(m_config.Grid.letterFont, font);
+        SetFaceName(m_config.Grid.numberFont, font);
+        SetFaceName(m_config.CluePrompt.font, font);
+
+        // Colors
+        wxColour bgColor = m_textColor->GetColor();
+        m_config.Clue.headingForegroundColor = bgColor;
+        m_config.Clue.listForegroundColor = bgColor;
+        m_config.Grid.penColor = bgColor;
+        m_config.CluePrompt.foregroundColor = bgColor;
+
+        wxColour fgColor = m_bgColor->GetColor();
+        m_config.Clue.listBackgroundColor = fgColor;
+        m_config.Clue.crossingBackgroundColor = fgColor;
+        m_config.Clue.selectedForegroundColor = fgColor;
+        m_config.Grid.backgroundColor = fgColor;
+        m_config.CluePrompt.backgroundColor = fgColor;
+
+        wxColour highlightColor = m_listHighlight->GetColor();
+        m_config.Clue.selectedBackgroundColor = highlightColor;
+        m_config.Clue.crossingForegroundColor = highlightColor;
+        m_config.Grid.selectionColor = highlightColor;
+
+        wxColour letterHighlight = m_gridHighlight->GetColor();
+        m_config.Grid.focusedLetterColor = letterHighlight;
+        m_config.Grid.focusedWordColor = GetWordHighlight(letterHighlight);
+
+        // Metadata
+        ConfigManager::MetadataCtrls_t & metadata = m_config.MetadataCtrls;
+        ConfigManager::MetadataCtrls_t::iterator meta;
+        for (meta = metadata.begin(); meta != metadata.end(); ++meta)
+        {
+            SetFaceName(meta->font, font);
+            meta->backgroundColor = bgColor;
+            meta->foregroundColor = fgColor;
+        }
+    }
+
+protected:
+    ConfigManager & m_config;
+
+    // Helper functions
+    static void SetFaceName(ConfigFont & cfg, const wxFont & font)
+    {
+        wxFont f(cfg.Get());
+        f.SetFaceName(font.GetFaceName());
+        cfg.Set(f);
+    }
+
+    static wxColour GetWordHighlight(const wxColour & letter)
+    {
+        // HSV isn't the best color model, but wxWidgets already has
+        // conversion functions, and it's at least better than trying to
+        // mess with RGB.
+        wxImage::RGBValue rgb(letter.Red(), letter.Green(), letter.Blue());
+        wxImage::HSVValue hsv = wxImage::RGBtoHSV(rgb);
+        // Numbers here were established by trial and error.
+        if (hsv.value < .3) // Dark colors
+        {
+            hsv.value += .2;
+        }
+        else if (hsv.saturation < .4) // Gray colors
+        {
+            if (hsv.saturation > .1) // If it's not too gray, saturate it
+                hsv.saturation += .2;
+            // Adjust value up or down
+            if (hsv.value < .5)
+                hsv.value += .2;
+            else
+                hsv.value -= .2;
+        }
+        else // "Colorful" colors (saturated and medium to high value)
+        {
+            // Adjust saturation up or down
+            if (hsv.saturation > .5)
+                hsv.saturation = std::max(0., hsv.saturation * .25);
+            else
+                hsv.saturation = std::min(1., hsv.saturation / .25);
+            // Adjust value up or down
+            if (hsv.value > .5)
+                hsv.value = std::max(0., hsv.value * .9);
+            else
+                hsv.value = std::min(1., hsv.value / .9);
+        }
+        rgb = wxImage::HSVtoRGB(hsv);
+        return wxColour(rgb.red, rgb.green, rgb.blue);
+    }
+
+    ColorChoice * m_listHighlight;
+    ColorChoice * m_gridHighlight;
+
+    virtual wxWindow * MakeStylePanel(wxWindow * parent)
+    {
+        wxWindow * panel = BasicStyle::MakeStylePanel(parent);
+        wxSizer * sizer = panel->GetSizer();
+
+        m_listHighlight = new ColorChoice(panel, wxID_ANY);
+        sizer->Add(new wxStaticText(panel, wxID_ANY, _T("List Highlight:")), 0, wxALIGN_CENTER_VERTICAL);
+        sizer->Add(m_listHighlight, 0, wxALIGN_CENTER_VERTICAL);
+
+        m_gridHighlight = new ColorChoice(panel, wxID_ANY);
+        sizer->Add(new wxStaticText(panel, wxID_ANY, _T("Grid Highlight:")), 0, wxALIGN_CENTER_VERTICAL);
+        sizer->Add(m_gridHighlight, 0, wxALIGN_CENTER_VERTICAL);
+
+        sizer->Layout();
+        return panel;
+    }
+};
 
 
 // Metadata

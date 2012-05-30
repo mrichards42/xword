@@ -32,7 +32,8 @@ public:
           Timer(&m_group),
           FileHistory(&m_group),
           autoSaveInterval(&m_group, _T("autoSaveInterval"), 0),
-          MetadataCtrls(&m_group, _T("Metadata"))
+          MetadataCtrls(&m_group, _T("Metadata")),
+          useSimpleStyle(&m_group, _T("useSimpleStyle"), true)
     {}
 
     // Frame position
@@ -171,6 +172,7 @@ public:
     } FileHistory;
 
     ConfigLong autoSaveInterval;
+    ConfigBool useSimpleStyle;
 };
 
 #endif // XWORD_CONFIG_H
