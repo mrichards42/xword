@@ -24,6 +24,7 @@
 #include "utils/timeit.hpp"
 #include "wx/graphics.h"
 #include <wx/mstream.h>
+#include "utils/color.hpp" // GetBrightness
 
 #define XWORD_USE_GC 0
 
@@ -428,6 +429,18 @@ XGridDrawer::DrawSquare(wxDC & adc,
     // If we are supposed to draw the outline, we'll draw the square with
     // the default square background, and then draw the outline using the
     // bgColor.
+
+    // Check the square background to see if this text color works
+    wxColour textColor = textColor_;
+    const bool lightBG = GetBrightness(bgColor) > 130,
+               lightFG = GetBrightness(textColor) > 130;
+    if (lightBG == lightFG)
+    {
+        // Invert the text color
+        textColor.Set(255 - textColor.Red(),
+                      255 - textColor.Green(),
+                      255 - textColor.Blue());
+    }
 
 #if wxUSE_GRAPHICS_CONTEXT && XWORD_USE_GC
     wxGCDC dc((wxWindowDC&)adc);
