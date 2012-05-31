@@ -52,6 +52,7 @@ protected:
     virtual void OnBlackSquareBrightness(wxScrollEvent & evt);
 
     virtual void OnStyleTreeSelection(wxTreeEvent & evt);
+    virtual void OnSimpleStyleButton(wxCommandEvent & evt);
 
     ConfigManager m_config;
 };

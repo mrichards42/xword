@@ -26,11 +26,11 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/treectrl.h>
+#include <wx/button.h>
 #include <wx/textctrl.h>
 #include "StyleEditors.hpp"
 #include <wx/slider.h>
 #include <wx/notebook.h>
-#include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/statline.h>
 #include <wx/frame.h>
@@ -63,6 +63,7 @@ class PreferencesDialogBase : public wxDialog
 		wxStaticText* m_staticText351;
 		wxPanel* styleTreePanel;
 		wxTreeCtrl* m_styleTree;
+		wxButton* m_simpleStyleButton;
 		wxPanel* m_stylePanel;
 		wxBoxSizer* m_styleSizer;
 		wxPanel* miscPanel;
@@ -83,6 +84,7 @@ class PreferencesDialogBase : public wxDialog
 		virtual void OnClose( wxCloseEvent& event ) = 0;
 		virtual void OnInit( wxInitDialogEvent& event ) = 0;
 		virtual void OnStyleTreeSelection( wxTreeEvent& event ) = 0;
+		virtual void OnSimpleStyleButton( wxCommandEvent& event ) = 0;
 		virtual void OnSaveFileHistory( wxCommandEvent& event ) = 0;
 		virtual void OnPrintCustomFonts( wxCommandEvent& event ) = 0;
 		virtual void OnBlackSquareBrightness( wxScrollEvent& event ) = 0;

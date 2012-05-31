@@ -129,10 +129,19 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	wxBoxSizer* treesizer;
 	treesizer = new wxBoxSizer( wxHORIZONTAL );
 	
+	wxBoxSizer* bSizer19;
+	bSizer19 = new wxBoxSizer( wxVERTICAL );
+	
 	m_styleTree = new wxTreeCtrl( styleTreePanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_FULL_ROW_HIGHLIGHT|wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_SINGLE );
 	m_styleTree->SetMinSize( wxSize( 130,-1 ) );
 	
-	treesizer->Add( m_styleTree, 0, wxALL|wxEXPAND, 5 );
+	bSizer19->Add( m_styleTree, 1, wxALL|wxEXPAND, 5 );
+	
+	m_simpleStyleButton = new wxButton( styleTreePanel, wxID_ANY, wxT("Show Advanced Options"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer19->Add( m_simpleStyleButton, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	
+	treesizer->Add( bSizer19, 0, wxEXPAND, 5 );
 	
 	m_stylePanel = new wxPanel( styleTreePanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	m_styleSizer = new wxBoxSizer( wxVERTICAL );
@@ -344,6 +353,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( PreferencesDialogBase::OnClose ) );
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PreferencesDialogBase::OnInit ) );
 	m_styleTree->Connect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( PreferencesDialogBase::OnStyleTreeSelection ), NULL, this );
+	m_simpleStyleButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnSimpleStyleButton ), NULL, this );
 	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnSaveFileHistory ), NULL, this );
 	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnPrintCustomFonts ), NULL, this );
 	m_printBlackSquareBrightness->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
@@ -365,6 +375,7 @@ PreferencesDialogBase::~PreferencesDialogBase()
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( PreferencesDialogBase::OnClose ) );
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PreferencesDialogBase::OnInit ) );
 	m_styleTree->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( PreferencesDialogBase::OnStyleTreeSelection ), NULL, this );
+	m_simpleStyleButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnSimpleStyleButton ), NULL, this );
 	m_saveFileHistory->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnSaveFileHistory ), NULL, this );
 	m_printCustomFonts->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnPrintCustomFonts ), NULL, this );
 	m_printBlackSquareBrightness->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PreferencesDialogBase::OnBlackSquareBrightness ), NULL, this );
