@@ -434,6 +434,7 @@ public:
         SetFaceName(m_config.Grid.letterFont, font);
         SetFaceName(m_config.Grid.numberFont, font);
         SetFaceName(m_config.CluePrompt.font, font);
+        SetFaceName(m_config.Notes.font, font);
 
         // Colors
         wxColour fgColor = m_textColor->GetColor();
@@ -441,6 +442,7 @@ public:
         m_config.Clue.listForegroundColor = fgColor;
         m_config.Grid.penColor = fgColor;
         m_config.CluePrompt.foregroundColor = fgColor;
+        m_config.Notes.foregroundColor = fgColor;
 
         wxColour bgColor = m_bgColor->GetColor();
         m_config.Clue.listBackgroundColor = bgColor;
@@ -448,6 +450,7 @@ public:
         m_config.Clue.selectedForegroundColor = bgColor;
         m_config.Grid.backgroundColor = bgColor;
         m_config.CluePrompt.backgroundColor = bgColor;
+        m_config.Notes.backgroundColor = bgColor;
 
         wxColour highlightColor = m_listHighlight->GetColor();
         m_config.Clue.selectedBackgroundColor = highlightColor;
@@ -615,6 +618,33 @@ protected:
     }
 };
 
+
+// Notes
+class NotesStyle : public BasicStyle
+{
+public:
+    NotesStyle(ConfigManager::Notes_t & config)
+        : BasicStyle(FP_FACENAME | STYLE_COLOR),
+          m_config(config)
+    {}
+
+    void LoadConfig()
+    {
+        m_font->SetSelectedFont(m_config.font());
+        m_textColor->SetColor(m_config.foregroundColor());
+        m_bgColor->SetColor(m_config.backgroundColor());
+    }
+
+    void SaveConfig()
+    {
+        m_config.font = m_font->GetSelectedFont();
+        m_config.foregroundColor = m_textColor->GetColor();
+        m_config.backgroundColor = m_bgColor->GetColor();
+    }
+
+protected:
+    ConfigManager::Notes_t & m_config;
+};
 
 
 // Clue List

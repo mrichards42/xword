@@ -280,6 +280,9 @@ PreferencesDialog::SetupStyleTree()
 
         metaroot = m_styleTree->AppendItem(root, _T("Metadata"));
 
+        wxTreeItemId notes = m_styleTree->AppendItem(metaroot, _T("Notes"));
+        m_styleTree->SetItemData(notes, new NotesStyle(m_config.Notes));
+
         m_styleTree->SelectItem(grid);
 
         m_simpleStyleButton->SetLabel(_T("Show Simple Options"));

@@ -38,6 +38,7 @@ class LayoutDialog;
 class PreferencesDialog;
 class wxHtmlWindow;
 class wxHtmlLinkEvent;
+class NotesPanel;
 
 class MyPrintout;
 class ConfigManager;
@@ -180,7 +181,7 @@ private:
     std::map<wxString, CluePanel *> m_clues;
 
     CluePrompt *  m_cluePrompt;
-    wxHtmlWindow * m_notes;
+    NotesPanel * m_notes;
 
 #ifdef USE_AUI_TOOLBAR
     wxAuiToolBar * m_toolbar;

@@ -46,7 +46,7 @@
 #include "CluePrompt.hpp"
 #include "XGridCtrl.hpp"
 #include "MyStatusBar.hpp"
-#include <wx/html/htmlwin.h>
+#include "NotesPanel.hpp"
 
 #ifdef XWORD_USE_LUA
 #   include "xwordlua.hpp"
@@ -969,7 +969,7 @@ MyFrame::CreateWindows()
 #endif
 
     m_cluePrompt = new CluePrompt(this, wxID_ANY);
-    m_notes      = new wxHtmlWindow(this, wxID_ANY);
+    m_notes      = new NotesPanel(this, wxID_ANY);
 
     // Metadata panels are created in LoadConfig
 
@@ -1443,6 +1443,7 @@ MyFrame::LoadConfig()
     g_pageSetupData->SetMarginBottomRight(wxPoint(margins.right(),
                                                   margins.bottom()));
 
+    // Misc
     config.Timer.autoStart.AddCallback(this, &MyFrame::SetAutoStartTimer);
     config.autoSaveInterval.AddCallback(this, &MyFrame::SetAutoSaveInterval);
 
