@@ -574,6 +574,29 @@ protected:
     ConfigManager::Metadata_t & m_config;
 };
 
+class SimpleMetadataStyle : public BasicStyle
+{
+public:
+    SimpleMetadataStyle(ConfigManager::Metadata_t & config)
+        : BasicStyle(STYLE_ALIGN),
+          m_config(config)
+    {}
+
+    void LoadConfig()
+    {
+        SetAlignment(m_config.alignment());
+    }
+
+    void SaveConfig()
+    {
+        m_config.alignment = GetAlignment();
+    }
+
+protected:
+    ConfigManager::Metadata_t & m_config;
+};
+
+
 // Clue Prompt
 class CluePromptStyle : public MetadataStyle
 {

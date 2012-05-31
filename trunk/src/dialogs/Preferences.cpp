@@ -235,18 +235,22 @@ PreferencesDialog::OnSaveFileHistory(wxCommandEvent & evt)
 void
 PreferencesDialog::SetupStyleTree()
 {
+    m_styleTree->Freeze();
     m_styleTree->DeleteAllItems();
 
     wxTreeItemId root = m_styleTree->AddRoot(_T("All Styles"));
 
     wxTreeItemId metaroot;
 
-    if (m_config.useSimpleStyle())
+    const bool simple = m_config.useSimpleStyle();
+    if (simple)
     {
         wxTreeItemId styles = m_styleTree->AppendItem(root, _T("Styles"));
         m_styleTree->SetItemData(styles, new SimpleStyle(m_config));
         metaroot = m_styleTree->AppendItem(root, _T("Metadata"));
         m_styleTree->SelectItem(styles);
+
+        m_simpleStyleButton->SetLabel(_T("Show Advanced Options"));
     }
     else
     {
@@ -258,11 +262,6 @@ PreferencesDialog::SetupStyleTree()
 
         wxTreeItemId gridTweaks = m_styleTree->AppendItem(grid, _T("Display Tweaks"));
         m_styleTree->SetItemData(gridTweaks, new GridTweaksStyle(m_config.Grid));
-
-        wxTreeItemId cluePrompt = m_styleTree->AppendItem(root, _T("Clue Prompt"));
-        m_styleTree->SetItemData(cluePrompt, new CluePromptStyle(m_config.CluePrompt));
-
-        metaroot = m_styleTree->AppendItem(root, _T("Metadata"));
 
         wxTreeItemId clueList = m_styleTree->AppendItem(root, _T("Clue List"));
         m_styleTree->SetItemData(clueList, new ClueListStyle(m_config.Clue));
@@ -276,7 +275,14 @@ PreferencesDialog::SetupStyleTree()
         wxTreeItemId clueListHeading = m_styleTree->AppendItem(clueList, _T("Heading"));
         m_styleTree->SetItemData(clueListHeading, new ClueListHeadingStyle(m_config.Clue));
 
+        wxTreeItemId cluePrompt = m_styleTree->AppendItem(root, _T("Clue Prompt"));
+        m_styleTree->SetItemData(cluePrompt, new CluePromptStyle(m_config.CluePrompt));
+
+        metaroot = m_styleTree->AppendItem(root, _T("Metadata"));
+
         m_styleTree->SelectItem(grid);
+
+        m_simpleStyleButton->SetLabel(_T("Show Simple Options"));
     }
 
     // Metadata
@@ -292,12 +298,27 @@ PreferencesDialog::SetupStyleTree()
             if (! meta->m_name.StartsWith(_T("/Metadata/"), &name))
                 name = meta->m_name;
             wxTreeItemId item = m_styleTree->AppendItem(metaroot, name);
-            m_styleTree->SetItemData(item, new MetadataStyle(*meta));
+            if (simple)
+                m_styleTree->SetItemData(item, new SimpleMetadataStyle(*meta));
+            else
+                m_styleTree->SetItemData(item, new MetadataStyle(*meta));
         }
     }
 
     m_styleTree->ExpandAll();
+    m_styleTree->Thaw();
 }
+
+void
+PreferencesDialog::OnSimpleStyleButton(wxCommandEvent & evt)
+{
+    bool simple = ! m_config.useSimpleStyle();
+    m_config.useSimpleStyle = simple;
+    // Copy this to the real config manager right away.
+    wxGetApp().GetConfigManager().useSimpleStyle = simple;
+    SetupStyleTree();
+}
+
 
 // Helper functions
 StyleBase * GetStyleData(wxTreeCtrl * ctrl, const wxTreeItemId & id)
