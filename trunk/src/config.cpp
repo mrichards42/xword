@@ -92,6 +92,13 @@ ConfigManager::CluePrompt_t::CluePrompt_t(ConfigGroup * parent)
     : Metadata_t(parent, _T("Clue Prompt"), _T("%cluenumber%. %clue%"), false)
 {}
 
+// Printing
+ConfigManager::Notes_t::Notes_t(ConfigGroup * parent)
+    : ConfigGroup(parent, _T("Notes")),
+      font(this, _T("font"), *wxSWISS_FONT),
+      foregroundColor(this, _T("foregroundColor"), *wxBLACK),
+      backgroundColor(this, _T("backgroundColor"), *wxWHITE)
+{}
 
 // Printing
 ConfigManager::Printing_t::Printing_t(ConfigGroup * parent)

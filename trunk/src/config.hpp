@@ -28,6 +28,7 @@ public:
           Grid(&m_group),
           Clue(&m_group),
           CluePrompt(&m_group),
+          Notes(&m_group),
           Printing(&m_group),
           Timer(&m_group),
           FileHistory(&m_group),
@@ -119,6 +120,16 @@ public:
     public:
         CluePrompt_t(ConfigGroup * parent);
     } CluePrompt;
+
+    // Notes
+    class Notes_t : public ConfigGroup {
+    public:
+        Notes_t(ConfigGroup * parent);
+
+        ConfigFont font;
+        ConfigColor foregroundColor;
+        ConfigColor backgroundColor;
+    } Notes;
 
     // Printing
     class Printing_t : public ConfigGroup {
