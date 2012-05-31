@@ -411,7 +411,7 @@ void
 XGridDrawer::DrawSquare(wxDC & adc,
                            const puz::Square & square,
                            const wxColour & bgColor,
-                           const wxColour & textColor)
+                           const wxColour & textColor_)
 {
     if (square.IsMissing())
         return;
