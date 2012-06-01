@@ -21,6 +21,8 @@
 #include <wx/config.h>
 #include <list>
 #include <map>
+#include <set>
+#include <algorithm>
 #include <wx/event.h> // wxEvtHandler, wxWindowDestroyEvent
 
 
@@ -115,7 +117,8 @@ public:
 
     virtual ~ConfigList()
     {
-        clear();
+        // Delete the pointers from m_children
+        clear(false);
     }
 
 public:
@@ -124,18 +127,48 @@ public:
     {
         if (m_name != other.m_name)
             throw ConfigManagerBase::CopyError();
-        clear();
+
+        // This is a bit of a convoluted process, since we need to avoid
+        // unnecessary deletion of the pointers in m_children (in case someone
+        // added a callback).
+
+        // Keep track of which entries we have copied
+        std::set<ConfigGroup *> entries(m_children.begin(), m_children.end());
+        // Copy the entires
         std::list<ConfigGroup *>::const_iterator it;
         for (it = other.m_children.begin(); it != other.m_children.end(); ++it)
         {
-            // Create a new entry
-            // Get the name of this entry by removing the prefix of the
-            // parent's name.
-            wxString name;
-            (*it)->m_name.StartsWith(other.m_name + _T("/"), &name);
-            T * entry = push_back(name);
-            // Fill it with values from the other config
-            entry->Copy(**it);
+            // Find the old entry
+            std::list<ConfigGroup *>::iterator old;
+            for (old = m_children.begin(); old != m_children.end(); ++old)
+            {
+                if ((*old)->m_name == (*it)->m_name)
+                {
+                    entries.erase(*old);
+                    (*old)->Copy(**it);
+                    break;
+                }
+            }
+            if (old == m_children.end()) // Not found
+            {
+                // Create a new entry
+                // Get the name of this entry by removing the prefix of the
+                // parent's name.
+                wxString name;
+                (*it)->m_name.StartsWith(other.m_name + _T("/"), &name);
+                T * entry = push_back(name);
+                // Fill it with values from the other config
+                entry->Copy(**it);
+            }
+        }
+        // Remove entries that were not copied
+        std::set<ConfigGroup *>::iterator old;
+        for (old = entries.begin(); old != entries.end(); ++old)
+        {
+            std::list<ConfigGroup *>::iterator item =
+                std::find(m_children.begin(), m_children.end(), *old);
+            if (item != m_children.end())
+                m_children.remove(*item);
         }
     }
 
@@ -174,9 +207,8 @@ public:
         return new T(this, name);
     }
 
-    bool remove(const wxString & name_)
+    bool remove(const wxString & name)
     {
-        wxString name = m_name + _T("/") + name_;
         m_cfg->GetConfig()->DeleteEntry(name);
         std::list<ConfigGroup *>::iterator it;
         for (it = m_children.begin(); it != m_children.end(); ++it)
@@ -192,12 +224,17 @@ public:
         return false;
     }
 
-    void clear()
+    void clear(bool delete_entries = true)
     {
-        // We own the pointers in m_children
         std::list<ConfigGroup *>::iterator it;
         for (it = m_children.begin(); it != m_children.end(); ++it)
+        {
+            // Remove from the config
+            if (delete_entries)
+                m_cfg->GetConfig()->DeleteEntry((*it)->m_name);
+            // We own the pointers in m_children
             delete *it;
+        }
         m_children.clear();
     }
 
@@ -207,7 +244,7 @@ protected:
     // Update m_children to reflect the current config state
     virtual void UpdateLists()
     {
-        clear();
+        clear(false);
         wxConfigBase * cfg = m_cfg->GetConfig();
         // Enumeration variables
         long index;
