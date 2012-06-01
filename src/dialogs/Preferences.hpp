@@ -36,8 +36,7 @@ protected:
     void SaveStyleTreeConfig();
 
     // Event Handlers
-    virtual void OnInit(wxInitDialogEvent & evt)
-        { LoadConfig(); SetupStyleTree(); evt.Skip(); }
+    virtual void OnInit(wxInitDialogEvent & evt);
     virtual void OnOK(wxCommandEvent & evt)
         { SaveConfig(); Close(); GetParent()->Refresh(); evt.Skip(); }
     virtual void OnApply(wxCommandEvent & evt)

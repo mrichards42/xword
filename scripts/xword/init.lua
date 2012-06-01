@@ -15,6 +15,7 @@ function xword.OnCleanup(func)
 end
 
 -- Require the xword packages
+require 'xword.config'
 require 'xword.menu'
 require 'xword.messages'
 require 'xword.pkgmgr'
