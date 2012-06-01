@@ -78,9 +78,6 @@ PreferencesDialog::LoadConfig()
     m_checkWhileTyping->SetValue((gridStyle & CHECK_WHILE_TYPING) != 0);
     m_strictRebus->SetValue((gridStyle & STRICT_REBUS) != 0);
 
-    // Misc
-    m_cluePromptFormat->ChangeValue(m_config.CluePrompt.displayFormat());
-
     // Printing
     ConfigManager::Printing_t & printing = m_config.Printing;
     const long brightness = printing.blackSquareBrightness();
@@ -162,9 +159,6 @@ PreferencesDialog::SaveConfig()
         gridStyle |= STRICT_REBUS;
 
     m_config.Grid.style = gridStyle;
-
-    // Misc
-    m_config.CluePrompt.displayFormat = m_cluePromptFormat->GetValue();
 
     // Printing settings
     //------------------
