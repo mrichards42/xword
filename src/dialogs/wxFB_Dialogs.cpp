@@ -91,29 +91,6 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	bSizer5->Add( sbSizer411, 0, wxEXPAND|wxALL, 5 );
 	
-	wxStaticBoxSizer* sbSizer4111;
-	sbSizer4111 = new wxStaticBoxSizer( new wxStaticBox( solvePanel, wxID_ANY, wxT("Auto Save") ), wxVERTICAL );
-	
-	wxBoxSizer* bSizer24;
-	bSizer24 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_staticText36 = new wxStaticText( solvePanel, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText36->Wrap( -1 );
-	bSizer24->Add( m_staticText36, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
-	
-	m_autoSave = new wxSpinCtrl( solvePanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), wxSP_ARROW_KEYS, 0, 99, 0 );
-	bSizer24->Add( m_autoSave, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
-	m_staticText351 = new wxStaticText( solvePanel, wxID_ANY, wxT("seconds (0 = disabled)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText351->Wrap( -1 );
-	bSizer24->Add( m_staticText351, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-	
-	
-	sbSizer4111->Add( bSizer24, 1, wxEXPAND, 5 );
-	
-	
-	bSizer5->Add( sbSizer4111, 0, wxEXPAND|wxALL, 5 );
-	
 	
 	bSizer3->Add( bSizer5, 1, wxALL|wxEXPAND, 5 );
 	
@@ -161,6 +138,9 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	bsizer26->Fit( styleTreePanel );
 	m_notebook->AddPage( styleTreePanel, wxT("Styles"), false );
 	miscPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizer20;
+	bSizer20 = new wxBoxSizer( wxVERTICAL );
+	
 	wxBoxSizer* bSizer42;
 	bSizer42 = new wxBoxSizer( wxVERTICAL );
 	
@@ -175,71 +155,47 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	sbSizer22->Add( m_reopenLastPuzzle, 0, wxALL, 5 );
 	
 	
-	bSizer42->Add( sbSizer22, 1, wxEXPAND|wxALL, 5 );
+	bSizer42->Add( sbSizer22, 0, wxALL|wxEXPAND, 5 );
 	
-	wxStaticBoxSizer* sbSizer13;
-	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("Clue prompt format") ), wxVERTICAL );
+	wxStaticBoxSizer* sbSizer4111;
+	sbSizer4111 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("Auto Save") ), wxVERTICAL );
 	
-	wxFlexGridSizer* fgSizer1;
-	fgSizer1 = new wxFlexGridSizer( 2, 2, 3, 5 );
-	fgSizer1->AddGrowableCol( 1 );
-	fgSizer1->SetFlexibleDirection( wxBOTH );
-	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxStaticText* m_staticText23;
-	m_staticText23 = new wxStaticText( miscPanel, wxID_ANY, wxT("Format:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText23->Wrap( -1 );
-	fgSizer1->Add( m_staticText23, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticText36 = new wxStaticText( miscPanel, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText36->Wrap( -1 );
+	bSizer24->Add( m_staticText36, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
-	m_cluePromptFormat = new wxTextCtrl( miscPanel, wxID_ANY, wxT("<center>%N. %T</center>"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer1->Add( m_cluePromptFormat, 0, wxEXPAND, 5 );
+	m_autoSave = new wxSpinCtrl( miscPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), wxSP_ARROW_KEYS, 0, 99, 0 );
+	bSizer24->Add( m_autoSave, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
-	
-	sbSizer13->Add( fgSizer1, 0, wxALL|wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer12;
-	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( miscPanel, wxID_ANY, wxT("Format help") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer2;
-	fgSizer2 = new wxFlexGridSizer( 2, 4, 0, 0 );
-	fgSizer2->AddGrowableCol( 1 );
-	fgSizer2->AddGrowableCol( 3 );
-	fgSizer2->SetFlexibleDirection( wxBOTH );
-	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticText* m_staticText32;
-	m_staticText32 = new wxStaticText( miscPanel, wxID_ANY, wxT("%T"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText32->Wrap( -1 );
-	fgSizer2->Add( m_staticText32, 0, wxALL, 5 );
-	
-	wxStaticText* m_staticText33;
-	m_staticText33 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue text"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText33->Wrap( -1 );
-	fgSizer2->Add( m_staticText33, 0, wxALL, 5 );
-	
-	wxStaticText* m_staticText34;
-	m_staticText34 = new wxStaticText( miscPanel, wxID_ANY, wxT("%N"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText34->Wrap( -1 );
-	fgSizer2->Add( m_staticText34, 0, wxALL, 5 );
-	
-	wxStaticText* m_staticText35;
-	m_staticText35 = new wxStaticText( miscPanel, wxID_ANY, wxT("Clue number"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText35->Wrap( -1 );
-	fgSizer2->Add( m_staticText35, 0, wxALL, 5 );
+	m_staticText351 = new wxStaticText( miscPanel, wxID_ANY, wxT("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText351->Wrap( -1 );
+	bSizer24->Add( m_staticText351, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	
 	
-	sbSizer12->Add( fgSizer2, 1, wxEXPAND, 5 );
+	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticText17 = new wxStaticText( miscPanel, wxID_ANY, wxT("Set to 0 to disable auto save"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText17->Wrap( -1 );
+	m_staticText17->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 90, false, wxEmptyString ) );
+	
+	bSizer24->Add( m_staticText17, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	sbSizer13->Add( sbSizer12, 0, wxEXPAND|wxALL, 5 );
+	sbSizer4111->Add( bSizer24, 1, wxEXPAND, 5 );
 	
 	
-	bSizer42->Add( sbSizer13, 0, wxEXPAND|wxALL, 10 );
+	bSizer42->Add( sbSizer4111, 0, wxEXPAND|wxALL, 5 );
 	
 	
-	miscPanel->SetSizer( bSizer42 );
+	bSizer20->Add( bSizer42, 1, wxEXPAND, 5 );
+	
+	
+	miscPanel->SetSizer( bSizer20 );
 	miscPanel->Layout();
-	bSizer42->Fit( miscPanel );
+	bSizer20->Fit( miscPanel );
 	m_notebook->AddPage( miscPanel, wxT("Misc"), false );
 	printPanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer371;
@@ -262,7 +218,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer5->Add( m_staticText144, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_printGridLetterFont = new FontPanel(printPanel, wxID_ANY, wxNullFont, FP_DEFAULT & ~ FP_POINTSIZE);
-	fgSizer5->Add( m_printGridLetterFont, 0, wxALL, 5 );
+	fgSizer5->Add( m_printGridLetterFont, 0, 0, 5 );
 	
 	wxStaticText* m_printGridNumberFontLabel;
 	m_printGridNumberFontLabel = new wxStaticText( printPanel, wxID_ANY, wxT("Grid Numbers:"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -270,7 +226,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer5->Add( m_printGridNumberFontLabel, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_printGridNumberFont = new FontPanel(printPanel, wxID_ANY, wxNullFont, FP_DEFAULT & ~ FP_POINTSIZE);
-	fgSizer5->Add( m_printGridNumberFont, 0, wxALL, 5 );
+	fgSizer5->Add( m_printGridNumberFont, 0, 0, 5 );
 	
 	wxStaticText* m_staticText1412;
 	m_staticText1412 = new wxStaticText( printPanel, wxID_ANY, wxT("Clues:"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -278,13 +234,13 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer5->Add( m_staticText1412, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_printClueFont = new FontPanel(printPanel, wxID_ANY);
-	fgSizer5->Add( m_printClueFont, 0, wxALL, 5 );
+	fgSizer5->Add( m_printClueFont, 0, 0, 5 );
 	
 	
 	sbSizer14->Add( fgSizer5, 1, wxALL|wxEXPAND, 5 );
 	
 	
-	bSizer371->Add( sbSizer14, 0, wxEXPAND|wxALL, 5 );
+	bSizer371->Add( sbSizer14, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer58;
 	bSizer58 = new wxBoxSizer( wxHORIZONTAL );

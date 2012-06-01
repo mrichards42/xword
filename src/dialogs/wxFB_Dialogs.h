@@ -19,19 +19,19 @@
 #include <wx/checkbox.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
-#include <wx/stattext.h>
-#include <wx/spinctrl.h>
 #include <wx/panel.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/treectrl.h>
 #include <wx/button.h>
-#include <wx/textctrl.h>
+#include <wx/stattext.h>
+#include <wx/spinctrl.h>
 #include "StyleEditors.hpp"
 #include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/dialog.h>
+#include <wx/textctrl.h>
 #include <wx/statline.h>
 #include <wx/frame.h>
 
@@ -58,9 +58,6 @@ class PreferencesDialogBase : public wxDialog
 		wxCheckBox* m_strictRebus;
 		wxCheckBox* m_moveOnRightClick;
 		wxCheckBox* m_startTimer;
-		wxStaticText* m_staticText36;
-		wxSpinCtrl* m_autoSave;
-		wxStaticText* m_staticText351;
 		wxPanel* styleTreePanel;
 		wxTreeCtrl* m_styleTree;
 		wxButton* m_simpleStyleButton;
@@ -69,7 +66,10 @@ class PreferencesDialogBase : public wxDialog
 		wxPanel* miscPanel;
 		wxCheckBox* m_saveFileHistory;
 		wxCheckBox* m_reopenLastPuzzle;
-		wxTextCtrl* m_cluePromptFormat;
+		wxStaticText* m_staticText36;
+		wxSpinCtrl* m_autoSave;
+		wxStaticText* m_staticText351;
+		wxStaticText* m_staticText17;
 		wxPanel* printPanel;
 		wxCheckBox* m_printCustomFonts;
 		FontPanel * m_printGridLetterFont;
