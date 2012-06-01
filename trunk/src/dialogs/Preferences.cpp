@@ -24,6 +24,7 @@
 #include "../widgets/SizedText.hpp"
 #include "../App.hpp" // For the ConfigManager
 #include "StyleEditors.hpp"
+#include "../xwordlua.hpp"
 
 PreferencesDialog::PreferencesDialog(wxWindow * parent)
     : PreferencesDialogBase(parent, wxID_ANY),
@@ -41,6 +42,35 @@ PreferencesDialog::~PreferencesDialog()
     delete m_config.GetConfig();
     // Clear the font faces
     FontFaceCtrl::ClearFaceNames();
+}
+
+extern int wxluatype_wxNotebook;
+
+void PreferencesDialog::OnInit(wxInitDialogEvent & evt)
+{
+    LoadConfig();
+    SetupStyleTree();
+#if XWORD_USE_LUA
+    // Add preferences pages from lua
+    MyFrame * frame = wxDynamicCast(GetParent(), MyFrame);
+    wxASSERT(frame);
+    if (frame)
+    {
+        wxLuaState & lua = frame->GetwxLuaState();
+        lua_State * L = lua.GetLuaState();
+        // Find the function xword.OnInitPreferencesDialog
+        lua_getglobal(L, "xword");
+        lua_getfield(L, -1, "OnInitPreferencesDialog");
+        if (lua_isfunction(L, -1))
+        {
+            // Call the function with our notebook argument
+            if (wxluaT_pushuserdatatype(L, m_notebook, wxluatype_wxNotebook))
+                lua_pcall(L, 1, 0, 0);
+        }
+        lua_pop(L, 1); // remove the xword table from the stack
+    }
+#endif
+    evt.Skip();
 }
 
 //------------------------------------------------------------------------------
