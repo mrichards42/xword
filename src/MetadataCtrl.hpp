@@ -45,7 +45,7 @@ public:
         Create(parent, id, displayFormat, position, size, style, name);
     }
 
-    ~MetadataCtrl();
+    virtual ~MetadataCtrl();
 
     bool Create(wxWindow * parent,
                 wxWindowID id,
