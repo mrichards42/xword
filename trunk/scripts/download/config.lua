@@ -697,7 +697,13 @@ function download.get_config_panel(parent)
     return panel
 end
 
-xword.AddPreferencesPanel("Downloader", download.get_config_panel)
+xword.AddPreferencesPanel(
+    "Downloader",
+    download.get_config_panel,
+    function (panel)
+        panel:apply()
+        download.save_config()
+    end)
 
 function download.show_config_dialog(parent)
     xword.showerrors = false
