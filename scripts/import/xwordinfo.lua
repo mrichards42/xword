@@ -54,6 +54,8 @@ function import.xwordinfoJSON(p, filename)
     end
     p.Author = doc.author
     p.Copyright = doc.copyright
+    p:SetMeta("editor", doc.editor)
+
     -- Add the copyright symbol (utf8)
     if #p.Copyright > 0 then p.Copyright = "\194\169 " .. p.Copyright end
     p.Notes = doc.notepad or ""
