@@ -73,9 +73,7 @@ public:
     bool HasLuaLog() const;
 #endif // XWORD_USE_LUA
 
-#ifdef __WXMSW__
-    void ShowHelp() { m_help.DisplayContents(); }
-#endif // __WXMSW__
+    void ShowHelp();
 
 private:
     void OnActivate(wxActivateEvent & evt);
