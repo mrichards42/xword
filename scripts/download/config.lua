@@ -83,6 +83,7 @@ for _, name in ipairs(basic_options) do
 end
 
 -- Previous view
+if not config.previous_view then config.previous_view = {} end
 if config.previous_view.start_date then
     config.previous_view.start_date = date(config.previous_view.start_date)
 end
