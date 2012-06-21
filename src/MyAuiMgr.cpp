@@ -414,10 +414,10 @@ MyAuiManager::ConstrainPanes(std::list<wxAuiPaneInfo *> & panes)
 {
     // Map docks to the pane they contain
     typedef std::list<wxAuiPaneInfo *> pane_list_t;
-    typedef std::map<wxAuiDockInfo *, pane_list_t> clue_map_t;
-    clue_map_t clue_docks;
-    // This is the sum of the average size of a pane in the each dock
-    // with only clue panes.  Thus, when adjusting the individual dock sizes,
+    typedef std::map<wxAuiDockInfo *, pane_list_t> dock_map_t;
+    dock_map_t dock_map;
+    // This is the sum of the average size of a pane in each dock
+    // Thus, when adjusting the individual dock sizes,
     // we will set dock_size = avg_dock_size * panes_in_this_dock
     int total_dock_size = 0;
     int dock_count = 0;
@@ -427,10 +427,10 @@ MyAuiManager::ConstrainPanes(std::list<wxAuiPaneInfo *> & panes)
         {
             wxAuiPaneInfo * pane = *it;
             wxAuiDockInfo & dock = FindDock(*pane);
-            pane_list_t & list = clue_docks[&dock];
+            pane_list_t & list = dock_map[&dock];
             list.push_back(pane);
-            // If all the panes in this dock are ClueLists, add the
-            // size of this dock to the total
+            // If all the panes in this dock are in the constrained panes list,
+            // add the size of this dock to the total dock size
             if (list.size() == dock.panes.Count())
             {
                 total_dock_size += (dock.size / list.size());
@@ -439,12 +439,12 @@ MyAuiManager::ConstrainPanes(std::list<wxAuiPaneInfo *> & panes)
         }
     }
 
-    // Adjust the dock size for docks with only ClueLists
+    // Adjust the dock size
     if (dock_count > 1)
     {
-        clue_map_t::iterator it;
+        dock_map_t::iterator it;
         int average_dock_size = total_dock_size / dock_count;
-        for (it = clue_docks.begin(); it != clue_docks.end(); ++it)
+        for (it = dock_map.begin(); it != dock_map.end(); ++it)
         {
             if (it->first->panes.Count() == it->second.size())
                 it->first->size = average_dock_size * it->second.size();
@@ -452,8 +452,8 @@ MyAuiManager::ConstrainPanes(std::list<wxAuiPaneInfo *> & panes)
     }
 
     // Adjust the proportion of panes in the docks
-    clue_map_t::iterator it;
-    for (it = clue_docks.begin(); it != clue_docks.end(); ++it)
+    dock_map_t::iterator it;
+    for (it = dock_map.begin(); it != dock_map.end(); ++it)
     {
         const int pane_count = it->second.size();
         if (pane_count < 2)
