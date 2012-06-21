@@ -1765,6 +1765,8 @@ XGridCtrl::HitTest(int x, int y, int * col, int * row)
 puz::Square *
 XGridCtrl::HitTest(int x, int y)
 {
+    if (IsEmpty())
+        return NULL;
     int col, row;
     HitTest(x, y, &col, &row);
     if (   0 <= col && col < m_grid->GetWidth()
