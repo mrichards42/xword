@@ -779,6 +779,13 @@ MyFrame::ShowGrid()
 void
 MyFrame::ShowClues()
 {
+    const bool no_clues = m_puz.GetClues().empty();
+    if (no_clues) // Fake clue lists for the layout
+    {
+        m_puz.SetClueList(puzT("Across"), puz::ClueList(puzT("Across")));
+        m_puz.SetClueList(puzT("Down"), puz::ClueList(puzT("Down")));
+    }
+
     // Remove the old clue lists from m_clues, but keep the windows alive
     std::map<wxString, CluePanel *> old_panels; // AUI_name = CluePanel *
     {
@@ -871,6 +878,8 @@ MyFrame::ShowClues()
             // Set the heading and clue list for the panel
             clues->SetHeading(label);
             clues->SetClueList(&it->second);
+            if (no_clues)
+                clues->ClearClueList();
             m_clues[label] = clues;
 #if USE_MY_AUI_MANAGER
             m_mgr.SetContextWindow(m_mgr.GetPane(clues), clues->m_heading);
@@ -887,6 +896,9 @@ MyFrame::ShowClues()
             it->second->Destroy();
         }
     }
+
+    if (no_clues)
+        m_puz.GetClues().clear();
 
     // Update the UI
     UpdateCluePanelConfig();

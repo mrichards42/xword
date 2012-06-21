@@ -125,8 +125,7 @@ void ClueListBox::OnLeftDown(wxMouseEvent & evt)
 
 void ClueListBox::OnSelection(wxCommandEvent & evt)
 {
-    const int count = m_clues->size();
-    if (count <= evt.GetSelection())
+    if (m_clues && m_clues->size() <= evt.GetSelection())
     {
         InvalidateCache();
         RefreshAll();

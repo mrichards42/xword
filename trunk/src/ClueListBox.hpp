@@ -57,7 +57,7 @@ public:
     virtual ~ClueListBox() {}
 
     void SetClueList(puz::ClueList * clues);
-    void ClearClueList();
+    void ClearClueList() { SetClueList(NULL); }
 
     puz::Clue * GetClue()
     {
@@ -129,15 +129,6 @@ inline void ClueListBox::SetClueList(puz::ClueList * clues)
 {
     m_clues = clues;
     InvalidateCache();
-    SetItemCount(m_clues->size());
-    RefreshAll();
-}
-
-inline void ClueListBox::ClearClueList()
-{
-    m_clues = NULL;
-    InvalidateCache();
-    SetItemCount(0);
     RefreshAll();
 }
 
