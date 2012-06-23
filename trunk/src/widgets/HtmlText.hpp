@@ -86,6 +86,8 @@ public:
         Refresh();
     }
 
+    wxString GetPlainLabel() const;
+
     virtual void SetAlignment(long alignment)
     {
         SetWindowStyle(GetWindowStyle() & ~ wxALIGN_MASK | alignment);

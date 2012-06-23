@@ -32,9 +32,7 @@
     // %override void ShowClues()
 
     void ShowClues()
-    void ShowTitle()
-    void ShowAuthor()
-    void ShowCopyright()
+    void ShowMetadata()
     void ShowNotes()
 
     // %override bool LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler = NULL)

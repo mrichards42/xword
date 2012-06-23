@@ -26,6 +26,8 @@
 // MyAuiManager
 // ----------------------------------------------------------------
 
+typedef std::list<wxAuiPaneInfo *> pane_list_t;
+
 BEGIN_EVENT_TABLE(MyAuiManager, wxAuiManager)
     EVT_AUI_PANE_BUTTON    (MyAuiManager::OnPaneButton)
     EVT_CONTEXT_MENU       (MyAuiManager::OnContextMenu)
@@ -361,13 +363,14 @@ MyAuiManager::Update()
     wxAuiPaneInfo & focused_pane = FindPane(wxWindow::FindFocus());
     for (size_t i = 0; i < m_panes.Count(); ++i)
         SavePaneSize(m_panes.Item(i));
-    // Force Clue panes to be the same size
-    std::list<wxAuiPaneInfo *> horizontal_clue_panes;
-    std::list<wxAuiPaneInfo *> vertical_clue_panes;
+
+    // Adjust various pane sizes
+    pane_list_t horizontal_clue_panes;
+    pane_list_t vertical_clue_panes;
     for (size_t i = 0; i < m_panes.Count(); ++i)
     {
         wxAuiPaneInfo & pane = m_panes.Item(i);
-        if (pane.name.StartsWith(_T("ClueList")))
+        if (pane.name.StartsWith(_T("ClueList"))) // ClueLists
         {
             if (pane.dock_direction == wxAUI_DOCK_TOP ||
                 pane.dock_direction == wxAUI_DOCK_BOTTOM)
@@ -380,6 +383,7 @@ MyAuiManager::Update()
             }
         }
     }
+    // Make ClueLists the same size
     ConstrainPanes(horizontal_clue_panes);
     ConstrainPanes(vertical_clue_panes);
 
@@ -413,7 +417,6 @@ void
 MyAuiManager::ConstrainPanes(std::list<wxAuiPaneInfo *> & panes)
 {
     // Map docks to the pane they contain
-    typedef std::list<wxAuiPaneInfo *> pane_list_t;
     typedef std::map<wxAuiDockInfo *, pane_list_t> dock_map_t;
     dock_map_t dock_map;
     // This is the sum of the average size of a pane in each dock

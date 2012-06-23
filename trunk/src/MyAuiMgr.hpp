@@ -122,6 +122,9 @@ public:
     wxAuiPaneInfo & FindPane(wxWindow * window);
     wxAuiPaneInfo & FindPane(int id);
 
+    // Find the dock this pane is in
+    wxAuiDockInfo & FindDock(wxAuiPaneInfo & info);
+
 protected:
     // Close Event
     bool FireCloseEvent(wxAuiPaneInfo & pane);
@@ -131,9 +134,6 @@ protected:
     wxAuiPaneInfo & HitTestPane(int x, int y);
     wxAuiFloatingFrame* CreateFloatingFrame(wxWindow* parent,
                                             const wxAuiPaneInfo& pane_info);
-
-    // Utils
-    wxAuiDockInfo & FindDock(wxAuiPaneInfo & info);
 
     // Menu
     wxMenu * m_menu;

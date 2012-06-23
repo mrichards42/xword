@@ -725,21 +725,9 @@ MyFrame::ShowPuzzle(bool update)
 
     // Update the GUI
     ShowClues();
-    ShowAuthor();
-    ShowTitle();
-    ShowCopyright();
     ShowNotes();
     ShowGrid();
-
-    // Update the metadata panels
-    wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
-    for (size_t i = 0; i < panes.size(); ++i)
-    {
-        wxAuiPaneInfo & pane = panes.Item(i);
-        MetadataCtrl * meta = wxDynamicCast(pane.window, MetadataCtrl);
-        if (meta)
-            meta->UpdateLabel();
-    }
+    ShowMetadata();
 
     // Timer
     StopTimer();
@@ -747,9 +735,9 @@ MyFrame::ShowPuzzle(bool update)
     if (m_puz.IsTimerRunning())
         StartTimer();
 
+    Thaw();
     if (update)
         m_mgr.Update();
-    Thaw();
 }
 
 void
@@ -906,22 +894,67 @@ MyFrame::ShowClues()
 
 
 void
-MyFrame::ShowTitle()
+MyFrame::ShowMetadata()
 {
+    // Set window title
     if (! m_puz.IsOk())
         SetTitle(XWORD_APP_NAME);
     else
         SetTitle(puz2wx(m_puz.GetTitle()) + _T(" - ") XWORD_APP_NAME);
-}
 
-void
-MyFrame::ShowAuthor()
-{
-}
 
-void
-MyFrame::ShowCopyright()
-{
+    // Update the metadata panels and adjust the size of panels
+    // proportionate to the length of their contents.
+    typedef std::vector<wxAuiPaneInfo *> pane_vector_t;
+    std::map<wxAuiDockInfo *, pane_vector_t> metadata_map;
+
+    wxAuiPaneInfoArray & panes = m_mgr.GetAllPanes();
+    for (size_t i = 0; i < panes.size(); ++i)
+    {
+        wxAuiPaneInfo & pane = panes.Item(i);
+        MetadataCtrl * meta = wxDynamicCast(pane.window, MetadataCtrl);
+        if (meta)
+        {
+            meta->UpdateLabel();
+            if (meta)
+            {
+                wxAuiDockInfo & dock = m_mgr.FindDock(pane);
+                metadata_map[&dock].push_back(&pane);
+            }
+        }
+    }
+
+    // Adjust sizes of MetadataCtrls
+    wxClientDC test_dc(this);
+    std::map<wxAuiDockInfo *, pane_vector_t>::iterator it;
+    for (it = metadata_map.begin(); it != metadata_map.end(); ++it)
+    {
+        pane_vector_t & panes = it->second;
+        // Calculate the total size of metadata panes in this dock
+        std::vector<int> widths;
+        int total_width = 0;
+        int total_proportion = 0;
+        for (size_t i = 0; i < panes.size(); ++i)
+        {
+            // This is a safe cast: we already know the type of window
+            wxAuiPaneInfo & pane = *panes[i];
+            MetadataCtrl * meta = (MetadataCtrl *)(pane.window);
+            int w, h;
+            test_dc.GetTextExtent(meta->GetPlainLabel(), &w, &h);
+            widths.push_back(w);
+            total_width += w;
+            total_proportion += pane.dock_proportion;
+        }
+        if (total_width <= 0 || total_proportion <= 0)
+            continue;
+        // Adjust the proportion based on calculated widths
+        for (size_t i = 0; i < panes.size(); ++i)
+        {
+            int proportion = total_proportion * (widths[i] / (double)total_width);
+            panes[i]->dock_proportion = std::max(proportion, 1);
+            ++i;
+        }
+    }
 }
 
 

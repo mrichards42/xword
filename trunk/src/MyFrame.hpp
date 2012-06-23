@@ -96,9 +96,7 @@ public:
     void ShowPuzzle(bool update = true); // Everything
     void ShowGrid();
     void ShowClues();
-    void ShowAuthor();
-    void ShowTitle();
-    void ShowCopyright();
+    void ShowMetadata();
     void ShowNotes();
 
     puz::Puzzle & GetPuzzle() { return m_puz; }
