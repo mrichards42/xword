@@ -26,6 +26,7 @@
 
 #include "../html/parse.hpp"
 #include <wx/html/winpars.h>
+#include <wx/tooltip.h>
 
 // this hack forces the linker to always link in m_* files
 #include <wx/html/forcelnk.h>
@@ -246,6 +247,12 @@ wxString ToText(wxHtmlContainerCell * container)
         cell = cell->GetNext();
     }
     return text;
+}
+
+wxString HtmlText::GetPlainLabel() const
+{
+    wxToolTip * tip = GetToolTip();
+    return tip ? tip->GetTip() : wxEmptyString;
 }
 
 
