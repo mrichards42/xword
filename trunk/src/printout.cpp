@@ -237,7 +237,7 @@ MyPrintout::GetHTML()
     wxString html;
 
     // Title
-    if (! m_puz->HasMeta(puzT("title")))
+    if (m_puz->HasMeta(puzT("title")))
     {
         SetFontSize(dc, base_font_size, 2);
         html << _T("<font size=\"+2\"><b>") 
@@ -246,7 +246,7 @@ MyPrintout::GetHTML()
                 << _T("<br>");
     }
     // Author
-    if (! m_puz->HasMeta(puzT("author")))
+    if (m_puz->HasMeta(puzT("author")))
     {
         SetFontSize(dc, base_font_size, 1);
         html << _T("<font size=\"+1\">")
