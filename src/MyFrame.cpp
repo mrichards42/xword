@@ -1274,7 +1274,7 @@ MyFrame::ManageWindows()
     // Give everything a name so we can save and load the layout
     m_mgr.AddPane(m_XGridCtrl,
                   wxAuiPaneInfo(baseInfo)
-                  .CenterPane()
+                  .Center()
                   .Caption(_T("Grid"))
                   .Name(_T("Grid")) );
 
@@ -1563,7 +1563,7 @@ MyFrame::LoadConfig()
                       wxAuiPaneInfo().Name(meta->m_name)
                       .Caption(name).CaptionVisible(false)
                       .CloseButton().Resizable(false).PaneBorder(false)
-                      .MinSize(15,15));
+                      .MinSize(25,25).Top().Layer(10));
 #if USE_MY_AUI_MANAGER
         m_mgr.SetContextWindow(m_mgr.GetPane(ctrl), ctrl);
 #endif
