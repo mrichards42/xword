@@ -73,6 +73,7 @@ enum GridStyle
 
 enum CorrectStatus
 {
+    UNCHECKABLE_PUZZLE = -2,
     INCOMPLETE_PUZZLE = -1,
     INCORRECT_PUZZLE, // = false
     CORRECT_PUZZLE // = true

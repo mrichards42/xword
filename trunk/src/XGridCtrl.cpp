@@ -301,27 +301,48 @@ XGridCtrl::UnscrambleSolution(unsigned short key)
     return success;
 }
 
+
+// Helper for IsCorrect and GetStats
+CorrectStatus GetCorrectStatus(const puz::Grid * grid, bool correct)
+{
+    // We *can* test scrambled puzzles!  Not sure why I didn't think of
+    // this before.  (Inspired by Alex Boisvert:
+    // http://alexboisvert.com/software.html#check)
+    if (correct)
+    {
+        return CORRECT_PUZZLE;
+    }
+    else if (grid->IsScrambled())
+    {
+        if (grid->CheckScrambledGrid())
+            return CORRECT_PUZZLE;
+        else
+            return INCORRECT_PUZZLE;
+    }
+    else if (! grid->HasSolution())
+    {
+        return UNCHECKABLE_PUZZLE;
+    }
+    else
+    {
+        return CORRECT_PUZZLE;
+    }
+}
+
 CorrectStatus
 XGridCtrl::IsCorrect() const
 {
     bool strictRebus = HasStyle(STRICT_REBUS);
-    bool incorrect = false;
+    bool correct = true;
     puz::Square * square;
     for (square = m_grid->First(); square != NULL; square = square->Next())
     {
         if (square->IsBlank())
             return INCOMPLETE_PUZZLE;
         else if (! square->Check(puz::NO_CHECK_BLANK, strictRebus))
-            incorrect = true;
+            correct = false;
     }
-    // We *can* test scrambled puzzles!  Not sure why I didn't think of
-    // this before.  (Inspired by Alex Boisvert:
-    // http://alexboisvert.com/software.html#check)
-    if (incorrect
-        || (m_grid->IsScrambled() && ! m_grid->CheckScrambledGrid()))
-        return INCORRECT_PUZZLE;
-    else
-        return CORRECT_PUZZLE;
+    return GetCorrectStatus(m_grid, correct);
 }
 
 void
@@ -332,7 +353,7 @@ XGridCtrl::GetStats(GridStats * stats) const
     stats->white = 0;
 
     bool strictRebus = HasStyle(STRICT_REBUS);
-    bool incorrect = false;
+    bool correct = true;
     puz::Square * square;
     for (square = m_grid->First(); square != NULL; square = square->Next())
     {
@@ -346,12 +367,11 @@ XGridCtrl::GetStats(GridStats * stats) const
             if (square->IsBlank())
             {
                 ++stats->blank;
-                stats->correct = INCOMPLETE_PUZZLE;
             }
-            else if (stats->blank == 0 && ! incorrect
+            else if (stats->blank == 0 && correct
                      && ! square->Check(puz::NO_CHECK_BLANK, strictRebus))
             {
-                incorrect = true;
+                correct = false;
             }
         }
     }
@@ -359,13 +379,9 @@ XGridCtrl::GetStats(GridStats * stats) const
     // this before.  (Inspired by Alex Boisvert:
     // http://alexboisvert.com/software.html#check)
     if (stats->blank == 0)
-    {
-        if (incorrect
-            || (m_grid->IsScrambled() && ! m_grid->CheckScrambledGrid()))
-            stats->correct = INCORRECT_PUZZLE;
-        else
-            stats->correct = CORRECT_PUZZLE;
-    }
+        stats->correct = GetCorrectStatus(m_grid, correct);
+    else
+        stats->correct = INCOMPLETE_PUZZLE;
 }
 
 //-------------------------------------------------------
