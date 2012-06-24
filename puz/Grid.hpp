@@ -192,7 +192,7 @@ public:
     // Scrambling
     bool ScrambleSolution  (unsigned short key = 0);
     bool UnscrambleSolution(unsigned short key);
-    bool CheckScrambledGrid();
+    bool CheckScrambledGrid() const;
 
     unsigned short  GetKey()   const { return m_key; }
     unsigned short  GetCksum() const { return m_cksum; }

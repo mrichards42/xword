@@ -753,8 +753,9 @@ MyFrame::ShowGrid()
         // Enable / disable scrambling tools
         m_toolMgr.Enable(ID_SCRAMBLE,   ! scrambled);
         m_toolMgr.Enable(ID_UNSCRAMBLE, scrambled);
-        EnableCheck(! scrambled);
-        EnableReveal(! scrambled);
+        const bool can_check = scrambled || ! m_puz.GetGrid().HasSolution();
+        EnableCheck(! can_check);
+        EnableReveal(! can_check);
 
         m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite());
     }
@@ -982,13 +983,19 @@ MyFrame::CheckPuzzle()
             m_status->SetAlert(_T("The puzzle is filled correctly!"),
                               *wxWHITE, *wxGREEN);
             break;
+        case UNCHECKABLE_PUZZLE:
+            StopTimer();
+            m_status->SetAlert(
+                _T("The puzzle is completely filled."),
+                *wxWHITE, *wxCYAN);
+            break;
         case INCORRECT_PUZZLE:
             m_status->SetAlert(
                 _T("The puzzle contains incorrect letters."),
                 *wxWHITE, *wxRED);
             break;
-        default:
         case INCOMPLETE_PUZZLE:
+        default:
             m_status->SetAlert(wxString::Format(_T("%d/%d filled (%d%%)"),
                 stats.white - stats.blank, stats.white,
                 int((100 * (stats.white - stats.blank) + .5) / stats.white)));

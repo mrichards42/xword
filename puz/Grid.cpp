@@ -286,7 +286,7 @@ Grid::UnscrambleSolution(unsigned short key)
 
 
 bool
-Grid::CheckScrambledGrid()
+Grid::CheckScrambledGrid() const
 {
     return Scrambler::CheckUserGrid(*this);
 }

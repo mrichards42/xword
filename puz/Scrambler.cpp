@@ -381,9 +381,9 @@ Scrambler::GetUserGridDown()
 
 
 bool
-Scrambler::CheckUserGrid(Grid & grid)
+Scrambler::CheckUserGrid(const Grid & grid)
 {
-    Scrambler scrambler(grid);
+    Scrambler scrambler(const_cast<Grid &>(grid));
     unsigned short cksum =
             Checksummer::cksum_region(scrambler.GetUserGridDown(), 0);
     return cksum == grid.GetCksum();

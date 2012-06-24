@@ -38,7 +38,7 @@ public:
     bool UnscrambleSolution(unsigned short key_int);
 
     // Check a scrambled grid to see if it is correct
-    static bool CheckUserGrid(Grid & grid);
+    static bool CheckUserGrid(const Grid & grid);
 
 private:
     Grid & m_grid;
