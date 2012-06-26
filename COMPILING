@@ -15,6 +15,11 @@ Unzip to a folder.  I'll pretend you unzipped to /Developer/wxMac-2.8.12
     $ mkdir build-release
     $ cd build-release
 
+(Optional)
+    Copy files in trunk/wxpatches to their respective locations in
+    /Developer/wxMac...
+    These files are improvements/changes to wxAUI for XWord
+
 If building on snow leopard, tell it to build 32-bit
     $ arch_flags="-arch i386"
     $ ../configure --enable-unicode --disable-shared CFLAGS="$arch_flags" CXXFLAGS="$arch_flags" CPPFLAGS="$arch_flags" LDFLAGS="$arch_flags" OBJCFLAGS="$arch_flags" OBJCXXFLAGS="$arch_flags"
