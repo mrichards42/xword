@@ -2,10 +2,10 @@ Entering Letters in the Grid
 ----------------------------
 
 To enter a letter into a square, [navigate](navigation.html) to the square and
-type a letter.
-The focused word is highlighted in one color, and the focused square is
-highlighted in a different color.  Unless configured otherwise, the focused
-square will move to the next square in the current word when a letter is typed.
+type a letter. The focused word is highlighted in one color, and the focused
+square is highlighted in a different color.  Unless
+[configured](preferences.html#solving_preferences) otherwise, the focused square
+will move to the next square in the current word when a letter is typed.
 
 XWord supports entering any printable character[^1] in a square, including
 symbols, however certain puzzle formats (such as .puz) only support a limited
@@ -32,17 +32,13 @@ Some puzzles require multiple letters to be entered in a square.
 1. Enter rebus mode by pressing `INSERT`, clicking the rebus toolbar icon, or
    selecting `Enter Multiple Letters` from the
    [`Solution`](window.html#solution_menu) menu.
-2. Type multiple letters.
-    - `BACKSPACE` can be used to remove letters (from the end).
-    - `DELETE` will remove letters from the beginning.
-    - `CTRL+BACKSPACE` or `CTRL+DELETE` will delete all letters in the square.
+2. An expandable text box will appear in which you can type multiple letters.
 3. Press `INSERT` or `ENTER` to exit rebus mode (the cursor will become
    solid again).
 
-Rebus entries longer than 4 characters are wrapped.  Entries longer than 10
-characters are truncated (for display only; XWord supports unlimited rebus
-entry length).  If the mouse is hovered over a rebus entry, a tool tip will
-pop up and display the entire entry (useful for truncated entries).
+For display, rebus entries longer than 4 characters are wrapped and entries
+longer than 10 characters are truncated.  If the mouse is hovered over a rebus
+entry, a tool tip will pop up and display the entire entry.
 
 ![Image of filling a rebus entry](images/rebus.png "Filling a rebus entry")
 
@@ -56,8 +52,7 @@ support entering Webdings symbols.
 
 ### Circles ###
 
-As a legacy holdover from Across Lite, typing an asterisk (\*) will toggle a
-circle in the current square.
+Typing an asterisk (\*) will toggle a circle in the current square.
 
 
 [^1]: A few reserved characters are not allowed to be entered as text: <code>: . [ </code>and<code> *</code>

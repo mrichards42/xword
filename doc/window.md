@@ -15,16 +15,19 @@ The Main Window
 <div style="position:absolute; left:8px; top:31px; width:31px; height:17px;">
     <a href="#file_menu" title="File Menu"></a>
 </div>
-<div style="position:absolute; left:42px; top:31px; width:34px; height:17px;">
+<div style="position:absolute; left:42px; top:31px; width:31px; height:17px;">
+    <a href="#edit_menu" title="Edit Menu"></a>
+</div>
+<div style="position:absolute; left:76px; top:31px; width:34px; height:17px;">
     <a href="#view_menu" title="View Menu"></a>
 </div>
-<div style="position:absolute; left:80px; top:31px; width:54px; height:17px;">
+<div style="position:absolute; left:114px; top:31px; width:54px; height:17px;">
     <a href="#solution_menu" title="Solution Menu"></a>
 </div>
-<div style="position:absolute; left:139px; top:31px; width:39px; height:17px;">
+<div style="position:absolute; left:173px; top:31px; width:39px; height:17px;">
     <a href="#tools_menu" title="Tools Menu"></a>
 </div>
-<div style="position:absolute; left:182px; top:31px; width:34px; height:17px;">
+<div style="position:absolute; left:215px; top:31px; width:34px; height:17px;">
     <a href="#help_menu" title="Help Menu"></a>
 </div>
 <div style="position:absolute; left:9px; top:52px; width:27px; height:29px;">
@@ -58,7 +61,7 @@ The Main Window
     <a href="#clue_prompt" title="Clue Prompt"></a>
 </div>
 <div style="position:absolute; left:221px; top:83px; width:358px; height:38px;">
-    <a href="#title_author_copyright" title="Title, Author, and Copyright"></a>
+    <a href="#metadata" title="Metadata"></a>
 </div>
 <div style="position:absolute; left:248px; top:325px; width:48px; height:25px;">
     <a href="check.html" title="Incorrect Letters"></a>
@@ -98,22 +101,24 @@ the clue prompt will have a tooltip with the current clue.
 
 XWord supports unlimited clue lists, though the vast majority of puzzles will
 have just Across and Down clues.  Clues with text that exceeds the boundary
-of the clue list will be wrapped.  The currently focused clue is highlighted,
+of the clue list is wrapped.  The currently focused clue is highlighted,
 and the clue that crosses the focused letter is highlighted in a different
 color.  Clicking on a clue in a clue list will make that clue the focused word.
 
-#### Title, Author, Copyright ####
+#### Metadata ####
 
-If a puzzle contains a title, the author's name, or a copyright, these will be
-displayed in their own panes.
+Information about the puzzle is displayed in user-configurable metadata panels.
+XWord ships with panels to display title, author, and copyright.  The actual
+information that is displayed in these panels can be configured using the
+[advanced styles](preferences.html#advanced_styles) preferences page.
+
 
 #### Notes ####
 
-Notes are read-only and can contain simple xhtml formatting.  Show and hide the
+Notes are read-only and can contain simple XHTML formatting.  Show and hide the
 notes window using the [`View`](#view_menu) menu, the toolbar buttons, or the
-[context menu](layout.html#context_menu) or
-[close button](layout.html#pane_buttons) on the pane.  If a puzzle has notes,
-the toolbar icon will turn yellow.
+[context menu](layout.html#context_menu).  If a puzzle has notes, the toolbar
+icon turns yellow.
 
 
 ### File Menu ###
@@ -132,14 +137,19 @@ downloader [package](packages.html).
 Puzzles can be saved by selecting `Save` or `Save As` from the `File` menu,
 or by clicking on the `Save Puzzle` toolbar button.  If no modifications have
 been made to the puzzle, the `Save Puzzle` toolbar button will be disabled.
-XWord can also be set to [auto save](preferences.html#auto_save) puzzles after
-a certain amount of time.
+XWord can also be set to [auto save](preferences.html#miscellaneous_preferences)
+puzzles after a certain amount of time.
 
 #### Printing Puzzles ####
 
 XWord prints puzzles on a single page, attempting to achieve the correct
 balance between readable clues and a large grid.  Puzzles can be printed with
 a blank grid, as currently solved, or with the solution.
+
+
+### Edit Menu ###
+
+The edit menu contains menu items for copying and pasting words and squares.
 
 
 ### View Menu ###
@@ -197,6 +207,7 @@ the following:
 
 - The filename
 - Solving [time](#timer)
-- When the puzzle is filled in, a section of the status bar will display a
-  message and change color depending on whether the puzzle is correct or not.
+- Solving status: when the puzzle is filled in, this section of the status bar
+  will display a message and change color depending on whether the puzzle is
+  correct or not.  While solving it displays percent completion.
 - Errors encountered in [packages](packages.html)
