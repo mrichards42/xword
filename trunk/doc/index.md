@@ -21,7 +21,7 @@ XWord Overview
 - Clues in directions (and shapes) other than straight Across and Down
 - Formatted clue text
 - Background images
-- Puzzles with [scrambled](window.html#unscrambling) solutions
+- Puzzles with [scrambled](window.html#unscrambling) or missing solutions
 - [Notes](window.html#notes)
 
 
@@ -30,10 +30,9 @@ XWord Overview
 - A [timer](window.html#timer)
 - [Checking and revealing](check.html) letters
 - [Printing](window.html#printing_puzzles)
-- [Autosaving](preferences.html#auto_save)
+- [Autosaving](preferences.html#miscellaneous_preferences)
 - Many [configuration](preferences.html) options, including
-    - [Colors](preferences.html#color_preferences) in the grid and clue list
-    - [Fonts](preferences.html#font_preferences)
+    - [Fonts and colors](preferences.html#styles)
     - Grid navigation / [solving](preferences.html#solving_preferences) behavior
     - [Window layout](layout.html)
 - [Extensible](packages.html) via the Lua programming language.

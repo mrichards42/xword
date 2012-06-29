@@ -15,62 +15,40 @@ and auto saving.
 #### Strict rebus checking ####
 
 - If this box is checked, squares with [rebus entries](solving.html#rebus_entries)
-  for solutions will only be counted as correct if the user enters a
-  matching rebus entry.
+  for solutions will only be counted as correct if you enter a matching rebus
+  entry.
 - If this box is unchecked, squares with rebus entries for solutions will
-  also be counted as correct if the user enters only the first letter
-  of the correct rebus entry.
-
-#### Auto save ####
-
-Auto save puzzles (if they are not temporary files) X seconds after the
-last letter was filled into the grid.  Auto save is disabled if this value is 0.
+  also be marked correct if you enter the first letter of the correct rebus entry.
 
 
-### Color Preferences ###
+### Styles ###
 
-The Color preferences page allows the user to change nearly every color that
-XWord uses to display a crossword puzzle.
+The styles page contains preferences related to visual display.  You can use
+a simple or advanced configuration options.
 
-![](images/color_prefs.png)
+#### Simple Styles ####
 
-- Multi-square selection
-    - The color that is used to highlight squares in the grid when the user
-      selects multiple squares (for Check and Reveal section commands).
-- Grid background
-    - The color used to fill the background when the grid does not take up the
-      entire window.
+![](images/simple_style_prefs.png)
 
+The simple settings page has options for global font, text and background color,
+list and grid highlight colors, as well as text alignment for the
+[metadata panels](window.html#metadata).
 
-### Font Preferences ###
+#### Advanced Styles ####
 
-![](images/font_prefs.png)
+![](images/advanced_style_prefs.png)
 
-Note that text is scaled to fit the allotted space in many places, so font
-size is irrelevant to several of these font choices:
-
-- Text entered into the grid by the user
-- Clue numbers in the grid
-- The main clue prompt
+The advanced settings page allows you to change nearly every color and font used
+for display.  You can change what information is displayed in metadata
+panels and the clue prompt (context help is available in the preferences dialog), 
+and the way the grid is presented.
 
 
 ### Miscellaneous Preferences ###
 
-This page contains file history preferences as well as various tweaks.
+This page contains file history and auto save preferences.
 
 ![](images/misc_prefs.png)
-
-#### Clue prompt format ####
-
-The clue prompt can be formatted using simple HTML.  `"%T"` will be replaced
-by the clue text, and `"%N"` by the clue number.  The clue is centered and
-includes the clue number by default.
-
-#### Grid tweaks ####
-
-This section allows the user to make minor aesthetic changes to the way
-the grid is presented by changing the size of grid text and numbers and the
-thickness of the lines in the grid.
 
 
 ### Printing Preferences ###

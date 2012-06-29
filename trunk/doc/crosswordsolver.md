@@ -10,7 +10,7 @@ significantly different solving experience (based on Crossword Solver 1.2).
 - Crossword Solver navigates the grid similarly to Across Lite, but doesn't
   respond to `HOME` and `END` keys.  
   Right click always moves the cursor, and only switches the direction when
-  the user clicks on the focused square (left click functions identically).  
+  you clicks on the focused square (left click functions identically).  
   Crossword Solver does not provide any customizability in terms of grid
   navigation.  
   Crossword Solver does not move the cursor to the first blank when
@@ -30,16 +30,16 @@ significantly different solving experience (based on Crossword Solver 1.2).
 - Crossword Solver has a single layout that is not resizable.  Puzzles in
   jpz format can customize the user interface (e.g. supply a different
   message when the puzzle is complete, disable reveal buttons).
-- XWord allows the user to position GUI components anywhere and resize them
-  to the user's liking.  XWord does not support loading or saving interface
+- XWord allows you to position GUI components anywhere and resize them
+  to your liking.  XWord does not support loading or saving interface
   information in puzzle files.
 
 #### [Check and reveal](check.html) ####
 
-- Crossword Solver allows the user to check the whole grid, or reveal the
+- Crossword Solver allows you to check the whole grid, or reveal the
   current letter, word, or entire grid.
-- XWord allows the user to check or reveal the current letter, word, or
-  entire grid, and also allows the user to check or reveal a section of
+- XWord allows you to check or reveal the current letter, word, or
+  entire grid, and also allows you to check or reveal a section of
   the grid.
 
 #### Pencil ####

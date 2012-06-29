@@ -4,6 +4,7 @@ XWord Support for Puzzle Features
 | Feature                                       | puz | xpf | jpz | ipuz[^1] |
 | --------------------------------------------- |:---:|:---:|:---:|:----:|
 | Scrambled solution                            |  X  |     |     |      |
+| No solution                                   |  X  |     |     |      |
 | [Rebus](solving.html#rebus_entries) entries   |  X  |  X  |  X  |  X   |
 | Circled squares                               |  X  |  X  |  X  |  X   |
 | Squares with colored or shaded backgrounds    |     |  X  |  X  |  X   |

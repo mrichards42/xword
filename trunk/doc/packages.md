@@ -22,7 +22,7 @@ time, the Package Manager will pop up and inform the user of available packages.
 When XWord is started, it automatically checks for updates to the main program
 and for installed packages.  This behavior cannot currently be changed, but if
 an update is ignored, XWord will no longer ask the user to install the update
-(though the user will still be informed of future updates).
+(though you will still be informed of future updates).
 
 
 ### For Developers ###
