@@ -289,7 +289,7 @@ function mt:iter()
             i = i + 1
             if i <= n then
                 local key = self._order[i]
-                if download.isenabled(self[key]) then
+                if not self[key].disabled then
                     return key, self[key]
                 end
             end
@@ -393,14 +393,6 @@ function download.get_download_data(puzzle, d)
     if data.filename then data.filename = download.get_filename(puzzle, d) end
     data.date = d:copy()
     return data
-end
-
-function download.isdisabled(puzzle)
-    return (download.disabled or {})[puzzle.id] == true
-end
-
-function download.isenabled(puzzle)
-    return not download.isdisabled(puzzle)
 end
 
 

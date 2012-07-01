@@ -1,7 +1,7 @@
 return {
-    name = "Puzzle Downloader2",
+    name = "Puzzle Downloader",
     packagename = "download",
     version = "1.2",
     description = "Puzzle downloader and organizer.",
-    requires = "0.5.4"
+    requires = "0.6"
 }

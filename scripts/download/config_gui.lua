@@ -392,3 +392,168 @@ download_function_panel = function(parent)
 
     return panel
 end
+
+
+-- ============================================================================
+-- Config Panel
+-- ============================================================================
+
+-- The panel
+local text_styles_panel
+local puzzle_sources_panel
+
+function config_panel(parent)
+    local panel = wx.wxPanel(parent, wx.wxID_ANY)
+
+    local sizer = wx.wxGridBagSizer(5,5)
+    sizer:AddGrowableCol(1)
+    panel:SetSizer(sizer)
+    local function sizerAdd(obj, pos, span, flags, border)
+        return sizer:Add(obj,
+            wx.wxGBPosition(unpack(pos)), wx.wxGBSpan(unpack(span or {1,1})),
+            flags or 0, border or 0)
+    end
+
+    local sizer1 = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    sizerAdd(sizer1, {0,0}, {1,2}, wx.wxEXPAND)
+
+    -- Download directory
+    local puzzle_directory = wx.wxDirPickerCtrl(panel, wx.wxID_ANY, "")
+    sizer1:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Download Directory:"), 0, wx.wxALIGN_CENTER)
+    sizer1:Add(puzzle_directory, 1, wx.wxEXPAND)
+
+    -- Separate directories radio box
+    local separate_directories = wx.wxRadioBox(
+        panel, wx.wxID_ANY, "Download puzzles to",
+        wx.wxDefaultPosition, wx.wxDefaultSize,
+        {"One directory", "Directories by source"}, 2
+    )
+    separate_directories.Selection = 1
+    sizerAdd(separate_directories, {1,0}, {1,1}, wx.wxEXPAND)
+
+    -- Auto download
+    local autosizer = wx.wxStaticBoxSizer(wx.wxHORIZONTAL, panel, "Automatically download")
+    sizerAdd(autosizer, {2,0}, {1,1}, wx.wxEXPAND)
+    autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Last"), 0, wx.wxALIGN_CENTER_VERTICAL)
+    local auto_download = wx.wxSpinCtrl(
+        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(100, -1),
+        wx.wxSP_ARROW_KEYS, 0, 30, 0)
+    autosizer:Add(auto_download, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxLEFT + wx.wxRIGHT, 5)
+    autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "day(s) [0 = disabled]"), 0, wx.wxALIGN_CENTER_VERTICAL)
+
+    -- Default view
+    local viewsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    sizerAdd(viewsizer, {3,0}, {1,1}, wx.wxEXPAND + wx.wxLEFT + wx.wxRIGHT, 5)
+    viewsizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Default dialog view:"),
+                  0, wx.wxALIGN_CENTER_VERTICAL)
+    viewsizer:AddStretchSpacer()
+    local default_view = wx.wxChoice(panel, wx.wxID_ANY, wx.wxDefaultPosition,
+        wx.wxDefaultSize, {"Day", "Week", "Month", "Previous view"})
+    default_view:SetStringSelection("Week")
+    viewsizer:Add(default_view, 0, wx.wxALIGN_CENTER_VERTICAL)
+
+    -- Text styles
+    local text_styles = text_styles_panel(panel)
+    local style_sizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Text styles")
+    style_sizer:Add(text_styles, 1, wx.wxALL, 5)
+    sizerAdd(style_sizer, {1, 1}, {3, 1}, wx.wxEXPAND)
+
+    -- Puzzle Sources
+    local sources = puzzle_sources_panel(panel)
+    sizerAdd(sources, {4, 0}, {1, 2}, wx.wxEXPAND)
+
+    panel.MinSize = wx.wxSize(500, -1)
+
+    -- Public stuff
+    panel.puzzle_directory = puzzle_directory
+    panel.separate_directories = separate_directories
+    panel.auto_download = auto_download
+    panel.default_view = default_view
+    panel.text_styles = text_styles.styles
+    panel.sources = sources
+
+    return panel
+end
+
+
+-- Text styles
+text_styles_panel = function(parent)
+    local panel = wx.wxPanel(parent, wx.wxID_ANY)
+    local sizer = wx.wxGridSizer(0, 3, 5, 5)
+    panel:SetSizer(sizer)
+
+    -- A style selector with font and color
+    local function make_style(label)
+        local text = wx.wxStaticText(panel, wx.wxID_ANY, label)
+        local font = wx.wxFontPickerCtrl(panel, wx.wxID_ANY)
+        local color = wx.wxColourPickerCtrl(panel, wx.wxID_ANY, wx.wxNullColour)
+        -- Update the label when the style changes
+        color:Connect(wx.wxEVT_COMMAND_COLOURPICKER_CHANGED, function (evt)
+            text.ForegroundColour = evt.Colour
+            text:Refresh()
+        end)
+        font:Connect(wx.wxEVT_COMMAND_FONTPICKER_CHANGED, function (evt)
+            text.Font = evt.Font
+            text:Refresh()
+        end)
+        -- Add the items to our grid
+        sizer:Add(text)
+        sizer:Add(font)
+        sizer:Add(color)
+        return { font = font, color = color, text = text }
+    end
+
+    panel.styles = {
+        missing = make_style("Missing"),
+        downloaded = make_style("Downloaded"),
+        progress = make_style("In Progress"),
+        complete = make_style("Complete")
+    }
+
+    return panel
+end
+
+
+-- Puzzle sources
+puzzle_sources_panel = function(parent)
+    local panel = wx.wxPanel(parent, wx.wxID_ANY)
+
+    local sizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    panel:SetSizer(sizer)
+
+    local listsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Puzzle sources")
+    sizer:Add(listsizer, 1, wx.wxEXPAND + wx.wxALL, 5)
+
+    local puzzle_list = wx.wxListBox(panel, wx.wxID_ANY, wx.wxDefaultPosition,
+                                     wx.wxSize(-1, 150))
+    listsizer:Add(puzzle_list, 1, wx.wxEXPAND)
+
+    -- List buttons
+    local buttonsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    listsizer:Add(buttonsizer, 0, wx.wxALL + wx.wxALIGN_RIGHT, 5)
+
+    local function make_button(tooltip, bitmap)
+        local button = BmpButton(panel, wx.wxID_ANY, bitmap)
+        buttonsizer:Add(button, 0, wx.wxLEFT, 5)
+        button.ToolTip = wx.wxToolTip(tooltip)
+        return button
+    end
+
+    local buttons = {
+        up = make_button("Move up in list", bmp.up),
+        down = make_button("Move down in list", bmp.down),
+        remove = make_button("Remove from list", bmp.remove),
+        add = make_button("Add a new source", bmp.add)
+    }
+
+    -- Details panel
+    local detailsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Configuration")
+    sizer:Add(detailsizer, 1, wx.wxEXPAND + wx.wxALL, 5)
+
+    -- Public stuff
+    panel.list = puzzle_list
+    panel.detailsizer = detailsizer
+    panel.buttons = buttons
+
+    return panel
+end
