@@ -24,7 +24,7 @@ download.separate_directories = true
 download.auto_download = 0
 download.default_view = "Day"
 download.previous_view = {}
-download.disabled = {
+default_disabled = {
     "NY Times Premium",
     "NY Times (XWord Info)",
     "Newsday",
@@ -105,16 +105,18 @@ for k, style in pairs(download.styles) do
     end
 end
 
--- Disabled
-local dl_list = config.disabled or download.disabled
-download.disabled = {}
-for _, id in ipairs(dl_list) do
-    download.disabled[id] = true
-end
-
 -- Add download sources
 for _, puzzle in ipairs(config.added or {}) do
     download.puzzles:insert(puzzle)
+end
+
+-- Disabled
+local dl_list = config.disabled or default_disabled
+for _, id in ipairs(dl_list) do
+    local puzzle = download.puzzles[id]
+    if puzzle then
+        puzzle.disabled = true
+    end
 end
 
 -- Changed sources
@@ -201,8 +203,8 @@ function download.save_config()
         config.previous_view.end_date = download.previous_view.end_date:fmt("%m/%d/%Y")
     end
     -- disabled
-    for id, disabled in pairs(download.disabled or {}) do
-        if disabled then
+    for id, puzzle in pairs(download.puzzles or {}) do
+        if puzzle.disabled then
             table.insert(config.disabled, id)
         end
     end
@@ -396,7 +398,242 @@ end
 -- Config dialog
 -- ----------------------------------------------------------------------------
 
-local function get_download_fields(parent, puzzle)
+local get_download_options_panel
+
+function download.get_config_panel(parent)
+    local panel = config_panel(parent)
+
+    -- Puzzle sources
+    -- ----------------------
+
+    local puzzles = {}
+    local puzzle_list = panel.sources.list
+
+    -- Update the puzzle sources list
+    local function update_sources()
+        -- Make a list of the names
+        local names = {}
+        for key, puzzle in puzzles:iterall() do
+            table.insert(names, puzzle.name)
+        end
+        -- Reset the selection after we change the list
+        local selection = panel.sources.list.Selection
+        puzzle_list:Set(names)
+        puzzle_list.Selection = selection
+    end
+
+    -- Is this a puzzle that the user added?
+    local function is_user_puzzle(puzzle)
+        local id
+        if type(puzzle) == 'table' then
+            id = puzzle.id
+        else
+            id = puzzle
+        end
+        return download.get_default_puzzles()[id] == nil
+    end
+
+    -- Button events
+    -- ----------------------
+    local buttons = panel.sources.buttons
+
+    -- Move up in the list
+    buttons.up:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
+        local idx = puzzle_list.Selection + 1
+        if idx > 1 then
+            local id = table.remove(puzzles._order, idx)
+            table.insert(puzzles._order, idx-1, id)
+            puzzle_list:Delete(idx - 1)
+            puzzle_list:Insert(puzzles[id].name, idx - 2)
+            puzzle_list.Selection = idx - 2
+        end
+    end)
+
+    -- Move down in the list
+    buttons.down:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
+        local idx = puzzle_list.Selection + 1
+        if idx < #puzzles._order then
+            local id = table.remove(puzzles._order, idx)
+            table.insert(puzzles._order, idx+1, id)
+            puzzle_list:Delete(idx - 1)
+            puzzle_list:Insert(puzzles[id].name, idx)
+            puzzle_list.Selection = idx
+        end
+    end)
+
+    -- Remove a puzzle
+    buttons.remove:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
+        local idx = puzzle_list.Selection + 1
+        if idx > 0 then
+            local id = puzzles._order[idx]
+            -- Only remove puzzles that we created
+            if is_user_puzzle(id) then
+                puzzles:remove(id)
+                puzzle_list:Delete(idx - 1)
+                if idx == 1 then
+                    puzzle_list.Selection = idx - 1
+                else
+                    puzzle_list.Selection = idx - 2
+                end
+            end
+        end
+    end)
+
+    -- Add a puzzle
+    buttons.add:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
+        local puzzle = show_advanced_options_dialog(panel, "New Source")
+        if puzzle then
+            puzzles:insert(puzzle)
+            local selection = puzzle_list.Selection
+            update_sources()
+            puzzle_list.Selection = selection
+        end
+    end)
+
+
+    -- Puzzle details
+    -- ----------------------
+    local detailsizer = panel.sources.detailsizer
+    local details
+
+    -- The text to show when no puzzle is selected
+    local text = wx.wxStaticText(panel.sources, wx.wxID_ANY, "Select a Puzzle",
+                                 wx.wxDefaultPosition, wx.wxDefaultSize,
+                                 wx.wxALIGN_CENTER)
+    detailsizer:Add(text, 1, wx.wxALIGN_CENTER)
+
+    local function get_selected_puzzle()
+        return puzzles:get(puzzle_list.Selection + 1)
+    end
+
+    local update_details
+
+    local function do_advanced_options(puzzle)
+        show_advanced_options_dialog(panel, puzzle)
+        update_sources()
+        update_details()
+    end
+
+    -- Update the details panel based on the selected puzzle
+    update_details = function()
+        if details then
+            details:apply()
+            detailsizer:Detach(details)
+            details:Destroy()
+        end
+        if puzzle_list.Selection == -1 then
+            detailsizer:Show(text, true)
+            text.Label = "Select a Puzzle"
+        else
+            detailsizer:Show(text, false)
+            details = get_download_options_panel(panel.sources, get_selected_puzzle())
+            detailsizer:Add(details, 1, wx.wxEXPAND)
+            detailsizer:Show(details, true)
+            -- Connect the advanced options button
+            details.advanced_button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+                do_advanced_options(details.puzzle)
+            end)
+
+        end
+        detailsizer:Layout()
+    end
+
+    -- Update details panel on selection
+    puzzle_list:Connect(wx.wxEVT_COMMAND_LISTBOX_SELECTED, function(evt)
+        update_details()
+        -- Disable/enable the remove button
+        buttons.remove:Enable(is_user_puzzle(get_selected_puzzle()))
+        evt:Skip()
+    end)
+
+    -- Show advanced options on double click
+    puzzle_list:Connect(wx.wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, function(evt)
+        if puzzle_list.Selection ~= -1 then
+            do_advanced_options(get_selected_puzzle())
+            -- Disable/enable the remove button
+            buttons.remove:Enable(is_user_puzzle(get_selected_puzzle()))
+        end
+        evt:Skip()
+    end)
+
+
+
+    -- Load and save config
+    -- --------------------------
+
+    -- Load config values into the panel
+    function panel:load_config()
+        -- Basic info
+        panel.puzzle_directory.Path = download.puzzle_directory
+        panel.separate_directories.Selection = download.separate_directories and 1 or 0
+        panel.auto_download.Value = download.auto_download or 0
+        panel.default_view:SetStringSelection(stringx.capitalize(download.default_view))
+        -- Text styles
+        for name, _ in pairs(download.styles) do
+            local style = panel.text_styles[name]
+            style.font.SelectedFont = download.styles[name].font
+            style.color.Colour = download.styles[name].color.AsString
+            style.text.Font = download.styles[name].font
+            style.text.ForegroundColour = download.styles[name].color
+        end
+        -- Puzzle sources
+        puzzles = tablex.deepcopy(download.puzzles)
+        update_sources()
+    end
+
+    -- Save config values from the panel
+    function panel:apply()
+        -- Basic info
+        download.puzzle_directory = panel.puzzle_directory.Path
+        download.separate_directories = panel.separate_directories.Selection == 1
+        download.auto_download = panel.auto_download.Value
+        download.default_view = panel.default_view.StringSelection:lower()
+        -- Text styles
+        for name, _ in pairs(download.styles) do
+            local style = panel.text_styles[name]
+            download.styles[name].font = style.font.SelectedFont
+            download.styles[name].color = style.color.Colour
+        end
+        -- Puzzle sources
+        if details then details:apply() end
+        download.puzzles = tablex.deepcopy(puzzles)
+        -- If we have an open downloader dialog make sure to update it
+        if download.dialog then
+            download.dialog:update()
+        end
+
+    end
+
+    panel:load_config()
+    return panel
+end
+
+local get_download_fields
+
+-- Get a config panel for the selected puzzle
+get_download_options_panel = function(parent, puzzle)
+    local panel = wx.wxPanel(parent, wx.wxID_ANY)
+    local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
+    panel:SetSizer(sizer)
+
+    local options = get_download_fields(panel, puzzle)
+    sizer:Add(options, 1, wx.wxEXPAND)
+
+    local advanced = wx.wxButton(panel, wx.wxID_ANY, "Advanced Options")
+    sizer:Add(advanced, 0, wx.wxTOP + wx.wxALIGN_CENTER,  5)
+
+    -- Public stuff
+    function panel:apply()
+        options:apply()
+    end
+    panel.advanced_button = advanced
+    panel.puzzle = puzzle
+
+    return panel
+end
+
+
+get_download_fields = function(parent, puzzle)
     -- If a source has options, add them to a 'fields' table (see NYT Premium
     -- for example)
     local function field_key(name)
@@ -409,25 +646,30 @@ local function get_download_fields(parent, puzzle)
         ctrls[name] = true
     end
 
+    -- The main panel
     local scroller = scrolled_panel(parent)
 
     local border = wx.wxBoxSizer(wx.wxVERTICAL)
     scroller.panel:SetSizer(border)
 
+    -- All sources get an "enabled" checkbox
     local enabled = wx.wxCheckBox(scroller.panel, wx.wxID_ANY, "Enabled")
-    enabled.Value = not download.disabled[puzzle.id]
+    enabled.Value = not puzzle.disabled
     border:Add(enabled, 0, wx.wxEXPAND + wx.wxLEFT + wx.wxRIGHT + wx.wxTOP, 5)
 
+    -- The sizer for user-defined fields
     local sizer = wx.wxFlexGridSizer(0, 2, 5,5)
     border:Add(sizer, 1, wx.wxEXPAND + wx.wxALL, 5)
     sizer:AddGrowableCol(1)
 
     for _, name in ipairs(ctrls) do
         sizer:Add(wx.wxStaticText(scroller.panel, wx.wxID_ANY, name), 0, wx.wxALIGN_CENTER_VERTICAL)
+        -- Make fields named "password" into password text boxes
         local flags = 0
         if name:lower():match("password") then
             flags = wx.wxTE_PASSWORD
         end
+        -- Create the text ctrl
         local ctrl = wx.wxTextCtrl(
             scroller.panel, wx.wxID_ANY, puzzle[field_key(name)] or '',
             wx.wxDefaultPosition, wx.wxDefaultSize, flags)
@@ -440,263 +682,12 @@ local function get_download_fields(parent, puzzle)
             local ctrl = ctrls[name]
             puzzle[field_key(name)] = ctrl.Value
         end
-        download.disabled[puzzle.id] = not enabled.Value
+        puzzle.disabled = not enabled.Value
     end
 
     return scroller
 end
 
-local function get_download_options_panel(parent, puzzle)
-    local panel = wx.wxPanel(parent, wx.wxID_ANY)
-    local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    panel:SetSizer(sizer)
-
-    local options = get_download_fields(panel, puzzle)
-    sizer:Add(options, 1, wx.wxEXPAND)
-
-    local advanced = wx.wxButton(panel, wx.wxID_ANY, "Advanced Options")
-    sizer:Add(advanced, 0, wx.wxTOP + wx.wxALIGN_CENTER,  5)
-
-    advanced:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
-        show_advanced_options_dialog(panel, puzzle)
-        parent.list:update_sources()
-        parent:update_details()
-    end)
-
-    function panel:apply()
-        options:apply()
-    end
-    return panel
-end
-
-
-function download.get_config_panel(parent)
-    local panel = wx.wxPanel(parent, wx.wxID_ANY)
-
-    local sizer = wx.wxGridBagSizer(5,5)
-    sizer:AddGrowableCol(1)
-    panel:SetSizer(sizer)
-    local function sizerAdd(obj, pos, span, flags, border)
-        return sizer:Add(obj,
-            wx.wxGBPosition(unpack(pos)), wx.wxGBSpan(unpack(span or {1,1})),
-            flags or 0, border or 0)
-    end
-
-    local sizer1 = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizerAdd(sizer1, {0,0}, {1,2}, wx.wxEXPAND)
-
-    local puzzle_directory = wx.wxDirPickerCtrl(panel, wx.wxID_ANY, download.puzzle_directory)
-    sizer1:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Download Directory:"), 0, wx.wxALIGN_CENTER)
-    sizer1:Add(puzzle_directory, 1, wx.wxEXPAND)
-
-    local separate_directories = wx.wxRadioBox(
-        panel, wx.wxID_ANY, "Download puzzles to",
-        wx.wxDefaultPosition, wx.wxDefaultSize,
-        {"One directory", "Directories by source"}, 2
-    )
-    separate_directories.Selection = download.separate_directories and 1 or 0
-    sizerAdd(separate_directories, {1,0}, {1,1}, wx.wxEXPAND)
-
-    -- Auto download
-    local autosizer = wx.wxStaticBoxSizer(wx.wxHORIZONTAL, panel, "Automatically download")
-    sizerAdd(autosizer, {2,0}, {1,1}, wx.wxEXPAND)
-    autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Last"), 0, wx.wxALIGN_CENTER_VERTICAL)
-    local auto_download = wx.wxSpinCtrl(
-        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(100, -1),
-        wx.wxSP_ARROW_KEYS, 0, 30, download.auto_download or 0)
-    autosizer:Add(auto_download, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxLEFT + wx.wxRIGHT, 5)
-    autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "day(s) [0 = disabled]"), 0, wx.wxALIGN_CENTER_VERTICAL)
-
-    -- Default view
-    local viewsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizerAdd(viewsizer, {3,0}, {1,1}, wx.wxEXPAND + wx.wxLEFT + wx.wxRIGHT, 5)
-    viewsizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Default dialog view:"),
-                  0, wx.wxALIGN_CENTER_VERTICAL)
-    viewsizer:AddStretchSpacer()
-    local default_view = wx.wxChoice(panel, wx.wxID_ANY, wx.wxDefaultPosition,
-        wx.wxDefaultSize, {"Day", "Week", "Month", "Previous view"})
-    default_view:SetStringSelection(stringx.capitalize(download.default_view))
-    viewsizer:Add(default_view, 0, wx.wxALIGN_CENTER_VERTICAL)
-
-    -- Text styles
-    local stylesizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Text styles")
-    sizerAdd(stylesizer, {1,1}, {3,1}, wx.wxEXPAND)
-
-    local stylegrid = wx.wxGridSizer(0, 3, 5, 5)
-    stylesizer:Add(stylegrid, 1, wx.wxALL, 5)
-
-    local function make_style(label, style)
-        local text = wx.wxStaticText(panel, wx.wxID_ANY, label)
-        text.Font = style.font
-        text.ForegroundColour = style.color
-        local font = wx.wxFontPickerCtrl(panel, wx.wxID_ANY, style.font, wx.wxDefaultPosition, wx.wxDefaultSize, 0)
-        font:Connect(wx.wxEVT_COMMAND_FONTPICKER_CHANGED, function (evt)
-            style.font = evt.Font
-            text.Font = evt.Font
-        end)
-        local color = wx.wxColourPickerCtrl(panel, wx.wxID_ANY, style.color)
-        color:Connect(wx.wxEVT_COMMAND_COLOURPICKER_CHANGED, function (evt)
-            style.color = evt.Colour
-            text.Colour = evt.Colour
-        end)
-        stylegrid:Add(text)
-        stylegrid:Add(font)
-        stylegrid:Add(color)
-    end
-
-    make_style("Missing", download.styles.missing)
-    make_style("Downloaded", download.styles.downloaded)
-    make_style("In Progress", download.styles.progress)
-    make_style("Complete", download.styles.complete)
-
-    -- Puzzle Sources
-    local srcsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-
-    local listsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Puzzle sources")
-    sizerAdd(listsizer, {4,0}, {1,1}, wx.wxEXPAND)
-
-    local puzzle_list = wx.wxListBox(panel, wx.wxID_ANY, wx.wxDefaultPosition,
-                                     wx.wxSize(-1, 150))
-    panel.list = puzzle_list
-    listsizer:Add(puzzle_list, 1, wx.wxEXPAND)
-    
-    local puzzles = tablex.deepcopy(download.puzzles)
-    function puzzle_list:update_sources()
-        local names = {}
-        for key, puzzle in puzzles:iterall() do
-            table.insert(names, puzzle.name)
-        end
-        local selection = puzzle_list.Selection
-        puzzle_list:Set(names)
-        puzzle_list.Selection = selection
-    end
-
-    -- List buttons
-    local buttonsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    listsizer:Add(buttonsizer, 0, wx.wxALL + wx.wxALIGN_RIGHT, 5)
-
-    local btn_up = BmpButton(panel, wx.wxID_ANY, bmp.up)
-    buttonsizer:Add(btn_up, 0, wx.wxLEFT, 5)
-    btn_up.ToolTip = wx.wxToolTip("Move up in list")
-    btn_up:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
-        local idx = puzzle_list.Selection + 1
-        if idx > 1 then
-            local id = table.remove(puzzles._order, idx)
-            table.insert(puzzles._order, idx-1, id)
-            puzzle_list:Delete(idx - 1)
-            puzzle_list:Insert(puzzles[id].name, idx - 2)
-            puzzle_list.Selection = idx - 2
-        end
-    end)
-
-    local btn_down = BmpButton(panel, wx.wxID_ANY, bmp.down)
-    buttonsizer:Add(btn_down, 0, wx.wxLEFT, 5)
-    btn_down.ToolTip = wx.wxToolTip("Move down in list")
-    btn_down:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
-        local idx = puzzle_list.Selection + 1
-        if idx < #puzzles._order then
-            local id = table.remove(puzzles._order, idx)
-            table.insert(puzzles._order, idx+1, id)
-            puzzle_list:Delete(idx - 1)
-            puzzle_list:Insert(puzzles[id].name, idx)
-            puzzle_list.Selection = idx
-        end
-    end)
-
-    local btn_remove = BmpButton(panel, wx.wxID_ANY, bmp.remove)
-    buttonsizer:Add(btn_remove, 0, wx.wxLEFT, 5)
-    btn_remove.ToolTip = wx.wxToolTip("Remove from list")
-    btn_remove:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
-        local idx = puzzle_list.Selection + 1
-        if idx > 0 then
-            local id = puzzles._order[idx]
-            -- Only remove puzzles that we created
-            if download.get_default_puzzles()[id] == nil then
-                puzzles:remove(id)
-                puzzle_list:Delete(idx - 1)
-                if idx == 1 then
-                    puzzle_list.Selection = idx - 1
-                else
-                    puzzle_list.Selection = idx - 2
-                end
-            end
-        end
-    end)
-
-
-    local btn_add = BmpButton(panel, wx.wxID_ANY, bmp.add)
-    buttonsizer:Add(btn_add, 0, wx.wxLEFT, 5)
-    btn_add.ToolTip = wx.wxToolTip("Add a new source")
-    btn_add:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
-        local puzzle = show_advanced_options_dialog(panel, "New Source")
-        if puzzle then
-            puzzles:insert(puzzle)
-            local selection = puzzle_list.Selection
-            puzzle_list:update_sources()
-            puzzle_list.Selection = selection
-        end
-    end)
-
-    -- Details panel
-    local detailsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Configuration")
-    sizerAdd(detailsizer, {4,1}, {1,1}, wx.wxEXPAND)
-    local details
-
-    local text = wx.wxStaticText(panel, wx.wxID_ANY, "Select a Puzzle",
-                                 wx.wxDefaultPosition, wx.wxDefaultSize,
-                                 wx.wxALIGN_CENTER)
-    detailsizer:Add(text, 1, wx.wxALIGN_CENTER)
-
-    function panel:update_details()
-        if details then
-            details:apply()
-            detailsizer:Detach(details)
-            details:Destroy()
-        end
-        if puzzle_list.Selection == -1 then
-            detailsizer:Show(text, true)
-            text.Label = "Select a Puzzle"
-        else
-            detailsizer:Show(text, false)
-            details = get_download_options_panel(panel, puzzles:get(puzzle_list.Selection + 1))
-            detailsizer:Add(details, 1, wx.wxEXPAND)
-            detailsizer:Show(details, true)
-        end
-        detailsizer:Layout()
-    end
-
-    puzzle_list:Connect(wx.wxEVT_COMMAND_LISTBOX_SELECTED, function(evt)
-        panel:update_details()
-        evt:Skip()
-    end)
-
-    puzzle_list:Connect(wx.wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, function(evt)
-        evt:Skip()
-        if puzzle_list.Selection ~= -1 then
-            show_advanced_options_dialog(panel, puzzles:get(puzzle_list.Selection + 1))
-            puzzle_list:update_sources()
-            panel:update_details()
-        end
-    end)
-
-    panel.MinSize = wx.wxSize(500, -1)
-
-    function panel:apply()
-        download.puzzle_directory = puzzle_directory.Path
-        download.separate_directories = separate_directories.Selection == 1
-        download.default_view = default_view:GetStringSelection():lower()
-        if details then details:apply() end
-        download.puzzles = tablex.deepcopy(puzzles)
-        download.auto_download = auto_download.Value
-        if download.dialog then
-            download.dialog:update()
-        end
-    end
-    
-    puzzle_list:update_sources()
-
-    return panel
-end
 
 xword.AddPreferencesPanel(
     "Downloader",
