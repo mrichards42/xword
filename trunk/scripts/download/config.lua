@@ -408,6 +408,7 @@ function download.get_config_panel(parent)
 
     local puzzles = {}
     local puzzle_list = panel.sources.list
+    local set_selection
 
     -- Update the puzzle sources list
     local function update_sources()
@@ -419,7 +420,8 @@ function download.get_config_panel(parent)
         -- Reset the selection after we change the list
         local selection = panel.sources.list.Selection
         puzzle_list:Set(names)
-        puzzle_list.Selection = selection
+        if selection == -1 then selection = 0 end
+        set_selection(selection)
     end
 
     -- Is this a puzzle that the user added?
@@ -445,7 +447,7 @@ function download.get_config_panel(parent)
             table.insert(puzzles._order, idx-1, id)
             puzzle_list:Delete(idx - 1)
             puzzle_list:Insert(puzzles[id].name, idx - 2)
-            puzzle_list.Selection = idx - 2
+            set_selection(idx - 2)
         end
     end)
 
@@ -457,7 +459,7 @@ function download.get_config_panel(parent)
             table.insert(puzzles._order, idx+1, id)
             puzzle_list:Delete(idx - 1)
             puzzle_list:Insert(puzzles[id].name, idx)
-            puzzle_list.Selection = idx
+            set_selection(idx)
         end
     end)
 
@@ -471,9 +473,9 @@ function download.get_config_panel(parent)
                 puzzles:remove(id)
                 puzzle_list:Delete(idx - 1)
                 if idx == 1 then
-                    puzzle_list.Selection = idx - 1
+                    set_selection(idx - 1)
                 else
-                    puzzle_list.Selection = idx - 2
+                    set_selection(idx - 2)
                 end
             end
         end
@@ -486,7 +488,7 @@ function download.get_config_panel(parent)
             puzzles:insert(puzzle)
             local selection = puzzle_list.Selection
             update_sources()
-            puzzle_list.Selection = selection
+            set_selection(selection)
         end
     end)
 
@@ -508,14 +510,45 @@ function download.get_config_panel(parent)
 
     local update_details
 
+    local function on_select()
+        update_details()
+        -- Disable/enable the remove button
+        buttons.remove:Enable(is_user_puzzle(get_selected_puzzle()))
+    end
+
+    set_selection = function(idx)
+        puzzle_list.Selection = idx
+        on_select()
+    end
+
+
     local function do_advanced_options(puzzle)
         show_advanced_options_dialog(panel, puzzle)
         update_sources()
         update_details()
     end
 
+    -- Events
+
+    -- Update details panel on selection
+    puzzle_list:Connect(wx.wxEVT_COMMAND_LISTBOX_SELECTED, function(evt)
+        on_select()
+        evt:Skip()
+    end)
+
+    -- Show advanced options on double click
+    puzzle_list:Connect(wx.wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, function(evt)
+        if puzzle_list.Selection ~= -1 then
+            do_advanced_options(get_selected_puzzle())
+            -- Disable/enable the remove button
+            buttons.remove:Enable(is_user_puzzle(get_selected_puzzle()))
+        end
+        evt:Skip()
+    end)
+
     -- Update the details panel based on the selected puzzle
     update_details = function()
+        panel.sources:Freeze()
         if details then
             details:apply()
             detailsizer:Detach(details)
@@ -536,27 +569,8 @@ function download.get_config_panel(parent)
 
         end
         detailsizer:Layout()
+        panel.sources:Thaw()
     end
-
-    -- Update details panel on selection
-    puzzle_list:Connect(wx.wxEVT_COMMAND_LISTBOX_SELECTED, function(evt)
-        update_details()
-        -- Disable/enable the remove button
-        buttons.remove:Enable(is_user_puzzle(get_selected_puzzle()))
-        evt:Skip()
-    end)
-
-    -- Show advanced options on double click
-    puzzle_list:Connect(wx.wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, function(evt)
-        if puzzle_list.Selection ~= -1 then
-            do_advanced_options(get_selected_puzzle())
-            -- Disable/enable the remove button
-            buttons.remove:Enable(is_user_puzzle(get_selected_puzzle()))
-        end
-        evt:Skip()
-    end)
-
-
 
     -- Load and save config
     -- --------------------------
@@ -615,6 +629,14 @@ get_download_options_panel = function(parent, puzzle)
     local panel = wx.wxPanel(parent, wx.wxID_ANY)
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
     panel:SetSizer(sizer)
+
+    local name = wx.wxStaticText(panel, wx.wxID_ANY, puzzle.name,
+                                 wx.wxDefaultPosition, wx.wxDefaultSize,
+                                 wx.wxST_NO_AUTORESIZE)
+    local font = name.Font
+    font.PointSize = font.PointSize + 2
+    name.Font = font
+    sizer:Add(name, 0, wx.wxALIGN_CENTER + wx.wxALL, 5)
 
     local options = get_download_fields(panel, puzzle)
     sizer:Add(options, 1, wx.wxEXPAND)
