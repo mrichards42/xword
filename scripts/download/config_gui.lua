@@ -403,24 +403,61 @@ local text_styles_panel
 local puzzle_sources_panel
 
 function config_panel(parent)
-    local panel = wx.wxPanel(parent, wx.wxID_ANY)
+    local main_panel = wx.wxPanel(parent, wx.wxID_ANY)
 
-    local sizer = wx.wxGridBagSizer(5,5)
-    sizer:AddGrowableCol(1)
+    local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
+    main_panel:SetSizer(sizer)
+    local notebook = wx.wxNotebook(main_panel, wx.wxID_ANY)
+    sizer:Add(notebook, 1, wx.wxEXPAND + wx.wxALL, 5)
+
+    local panel
+
+    -- Sources
+    -- ----------------------
+    panel = wx.wxPanel(notebook, wx.wxID_ANY)
+    sizer = wx.wxBoxSizer(wx.wxVERTICAL)
     panel:SetSizer(sizer)
-    local function sizerAdd(obj, pos, span, flags, border)
-        return sizer:Add(obj,
-            wx.wxGBPosition(unpack(pos)), wx.wxGBSpan(unpack(span or {1,1})),
-            flags or 0, border or 0)
-    end
 
-    local sizer1 = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizerAdd(sizer1, {0,0}, {1,2}, wx.wxEXPAND)
+    local sources = puzzle_sources_panel(panel)
+    sizer:Add(sources, 1, wx.wxEXPAND + wx.wxALL, 5)
+
+    notebook:AddPage(panel, "Puzzles")
+
+    -- Dialog
+    -- ---------------------
+    panel = wx.wxPanel(notebook, wx.wxID_ANY)
+    sizer = wx.wxBoxSizer(wx.wxVERTICAL)
+    panel:SetSizer(sizer)
+
+    -- Default view
+    local viewsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
+    viewsizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Default dialog view:"),
+                  0, wx.wxALIGN_CENTER_VERTICAL)
+    viewsizer:AddStretchSpacer()
+    local default_view = wx.wxChoice(panel, wx.wxID_ANY, wx.wxDefaultPosition,
+        wx.wxDefaultSize, {"Day", "Week", "Month", "Previous view"})
+    default_view:SetStringSelection("Week")
+    viewsizer:Add(default_view, 0, wx.wxALIGN_CENTER_VERTICAL)
+    sizer:Add(viewsizer, 0, wx.wxEXPAND + wx.wxALL, 5)
+
+    -- Text styles
+    local text_styles = text_styles_panel(panel)
+    local stylesizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Text styles")
+    stylesizer:Add(text_styles, 1, wx.wxALL, 5)
+    sizer:Add(stylesizer, 0, wx.wxEXPAND + wx.wxALL, 5)
+
+    notebook:AddPage(panel, "Dialog")
+
+    -- Download Options
+    -- ---------------------
+    panel = wx.wxPanel(notebook, wx.wxID_ANY)
+    sizer = wx.wxBoxSizer(wx.wxVERTICAL)
+    panel:SetSizer(sizer)
 
     -- Download directory
     local puzzle_directory = wx.wxDirPickerCtrl(panel, wx.wxID_ANY, "")
-    sizer1:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Download Directory:"), 0, wx.wxALIGN_CENTER)
-    sizer1:Add(puzzle_directory, 1, wx.wxEXPAND)
+    sizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Download Directory:"))
+    sizer:Add(puzzle_directory, 0, wx.wxEXPAND)
 
     -- Separate directories radio box
     local separate_directories = wx.wxRadioBox(
@@ -429,50 +466,29 @@ function config_panel(parent)
         {"One directory", "Directories by source"}, 2
     )
     separate_directories.Selection = 1
-    sizerAdd(separate_directories, {1,0}, {1,1}, wx.wxEXPAND)
+    sizer:Add(separate_directories, 0, wx.wxEXPAND)
 
     -- Auto download
     local autosizer = wx.wxStaticBoxSizer(wx.wxHORIZONTAL, panel, "Automatically download")
-    sizerAdd(autosizer, {2,0}, {1,1}, wx.wxEXPAND)
     autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Last"), 0, wx.wxALIGN_CENTER_VERTICAL)
     local auto_download = wx.wxSpinCtrl(
-        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(100, -1),
+        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(50, -1),
         wx.wxSP_ARROW_KEYS, 0, 30, 0)
     autosizer:Add(auto_download, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxLEFT + wx.wxRIGHT, 5)
     autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "day(s) [0 = disabled]"), 0, wx.wxALIGN_CENTER_VERTICAL)
+    sizer:Add(autosizer, 0, wx.wxEXPAND)
 
-    -- Default view
-    local viewsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizerAdd(viewsizer, {3,0}, {1,1}, wx.wxEXPAND + wx.wxLEFT + wx.wxRIGHT, 5)
-    viewsizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Default dialog view:"),
-                  0, wx.wxALIGN_CENTER_VERTICAL)
-    viewsizer:AddStretchSpacer()
-    local default_view = wx.wxChoice(panel, wx.wxID_ANY, wx.wxDefaultPosition,
-        wx.wxDefaultSize, {"Day", "Week", "Month", "Previous view"})
-    default_view:SetStringSelection("Week")
-    viewsizer:Add(default_view, 0, wx.wxALIGN_CENTER_VERTICAL)
-
-    -- Text styles
-    local text_styles = text_styles_panel(panel)
-    local style_sizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Text styles")
-    style_sizer:Add(text_styles, 1, wx.wxALL, 5)
-    sizerAdd(style_sizer, {1, 1}, {3, 1}, wx.wxEXPAND)
-
-    -- Puzzle Sources
-    local sources = puzzle_sources_panel(panel)
-    sizerAdd(sources, {4, 0}, {1, 2}, wx.wxEXPAND)
-
-    panel.MinSize = wx.wxSize(500, -1)
+    notebook:AddPage(panel, "Download Options")
 
     -- Public stuff
-    panel.puzzle_directory = puzzle_directory
-    panel.separate_directories = separate_directories
-    panel.auto_download = auto_download
-    panel.default_view = default_view
-    panel.text_styles = text_styles.styles
-    panel.sources = sources
+    main_panel.puzzle_directory = puzzle_directory
+    main_panel.separate_directories = separate_directories
+    main_panel.auto_download = auto_download
+    main_panel.default_view = default_view
+    main_panel.text_styles = text_styles.styles
+    main_panel.sources = sources
 
-    return panel
+    return main_panel
 end
 
 
@@ -521,11 +537,10 @@ puzzle_sources_panel = function(parent)
     local sizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
     panel:SetSizer(sizer)
 
-    local listsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Puzzle sources")
-    sizer:Add(listsizer, 1, wx.wxEXPAND + wx.wxALL, 5)
+    local listsizer = wx.wxBoxSizer(wx.wxVERTICAL)
+    sizer:Add(listsizer, 2, wx.wxEXPAND + wx.wxALL, 5)
 
-    local puzzle_list = wx.wxListBox(panel, wx.wxID_ANY, wx.wxDefaultPosition,
-                                     wx.wxSize(-1, 150))
+    local puzzle_list = wx.wxListBox(panel, wx.wxID_ANY)
     listsizer:Add(puzzle_list, 1, wx.wxEXPAND)
 
     -- List buttons
@@ -547,8 +562,8 @@ puzzle_sources_panel = function(parent)
     }
 
     -- Details panel
-    local detailsizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Configuration")
-    sizer:Add(detailsizer, 1, wx.wxEXPAND + wx.wxALL, 5)
+    local detailsizer = wx.wxBoxSizer(wx.wxVERTICAL)
+    sizer:Add(detailsizer, 3, wx.wxEXPAND + wx.wxALL, 5)
 
     -- Public stuff
     panel.list = puzzle_list
