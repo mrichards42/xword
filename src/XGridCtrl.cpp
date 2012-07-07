@@ -325,7 +325,7 @@ CorrectStatus GetCorrectStatus(const puz::Grid * grid, bool correct)
     }
     else
     {
-        return CORRECT_PUZZLE;
+        return INCORRECT_PUZZLE;
     }
 }
 
