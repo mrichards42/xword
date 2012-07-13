@@ -96,10 +96,10 @@ function advanced_options_dialog(parent, title)
     dlg:SetSizer(sizer)
     local panel = advanced_options_panel(dlg)
     panel.MinSize = wx.wxSize(400, -1)
-    sizer:Add(panel, 1, wx.wxEXPAND + wx.wxALL, 5)
+    sizer:Add(panel, 1, wx.wxEXPAND + wx.wxALL, 10)
 
     local buttons = dlg:CreateButtonSizer(wx.wxOK + wx.wxCANCEL)
-    sizer:Add(buttons, 0, wx.wxALL, 5)
+    sizer:Add(buttons, 0, wx.wxALL, 10)
 
     local reset_button = wx.wxButton(dlg, wx.wxID_ANY, "Reset to Defaults")
     buttons:Add(reset_button)
@@ -426,33 +426,37 @@ function config_panel(parent)
     -- Dialog
     -- ---------------------
     panel = wx.wxPanel(notebook, wx.wxID_ANY)
+    local bordersizer = wx.wxBoxSizer(wx.wxVERTICAL)
     sizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    panel:SetSizer(sizer)
+    bordersizer:Add(sizer, 1, wx.wxEXPAND + wx.wxALL, 10)
+    panel:SetSizer(bordersizer)
 
     -- Default view
     local viewsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
     viewsizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Default dialog view:"),
                   0, wx.wxALIGN_CENTER_VERTICAL)
-    viewsizer:AddStretchSpacer()
+    viewsizer:AddSpacer(5)
     local default_view = wx.wxChoice(panel, wx.wxID_ANY, wx.wxDefaultPosition,
         wx.wxDefaultSize, {"Day", "Week", "Month", "Previous view"})
     default_view:SetStringSelection("Week")
     viewsizer:Add(default_view, 0, wx.wxALIGN_CENTER_VERTICAL)
-    sizer:Add(viewsizer, 0, wx.wxEXPAND + wx.wxALL, 5)
+    sizer:Add(viewsizer, 0, wx.wxEXPAND)
 
     -- Text styles
     local text_styles = text_styles_panel(panel)
     local stylesizer = wx.wxStaticBoxSizer(wx.wxVERTICAL, panel, "Text styles")
     stylesizer:Add(text_styles, 1, wx.wxALL, 5)
-    sizer:Add(stylesizer, 0, wx.wxEXPAND + wx.wxALL, 5)
+    sizer:Add(stylesizer, 0, wx.wxEXPAND + wx.wxTOP, 10)
 
     notebook:AddPage(panel, "Dialog")
 
     -- Download Options
     -- ---------------------
     panel = wx.wxPanel(notebook, wx.wxID_ANY)
+    local bordersizer = wx.wxBoxSizer(wx.wxVERTICAL)
     sizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    panel:SetSizer(sizer)
+    bordersizer:Add(sizer, 1, wx.wxEXPAND + wx.wxALL, 10)
+    panel:SetSizer(bordersizer)
 
     -- Download directory
     local puzzle_directory = wx.wxDirPickerCtrl(panel, wx.wxID_ANY, "")
@@ -463,10 +467,10 @@ function config_panel(parent)
     local separate_directories = wx.wxRadioBox(
         panel, wx.wxID_ANY, "Download puzzles to",
         wx.wxDefaultPosition, wx.wxDefaultSize,
-        {"One directory", "Directories by source"}, 2
+        {"One directory", "Separate directories by source"}, 2
     )
     separate_directories.Selection = 1
-    sizer:Add(separate_directories, 0, wx.wxEXPAND)
+    sizer:Add(separate_directories, 0, wx.wxEXPAND + wx.wxTOP, 10)
 
     -- Auto download
     local autosizer = wx.wxStaticBoxSizer(wx.wxHORIZONTAL, panel, "Automatically download")
@@ -476,7 +480,7 @@ function config_panel(parent)
         wx.wxSP_ARROW_KEYS, 0, 30, 0)
     autosizer:Add(auto_download, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxLEFT + wx.wxRIGHT, 5)
     autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "day(s) [0 = disabled]"), 0, wx.wxALIGN_CENTER_VERTICAL)
-    sizer:Add(autosizer, 0, wx.wxEXPAND)
+    sizer:Add(autosizer, 0, wx.wxEXPAND + wx.wxTOP, 10)
 
     notebook:AddPage(panel, "Download Options")
 

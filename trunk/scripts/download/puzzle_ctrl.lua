@@ -57,7 +57,11 @@ local function make_popup(parent, puzzle)
     local bmp
     if success then
         bmp = draw_puzzle(p)
-        local title = wx.wxStaticText(popup, wx.wxID_ANY, p.Title)
+        local title_label = p.Title
+        if #p.Notes > 0 then
+            title_label = title_label .. " [Notes]"
+        end
+        local title = wx.wxStaticText(popup, wx.wxID_ANY, title_label)
         local author = wx.wxStaticText(popup, wx.wxID_ANY, p.Author)
         -- If title / author is going to fit on one line, make it
         if title.Size.Width + 5 + author.Size.Width < bmp.Width then
