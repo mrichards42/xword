@@ -246,12 +246,12 @@ local function PuzzlePanel(parent, puzzle)
 
     -- Update the panel to reflect our stats
     function panel:update_stats()
-        local counts = {}
+        local count = {}
         local dates = panel:get_dates()
         for _, d in ipairs(dates) do
             local status = download.status_map[download.get_filename(puzzle, d)]
             if status then
-                counts[status] = (counts[status] or 0) + 1
+                count[status] = (count[status] or 0) + 1
             else
                 -- Short cut . . . don't display incomplete info
                 download_button.Label = string.format('%d Puzzles', #dates)
@@ -259,9 +259,8 @@ local function PuzzlePanel(parent, puzzle)
                 return
             end
         end
-        -- TODO: make this look better
-        local text = string.format("%d/%d/%d Puzzles %d Missing",
-            counts[download.SOLVING] or 0, counts[download.COMPLETE] or 0, #dates, counts[download.MISSING] or 0)
+        local text = string.format("%d Puzzles (%d Complete, %d Missing)",
+            #dates, count[download.COMPLETE] or 0, count[download.MISSING] or 0)
         download_button.Label = text
         header:Layout()
     end

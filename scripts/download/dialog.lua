@@ -91,7 +91,7 @@ local function DownloadDialog(parent, id, title, pos, size)
 
     local status = Status(panel)
     sizer:Add(status, 0, wx.wxEXPAND)
-
+--[[ -- Config is done through main XWord preferences
     local btn = wx.wxButton(panel, wx.wxID_ANY, "config")
     sizer:Add(btn, 0, wx.wxALL, 5)
 
@@ -99,10 +99,11 @@ local function DownloadDialog(parent, id, title, pos, size)
         require 'download.config'
         download.show_config_dialog()
     end)
+--]]
 
     -- Sizing
     dialog:Fit()
-    dialog:SetSize(dialog.Size.Width, dialog.Size.Height + 100)
+    dialog:SetSize(dialog.Size.Width + 50, dialog.Size.Height + 200)
     dialog.MinSize = dialog.Size
 
     -- Events
