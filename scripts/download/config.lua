@@ -227,7 +227,7 @@ function download.save_config()
                         if type(puz1[k]) == 'table' and type(puz2[k]) == 'table' then
                             changes[k] = get_changes(puz1[k], puz2[k])
                             changed = changed or changes[k]
-                        else
+                        elseif k ~= "disabled" then
                             changes[k] = v
                             changed = true
                         end
