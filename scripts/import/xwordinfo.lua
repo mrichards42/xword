@@ -23,8 +23,8 @@ end
 
 -- Decode xml entities
 local entities = {
-    lt = "<",
-    gt = ">",
+    --lt = "<", -- Apparently these shouldn't be unescaped
+    --gt = ">",
     apos = "'",
     quot = '"',
     amp = "&"
