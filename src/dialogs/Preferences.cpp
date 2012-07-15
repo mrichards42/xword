@@ -155,6 +155,7 @@ PreferencesDialog::LoadConfig()
     // File History
     m_saveFileHistory->SetValue(m_config.FileHistory.saveFileHistory());
     m_reopenLastPuzzle->SetValue(m_config.FileHistory.reopenLastPuzzle());
+    m_reopenLastPuzzle->Enable(m_saveFileHistory->GetValue());
 }
 
 
@@ -266,8 +267,6 @@ void
 PreferencesDialog::OnSaveFileHistory(wxCommandEvent & evt)
 {
     m_reopenLastPuzzle->Enable(evt.IsChecked());
-    if (! evt.IsChecked())
-        m_reopenLastPuzzle->SetValue(false);
 }
 
 
