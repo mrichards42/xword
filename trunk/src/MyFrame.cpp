@@ -455,11 +455,15 @@ MyFrame::MyFrame()
     ShowPuzzle();
 
     // See if we should open the last puzzle
-    if (wxGetApp().GetConfigManager().FileHistory.reopenLastPuzzle())
+    ConfigManager::FileHistory_t & history = wxGetApp().GetConfigManager().FileHistory;
+    if (history.saveFileHistory() && history.reopenLastPuzzle())
     {
-        wxString fn = m_fileHistory.GetHistoryFile(0);
-        if (! fn.empty() && wxIsReadable(fn))
-            LoadPuzzle(fn);
+        if (m_fileHistory.GetCount() > 0)
+        {
+            wxString fn = m_fileHistory.GetHistoryFile(0);
+            if (! fn.empty() && wxIsReadable(fn))
+                LoadPuzzle(fn);
+        }
     }
 }
 
@@ -1604,9 +1608,6 @@ MyFrame::SetSaveFileHistory(bool doit)
     {
         m_fileHistory.RemoveMenu(recent->GetSubMenu());
         delete fileMenu->Remove(ID_FILE_HISTORY_MENU);
-        // Remove the files
-        for (size_t i = m_fileHistory.GetCount(); i > 0; --i)
-            m_fileHistory.RemoveFileFromHistory(i-1);
     }
 }
 
@@ -1662,6 +1663,12 @@ MyFrame::SaveConfig()
 
     // File History
     wxFileConfig * raw_cfg = GetConfig();
+    if (! config.FileHistory.saveFileHistory())
+    {
+        // Erase the file history if we aren't saving it
+        for (size_t i = m_fileHistory.GetCount(); i > 0; --i)
+            m_fileHistory.RemoveFileFromHistory(i-1);
+    }
     raw_cfg->SetPath(config.FileHistory.m_name);
     m_fileHistory.Save(*raw_cfg);
     raw_cfg->SetPath(_T(""));
