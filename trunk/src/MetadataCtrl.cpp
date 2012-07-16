@@ -91,7 +91,7 @@ MetadataCtrl::GetMeta(const wxString & str_, MyFrame * frame)
 wxString
 MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame, bool useLua)
 {
-    if (! frame)
+    if (! frame || ! frame->GetPuzzle().IsOk())
         return wxEmptyString;
     wxString result;
     const puz::Puzzle & puz = frame->GetPuzzle();
