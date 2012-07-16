@@ -412,13 +412,13 @@ class SimpleStyle : public BasicStyle
 {
 public:
     SimpleStyle(ConfigManager & config)
-        : BasicStyle(FP_FACENAME | STYLE_COLOR),
+        : BasicStyle(FP_FACENAME | FP_POINTSIZE | STYLE_COLOR),
           m_config(config)
     {}
 
     void LoadConfig()
     {
-        m_font->SetSelectedFont(m_config.Grid.letterFont());
+        m_font->SetSelectedFont(m_config.Clue.font());
         m_textColor->SetColor(m_config.Grid.penColor());
         m_bgColor->SetColor(m_config.Grid.backgroundColor());
         m_listHighlight->SetColor(m_config.Clue.selectedBackgroundColor());
@@ -429,8 +429,9 @@ public:
     {
         // Fonts
         wxFont font = m_font->GetSelectedFont();
-        SetFaceName(m_config.Clue.font, font);
-        SetFaceName(m_config.Clue.headingFont, font);
+        m_config.Clue.font = font;
+        font.SetPointSize(font.GetPointSize() + 2);
+        m_config.Clue.headingFont = font;
         SetFaceName(m_config.Grid.letterFont, font);
         SetFaceName(m_config.Grid.numberFont, font);
         SetFaceName(m_config.CluePrompt.font, font);
