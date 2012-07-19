@@ -26,7 +26,6 @@ download.default_view = "Day"
 download.previous_view = {}
 default_disabled = {
     "NY Times Premium",
-    "NY Times (XWord Info)",
     "Newsday",
     "USA Today",
     "Universal",
