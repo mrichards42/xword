@@ -65,36 +65,6 @@ local sources = {
     },
 
     {
-        name = "NY Times (XWord Info)",
-        url = "http://www.xwordinfo.com/XPF/?date=%m/%d/%Y",
-        directoryname = "NY Times",
-        filename = "nyt%Y%m%d.xml",
-        days = { true, true, true, true, true, true, true },
-        curlopts =
-        {
-            [curl.OPT_REFERER] = 'http://www.xwordinfo.com/',
-        },
-        func = [[
-    -- Try to download the XPF first
-    download(puzzle.url, puzzle.filename, puzzle.curlopts)
-    if true then return end -- Cut this off for now.
-    local success, p = pcall(puz.Puzzle, puzzle.filename)
-    if success then
-        p:__gc()
-        return
-    end
-    -- Otherwise download it as JSON
-    local url = puzzle.date:fmt("http://www.xwordinfo.com/JSON/Data.aspx?date=%m/%d/%Y")
-    download(url, puzzle.filename, puzzle.curlopts)
-    local success, p = pcall(puz.Puzzle, puzzle.filename, import.xwordinfoJSON)
-    if success then
-        p:Save(puzzle.filename) -- Save this as an XPF
-        p:__gc()
-    end
-]]
-    },
-
-    {
         name = "CrosSynergy",
         url = "http://www.washingtonpost.com/r/WashingtonPost/Content/Puzzles/Daily/cs%y%m%d.jpz",
         filename = "cs%Y%m%d.jpz",
