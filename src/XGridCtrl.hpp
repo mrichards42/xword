@@ -365,7 +365,8 @@ protected:
 
     const wxColor & GetSquareColor(const puz::Square & square);
 
-    void MakeVisible(const puz::Square & square);
+    // Return true if we had to scroll
+    bool MakeVisible(const puz::Square & square);
 
 
     // Scaling functions and members
