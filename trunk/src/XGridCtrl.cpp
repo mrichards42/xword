@@ -630,33 +630,34 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
     DoSetFocusedWord(square, word, direction);
     wxASSERT(m_focusedWord != NULL);
 
-    MakeVisible(*m_focusedSquare);
-
-    if (oldWord == m_focusedWord)
-    {
-        if (oldSquare != m_focusedSquare && oldSquare)
-            DrawSquare(dc, *oldSquare, GetFocusedWordColor());
-        // Always redraw the newly focused square.
-        DrawSquare(dc, *m_focusedSquare, GetFocusedLetterColor());
-    }
-    else
-    {
-        // Draw the old word
-        if (oldWord)
+    if (! MakeVisible(*m_focusedSquare))
+    { // We didn't refresh
+        if (oldWord == m_focusedWord)
         {
-            puz::square_iterator it;
-            for (it = oldWord->begin(); it != oldWord->end(); ++it)
-                DrawSquare(dc, *it, wxNullColour);
+            if (oldSquare != m_focusedSquare && oldSquare)
+                DrawSquare(dc, *oldSquare, GetFocusedWordColor());
+            // Always redraw the newly focused square.
+            DrawSquare(dc, *m_focusedSquare, GetFocusedLetterColor());
         }
-        else if (oldSquare)
-            DrawSquare(dc, *oldSquare, wxNullColour);
-
-        // Draw the new focused word
-        if (m_focusedWord)
+        else
         {
-            puz::square_iterator it;
-            for (it = m_focusedWord->begin(); it != m_focusedWord->end(); ++it)
-                DrawSquare(dc, *it);
+            // Draw the old word
+            if (oldWord)
+            {
+                puz::square_iterator it;
+                for (it = oldWord->begin(); it != oldWord->end(); ++it)
+                    DrawSquare(dc, *it, wxNullColour);
+            }
+            else if (oldSquare)
+                DrawSquare(dc, *oldSquare, wxNullColour);
+
+            // Draw the new focused word
+            if (m_focusedWord)
+            {
+                puz::square_iterator it;
+                for (it = m_focusedWord->begin(); it != m_focusedWord->end(); ++it)
+                    DrawSquare(dc, *it);
+            }
         }
     }
 
@@ -838,11 +839,11 @@ XGridCtrl::DoSetFocusedWord(puz::Square * square,
 }
 
 
-void
+bool
 XGridCtrl::MakeVisible(const puz::Square & square)
 {
     if (m_fit || IsEmpty())
-        return;
+        return false;
 
     const int col = square.GetCol();
     const int row = square.GetRow();
@@ -882,7 +883,13 @@ XGridCtrl::MakeVisible(const puz::Square & square)
             startY = m_grid->LastRow() - lengthY;
     }
 
-    Scroll(startX, startY);
+    if (startX != -1 || startY != -1)
+    {
+        Scroll(startX, startY);
+        Refresh();
+        return true;
+    }
+    return false;
 }
 
 
@@ -1002,8 +1009,9 @@ XGridCtrl::OnSize(wxSizeEvent & WXUNUSED(evt))
 {
     Freeze();
     Scale();
+    bool refresh = false;
     if (m_focusedSquare != NULL)
-        MakeVisible(*m_focusedSquare);
+        refresh = ! MakeVisible(*m_focusedSquare);
     Thaw();
     Refresh();
 }
