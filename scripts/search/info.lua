@@ -8,11 +8,11 @@ Adds a search menu with the following entries:
 * Wikipedia - search for the current word
 * Google - search for the current word
 
-Changes for version 1.1:
-* OneAcross search works with words that are all blank.
-
 Changes for version 1.2:
 * Google search.
+
+Changes for version 1.1:
+* OneAcross search works with words that are all blank.
 ]],
     requires = "0.5"
 }
