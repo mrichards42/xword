@@ -8,8 +8,7 @@ XWord is a cross-platform crossword puzzle program designed to be highly
 configurable.  It reads multiple puzzle file formats.
 
 Supported features:
-    - Solving of all American style and cryptic crosswords.
-    - Partial support for solving diagramless puzzles.
+    - Solving of all American style, cryptic, and diagramless crosswords.
     - Solving rebus puzzles.
     - Solving puzzles with a variety of tricks, e.g. diagonal clues, arbitrary
       numbering schemes, shaded squares.
@@ -26,22 +25,10 @@ Supported features:
     - Zooming the grid in and out.
     - Rearranging the window layout.
     - Color, font, and solving behavior configuration.
-    - Printing (not yet polished, and somewhat buggy)
+    - Printing
 
 XWord is extensible via the lua scripting language.  A number of plugins are
-available.  See Tools > Plugin Manager.
-
-Rebus
-=====
-
-Key               Function
--------------------------------------
-Insert            Begin entering multiple letters and/or numbers into a square.
-Insert or Enter   End entering multiple letters.
-Delete            Remove letters from the beginning of the word.
-Backspace         Remove letters from the end of the word.
-Ctrl + Delete     Remove all letters.
-Ctrl + Backspace  Remove all letters.
+available.  See Tools > Package Manager.
 
 
 Diagramless Puzzles
@@ -57,26 +44,6 @@ in the grid are automatically calculated when a square is made black or white.
 Numbers in the grid that do not appear in the clue list are highlighted in red.
 Naturally, this automatic calculation of grid numbers only works if the puzzle
 follows the normal rules of numbering a grid.
-
-
-Configuration
-=============
-
-Configuration settings can be accessed from the File menu (under "Preferences").
-Users can configure grid movement/solving options, colors, and fonts.  Most of
-XWord's configuration can be accessed this way.  However, there are a few
-configuration settings that are not yet implemented in the GUI (and require a
-program restart to take effect):
-
-
-    - Clue list spacing.
-        Accessed under [Clue] heading of config file (spacing)
-
-        X and y spacing applied to the clue list text, and between the clue
-        number and the clue text.
-        This is slightly buggy, as setting an X padding to zero causes some of
-        the clue numbers to get cut off.
-
 
 
 Building XWord
