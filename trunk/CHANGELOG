@@ -1,3 +1,35 @@
+Version 0.6 (7/20/2012)
+==========================
+New Features
+------------
+* Copy and paste support.
+* Rebus entry uses an expanding text ctrl so that the entire entry can be seen.
+* Revised style preferences to be simpler and more comprehensive.
+* Configurable metadata info panels.
+* New menu item: Reset Timer.
+* Puzzle status area shows percent complete for incomplete puzzles.
+* Edit Mode for moving panels.
+* More refined panel configuration.
+* Lua scripts can insert panels into the preferences dialog.
+
+Bug Fixes
+---------
+* Fixed regression where the last square in the grid was not being checked.
+* If autosave fails for some reason, the user is alerted in the status bar
+  instead of with a message box.
+* Frame size and position are saved if frame is iconized when it is closed.
+* Puz files with no solution are correctly not able to be checked.
+* The grid redraws correctly when scrolled (if it is zoomed in)
+
+Removed Features
+----------------
+* Character map removed (not all-inclusive, and somewhat buggy; use the system
+  character map)
+
+
+----------------------------------------------------------------------
+
+
 Version 0.5.4 (11/16/2011)
 ==========================
 New Features
@@ -12,7 +44,6 @@ New Features
 * New menu item: Erase Uncrossed Squares.
 * New menu item / toolbar item: Rebus Entry (previously only accessible by
   pressing INSERT)
-
 
 Bug Fixes
 ---------
