@@ -277,19 +277,24 @@ MyPrintout::GetHTML()
 // Setup functions
 //-----------------------------------------------------------------------------
 
-MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, int options,
-                       int numPages)
+MyPrintout::MyPrintout(MyFrame * frame, puz::Puzzle * puz, PrintInfo info)
     : wxPrintout(puz2wx(puz->GetTitle())),
       m_frame(frame),
       m_puz(puz),
       m_drawer(puz),
-      m_numPages(numPages),
+      m_info(info),
       m_isScaled(false)
 {
     m_htmlRenderer = new MyHtmlDCRenderer(new PrintHtmlWinParser);
-
-    m_drawer.SetFlags(options);
-    // Since print DPI huge, set the number scale to something reasonable
+    // Edit grid drawer options
+    m_info.grid_options |= XGridDrawer::DRAW_CIRCLE;
+    if (puz->IsDiagramless())
+    {
+        if (! (m_info.grid_options & XGridDrawer::DRAW_TEXT))
+            m_info.grid_options |= XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
+    }
+    m_drawer.SetFlags(m_info.grid_options);
+    // Since print DPI is huge, set the number scale to something reasonable
     m_drawer.SetNumberScale(0.25);
     ReadConfig();
 }
@@ -398,7 +403,7 @@ void MyPrintout::UnscaleDC()
 bool
 MyPrintout::HasPage(int pageNum)
 {
-    return pageNum <= m_numPages;
+    return pageNum < 2 || (pageNum == 2 && m_info.two_pages);
 }
 
 
@@ -413,8 +418,8 @@ MyPrintout::GetPageInfo(int *minPage, int *maxPage, int *pageFrom, int *pageTo)
 {
     *minPage = 1;
     *pageFrom = 1;
-    *maxPage = m_numPages;
-    *pageTo  = m_numPages;
+    *maxPage = m_info.two_pages ? 2 : 1;
+    *pageTo  = *maxPage;
 }
 
 bool
@@ -422,23 +427,29 @@ MyPrintout::OnPrintPage(int pageNum)
 {
     m_isDrawing = true;
     DrawHeader();
-    if (m_numPages == 1)
+    if (! m_info.two_pages)
     {
-        // m_gridScale, m_columns, and m_fontSize are set when we do the page
-        // layout (in OnPreparePrinting)
-        LayoutGrid(m_gridScale);
-        DrawGrid();
-        DrawText(m_columns, m_fontSize);
+        if (m_info.grid)
+        {
+            LayoutGrid(m_gridScale);
+            DrawGrid();
+        }
+        if (m_info.clues)
+            DrawText(m_columns, m_fontSize);
     }
-    // Two page printing
-    else if (pageNum == 1)
+    // Two page printing (always inclues clues and grid)
+    else
     {
-        LayoutGrid(m_gridScale);
-        DrawGrid();
-    }
-    else if (pageNum == 2)
-    {
-        DrawText(m_columns, m_fontSize);
+        wxASSERT(m_info.clues && m_info.grid);
+        if (pageNum == 1)
+        {
+            LayoutGrid(m_gridScale);
+            DrawGrid();
+        }
+        else // pageNum == 2
+        {
+            DrawText(m_columns, m_fontSize);
+        }
     }
     return true;
 }
@@ -479,7 +490,7 @@ MyPrintout::LayoutPages()
 
     // If we're doing a two-page layout, just figure out how to layout the
     // text
-    if (m_numPages > 1)
+    if (m_info.two_pages || ! (m_info.grid && m_info.clues))
     {
         for (int pt = MAX_FONT_SIZE; pt >= MIN_FONT_SIZE; --pt)
         {
@@ -606,6 +617,11 @@ MyPrintout::LayoutPages()
 void
 MyPrintout::DrawHeader()
 {
+    if (! (m_info.author || m_info.title))
+    {
+        m_headerHeight = 0;
+        return;
+    }
     wxDC * dc = GetDC();
     ScaleDC();
 
@@ -622,14 +638,14 @@ MyPrintout::DrawHeader()
     wxString html;
     html << _T("<table align=center border=0 cellpadding=2 width=100%>");
     // Title
-    if (m_puz->HasMeta(puzT("title")))
+    if (m_info.title && m_puz->HasMeta(puzT("title")))
     {
         html << _T("<tr><td><font size=\"+1\"><b>") 
                     << puz2wx(m_puz->GetTitle())
                 << _T("<b></font></td></tr>");
     }
     // Author / Editor
-    if (m_puz->HasMeta(puzT("author")))
+    if (m_info.author && m_puz->HasMeta(puzT("author")))
     {
 
         html << _T("<tr><td><font size=\"+0\">") << puz2wx(m_puz->GetAuthor());
@@ -694,7 +710,7 @@ MyPrintout::DrawText(int columns, int fontSize)
         if (! m_pageRect.Contains(x, m_pageRect.y))
             return false;
 
-        if (m_numPages == 1)
+        if (! m_info.two_pages && m_info.grid)
         {
             // Make sure we don't start this column in the grid
             if (m_gridRect.Contains(colRect.GetTopLeft()))
@@ -803,7 +819,7 @@ MyPrintout::LayoutGrid(double gridScale)
     m_gridRect.x = pageRect.x;
     m_gridRect.y = pageRect.y;
 
-    if (m_numPages > 1)
+    if (m_info.two_pages || ! m_info.clues)
     {
         // Center the grid
         m_gridRect.x += (pageRect.width - m_gridRect.width) / 2;

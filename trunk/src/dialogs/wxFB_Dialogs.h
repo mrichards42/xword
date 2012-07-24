@@ -183,9 +183,9 @@ class DisplayFormatDialogBase : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class CustomPrintDialog
+/// Class CustomPrintDialogBase
 ///////////////////////////////////////////////////////////////////////////////
-class CustomPrintDialog : public wxDialog 
+class CustomPrintDialogBase : public wxDialog 
 {
 	private:
 	
@@ -203,11 +203,24 @@ class CustomPrintDialog : public wxDialog
 		wxStdDialogButtonSizer* m_sdbSizer5;
 		wxButton* m_sdbSizer5OK;
 		wxButton* m_sdbSizer5Cancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnInit( wxInitDialogEvent& event ) = 0;
+		virtual void OnPresetSelected( wxCommandEvent& event ) = 0;
+		virtual void OnGridChecked( wxCommandEvent& event ) = 0;
+		virtual void OnGridNumbersChecked( wxCommandEvent& event ) = 0;
+		virtual void OnGridTextChecked( wxCommandEvent& event ) = 0;
+		virtual void OnGridSolutionChecked( wxCommandEvent& event ) = 0;
+		virtual void OnCluesChecked( wxCommandEvent& event ) = 0;
+		virtual void OnTitleChecked( wxCommandEvent& event ) = 0;
+		virtual void OnAuthorChecked( wxCommandEvent& event ) = 0;
+		virtual void OnPagesSelected( wxCommandEvent& event ) = 0;
+		
 	
 	public:
 		
-		CustomPrintDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Custom Print"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
-		~CustomPrintDialog();
+		CustomPrintDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Custom Print"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~CustomPrintDialogBase();
 	
 };
 

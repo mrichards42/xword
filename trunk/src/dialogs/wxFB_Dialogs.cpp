@@ -518,7 +518,7 @@ DisplayFormatDialogBase::~DisplayFormatDialogBase()
 	
 }
 
-CustomPrintDialog::CustomPrintDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
@@ -589,7 +589,7 @@ CustomPrintDialog::CustomPrintDialog( wxWindow* parent, wxWindowID id, const wxS
 	wxString m_numPagesChoices[] = { wxT("One page"), wxT("Two pages") };
 	int m_numPagesNChoices = sizeof( m_numPagesChoices ) / sizeof( wxString );
 	m_numPages = new wxRadioBox( this, wxID_ANY, wxT("Print On"), wxDefaultPosition, wxDefaultSize, m_numPagesNChoices, m_numPagesChoices, 1, wxRA_SPECIFY_COLS );
-	m_numPages->SetSelection( 0 );
+	m_numPages->SetSelection( 1 );
 	bSizer25->Add( m_numPages, 0, wxALL|wxEXPAND, 5 );
 	
 	
@@ -613,8 +613,32 @@ CustomPrintDialog::CustomPrintDialog( wxWindow* parent, wxWindowID id, const wxS
 	bSizer26->Fit( this );
 	
 	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( CustomPrintDialogBase::OnInit ) );
+	m_preset->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( CustomPrintDialogBase::OnPresetSelected ), NULL, this );
+	m_grid->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridChecked ), NULL, this );
+	m_numbers->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridNumbersChecked ), NULL, this );
+	m_text->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridTextChecked ), NULL, this );
+	m_solution->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridSolutionChecked ), NULL, this );
+	m_clues->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnCluesChecked ), NULL, this );
+	m_title->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnTitleChecked ), NULL, this );
+	m_author->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnAuthorChecked ), NULL, this );
+	m_numPages->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( CustomPrintDialogBase::OnPagesSelected ), NULL, this );
 }
 
-CustomPrintDialog::~CustomPrintDialog()
+CustomPrintDialogBase::~CustomPrintDialogBase()
 {
+	// Disconnect Events
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( CustomPrintDialogBase::OnInit ) );
+	m_preset->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( CustomPrintDialogBase::OnPresetSelected ), NULL, this );
+	m_grid->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridChecked ), NULL, this );
+	m_numbers->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridNumbersChecked ), NULL, this );
+	m_text->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridTextChecked ), NULL, this );
+	m_solution->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridSolutionChecked ), NULL, this );
+	m_clues->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnCluesChecked ), NULL, this );
+	m_title->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnTitleChecked ), NULL, this );
+	m_author->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnAuthorChecked ), NULL, this );
+	m_numPages->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( CustomPrintDialogBase::OnPagesSelected ), NULL, this );
+	
 }

@@ -2470,12 +2470,12 @@ MyFrame::OnPageSetup(wxCommandEvent & WXUNUSED(evt))
 
 
 void
-MyFrame::DoPrint(int options)
+MyFrame::DoPrint(const PrintInfo & info)
 {
     wxPrintDialogData printDialogData(*g_printData);
 
     wxPrinter printer(& printDialogData);
-    MyPrintout printout(this, &m_puz, options, 1);
+    MyPrintout printout(this, &m_puz, info);
     if (!printer.Print(this, &printout, true /*prompt*/))
     {
         if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
@@ -2498,45 +2498,49 @@ const int PRINT_CURRENT = XGridDrawer::DRAW_CIRCLE
                         | XGridDrawer::DRAW_USER_TEXT;
 
 const int PRINT_SOLUTION = XGridDrawer::DRAW_CIRCLE
-                         | XGridDrawer::DRAW_NUMBER
                          | XGridDrawer::DRAW_SOLUTION;
 
 void
 MyFrame::OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt))
 {
+    PrintInfo info;
     if (! m_puz.IsDiagramless())
-        DoPrint(PRINT_BLANK);
+        info.grid_options = PRINT_BLANK;
     else
-        DoPrint(PRINT_BLANK & ~XGridDrawer::DRAW_NUMBER
-                | XGridDrawer::DRAW_BLANK_DIAGRAMLESS);
+        info.grid_options = PRINT_BLANK
+                            & ~XGridDrawer::DRAW_NUMBER
+                            | XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
+    DoPrint(info);
 }
 
 void
 MyFrame::OnPrintCurrent(wxCommandEvent & WXUNUSED(evt))
 {
+    PrintInfo info;
     if (! m_puz.IsDiagramless())
-        DoPrint(PRINT_CURRENT);
+        info.grid_options = PRINT_CURRENT;
     else
-        DoPrint(PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER);
+        info.grid_options = PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER;
+    DoPrint(info);
 }
 
 void
 MyFrame::OnPrintSolution(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! m_puz.IsDiagramless())
-        DoPrint(PRINT_SOLUTION);
-    else
-        DoPrint(PRINT_SOLUTION & ~XGridDrawer::DRAW_NUMBER);
+    PrintInfo info;
+    info.grid_options = PRINT_SOLUTION;
+    info.clues = false;
+    DoPrint(info);
 }
 
 void
-MyFrame::DoPrintPreview(int options)
+MyFrame::DoPrintPreview(const PrintInfo & info)
 {
     // Pass two printout objects: for preview, and possible printing.
     wxPrintDialogData printDialogData(*g_printData);
     wxPrintPreview * preview = new wxPrintPreview(
-        new MyPrintout(this, &m_puz, options, 1),
-        new MyPrintout(this, &m_puz, options, 1),
+        new MyPrintout(this, &m_puz, info),
+        new MyPrintout(this, &m_puz, info),
         &printDialogData
     );
     if (! preview->Ok())
@@ -2557,29 +2561,41 @@ MyFrame::DoPrintPreview(int options)
 void
 MyFrame::OnPreviewBlankGrid(wxCommandEvent & WXUNUSED(evt))
 {
+    PrintInfo info;
+
+    if (GetCustomPrintInfo(this, &info))
+    {
+        DoPrintPreview(info);
+    }
+    return;
+
     if (! m_puz.IsDiagramless())
-        DoPrintPreview(PRINT_BLANK);
+        info.grid_options = PRINT_BLANK;
     else
-        DoPrintPreview(PRINT_BLANK & ~XGridDrawer::DRAW_NUMBER
-                       | XGridDrawer::DRAW_BLANK_DIAGRAMLESS);
+        info.grid_options = PRINT_BLANK
+                            & ~XGridDrawer::DRAW_NUMBER
+                            | XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
+    DoPrintPreview(info);
 }
 
 void
 MyFrame::OnPreviewCurrent(wxCommandEvent & WXUNUSED(evt))
 {
+    PrintInfo info;
     if (! m_puz.IsDiagramless())
-        DoPrintPreview(PRINT_CURRENT);
+        info.grid_options = PRINT_CURRENT;
     else
-        DoPrintPreview(PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER);
+        info.grid_options = PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER;
+    DoPrintPreview(info);
 }
 
 void
 MyFrame::OnPreviewSolution(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! m_puz.IsDiagramless())
-        DoPrintPreview(PRINT_SOLUTION);
-    else
-        DoPrintPreview(PRINT_SOLUTION & ~XGridDrawer::DRAW_NUMBER);
+    PrintInfo info;
+    info.grid_options = PRINT_SOLUTION;
+    info.clues = false;
+    DoPrintPreview(info);
 }
 
 

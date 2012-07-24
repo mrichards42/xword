@@ -41,6 +41,7 @@ class wxHtmlLinkEvent;
 class NotesPanel;
 
 class MyPrintout;
+struct PrintInfo;
 class ConfigManager;
 
 #include "XGridCtrl.hpp"
@@ -328,8 +329,8 @@ private:
 
     // Printing
     void OnPageSetup(wxCommandEvent & WXUNUSED(evt));
-    void DoPrint(int options);
-    void DoPrintPreview(int options);
+    void DoPrint(const PrintInfo & info);
+    void DoPrintPreview(const PrintInfo & info);
     void OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt));
     void OnPrintSolution(wxCommandEvent & WXUNUSED(evt));
     void OnPrintCurrent(wxCommandEvent & WXUNUSED(evt));
