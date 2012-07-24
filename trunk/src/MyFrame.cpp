@@ -1734,7 +1734,19 @@ MyFrame::SetFocusedDirection(short direction)
 puz::Clue *
 MyFrame::GetFocusedClue()
 {
-    return m_puz.FindClue(GetFocusedWord());
+    if (! m_puz.IsDiagramless())
+        return m_puz.FindClue(GetFocusedWord());
+    else
+    {
+        std::map<wxString, CluePanel*>::iterator it;
+        for (it = m_clues.begin(); it != m_clues.end(); ++it)
+        {
+            CluePanel * panel = it->second;
+            if (panel->GetDirection() == CluePanel::FOCUSED)
+                return panel->GetClue();
+        }
+        return NULL;
+    }
 }
 
 bool
@@ -2442,7 +2454,6 @@ MyFrame::OnLicense(wxCommandEvent & WXUNUSED(evt))
 // Printing events
 //------------------------------------------------------------------------------
 // Most of this is only slightly adapted from the wxWidgets printing sample.
-// TODO: The printing framework needs a lot of work.
 
 void
 MyFrame::OnPageSetup(wxCommandEvent & WXUNUSED(evt))
@@ -2464,7 +2475,7 @@ MyFrame::DoPrint(int options)
     wxPrintDialogData printDialogData(*g_printData);
 
     wxPrinter printer(& printDialogData);
-    MyPrintout printout(this, &m_puz, options, 01);
+    MyPrintout printout(this, &m_puz, options, 1);
     if (!printer.Print(this, &printout, true /*prompt*/))
     {
         if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
@@ -2607,6 +2618,7 @@ MyFrame::UpdateClues()
         puz::Clues::const_iterator it;
         for (it = m_puz.GetClues().begin(); it != m_puz.GetClues().end(); ++it)
         {
+            CluePanel * panel = m_clues[puz2wx(it->first)];
             const puz::ClueList & cluelist = it->second;
             if (focusedClue == NULL)
             {
@@ -2621,7 +2633,7 @@ MyFrame::UpdateClues()
                     if (word == focusedWord)
                     {
                         focusedClue = clue;
-                        m_clues[puz2wx(it->first)]->SetClue(focusedClue, CluePanel::FOCUSED);
+                        panel->SetClue(focusedClue, CluePanel::FOCUSED);
                         break;
                     }
                     else if (foundClue == NULL)
@@ -2629,11 +2641,11 @@ MyFrame::UpdateClues()
                             foundClue = clue;
                 }
                 if (! focusedClue)
-                    m_clues[puz2wx(it->first)]->SetClue(foundClue, CluePanel::CROSSING);
+                    panel->SetClue(foundClue, CluePanel::CROSSING);
             }
             else // We have already set focusedClue, so this will be a crossing clue.
             {
-                m_clues[puz2wx(it->first)]->SetClue(cluelist.Find(focusedSquare), CluePanel::CROSSING);
+                panel->SetClue(cluelist.Find(focusedSquare), CluePanel::CROSSING);
             }
         }
     }
@@ -2642,37 +2654,42 @@ MyFrame::UpdateClues()
         const short direction = GetFocusedDirection();
         const puz::GridDirection crossing_direction =
             puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
+        // The first letter in the crossing word
         const puz::Square * crossingSquare =
             focusedSquare->GetWordStart(crossing_direction);
 
         puz::Clues::const_iterator it;
         for (it = m_puz.GetClues().begin(); it != m_puz.GetClues().end(); ++it)
         {
+            CluePanel * panel = m_clues[puz2wx(it->first)];
             const puz::ClueList & cluelist = it->second;
             puz::ClueList::const_iterator clues_it;
+            // Figure out if this clue is focused or crossing
             const bool is_focused =
                 (direction == puz::ACROSS &&
                  cluelist.GetTitle() == puzT("Across")) ||
                 (direction == puz::DOWN &&
                  cluelist.GetTitle() == puzT("Down"));
 
+            // Find the clue
             for (clues_it = cluelist.begin(); clues_it != cluelist.end(); ++clues_it)
             {
                 const puz::Clue * clue = &*clues_it;
-                if (clue->GetNumber() == focusedWord->front()->GetNumber()
-                    && is_focused)
+                if (is_focused
+                    && clue->GetNumber() == focusedWord->front()->GetNumber())
                 {
-                    focusedClue = clue;
-                    m_clues[puz2wx(it->first)]->SetClue(focusedClue, CluePanel::FOCUSED);
+                    panel->SetClue(clue, CluePanel::FOCUSED);
                     break;
                 }
-                else if (crossingSquare
-                         && clue->GetNumber() == crossingSquare->GetNumber()
-                         && ! is_focused)
+                else if (! is_focused && crossingSquare
+                         && clue->GetNumber() == crossingSquare->GetNumber())
                 {
-                    m_clues[puz2wx(it->first)]->SetClue(clue, CluePanel::CROSSING);
+                    panel->SetClue(clue, CluePanel::CROSSING);
+                    break;
                 }
             }
+            if (clues_it == cluelist.end())
+                panel->SetClue(NULL, is_focused ? CluePanel::FOCUSED : CluePanel::CROSSING);
         }
     }
     m_cluePrompt->UpdateLabel();
