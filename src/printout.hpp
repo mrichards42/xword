@@ -27,13 +27,14 @@
 #include "html/render.hpp" // Html text printing
 #include "XGridDrawer.hpp"
 #include "puz/Puzzle.hpp"
+#include "dialogs/CustomPrint.hpp" // PrintInfo
 
 class MyFrame;
 
 class MyPrintout : public wxPrintout
 {
 public:
-    MyPrintout(MyFrame * frame, puz::Puzzle * puz, int options, int numPages);
+    MyPrintout(MyFrame * frame, puz::Puzzle * puz, PrintInfo info);
     ~MyPrintout();
 
     bool HasPage(int pageNum);
@@ -43,6 +44,8 @@ public:
     void OnPreparePrinting();
 
 protected:
+    PrintInfo m_info;
+
     void ReadConfig();
     bool LayoutPages();
 
@@ -52,7 +55,6 @@ protected:
 
     puz::Puzzle * m_puz;
     MyFrame * m_frame;
-    int m_numPages;
 
     // Fonts
     wxFont m_numberFont;
