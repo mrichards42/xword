@@ -34,6 +34,7 @@
 #include <wx/textctrl.h>
 #include <wx/statline.h>
 #include <wx/frame.h>
+#include <wx/choice.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -178,6 +179,35 @@ class DisplayFormatDialogBase : public wxDialog
 		
 		DisplayFormatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Display Format"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,393 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~DisplayFormatDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class CustomPrintDialog
+///////////////////////////////////////////////////////////////////////////////
+class CustomPrintDialog : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText14;
+		wxChoice* m_preset;
+		wxCheckBox* m_grid;
+		wxCheckBox* m_numbers;
+		wxCheckBox* m_text;
+		wxCheckBox* m_solution;
+		wxCheckBox* m_clues;
+		wxCheckBox* m_title;
+		wxCheckBox* m_author;
+		wxRadioBox* m_numPages;
+		wxStdDialogButtonSizer* m_sdbSizer5;
+		wxButton* m_sdbSizer5OK;
+		wxButton* m_sdbSizer5Cancel;
+	
+	public:
+		
+		CustomPrintDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Custom Print"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~CustomPrintDialog();
 	
 };
 
