@@ -82,7 +82,8 @@ protected:
             m_firstTableCell = NULL;
             m_table = NULL;
         }
-        else if (tag.GetName() == _T("TH"))
+        else if (tag.GetName() == _T("TH")
+                || (tag.GetName() == _T("TR") && m_table == NULL))
         {
             // The table is a child of the current container;
             m_table = wxDynamicCast(GetContainer()->GetLastChild(), wxHtmlContainerCell);
@@ -95,7 +96,7 @@ protected:
 
         // After the table is constructed, we can safely modify the order of
         // cells.
-        if (tag.GetName() == _T("TABLE"))
+        if (tag.GetName() == _T("TABLE") && m_table)
         {
 #if 0 // This became buggy (at least between wx 2.8.10 and 2.8.12
             // Remove the header and first table row (number and clue)
@@ -235,25 +236,6 @@ MyPrintout::GetHTML()
     // This will contain the header stuff and then one long table for each
     // clue list.
     wxString html;
-
-    // Title
-    if (m_puz->HasMeta(puzT("title")))
-    {
-        SetFontSize(dc, base_font_size, 2);
-        html << _T("<font size=\"+2\"><b>") 
-                    << BreakLine(dc, puz2wx(m_puz->GetTitle()), m_columnWidth)
-                << _T("<b></font>")
-                << _T("<br>");
-    }
-    // Author
-    if (m_puz->HasMeta(puzT("author")))
-    {
-        SetFontSize(dc, base_font_size, 1);
-        html << _T("<font size=\"+1\">")
-                << BreakLine(dc, puz2wx(m_puz->GetAuthor()), m_columnWidth)
-             << _T("</font>")
-             << _T("<br>");
-    }
 
     SetFontSize(dc, base_font_size, 0);
     // Clue lists
@@ -438,12 +420,26 @@ MyPrintout::GetPageInfo(int *minPage, int *maxPage, int *pageFrom, int *pageTo)
 bool
 MyPrintout::OnPrintPage(int pageNum)
 {
-    // m_gridScale, m_columns, and m_fontSize are set when we do the page
-    // layout (in OnPreparePrinting)
     m_isDrawing = true;
-    LayoutGrid(m_gridScale);
-    DrawGrid();
-    DrawText(m_columns, m_fontSize);
+    DrawHeader();
+    if (m_numPages == 1)
+    {
+        // m_gridScale, m_columns, and m_fontSize are set when we do the page
+        // layout (in OnPreparePrinting)
+        LayoutGrid(m_gridScale);
+        DrawGrid();
+        DrawText(m_columns, m_fontSize);
+    }
+    // Two page printing
+    else if (pageNum == 1)
+    {
+        LayoutGrid(m_gridScale);
+        DrawGrid();
+    }
+    else if (pageNum == 2)
+    {
+        DrawText(m_columns, m_fontSize);
+    }
     return true;
 }
 
@@ -459,12 +455,50 @@ MyPrintout::OnPreparePrinting()
 // Full Page Layout
 //-----------------------------------------------------------------------------
 
+wxRect
+MyPrintout::GetPageRect()
+{
+    // Fake a larger margin for the header
+    wxRect rect = GetLogicalPageMarginsRect(*g_pageSetupData);
+    double x, y;
+    GetDC()->GetUserScale(&x, &y);
+    rect.y += m_headerHeight / y;
+    rect.height -= m_headerHeight / y;
+    return rect;
+}
+
 bool
 MyPrintout::LayoutPages()
 {
     // Disable windows while laying out the page
     wxWindowDisabler disableAll;
     wxBusyInfo wait(_T("Please wait. Laying out page..."));
+
+    // Figure out how much space to allot for the header
+    DrawHeader();
+
+    // If we're doing a two-page layout, just figure out how to layout the
+    // text
+    if (m_numPages > 1)
+    {
+        for (int pt = MAX_FONT_SIZE; pt >= MIN_FONT_SIZE; --pt)
+        {
+            for (int columns = 3; columns <= 6; ++columns)
+            {
+                // If the layout worked, we're done
+                if (LayoutText(columns, pt))
+                {
+                    m_gridScale = 1; // Grid takes up one page
+                    m_fontSize = pt;
+                    m_columns = columns;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Otherwise layout the grid and text on one page
 
     // Start with the preferred grid size and column layout.
     // Try to layout the text wrapping around the grid.
@@ -496,7 +530,7 @@ MyPrintout::LayoutPages()
     // Set the min box size.
     // I can't figure out how to reliably set min box size to an inch
     // measurement, so this will have to do.
-    m_pageRect = GetLogicalPageMarginsRect(*g_pageSetupData);
+    m_pageRect = GetPageRect();
     int w, h;
     GetPageSizeMM(&w, &h);
     w -= (g_pageSetupData->GetMarginTopLeft().x + g_pageSetupData->GetMarginBottomRight().x);
@@ -566,6 +600,54 @@ MyPrintout::LayoutPages()
         return false;
 }
 
+//--------------------------------------------------------------------------------
+// Header
+//--------------------------------------------------------------------------------
+void
+MyPrintout::DrawHeader()
+{
+    wxDC * dc = GetDC();
+    ScaleDC();
+
+    wxRect rect = GetLogicalPageMarginsRect(*g_pageSetupData);
+
+    // Setup the HTML Renderer
+    m_htmlRenderer->SetDC(dc);
+    m_htmlRenderer->SetSize(rect.width, rect.height);
+    m_htmlRenderer->SetStandardFonts(12);
+    dc->SetFont(m_clueFont);
+
+    // Get the header Text
+
+    wxString html;
+    html << _T("<table align=center border=0 cellpadding=2 width=100%>");
+    // Title
+    if (m_puz->HasMeta(puzT("title")))
+    {
+        html << _T("<tr><td><font size=\"+1\"><b>") 
+                    << puz2wx(m_puz->GetTitle())
+                << _T("<b></font></td></tr>");
+    }
+    // Author / Editor
+    if (m_puz->HasMeta(puzT("author")))
+    {
+
+        html << _T("<tr><td><font size=\"+0\">") << puz2wx(m_puz->GetAuthor());
+        if (m_puz->HasMeta(puzT("editor")))
+            html << _T(" / ") << puz2wx(m_puz->GetMeta(puzT("editor")));
+        html << _T("</font></tr></td>");
+    }
+    html << _T("</table>");
+
+    m_htmlRenderer->SetHtmlText(html);
+
+    wxArrayInt breaks;
+    m_headerHeight = m_htmlRenderer->Render(rect.x, rect.y, breaks, 0, ! m_isDrawing);
+    double x, y;
+    dc->GetUserScale(&x, &y);
+    m_headerHeight *= y;
+}
+
 
 //--------------------------------------------------------------------------------
 // Text Layout
@@ -584,7 +666,7 @@ MyPrintout::DrawText(int columns, int fontSize)
 {
     wxDC * dc = GetDC();
     ScaleDC();
-    m_pageRect = GetLogicalPageMarginsRect(*g_pageSetupData);
+    m_pageRect = GetPageRect();
     // Figure out the column width
     m_columnWidth = (m_pageRect.width - (COLUMN_PADDING * (columns - 1)))
                         / (double)columns;
@@ -612,16 +694,19 @@ MyPrintout::DrawText(int columns, int fontSize)
         if (! m_pageRect.Contains(x, m_pageRect.y))
             return false;
 
-        // Make sure we don't start this column in the grid
-        if (m_gridRect.Contains(colRect.GetTopLeft()))
+        if (m_numPages == 1)
         {
-            colRect.y = m_gridRect.GetBottom() + GRID_PADDING;
-            colRect.SetBottom(m_pageRect.GetBottom());
-        }
-        // Make sure we don't overlap the grid
-        if (m_gridRect.Intersects(colRect)) // The column is too long
-        {
-            colRect.SetBottom(m_gridRect.GetTop() - GRID_PADDING);
+            // Make sure we don't start this column in the grid
+            if (m_gridRect.Contains(colRect.GetTopLeft()))
+            {
+                colRect.y = m_gridRect.GetBottom() + GRID_PADDING;
+                colRect.SetBottom(m_pageRect.GetBottom());
+            }
+            // Make sure we don't overlap the grid
+            if (m_gridRect.Intersects(colRect)) // The column is too long
+            {
+                colRect.SetBottom(m_gridRect.GetTop() - GRID_PADDING);
+            }
         }
 
         // Draw the column
@@ -683,14 +768,14 @@ MyPrintout::LayoutGrid(double gridScale)
     // Unscale the DC for layout calculations
     UnscaleDC();
 
-    const wxRect pageRect = GetLogicalPageMarginsRect(*g_pageSetupData);
+    const wxRect pageRect = GetPageRect();
 
     // Calculate the grid width and height
     //------------------------------------
 
     // The most space we will allow the grid to take up
-    const double maGridWidth  = pageRect.width  * (gridScale);
-    const double maGridHeight = pageRect.height * (gridScale);
+    const double maxGridWidth  = pageRect.width  * (gridScale);
+    const double maxGridHeight = pageRect.height * (gridScale);
 
     // Calculate the size of each square
     const int borderSize = m_drawer.GetBorderSize();
@@ -700,10 +785,10 @@ MyPrintout::LayoutGrid(double gridScale)
     // The largest a square can be is the total allowed space less the borders
     // divided by the number of squares in a row / col.
     const double boxWidth =
-        (maGridWidth  - borderSize * (gridWidth + 1)) / gridWidth;
+        (maxGridWidth  - borderSize * (gridWidth + 1)) / gridWidth;
 
     const double boxHeight =
-        (maGridHeight - borderSize * (gridHeight + 1)) / gridHeight;
+        (maxGridHeight - borderSize * (gridHeight + 1)) / gridHeight;
 
     const double boxSize = std::min(boxWidth, boxHeight);
 
@@ -718,10 +803,19 @@ MyPrintout::LayoutGrid(double gridScale)
     m_gridRect.x = pageRect.x;
     m_gridRect.y = pageRect.y;
 
-    if ((m_gridAlign & wxALIGN_RIGHT) != 0)
-        m_gridRect.x += pageRect.width - m_gridRect.width;
-    if ((m_gridAlign & wxALIGN_BOTTOM) != 0)
-        m_gridRect.y += pageRect.height - m_gridRect.height;
+    if (m_numPages > 1)
+    {
+        // Center the grid
+        m_gridRect.x += (pageRect.width - m_gridRect.width) / 2;
+        m_gridRect.y += (pageRect.height - m_gridRect.height) / 2;
+    }
+    else
+    {
+        if ((m_gridAlign & wxALIGN_RIGHT) != 0)
+            m_gridRect.x += pageRect.width - m_gridRect.width;
+        if ((m_gridAlign & wxALIGN_BOTTOM) != 0)
+            m_gridRect.y += pageRect.height - m_gridRect.height;
+    }
 
     m_drawer.SetAlign(m_gridAlign);
     m_drawer.SetMaxSize(m_gridRect.GetSize());
