@@ -11,6 +11,8 @@ local lfs = require 'lfs'
 local currentdir = lfs.currentdir()
 lfs.chdir('../scripts')
 local scriptsdir = lfs.currentdir()
+lfs.chdir('../../files/scripts')
+local oldscriptsdir = lfs.currentdir()
 lfs.chdir(currentdir)
 
 package.path = table.concat(
@@ -39,6 +41,7 @@ package.cpath = table.concat(
 local serialize = require 'serialize'
 local join = require 'pl.path'.join
 local startswith = require 'pl.stringx'.startswith
+local endswith = require 'pl.stringx'.endswith
 
 local function gen_packages(outdir)
     -- Walk scriptsdir
@@ -49,20 +52,35 @@ local function gen_packages(outdir)
             download = string.format("http://sourceforge.net/projects/wx-xword/files/Binary/XWord_%s.exe", xword_version)
         }
     }
+    function add_info(filename)
+        local info = serialize.loadfile(filename)
+        if info then
+            if info.name and info.requires and info.version and info.packagename then
+                -- Make sure we don't have duplicates
+                for _, pkg in ipairs(packages) do
+                    if pkg.name == info.name and pkg.version == info.version then
+                        return info
+                    end
+                end
+                -- Add info to the package table
+                info.download = string.format("http://sourceforge.net/projects/wx-xword/files/scripts/%s_%s.tar.gz", info.packagename, info.version)
+                table.insert(packages, info)
+            end
+            return info
+        end
+    end
     local readme = {}
     lfs.mkdir(join(outdir, "_temp_packages"))
+    -- Current packages
     for name in lfs.dir(scriptsdir) do
         local dirname = join(scriptsdir, name)
         if not startswith(name, '.') and name ~= 'xword' and name ~= 'libs'
             and lfs.attributes(dirname, 'mode') == 'directory'
             and not startswith(name, "_")
         then
-            local info = serialize.loadfile(join(dirname, 'info.lua'))
+            local info = add_info(join(dirname, 'info.lua'))
             if info then
                 if info.name and info.requires and info.version and info.packagename then
-                    -- Add info to the package table
-                    info.download = string.format("http://sourceforge.net/projects/wx-xword/files/scripts/%s_%s.tar.gz", info.packagename, info.version)
-                    table.insert(packages, info)
                     -- Add info to readme.md
                     table.insert(readme, string.format("%s (%s)\n====\n%s\n\n----\n\n", info.name, info.version, info.description))
                     -- Copy the files to a temp directory so that we can
@@ -112,6 +130,40 @@ local function gen_packages(outdir)
                 end
             else
                 print("Package "..name.." is missing info.lua")
+            end
+        end
+    end
+    -- Old Packages
+    for name in lfs.dir(oldscriptsdir) do
+        local archive_name = name:match("(.-)%.tar%.gz") or ""
+        if archive_name
+            and lfs.attributes(join(oldscriptsdir, archive_name..'.tar.gz'), 'mode') == 'file'
+        then
+            -- Unzip the archive
+            local rc = os.execute(string.format(
+                "%s e %s.tar.gz -o\"%s\"",
+                '7za.exe',
+                join(oldscriptsdir, archive_name),
+                join(outdir, "_temp_packages")
+            ))
+            if rc ~= 0 then
+                print("Error extracting package "..archive_name)
+            else
+                -- Extract the info file
+                local rc = os.execute(string.format(
+                    "%s e %s.tar info.lua -o\"%s\"",
+                    '7za.exe',
+                    join(outdir, "_temp_packages", archive_name),
+                    join(outdir, "_temp_packages")
+                ))
+                if rc ~= 0 then
+                    print("No info.lua file: "..archive_name)
+                else
+                    local info_filename = join(outdir, "_temp_packages", "info.lua")
+                    add_info(info_filename)
+                    os.remove(info_filename)
+                end
+                os.remove(join(outdir, "_temp_packages", archive_name .. '.tar'))
             end
         end
     end
