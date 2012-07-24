@@ -233,7 +233,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_staticText1412->Wrap( -1 );
 	fgSizer5->Add( m_staticText1412, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_printClueFont = new FontPanel(printPanel, wxID_ANY);
+	m_printClueFont = new FontPanel(printPanel, wxID_ANY, wxNullFont, FP_DEFAULT & ~ FP_POINTSIZE);
 	fgSizer5->Add( m_printClueFont, 0, 0, 5 );
 	
 	
