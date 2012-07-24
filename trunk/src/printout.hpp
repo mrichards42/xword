@@ -68,6 +68,7 @@ protected:
     wxRect m_pageRect;
     wxRect m_gridRect;
     double m_gridScale;
+    double m_headerHeight;
     int m_columnWidth;
     int m_numberWidth;
     int m_clueWidth;
@@ -75,6 +76,11 @@ protected:
     int m_fontSize;
     int m_x, m_y; // Current position for text
     int m_w, m_h; // width and height of last-drawn text (set by DrawTextLine)
+
+    wxRect GetPageRect();
+
+    // Header
+    void DrawHeader();
 
     // Grid
     XGridDrawer m_drawer;
