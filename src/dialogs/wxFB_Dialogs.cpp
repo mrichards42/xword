@@ -517,3 +517,104 @@ DisplayFormatDialogBase::~DisplayFormatDialogBase()
 	m_useLua->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( DisplayFormatDialogBase::OnUseLua ), NULL, this );
 	
 }
+
+CustomPrintDialog::CustomPrintDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer26;
+	bSizer26 = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer28;
+	bSizer28 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText14 = new wxStaticText( this, wxID_ANY, wxT("Preset:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText14->Wrap( -1 );
+	bSizer28->Add( m_staticText14, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxString m_presetChoices[] = { wxT("Blank Grid"), wxT("Current Progress"), wxT("Solution Grid"), wxT("Clues"), wxT("Sunday (Two Pages)"), wxT("Custom") };
+	int m_presetNChoices = sizeof( m_presetChoices ) / sizeof( wxString );
+	m_preset = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_presetNChoices, m_presetChoices, 0 );
+	m_preset->SetSelection( 0 );
+	bSizer28->Add( m_preset, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer26->Add( bSizer28, 1, wxEXPAND|wxALL, 5 );
+	
+	wxBoxSizer* bSizer22;
+	bSizer22 = new wxBoxSizer( wxHORIZONTAL );
+	
+	wxStaticBoxSizer* sbSizer13;
+	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Puzzle") ), wxVERTICAL );
+	
+	m_grid = new wxCheckBox( this, wxID_ANY, wxT("Grid"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer13->Add( m_grid, 0, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer21;
+	bSizer21 = new wxBoxSizer( wxVERTICAL );
+	
+	m_numbers = new wxCheckBox( this, wxID_ANY, wxT("Numbers"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer21->Add( m_numbers, 0, wxALL|wxEXPAND, 5 );
+	
+	m_text = new wxCheckBox( this, wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer21->Add( m_text, 0, wxALL|wxEXPAND, 5 );
+	
+	m_solution = new wxCheckBox( this, wxID_ANY, wxT("Solution"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer21->Add( m_solution, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	sbSizer13->Add( bSizer21, 0, wxLEFT|wxEXPAND, 25 );
+	
+	m_clues = new wxCheckBox( this, wxID_ANY, wxT("Clues"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer13->Add( m_clues, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	bSizer22->Add( sbSizer13, 1, wxEXPAND|wxALL, 5 );
+	
+	wxBoxSizer* bSizer25;
+	bSizer25 = new wxBoxSizer( wxVERTICAL );
+	
+	wxStaticBoxSizer* sbSizer12;
+	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Header") ), wxVERTICAL );
+	
+	m_title = new wxCheckBox( this, wxID_ANY, wxT("Title"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer12->Add( m_title, 0, wxALL|wxEXPAND, 5 );
+	
+	m_author = new wxCheckBox( this, wxID_ANY, wxT("Author"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer12->Add( m_author, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	bSizer25->Add( sbSizer12, 0, wxALL|wxEXPAND, 5 );
+	
+	wxString m_numPagesChoices[] = { wxT("One page"), wxT("Two pages") };
+	int m_numPagesNChoices = sizeof( m_numPagesChoices ) / sizeof( wxString );
+	m_numPages = new wxRadioBox( this, wxID_ANY, wxT("Print On"), wxDefaultPosition, wxDefaultSize, m_numPagesNChoices, m_numPagesChoices, 1, wxRA_SPECIFY_COLS );
+	m_numPages->SetSelection( 0 );
+	bSizer25->Add( m_numPages, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	bSizer22->Add( bSizer25, 1, wxEXPAND, 5 );
+	
+	
+	bSizer26->Add( bSizer22, 0, wxEXPAND|wxALL, 5 );
+	
+	m_sdbSizer5 = new wxStdDialogButtonSizer();
+	m_sdbSizer5OK = new wxButton( this, wxID_OK );
+	m_sdbSizer5->AddButton( m_sdbSizer5OK );
+	m_sdbSizer5Cancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer5->AddButton( m_sdbSizer5Cancel );
+	m_sdbSizer5->Realize();
+	
+	bSizer26->Add( m_sdbSizer5, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	this->SetSizer( bSizer26 );
+	this->Layout();
+	bSizer26->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+CustomPrintDialog::~CustomPrintDialog()
+{
+}
