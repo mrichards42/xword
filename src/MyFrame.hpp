@@ -331,12 +331,11 @@ private:
     void OnPageSetup(wxCommandEvent & WXUNUSED(evt));
     void DoPrint(const PrintInfo & info);
     void DoPrintPreview(const PrintInfo & info);
-    void OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt));
+    void OnPrintBlank(wxCommandEvent & WXUNUSED(evt));
     void OnPrintSolution(wxCommandEvent & WXUNUSED(evt));
     void OnPrintCurrent(wxCommandEvent & WXUNUSED(evt));
-    void OnPreviewBlankGrid(wxCommandEvent & WXUNUSED(evt));
-    void OnPreviewSolution(wxCommandEvent & WXUNUSED(evt));
-    void OnPreviewCurrent(wxCommandEvent & WXUNUSED(evt));
+    void OnPrintTwoPages(wxCommandEvent & WXUNUSED(evt));
+    void OnPrintCustom(wxCommandEvent & WXUNUSED(evt));
 
     // Help
     void OnAbout(wxCommandEvent & WXUNUSED(evt));
