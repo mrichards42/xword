@@ -22,15 +22,15 @@
 
 CustomPrintDialog::CustomPrintDialog(MyFrame * frame)
     : CustomPrintDialogBase(frame, wxID_ANY),
-      has_solution(true)
+      has_solution(true),
+      m_puz(&frame->GetPuzzle())
 {
-    if (frame->GetPuzzle().IsScrambled()
-        || ! frame->GetPuzzle().GetGrid().HasSolution())
+    if (m_puz->IsScrambled()
+        || ! m_puz->GetGrid().HasSolution())
     {
         has_solution = false;
         m_preset->Delete(2); // Remove the "Solution Grid" preset
     }
-    is_diagramless = frame->GetPuzzle().IsDiagramless();
 }
 
 
@@ -52,8 +52,23 @@ void CustomPrintDialog::UpdatePrintInfo()
     if (! (m_info.grid && m_info.clues))
         m_info.two_pages = false;
 
-    if (is_diagramless)
+    if (m_puz->IsDiagramless())
         m_info.grid_options &= ~XGridDrawer::DRAW_NUMBER;
+    if (! m_puz->HasMeta(puzT("title")))
+    {
+        m_title->Disable();
+        m_info.title = false;
+    }
+    if (! m_puz->HasMeta(puzT("author")))
+    {
+        m_author->Disable();
+        m_info.author = false;
+    }
+    if (! m_puz->HasMeta(puzT("notes")))
+    {
+        m_notes->Disable();
+        m_info.notes = false;
+    }
 
     // Check and enable ctrls
     m_grid->SetValue(m_info.grid);
@@ -65,13 +80,16 @@ void CustomPrintDialog::UpdatePrintInfo()
     m_numbers->Enable(m_info.grid);
     m_text->Enable(m_info.grid);
     m_solution->Enable(m_info.grid);
-    if (is_diagramless)
+    if (m_puz->IsDiagramless())
         m_numbers->Disable();
+    if (! has_solution)
+        m_solution->Disable();
 
     m_clues->SetValue(m_info.clues);
 
     m_title->SetValue(m_info.title);
     m_author->SetValue(m_info.author);
+    m_notes->SetValue(m_info.notes);
 
     m_numPages->SetSelection(m_info.two_pages ? 1 : 0);
     m_numPages->Enable(m_info.grid && m_info.clues);
@@ -211,6 +229,13 @@ void CustomPrintDialog::OnTitleChecked(wxCommandEvent & evt)
 void CustomPrintDialog::OnAuthorChecked(wxCommandEvent & evt)
 {
     m_info.author = evt.IsChecked();
+    UpdatePrintInfo();
+    evt.Skip();
+}
+
+void CustomPrintDialog::OnNotesChecked(wxCommandEvent & evt)
+{
+    m_info.notes = evt.IsChecked();
     UpdatePrintInfo();
     evt.Skip();
 }

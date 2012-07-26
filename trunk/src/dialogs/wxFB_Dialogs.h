@@ -199,10 +199,11 @@ class CustomPrintDialogBase : public wxDialog
 		wxCheckBox* m_clues;
 		wxCheckBox* m_title;
 		wxCheckBox* m_author;
+		wxCheckBox* m_notes;
 		wxRadioBox* m_numPages;
-		wxStdDialogButtonSizer* m_sdbSizer5;
-		wxButton* m_sdbSizer5OK;
-		wxButton* m_sdbSizer5Cancel;
+		wxButton* m_btnPrint;
+		wxButton* m_btnPreview;
+		wxButton* m_btnCancel;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnInit( wxInitDialogEvent& event ) = 0;
@@ -214,7 +215,11 @@ class CustomPrintDialogBase : public wxDialog
 		virtual void OnCluesChecked( wxCommandEvent& event ) = 0;
 		virtual void OnTitleChecked( wxCommandEvent& event ) = 0;
 		virtual void OnAuthorChecked( wxCommandEvent& event ) = 0;
+		virtual void OnNotesChecked( wxCommandEvent& event ) = 0;
 		virtual void OnPagesSelected( wxCommandEvent& event ) = 0;
+		virtual void OnPrintButton( wxCommandEvent& event ) = 0;
+		virtual void OnPreviewButton( wxCommandEvent& event ) = 0;
+		virtual void OnCancelButton( wxCommandEvent& event ) = 0;
 		
 	
 	public:
