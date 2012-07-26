@@ -469,7 +469,7 @@ MyPrintout::OnPreparePrinting()
 wxRect
 MyPrintout::GetPageRect()
 {
-    // Fake a larger margin for the header
+    // Remove the header from the page rect
     wxRect rect = GetLogicalPageMarginsRect(*g_pageSetupData);
     double x, y;
     GetDC()->GetUserScale(&x, &y);
@@ -490,18 +490,20 @@ MyPrintout::LayoutPages()
 
     // If we're doing a two-page layout, just figure out how to layout the
     // text
+    // Try columns in this order
+    int columns[] = { 4, 3, 5, 6 };
     if (m_info.two_pages || ! (m_info.grid && m_info.clues))
     {
         for (int pt = MAX_FONT_SIZE; pt >= MIN_FONT_SIZE; --pt)
         {
-            for (int columns = 3; columns <= 6; ++columns)
+            for (int i = 0; i < 4; ++i)
             {
                 // If the layout worked, we're done
-                if (LayoutText(columns, pt))
+                if (LayoutText(columns[i], pt))
                 {
                     m_gridScale = 1; // Grid takes up one page
                     m_fontSize = pt;
-                    m_columns = columns;
+                    m_columns = columns[i];
                     return true;
                 }
             }
@@ -617,7 +619,7 @@ MyPrintout::LayoutPages()
 void
 MyPrintout::DrawHeader()
 {
-    if (! (m_info.author || m_info.title))
+    if (! (m_info.author || m_info.title || m_info.notes))
     {
         m_headerHeight = 0;
         return;
@@ -636,24 +638,32 @@ MyPrintout::DrawHeader()
     // Get the header Text
 
     wxString html;
-    html << _T("<table align=center border=0 cellpadding=2 width=100%>");
+    html << _T("<table border=0 cellpadding=2 width=100%><tr>");
     // Title
     if (m_info.title && m_puz->HasMeta(puzT("title")))
     {
-        html << _T("<tr><td><font size=\"+1\"><b>") 
+        html << _T("<td align=left><font size=\"+1\"><b>") 
                     << puz2wx(m_puz->GetTitle())
-                << _T("<b></font></td></tr>");
+                << _T("<b></font></td>");
     }
     // Author / Editor
     if (m_info.author && m_puz->HasMeta(puzT("author")))
     {
 
-        html << _T("<tr><td><font size=\"+0\">") << puz2wx(m_puz->GetAuthor());
+        html << _T("<td align=right>") << puz2wx(m_puz->GetAuthor());
         if (m_puz->HasMeta(puzT("editor")))
             html << _T(" / ") << puz2wx(m_puz->GetMeta(puzT("editor")));
-        html << _T("</font></tr></td>");
+        html << _T("</td>");
     }
-    html << _T("</table>");
+    html << _T("</tr></table>");
+    // Notes
+    if (m_info.notes && m_puz->HasMeta(puzT("notes")))
+    {
+
+        html << _T("<table border=0 cellpadding=5 width=100%><tr><td>")
+             << puz2wx(m_puz->GetNotes())
+             << _T("</td></tr></table>");
+    }
 
     m_htmlRenderer->SetHtmlText(html);
 
