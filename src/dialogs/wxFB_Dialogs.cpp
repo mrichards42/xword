@@ -548,25 +548,25 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Puzzle") ), wxVERTICAL );
 	
 	m_grid = new wxCheckBox( this, wxID_ANY, wxT("Grid"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer13->Add( m_grid, 0, wxALL|wxEXPAND, 5 );
+	sbSizer13->Add( m_grid, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer21;
 	bSizer21 = new wxBoxSizer( wxVERTICAL );
 	
 	m_numbers = new wxCheckBox( this, wxID_ANY, wxT("Numbers"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer21->Add( m_numbers, 0, wxALL|wxEXPAND, 5 );
+	bSizer21->Add( m_numbers, 1, wxALL|wxEXPAND, 5 );
 	
 	m_text = new wxCheckBox( this, wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer21->Add( m_text, 0, wxALL|wxEXPAND, 5 );
+	bSizer21->Add( m_text, 1, wxALL|wxEXPAND, 5 );
 	
 	m_solution = new wxCheckBox( this, wxID_ANY, wxT("Solution"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer21->Add( m_solution, 0, wxALL|wxEXPAND, 5 );
+	bSizer21->Add( m_solution, 1, wxALL|wxEXPAND, 5 );
 	
 	
-	sbSizer13->Add( bSizer21, 0, wxLEFT|wxEXPAND, 25 );
+	sbSizer13->Add( bSizer21, 3, wxLEFT|wxEXPAND, 25 );
 	
 	m_clues = new wxCheckBox( this, wxID_ANY, wxT("Clues"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer13->Add( m_clues, 0, wxALL|wxEXPAND, 5 );
+	sbSizer13->Add( m_clues, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	bSizer22->Add( sbSizer13, 1, wxEXPAND|wxALL, 5 );
@@ -583,6 +583,9 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	m_author = new wxCheckBox( this, wxID_ANY, wxT("Author"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer12->Add( m_author, 0, wxALL|wxEXPAND, 5 );
 	
+	m_notes = new wxCheckBox( this, wxID_ANY, wxT("Notes"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer12->Add( m_notes, 0, wxALL, 5 );
+	
 	
 	bSizer25->Add( sbSizer12, 0, wxALL|wxEXPAND, 5 );
 	
@@ -598,14 +601,21 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	bSizer26->Add( bSizer22, 0, wxEXPAND|wxALL, 5 );
 	
-	m_sdbSizer5 = new wxStdDialogButtonSizer();
-	m_sdbSizer5OK = new wxButton( this, wxID_OK );
-	m_sdbSizer5->AddButton( m_sdbSizer5OK );
-	m_sdbSizer5Cancel = new wxButton( this, wxID_CANCEL );
-	m_sdbSizer5->AddButton( m_sdbSizer5Cancel );
-	m_sdbSizer5->Realize();
+	wxBoxSizer* bSizer251;
+	bSizer251 = new wxBoxSizer( wxHORIZONTAL );
 	
-	bSizer26->Add( m_sdbSizer5, 0, wxALL|wxEXPAND, 5 );
+	m_btnPrint = new wxButton( this, wxID_ANY, wxT("&Print"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_btnPrint->SetDefault(); 
+	bSizer251->Add( m_btnPrint, 0, wxALL, 5 );
+	
+	m_btnPreview = new wxButton( this, wxID_ANY, wxT("Print Preview"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer251->Add( m_btnPreview, 0, wxALL, 5 );
+	
+	m_btnCancel = new wxButton( this, wxID_ANY, wxT("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer251->Add( m_btnCancel, 0, wxALL, 5 );
+	
+	
+	bSizer26->Add( bSizer251, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer26 );
@@ -624,7 +634,11 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	m_clues->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnCluesChecked ), NULL, this );
 	m_title->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnTitleChecked ), NULL, this );
 	m_author->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnAuthorChecked ), NULL, this );
+	m_notes->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnNotesChecked ), NULL, this );
 	m_numPages->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( CustomPrintDialogBase::OnPagesSelected ), NULL, this );
+	m_btnPrint->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnPrintButton ), NULL, this );
+	m_btnPreview->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnPreviewButton ), NULL, this );
+	m_btnCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnCancelButton ), NULL, this );
 }
 
 CustomPrintDialogBase::~CustomPrintDialogBase()
@@ -639,6 +653,10 @@ CustomPrintDialogBase::~CustomPrintDialogBase()
 	m_clues->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnCluesChecked ), NULL, this );
 	m_title->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnTitleChecked ), NULL, this );
 	m_author->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnAuthorChecked ), NULL, this );
+	m_notes->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnNotesChecked ), NULL, this );
 	m_numPages->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( CustomPrintDialogBase::OnPagesSelected ), NULL, this );
+	m_btnPrint->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnPrintButton ), NULL, this );
+	m_btnPreview->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnPreviewButton ), NULL, this );
+	m_btnCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnCancelButton ), NULL, this );
 	
 }

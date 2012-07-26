@@ -21,6 +21,7 @@
 
 #include "wxFB_Dialogs.h"
 
+namespace puz { class Puzzle; }
 class MyFrame;
 
 struct PrintInfo
@@ -31,7 +32,8 @@ struct PrintInfo
           grid_options(options),
           two_pages(false),
           title(true),
-          author(true)
+          author(true),
+          notes(false)
     {}
 
     bool clues;
@@ -40,6 +42,7 @@ struct PrintInfo
     bool two_pages;
     bool author;
     bool title;
+    bool notes;
 };
 
 class CustomPrintDialog : public CustomPrintDialogBase
@@ -48,6 +51,13 @@ public:
     CustomPrintDialog(MyFrame * frame);
 
     PrintInfo GetPrintInfo() { return m_info; }
+
+    enum buttons
+    {
+        ID_PRINT,
+        ID_PREVIEW,
+        ID_CANCEL
+    };
 
 protected:
     // Event Handlers
@@ -61,27 +71,19 @@ protected:
     virtual void OnCluesChecked(wxCommandEvent & evt);
     virtual void OnTitleChecked(wxCommandEvent & evt);
     virtual void OnAuthorChecked(wxCommandEvent & evt);
+    virtual void OnNotesChecked(wxCommandEvent & evt);
     virtual void OnPagesSelected(wxCommandEvent & evt);
+
+    virtual void OnPrintButton(wxCommandEvent & WXUNUSED(evt)) { EndModal(ID_PRINT); }
+    virtual void OnPreviewButton(wxCommandEvent & WXUNUSED(evt)) { EndModal(ID_PREVIEW); }
+    virtual void OnCancelButton(wxCommandEvent & WXUNUSED(evt)) { EndModal(ID_CANCEL); }
 
     void UpdatePrintInfo();
     
     PrintInfo m_info;
-    MyFrame * m_frame;
+    puz::Puzzle * m_puz;
     bool has_solution;
-    bool is_diagramless;
 };
 
-
-static bool GetCustomPrintInfo(MyFrame * frame, PrintInfo * info)
-{
-    CustomPrintDialog dlg(frame);
-    if (dlg.ShowModal() == wxID_OK)
-    {
-        *info = dlg.GetPrintInfo();
-        return true;
-    }
-    else
-        return false;
-}
 
 #endif // PREFERENCES_DLG_H
