@@ -122,11 +122,11 @@ enum toolIds
     //wxID_PREFERENCES,
 
     ID_PAGE_SETUP,
-    ID_PREVIEW_CURRENT,
-    ID_PREVIEW_BLANK,
-    ID_PREVIEW_SOLUTION,
-    ID_PRINT_CURRENT,
+
+    ID_PRINT_CUSTOM,
     ID_PRINT_BLANK,
+    ID_PRINT_TWO_PAGES,
+    ID_PRINT_CURRENT,
     ID_PRINT_SOLUTION,
 
     //wxID_HELP_CONTENTS,
@@ -213,24 +213,20 @@ MyFrame::ManageTools()
         { ID_PAGE_SETUP,     wxITEM_NORMAL, _T("Page Setup..."), NULL, NULL,
                      _handler(MyFrame::OnPageSetup) },
 
+        { ID_PRINT_BLANK,    wxITEM_NORMAL, _T("&Blank Grid\tCtrl+P"), NULL, NULL,
+                     _handler(MyFrame::OnPrintBlank) },
+
+        { ID_PRINT_TWO_PAGES,  wxITEM_NORMAL, _T("Blank Grid (&Two Pages)"), NULL, NULL,
+                     _handler(MyFrame::OnPrintTwoPages) },
+
         { ID_PRINT_CURRENT,  wxITEM_NORMAL, _T("&Current Progress"), NULL, NULL,
                      _handler(MyFrame::OnPrintCurrent) },
-
-        { ID_PRINT_BLANK,    wxITEM_NORMAL, _T("&Blank Grid\tCtrl+P"), NULL, NULL,
-                     _handler(MyFrame::OnPrintBlankGrid) },
 
         { ID_PRINT_SOLUTION,  wxITEM_NORMAL, _T("&Solution"), NULL, NULL,
                      _handler(MyFrame::OnPrintSolution) },
 
-        { ID_PREVIEW_CURRENT,  wxITEM_NORMAL, _T("&Current Progress"), NULL, NULL,
-                     _handler(MyFrame::OnPreviewCurrent) },
-
-        { ID_PREVIEW_BLANK,    wxITEM_NORMAL, _T("&Blank Grid"), NULL, NULL,
-                     _handler(MyFrame::OnPreviewBlankGrid) },
-
-        { ID_PREVIEW_SOLUTION, wxITEM_NORMAL, _T("&Solution"), NULL, NULL,
-                     _handler(MyFrame::OnPreviewSolution) },
-
+        { ID_PRINT_CUSTOM,  wxITEM_NORMAL, _T("&Custom\tCtrl+Shift+P"), NULL, NULL,
+                     _handler(MyFrame::OnPrintCustom) },
 
         { wxID_EXIT,         wxITEM_NORMAL, _T("&Quit\tCtrl+Q"), NULL, NULL,
                      _handler(MyFrame::OnQuit) },
@@ -1132,15 +1128,12 @@ MyFrame::CreateMenuBar()
         menu->AppendSeparator();
         m_toolMgr.Add(menu, ID_PAGE_SETUP);
         submenu = new wxMenu();
-            m_toolMgr.Add(submenu, ID_PRINT_CURRENT);
             m_toolMgr.Add(submenu, ID_PRINT_BLANK);
+            m_toolMgr.Add(submenu, ID_PRINT_TWO_PAGES);
+            m_toolMgr.Add(submenu, ID_PRINT_CURRENT);
             m_toolMgr.Add(submenu, ID_PRINT_SOLUTION);
+            m_toolMgr.Add(submenu, ID_PRINT_CUSTOM);
         menu->AppendSubMenu(submenu, _T("&Print"));
-        submenu = new wxMenu();
-            m_toolMgr.Add(submenu, ID_PREVIEW_CURRENT);
-            m_toolMgr.Add(submenu, ID_PREVIEW_BLANK);
-            m_toolMgr.Add(submenu, ID_PREVIEW_SOLUTION);
-        menu->AppendSubMenu(submenu, _T("Print Preview"));
         menu->AppendSeparator();
         m_toolMgr.Add(menu, wxID_EXIT);
     mb->Append(menu, _T("&File"));
@@ -1377,17 +1370,13 @@ MyFrame::EnableTools(bool enable)
     m_toolMgr.Enable(wxID_DELETE, enable);
     m_toolMgr.Enable(ID_TIMER, enable);
 
-    m_toolMgr.Enable(ID_PRINT_CURRENT, enable);
     m_toolMgr.Enable(ID_PRINT_BLANK, enable);
+    m_toolMgr.Enable(ID_PRINT_TWO_PAGES, enable);
+    m_toolMgr.Enable(ID_PRINT_CURRENT, enable);
     m_toolMgr.Enable(ID_PRINT_SOLUTION, enable);
+    m_toolMgr.Enable(ID_PRINT_CUSTOM, enable);
     m_menubar->Enable(m_menubar->FindMenuItem(_T("File"), _T("Print")),
                       enable);
-    m_toolMgr.Enable(ID_PREVIEW_CURRENT, enable);
-    m_toolMgr.Enable(ID_PREVIEW_BLANK, enable);
-    m_toolMgr.Enable(ID_PREVIEW_SOLUTION, enable);
-    m_menubar->Enable(m_menubar->FindMenuItem(_T("File"), _T("Print Preview")),
-                      enable);
-
 }
 
 
@@ -2490,49 +2479,6 @@ MyFrame::DoPrint(const PrintInfo & info)
     }
 }
 
-const int PRINT_BLANK = XGridDrawer::DRAW_CIRCLE
-                      | XGridDrawer::DRAW_NUMBER;
-
-const int PRINT_CURRENT = XGridDrawer::DRAW_CIRCLE
-                        | XGridDrawer::DRAW_NUMBER
-                        | XGridDrawer::DRAW_USER_TEXT;
-
-const int PRINT_SOLUTION = XGridDrawer::DRAW_CIRCLE
-                         | XGridDrawer::DRAW_SOLUTION;
-
-void
-MyFrame::OnPrintBlankGrid(wxCommandEvent & WXUNUSED(evt))
-{
-    PrintInfo info;
-    if (! m_puz.IsDiagramless())
-        info.grid_options = PRINT_BLANK;
-    else
-        info.grid_options = PRINT_BLANK
-                            & ~XGridDrawer::DRAW_NUMBER
-                            | XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
-    DoPrint(info);
-}
-
-void
-MyFrame::OnPrintCurrent(wxCommandEvent & WXUNUSED(evt))
-{
-    PrintInfo info;
-    if (! m_puz.IsDiagramless())
-        info.grid_options = PRINT_CURRENT;
-    else
-        info.grid_options = PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER;
-    DoPrint(info);
-}
-
-void
-MyFrame::OnPrintSolution(wxCommandEvent & WXUNUSED(evt))
-{
-    PrintInfo info;
-    info.grid_options = PRINT_SOLUTION;
-    info.clues = false;
-    DoPrint(info);
-}
-
 void
 MyFrame::DoPrintPreview(const PrintInfo & info)
 {
@@ -2557,45 +2503,59 @@ MyFrame::DoPrintPreview(const PrintInfo & info)
     frame->Show();
 }
 
-
 void
-MyFrame::OnPreviewBlankGrid(wxCommandEvent & WXUNUSED(evt))
-{
-    PrintInfo info;
-
-    if (GetCustomPrintInfo(this, &info))
-    {
-        DoPrintPreview(info);
-    }
-    return;
-
-    if (! m_puz.IsDiagramless())
-        info.grid_options = PRINT_BLANK;
-    else
-        info.grid_options = PRINT_BLANK
-                            & ~XGridDrawer::DRAW_NUMBER
-                            | XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
-    DoPrintPreview(info);
-}
-
-void
-MyFrame::OnPreviewCurrent(wxCommandEvent & WXUNUSED(evt))
+MyFrame::OnPrintBlank(wxCommandEvent & WXUNUSED(evt))
 {
     PrintInfo info;
     if (! m_puz.IsDiagramless())
-        info.grid_options = PRINT_CURRENT;
+        info.grid_options = XGridDrawer::DRAW_NUMBER;
     else
-        info.grid_options = PRINT_CURRENT & ~XGridDrawer::DRAW_NUMBER;
-    DoPrintPreview(info);
+        info.grid_options = XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
+    DoPrint(info);
 }
 
 void
-MyFrame::OnPreviewSolution(wxCommandEvent & WXUNUSED(evt))
+MyFrame::OnPrintTwoPages(wxCommandEvent & WXUNUSED(evt))
 {
     PrintInfo info;
-    info.grid_options = PRINT_SOLUTION;
+    info.two_pages = true;
+    if (! m_puz.IsDiagramless())
+        info.grid_options = XGridDrawer::DRAW_NUMBER;
+    else
+        info.grid_options = XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
+    DoPrint(info);
+}
+
+void
+MyFrame::OnPrintCurrent(wxCommandEvent & WXUNUSED(evt))
+{
+    PrintInfo info;
+    if (! m_puz.IsDiagramless())
+        info.grid_options = XGridDrawer::DRAW_USER_TEXT
+                            | XGridDrawer::DRAW_NUMBER;
+    else
+        info.grid_options = XGridDrawer::DRAW_USER_TEXT;
+    DoPrint(info);
+}
+
+void
+MyFrame::OnPrintSolution(wxCommandEvent & WXUNUSED(evt))
+{
+    PrintInfo info;
+    info.grid_options = XGridDrawer::DRAW_SOLUTION;
     info.clues = false;
-    DoPrintPreview(info);
+    DoPrint(info);
+}
+
+void
+MyFrame::OnPrintCustom(wxCommandEvent & WXUNUSED(evt))
+{
+    CustomPrintDialog dlg(this);
+    int code = dlg.ShowModal();
+    if (code == CustomPrintDialog::ID_PRINT)
+        DoPrint(dlg.GetPrintInfo());
+    else if (code == CustomPrintDialog::ID_PREVIEW)
+        DoPrintPreview(dlg.GetPrintInfo());
 }
 
 
