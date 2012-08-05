@@ -342,7 +342,7 @@ local function UpdatePanel(parent)
             if not pkg.ignored then
                 table.insert(to_install, pkg)
             else
-                -- Find the update in updates_file and set ignoredpkg
+                -- Find the update in updates_file and set ignored
                 for _, p in ipairs(update_packages) do
                     if p.name == pkg.name then
                         p.ignored = true
@@ -401,28 +401,76 @@ end
 -- ---------------------------------------------------------------------------
 -- The Package Manager dialog
 -- ---------------------------------------------------------------------------
-function P.PackageDialog()
-    local dlg = wx.wxDialog(xword.frame or wx.NULL, wx.wxID_ANY,
+function P.PackageDialog(opts)
+    if P.dlg then
+        p.dlg:Show()
+        return false
+    end
+
+    -- Dialog options
+    if opts == nil then
+        opts = {}
+    end
+    if opts.scripts == nil and opts.updates == nil and opts.available == nil then
+        opts.scripts = true
+        opts.updates = true
+        opts.available = true
+    end
+    if opts.check == nil then
+        opts.check = true
+    end
+    if opts.parent == nil then
+        opts.parent = xword.frame or wx.NULL
+    end
+    if opts.buttons == nil or opts.buttons == true then
+        opts.buttons = { close = true, check = true }
+    end
+
+    local dlg = wx.wxDialog(opts.parent, wx.wxID_ANY,
                             "Package Manager",
                             wx.wxDefaultPosition, wx.wxSize(450,350),
                             wx.wxDEFAULT_DIALOG_STYLE + wx.wxRESIZE_BORDER)
     P.dlg = dlg
 
-    -- Notebook Pages
-    local notebook = wx.wxNotebook(dlg, wx.wxID_ANY)
-    dlg.notebook = notebook
+    -- Count the number of pages to see if we need a notebook
+    local num_pages = (opts.scripts and 1 or 0)
+                      + (opts.updates and 1 or 0)
+                      + (opts.available and 1 or 0)
+
+    local panel_parent = dlg
+    local main_panel = nil
+    if num_pages > 1 then
+        dlg.notebook = wx.wxNotebook(dlg, wx.wxID_ANY)
+        panel_parent = dlg.notebook
+        main_panel = dlg.notebook
+    else
+        dlg.notebook = false
+    end
 
     -- Scripts
-    dlg.scripts = ScriptsPanel(notebook)
-    notebook:AddPage(dlg.scripts, "Installed Packages")
+    dlg.scripts = opts.scripts and ScriptsPanel(panel_parent) or false
 
     -- Updates
-    dlg.updates = UpdatePanel(notebook)
-    notebook:AddPage(dlg.updates, "Updates")
+    dlg.updates = opts.updates and UpdatePanel(panel_parent) or false
 
     -- Available
-    dlg.available = AvailablePanel(notebook)
-    notebook:AddPage(dlg.available, "Available Packages")
+    dlg.available = opts.available and AvailablePanel(panel_parent) or false
+
+
+    -- Add notebook pages
+    if dlg.notebook then
+        if dlg.scripts then
+            dlg.notebook:AddPage(dlg.scripts, "Installed Packages")
+        end
+        if dlg.updates then
+            dlg.notebook:AddPage(dlg.updates, "Updates")
+        end
+        if dlg.available then
+            dlg.notebook:AddPage(dlg.available, "Available Packages")
+        end
+    else
+        main_panel = dlg.scripts or dlg.updates or dlg.available
+    end
 
 
     -- Load scripts info from files
@@ -438,7 +486,9 @@ function P.PackageDialog()
         for packagename, value in pairs(installed) do
             self.packages[packagename].installed = value
         end
-        self.scripts:SetData(self.packages)
+        if self.scripts then
+            self.scripts:SetData(self.packages)
+        end
     end
 
     -- Load updates and available packages
@@ -489,41 +539,67 @@ function P.PackageDialog()
                 end
             end
         end
-        self.updates:SetData(update_packages)
-        self.available:SetData(new_packages)
+        if self.updates then
+            self.updates:SetData(update_packages)
+        end
+        if self.available then
+            self.available:SetData(new_packages)
+        end
     end
 
     dlg:RefreshPackages()
     dlg:RefreshUpdates()
 
     -- The buttons
-    local buttons = wx.wxStdDialogButtonSizer()
-    local close = wx.wxButton(dlg, wx.wxID_OK, "Close")
+    local buttons
+    if opts.buttons then
+        buttons = wx.wxStdDialogButtonSizer()
 
-    buttons:SetAffirmativeButton(close)
-    local checkbutton = wx.wxButton(dlg, wx.wxID_ANY, "Check for updates")
-    checkbutton:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
-        P.updater.CheckForUpdates(function ()
-            dlg:RefreshUpdates(true) -- Check for XWord update
-            local selection = notebook:GetSelection()
-            if selection ~= 1 and selection ~= 2 then
-                notebook:SetSelection(1)
-            end
-        end)
-        evt:Skip()
-    end)
-    buttons:Add(checkbutton, 0)
-    buttons:Realize()
+        if opts.buttons.close then
+            local close = wx.wxButton(dlg, wx.wxID_OK, "Close")
+            close:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+                dlg:Close()
+            end)
+            buttons:SetAffirmativeButton(close)
+        end
+
+        if opts.buttons.check then
+            local checkbutton = wx.wxButton(dlg, wx.wxID_ANY, "Check for updates")
+            checkbutton:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+                P.updater.CheckForUpdates(function ()
+                    dlg:RefreshUpdates(true) -- Check for XWord update
+                    if dlg.notebook and dlg.scripts then -- Select the update page
+                        if dlg.notebook:GetPage(dlg.notebook:GetSelection()).Id == dlg.scripts.Id then
+                            dlg.notebook:SetSelection(1)
+                        end
+                    end
+                end)
+                evt:Skip()
+            end)
+            buttons:Add(checkbutton, 0)
+        end
+        buttons:Realize()
+    end
 
     -- Layout
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    sizer:Add(notebook, 1, wx.wxEXPAND + wx.wxALL, 5)
-    sizer:Add(buttons, 0, wx.wxEXPAND + wx.wxALL, 5)
+    sizer:Add(main_panel, 1, wx.wxEXPAND + wx.wxALL, 5)
+    if buttons then
+        sizer:Add(buttons, 0, wx.wxEXPAND + wx.wxALL, 5)
+    end
     dlg:SetSizer(sizer)
 
     dlg:Center()
 
-    P.updater.CheckForUpdates(function() dlg:RefreshUpdates() end)
+    if do_check ~= false then
+        P.updater.CheckForUpdates(function() dlg:RefreshUpdates() end)
+    end
+
+    dlg:Connect(wx.wxEVT_CLOSE_WINDOW, function(evt)
+        evt:Skip()
+        dlg:Destroy()
+        P.dlg = nil
+    end)
 
     return dlg
 end
