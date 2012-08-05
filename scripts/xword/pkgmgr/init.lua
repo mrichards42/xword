@@ -55,9 +55,10 @@ local function init()
     P.updater.CheckForUpdates(function()
 
         -- Show a hacked version of the package dialog
-        local function do_update(message, pagenum)
+        local function do_update(message, opts)
+            opts.check = false
             require 'xword.pkgmgr.dialog'
-            local dlg = P.PackageDialog()
+            local dlg = P.PackageDialog(opts)
 
             -- Add a header to the dialog
             local text = wx.wxStaticText(dlg, -1, message)
@@ -70,28 +71,27 @@ local function init()
             dlg:GetSizer():Insert(0, top, 0, wx.wxEXPAND + wx.wxALL, 10)
 
             -- Add buttons to the update page
-            local sizer = dlg.updates:GetSizer():GetItem(1):GetSizer()
-            local laterButton = wx.wxButton(dlg.updates, -1, "Later")
-            local ignoreButton = wx.wxButton(dlg.updates, -1, "Ignore updates")
-            sizer:Add(laterButton, 0, wx.wxALL, 5)
-            sizer:Add(ignoreButton, 0, wx.wxALL, 5)
-            sizer:Layout()
+            if dlg.updates then
+                local sizer = dlg.updates:GetSizer():GetItem(1):GetSizer()
+                local laterButton = wx.wxButton(dlg.updates, -1, "Later")
+                local ignoreButton = wx.wxButton(dlg.updates, -1, "Ignore updates")
+                sizer:Add(laterButton, 0, wx.wxALL, 5)
+                sizer:Add(ignoreButton, 0, wx.wxALL, 5)
+                sizer:Layout()
 
-            laterButton:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
-                dlg:Close()
-            end)
+                laterButton:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
+                    dlg:Close()
+                end)
 
-            ignoreButton:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
-                -- Uncheck all the boxes, then save the ignore state
-                for _, pkg in ipairs(dlg.updates.packages) do
-                    pkg.ignored = true
-                end
-                dlg.updates.InstallUpdates() -- This rewrites updates.lua
-                dlg:Close()
-            end)
-
-            -- Select the update page
-            dlg.notebook:SetSelection(pagenum)
+                ignoreButton:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
+                    -- Ignore all the update packages
+                    for _, pkg in ipairs(dlg.updates.packages) do
+                        pkg.ignored = true
+                    end
+                    dlg.updates.InstallUpdates() -- This rewrites updates.lua
+                    dlg:Close()
+                end)
+            end
 
             dlg:ShowModal()
         end
@@ -122,7 +122,7 @@ local function init()
         if xword.firstrun then
             for _, pkg in ipairs(updates) do
                 if not packages[pkg.packagename] then
-                    do_update("Addon packages are available:", 2)
+                    do_update("Addon packages are available:", {available=true, buttons={close=true}})
                     return
                 end
             end
@@ -137,7 +137,7 @@ local function init()
                         if P.is_newer(pkg.version, p.version)
                            and not P.is_newer(pkg.requires, xword.version)
                         then
-                            do_update("New updates are available:", 1)
+                            do_update("New updates are available:", {updates=true, buttons=false})
                             return
                         end
                     end

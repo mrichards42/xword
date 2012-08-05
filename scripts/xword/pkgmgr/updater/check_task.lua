@@ -44,15 +44,11 @@ local updates = serialize.loadfile(updates_filename) or {}
 -- "ignored" from packages in updates
 for _, pkg in ipairs(remote_updates or {}) do
     -- Find the local package
-    local local_pkg
-    for _, p in ipairs(updates) do
-        if p.name == pkg.name then
-            local_pkg = p
+    for i, local_pkg in ipairs(updates) do
+        if local_pkg.name == pkg.name and local_pkg.version == pkg.version then
+            pkg.ignored = local_pkg.ignored -- Copy ignored status
+            table.remove(updates, i)
         end
-    end
-    -- Copy "ignored"
-    if local_pkg then
-        pkg.ignored = local_pkg.ignored
     end
 end
 
@@ -61,6 +57,11 @@ if updates.xword and remote_updates.xword
     and updates.xword.version == remote_updates.xword.version
 then
     remote_updates.xword.ignored = updates.xword.ignored
+end
+
+-- Save update status of packages that were not already in remote_updates
+for _, p in ipairs(updates) do
+    table.insert(remote_updates, p)
 end
 
 -- Save the updates to file
