@@ -56,6 +56,21 @@ local sources = {
                 return "Unable to login"
             end
         end
+        -- Read the cookies file and remove expiration times
+        local f = io.open(cookies_filename, 'rb')
+        if f then
+            local text = {}
+            for line in f:lines() do
+                line = line:gsub("(.-)\t(.-)\t(.-)\t(.-)\t(.-)\t(.-)\t(.-)",
+                                  "%1\t%2\t%3\t%4\t0\t%6\t%7")
+                table.insert(text, line)
+            end
+            f:close()
+            -- Write the new cookies file
+            f = io.open(cookies_filename, 'wb')
+            f:write(table.concat(text, '\n'))
+            f:close()
+        end
     end
     -- Download the puzzle, using the supplied cookies
     set_status()
