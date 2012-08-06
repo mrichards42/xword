@@ -84,6 +84,8 @@ local function make_popup(parent, puzzle)
         end
         sizer:Add(wx.wxStaticBitmap(popup, wx.wxID_ANY, bmp), 0, wx.wxTOP, 5)
         p:__gc()
+    elseif download.puzzle_exists(puzzle.filename) then
+        sizer:Add(wx.wxStaticText(popup, wx.wxID_ANY, tostring(puzzle.filename)))
     else
         sizer:Add(wx.wxStaticText(popup, wx.wxID_ANY, tostring(puzzle.url)))
     end
@@ -132,7 +134,9 @@ local function PuzzleCtrl(parent, text, puzzle)
     -- Open the puzzle
     function ctrl:open_puzzle()
         if download.puzzle_exists(puzzle.filename) then
-            xword.frame:LoadPuzzle(puzzle.filename)
+            if puz.Puzzle.CanLoad(puzzle.filename) then
+                xword.frame:LoadPuzzle(puzzle.filename)
+            end
         else
             download.add_download(puzzle, download.PREPEND)
             download.open_after_download = puzzle.filename

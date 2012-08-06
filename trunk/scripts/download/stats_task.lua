@@ -13,7 +13,9 @@ local function get_status(filename)
 
     -- If we can't save this format, assume that the user hasn't started
     -- solving the puzzle
-    if not puz.Puzzle.CanSave(filename) then
+    -- If we can't load this format (e.g. PDF) obviously the user hasn't started
+    -- solving either
+    if not puz.Puzzle.CanSave(filename) or not puz.Puzzle.CanLoad(filename) then
         return download.EXISTS
     end
 
