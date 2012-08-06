@@ -254,7 +254,7 @@ local function download_puzzle(puzzle)
         if err == 'abort' then
             error({'abort'})
         end
-    else
+    elseif puz.Puzzle.CanLoad(puzzle.filename) then
         -- Try to open the file
         local success, result = pcall(puz.Puzzle, puzzle.filename)
         if success then
