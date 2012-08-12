@@ -23,7 +23,7 @@ end
 
 -- Decode xml entities
 local entities = {
-    --lt = "<", -- Apparently these shouldn't be unescaped
+    --lt = "<", -- These will be unescaped later
     --gt = ">",
     apos = "'",
     quot = '"',
@@ -31,7 +31,8 @@ local entities = {
 }
 
 local function decode_entities(str)
-    return str:gsub("&(.-);", entities)
+    -- Decode entities and replace XHTML tags
+    return str:gsub("&(.-);", entities):gsub("&lt;([^%s]-)&gt;", "<%1>")
 end
 
 
