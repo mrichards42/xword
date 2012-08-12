@@ -1,11 +1,15 @@
 return {
     name = "Puzzle import",
     packagename = "import",
-    version = "1.2",
+    version = "1.3",
     description = [[
 Import non-native puzzle types:
 * UClick XML
 * XWord Info
+
+Changes for version 1.3 (XWord 0.6.1):
+* JSON parser
+* XWord Info json parser
 
 Changes for version 1.2 (XWord 0.6):
 * JSON parser
