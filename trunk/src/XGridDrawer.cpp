@@ -543,7 +543,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
     if (HasFlag(DRAW_CIRCLE) && square.HasFlag(puz::FLAG_CIRCLE))
     {
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
-        dc.SetPen(wxPen(*wxBLACK, 1));
+        dc.SetPen(wxPen(GetBlackSquareColor(), m_borderSize));
         dc.DrawEllipse(x, y, m_boxSize, m_boxSize);
     }
 
