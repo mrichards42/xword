@@ -39,7 +39,7 @@ void Clue::SetNumber(int _number)
 
 void Clue::SetText(const string_t & _text)
 {
-    text = _text;
+    text = unescape_xml(_text);
 }
 
 // ---------------------------------------------------------------------------

@@ -81,12 +81,18 @@ std::string GetExtension(const std::string & filename);
 string_t ToString(int number);
 int ToInt(const string_t & str);
 
+// XML stuff
+enum {
+    UNESCAPE_BR = 1,
+    UNESCAPE_ENTITIES = 2,
+    UNESCAPE_ALL = UNESCAPE_BR | UNESCAPE_ENTITIES
+    // Character references will always be unescaped
+};
+
 string_t escape_xml(const string_t & str);
-string_t unescape_xml(const string_t & str);
+string_t unescape_xml(const string_t & str, int options = 0);
 
 std::string GetPuzText(const string_t & str);
-
-
 } // namespace puz
 
 #endif // PUZ_STRING_H
