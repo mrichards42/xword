@@ -3,7 +3,7 @@
 -- Generate readme.md for sourceforge.
 -- NOTE: don't forget to update xword_version
 
-xword_version = "0.6"
+xword_version = "0.6.1"
 
 local lfs = require 'lfs'
 

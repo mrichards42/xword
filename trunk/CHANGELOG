@@ -1,3 +1,19 @@
+Version 0.6.1 (8/12/2012)
+==========================
+New Features
+------------
+* More customizable printing, including an option to print on two-pages.
+
+
+Bug Fixes
+---------
+* Cleaner update dialog that will not pop up after the user has ignored updates.
+* DLLs for cURL SSL are included
+* Fix occasional bug where raw HTML character referencs would show up in
+  printouts.
+* Circles are the same color and weight as grid lines.
+
+
 Version 0.6 (7/20/2012)
 ==========================
 New Features
