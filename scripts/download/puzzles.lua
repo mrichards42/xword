@@ -80,6 +80,16 @@ local sources = {
     },
 
     {
+        name = "NY Times PDF",
+        url = "http://select.nytimes.com/premium/xword/%Y/%m/%d/%b%d%y.pdf",
+        directoryname = "NY Times",
+        filename = "nyt%Y%m%d.pdf",
+        days = { true, true, true, true, true, true, true },
+        fields = { "User Name", "Password", },
+        -- func is the same as NY Times Premium, and it is set below
+    },
+
+    {
         name = "CrosSynergy",
         url = "http://www.washingtonpost.com/r/WashingtonPost/Content/Puzzles/Daily/cs%y%m%d.jpz",
         filename = "cs%Y%m%d.jpz",
@@ -257,6 +267,9 @@ local sources = {
         days = { false, false, false, false, false, false, true },
     },
 }
+
+-- Copy NY Times custom download function for NY Times PDF
+sources[2].func = sources[1].func
 
 -- Make this into a class
 local puzzles = {}
