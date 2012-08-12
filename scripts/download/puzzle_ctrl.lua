@@ -136,6 +136,13 @@ local function PuzzleCtrl(parent, text, puzzle)
         if download.puzzle_exists(puzzle.filename) then
             if puz.Puzzle.CanLoad(puzzle.filename) then
                 xword.frame:LoadPuzzle(puzzle.filename)
+            else
+                -- Try to open the file
+                local ext = puzzle.filename:match('%.([^%.]+)')
+                local ft = wx.wxTheMimeTypesManager:GetFileTypeFromExtension(ext)
+                if ft then
+                    wx.wxExecute(ft:GetOpenCommand(puzzle.filename), wx.wxEXEC_ASYNC)
+                end
             end
         else
             download.add_download(puzzle, download.PREPEND)
