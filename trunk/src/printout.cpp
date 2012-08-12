@@ -23,15 +23,6 @@
 // Have wxHtmlDCRenderer remember where it left off.  Render() returns the
 //     y-position of the first cell not rendered.  Change the default value of
 //     "from" to -1, which will mean "start from where we left off".
-// Work on multi-page printing.  If things don't fit at all after some
-//     threshold (which would be MIN_FONT_SIZE, MIN_BOX_SIZE), try again,
-//     but allow 2+ pages.  At the start of printing, setup the
-//     wxHtmlDCRenderer, and draw the text on subsequent calls of
-//     OnPrintPage(page_num).  If page_num != 1, don't move columns out of
-//     the way of the grid.
-//     The infrastructure for laying-out and drawing a page is in place, but it
-//     will take a little work to make it happy with more than one page.
-
 
 #include "printout.hpp"
 #include "puz/Puzzle.hpp"
@@ -52,6 +43,8 @@ const double MIN_SQUARE_SIZE = 0.15; // In inches
 // the layout is.
 const double GOOD_SQUARE_SIZE = 0.2;
 const int GOOD_FONT_SIZE = 10;
+// Proportion of white space in a square to grid line thickness
+const double BORDER_SCALE = .035;
 
 //-----------------------------------------------------------------------------
 // HTML
@@ -490,10 +483,10 @@ MyPrintout::LayoutPages()
 
     // If we're doing a two-page layout, just figure out how to layout the
     // text
-    // Try columns in this order
-    int columns[] = { 4, 3, 5, 6 };
     if (m_info.two_pages || ! (m_info.grid && m_info.clues))
     {
+        // Try columns in this order
+        int columns[] = { 4, 3, 5, 6 };
         for (int pt = MAX_FONT_SIZE; pt >= MIN_FONT_SIZE; --pt)
         {
             for (int i = 0; i < 4; ++i)
@@ -787,10 +780,6 @@ MyPrintout::LayoutGrid(double gridScale)
     wxDC * dc = GetDC();
     m_drawer.SetDC(dc);
 
-    // Scale the DC for border calcluations
-    ScaleDC();
-    m_drawer.SetBorderSize(dc->LogicalToDeviceXRel(2));
-
     // Unscale the DC for layout calculations
     UnscaleDC();
 
@@ -803,26 +792,32 @@ MyPrintout::LayoutGrid(double gridScale)
     const double maxGridWidth  = pageRect.width  * (gridScale);
     const double maxGridHeight = pageRect.height * (gridScale);
 
+    // Calculate the border (grid lines) size
+    const int rows = m_puz->GetGrid().GetWidth();
+    const int cols = m_puz->GetGrid().GetHeight();
+
+    const int borderSize = std::max(1, (int)std::min(
+        (maxGridWidth  / cols) * BORDER_SCALE,
+        (maxGridHeight / rows) * BORDER_SCALE));
+    m_drawer.SetBorderSize(borderSize);
+
     // Calculate the size of each square
-    const int borderSize = m_drawer.GetBorderSize();
-    const int gridWidth  = m_puz->GetGrid().GetWidth();
-    const int gridHeight = m_puz->GetGrid().GetHeight();
 
     // The largest a square can be is the total allowed space less the borders
     // divided by the number of squares in a row / col.
     const double boxWidth =
-        (maxGridWidth  - borderSize * (gridWidth + 1)) / gridWidth;
+        (maxGridWidth  - borderSize * (cols + 1)) / cols;
 
     const double boxHeight =
-        (maxGridHeight - borderSize * (gridHeight + 1)) / gridHeight;
+        (maxGridHeight - borderSize * (rows + 1)) / rows;
 
     const double boxSize = std::min(boxWidth, boxHeight);
 
     // Calculate the grid size based on the size of a square.
     // This is the boxSize times the number of squares in the row / col plus
     // borders.
-    m_gridRect.width  = (boxSize + borderSize) * gridWidth  + borderSize;
-    m_gridRect.height = (boxSize + borderSize) * gridHeight + borderSize;
+    m_gridRect.width  = (boxSize + borderSize) * cols  + borderSize;
+    m_gridRect.height = (boxSize + borderSize) * rows + borderSize;
 
     // Align the grid
     //---------------
