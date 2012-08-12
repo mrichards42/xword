@@ -332,7 +332,7 @@ std::string GetPuzText(const string_t & str)
 {
     if (! IsOkForPuz(str))
         throw ConversionError("Puz format does not support XHTML formatting.");
-    return encode_puz(unescape_xml(str));
+    return encode_puz(unescape_xml(str, UNESCAPE_ALL));
 }
 
 //----------------------------------------------------------------------------
@@ -397,14 +397,65 @@ size_t GetBrTag(const string_t & str, size_t index)
 }
 
 
-string_t unescape_xml(const string_t & str)
+unsigned int get_entity_char(const string_t & entity, bool unescape_entities)
 {
-    // Replace &amp; with &
-    // Replace &lt; with <
-    // Replace &gt; with >
+    size_t length = entity.size();
+    if (length < 2)
+        return 0;
+    if (entity[0] == puzT('#')) // code point
+    {
+        unsigned int code = 0;
+        // Hex
+        if (entity[1] == puzT('x') || entity[1] == puzT('X'))
+        {
+            for (size_t i = 2; i < length; ++i)
+            {
+                char_t c = tolower(entity[i]);
+                if (! isxdigit(c))
+                    return 0;
+                code = code * 16 + (isdigit(c) ? c - 48 : c - 87);
+            }
+        }
+        // Decimal
+        else
+        {
+            for (size_t i = 1; i < length; ++i)
+            {
+                char_t c = entity[i];
+                if (! isdigit(c))
+                    return 0;
+                code = code * 10 + c - 48;
+            }
+        }
+        return code;
+    }
+    // Quotes are always safe to unescape
+    else if (entity == puzT("apos"))
+        return '\'';
+    else if (entity == puzT("quot"))
+        return '"';
+    // These entities could cause problems
+    else if (unescape_entities)
+    {
+        if (entity == puzT("amp"))
+            return '&';
+        else if (entity == puzT("lt"))
+            return '<';
+        else if (entity == puzT("gt"))
+            return '>';
+    }
+    return 0;
+}
+
+string_t unescape_xml(const string_t & str, int options)
+{
     // Replace <br /> with \n
+    // Replace character references
+    string_t find_chars((options & UNESCAPE_BR) ? puzT("<&") : puzT("&"));
+    const bool unescape_entities = (options & UNESCAPE_ENTITIES) != 0;
+
     size_t start = 0;
-    size_t index = str.find_first_of(puzT("<&"), start);
+    size_t index = str.find_first_of(find_chars, start);
     if (index == string_t::npos)
         return str; // Shortcut if we don't have anything to replace.
     string_t ret;
@@ -436,36 +487,48 @@ string_t unescape_xml(const string_t & str)
                 }
             }
                 break;
-            // &amp;
-            // &lt;
-            // &gt;
+            // Character references
             case puzT('&'):
             {
-                size_t semi = str.find(puzT(';'), index);
-                if (semi != string_t::npos)
+                // Scan to the semicolon
+                const char_t * c = str.c_str() + index + 1;
+                for (; (*c >= puzT('a') && *c <= puzT('z')) ||
+                       (*c >= puzT('A') && *c <= puzT('Z')) ||
+                       (*c >= puzT('0') && *c <= puzT('9')) ||
+                       *c == puzT('_') || *c == puzT('#'); c++) {}
+                // Entity must end with a semicolon
+                if (*c != puzT(';'))
                 {
-                    ++index;
-                    string_t substr = str.substr(index, semi - index);
-                    if (substr == puzT("amp"))
-                        ret.append(puzT("&"));
-                    else if (substr == puzT("lt"))
-                        ret.append(puzT("<"));
-                    else if (substr == puzT("gt"))
-                        ret.append(puzT(">"));
-                    start = semi+1;
+                    ret.append(1, puzT('&'));
+                    start = index + 1;
+                    break;
                 }
+                // Decode the entity and advance the scan pointer
+                size_t nchars = c - (str.c_str() + index + 1) + 2;
+                // Chop off the '&' and the ';'
+                string_t entity = str.substr(index + 1, nchars - 2);
+                unsigned int entity_char = get_entity_char(entity, unescape_entities);
+                if (entity_char == 0)
+                    ret.append(str.substr(index, nchars));
                 else
-                {
-                    start = index+1;
-                }
+#if PUZ_UNICODE
+                    ret.append(1, entity_char);
+#else
+                    unicode_to_utf8(entity_char, ret);
+#endif
+                start = index + nchars;
             }
                 break;
         }
-        index = str.find_first_of(puzT("<&"), start);
+        index = str.find_first_of(find_chars, start);
     }
     ret.append(str.substr(start));
     return ret;
 }
+
+
+string_t escape_character_references(const string_t & str);
+string_t unescape_character_references(const string_t & str);
 
 
 } // namespace puz
