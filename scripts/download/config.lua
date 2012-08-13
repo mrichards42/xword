@@ -4,6 +4,7 @@ local stringx = require 'pl.stringx'
 require 'safe_exec'
 require 'os'
 require 'lfs'
+require 'date'
 
 require 'luacurl'
 local curl_opt_names = {}
