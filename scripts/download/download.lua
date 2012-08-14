@@ -65,8 +65,8 @@ local function start_task(downloads)
             end
             if download.open_after_download == puzzle.filename then
                 download.open_after_download = nil
-                if not err and lfs.attributes(puzzle.filename, 'mode') == 'file' then
-                    xword.frame:LoadPuzzle(puzzle.filename)
+                if not err then
+                    download.open_puzzle(puzzle.filename)
                 end
             end
         end,
