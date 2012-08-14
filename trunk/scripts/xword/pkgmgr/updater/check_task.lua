@@ -53,10 +53,12 @@ for _, pkg in ipairs(remote_updates or {}) do
 end
 
 -- Copy ignored only if this is an xword version that we have already seen.
-if updates.xword and remote_updates.xword
-    and updates.xword.version == remote_updates.xword.version
-then
-    remote_updates.xword.ignored = updates.xword.ignored
+if updates.xword then
+    if not remote_updates.xword then
+        remote_updates.xword = updates.xword
+    elseif updates.xword.version == remote_updates.xword.version then
+        remote_updates.xword.ignored = updates.xword.ignored
+    end
 end
 
 -- Save update status of packages that were not already in remote_updates
