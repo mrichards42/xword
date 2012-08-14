@@ -274,11 +274,11 @@ xword.OnCleanup(download.save_config)
 -- GUI
 -- ============================================================================
 
-require 'luacurl'
 local ArrowButton = require 'download.gui.arrow_button'
 local TextButton = require 'download.gui.text_button'
 local BmpButton = require 'download.gui.bmp_button'
 local bmp = require 'download.gui.bmp'
+local ScrolledPanel = require 'download.gui.scrolled_panel'
 
 
 -- ----------------------------------------------------------------------------
