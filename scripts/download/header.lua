@@ -1,7 +1,7 @@
 require 'date'
-local bmp = require 'download.bmp'
-local BmpButton = require 'download.bmp_button'
-local TextButton = require 'download.text_button'
+local bmp = require 'download.gui.bmp'
+local BmpButton = require 'download.gui.bmp_button'
+local TextButton = require 'download.gui.text_button'
 local stringx = require 'pl.stringx'
 
 local function DownloadHeader(parent)

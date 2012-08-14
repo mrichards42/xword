@@ -3,83 +3,12 @@
 -- ============================================================================
 
 require 'luacurl'
-local ArrowButton = require 'download.arrow_button'
-local TextButton = require 'download.text_button'
-local BmpButton = require 'download.bmp_button'
-local bmp = require 'download.bmp'
+local TextButton = require 'download.gui.text_button'
+local BmpButton = require 'download.gui.bmp_button'
+local bmp = require 'download.gui.bmp'
 local tablex = require 'pl.tablex'
-
--- A basic scrolled panel
-function scrolled_panel(parent)
-    local scroller = wx.wxScrolledWindow(parent, wx.wxID_ANY)
-    scroller:SetWindowStyle(wx.wxBORDER_DOUBLE)
-    scroller:SetScrollRate(10, 10)
-
-    function scroller:update_scrollbars()
-        self.panel:Layout()
-        self:FitInside()
-        self:Refresh()
-    end
-
-    -- This panel preserves tab behavior
-    local psizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    local panel = wx.wxPanel(scroller, wx.wxID_ANY)
-    psizer:Add(panel, 1, wx.wxEXPAND)
-    scroller:SetSizer(psizer)
-
-    scroller.panel = panel
-    return scroller
-end
-
-
--- A panel with a title and a collapse button
-function collapse_panel(parent, label)
-    local panel = wx.wxPanel(parent, wx.wxID_ANY)
-    local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    panel:SetSizer(sizer)
-
-    -- Header
-    local header = wx.wxBoxSizer(wx.wxHORIZONTAL)
-    sizer:Add(header, 0, wx.wxEXPAND + wx.wxBOTTOM, 5)
-
-    local arrow = ArrowButton(panel, wx.wxID_ANY)
-    header:Add(arrow, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxRIGHT, 5)
-    local text = TextButton(panel, wx.wxID_ANY, label)
-    header:Add(text, 0, wx.wxALIGN_CENTER_VERTICAL)
-
-    -- Collapsing
-    local inside_panel
-    local function update_panel()
-        if inside_panel then
-            sizer:Show(inside_panel, arrow:IsExpanded())
-            sizer:Layout()
-            parent.Parent:Fit()
-        end
-    end
-
-    arrow:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, update_panel)
-    
-    text:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
-        arrow:Toggle()
-        update_panel()
-    end)
-
-    -- Public stuff
-    panel.header = header
-    panel.sizer = sizer
-    function panel:set_panel(p)
-        inside_panel = p
-        sizer:Add(inside_panel, 1, wx.wxEXPAND)
-        update_panel()
-    end
-
-    function panel:set_label(label)
-        text:SetLabel(label)
-    end
-
-    return panel
-end
-
+local ScrolledPanel = require 'download.gui.scrolled_panel'
+local CollapsePanel = require 'download.gui.collapse_panel'
 
 -- ============================================================================
 -- Advanced Options Dialog
@@ -188,7 +117,7 @@ end
 
 -- cURL options
 curl_options_panel = function(parent)
-    local panel = collapse_panel(parent, "Download Options")
+    local panel = CollapsePanel(parent, "Download Options")
 
     -- Add a help button to the header
     panel.header:AddStretchSpacer()
@@ -201,7 +130,7 @@ curl_options_panel = function(parent)
     panel.header:Add(link)
 
     -- The main panel
-    local scroller = scrolled_panel(panel, wx.wxID_ANY)
+    local scroller = ScrolledPanel(panel, wx.wxID_ANY)
     panel:set_panel(scroller)
 
     local grid = wx.wxFlexGridSizer(0, 3, 5, 5)
@@ -293,10 +222,10 @@ end
 
 -- Custom fields
 download_fields_panel = function(parent)
-    local panel = collapse_panel(parent, "Custom User Options")
+    local panel = CollapsePanel(parent, "Custom User Options")
 
     -- Fields
-    local scroller = scrolled_panel(panel, wx.wxID_ANY)
+    local scroller = ScrolledPanel(panel, wx.wxID_ANY)
     panel:set_panel(scroller)
 
     local grid = wx.wxFlexGridSizer(0, 2, 5, 5)
@@ -363,7 +292,7 @@ end
 
 -- Custom download function
 download_function_panel = function(parent)
-    local panel = collapse_panel(parent, "Custom Download Function")
+    local panel = CollapsePanel(parent, "Custom Download Function")
 
     local font = wx.wxFont(8, wx.wxFONTFAMILY_MODERN, wx.wxFONTSTYLE_NORMAL,
                            wx.wxFONTWEIGHT_NORMAL, false)

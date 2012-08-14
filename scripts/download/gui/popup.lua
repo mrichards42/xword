@@ -1,4 +1,3 @@
-
 local function PopupWindow(parent, id, pos, size)
     -- Create a dialog without a border
     local win = wx.wxDialog(

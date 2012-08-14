@@ -1,7 +1,7 @@
 require 'lfs'
 local join = require 'pl.path'.join
-local PopupWindow = require 'download.popup'
-local TextButton = require 'download.text_button'
+local PopupWindow = require 'download.gui.popup'
+local TextButton = require 'download.gui.text_button'
 require 'download.stats'
 require 'download.download'
 
