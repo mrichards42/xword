@@ -393,6 +393,20 @@ function download.get_download_data(puzzle, d)
     return data
 end
 
+function download.open_puzzle(filename)
+    if not download.puzzle_exists(filename) then return end
+    if puz.Puzzle.CanLoad(filename) then
+        xword.frame:LoadPuzzle(filename)
+    else
+        -- Try to open the file
+        local ext = filename:match('%.([^%.]+)')
+        local ft = wx.wxTheMimeTypesManager:GetFileTypeFromExtension(ext)
+        if ft then
+            wx.wxExecute(ft:GetOpenCommand(filename), wx.wxEXEC_ASYNC)
+        end
+    end
+end
+
 
 -- Update the download sources
 require 'download.config'
