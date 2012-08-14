@@ -1,7 +1,7 @@
 require 'date'
-local ArrowButton = require 'download.arrow_button'
+local ArrowButton = require 'download.gui.arrow_button'
 local PuzzleCtrl = require 'download.puzzle_ctrl'
-local TextButton = require 'download.text_button'
+local TextButton = require 'download.gui.text_button'
 require 'download.stats'
 require 'download.config'
 

@@ -1,5 +1,5 @@
 -- A bitmap button with no border
-local function BmpButton(parent, id, bmp)
+function BmpButton(parent, id, bmp)
     local ctrl = wx.wxStaticBitmap(parent, id or wx.wxID_ANY, bmp)
 
     ctrl.bmp = bmp

@@ -275,10 +275,10 @@ xword.OnCleanup(download.save_config)
 -- ============================================================================
 
 require 'luacurl'
-local ArrowButton = require 'download.arrow_button'
-local TextButton = require 'download.text_button'
-local BmpButton = require 'download.bmp_button'
-local bmp = require 'download.bmp'
+local ArrowButton = require 'download.gui.arrow_button'
+local TextButton = require 'download.gui.text_button'
+local BmpButton = require 'download.gui.bmp_button'
+local bmp = require 'download.gui.bmp'
 
 
 -- ----------------------------------------------------------------------------
@@ -670,7 +670,7 @@ get_download_fields = function(parent, puzzle)
     end
 
     -- The main panel
-    local scroller = scrolled_panel(parent)
+    local scroller = ScrolledPanel(parent)
 
     local border = wx.wxBoxSizer(wx.wxVERTICAL)
     scroller.panel:SetSizer(border)

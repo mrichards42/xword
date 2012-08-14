@@ -1,8 +1,8 @@
 -- A status bar sort of thing
 require 'download.download'
-local PopupWindow = require 'download.popup'
-local BmpButton = require 'download.bmp_button'
-local bmp = require 'download.bmp'
+local PopupWindow = require 'download.gui.popup'
+local BmpButton = require 'download.gui.bmp_button'
+local bmp = require 'download.gui.bmp'
 local basename = require 'pl.path'.basename
 local clear = require 'pl.tablex'.clear
 

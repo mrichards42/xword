@@ -1,5 +1,5 @@
-local bmp = require 'download.bmp'
-BmpButton = require 'download.bmp_button'
+local bmp = require 'download.gui.bmp'
+BmpButton = require 'download.gui.bmp_button'
 
 local function get_collapsed()
     return bmp.arrows:GetSubBitmap(wx.wxRect(0, 0, 10, 10))
