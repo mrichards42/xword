@@ -87,6 +87,7 @@ XGridDrawer::Init()
 
     SetWhiteSquareColor(*wxWHITE);
     SetBlackSquareColor(*wxBLACK);
+    UpdateHighlightColor();
     SetPenColor(*wxBLACK);
     SetRevealedColor(wxColour(246, 36, 0));
     SetCheckedColor(*wxBLACK);
@@ -703,6 +704,18 @@ XGridDrawer::DrawGrid(wxDC & dc)
 }
 
 
+void XGridDrawer::UpdateHighlightColor()
+{
+    // Highlight is 25% as dark as black
+    wxImage::RGBValue rgb(m_blackSquareColor.Red(),
+                          m_blackSquareColor.Green(),
+                          m_blackSquareColor.Blue());
+    wxImage::HSVValue hsv = wxImage::RGBtoHSV(rgb);
+    hsv.value = (1 - (1 - hsv.value) * .25);
+    rgb = wxImage::HSVtoRGB(hsv);
+    m_highlightColor.Set(rgb.red, rgb.green, rgb.blue);
+}
+
 wxColour
 XGridDrawer::GetSquareColor(const puz::Square & square) const
 {
@@ -710,7 +723,9 @@ XGridDrawer::GetSquareColor(const puz::Square & square) const
     {
         if (square.IsWhite() || HasFlag(DRAW_BLANK_DIAGRAMLESS))
         {
-            if (square.HasColor())
+            if (square.HasHighlight())
+                return GetHighlightColor();
+            else if (square.HasColor())
                 return wxColor(square.m_red, square.m_green, square.m_blue);
             else
                 return GetWhiteSquareColor();
@@ -724,7 +739,9 @@ XGridDrawer::GetSquareColor(const puz::Square & square) const
     {
         if (square.IsSolutionWhite() || HasFlag(DRAW_BLANK_DIAGRAMLESS))
         {
-            if (square.HasColor())
+            if (square.HasHighlight())
+                return GetHighlightColor();
+            else if (square.HasColor())
                 return wxColor(square.m_red, square.m_green, square.m_blue);
             else
                 return GetWhiteSquareColor();

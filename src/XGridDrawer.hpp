@@ -101,6 +101,7 @@ public:
     wxColour GetSquareColor(const puz::Square & square) const;
     const wxColour & GetWhiteSquareColor() const { return m_whiteSquareColor; }
     const wxColour & GetBlackSquareColor() const { return m_blackSquareColor; }
+    const wxColour & GetHighlightColor()   const { return m_highlightColor; }
     const wxColour & GetPenColor()         const { return m_penColor; }
     const wxColour & GetCorrectColor()     const { return m_correctColor; }
     const wxColour & GetCheckedColor()     const { return m_checkedColor; }
@@ -110,12 +111,13 @@ public:
     void SetWhiteSquareColor(const wxColour & color)
         { m_whiteSquareColor = color; }
     void SetBlackSquareColor(const wxColour & color)
-        { m_blackSquareColor = color; }
+        { m_blackSquareColor = color; UpdateHighlightColor(); }
     void SetPenColor(const wxColour & color) { m_penColor = color; }
     void SetCorrectColor(const wxColour & color) { m_correctColor = color; }
     void SetCheckedColor(const wxColour & color) { m_checkedColor = color; }
     void SetRevealedColor(const wxColour & color) { m_revealedColor = color; }
 
+    void UpdateHighlightColor();
 
     // Selective Drawing
     //------------------
@@ -216,6 +218,7 @@ private:
     // Colors
     wxColour m_whiteSquareColor;
     wxColour m_blackSquareColor;
+    wxColour m_highlightColor;
     wxColour m_penColor;
     wxColour m_revealedColor;
     wxColour m_correctColor;
