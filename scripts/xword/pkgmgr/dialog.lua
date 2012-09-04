@@ -592,7 +592,7 @@ function P.PackageDialog(opts)
     dlg:Center()
 
     if do_check ~= false then
-        P.updater.CheckForUpdates(function() dlg:RefreshUpdates() end)
+        P.updater.CheckForUpdates(function() if P.dlg then P.dlg:RefreshUpdates() end end)
     end
 
     dlg:Connect(wx.wxEVT_CLOSE_WINDOW, function(evt)
