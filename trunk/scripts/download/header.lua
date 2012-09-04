@@ -119,23 +119,29 @@ local function DownloadHeader(parent)
         else
             label.Label = start_date.Value:Format("%b %d, %Y") .. " - " .. end_date.Value:Format("%b %d, %Y")
         end
-        parent:update_puzzles()
+        download.dialog:update_puzzles()
     end
 
     -- Update kind
     local function update_kind()
         local kind = header:get_kind()
         -- Show or hide controls
-        top:Show(prev_week, (kind == 'day'))
-        top:Show(prev, (kind ~= 'custom'))
-        top:Show(next, (kind ~= 'custom'))
-        top:Show(next_week, (kind == 'day'))
+        local is_custom = kind == 'custom'
+        local is_day = kind == 'day'
+        top:Show(prev_week, is_day)
+        top:Show(prev, not is_custom)
+        top:Show(next, not is_custom)
+        top:Show(next_week, is_day)
 
-        bottom:Show(start_text, (kind == 'custom'))
-        bottom:Show(end_text, (kind == 'custom'))
-        bottom:Show(end_date, (kind == 'custom'))
+        bottom:Show(start_text, is_custom)
+        bottom:Show(end_text, is_custom)
+        bottom:Show(end_date, is_custom)
+        download.dialog:ShowFilter(is_custom)
+            
         -- Change labels
         if kind == 'day' then
+            prev.ToolTip = wx.wxToolTip("Previous Day")
+            next.ToolTip = wx.wxToolTip("Next Day")
         elseif kind == 'week' then
             prev.ToolTip = wx.wxToolTip("Previous Week")
             next.ToolTip = wx.wxToolTip("Next Week")
@@ -144,7 +150,12 @@ local function DownloadHeader(parent)
             next.ToolTip = wx.wxToolTip("Next Month")
         end
         header:Layout()
+        header.Parent:Layout()
         update_dates()
+
+        if kind == 'custom' then
+            download.dialog:update_puzzles() -- This doesn't happen in update_dates()
+        end
     end
 
     -- ------------------------------------------------------------------------
@@ -203,7 +214,7 @@ local function DownloadHeader(parent)
     end_date:Connect(wx.wxEVT_DATE_CHANGED, update_dates)
 
     label:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function (evt)
-        parent:download_puzzles()
+        download.dialog:download_puzzles()
     end)
 
     -- Functions
@@ -212,7 +223,6 @@ local function DownloadHeader(parent)
             kind:SetStringSelection(stringx.capitalize(kind_))
         end
         if start_date_ then
-            print("start_date", start_date_)
             start_date.Value = wx.wxDateTimeFromDMY(
                 start_date_:getday(), start_date_:getmonth()-1, start_date_:getyear())
             real_start = start_date.Value

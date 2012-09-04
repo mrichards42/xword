@@ -1,6 +1,7 @@
 require 'download.puzzles'
 require 'date'
 local DownloadHeader = require 'download.header'
+local DownloadFilter = require 'download.filter'
 local PuzzlePanel = require 'download.puzzle_panel'
 local Status = require 'download.status'
 require 'download.stats'
@@ -28,13 +29,13 @@ local function make_puzzles(parent)
         self:Layout()
     end
 
-    function scroller:set_dates(kind, start_date, end_date)
+    function scroller:set_dates(kind, start_date, end_date, custom_func)
         download.clear_stats()
         tablex.clear(download.puzzle_map)
         self:Freeze()
         local stats_filenames = {}
         for _, p in ipairs(puzzle_panels) do
-            local filenames, now = p:set_dates(kind, start_date, end_date)
+            local filenames, now = p:set_dates(kind, start_date, end_date, custom_func)
             for _, fn in ipairs(filenames) do
                 download.puzzle_map[fn] = p
                 if now then
@@ -74,8 +75,11 @@ local function DownloadDialog(parent, id, title, pos, size)
     local dialog = download.dialog
 
     -- Layout
+    dialog:SetSizer(wx.wxBoxSizer(wx.wxHORIZONTAL))
+
+    -- Main panel
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    dialog:SetSizer(sizer)
+    dialog.Sizer:Add(sizer, 1, wx.wxEXPAND)
 
     local panel = wx.wxPanel(dialog, wx.wxID_ANY)
     panel:SetBackgroundColour(wx.wxWHITE)
@@ -91,15 +95,11 @@ local function DownloadDialog(parent, id, title, pos, size)
 
     local status = Status(panel)
     sizer:Add(status, 0, wx.wxEXPAND)
---[[ -- Config is done through main XWord preferences
-    local btn = wx.wxButton(panel, wx.wxID_ANY, "config")
-    sizer:Add(btn, 0, wx.wxALL, 5)
 
-    btn:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
-        require 'download.config'
-        download.show_config_dialog()
-    end)
---]]
+    -- Filter panel
+    local filter = DownloadFilter(dialog)
+    dialog.Sizer:Add(filter)
+    dialog.Sizer:Show(filter, false)
 
     -- Sizing
     dialog:Fit()
@@ -109,23 +109,49 @@ local function DownloadDialog(parent, id, title, pos, size)
     -- Events
     dialog:Connect(wx.wxEVT_CLOSE_WINDOW,
         function(evt)
-            dialog = nil
             download.erase_stats()
+            dialog:ShowFilter(false)
             evt:Skip()
         end)
 
+    function dialog:ShowFilter(doit)
+        if doit == nil then doit = true end
+        if dialog.Sizer:GetItem(filter):IsShown() == doit then
+            return
+        end
+        if doit then
+            self.Sizer:Show(filter, true)
+            self:Layout()
+            self.MinSize = wx.wxSize(self.MinSize.Width + filter.Size.Width,
+                                     self.MinSize.Height)
+            local new_width = self.Size.Width + filter.Size.Width
+            if new_width < wx.wxSystemSettings.GetMetric(wx.wxSYS_SCREEN_X) then
+                self:SetSize(new_width, self.Size.Height)
+            end
+        else
+            self.Sizer:Show(filter, false)
+            self:Layout()
+            self.MinSize = wx.wxSize(self.MinSize.Width - filter.Size.Width,
+                                     self.MinSize.Height)
+            if not self:IsMaximized() then
+                self:SetSize(self.Size.Width - filter.Size.Width, self.Size.Height)
+            end
+        end
+    end
+
     -- functions
-    function panel:update_puzzles()
+    function dialog:update_puzzles()
         local kind = header:get_kind()
         local start_date = header:get_start_date()
         local end_date = header:get_end_date()
-        puzzle_panel:set_dates(kind, start_date, end_date)
+        local custom_func = filter:get_custom_func()
+        puzzle_panel:set_dates(kind, start_date, end_date, custom_func)
         download.previous_view.kind = kind
         download.previous_view.start_date = start_date
         download.previous_view.end_date = end_date
     end
 
-    function panel:download_puzzles()
+    function dialog:download_puzzles()
         puzzle_panel:download_puzzles()
     end
 
@@ -136,7 +162,8 @@ local function DownloadDialog(parent, id, title, pos, size)
     function dialog:update()
         self:Freeze()
         puzzle_panel:update_puzzle_list()
-        panel:update_puzzles()
+        self:update_puzzles()
+        self:ShowFilter(header:get_kind() == 'custom')
         self:Thaw()
     end
 
