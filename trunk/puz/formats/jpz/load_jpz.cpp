@@ -154,7 +154,12 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     xml::node applet = doc.child("crossword-compiler-applet");
     if (! applet)
-        throw FileTypeError("jpz");
+    {
+        // Try an alternate root node
+        applet = doc.child("crossword-compiler");
+        if (! applet)
+            throw FileTypeError("jpz");
+    }
     xml::node puzzle = RequireChild(applet, "rectangular-puzzle");
     xml::node crossword = RequireChild(puzzle, "crossword");
 
