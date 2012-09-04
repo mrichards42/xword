@@ -91,7 +91,7 @@ local sources = {
 
     {
         name = "CrosSynergy",
-        url = "http://www.washingtonpost.com/r/WashingtonPost/Content/Puzzles/Daily/cs%y%m%d.jpz",
+        url = "http://cdn.games.arkadiumhosted.com/washingtonpost/crossynergy/cs%y%m%d.jpz",
         filename = "cs%Y%m%d.jpz",
         days = { true, true, true, true, true, true, true },
     },
@@ -394,7 +394,7 @@ function download.get_download_data(puzzle, d)
 end
 
 function download.open_puzzle(filename)
-    if not download.puzzle_exists(filename) then return end
+    if lfs.attributes(filename, 'mode') ~= 'file' then return end
     if puz.Puzzle.CanLoad(filename) then
         xword.frame:LoadPuzzle(filename)
     else
