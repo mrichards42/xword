@@ -6,24 +6,18 @@ require 'download.stats'
 require 'download.config'
 
 -- Display puzzles as a vertical list
-local function ListPanel(parent, puzzle, start_date, end_date)
+local function ListPanel(parent, puzzle, dates)
     local panel = wx.wxPanel(parent, wx.wxID_ANY)
     local space = 10
     local sizer = wx.wxFlexGridSizer(0, 7, space, space)
     panel:SetSizer(sizer)
 
     local item_size = 0
-    local d = start_date:copy()
-    local today = date():sethours(0,0,0,0)
-    while d <= end_date do
-        local ctrl
+    for _, d in ipairs(dates) do
         local text = d:fmt("%a %m/%d")
-        if puzzle.days[d:getisoweekday()] and d <= today then
-            ctrl = PuzzleCtrl(panel, text, download.get_download_data(puzzle, d))
-            item_size = math.max(item_size, ctrl.Size.Width)
-            sizer:Add(ctrl, 1, wx.wxEXPAND)
-        end
-        d:adddays(1)
+        local ctrl = PuzzleCtrl(panel, text, download.get_download_data(puzzle, d))
+        item_size = math.max(item_size, ctrl.Size.Width)
+        sizer:Add(ctrl, 1, wx.wxEXPAND)
     end
 
     -- Wrap the items
@@ -102,8 +96,8 @@ local function PuzzlePanel(parent, puzzle)
     border:Add(header_sizer, 1, wx.wxEXPAND + wx.wxALL, 5)
 
     -- Expand button
-    local button = ArrowButton(header, wx.wxID_ANY)
-    header_sizer:Add(button, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxRIGHT, 5)
+    local expand_button = ArrowButton(header, wx.wxID_ANY)
+    header_sizer:Add(expand_button, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxRIGHT, 5)
 
     -- Name
     local name = TextButton(header, wx.wxID_ANY, puzzle.name)
@@ -128,13 +122,12 @@ local function PuzzlePanel(parent, puzzle)
     -- ------------------------------------------------------------------------
     -- The body panel is created when the user clicks on the arrow button
     local body
-    local kind, start_date, end_date
-    local function make_body()
+    local kind, start_date, end_date, custom_func
+    panel.dates = false
+    local function make_body(dates)
         panel:Freeze()
         if kind == 'week' or kind == 'custom' then
-            body = ListPanel(panel, puzzle,
-                             start_date,
-                             end_date or start_date:copy():adddays(6))
+            body = ListPanel(panel, puzzle, panel:get_dates())
         elseif kind == 'month' then
             body = MonthPanel(panel, puzzle, start_date)
         end
@@ -144,41 +137,43 @@ local function PuzzlePanel(parent, puzzle)
         body:SetSizer(border, false) -- don't destroy the old sizer
 
         sizer:Insert(1, body, 1, wx.wxEXPAND + wx.wxLEFT, 20)
-        sizer:Show(body, button:IsExpanded())
+        sizer:Show(body, expand_button:IsExpanded())
         panel:Thaw()
     end
 
     -- ------------------------------------------------------------------------
     -- Functions
     -- ------------------------------------------------------------------------
-    function panel:get_dates()
-        -- Return a list of dates
-        local dates = {}
+    function panel:get_dates(refresh)
+        -- Cache dates
+        if self.dates and not refresh then return self.dates end
         local today = date():sethours(0,0,0,0)
-        if kind == 'month' then
-            local d = start_date:copy():setday(1)
-            local month = d:getmonth()
-            while d:getmonth() == month and d <= today do
-                if puzzle.days[d:getisoweekday()] then
+        -- Return a list of dates
+        local function do_get_dates(start_, end_, func)
+            if end_ > today then end_ = today end
+            if not func then
+                func = function() return true end
+            end
+            local dates = {}
+            local d = start_:copy()
+            while d <= end_ do
+                if puzzle.days[d:getisoweekday()] and func(puzzle, d) then
                     table.insert(dates, d:copy())
                 end
                 d:adddays(1)
             end
-        elseif kind == 'day' then
-            if puzzle.days[start_date:getisoweekday()] then
-                table.insert(dates, start_date:copy())
-            end
-        else
-            local d = start_date:copy()
-            local end_ = end_date or start_date:copy():adddays(6)
-            while d <= end_ and d <= today do
-                if puzzle.days[d:getisoweekday()] then
-                    table.insert(dates, d:copy())
-                end
-                d:adddays(1)
-            end
+            self.dates = dates
+            return dates
         end
-        return dates
+        if kind == 'month' then
+            return do_get_dates(start_date, end_date)
+        elseif kind == 'day' then
+            return do_get_dates(start_date, start_date)
+        elseif kind == 'week' then
+            return do_get_dates(start_date, start_date:copy():adddays(6))
+        else -- Custom
+            return do_get_dates(start_date, end_date, custom_func)
+        end
     end
 
     function panel:get_download_data()
@@ -193,10 +188,11 @@ local function PuzzlePanel(parent, puzzle)
         return data
     end
 
-    function panel:set_dates(kind_, start_date_, end_date_)
+    function panel:set_dates(kind_, start_date_, end_date_, custom_func_)
         kind = kind_
         start_date = start_date_
         end_date = end_date_
+        custom_func = custom_func_
         -- Destroy the old body
         if body then
             sizer:Detach(body)
@@ -204,7 +200,7 @@ local function PuzzlePanel(parent, puzzle)
             body = nil
         end
         -- Compute a list of valid dates
-        local dates = self:get_dates()
+        local dates = self:get_dates(true) -- Don't use the cache
         -- Update the label
         panel.Parent.Sizer:Show(panel, true)
         if #dates == 0 then
@@ -220,7 +216,7 @@ local function PuzzlePanel(parent, puzzle)
         end
         header_sizer:Show(download_button, true)
         if #dates <= 1 and kind ~= 'month' then
-            header_sizer:Show(button, false)
+            header_sizer:Show(expand_button, false)
             if #dates == 1 then
                 local d = dates[1]
                 header_puzzle = PuzzleCtrl(header, d:fmt("%a %m/%d"),
@@ -229,8 +225,8 @@ local function PuzzlePanel(parent, puzzle)
                 header_sizer:Show(download_button, false)
             end
         else
-            header_sizer:Show(button, true)
-            if button:IsExpanded() then
+            header_sizer:Show(expand_button, true)
+            if expand_button:IsExpanded() then
                 make_body()
             end
         end
@@ -241,7 +237,7 @@ local function PuzzlePanel(parent, puzzle)
         for _, d in ipairs(dates) do
             table.insert(filenames, download.get_filename(puzzle, d))
         end
-        return filenames, button:IsExpanded()
+        return filenames, expand_button:IsExpanded()
     end
 
     -- Update the panel to reflect our stats
@@ -259,7 +255,7 @@ local function PuzzlePanel(parent, puzzle)
                 return
             end
         end
-        local text = string.format("%d Puzzles (%d Complete, %d Missing)",
+        local text = string.format("%d Puzzles (+%d, -%d)",
             #dates, count[download.COMPLETE] or 0, count[download.MISSING] or 0)
         download_button.Label = text
         header:Layout()
@@ -282,12 +278,12 @@ local function PuzzlePanel(parent, puzzle)
             download.fetch_stats{filenames, prepend = true}
         end
         panel.Parent:Freeze()
-        sizer:Show(body, button:IsExpanded())
+        sizer:Show(body, expand_button:IsExpanded())
         panel.Parent:Layout()
         panel.Parent:FitInside()
         panel.Parent:Thaw()
     end
-    button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
+    expand_button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
         update_body()
     end)
 
@@ -295,7 +291,7 @@ local function PuzzlePanel(parent, puzzle)
         if header_puzzle then
             header_puzzle:open_puzzle()
         else
-            button:Toggle()
+            expand_button:Toggle()
             update_body()
         end
     end)
