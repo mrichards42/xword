@@ -262,9 +262,15 @@ local sources = {
 
     {
         name = "Washington Post Puzzler",
-        url = "http://crosswords.washingtonpost.com/wp-srv/style/crosswords/util/csserve2.cgi/cs%y%m%d.puz?t=pimage&z=puzzler&f=cs%y%m%d.puz",
-        filename = "wp%Y%m%d.puz",
+        url = "http://cdn.games.arkadiumhosted.com/washingtonpost/puzzler/puzzle_%y%m%d.xml",
+        filename = "wp%Y%m%d.jpz",
         days = { false, false, false, false, false, false, true },
+        func = [[
+    local jpz = download(puzzle.url)
+    local f = assert(io.open(puzzle.filename, 'wb'))
+    f:write(jpz:gsub("crossword-compiler", "crossword-compiler-applet"))
+    f:close()
+]]
     },
 }
 
