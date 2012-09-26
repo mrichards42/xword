@@ -131,7 +131,7 @@ curl_options_panel = function(parent)
 
     -- The main panel
     local scroller = ScrolledPanel(panel, wx.wxID_ANY)
-    panel:set_panel(scroller)
+    panel:SetPanel(scroller)
 
     local grid = wx.wxFlexGridSizer(0, 3, 5, 5)
     grid:AddGrowableCol(1)
@@ -185,7 +185,7 @@ curl_options_panel = function(parent)
         grid:Insert(#opts * 3 + 1, text, 1, wx.wxEXPAND)
         grid:Insert(#opts * 3 + 2, remove_button, 0, wx.wxALIGN_CENTER_VERTICAL)
         table.insert(opts, {opt, text})
-        scroller:update_scrollbars()
+        scroller:UpdateScrollbars()
 
         -- Remove event
         remove_button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
@@ -198,7 +198,7 @@ curl_options_panel = function(parent)
                     opt:Destroy()
                     text:Destroy()
                     remove_button:Destroy()
-                    scroller:update_scrollbars()
+                    scroller:UpdateScrollbars()
                     break
                 end
             end
@@ -213,7 +213,7 @@ curl_options_panel = function(parent)
             window:Destroy()
         end
         tablex.clear(opts)
-        scroller:update_scrollbars()
+        scroller:UpdateScrollbars()
     end
 
     return panel
@@ -226,7 +226,7 @@ download_fields_panel = function(parent)
 
     -- Fields
     local scroller = ScrolledPanel(panel, wx.wxID_ANY)
-    panel:set_panel(scroller)
+    panel:SetPanel(scroller)
 
     local grid = wx.wxFlexGridSizer(0, 2, 5, 5)
     grid:AddGrowableCol(0)
@@ -257,7 +257,7 @@ download_fields_panel = function(parent)
         grid:Insert(#fields * 2, text, 1, wx.wxEXPAND)
         grid:Insert(#fields * 2 + 1, remove_button, 0, wx.wxALIGN_CENTER_VERTICAL)
         table.insert(fields, text)
-        scroller:update_scrollbars()
+        scroller:UpdateScrollbars()
 
         -- Remove event
         remove_button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(evt)
@@ -268,7 +268,7 @@ download_fields_panel = function(parent)
                     grid:Detach((i-1) * 2)
                     text:Destroy()
                     remove_button:Destroy()
-                    scroller:update_scrollbars()
+                    scroller:UpdateScrollbars()
                     break
                 end
             end
@@ -283,7 +283,7 @@ download_fields_panel = function(parent)
             window:Destroy()
         end
         tablex.clear(fields)
-        scroller:update_scrollbars()
+        scroller:UpdateScrollbars()
     end
 
     return panel
@@ -314,7 +314,7 @@ download_function_panel = function(parent)
     st.Font = font
     sizer:Add(st, 0, wx.wxLEFT, 10)
 
-    panel:set_panel(sizer)
+    panel:SetPanel(sizer)
 
     -- Public stuff
     panel.text = text
