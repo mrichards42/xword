@@ -1,0 +1,49 @@
+;; These are additions to autoexp.dat for Visual C++
+;; On my system this is found in:
+;; C:\Program Files\Microsoft Visual Studio 9.0\Common7\Packages\Debugger\autoexp.dat
+
+[AutoExpand]
+;; wxWidgets
+wxString=<m_pchData,su>
+
+;; XWord
+puz::Grid=<m_width,u> X <m_height,u>
+
+[Visualizer]
+;; XWord
+puz::Square{
+    preview (
+        #(
+            "(", [$e.m_col,u], ", ", [$e.m_row,u], ")",
+            " Solution=",
+            #if(($e.m_solution._Myres) < ($e.m_solution._BUF_SIZE)) ([$e.m_solution._Bx._Buf,su]) #else ( [$e.m_solution._Bx._Ptr,su]),
+            " Text=",
+            #if(($e.m_text._Myres) < ($e.m_text._BUF_SIZE)) ([$e.m_text._Bx._Buf,su]) #else ( [$e.m_text._Bx._Ptr,su])
+        )
+    )
+}
+
+puz::Puzzle{
+    preview (
+        #(
+            "Grid=(",[$e.m_grid.m_width,u]," X ",[$e.m_grid.m_height,u],")",
+            " Title=",
+            #if(($e.m_title._Myres) < ($e.m_title._BUF_SIZE)) ([$e.m_title._Bx._Buf,su]) #else ( [$e.m_title._Bx._Ptr,su]),
+            " Author=",
+            #if(($e.m_author._Myres) < ($e.m_author._BUF_SIZE)) ([$e.m_author._Bx._Buf,su]) #else ( [$e.m_author._Bx._Ptr,su])
+        )
+    )
+}
+
+
+puz::Clue{
+    preview (
+        #(
+            "Number=",
+            #if(($e.m_number._Myres) < ($e.m_number._BUF_SIZE)) ([$e.m_number._Bx._Buf,su]) #else ( [$e.m_number._Bx._Ptr,su]),
+            " Text=",
+            #if(($e.m_text._Myres) < ($e.m_text._BUF_SIZE)) ([$e.m_text._Bx._Buf,su]) #else ( [$e.m_text._Bx._Ptr,su]),
+            " Word=",[$e.m_word,x]
+        )
+    )
+}
