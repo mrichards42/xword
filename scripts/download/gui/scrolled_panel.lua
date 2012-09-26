@@ -2,9 +2,9 @@
 local function ScrolledPanel(parent)
     local scroller = wx.wxScrolledWindow(parent, wx.wxID_ANY)
     scroller:SetWindowStyle(wx.wxBORDER_DOUBLE)
-    scroller:SetScrollRate(10, 10)
+    scroller:SetScrollRate(0, 10)
 
-    function scroller:update_scrollbars()
+    function scroller:UpdateScrollbars()
         self.panel:Layout()
         self:FitInside()
         self:Refresh()

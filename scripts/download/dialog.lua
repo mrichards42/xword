@@ -98,7 +98,7 @@ local function DownloadDialog(parent, id, title, pos, size)
 
     -- Filter panel
     local filter = DownloadFilter(dialog)
-    dialog.Sizer:Add(filter)
+    dialog.Sizer:Add(filter, 0, wx.wxEXPAND)
     dialog.Sizer:Show(filter, false)
 
     -- Sizing
