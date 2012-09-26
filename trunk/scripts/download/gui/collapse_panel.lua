@@ -22,8 +22,12 @@ function CollapsePanel(parent, label)
         if inside_panel then
             sizer:Show(inside_panel, arrow:IsExpanded())
             sizer:Layout()
-            parent.Parent:Fit()
+            panel:OnToggle()
         end
+    end
+
+    function panel:OnToggle()
+        parent.Parent:Fit()
     end
 
     arrow:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, update_panel)
@@ -36,14 +40,24 @@ function CollapsePanel(parent, label)
     -- Public stuff
     panel.header = header
     panel.sizer = sizer
-    function panel:set_panel(p)
+    function panel:SetPanel(p)
         inside_panel = p
-        sizer:Add(inside_panel, 1, wx.wxEXPAND)
+        sizer:Add(inside_panel, 0, wx.wxEXPAND)
         update_panel()
     end
 
-    function panel:set_label(label)
+    function panel:SetLabel(label)
         text:SetLabel(label)
+    end
+
+    function panel:Expand()
+        arrow:Expand()
+        update_panel()
+    end
+
+    function panel:Collapse()
+        arrow:Collapse()
+        update_panel()
     end
 
     return panel
