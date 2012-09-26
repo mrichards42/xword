@@ -1123,7 +1123,7 @@ XGridCtrl::Check(puz::square_iterator begin, puz::square_iterator end,
 bool
 XGridCtrl::CheckSquare(puz::Square * square, int options, wxDC & dc)
 {
-    if (! square->IsWhite())
+    if (! square->IsWhite() && ! m_puz->IsDiagramless())
         return true;
     square->RemoveFlag(puz::FLAG_CORRECT);
     if (! square->Check((options & CHECK_ALL) != 0, HasStyle(STRICT_REBUS)))
