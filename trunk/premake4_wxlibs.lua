@@ -12,18 +12,38 @@ configuration "windows"
         "oleacc",
     }
 
+    -- Determine the version by looking at the directory
+    local v1, v2 = _OPTIONS["wx-prefix"]:match("wxWidgets%-(%d+)%.(%d%+)")
+    local version
+    if v1 and v2 then
+        version = v1 .. v2
+    end
+    if not version then
+        -- Determine the version by looking at the libraries
+        local libs = os.matchfiles(_OPTIONS["wx-prefix"].."/lib/vc_lib/wxmsw*.lib")
+        if libs then
+            version = libs[1]:match("wxmsw(%d%d)")
+        end
+    end
+    if version then
+        print("Using wxWidgets version " .. version)
+    else
+        print("Unable to determine wxWidgets version.")
+        error()
+    end
+
     configuration { "windows", "Release" }
         links {
-            "wxmsw28u_xrc",
-            "wxmsw28u_html",
-            "wxmsw28u_gl",
-            "wxmsw28u_aui",
-            "wxmsw28u_media",
-            "wxmsw28u_adv",
-            "wxbase28u_net",
-            "wxbase28u_xml",
-            "wxmsw28u_core",
-            "wxbase28u",
+            "wxmsw" .. version .. "u_xrc",
+            "wxmsw" .. version .. "u_html",
+            "wxmsw" .. version .. "u_gl",
+            "wxmsw" .. version .. "u_aui",
+            "wxmsw" .. version .. "u_media",
+            "wxmsw" .. version .. "u_adv",
+            "wxbase" .. version .. "u_net",
+            "wxbase" .. version .. "u_xml",
+            "wxmsw" .. version .. "u_core",
+            "wxbase" .. version .. "u",
             "wxtiff",
             "wxjpeg",
             "wxpng",
@@ -34,16 +54,16 @@ configuration "windows"
 
     configuration { "windows", "Debug" }
         links {
-            "wxmsw28ud_xrc",
-            "wxmsw28ud_html",
-            "wxmsw28ud_gl",
-            "wxmsw28ud_aui",
-            "wxmsw28ud_media",
-            "wxmsw28ud_adv",
-            "wxbase28ud_net",
-            "wxbase28ud_xml",
-            "wxmsw28ud_core",
-            "wxbase28ud",
+            "wxmsw" .. version .. "ud_xrc",
+            "wxmsw" .. version .. "ud_html",
+            "wxmsw" .. version .. "ud_gl",
+            "wxmsw" .. version .. "ud_aui",
+            "wxmsw" .. version .. "ud_media",
+            "wxmsw" .. version .. "ud_adv",
+            "wxbase" .. version .. "ud_net",
+            "wxbase" .. version .. "ud_xml",
+            "wxmsw" .. version .. "ud_core",
+            "wxbase" .. version .. "ud",
             "wxtiffd",
             "wxjpegd",
             "wxpngd",
@@ -56,11 +76,11 @@ elseif os.is("linux") then
 
 configuration { "linux", "Debug" }
     linkoptions(string.format("`%s --debug --unicode --static --libs`",
-    							_OPTIONS["wx-config-debug"]))
+                                _OPTIONS["wx-config-debug"]))
 
 configuration { "linux", "Release" }
     linkoptions(string.format("`%s --release --unicode --static --libs`",
-    							_OPTIONS["wx-config-release"]))
+                                _OPTIONS["wx-config-release"]))
 
 elseif os.is("macosx") then
 
