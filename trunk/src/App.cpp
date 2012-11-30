@@ -46,20 +46,15 @@ END_EVENT_TABLE()
 // Command line table
 const wxCmdLineEntryDesc cmdLineDesc[] =
 {
-    { wxCMD_LINE_SWITCH,
-      _T("p"), _T("portable"),
-      _T("portable mode") },
+    { wxCMD_LINE_SWITCH, "p", "portable", "portable mode" },
 
-    { wxCMD_LINE_OPTION,
-      _T("s"), _T("script"),
-      _T("lua script to execute") },
+    { wxCMD_LINE_OPTION, "s", "script", "lua script to execute" },
 
-    { wxCMD_LINE_PARAM,
-      NULL, NULL,
+    { wxCMD_LINE_PARAM, NULL, NULL,
 #ifdef XWORD_USE_LUA
-      _T("crossword puzzle or arguments for the script"),
+      "crossword puzzle or arguments for the script",
 #else
-      _T("crossword puzzle"),
+      "crossword puzzle",
 #endif // XWORD_USE_LUA
       wxCMD_LINE_VAL_STRING,
       wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },

@@ -33,7 +33,7 @@ inline std::string wx2file(const wxString & str)
 
 inline puz::string_t wx2puz(const wxString & str)
 {
-    return str.c_str();
+    return str.wc_str();
 }
 
 inline wxString puz2wx(const puz::string_t & str)
@@ -45,12 +45,12 @@ inline wxString puz2wx(const puz::string_t & str)
 
 inline puz::string_t wx2puz(const wxString & str)
 {
-    return puz::string_t(str.mb_str(wxConvUTF8));
+    return puz::string_t(str.utf8_str());
 }
 
 inline wxString puz2wx(const puz::string_t & str)
 {
-    return wxString(str.c_str(), wxConvUTF8);
+    return wxString::FromUTF8(str.c_str());
 }
 
 #endif // PUZ_UNICODE
