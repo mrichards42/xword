@@ -993,9 +993,9 @@ MyAuiManager::OnLeftDown(wxMouseEvent & evt)
     {
         // Start dragging the pane
         m_action = actionClickCaption;
-        m_action_part = part;
-        m_action_start = pos;
-        m_action_offset = pos - part->rect.GetTopLeft();
+        m_actionPart = part;
+        m_actionStart = pos;
+        m_actionOffset = pos - part->rect.GetTopLeft();
         if (! m_frame->HasCapture())
             m_frame->CaptureMouse();
     }
@@ -1023,7 +1023,7 @@ MyAuiManager::OnCaptureLost(wxMouseCaptureLostEvent & evt)
         m_frame->ReleaseMouse();
     // Reset the action variables
     m_action = actionNone;
-    m_last_mouse_move = wxPoint();
+    m_lastMouseMove = wxPoint();
     EndEdit();
 }
 

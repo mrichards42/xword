@@ -66,6 +66,7 @@ class ConfigManager;
 #   include "MyAuiMgr.hpp"
 #else
 #   include <wx/aui/aui.h>
+#   include <wx/tokenzr.h>
 #endif
 
 
@@ -436,9 +437,34 @@ MyFrame::LoadLayout(const wxString & name, bool update)
 
 inline bool
 MyFrame::LoadPerspective(const wxString & perspective, bool update)
-
 {
+#if USE_MY_AUI_MANAGER
     return m_mgr.LoadPerspective(perspective, update);
+#else // ! USE_MY_AUI_MANAGER
+    // Strip the sections wxAuiManager can't read
+    wxString escaped_layout = perspective;
+    // Escape
+    escaped_layout.Replace(_T("\\|"), _T("\a"));
+    escaped_layout.Replace(_T("\\;"), _T("\b"));
+
+    // Get rid of frame_size section (and old "private" panes)
+    wxString processed_layout;
+    processed_layout.reserve(perspective.size());
+    {
+        wxStringTokenizer tok(escaped_layout, _T("|"), wxTOKEN_RET_DELIMS);
+        while (tok.HasMoreTokens())
+        {
+            wxString part = tok.GetNextToken();
+            if (! part.StartsWith(_T("frame_size"))
+                && ! part.StartsWith(_T("__"))) // Old tabs
+                processed_layout += part;
+        }
+        // Unescape
+        processed_layout.Replace(_T("\a"), _T("\\|"));
+        processed_layout.Replace(_T("\b"), _T("\\;"));
+    }
+    return m_mgr.LoadPerspective(processed_layout, update);
+#endif // ! USE_MY_AUI_MANAGER
 }
 
 
