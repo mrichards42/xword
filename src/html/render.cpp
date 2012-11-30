@@ -86,7 +86,7 @@ int MyHtmlDCRenderer::Render(int x, int y,
     if (m_Cells == NULL || m_DC == NULL) return 0;
 
     pbreak = (int)(from + m_Height);
-    while (m_Cells->AdjustPagebreak(&pbreak, known_pagebreaks)) {}
+    while (m_Cells->AdjustPagebreak(&pbreak, known_pagebreaks, m_Height)) {}
     hght = pbreak - from;
     if(to < hght)
         hght = to;
