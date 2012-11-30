@@ -51,6 +51,7 @@ FontPanelBase::FontPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& po
 	
 	this->SetSizer( bSizer14 );
 	this->Layout();
+	bSizer14->Fit( this );
 }
 
 FontPanelBase::~FontPanelBase()
@@ -123,6 +124,7 @@ GridTweaksPanel::GridTweaksPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	
 	this->SetSizer( gbSizer1 );
 	this->Layout();
+	gbSizer1->Fit( this );
 }
 
 GridTweaksPanel::~GridTweaksPanel()

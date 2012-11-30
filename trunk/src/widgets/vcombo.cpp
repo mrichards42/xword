@@ -30,8 +30,8 @@
 
 const int VirtualComboBox::s_popupBorder = 3;
 
-class VirtualComboPopup : public wxVListBox,
-                          public wxComboPopup
+class VirtualComboPopup : public wxComboPopup,
+                          public wxVListBox
 {
 public:
     // ------------------------------------------------------------------------
@@ -201,7 +201,7 @@ wxSize VirtualComboPopup::GetAdjustedSize(int minWidth, int prefHeight, int maxH
             // Adjust height to a multiple of the height of the first item
             // NB: Calculations that take variable height into account
             //     are unnecessary.
-            int flh = OnGetLineHeight(0);
+            int flh = OnGetRowHeight(0);
             height -= height % flh;
         }
     }

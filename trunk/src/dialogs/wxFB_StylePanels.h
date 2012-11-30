@@ -43,7 +43,7 @@ class FontPanelBase : public wxPanel
 	
 	public:
 		
-		FontPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL ); 
+		FontPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL ); 
 		~FontPanelBase();
 	
 };
@@ -63,7 +63,7 @@ class GridTweaksPanel : public wxPanel
 		wxSpinCtrl* m_letterScale;
 		wxSpinCtrl* m_numberScale;
 		
-		GridTweaksPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL ); 
+		GridTweaksPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~GridTweaksPanel();
 	
 };
