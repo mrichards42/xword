@@ -98,7 +98,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	solvePanel->SetSizer( bSizer3 );
 	solvePanel->Layout();
 	bSizer3->Fit( solvePanel );
-	m_notebook->AddPage( solvePanel, wxT("Solving"), true );
+	m_notebook->AddPage( solvePanel, wxT("Solving"), false );
 	styleTreePanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bsizer26;
 	bsizer26 = new wxBoxSizer( wxVERTICAL );
@@ -208,7 +208,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	sbSizer14->Add( m_printCustomFonts, 0, wxALL, 8 );
 	
 	wxFlexGridSizer* fgSizer5;
-	fgSizer5 = new wxFlexGridSizer( 2, 2, 10, 10 );
+	fgSizer5 = new wxFlexGridSizer( 3, 2, 10, 10 );
 	fgSizer5->SetFlexibleDirection( wxBOTH );
 	fgSizer5->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -237,7 +237,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer5->Add( m_printClueFont, 0, 0, 5 );
 	
 	
-	sbSizer14->Add( fgSizer5, 1, wxALL|wxEXPAND, 5 );
+	sbSizer14->Add( fgSizer5, 0, wxALL, 5 );
 	
 	
 	bSizer371->Add( sbSizer14, 0, wxALL|wxEXPAND, 5 );
@@ -285,7 +285,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	printPanel->SetSizer( bSizer371 );
 	printPanel->Layout();
 	bSizer371->Fit( printPanel );
-	m_notebook->AddPage( printPanel, wxT("Printing"), false );
+	m_notebook->AddPage( printPanel, wxT("Printing"), true );
 	
 	sizer->Add( m_notebook, 1, wxEXPAND | wxALL, 5 );
 	

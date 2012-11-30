@@ -24,7 +24,9 @@
 #include "../widgets/SizedText.hpp"
 #include "../App.hpp" // For the ConfigManager
 #include "StyleEditors.hpp"
-#include "../xwordlua.hpp"
+#if XWORD_USE_LUA
+#   include "../xwordlua.hpp"
+#endif // XWORD_USE_LUA
 
 PreferencesDialog::PreferencesDialog(wxWindow * parent)
     : PreferencesDialogBase(parent, wxID_ANY),
