@@ -4,16 +4,16 @@
 // Any changes made to this file will be lost when the file is regenerated.
 // ---------------------------------------------------------------------------
 
+
+#include "wx/wxprec.h"
+
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
 
-#include "wx/wxprec.h"
-
 #ifndef WX_PRECOMP
      #include "wx/wx.h"
 #endif
-
 
 #include "wxlua/include/wxlstate.h"
 #include "wxbind/include/wxbase_bind.h"
@@ -250,6 +250,12 @@ static int LUACALL wxLua_wxStandardPaths_GetUserLocalDataDir(lua_State *L)
 
 
 
+void wxLua_wxStandardPaths_delete_function(void** p)
+{
+    wxStandardPaths* o = (wxStandardPaths*)(*p);
+    delete o;
+}
+
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxStandardPaths_methods[] = {
     { "Get", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxStandardPaths_Get, 1, NULL },
@@ -453,7 +459,7 @@ static int LUACALL wxLua_wxPathList_constructor(lua_State *L)
     // call constructor
     wxPathList* returns = new wxPathList();
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxPathList((wxPathList*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxPathList);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxPathList);
 
@@ -482,6 +488,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxPathList_Add_overload[] =
 static int s_wxluafunc_wxLua_wxPathList_Add_overload_count = sizeof(s_wxluafunc_wxLua_wxPathList_Add_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // ((wxLUA_USE_wxArrayString) && (wxCHECK_VERSION(2,8,0)))||(wxCHECK_VERSION(2,8,0))||(!wxCHECK_VERSION(2,8,0))
+
+void wxLua_wxPathList_delete_function(void** p)
+{
+    wxPathList* o = (wxPathList*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxPathList_methods[] = {
@@ -827,7 +839,7 @@ static int LUACALL wxLua_wxFileName_DirName(lua_State *L)
     // allocate a new object using the copy constructor
     wxFileName* returns = new wxFileName(wxFileName::DirName(dir));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileName((wxFileName*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
 
@@ -878,7 +890,7 @@ static int LUACALL wxLua_wxFileName_FileName(lua_State *L)
     // allocate a new object using the copy constructor
     wxFileName* returns = new wxFileName(wxFileName::FileName(file));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileName((wxFileName*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
 
@@ -1098,7 +1110,7 @@ static int LUACALL wxLua_wxFileName_GetModificationTime(lua_State *L)
     // allocate a new object using the copy constructor
     wxDateTime* returns = new wxDateTime(self->GetModificationTime());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxDateTime((wxDateTime*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxDateTime);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxDateTime);
 
@@ -1249,7 +1261,7 @@ static int LUACALL wxLua_wxFileName_GetSize1(lua_State *L)
     // allocate a new object using the copy constructor
     wxULongLong* returns = new wxULongLong(wxFileName::GetSize(file));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxULongLong((wxULongLong*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxULongLong);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxULongLong);
 
@@ -1268,7 +1280,7 @@ static int LUACALL wxLua_wxFileName_GetSize(lua_State *L)
     // allocate a new object using the copy constructor
     wxULongLong* returns = new wxULongLong(self->GetSize());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxULongLong((wxULongLong*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxULongLong);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxULongLong);
 
@@ -1292,12 +1304,12 @@ static int LUACALL wxLua_wxFileName_GetTimes(lua_State *L)
     // call GetTimes
     bool returns = self->GetTimes(dtAccess, dtMod, dtCreate);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)dtAccess, new wxLua_wxObject_wxDateTime(dtAccess));
-    wxluaO_addgcobject(L, (void*)dtMod, new wxLua_wxObject_wxDateTime(dtMod));
-    wxluaO_addgcobject(L, (void*)dtCreate, new wxLua_wxObject_wxDateTime(dtCreate));
+    wxluaO_addgcobject(L, (void*)dtAccess, wxluatype_wxDateTime);
+    wxluaO_addgcobject(L, (void*)dtMod,    wxluatype_wxDateTime);
+    wxluaO_addgcobject(L, (void*)dtCreate, wxluatype_wxDateTime);
     // push the constructed class pointers
     wxluaT_pushuserdatatype(L, dtAccess, wxluatype_wxDateTime);
-    wxluaT_pushuserdatatype(L, dtMod, wxluatype_wxDateTime);
+    wxluaT_pushuserdatatype(L, dtMod,    wxluatype_wxDateTime);
     wxluaT_pushuserdatatype(L, dtCreate, wxluatype_wxDateTime);
     // push the result flag
     lua_pushboolean(L, returns);
@@ -2185,7 +2197,7 @@ static int LUACALL wxLua_wxFileName_constructor4(lua_State *L)
     // call constructor
     wxFileName* returns = new wxFileName(volume, path, name, ext, format);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileName((wxFileName*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
 
@@ -2209,7 +2221,7 @@ static int LUACALL wxLua_wxFileName_constructor3(lua_State *L)
     // call constructor
     wxFileName* returns = new wxFileName(path, name, format);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileName((wxFileName*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
 
@@ -2231,7 +2243,7 @@ static int LUACALL wxLua_wxFileName_constructor2(lua_State *L)
     // call constructor
     wxFileName* returns = new wxFileName(fullpath, format);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileName((wxFileName*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
 
@@ -2249,7 +2261,7 @@ static int LUACALL wxLua_wxFileName_constructor1(lua_State *L)
     // call constructor
     wxFileName* returns = new wxFileName(*filename);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileName((wxFileName*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
 
@@ -2264,7 +2276,7 @@ static int LUACALL wxLua_wxFileName_constructor(lua_State *L)
     // call constructor
     wxFileName* returns = new wxFileName();
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileName((wxFileName*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
 
@@ -2455,6 +2467,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileName_constructor_overload[] =
 static int s_wxluafunc_wxLua_wxFileName_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxFileName_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // (wxLUA_USE_wxFileName)
+
+void wxLua_wxFileName_delete_function(void** p)
+{
+    wxFileName* o = (wxFileName*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileName_methods[] = {
@@ -2970,7 +2988,7 @@ static int LUACALL wxLua_wxFile_constructor1(lua_State *L)
     // call constructor
     wxFile* returns = new wxFile(filename, mode);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFile((wxFile*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFile);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFile);
 
@@ -2985,7 +3003,7 @@ static int LUACALL wxLua_wxFile_constructor(lua_State *L)
     // call constructor
     wxFile* returns = new wxFile();
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFile((wxFile*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFile);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFile);
 
@@ -3013,6 +3031,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxFile_constructor_overload[] =
 static int s_wxluafunc_wxLua_wxFile_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxFile_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // (wxLUA_USE_wxFile && wxUSE_FILE)
+
+void wxLua_wxFile_delete_function(void** p)
+{
+    wxFile* o = (wxFile*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFile_methods[] = {
@@ -3226,7 +3250,7 @@ static int LUACALL wxLua_wxTempFile_constructor1(lua_State *L)
     // call constructor
     wxTempFile* returns = new wxTempFile(strName);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxTempFile((wxTempFile*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxTempFile);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxTempFile);
 
@@ -3241,7 +3265,7 @@ static int LUACALL wxLua_wxTempFile_constructor(lua_State *L)
     // call constructor
     wxTempFile* returns = new wxTempFile();
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxTempFile((wxTempFile*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxTempFile);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxTempFile);
 
@@ -3261,6 +3285,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxTempFile_constructor_overload[] =
 static int s_wxluafunc_wxLua_wxTempFile_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxTempFile_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // (wxLUA_USE_wxFile && wxUSE_FILE)
+
+void wxLua_wxTempFile_delete_function(void** p)
+{
+    wxTempFile* o = (wxTempFile*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxTempFile_methods[] = {
@@ -3346,9 +3376,9 @@ static int LUACALL wxLua_wxDir_GetAllFiles(lua_State *L)
     // get number of arguments
     int argCount = lua_gettop(L);
     // int flags = wxDIR_DEFAULT
-    int flags = (argCount >= 4 ? (int)wxlua_getintegertype(L, 3) : wxDIR_DEFAULT);
+    int flags = (argCount >= 3 ? (int)wxlua_getintegertype(L, 3) : wxDIR_DEFAULT);
     // const wxString& filespec = ""
-    wxString filespec = (argCount >= 3 ? wxlua_getwxStringtype(L, 2) : wxString(wxT("")));
+    wxString filespec = (argCount >= 2 ? wxlua_getwxStringtype(L, 2) : wxString(wxT("")));
     // wxArrayString *files
     wxArrayString files;
     // const wxString& dirname
@@ -3441,7 +3471,7 @@ static int LUACALL wxLua_wxDir_GetTotalSize(lua_State *L)
     // allocate a new object using the copy constructor
     wxULongLong* returns = new wxULongLong(wxDir::GetTotalSize(dir));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxULongLong((wxULongLong*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxULongLong);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxULongLong);
 
@@ -3538,7 +3568,7 @@ static int LUACALL wxLua_wxDir_constructor1(lua_State *L)
     // call constructor
     wxDir* returns = new wxDir(dir);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxDir((wxDir*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxDir);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxDir);
 
@@ -3553,7 +3583,7 @@ static int LUACALL wxLua_wxDir_constructor(lua_State *L)
     // call constructor
     wxDir* returns = new wxDir();
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxDir((wxDir*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxDir);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxDir);
 
@@ -3573,6 +3603,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxDir_constructor_overload[] =
 static int s_wxluafunc_wxLua_wxDir_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxDir_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // (wxLUA_USE_wxDir)
+
+void wxLua_wxDir_delete_function(void** p)
+{
+    wxDir* o = (wxDir*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxDir_methods[] = {
@@ -3645,7 +3681,7 @@ static int LUACALL wxLua_wxFileTypeInfo_GetExtensions(lua_State *L)
     // allocate a new object using the copy constructor
     wxArrayString* returns = new wxArrayString(self->GetExtensions());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxArrayString((wxArrayString*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxArrayString);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxArrayString);
 
@@ -3834,7 +3870,7 @@ static int LUACALL wxLua_wxFileTypeInfo_constructor(lua_State *L)
     // call constructor
     wxFileTypeInfo* returns = new wxFileTypeInfo(sArray);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileTypeInfo((wxFileTypeInfo*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileTypeInfo);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileTypeInfo);
 
@@ -3851,7 +3887,7 @@ static int LUACALL wxLua_wxFileTypeInfo_constructor1(lua_State *L)
     // call constructor
     wxFileTypeInfo* returns = new wxFileTypeInfo();
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileTypeInfo((wxFileTypeInfo*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileTypeInfo);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileTypeInfo);
 
@@ -3873,6 +3909,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileTypeInfo_constructor_overload[] =
 static int s_wxluafunc_wxLua_wxFileTypeInfo_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxFileTypeInfo_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // (wxLUA_USE_wxArrayString)
+
+void wxLua_wxFileTypeInfo_delete_function(void** p)
+{
+    wxFileTypeInfo* o = (wxFileTypeInfo*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileTypeInfo_methods[] = {
@@ -4019,7 +4061,7 @@ static int LUACALL wxLua_wxIconLocation_constructor1(lua_State *L)
     // call constructor
     wxIconLocation* returns = new wxIconLocation(file, num);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxIconLocation((wxIconLocation*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxIconLocation);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxIconLocation);
 
@@ -4042,7 +4084,7 @@ static int LUACALL wxLua_wxIconLocation_constructor(lua_State *L)
     // call constructor
     wxIconLocation* returns = new wxIconLocation(filename);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxIconLocation((wxIconLocation*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxIconLocation);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxIconLocation);
 
@@ -4069,6 +4111,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxIconLocation_constructor_overload[] =
 static int s_wxluafunc_wxLua_wxIconLocation_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxIconLocation_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // (defined(__WXMSW__))||(!defined(__WXMSW__))
+
+void wxLua_wxIconLocation_delete_function(void** p)
+{
+    wxIconLocation* o = (wxIconLocation*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxIconLocation_methods[] = {
@@ -4172,7 +4220,7 @@ static int LUACALL wxLua_wxFileType_MessageParameters_constructor(lua_State *L)
     // call constructor
     wxFileType::MessageParameters* returns = new wxFileType::MessageParameters(filename, mimetype);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileType_MessageParameters((wxFileType::MessageParameters*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileType_MessageParameters);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileType_MessageParameters);
 
@@ -4180,6 +4228,12 @@ static int LUACALL wxLua_wxFileType_MessageParameters_constructor(lua_State *L)
 }
 
 
+
+void wxLua_wxFileType_MessageParameters_delete_function(void** p)
+{
+    wxFileType::MessageParameters* o = (wxFileType::MessageParameters*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileType_MessageParameters_methods[] = {
@@ -4445,7 +4499,7 @@ static int LUACALL wxLua_wxFileType_constructor(lua_State *L)
     // call constructor
     wxFileType* returns = new wxFileType(*ftInfo);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileType((wxFileType*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileType);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileType);
 
@@ -4453,6 +4507,12 @@ static int LUACALL wxLua_wxFileType_constructor(lua_State *L)
 }
 
 
+
+void wxLua_wxFileType_delete_function(void** p)
+{
+    wxFileType* o = (wxFileType*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileType_methods[] = {
@@ -4638,10 +4698,12 @@ static int LUACALL wxLua_wxMimeTypesManager_IsOfType(lua_State *L)
     return 1;
 }
 
+
+#if !wxCHECK_VERSION(2,9,0)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMimeTypesManager_ReadMailcap[] = { &wxluatype_wxMimeTypesManager, &wxluatype_TSTRING, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxMimeTypesManager_ReadMailcap(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMimeTypesManager_ReadMailcap[1] = {{ wxLua_wxMimeTypesManager_ReadMailcap, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxMimeTypesManager_ReadMailcap }};
-//     bool ReadMailcap(const wxString& filename, bool fallback = false);
+//     !%wxchkver_2_9 bool ReadMailcap(const wxString& filename, bool fallback = false);
 static int LUACALL wxLua_wxMimeTypesManager_ReadMailcap(lua_State *L)
 {
     // get number of arguments
@@ -4663,7 +4725,7 @@ static int LUACALL wxLua_wxMimeTypesManager_ReadMailcap(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMimeTypesManager_ReadMimeTypes[] = { &wxluatype_wxMimeTypesManager, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMimeTypesManager_ReadMimeTypes(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMimeTypesManager_ReadMimeTypes[1] = {{ wxLua_wxMimeTypesManager_ReadMimeTypes, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMimeTypesManager_ReadMimeTypes }};
-//     bool ReadMimeTypes(const wxString& filename);
+//     !%wxchkver_2_9 bool ReadMimeTypes(const wxString& filename);
 static int LUACALL wxLua_wxMimeTypesManager_ReadMimeTypes(lua_State *L)
 {
     // const wxString filename
@@ -4677,6 +4739,8 @@ static int LUACALL wxLua_wxMimeTypesManager_ReadMimeTypes(lua_State *L)
 
     return 1;
 }
+
+#endif // !wxCHECK_VERSION(2,9,0)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMimeTypesManager_Unassociate[] = { &wxluatype_wxMimeTypesManager, &wxluatype_wxFileType, NULL };
 static int LUACALL wxLua_wxMimeTypesManager_Unassociate(lua_State *L);
@@ -4698,6 +4762,12 @@ static int LUACALL wxLua_wxMimeTypesManager_Unassociate(lua_State *L)
 
 
 
+void wxLua_wxMimeTypesManager_delete_function(void** p)
+{
+    wxMimeTypesManager* o = (wxMimeTypesManager*)(*p);
+    delete o;
+}
+
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxMimeTypesManager_methods[] = {
     { "AddFallback", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMimeTypesManager_AddFallback, 1, NULL },
@@ -4712,8 +4782,12 @@ wxLuaBindMethod wxMimeTypesManager_methods[] = {
     { "GetFileTypeFromMimeType", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMimeTypesManager_GetFileTypeFromMimeType, 1, NULL },
     { "Initialize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMimeTypesManager_Initialize, 1, NULL },
     { "IsOfType", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxMimeTypesManager_IsOfType, 1, NULL },
+
+#if !wxCHECK_VERSION(2,9,0)
     { "ReadMailcap", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMimeTypesManager_ReadMailcap, 1, NULL },
     { "ReadMimeTypes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMimeTypesManager_ReadMimeTypes, 1, NULL },
+#endif // !wxCHECK_VERSION(2,9,0)
+
     { "Unassociate", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMimeTypesManager_Unassociate, 1, NULL },
     { 0, 0, 0, 0 },
 };
@@ -4830,6 +4904,12 @@ static int LUACALL wxLua_wxStreamBase_Reset(lua_State *L)
 
 
 
+
+void wxLua_wxStreamBase_delete_function(void** p)
+{
+    wxStreamBase* o = (wxStreamBase*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxStreamBase_methods[] = {
@@ -4951,7 +5031,7 @@ static int LUACALL wxLua_wxInputStream_Read1(lua_State *L)
     // get this
     wxInputStream * self = (wxInputStream *)wxluaT_getuserdatatype(L, 1, wxluatype_wxInputStream);
     // call Read
-    wxInputStream* returns = &self->Read(*stream_in);
+    wxInputStream* returns = (wxInputStream*)&self->Read(*stream_in);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxInputStream);
 
@@ -5090,6 +5170,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxInputStream_Ungetch_overload[] =
 static int s_wxluafunc_wxLua_wxInputStream_Ungetch_overload_count = sizeof(s_wxluafunc_wxLua_wxInputStream_Ungetch_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // (wxUSE_STREAMS)
+
+void wxLua_wxInputStream_delete_function(void** p)
+{
+    wxInputStream* o = (wxInputStream*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxInputStream_methods[] = {
@@ -5230,7 +5316,7 @@ static int LUACALL wxLua_wxOutputStream_Write1(lua_State *L)
     // get this
     wxOutputStream * self = (wxOutputStream *)wxluaT_getuserdatatype(L, 1, wxluatype_wxOutputStream);
     // call Write
-    wxOutputStream* returns = &self->Write(*stream_in);
+    wxOutputStream* returns = (wxOutputStream*)&self->Write(*stream_in);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxOutputStream);
 
@@ -5272,6 +5358,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxOutputStream_Write_overload[] =
 static int s_wxluafunc_wxLua_wxOutputStream_Write_overload_count = sizeof(s_wxluafunc_wxLua_wxOutputStream_Write_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // (wxUSE_STREAMS)
+
+void wxLua_wxOutputStream_delete_function(void** p)
+{
+    wxOutputStream* o = (wxOutputStream*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxOutputStream_methods[] = {
@@ -5337,7 +5429,7 @@ static int LUACALL wxLua_wxFileInputStream_constructor1(lua_State *L)
     // call constructor
     wxFileInputStream* returns = new wxFileInputStream(*file);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileInputStream((wxFileInputStream*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileInputStream);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileInputStream);
 
@@ -5357,7 +5449,7 @@ static int LUACALL wxLua_wxFileInputStream_constructor(lua_State *L)
     // call constructor
     wxFileInputStream* returns = new wxFileInputStream(fileName);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileInputStream((wxFileInputStream*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileInputStream);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileInputStream);
 
@@ -5380,6 +5472,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileInputStream_constructor_overload[]
 static int s_wxluafunc_wxLua_wxFileInputStream_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxFileInputStream_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // ((wxUSE_STREAMS) && (wxLUA_USE_wxFile && wxUSE_FILE))||(wxUSE_STREAMS)
+
+void wxLua_wxFileInputStream_delete_function(void** p)
+{
+    wxFileInputStream* o = (wxFileInputStream*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileInputStream_methods[] = {
@@ -5438,7 +5536,7 @@ static int LUACALL wxLua_wxFileOutputStream_constructor1(lua_State *L)
     // call constructor
     wxFileOutputStream* returns = new wxFileOutputStream(*file);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileOutputStream((wxFileOutputStream*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileOutputStream);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileOutputStream);
 
@@ -5458,7 +5556,7 @@ static int LUACALL wxLua_wxFileOutputStream_constructor(lua_State *L)
     // call constructor
     wxFileOutputStream* returns = new wxFileOutputStream(fileName);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileOutputStream((wxFileOutputStream*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileOutputStream);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileOutputStream);
 
@@ -5481,6 +5579,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileOutputStream_constructor_overload[
 static int s_wxluafunc_wxLua_wxFileOutputStream_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxFileOutputStream_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // ((wxUSE_STREAMS) && (wxLUA_USE_wxFile && wxUSE_FILE))||(wxUSE_STREAMS)
+
+void wxLua_wxFileOutputStream_delete_function(void** p)
+{
+    wxFileOutputStream* o = (wxFileOutputStream*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileOutputStream_methods[] = {
@@ -5524,7 +5628,7 @@ static int LUACALL wxLua_wxMemoryInputStream_constructor(lua_State *L)
     // call constructor
     wxMemoryInputStream* returns = new wxMemoryInputStream(data, length);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxMemoryInputStream((wxMemoryInputStream*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxMemoryInputStream);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxMemoryInputStream);
 
@@ -5534,6 +5638,12 @@ static int LUACALL wxLua_wxMemoryInputStream_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxMemoryInputStream_delete_function(void** p)
+{
+    wxMemoryInputStream* o = (wxMemoryInputStream*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxMemoryInputStream_methods[] = {
@@ -5682,7 +5792,7 @@ static int LUACALL wxLua_wxDataInputStream_constructor(lua_State *L)
     // call constructor
     wxDataInputStream* returns = new wxDataInputStream(*s);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxDataInputStream((wxDataInputStream*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxDataInputStream);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxDataInputStream);
 
@@ -5691,6 +5801,12 @@ static int LUACALL wxLua_wxDataInputStream_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxDataInputStream_delete_function(void** p)
+{
+    wxDataInputStream* o = (wxDataInputStream*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxDataInputStream_methods[] = {
@@ -5846,7 +5962,7 @@ static int LUACALL wxLua_wxDataOutputStream_constructor(lua_State *L)
     // call constructor
     wxDataOutputStream* returns = new wxDataOutputStream(*s);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxDataOutputStream((wxDataOutputStream*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxDataOutputStream);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxDataOutputStream);
 
@@ -5855,6 +5971,12 @@ static int LUACALL wxLua_wxDataOutputStream_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxDataOutputStream_delete_function(void** p)
+{
+    wxDataOutputStream* o = (wxDataOutputStream*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxDataOutputStream_methods[] = {
@@ -5895,7 +6017,7 @@ static int LUACALL wxLua_wxFSFile_DetachStream(lua_State *L)
     wxFSFile * self = (wxFSFile *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFSFile);
     // call DetachStream
     wxInputStream* returns = (wxInputStream*)self->DetachStream();
-    if (!wxluaO_isgcobject(L, returns)) wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxInputStream(returns));
+    if (!wxluaO_isgcobject(L, returns)) wxluaO_addgcobject(L, returns, wxluatype_wxInputStream);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxInputStream);
 
@@ -5966,7 +6088,7 @@ static int LUACALL wxLua_wxFSFile_GetModificationTime(lua_State *L)
     // allocate a new object using the copy constructor
     wxDateTime* returns = new wxDateTime(self->GetModificationTime());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxDateTime((wxDateTime*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxDateTime);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxDateTime);
 
@@ -6036,7 +6158,7 @@ static int LUACALL wxLua_wxFSFile_constructor(lua_State *L)
     // call constructor
     wxFSFile* returns = new wxFSFile(stream, loc, mimetype, anchor, modif);
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxFSFile);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFSFile);
 
@@ -6046,6 +6168,12 @@ static int LUACALL wxLua_wxFSFile_constructor(lua_State *L)
 #endif // (((wxUSE_STREAMS) && (wxUSE_FILESYSTEM)) && (wxUSE_STREAMS)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
 
 
+
+void wxLua_wxFSFile_delete_function(void** p)
+{
+    wxFSFile* o = (wxFSFile*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFSFile_methods[] = {
@@ -6170,6 +6298,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileSystemHandler_delete[1] = {{ wxlua
 
 
 
+void wxLua_wxFileSystemHandler_delete_function(void** p)
+{
+    wxFileSystemHandler* o = (wxFileSystemHandler*)(*p);
+    delete o;
+}
+
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileSystemHandler_methods[] = {
     { "CanOpen", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFileSystemHandler_CanOpen, 1, NULL },
@@ -6219,7 +6353,7 @@ static int LUACALL wxLua_wxLocalFSHandler_constructor(lua_State *L)
     // call constructor
     wxLocalFSHandler* returns = new wxLocalFSHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxLocalFSHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxLocalFSHandler);
 
@@ -6228,6 +6362,12 @@ static int LUACALL wxLua_wxLocalFSHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxLocalFSHandler_delete_function(void** p)
+{
+    wxLocalFSHandler* o = (wxLocalFSHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxLocalFSHandler_methods[] = {
@@ -6254,11 +6394,12 @@ int wxluatype_wxFileSystem = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileSystem_AddHandler[] = { &wxluatype_wxFileSystemHandler, NULL };
 static int LUACALL wxLua_wxFileSystem_AddHandler(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileSystem_AddHandler[1] = {{ wxLua_wxFileSystem_AddHandler, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxFileSystem_AddHandler }};
-//     static void AddHandler(wxFileSystemHandler *handler);
+//     static void AddHandler(%ungc wxFileSystemHandler *handler);
 static int LUACALL wxLua_wxFileSystem_AddHandler(lua_State *L)
 {
     // wxFileSystemHandler handler
     wxFileSystemHandler * handler = (wxFileSystemHandler *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFileSystemHandler);
+    if (wxluaO_isgcobject(L, handler)) wxluaO_undeletegcobject(L, handler);
     // call AddHandler
     wxFileSystem::AddHandler(handler);
 
@@ -6414,7 +6555,7 @@ static int LUACALL wxLua_wxFileSystem_HasHandlerForPath(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileSystem_OpenFile[] = { &wxluatype_wxFileSystem, &wxluatype_TSTRING, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxFileSystem_OpenFile(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileSystem_OpenFile[1] = {{ wxLua_wxFileSystem_OpenFile, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxFileSystem_OpenFile }};
-//     wxFSFile* OpenFile(const wxString& location, int flags = wxFS_READ);
+//     %gc wxFSFile* OpenFile(const wxString& location, int flags = wxFS_READ);
 static int LUACALL wxLua_wxFileSystem_OpenFile(lua_State *L)
 {
     // get number of arguments
@@ -6427,7 +6568,7 @@ static int LUACALL wxLua_wxFileSystem_OpenFile(lua_State *L)
     wxFileSystem * self = (wxFileSystem *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFileSystem);
     // call OpenFile
     wxFSFile* returns = (wxFSFile*)self->OpenFile(location, flags);
-    wxluaO_addgcobject(L, returns);
+    if (!wxluaO_isgcobject(L, returns)) wxluaO_addgcobject(L, returns, wxluatype_wxFSFile);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFSFile);
 
@@ -6437,13 +6578,14 @@ static int LUACALL wxLua_wxFileSystem_OpenFile(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileSystem_RemoveHandler[] = { &wxluatype_wxFileSystemHandler, NULL };
 static int LUACALL wxLua_wxFileSystem_RemoveHandler(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileSystem_RemoveHandler[1] = {{ wxLua_wxFileSystem_RemoveHandler, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxFileSystem_RemoveHandler }};
-//     static wxFileSystemHandler* RemoveHandler(wxFileSystemHandler *handler);
+//     static %gc wxFileSystemHandler* RemoveHandler(wxFileSystemHandler *handler);
 static int LUACALL wxLua_wxFileSystem_RemoveHandler(lua_State *L)
 {
     // wxFileSystemHandler handler
     wxFileSystemHandler * handler = (wxFileSystemHandler *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFileSystemHandler);
     // call RemoveHandler
     wxFileSystemHandler* returns = (wxFileSystemHandler*)wxFileSystem::RemoveHandler(handler);
+    if (!wxluaO_isgcobject(L, returns)) wxluaO_addgcobject(L, returns, wxluatype_wxFileSystemHandler);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileSystemHandler);
 
@@ -6464,7 +6606,7 @@ static int LUACALL wxLua_wxFileSystem_URLToFileName(lua_State *L)
     // allocate a new object using the copy constructor
     wxFileName* returns = new wxFileName(wxFileSystem::URLToFileName(url));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxFileName((wxFileName*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
 
@@ -6484,7 +6626,7 @@ static int LUACALL wxLua_wxFileSystem_constructor(lua_State *L)
     // call constructor
     wxFileSystem* returns = new wxFileSystem();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileSystem);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileSystem);
 
@@ -6493,6 +6635,12 @@ static int LUACALL wxLua_wxFileSystem_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxFileSystem_delete_function(void** p)
+{
+    wxFileSystem* o = (wxFileSystem*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileSystem_methods[] = {
@@ -6546,7 +6694,7 @@ static int LUACALL wxLua_wxArchiveFSHandler_constructor(lua_State *L)
     // call constructor
     wxArchiveFSHandler* returns = new wxArchiveFSHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxArchiveFSHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxArchiveFSHandler);
 
@@ -6555,6 +6703,12 @@ static int LUACALL wxLua_wxArchiveFSHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxArchiveFSHandler_delete_function(void** p)
+{
+    wxArchiveFSHandler* o = (wxArchiveFSHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxArchiveFSHandler_methods[] = {
@@ -6588,7 +6742,7 @@ static int LUACALL wxLua_wxFilterFSHandler_constructor(lua_State *L)
     // call constructor
     wxFilterFSHandler* returns = new wxFilterFSHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxFilterFSHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxFilterFSHandler);
 
@@ -6597,6 +6751,12 @@ static int LUACALL wxLua_wxFilterFSHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxFilterFSHandler_delete_function(void** p)
+{
+    wxFilterFSHandler* o = (wxFilterFSHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFilterFSHandler_methods[] = {
@@ -6630,7 +6790,7 @@ static int LUACALL wxLua_wxInternetFSHandler_constructor(lua_State *L)
     // call constructor
     wxInternetFSHandler* returns = new wxInternetFSHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxInternetFSHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxInternetFSHandler);
 
@@ -6639,6 +6799,12 @@ static int LUACALL wxLua_wxInternetFSHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxInternetFSHandler_delete_function(void** p)
+{
+    wxInternetFSHandler* o = (wxInternetFSHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxInternetFSHandler_methods[] = {

@@ -1,31 +1,20 @@
-// XWord edits:
-// Adjust wxlua_wxLuaBindClass__index so that a class can define an __index
-// method that is called wxlua_wxLuaBindClass__index fails.
-// Likewise for __newindex.
-
-// Edits delimited by
-
-// XWORD START ================================================================
-// XWORD END   ================================================================
-
-
 /////////////////////////////////////////////////////////////////////////////
 // Name:          wxlbind.cpp
 // Purpose:       wxLuaBinding
 // Author:        Ray Gilbert, John Labenski, J Winwood
 // Created:       14/11/2001
-// Copyright:
+// Copyright:     (c) 2012 John Labenski
 // Licence:       wxWidgets licence
 /////////////////////////////////////////////////////////////////////////////
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
 
 #ifndef WX_PRECOMP
-    #include "wx/wx.h"
+    #include <wx/wx.h>
 #endif
 
 #include "wxlua/include/wxlbind.h"
@@ -36,12 +25,9 @@
 const wxLuaSmartwxArrayString wxLuaNullSmartwxArrayString(NULL, true);
 
 
-#include "wx/listimpl.cpp"
-WX_DEFINE_LIST(wxLuaBindingList);
-
 wxLuaArgType g_wxluaargtypeArray_None[1] = {0};
-wxLuaBindNumber g_wxluanumberArray_None[1] = {{0, 0}};
 
+int wxluatype_TUNKNOWN       = WXLUA_TUNKNOWN;
 int wxluatype_TNONE          = WXLUA_TNONE;
 int wxluatype_TNIL           = WXLUA_TNIL;
 int wxluatype_TBOOLEAN       = WXLUA_TBOOLEAN;
@@ -54,19 +40,22 @@ int wxluatype_TUSERDATA      = WXLUA_TUSERDATA;      // raw data
 int wxluatype_TTHREAD        = WXLUA_TTHREAD;
 int wxluatype_TINTEGER       = WXLUA_TINTEGER;
 int wxluatype_TCFUNCTION     = WXLUA_TCFUNCTION;
+int wxluatype_TPOINTER       = WXLUA_TPOINTER;
+int wxluatype_TANY           = WXLUA_TANY;
 
 int wxluatype_NULL           = WXLUATYPE_NULL;
 
 wxLuaBindClass wxLuaBindClass_NULL =
-    { "NULL", NULL, 0, NULL, &wxluatype_NULL, NULL, NULL, g_wxluanumberArray_None, 0, };
+    { "NULL", NULL, 0, NULL, &wxluatype_NULL, NULL, NULL, NULL, NULL, NULL, 0, };
 
-static int wxluatype_dummy           = WXLUA_TUNKNOWN;
-int* p_wxluatype_wxEvent             = &wxluatype_dummy;
-int* p_wxluatype_wxWindow            = &wxluatype_dummy;
-int* p_wxluatype_wxString            = &wxluatype_dummy;
-int* p_wxluatype_wxArrayString       = &wxluatype_dummy;
-int* p_wxluatype_wxSortedArrayString = &wxluatype_dummy;
-int* p_wxluatype_wxArrayInt          = &wxluatype_dummy;
+int* p_wxluatype_wxEvent             = &wxluatype_TUNKNOWN;
+int* p_wxluatype_wxWindow            = &wxluatype_TUNKNOWN;
+int* p_wxluatype_wxScrollEvent       = &wxluatype_TUNKNOWN;
+int* p_wxluatype_wxSpinEvent         = &wxluatype_TUNKNOWN;
+int* p_wxluatype_wxString            = &wxluatype_TUNKNOWN;
+int* p_wxluatype_wxArrayString       = &wxluatype_TUNKNOWN;
+int* p_wxluatype_wxSortedArrayString = &wxluatype_TUNKNOWN;
+int* p_wxluatype_wxArrayInt          = &wxluatype_TUNKNOWN;
 
 //-----------------------------------------------------------------------------
 // wxLuaObject
@@ -74,39 +63,52 @@ int* p_wxluatype_wxArrayInt          = &wxluatype_dummy;
 IMPLEMENT_ABSTRACT_CLASS(wxLuaObject, wxObject)
 
 wxLuaObject::wxLuaObject(const wxLuaState& wxlState, int stack_idx)
-            : m_wxlState(new wxLuaState(wxlState)),
+            : m_wxlState(new wxLuaState(wxlState.GetLuaState(), wxLUASTATE_GETSTATE|wxLUASTATE_ROOTSTATE)),
               m_alloc_flag(wxLUAOBJECT_NONE),
               m_int(0) // GCC only wants one initializer
-
 {
+    // set up the reference to the item on the stack
+    m_reference = m_wxlState->wxluaR_Ref(stack_idx, &wxlua_lreg_refs_key);
+}
+wxLuaObject::wxLuaObject(lua_State* L, int stack_idx)
+            : m_alloc_flag(wxLUAOBJECT_NONE),
+              m_int(0) // GCC only wants one initializer
+{
+    m_wxlState = new wxLuaState(L, wxLUASTATE_GETSTATE|wxLUASTATE_ROOTSTATE);
+
     // set up the reference to the item on the stack
     m_reference = m_wxlState->wxluaR_Ref(stack_idx, &wxlua_lreg_refs_key);
 }
 
 wxLuaObject::~wxLuaObject()
 {
+    if ((m_reference != LUA_NOREF) && m_wxlState->Ok() && !m_wxlState->IsClosing())
+    {
+        m_wxlState->wxluaR_Unref(m_reference, &wxlua_lreg_refs_key);
+        m_reference = LUA_NOREF;
+    }
+    //else if (!m_wxlState->IsClosing())
+    //    wxPrintf(wxT("~wxLuaObject %d %d %d\n"), (int)m_reference, (int)m_wxlState->Ok(), (int)m_wxlState->IsClosing());
+
     if (m_alloc_flag == wxLUAOBJECT_STRING)
         delete m_string;
     else if (m_alloc_flag == wxLUAOBJECT_ARRAYINT)
         delete m_arrayInt;
 
-    // If a refererence exists, remove it, but don't bother if Lua is being closed
-    if ((m_reference != LUA_NOREF) && m_wxlState->Ok() && !m_wxlState->IsClosing())
-        m_wxlState->wxluaR_Unref(m_reference, &wxlua_lreg_refs_key);
-
     delete m_wxlState;
 }
 
-wxLuaState wxLuaObject::GetwxLuaState() const
+void wxLuaObject::RemoveReference(lua_State* L)
 {
-    return (m_wxlState != NULL) ? *m_wxlState : wxNullLuaState;
+    // If a reference exists, remove it, but don't bother if Lua is being closed
+    if ((m_reference != LUA_NOREF) && m_wxlState->Ok() && !m_wxlState->IsClosing())
+        wxluaR_unref(L, m_reference, &wxlua_lreg_refs_key);
+
+    m_reference = LUA_NOREF;
 }
 
-bool wxLuaObject::GetObject()
+bool wxLuaObject::GetObject(lua_State* L)
 {
-    wxCHECK_MSG(m_wxlState->Ok(), false, wxT("Invalid wxLuaState"));
-    lua_State* L = m_wxlState->GetLuaState();
-
     if (m_alloc_flag == wxLUAOBJECT_BOOL)
     {
         lua_pushboolean(L, m_bool);
@@ -127,80 +129,95 @@ bool wxLuaObject::GetObject()
         wxlua_pushwxArrayInttable(L, *m_arrayInt);
         return true;
     }
-    else if (wxluaR_getref(L, m_reference, &wxlua_lreg_refs_key))
+    else if ((m_reference != LUA_NOREF) && wxluaR_getref(L, m_reference, &wxlua_lreg_refs_key))
         return true;
 
     return false; // nothing on the stack
 }
 
-void wxLuaObject::SetObject(int stack_idx)
+void wxLuaObject::SetObject(lua_State* L, int stack_idx)
 {
-    wxCHECK_RET(m_wxlState->Ok(), wxT("Invalid wxLuaState"));
+    wxCHECK_RET(m_alloc_flag == wxLUAOBJECT_NONE, wxT("wxLuaObject already initialized by wxLuaObject::GetXXXPtr"));
 
     if (m_reference != LUA_NOREF) // FIXME should this error out?
-        m_wxlState->wxluaR_Unref(m_reference, &wxlua_lreg_refs_key);
+        wxluaR_unref(L, m_reference, &wxlua_lreg_refs_key);
 
-    m_reference = m_wxlState->wxluaR_Ref(stack_idx, &wxlua_lreg_refs_key);
+    m_reference = wxluaR_ref(L, stack_idx, &wxlua_lreg_refs_key);
 }
 
-bool *wxLuaObject::GetBoolPtr()
+bool *wxLuaObject::GetBoolPtr(lua_State* L)
 {
-    wxCHECK_MSG(m_wxlState->Ok(), 0, wxT("Invalid wxLuaState"));
-    wxCHECK_MSG(m_alloc_flag == wxLUAOBJECT_NONE, 0, wxT("wxLuaObject already initialized in wxLuaObject::GetBoolPtr"));
+    wxCHECK_MSG((m_alloc_flag == wxLUAOBJECT_NONE) || (m_alloc_flag == wxLUAOBJECT_BOOL),
+                0, wxT("wxLuaObject already initialized in wxLuaObject::GetBoolPtr"));
 
-    if ((m_reference != LUA_NOREF) && GetObject())
+    if (m_alloc_flag == wxLUAOBJECT_NONE)
     {
-        m_bool = (m_wxlState->lua_ToBoolean(-1) != 0);
-        m_alloc_flag = wxLUAOBJECT_BOOL;
-        m_wxlState->lua_Pop(1);
+        if ((m_reference != LUA_NOREF) && GetObject(L))
+        {
+            m_bool = (lua_toboolean(L, -1) != 0);
+            m_alloc_flag = wxLUAOBJECT_BOOL;
+            lua_pop(L, 1);
+        }
     }
+
     return &m_bool;
 }
 
-int *wxLuaObject::GetIntPtr()
+int *wxLuaObject::GetIntPtr(lua_State* L)
 {
-    wxCHECK_MSG(m_wxlState->Ok(), false, wxT("Invalid wxLuaState"));
-    wxCHECK_MSG(m_alloc_flag == wxLUAOBJECT_NONE, 0, wxT("wxLuaObject already initialized in wxLuaObject::GetIntPtr"));
+    wxCHECK_MSG((m_alloc_flag == wxLUAOBJECT_NONE) || (m_alloc_flag == wxLUAOBJECT_INT),
+                0, wxT("wxLuaObject already initialized in wxLuaObject::GetIntPtr"));
 
-    if ((m_reference != LUA_NOREF) && GetObject())
+    if (m_alloc_flag == wxLUAOBJECT_NONE)
     {
-        m_int = (int)m_wxlState->lua_ToNumber(-1);
-        m_alloc_flag = wxLUAOBJECT_INT;
-        m_wxlState->lua_Pop(1);
+        if ((m_reference != LUA_NOREF) && GetObject(L))
+        {
+            m_int = (int)lua_tonumber(L, -1);
+            m_alloc_flag = wxLUAOBJECT_INT;
+            lua_pop(L, 1);
+        }
     }
+
     return &m_int;
 }
 
-wxString *wxLuaObject::GetStringPtr()
+wxString *wxLuaObject::GetStringPtr(lua_State* L)
 {
-    wxCHECK_MSG(m_wxlState->Ok(), false, wxT("Invalid wxLuaState"));
-    wxCHECK_MSG(m_alloc_flag == wxLUAOBJECT_NONE, 0, wxT("wxLuaObject already initialized in wxLuaObject::GetStringPtr"));
+    wxCHECK_MSG((m_alloc_flag == wxLUAOBJECT_NONE) || (m_alloc_flag == wxLUAOBJECT_STRING),
+                0, wxT("wxLuaObject already initialized in wxLuaObject::GetStringPtr"));
 
-    m_string = new wxString(); // create valid string for return
-
-    if ((m_reference != LUA_NOREF) && GetObject())
+    if (m_alloc_flag == wxLUAOBJECT_NONE)
     {
-        *m_string = m_wxlState->lua_TowxString(-1);
-        m_alloc_flag = wxLUAOBJECT_STRING;
-        m_wxlState->lua_Pop(1);
+        m_string = new wxString(); // create valid string for return
+
+        if ((m_reference != LUA_NOREF) && GetObject(L))
+        {
+            *m_string = lua2wx(lua_tostring(L, -1));
+            m_alloc_flag = wxLUAOBJECT_STRING;
+            lua_pop(L, 1);
+        }
     }
 
     return m_string;
 }
 
-wxArrayInt *wxLuaObject::GetArrayPtr()
+wxArrayInt *wxLuaObject::GetArrayPtr(lua_State* L)
 {
-    wxCHECK_MSG(m_wxlState->Ok(), false, wxT("Invalid wxLuaState"));
-    wxCHECK_MSG(m_alloc_flag == wxLUAOBJECT_NONE, 0, wxT("wxLuaObject already initialized in wxLuaObject::GetArrayPtr"));
+    wxCHECK_MSG((m_alloc_flag == wxLUAOBJECT_NONE) || (m_alloc_flag == wxLUAOBJECT_ARRAYINT),
+                0, wxT("wxLuaObject already initialized in wxLuaObject::GetArrayPtr"));
 
-    m_arrayInt = new wxArrayInt(); // create valid array for return
-
-    if ((m_reference != LUA_NOREF) && GetObject())
+    if (m_alloc_flag == wxLUAOBJECT_NONE)
     {
-        *m_arrayInt = (wxArrayInt&)m_wxlState->GetwxArrayInt(-1); // coerce wxLuaSmartwxArrayInt
-        m_alloc_flag = wxLUAOBJECT_ARRAYINT;
-        m_wxlState->lua_Pop(1);
+        m_arrayInt = new wxArrayInt(); // create valid array for return
+
+        if ((m_reference != LUA_NOREF) && GetObject(L))
+        {
+            *m_arrayInt = (wxArrayInt&)wxlua_getwxArrayInt(L, -1); // coerce wxLuaSmartwxArrayInt
+            m_alloc_flag = wxLUAOBJECT_ARRAYINT;
+            lua_pop(L, 1);
+        }
     }
+
     return m_arrayInt;
 }
 
@@ -211,9 +228,9 @@ wxArrayInt *wxLuaObject::GetArrayPtr()
 class wxLuaSmartwxArrayStringRefData : public wxObjectRefData
 {
 public:
-    wxLuaSmartwxArrayStringRefData(wxArrayString* arr, int del) : m_arr(arr), m_delete(del)
+    wxLuaSmartwxArrayStringRefData(wxArrayString* arr, bool del) : m_arr(arr), m_delete(del)
     {
-        if (!m_arr) { m_arr = new wxArrayString; m_delete = true; } // always exists
+        if (m_arr == NULL) { m_arr = new wxArrayString; m_delete = true; } // always exists
     }
 
     virtual ~wxLuaSmartwxArrayStringRefData() { if (m_delete) delete m_arr; }
@@ -238,9 +255,9 @@ wxArrayString* wxLuaSmartwxArrayString::GetArray() const
 class wxLuaSmartwxSortedArrayStringRefData : public wxObjectRefData
 {
 public:
-    wxLuaSmartwxSortedArrayStringRefData(wxSortedArrayString* arr, int del) : m_arr(arr), m_delete(del)
+    wxLuaSmartwxSortedArrayStringRefData(wxSortedArrayString* arr, bool del) : m_arr(arr), m_delete(del)
     {
-        if (!m_arr) { m_arr = new wxSortedArrayString; m_delete = true; } // always exists
+        if (m_arr == NULL) { m_arr = new wxSortedArrayString; m_delete = true; } // always exists
     }
 
     virtual ~wxLuaSmartwxSortedArrayStringRefData() { if (m_delete) delete m_arr; }
@@ -265,9 +282,9 @@ wxSortedArrayString* wxLuaSmartwxSortedArrayString::GetArray() const
 class wxLuaSmartwxArrayIntRefData : public wxObjectRefData
 {
 public:
-    wxLuaSmartwxArrayIntRefData(wxArrayInt* arr, int del) : m_arr(arr), m_delete(del)
+    wxLuaSmartwxArrayIntRefData(wxArrayInt* arr, bool del) : m_arr(arr), m_delete(del)
     {
-        if (!m_arr) { m_arr = new wxArrayInt; m_delete = true; } // always exists
+        if (m_arr == NULL) { m_arr = new wxArrayInt; m_delete = true; } // always exists
     }
 
     virtual ~wxLuaSmartwxArrayIntRefData() { if (m_delete) delete m_arr; }
@@ -302,11 +319,8 @@ static int LUACALL wxlua_tableErrorHandler(lua_State *L)
 
 int LUACALL wxlua_userdata_delete(lua_State *L)
 {
-    void* udata   = lua_touserdata(L, 1);
-    void* obj_ptr = wxlua_touserdata(L, 1, false);
-
     // if removed from tracked mem list, remove the metatable so that __gc is not called on this object.
-    if ((obj_ptr != NULL) && wxluaO_deletegcobject(L, udata, obj_ptr, WXLUA_DELETE_OBJECT_ALL))
+    if (wxluaO_deletegcobject(L, 1, WXLUA_DELETE_OBJECT_ALL))
     {
         lua_pushnil(L);
         lua_setmetatable(L, -2);
@@ -314,7 +328,7 @@ int LUACALL wxlua_userdata_delete(lua_State *L)
     else
     {
         wxString msg;
-        msg.Printf(wxT("wxLua: Unable to call wxuserdata:delete() on object %p, someone else owns it."), obj_ptr);
+        msg.Printf(wxT("wxLua: Unable to call wxuserdata:delete() on object!"));
 
         // leave this printf since we really want to know if this happens
         wxPrintf(wxString(msg + wxT("\n")).c_str());
@@ -334,11 +348,8 @@ int LUACALL wxlua_wxLuaBindClass__gc(lua_State *L)
 
     if ((wxlClass != NULL) && wxlua_iswxuserdata(L, 1) && (wxluaT_type(L, 1) == *wxlClass->wxluatype))
     {
-        void* udata   = lua_touserdata(L, 1);
-        void* obj_ptr = wxlua_touserdata(L, 1, true); // clear lua userdata's ptr
-
         // clean up the rest of this, this won't error if the key doesn't exist
-        wxluaO_deletegcobject(L, udata, obj_ptr, WXLUA_DELETE_OBJECT_LAST);
+        wxluaO_deletegcobject(L, 1, WXLUA_DELETE_OBJECT_LAST);
     }
 
     return 0;
@@ -350,7 +361,7 @@ int LUACALL wxlua_wxLuaBindClass__gc(lua_State *L)
 
 int LUACALL wxlua_wxLuaBindClass__index(lua_State *L)
 {
-    // This function is called for the __index metable of the wxLua userdata
+    // This function is called for the __index metatable of the wxLua userdata
     // for class instances.
 
     // Lua stack : 1 = userdata, 2 = key; userdata:key()
@@ -372,26 +383,9 @@ int LUACALL wxlua_wxLuaBindClass__index(lua_State *L)
 
     if (!name)
     {
-// XWORD START ================================================================
-        // Try calling __index
-
-        // Retrieve the __index method
-        wxLuaBindMethod* wxlMethod = wxLuaBinding::GetClassMethod(wxlClass, "__index", WXLUAMETHOD_METHOD, true);
-
-        // No index method.  Revert to standard wxLua procedure (raise an error)
-        if (wxlMethod == NULL)
-        {
-            // name is NULL if it's not a string
-            wxlua_error(L, wxString::Format(_("wxLua: Attempt to call a class method using '%s' on a '%s' wxLua type."),
-                wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()));
-        }
-        else // We have an __index method
-        {
-            found = true;
-            // Call the __index method
-            result = (*wxlMethod->wxluacfuncs[0].lua_cfunc)(L);
-        }
-// XWORD END   ================================================================
+        // name is NULL if it's not a string
+        wxlua_error(L, wxString::Format(_("wxLua: Attempt to call a class method using '%s' on a '%s' wxLua type."),
+            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()));
     }
     else if (wxluaT_type(L, 1) == *wxlClass->wxluatype)
     {
@@ -402,7 +396,7 @@ int LUACALL wxlua_wxLuaBindClass__index(lua_State *L)
             name++; // skip past "_"[FunctionName]
         else
         {
-            // if there's a derived method, push it onto the stack to be run
+            // if there's a derived method in Lua, push it onto the stack to be run
             if (wxlua_hasderivedmethod(L, obj_ptr, name, true))
             {
                 found = true;
@@ -415,10 +409,14 @@ int LUACALL wxlua_wxLuaBindClass__index(lua_State *L)
         {
             wxLuaBindMethod* wxlMethod = wxLuaBinding::GetClassMethod(wxlClass, name, WXLUAMETHOD_METHOD|WXLUAMETHOD_GETPROP, true);
 
-            if (wxlMethod != NULL)
+            if ((wxlMethod != NULL) && (wxlMethod->wxluacfuncs != NULL))
             {
                 if (WXLUA_HASBIT(wxlMethod->method_type, WXLUAMETHOD_GETPROP))
                 {
+                    // The user wants to call the C++ function as a property
+                    // which is treated as though it were a member variable.
+                    // It shouldn't have been called as a function with ()
+                    // and so we call the function here and leave the value on the stack.
                     found = true;
                     if (WXLUA_HASBIT(wxlMethod->method_type, WXLUAMETHOD_STATIC))
                         lua_pop(L, 2); // remove the userdata and func name
@@ -429,6 +427,9 @@ int LUACALL wxlua_wxLuaBindClass__index(lua_State *L)
                 }
                 else
                 {
+                    // The user has called a real C++ function and if it's
+                    // overloaded we call wxlua_callOverloadedFunction() to
+                    // find the correct one to call.
                     found = true;
                     result = 1;
 
@@ -473,25 +474,8 @@ int LUACALL wxlua_wxLuaBindClass__index(lua_State *L)
 
     if (!found)
     {
-// XWORD START ================================================================
-        // Try calling __index
-
-        // Retrieve the __index method
-        wxLuaBindMethod* wxlMethod = wxLuaBinding::GetClassMethod(wxlClass, "__index", WXLUAMETHOD_METHOD, true);
-
-        // No index method.  Revert to standard wxLua procedure (raise an error)
-        if (wxlMethod == NULL)
-        {
-            wxlua_error(L, wxString::Format(_("wxLua: Unable to call an unknown method '%s' on a '%s' type."),
-                lua2wx(name).c_str(), lua2wx(wxlClass ? wxlClass->name : "").c_str()));
-        }
-        else // We have an __index method
-        {
-            found = true;
-            // Call the __index method
-            result = (*wxlMethod->wxluacfuncs[0].lua_cfunc)(L);
-        }
-// XWORD END   ================================================================
+        wxlua_error(L, wxString::Format(_("wxLua: Unable to call an unknown method '%s' on a '%s' type."),
+            lua2wx(name).c_str(), lua2wx(wxlClass ? wxlClass->name : "").c_str()));
     }
 
     return result;
@@ -513,26 +497,9 @@ int LUACALL wxlua_wxLuaBindClass__newindex(lua_State *L)
 
     if (!name)
     {
-// XWORD START ================================================================
-        // Try calling __newindex
-
-        // Retrieve the __newindex method
-        wxLuaBindMethod* wxlMethod = wxLuaBinding::GetClassMethod(wxlClass, "__newindex", WXLUAMETHOD_METHOD, true);
-
-        // No index method.  Revert to standard wxLua procedure (raise an error)
-        if (wxlMethod == NULL)
-        {
-            // name is NULL if it's not a string
-            wxlua_error(L, wxString::Format(_("wxLua: Attempt to call or add a class method using '%s' on a '%s' type."),
-                wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()));
-        }
-        else // We have a __newindex method
-        {
-            found = true;
-            // Call the __newindex method
-            (*wxlMethod->wxluacfuncs[0].lua_cfunc)(L);
-        }
-// XWORD END   ================================================================
+        // name is NULL if it's not a string
+        wxlua_error(L, wxString::Format(_("wxLua: Attempt to call or add a class method using '%s' on a '%s' type."),
+            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()));
     }
     else if (wxluaT_type(L, 1) == *wxlClass->wxluatype)
     {
@@ -548,10 +515,9 @@ int LUACALL wxlua_wxLuaBindClass__newindex(lua_State *L)
 
             (*wxlMethod->wxluacfuncs[0].lua_cfunc)(L);
         }
-
-        // Maybe this is an undeclared property? Prepend 'Set' and try again.
-        if (!found)
+        else
         {
+            // Maybe this is an undeclared property? Prepend 'Set' and try again.
             int len = strlen(name);
             wxCharBuffer buf(len + 4);
             char* str = buf.data();
@@ -574,36 +540,17 @@ int LUACALL wxlua_wxLuaBindClass__newindex(lua_State *L)
         if (!found)
         {
             found = true;
-            wxLuaState wxlState(L);
-            wxCHECK_MSG(wxlState.Ok(), 0, wxT("Invalid wxLuaState"));
 
             void *obj_ptr = wxlua_touserdata(L, 1, false);
-            wxLuaObject* wxlObj = new wxLuaObject(wxlState, 3);
+            wxLuaObject* wxlObj = new wxLuaObject(L, 3);
             wxlua_setderivedmethod(L, obj_ptr, name, wxlObj);
         }
     }
 
     if (!found)
     {
-// XWORD START ================================================================
-        // Try calling __newindex
-
-        // Retrieve the __newindex method
-        wxLuaBindMethod* wxlMethod = wxLuaBinding::GetClassMethod(wxlClass, "__newindex", WXLUAMETHOD_METHOD, true);
-
-        // No index method.  Revert to standard wxLua procedure (raise an error)
-        if (wxlMethod == NULL)
-        {
-            wxlua_error(L, wxString::Format(_("wxLua: Unable to call or add an unknown method '%s' on a '%s' type."),
-                lua2wx(name).c_str(), lua2wx(wxlClass ? wxlClass->name : "").c_str()));
-        }
-        else // We have a __newindex method
-        {
-            found = true;
-            // Call the __newindex method
-            (*wxlMethod->wxluacfuncs[0].lua_cfunc)(L);
-        }
-// XWORD END   ================================================================
+        wxlua_error(L, wxString::Format(_("wxLua: Unable to call or add an unknown method '%s' on a '%s' type."),
+            lua2wx(name).c_str(), lua2wx(wxlClass ? wxlClass->name : "").c_str()));
     }
 
     return 0;
@@ -966,33 +913,33 @@ wxString wxlua_getBindMethodArgsMsg(lua_State* L, struct wxLuaBindMethod* wxlMet
 // ----------------------------------------------------------------------------
 
 // Function to compare to wxLuaBindEvents by eventType
-int wxLuaBindEventArrayCompareFn(const void *p1, const void *p2)
+int wxLuaBindEvent_CompareByEventTypeFn(const void *p1, const void *p2)
 {
     return (*((const wxLuaBindEvent*)p1)->eventType) - (*((const wxLuaBindEvent*)p2)->eventType);
 }
 // Function to compare to wxLuaBindNumber by name
-int wxLuaBindNumberArrayCompareFn(const void *p1, const void *p2)
+int wxLuaBindNumber_CompareByNameFn(const void *p1, const void *p2)
 {
     return strcmp(((const wxLuaBindNumber*)p1)->name, ((const wxLuaBindNumber*)p2)->name);
 }
 // Function to compare to wxLuaBindStrings by name
-int wxLuaBindStringArrayCompareFn(const void *p1, const void *p2)
+int wxLuaBindString_CompareByNameFn(const void *p1, const void *p2)
 {
     return strcmp(((const wxLuaBindString*)p1)->name, ((const wxLuaBindString*)p2)->name);
 }
 // Function to compare to wxLuaBindObjects by name
-int wxLuaBindObjectArrayCompareFn(const void *p1, const void *p2)
+int wxLuaBindObject_CompareByNameFn(const void *p1, const void *p2)
 {
     return strcmp(((const wxLuaBindObject*)p1)->name, ((const wxLuaBindObject*)p2)->name);
 }
 // Function to compare to wxLuaBindMethods by name
-int wxLuaBindMethodArrayCompareFnInit(const void *p1, const void *p2)
+int wxLuaBindMethod_CompareByNameFnInit(const void *p1, const void *p2)
 {
     int v = strcmp(((const wxLuaBindMethod*)p1)->name, ((const wxLuaBindMethod*)p2)->name);
     if (v == 0)
     {
-        int t1 = WXLUAMETHOD_SORT_MASK & ((const wxLuaBindMethod*)p1)->method_type;
-        int t2 = WXLUAMETHOD_SORT_MASK & ((const wxLuaBindMethod*)p2)->method_type;
+        int t1 = ((const wxLuaBindMethod*)p1)->method_type;
+        int t2 = ((const wxLuaBindMethod*)p2)->method_type;
         v = t1 - t2;
     }
 
@@ -1001,13 +948,13 @@ int wxLuaBindMethodArrayCompareFnInit(const void *p1, const void *p2)
     return v;
 }
 // Function for wxLuaBinding::GetClassMethod()
-int wxLuaBindMethodArrayCompareFnGet(const void *p1, const void *p2)
+int wxLuaBindMethod_CompareByNameFnGet(const void *p1, const void *p2)
 {
     int v = strcmp(((const wxLuaBindMethod*)p1)->name, ((const wxLuaBindMethod*)p2)->name);
     if (v == 0)
     {
-        int t1 = WXLUAMETHOD_SEARCH_MASK & ((const wxLuaBindMethod*)p1)->method_type;
-        int t2 = WXLUAMETHOD_SEARCH_MASK & ((const wxLuaBindMethod*)p2)->method_type;
+        int t1 = ((const wxLuaBindMethod*)p1)->method_type;
+        int t2 = ((const wxLuaBindMethod*)p2)->method_type;
 
         if ((t1 & t2) != 0) return 0; // any matched bits will work
 
@@ -1017,12 +964,12 @@ int wxLuaBindMethodArrayCompareFnGet(const void *p1, const void *p2)
     return v;
 }
 // Function to compare the wxLuaBindClasses by name
-int wxLuaBindClassArrayCompareFn(const void *p1, const void *p2)
+int wxLuaBindClass_CompareByNameFn(const void *p1, const void *p2)
 {
     return strcmp(((const wxLuaBindClass*)p1)->name, ((const wxLuaBindClass*)p2)->name);
 }
 // Function to compare the wxLuaBindClasses by wxluatype
-int wxLuaBindClassArrayCompareBywxLuaType(const void *p1, const void *p2)
+int wxLuaBindClass_CompareBywxLuaTypeFn(const void *p1, const void *p2)
 {
     return (*((const wxLuaBindClass*)p1)->wxluatype) - (*((const wxLuaBindClass*)p2)->wxluatype);
 }
@@ -1033,8 +980,8 @@ int wxLuaBindClassArrayCompareBywxLuaType(const void *p1, const void *p2)
 
 IMPLEMENT_ABSTRACT_CLASS(wxLuaBinding, wxObject)
 
-wxLuaBindingList wxLuaBinding::sm_bindingList;
-bool wxLuaBinding::sm_bindingList_initialized = false;
+wxLuaBindingArray wxLuaBinding::sm_bindingArray;
+int wxLuaBinding::sm_bindingArray_initialized = 0;
 int wxLuaBinding::sm_wxluatype_max = WXLUA_T_MAX+1; // highest wxLua type initially
 
 wxLuaBinding::wxLuaBinding()
@@ -1059,7 +1006,7 @@ void wxLuaBinding::InitBinding()
         if (*m_classArray[0].wxluatype != WXLUA_TUNKNOWN)
             return;
 
-        qsort(m_classArray, m_classCount, sizeof(wxLuaBindClass), wxLuaBindClassArrayCompareFn);
+        qsort(m_classArray, m_classCount, sizeof(wxLuaBindClass), wxLuaBindClass_CompareByNameFn);
 
         wxLuaBindClass* wxlClass = m_classArray;
         for (size_t i = 0; i < m_classCount; ++i, ++wxlClass)
@@ -1068,10 +1015,10 @@ void wxLuaBinding::InitBinding()
 
             // Also sort the member functions for each class
             if (wxlClass->wxluamethods && (wxlClass->wxluamethods_n > 0))
-                qsort(wxlClass->wxluamethods, wxlClass->wxluamethods_n, sizeof(wxLuaBindMethod), wxLuaBindMethodArrayCompareFnInit);
+                qsort(wxlClass->wxluamethods, wxlClass->wxluamethods_n, sizeof(wxLuaBindMethod), wxLuaBindMethod_CompareByNameFnInit);
             // And their enums
             if (wxlClass->enums && (wxlClass->enums_n > 0))
-                qsort(wxlClass->enums, wxlClass->enums_n, sizeof(wxLuaBindNumber), wxLuaBindNumberArrayCompareFn);
+                qsort(wxlClass->enums, wxlClass->enums_n, sizeof(wxLuaBindNumber), wxLuaBindNumber_CompareByNameFn);
         }
 
         // these mark what types numbers are declared in this binding
@@ -1080,17 +1027,36 @@ void wxLuaBinding::InitBinding()
     }
 
     if (m_numberArray && (m_numberCount > 0))
-        qsort(m_numberArray, m_numberCount, sizeof(wxLuaBindNumber), wxLuaBindNumberArrayCompareFn);
+        qsort(m_numberArray, m_numberCount, sizeof(wxLuaBindNumber), wxLuaBindNumber_CompareByNameFn);
 
     if (m_stringArray && (m_stringCount > 0))
-        qsort(m_stringArray, m_stringCount, sizeof(wxLuaBindString), wxLuaBindStringArrayCompareFn);
+        qsort(m_stringArray, m_stringCount, sizeof(wxLuaBindString), wxLuaBindString_CompareByNameFn);
 
     // sort by event type for fastest lookup
     if (m_eventArray && (m_eventCount > 0))
-        qsort(m_eventArray, m_eventCount, sizeof(wxLuaBindEvent), wxLuaBindEventArrayCompareFn);
+        qsort(m_eventArray, m_eventCount, sizeof(wxLuaBindEvent), wxLuaBindEvent_CompareByEventTypeFn);
 
     if (m_objectArray && (m_objectCount > 0))
-        qsort(m_objectArray, m_objectCount, sizeof(wxLuaBindObject), wxLuaBindObjectArrayCompareFn);
+        qsort(m_objectArray, m_objectCount, sizeof(wxLuaBindObject), wxLuaBindObject_CompareByNameFn);
+}
+
+// static
+bool wxLuaBinding::RegisterBindings(const wxLuaState& wxlState)
+{
+    wxCHECK_MSG(wxlState.Ok(), false, wxT("Invalid wxLuaState"));
+
+    lua_State *L = wxlState.GetLuaState();
+    size_t n, binding_count = sm_bindingArray.GetCount();
+
+    wxLuaBinding::InitAllBindings(); // only runs the first time through
+
+    for (n = 0; n < binding_count; ++n)
+    {
+        sm_bindingArray[n]->RegisterBinding(wxlState);
+        lua_pop(L, 1); // pop the Lua table the binding was installed into
+    }
+
+    return true;
 }
 
 bool wxLuaBinding::RegisterBinding(const wxLuaState& wxlState)
@@ -1205,7 +1171,10 @@ void wxLuaBinding::DoRegisterBinding(const wxLuaState& wxlState) const
     for (n = 0; n < m_stringCount; ++n, ++wxlString)
     {
         lua_pushstring(L, wxlString->name);
-        lua_pushstring(L, wx2lua(wxlString->value));
+        if (wxlString->wxchar_string != NULL)
+            lua_pushstring(L, wx2lua(wxlString->wxchar_string));
+        else
+            lua_pushstring(L, wxlString->c_string);
         lua_rawset(L, -3);
     }
 
@@ -1402,7 +1371,7 @@ const wxLuaBindEvent* wxLuaBinding::GetBindEvent(wxEventType eventType_) const
                                                     m_eventArray,
                                                     m_eventCount,
                                                     sizeof(wxLuaBindEvent),
-                                                    wxLuaBindEventArrayCompareFn);
+                                                    wxLuaBindEvent_CompareByEventTypeFn);
     return pLuaEvent;
 }
 
@@ -1418,12 +1387,13 @@ const wxLuaBindClass* wxLuaBinding::GetBindClass(int wxluatype_) const
     wxLuaBindClass classItem = { 0, 0, 0, 0, &wxluatype, 0, 0, 0, 0 };
 
     // this relies on LUA allocating the wxLua types in ascending order of definition
-    // if LUA stops doing this, then the search may break.
+    // if LUA stops doing this, then the search may break. Note that we initially
+    // sort the classes by name then allocate types in acending order.
     const wxLuaBindClass *wxlClass = (wxLuaBindClass *)bsearch(&classItem,
                                                        m_classArray,
                                                        m_classCount,
                                                        sizeof(wxLuaBindClass),
-                                                       wxLuaBindClassArrayCompareBywxLuaType);
+                                                       wxLuaBindClass_CompareBywxLuaTypeFn);
 
     return wxlClass;
 }
@@ -1432,28 +1402,27 @@ const wxLuaBindClass* wxLuaBinding::GetBindClass(const char* className) const
 {
     wxLuaBindClass classItem = { className, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    // this relies on LUA allocating the wxLua types in ascending order of definition
-    // if LUA stops doing this, then the search may break.
     const wxLuaBindClass *wxlClass = (wxLuaBindClass *)bsearch(&classItem,
                                                        m_classArray,
                                                        m_classCount,
                                                        sizeof(wxLuaBindClass),
-                                                       wxLuaBindClassArrayCompareFn);
+                                                       wxLuaBindClass_CompareByNameFn);
 
     return wxlClass;
 }
 
 const wxLuaBindClass* wxLuaBinding::GetBindClass(const wxLuaBindMethod* wxlMethod_tofind) const
 {
+    size_t c, m, methods_n;
     wxLuaBindClass*  wxlClass  = m_classArray;
     wxLuaBindMethod* wxlMethod = NULL;
 
-    for (size_t c = 0; c < m_classCount; ++c, ++wxlClass)
+    for (c = 0; c < m_classCount; ++c, ++wxlClass)
     {
         wxlMethod = wxlClass->wxluamethods;
-        int m , wxluamethods_n = wxlClass->wxluamethods_n;
+        methods_n = wxlClass->wxluamethods_n;
 
-        for (m = 0; m < wxluamethods_n; ++m, ++wxlMethod)
+        for (m = 0; m < methods_n; ++m, ++wxlMethod)
         {
             if (wxlMethod == wxlMethod_tofind)
                 return wxlClass;
@@ -1496,15 +1465,12 @@ const wxLuaBindClass* wxLuaBinding::GetBindClass(const wxLuaBindCFunc* wxlCFunc_
 // static
 wxLuaBinding* wxLuaBinding::GetLuaBinding(const wxString& bindingName)
 {
-    wxLuaBindingList::compatibility_iterator node = sm_bindingList.GetFirst();
+    size_t i, binding_count = sm_bindingArray.GetCount();
 
-    while (node)
+    for (i = 0; i < binding_count; ++i)
     {
-        wxLuaBinding* binding = node->GetData();
-        if (binding->GetBindingName() == bindingName)
-            return binding;
-
-        node = node->GetNext();
+        if (sm_bindingArray[i]->GetBindingName() == bindingName)
+            return sm_bindingArray[i];
     }
 
     return NULL;
@@ -1513,17 +1479,14 @@ wxLuaBinding* wxLuaBinding::GetLuaBinding(const wxString& bindingName)
 // static
 const wxLuaBindClass* wxLuaBinding::FindBindClass(const char* className)
 {
-    wxLuaBindingList::compatibility_iterator node = sm_bindingList.GetFirst();
+    size_t i, binding_count = sm_bindingArray.GetCount();
 
-    while (node)
+    for (i = 0; i < binding_count; ++i)
     {
-        wxLuaBinding* binding = node->GetData();
-        const wxLuaBindClass* wxlClass = binding->GetBindClass(className);
+        const wxLuaBindClass* wxlClass = sm_bindingArray[i]->GetBindClass(className);
 
         if (wxlClass)
             return wxlClass;
-
-        node = node->GetNext();
     }
 
     return NULL;
@@ -1532,17 +1495,14 @@ const wxLuaBindClass* wxLuaBinding::FindBindClass(const char* className)
 // static
 const wxLuaBindClass* wxLuaBinding::FindBindClass(int wxluatype)
 {
-    wxLuaBindingList::compatibility_iterator node = sm_bindingList.GetFirst();
+    size_t i, binding_count = sm_bindingArray.GetCount();
 
-    while (node)
+    for (i = 0; i < binding_count; ++i)
     {
-        wxLuaBinding* binding = node->GetData();
-        const wxLuaBindClass* wxlClass = binding->GetBindClass(wxluatype);
+        const wxLuaBindClass* wxlClass = sm_bindingArray[i]->GetBindClass(wxluatype);
 
         if (wxlClass)
             return wxlClass;
-
-        node = node->GetNext();
     }
 
     return NULL;
@@ -1551,17 +1511,14 @@ const wxLuaBindClass* wxLuaBinding::FindBindClass(int wxluatype)
 // static
 const wxLuaBindClass* wxLuaBinding::FindBindClass(const wxLuaBindMethod* wxlMethod)
 {
-    wxLuaBindingList::compatibility_iterator node = sm_bindingList.GetFirst();
+    size_t i, binding_count = sm_bindingArray.GetCount();
 
-    while (node)
+    for (i = 0; i < binding_count; ++i)
     {
-        wxLuaBinding* binding = node->GetData();
-        const wxLuaBindClass* wxlClass = binding->GetBindClass(wxlMethod);
+        const wxLuaBindClass* wxlClass = sm_bindingArray[i]->GetBindClass(wxlMethod);
 
         if (wxlClass)
             return wxlClass;
-
-        node = node->GetNext();
     }
 
     return NULL;
@@ -1570,17 +1527,14 @@ const wxLuaBindClass* wxLuaBinding::FindBindClass(const wxLuaBindMethod* wxlMeth
 // static
 const wxLuaBindClass* wxLuaBinding::FindBindClass(const wxLuaBindCFunc* wxlCFunc)
 {
-    wxLuaBindingList::compatibility_iterator node = sm_bindingList.GetFirst();
+    size_t i, binding_count = sm_bindingArray.GetCount();
 
-    while (node)
+    for (i = 0; i < binding_count; ++i)
     {
-        wxLuaBinding* binding = node->GetData();
-        const wxLuaBindClass* wxlClass = binding->GetBindClass(wxlCFunc);
+        const wxLuaBindClass* wxlClass = sm_bindingArray[i]->GetBindClass(wxlCFunc);
 
         if (wxlClass)
             return wxlClass;
-
-        node = node->GetNext();
     }
 
     return NULL;
@@ -1589,17 +1543,14 @@ const wxLuaBindClass* wxLuaBinding::FindBindClass(const wxLuaBindCFunc* wxlCFunc
 // static
 const wxLuaBindEvent* wxLuaBinding::FindBindEvent(wxEventType eventType)
 {
-    wxLuaBindingList::compatibility_iterator node = sm_bindingList.GetFirst();
+    size_t i, binding_count = sm_bindingArray.GetCount();
 
-    while (node)
+    for (i = 0; i < binding_count; ++i)
     {
-        wxLuaBinding* binding = node->GetData();
-        const wxLuaBindEvent* wxlEvent = binding->GetBindEvent(eventType);
+        const wxLuaBindEvent* wxlEvent = sm_bindingArray[i]->GetBindEvent(eventType);
 
         if (wxlEvent)
             return wxlEvent;
-
-        node = node->GetNext();
     }
 
     return NULL;
@@ -1608,21 +1559,18 @@ const wxLuaBindEvent* wxLuaBinding::FindBindEvent(wxEventType eventType)
 // static
 wxLuaBinding* wxLuaBinding::FindMethodBinding(const wxLuaBindMethod* wxlMethod)
 {
-    wxLuaBindingList::compatibility_iterator node = sm_bindingList.GetFirst();
+    size_t i, binding_count = sm_bindingArray.GetCount();
 
-    while (node)
+    for (i = 0; i < binding_count; ++i)
     {
-        wxLuaBinding* binding = node->GetData();
-        size_t n, count = binding->GetFunctionCount();
-        wxLuaBindMethod* m = binding->GetFunctionArray();
+        size_t j, fn_count = sm_bindingArray[i]->GetFunctionCount();
+        wxLuaBindMethod* m = sm_bindingArray[i]->GetFunctionArray();
 
-        for (n = 0; n < count; ++n, ++m)
+        for (j = 0; j < fn_count; ++j, ++m)
         {
             if (m == wxlMethod)
-                return binding;
+                return sm_bindingArray[i];
         }
-
-        node = node->GetNext();
     }
 
     return NULL;
@@ -1636,116 +1584,54 @@ wxLuaBindMethod* wxLuaBinding::GetClassMethod(const wxLuaBindClass *wxlClass, co
 {
     wxCHECK_MSG(wxlClass, NULL, wxT("Invalid wxLuaBindClass to find method from."));
 
-#if 1
-
     wxLuaBindMethod methodItem = { methodName, method_type, 0, 0, 0 };
 
     wxLuaBindMethod *wxlMethod = (wxLuaBindMethod *)bsearch(&methodItem,
                                                        wxlClass->wxluamethods,
                                                        wxlClass->wxluamethods_n,
                                                        sizeof(wxLuaBindMethod),
-                                                       wxLuaBindMethodArrayCompareFnGet);
+                                                       wxLuaBindMethod_CompareByNameFnGet);
 
     if ((wxlMethod == NULL) && search_baseclasses && wxlClass->baseclassNames)
     {
         for (size_t i = 0; wxlClass->baseclassNames[i]; ++i)
         {
-            wxlMethod = GetClassMethod(wxlClass->baseBindClasses[i], methodName, method_type, search_baseclasses);
-            if (wxlMethod != NULL)
-                return wxlMethod;
+            // The class may not have been installed
+            if (wxlClass->baseBindClasses[i])
+            {
+                wxlMethod = GetClassMethod(wxlClass->baseBindClasses[i], methodName, method_type, search_baseclasses);
+                if (wxlMethod != NULL)
+                    return wxlMethod;
+            }
         }
     }
-
-#else
-
-    wxLuaBindMethod *wxlMethod = wxlClass->wxluamethods;
-    int i_method, method_count = wxlClass->wxluamethods_n;
-
-    // find a method in the class, recurse through classes from which this class is derived.
-    for (i_method = 0; i_method < method_count; ++i_method, ++wxlMethod)
-    {
-        if (WXLUA_HASBIT(wxlMethod->type, method_type)
-                && (strcmp(wxlMethod->name, methodName) == 0))
-        {
-            return wxlMethod;
-        }
-    }
-
-    if (search_baseclasses && wxlClass->baseclass)
-        return GetClassMethod(wxlClass->baseclass, methodName, method_type, search_baseclasses);
-
-#endif
 
     return wxlMethod;
 }
 
 // --------------------------------------------------------------------------
 
-static void wxLuaBinding_RecurseBaseMethods(wxLuaBindClass* wxlClass, wxLuaBindMethod* wxlMethod, bool force_update)
-{
-    // iterate through the base classes to find if this function is
-    // an overload, but only if we haven't checked already.
-    if (force_update || !WXLUA_HASBIT(wxlMethod->method_type, WXLUAMETHOD_CHECKED_OVERLOAD|WXLUAMETHOD_DELETE))
-    {
-        wxLuaBindMethod *parentMethod = wxlMethod;
-
-        // Use the baseclassNames to check for terminating NULL
-        for (size_t i = 0; wxlClass->baseclassNames && wxlClass->baseclassNames[i]; ++i)
-        {
-            // Note that these may be NULL if the lib/module containing them wasn't loaded
-            wxLuaBindClass *baseClass = wxlClass->baseBindClasses[i];
-            if (baseClass != NULL)
-            {
-                parentMethod->method_type |= WXLUAMETHOD_CHECKED_OVERLOAD; // have checked parent
-
-                wxLuaBindMethod* baseMethod = wxLuaBinding::GetClassMethod(baseClass, wxlMethod->name, WXLUAMETHOD_SEARCH_MASK, false);
-                if (baseMethod)
-                {
-                    // don't link to base class delete functions
-                    if (!WXLUA_HASBIT(baseMethod->method_type, WXLUAMETHOD_DELETE))
-                    {
-                        parentMethod->basemethod = baseMethod;
-                        parentMethod = baseMethod;
-                    }
-
-                    // we have already checked the base classes below this
-                    if (!WXLUA_HASBIT(baseMethod->method_type, WXLUAMETHOD_CHECKED_OVERLOAD))
-                        wxLuaBinding_RecurseBaseMethods(baseClass, parentMethod, force_update);
-                }
-            }
-        }
-    }
-}
-
 // static
 void wxLuaBinding::InitAllBindings(bool force_update)
 {
-    if (sm_bindingList_initialized && !force_update) return;
+    size_t n, i, j, k, binding_count = sm_bindingArray.GetCount();
 
-    // Initialize the bindings, sort and set the wxLua types
-    wxLuaBindingList::compatibility_iterator node = sm_bindingList.GetFirst();
-    while (node)
-    {
-        wxLuaBinding* binding = node->GetData();
-        binding->InitBinding();
-
-        node = node->GetNext();
-    }
+    // update if a binding was added or removed
+    if (((size_t)sm_bindingArray_initialized == binding_count) && !force_update)
+        return;
 
     // set the base class wxLuaBindClass* using the base class names of the parent wxLuaBindClass
-    node = sm_bindingList.GetFirst();
-    while (node)
+    for (n = 0; n < binding_count; ++n)
     {
-        wxLuaBinding* binding    = node->GetData();
-        wxLuaBindClass* wxlClass = binding->GetClassArray();
-        size_t i, class_count    = binding->GetClassCount();
+        wxLuaBindClass* wxlClass = sm_bindingArray[n]->GetClassArray();
+        size_t class_count       = sm_bindingArray[n]->GetClassCount();
 
         for (i = 0; i < class_count; ++i, ++wxlClass)
         {
             if (wxlClass->baseclassNames) // does it have any base classes at all?
             {
                 // find the base class using their names in the bindings
-                for (size_t j = 0; wxlClass->baseclassNames[j]; ++j)
+                for (j = 0; wxlClass->baseclassNames[j]; ++j)
                 {
                     wxLuaBindClass* wxlBaseClass = (wxLuaBindClass*)wxLuaBinding::FindBindClass(wxlClass->baseclassNames[j]);
                     if (wxlBaseClass)
@@ -1753,35 +1639,47 @@ void wxLuaBinding::InitAllBindings(bool force_update)
                 }
             }
         }
-
-        node = node->GetNext();
     }
 
     // Link together all of the class member functions with base class functions
     // with the same name so the overloads work for them too.
-    node = sm_bindingList.GetFirst();
-    while (node)
+    for (n = 0; n < binding_count; ++n)
     {
-        wxLuaBinding* binding    = node->GetData();
-        wxLuaBindClass* wxlClass = binding->GetClassArray();
-        size_t i, class_count    = binding->GetClassCount();
+        wxLuaBindClass* wxlClass = sm_bindingArray[n]->GetClassArray();
+        size_t i, class_count    = sm_bindingArray[n]->GetClassCount();
 
         for (i = 0; i < class_count; ++i, ++wxlClass)
         {
             if (wxlClass->baseclassNames) // does it have any base classes at all?
             {
                 wxLuaBindMethod *wxlMethod = wxlClass->wxluamethods;
-                size_t j, method_count = wxlClass->wxluamethods_n;
+                size_t method_count        = wxlClass->wxluamethods_n;
 
                 for (j = 0; j < method_count; ++j, ++wxlMethod)
                 {
-                    wxLuaBinding_RecurseBaseMethods(wxlClass, wxlMethod, force_update);
+                    if (wxlClass->baseclassNames && !WXLUA_HASBIT(wxlMethod->method_type, WXLUAMETHOD_DELETE))
+                    {
+                        // Use the baseclassNames to check for terminating NULL
+                        for (k = 0; wxlClass->baseclassNames[k]; ++k)
+                        {
+                            // Note that these may be NULL if the lib/module containing them wasn't loaded
+                            wxLuaBindClass *baseClass = wxlClass->baseBindClasses[k];
+                            if (baseClass != NULL)
+                            {
+                                wxLuaBindMethod* baseMethod = wxLuaBinding::GetClassMethod(baseClass, wxlMethod->name, WXLUAMETHOD_MASK, true);
+                                if (baseMethod)
+                                {
+                                    // don't link to base class delete functions
+                                    if (!WXLUA_HASBIT(baseMethod->method_type, WXLUAMETHOD_DELETE))
+                                        wxlMethod->basemethod = baseMethod;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-
-        node = node->GetNext();
     }
 
-    sm_bindingList_initialized = true;
+    sm_bindingArray_initialized = binding_count;
 }

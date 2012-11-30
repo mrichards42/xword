@@ -3,19 +3,19 @@
 // Purpose:     wxLuaEventCallback and wxLuaWinDestroyCallback
 // Author:      Francis Irving, John Labenski
 // Created:     11/05/2002
-// Copyright:   (c) 2002 Creature Labs. All rights reserved.
+// Copyright:   (c) 2012 John Labenski, 2002 Creature Labs. All rights reserved.
 // Licence:     wxWidgets licence
 /////////////////////////////////////////////////////////////////////////////
 
 // For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
 
 #ifndef WX_PRECOMP
-    #include "wx/wx.h"
+    #include <wx/wx.h>
 #endif // WX_PRECOMP
 
 #include "wxlua/include/wxlcallb.h"
@@ -23,12 +23,13 @@
 //-----------------------------------------------------------------------------
 // wxLuaEventCallback
 //-----------------------------------------------------------------------------
-IMPLEMENT_ABSTRACT_CLASS(wxLuaEventCallback, wxObject)
+IMPLEMENT_ABSTRACT_CLASS(wxLuaEventCallback, wxLuaCallbackBaseClass)
 
 wxLuaEventCallback::wxLuaEventCallback()
-                   : m_luafunc_ref(0), //m_wxlState(wxNullLuaState),
-                     m_evtHandler(NULL), m_id(wxID_ANY), m_last_id(wxID_ANY),
-                     m_wxlBindEvent(NULL)
+                   :wxLuaCallbackBaseClass(),
+                    m_luafunc_ref(0), //m_wxlState(wxNullLuaState),
+                    m_evtHandler(NULL), m_id(wxID_ANY), m_last_id(wxID_ANY),
+                    m_wxlBindEvent(NULL)
 {
 }
 
@@ -52,18 +53,32 @@ wxString wxLuaEventCallback::Connect(const wxLuaState& wxlState, int lua_func_st
     wxCHECK_MSG((m_evtHandler == NULL) && (m_luafunc_ref == 0), wxT("Attempting to reconnect a wxLuaEventCallback"), wxT("Attempting to reconnect a wxLuaEventCallback"));
     wxCHECK_MSG(wxlState.Ok(), wxT("Invalid wxLuaState"), wxT("Invalid wxLuaState"));
 
+    // NOTE: See below about how we use the root lua_State to avoid these problems.
+    // We must always be installed into the main lua_State, never a coroutine
+    // 1) It will be called only when the lua_State is suspended or dead
+    // 2) We have no way of tracking when the coroutine state is garbage collected/dead
+    //if (lua_pushthread(wxlState.GetLuaState()) != 1)
+    //{
+    //    wxlState.lua_Pop(1);
+    //    return wxT("wxLua: Creating a callback function in a coroutine is not allowed since it will only be called when the thread is either suspended or dead.");
+    //}
+    //wxlState.lua_Pop(1);
+
     m_wxlState   = wxlState;
     m_evtHandler = evtHandler;
     m_id         = win_id;
     m_last_id    = last_id;
 
-    m_wxlBindEvent = wxlState.GetBindEvent(eventType);
+    // NOTE: FIXME? We look for the wxLuaBindEvent in all of the bindings, but it
+    // may not have actually been installed if someone had modified the bindings.
+    // It should be ok since it will error out soon enough without crashing.
+    m_wxlBindEvent = wxLuaBinding::FindBindEvent(eventType);
 
     // Do not install this invalid or unknown event type since we won't know
     // what wxEvent type class to use and someone probably made a mistake.
     if (m_wxlBindEvent == NULL)
     {
-        return wxString::Format(wxT("wxLua: Invalid or unknown wxEventType for wxEvtHandler::Connect() : %d, winIds %d, %d."),
+        return wxString::Format(wxT("wxLua: Invalid or unknown wxEventType %d for wxEvtHandler::Connect(). winIds %d, %d."),
                                   (int)eventType, win_id, last_id);
     }
 
@@ -79,21 +94,31 @@ wxString wxLuaEventCallback::Connect(const wxLuaState& wxlState, int lua_func_st
     m_evtHandler->Connect(win_id, last_id, eventType,
                           (wxObjectEventFunction)&wxLuaEventCallback::OnAllEvents,
                           this);
+
+    // We always must run the function in the main lua_State.
+    // See above about the problems not doing so...
+    // Note saving the main lua_State to use in the callback may not always work 
+    // and if a problem is found we need to resort to blocking connecting event 
+    // handlers in coroutines as was done before.
+    m_wxlState = wxLuaState(wxlState.GetLuaState(), wxLUASTATE_GETSTATE|wxLUASTATE_ROOTSTATE);
+
     return wxEmptyString;
 }
 
 void wxLuaEventCallback::ClearwxLuaState()
 {
-    m_wxlState.UnRef();
+    m_wxlState.UnRef(); // ok if it's not Ok()
 }
 
 wxString wxLuaEventCallback::GetInfo() const
 {
     return wxString::Format(wxT("%s(%d) -> wxLuaEventCallback(%p, ids %d, %d)|wxEvtHandler(%p) -> %s : %s"),
-                lua2wx(m_wxlBindEvent ? m_wxlBindEvent->name : "?").c_str(), (int)GetEventType(),
+                lua2wx(m_wxlBindEvent ? m_wxlBindEvent->name : "?NULL?").c_str(),
+                (int)GetEventType(),
                 this, m_id, m_last_id,
-                m_evtHandler, m_evtHandler->GetClassInfo()->GetClassName(),
-                m_wxlState.GetwxLuaTypeName(*m_wxlBindEvent->wxluatype).c_str());
+                m_evtHandler,
+                m_evtHandler ? m_evtHandler->GetClassInfo()->GetClassName() : wxT("?NULL?"),
+                m_wxlState.GetwxLuaTypeName(m_wxlBindEvent ? *m_wxlBindEvent->wxluatype : WXLUA_TUNKNOWN).c_str());
 }
 
 void wxLuaEventCallback::OnAllEvents(wxEvent& event)
@@ -105,13 +130,16 @@ void wxLuaEventCallback::OnAllEvents(wxEvent& event)
     wxLuaEventCallback *theCallback = (wxLuaEventCallback *)event.m_callbackUserData;
     wxCHECK_RET(theCallback != NULL, wxT("Invalid wxLuaEventCallback in wxEvent user data"));
 
-    // Not an error if !Ok(), the wxLuaState is cleared during shutdown or after a destroy event.
-    wxLuaState wxlState(theCallback->GetwxLuaState());
-    if (wxlState.Ok())
+    if (theCallback != NULL)
     {
-        wxlState.SetInEventType(evtType);
-        theCallback->OnEvent(&event);
-        wxlState.SetInEventType(wxEVT_NULL);
+        // Not an error if !Ok(), the wxLuaState is cleared during shutdown or after a destroy event.
+        wxLuaState wxlState(theCallback->GetwxLuaState());
+        if (wxlState.Ok())
+        {
+            wxlState.SetInEventType(evtType);
+            theCallback->OnEvent(&event);
+            wxlState.SetInEventType(wxEVT_NULL);
+        }
     }
 
     // we want the wxLuaWinDestroyCallback to get this too
@@ -121,6 +149,9 @@ void wxLuaEventCallback::OnAllEvents(wxEvent& event)
 
 void wxLuaEventCallback::OnEvent(wxEvent *event)
 {
+    static wxClassInfo* wxSpinEvent_ClassInfo   = wxClassInfo::FindClass(wxT("wxSpinEvent"));
+    static wxClassInfo* wxScrollEvent_ClassInfo = wxClassInfo::FindClass(wxT("wxScrollEvent"));
+
     // Cannot call it if Lua is gone or the interpreter has been destroyed
     // This can happen when the program exits since windows may be destroyed
     // after Lua has been deleted.
@@ -130,28 +161,34 @@ void wxLuaEventCallback::OnEvent(wxEvent *event)
     // ref the state in case this generates a wxEVT_DESTROY which clears us
     wxLuaState wxlState(m_wxlState);
 
-    int event_wxl_type = WXLUA_TUNKNOWN;
+    // initialize to the generic wxluatype_wxEvent
+    int event_wxl_type = *p_wxluatype_wxEvent; // inits to wxluatype_TUNKNOWN == WXLUA_TUNKNOWN
 
     // If !m_wxlBindEvent, we would have errored in Connect(), but don't crash...
     if (m_wxlBindEvent != NULL)
     {
         event_wxl_type = *m_wxlBindEvent->wxluatype;
 
-        // These wxEventTypes can be wxScrollEvents or wxSpinEvents
+        // These wxEventTypes can be wxScrollEvents or wxSpinEvents - FIXME could this be cleaner?
         // wxEVT_SCROLL_LINEUP, wxEVT_SCROLL_LINEDOWN, wxEVT_SCROLL_THUMBTRACK
 
-        if ((strcmp(m_wxlBindEvent->name, "wxScrollEvent") == 0) &&
-            (event->GetClassInfo()->GetClassName() == wxString(wxT("wxSpinEvent"))))
+        if ((*m_wxlBindEvent->wxluatype == *p_wxluatype_wxScrollEvent) &&
+            event->GetClassInfo()->IsKindOf(wxSpinEvent_ClassInfo))
         {
-            const wxLuaBindClass *wxlClass = wxlState.GetBindClass("wxSpinEvent");
-            if (wxlClass != NULL)
-                event_wxl_type = *wxlClass->wxluatype;
+            if (*p_wxluatype_wxSpinEvent != WXLUA_TUNKNOWN)
+                event_wxl_type = *p_wxluatype_wxSpinEvent;
+            else
+                event_wxl_type = *p_wxluatype_wxEvent; // get the generic wxluatype_wxEvent
+        }
+        else if ((*m_wxlBindEvent->wxluatype == *p_wxluatype_wxSpinEvent) &&
+                 event->GetClassInfo()->IsKindOf(wxScrollEvent_ClassInfo))
+        {
+            if (*p_wxluatype_wxScrollEvent != WXLUA_TUNKNOWN)
+                event_wxl_type = *p_wxluatype_wxScrollEvent;
             else
                 event_wxl_type = *p_wxluatype_wxEvent; // get the generic wxluatype_wxEvent
         }
     }
-    else
-        event_wxl_type = *p_wxluatype_wxEvent; // get the generic wxluatype_wxEvent
 
     // Should know our event type, but error out in case we don't
     wxCHECK_RET(event_wxl_type != WXLUA_TUNKNOWN, wxT("Unknown wxEvent wxLua tag for : ") + wxString(event->GetClassInfo()->GetClassName()));
@@ -170,10 +207,10 @@ void wxLuaEventCallback::OnEvent(wxEvent *event)
             wxlState.LuaPCall(1, 0); // one input no returns
         }
         else
-            wxlState.wxlua_Error("wxLua: wxEvtHandler::Connect() in wxLuaEventCallback::OnEvent(), function is not a Lua function.");
+            wxlState.wxlua_Error("wxLua: wxEvtHandler::Connect() in wxLuaEventCallback::OnEvent(), callback function is not a Lua function.");
     }
     else
-        wxlState.wxlua_Error("wxLua: wxEvtHandler::Connect() in wxLuaEventCallback::OnEvent(), function to call is not refed.");
+        wxlState.wxlua_Error("wxLua: wxEvtHandler::Connect() in wxLuaEventCallback::OnEvent(), callback function to call is not refed.");
 
     wxlState.lua_SetTop(oldTop); // pop function and error message from the stack (if they're there)
 }
@@ -181,11 +218,11 @@ void wxLuaEventCallback::OnEvent(wxEvent *event)
 // ----------------------------------------------------------------------------
 // wxLuaWinDestroyCallback
 // ----------------------------------------------------------------------------
-IMPLEMENT_ABSTRACT_CLASS(wxLuaWinDestroyCallback, wxObject)
+IMPLEMENT_ABSTRACT_CLASS(wxLuaWinDestroyCallback, wxLuaCallbackBaseClass)
 
 wxLuaWinDestroyCallback::wxLuaWinDestroyCallback(const wxLuaState& wxlState,
                                                  wxWindow* win)
-                        :m_wxlState(wxlState), m_window(win)
+                        :wxLuaCallbackBaseClass(), m_wxlState(wxlState), m_window(win)
 {
     wxCHECK_RET(m_wxlState.Ok(), wxT("Invalid wxLuaState"));
     wxCHECK_RET(m_window != NULL, wxT("Invalid wxWindow"));
@@ -209,7 +246,7 @@ wxLuaWinDestroyCallback::~wxLuaWinDestroyCallback()
 
 void wxLuaWinDestroyCallback::ClearwxLuaState()
 {
-    m_wxlState.UnRef();
+    m_wxlState.UnRef(); // ok if it's not Ok()
 }
 
 wxString wxLuaWinDestroyCallback::GetInfo() const
@@ -252,7 +289,7 @@ void wxLuaWinDestroyCallback::OnDestroy(wxWindowDestroyEvent& event)
         wxlua_removederivedmethods(L, m_window);
 
         // Clear our own pointer to this window
-        m_wxlState.RemoveTrackedWindow(m_window);
+        wxluaW_removetrackedwindow(L, m_window);
 
         wxEvtHandler* evtHandler = m_window->GetEventHandler();
 
@@ -277,7 +314,7 @@ void wxLuaWinDestroyCallback::OnDestroy(wxWindowDestroyEvent& event)
             {
                 // remove the ref to the routine since we're clearing the wxLuaState
                 // See ~wxLuaEventCallback
-                m_wxlState.wxluaR_Unref(wxlCallback->GetLuaFuncRef(), &wxlua_lreg_refs_key);
+                wxluaR_unref(L, wxlCallback->GetLuaFuncRef(), &wxlua_lreg_refs_key);
                 wxlCallback->ClearwxLuaState();
 
                 lua_pop(L, 1);        // pop value
