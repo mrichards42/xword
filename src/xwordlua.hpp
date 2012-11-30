@@ -27,6 +27,7 @@
 #define wxLUA_USEBINDING_WXGL 0
 #define wxLUA_USEBINDING_WXMEDIA 0
 #define wxLUA_USEBINDING_WXRICHTEXT 0
+#define wxLUA_USEBINDING_WXSTC 0
 
 #include "paths.hpp"
 #include "wxlua/include/wxlua.h"
@@ -34,7 +35,8 @@
 
 WXLUA_DECLARE_BIND_ALL
 // XWord binding initialization
-extern bool wxLuaBinding_xword_init();
+
+#include "xwordbind/xword_bind.h"
 
 #define XWORD_LUA_IMPLEMENT_BIND_ALL \
         WXLUA_IMPLEMENT_BIND_ALL     \
