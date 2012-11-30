@@ -3,7 +3,7 @@
 // Purpose:     wxLua common defines
 // Author:      John Labenski
 // Created:     5/28/2005
-// Copyright:   (c) John Labenski
+// Copyright:   (c) 2012 John Labenski
 // Licence:     wxWidgets licence
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -26,45 +26,20 @@ extern "C"
     //typedef int (*lua_CFunction)(lua_State *);
 }
 
-#include "wx/defs.h"
+#include <wx/defs.h>
+
+#include "wxlversion.h"
 
 //-----------------------------------------------------------------------------
-// The version of wxLua - for convenience we use the current version of
-// wxWidgets which wxLua is most compatible with.
-//-----------------------------------------------------------------------------
+// 2.9 uses char* mostly so for compatibility we need wxT() to not append 'L'
+// for wide chars for 2.8, but rather do nothing for 2.9.
+// Mainly used for wxCmdLineEntryDesc.
 
-#define wxLUA_MAJOR_VERSION       2
-#define wxLUA_MINOR_VERSION       8
-#define wxLUA_RELEASE_NUMBER      10
-#define wxLUA_SUBRELEASE_NUMBER   0
-#define wxLUA_VERSION_STRING      wxT("wxLua 2.8.10.0")
-
-// For non-Unix systems (i.e. when building without a configure script),
-// users of this component can use the following macro to check if the
-// current version is at least major.minor.release
-#define wxLUA_CHECK_VERSION(major,minor,release) \
-    (wxLUA_MAJOR_VERSION > (major) || \
-    (wxLUA_MAJOR_VERSION == (major) && wxLUA_MINOR_VERSION > (minor)) || \
-    (wxLUA_MAJOR_VERSION == (major) && wxLUA_MINOR_VERSION == (minor) && wxLUA_RELEASE_NUMBER >= (release)))
-
-// the same but check the subrelease also
-#define wxLUA_CHECK_VERSION_FULL(major,minor,release,subrel) \
-    (wxLUA_CHECK_VERSION(major, minor, release) && \
-        ((major) != wxLUA_MAJOR_VERSION || \
-            (minor) != wxLUA_MINOR_VERSION || \
-                (release) != wxLUA_RELEASE_NUMBER || \
-                    (subrel) <= wxLUA_SUBRELEASE_NUMBER))
-
-//-----------------------------------------------------------------------------
-// This is an internal use binding generator version whos number is
-//   incremented every time something changes that requires a regeneration
-//   of the bindings. The check is written into the generated bindings to
-//   give a compile time error.
-// If this number is incremented the variable by the same name must be updated
-//   in genwxbind.lua must be updated as well.
-//-----------------------------------------------------------------------------
-
-#define WXLUA_BINDING_VERSION 27
+#if wxCHECK_VERSION(2, 9, 0)
+    #define wxLuaT(x) (x)
+#else
+    #define wxLuaT(x) wxT(x)
+#endif
 
 // ----------------------------------------------------------------------------
 // If you're using stdcall in Lua, then override this with
@@ -76,10 +51,10 @@ extern "C"
 #endif
 
 // ----------------------------------------------------------------------------
-// WXDLLIMPEXP macros
+// WXDLLIMPEXP macros for DLL export, import, or neither for static libs.
+//   see wxWidgets include/wx/dlimpexp.h
 // ----------------------------------------------------------------------------
 
-// These are our DLL macros (see the contrib libs like wxPlot)
 #ifdef WXMAKINGDLL_WXLUA
     #define WXDLLIMPEXP_WXLUA WXEXPORT
     #define WXDLLIMPEXP_DATA_WXLUA(type) WXEXPORT type
@@ -91,11 +66,26 @@ extern "C"
     #define WXDLLIMPEXP_DATA_WXLUA(type) type
 #endif
 
+// Forward declare all wxLua classes with this macro
+#if defined(HAVE_VISIBILITY) || (defined(__WINDOWS__) && defined(__GNUC__))
+    #define WXDLLIMPEXP_FWD_WXLUA
+#else
+    #define WXDLLIMPEXP_FWD_WXLUA WXDLLIMPEXP_WXLUA
+#endif
+
+// ----------------------------------------------------------------------------
+// Blank dummy defines that may be used in the bindings to not import or export
+// a class or data in a DLL.
+// ----------------------------------------------------------------------------
+
+#define WXLUA_NO_DLLIMPEXP           // use if you don't want to export class
+#define WXLUA_NO_DLLIMPEXP_DATA(x) x // use if you don't want to export data
+
 // ----------------------------------------------------------------------------
 // Useful macros to make coding easier
 // ----------------------------------------------------------------------------
 
-#if wxUSE_UNICODE
+#if wxUSE_UNICODE && !wxCHECK_VERSION(2,9,0)
     #define wxLUA_UNICODE_ONLY(x) x
 #else /* !Unicode */
     #define wxLUA_UNICODE_ONLY(x)
@@ -119,19 +109,6 @@ extern "C"
     &ld, ld.event, lua2wx(ld.name).c_str(), lua2wx(ld.namewhat).c_str(), lua2wx(ld.what).c_str(), lua2wx(ld.source).c_str(), ld.currentline, ld.nups, ld.linedefined, ld.lastlinedefined, lua2wx(ld.short_src).c_str(), ld.i_ci)
 
 // ----------------------------------------------------------------------------
-// Convert from wxWidgets wxT('') to wxT(""), a string. Copied from wx/filefn.h
-
-// platform independent versions
-#if defined(__UNIX__) && !defined(__OS2__)
-  // CYGWIN also uses UNIX settings
-  #define wxLua_FILE_SEP_PATH     wxT("/")
-#elif defined(__MAC__)
-  #define wxLua_FILE_SEP_PATH     wxT(":")
-#else   // Windows and OS/2
-  #define wxLua_FILE_SEP_PATH     wxT("\\")
-#endif  // Unix/Windows
-
-// ----------------------------------------------------------------------------
 // wxWidgets compatibility defines
 // ----------------------------------------------------------------------------
 
@@ -146,7 +123,7 @@ extern "C"
 // Forward declared classes
 // ----------------------------------------------------------------------------
 
-class WXDLLIMPEXP_WXLUA wxLuaState;
+class WXDLLIMPEXP_FWD_WXLUA wxLuaState;
 
 
 #endif  // __WX_WXLDEFS_H__

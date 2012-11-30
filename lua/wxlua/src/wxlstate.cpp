@@ -3,12 +3,12 @@
 // Purpose:     wxLuaState, a wxWidgets interface to Lua
 // Author:      Ray Gilbert, John Labenski, J Winwood (Reuben Thomas for bitlib at bottom)
 // Created:     14/11/2001
-// Copyright:   (c) 2001-2002 Lomtick Software. All rights reserved.
+// Copyright:   (c) 2012 John Labenski, 2001-2002 Lomtick Software. All rights reserved.
 // Licence:     wxWidgets licence
 /////////////////////////////////////////////////////////////////////////////
 
 // For compilers that support precompilation, includes "wx/wx.h"
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 
 #ifdef __BORLANDC__
     #pragma hdrstop
@@ -16,34 +16,39 @@
 
 // for all others, include the necessary headers
 #ifndef WX_PRECOMP
-    #include "wx/wx.h"
+    #include <wx/wx.h>
 #endif
 
 #include "wxlua/include/wxlstate.h"
 #include "wxlua/include/wxlcallb.h"
-#include "wx/tokenzr.h"
+#include <wx/tokenzr.h>
 
 //#include "wxluadebug/include/wxldebug.h" // for debugging only
 
-const char* wxlua_lreg_types_key               = "wxLua metatable class types";
-const char* wxlua_lreg_refs_key                = "wxLua Lua object refs";
-const char* wxlua_lreg_debug_refs_key          = "wxLuaDebugData refs";
-const char* wxlua_lreg_classes_key             = "wxLuaBindClass structs";
-const char* wxlua_lreg_derivedmethods_key      = "wxLua derived class methods";
-const char* wxlua_lreg_wxluastate_key          = "wxLuaState";
-const char* wxlua_lreg_wxluabindings_key       = "wxLuaBindings";
-const char* wxlua_lreg_weakobjects_key         = "wxLua objects pushed";
-const char* wxlua_lreg_gcobjects_key           = "wxLua gc objects to delete";
-const char* wxlua_lreg_evtcallbacks_key        = "wxLuaEventCallbacks";
-const char* wxlua_lreg_windestroycallbacks_key = "wxLuaWinDestoyCallbacks";
-const char* wxlua_lreg_topwindows_key          = "wxLua top level wxWindows";
-const char* wxlua_lreg_callbaseclassfunc_key   = "wxLua CallBaseClassFunc";
-const char* wxlua_lreg_wxeventtype_key         = "wxLua wxEventType";
-const char* wxlua_lreg_wxluastatedata_key      = "wxLuaStateData";
-const char* wxlua_lreg_regtable_key            = "wxLua LUA_REGISTRYINDEX tables";
+const char* wxlua_lreg_regtable_key            = "wxlua_lreg_regtable_key : wxLua LUA_REGISTRYINDEX tables";
 
-const char* wxlua_metatable_type_key           = "wxLua metatable class type";
-const char* wxlua_metatable_wxluabindclass_key = "wxLua metatable wxLuaBindClass";
+const char* wxlua_lreg_wxluastate_key          = "wxlua_lreg_wxluastate_key : wxLuaState";
+const char* wxlua_lreg_wxluastatedata_key      = "wxlua_lreg_wxluastatedata_key : wxLuaStateData";
+
+const char* wxlua_lreg_wxluabindings_key       = "wxlua_lreg_wxluabindings_key : wxLuaBindings installed";
+const char* wxlua_lreg_classes_key             = "wxlua_lreg_classes_key : wxLuaBindClass structs installed";
+const char* wxlua_lreg_types_key               = "wxlua_lreg_types_key : wxLua metatable class types";
+
+const char* wxlua_lreg_weakobjects_key         = "wxlua_lreg_weakobjects_key : wxLua objects pushed";
+const char* wxlua_lreg_gcobjects_key           = "wxlua_lreg_gcobjects_key : wxLua gc objects to delete";
+const char* wxlua_lreg_derivedmethods_key      = "wxlua_lreg_derivedmethods_key : wxLua derived class methods";
+const char* wxlua_lreg_evtcallbacks_key        = "wxlua_lreg_evtcallbacks_key : wxLuaEventCallbacks";
+const char* wxlua_lreg_windestroycallbacks_key = "wxlua_lreg_windestroycallbacks_key : wxLuaWinDestoyCallbacks";
+const char* wxlua_lreg_topwindows_key          = "wxlua_lreg_topwindows_key : wxLua top level wxWindows";
+const char* wxlua_lreg_wxeventtype_key         = "wxlua_lreg_wxeventtype_key : wxLua wxEventType";
+const char* wxlua_lreg_callbaseclassfunc_key   = "wxlua_lreg_callbaseclassfunc_key : wxLua CallBaseClassFunc";
+
+const char* wxlua_lreg_refs_key                = "wxlua_lreg_refs_key : wxLua Lua object refs";
+const char* wxlua_lreg_debug_refs_key          = "wxlua_lreg_debug_refs_key : wxLuaDebugData refs";
+
+const char* wxlua_metatable_type_key           = "wxlua_metatable_type_key : wxLua metatable class type";
+const char* wxlua_metatable_wxluabindclass_key = "wxlua_metatable_wxluabindclass_key : wxLua metatable wxLuaBindClass";
+
 
 wxLuaState wxNullLuaState(false);
 
@@ -60,6 +65,19 @@ int LUACALL wxlua_printFunction( lua_State *L )
 {
     wxLuaState wxlState(L); // doesn't have to be ok
 
+    // If the wxLuaState is not going to print, we'll let Lua print normally
+    if (!wxlState.Ok() || (wxlState.GetEventHandler() == NULL) || (!wxApp::IsMainLoopRunning() && !wxlState.sm_wxAppMainLoop_will_run))
+    {
+        // Get our saved copy of the Lua's print function from the registry
+        lua_pushlstring(L, "print_lua", 9);
+        lua_rawget( L, LUA_REGISTRYINDEX ); // pop key, push print function
+
+        lua_CFunction lua_print = lua_tocfunction(L, -1);
+        lua_pop(L, 1);                      // pop the print function
+        return lua_print(L);
+    }
+
+    // The wxLuaState can print by sending an event
     wxString msg;
     int i, n = lua_gettop(L);
 
@@ -76,8 +94,6 @@ int LUACALL wxlua_printFunction( lua_State *L )
 
     for (i = 1; i <= n; ++i)
     {
-        if (i > 1) msg.Append(wxT("\t")); // Lua uses a tab too in luaB_print
-
         const char *s;
         lua_pushvalue(L, -1);       /* function to be called */
         lua_pushvalue(L, i);        /* value to print */
@@ -89,18 +105,21 @@ int LUACALL wxlua_printFunction( lua_State *L )
             return luaL_error(L, LUA_QL("tostring") " must return a string to "
                               LUA_QL("print"));
         }
+
+        if (i > 1) msg.Append(wxT("\t")); // Lua uses a tab too in luaB_print
         msg += lua2wx(s);
+
         lua_pop(L, 1);  /* pop result */
     }
 
-    if (!msg.IsEmpty() && wxlState.Ok())
+    if (!msg.IsEmpty())
     {
         wxLuaEvent event(wxEVT_LUA_PRINT, wxlState.GetId(), wxlState);
         event.SetString(msg);
         wxlState.SendEvent(event);
     }
-    else if (!msg.IsEmpty())
-        wxPrintf(wxT("%s\n"), msg.c_str()); // Lua puts a \n too
+    //else if (!msg.IsEmpty())
+    //    wxPrintf(wxT("%s\n"), msg.c_str()); // Lua puts a \n too
 
     return 0; // no items put onto stack
 }
@@ -130,14 +149,12 @@ void LUACALL wxlua_debugHookFunction(lua_State *L, lua_Debug *LDebug)
         return;
     }
 
-    // Assume they've set the wxEvtHandler, ok if not, but it wouldn't make sense
     // We use wxLuaState::SendEvent() because it sets wxEvent::SetEventObject() for us.
-    if (wxlStateData->m_lua_debug_hook_send_evt)
+    if (wxlStateData->m_lua_debug_hook_send_evt && wxlStateData->m_evtHandler)
     {
         wxLuaState wxlState(L);
 
-        int ret = 0;
-        ret = lua_getinfo(L, "l", LDebug); // line (ldebug.currentline)
+        lua_getinfo(L, "l", LDebug); // line (ldebug.currentline)
 
         wxLuaEvent event(wxEVT_LUA_DEBUG_HOOK, wxlState.GetId(), wxlState);
         event.m_lua_Debug = LDebug;
@@ -328,7 +345,8 @@ void LUACALL wxlua_argerrormsg(lua_State *L, const wxString& msg_)
             funcArgs += wxlua_getBindMethodArgsMsg(L, wxlMethod);
     }
 
-    wxString msg = msg_ + wxT("\nFunction called: '") + argMsg + wxT("'") + funcArgs;
+    wxString msg;
+    msg.Printf(wxT("%s\nFunction called: '%s'%s"), msg_.c_str(), argMsg.c_str(), funcArgs.c_str());
     wxlua_error(L, msg);
 }
 
@@ -480,11 +498,7 @@ int LUACALL wxluaR_isrefed(lua_State* L, int stack_idx, void* lightuserdata_reg_
 // wxluaO_XXX - functions operate on the "Objects"
 // ----------------------------------------------------------------------------
 
-void LUACALL wxluaO_addgcobject(lua_State *L, wxObject* wxobj)
-{
-    wxluaO_addgcobject(L, (void*)wxobj, wxobj);
-}
-void LUACALL wxluaO_addgcobject(lua_State *L, void *obj_ptr, wxObject* wxobj)
+bool LUACALL wxluaO_addgcobject(lua_State *L, void *obj_ptr, int wxl_type)
 {
     lua_pushlightuserdata(L, &wxlua_lreg_gcobjects_key); // push key
     lua_rawget(L, LUA_REGISTRYINDEX);                    // pop key, push value (table)
@@ -492,54 +506,76 @@ void LUACALL wxluaO_addgcobject(lua_State *L, void *obj_ptr, wxObject* wxobj)
     // Check if it's already tracked since that means the weak udata table isn't working right
     lua_pushlightuserdata(L, obj_ptr); // push key
     lua_rawget(L, -2);                 // get t[key] = value, pops key
+
     if (!lua_isnil(L, -1))
     {
         lua_pop(L, 2); // pop table and value
-        wxFAIL_MSG(wxT("Tracking an object twice in wxluaO_addgcobject: ") + wxString(wxobj->GetClassInfo()->GetClassName()));
-        return;
+        wxCHECK_MSG(false, false, wxT("Tracking an object twice in wxluaO_addgcobject: ") + wxluaT_typename(L, wxl_type));
+        return false;
     }
+
     lua_pop(L, 1); // pop nil
 
     // Then add it
     lua_pushlightuserdata(L, obj_ptr);  // push key
-    lua_pushlightuserdata(L, wxobj);    // push value
+    lua_pushnumber(L, wxl_type);        // push value
     lua_rawset(L, -3);                  // set t[key] = value, pops key and value
 
     lua_pop(L, 1); // pop table
+
+    return true;
 }
 
-bool LUACALL wxluaO_deletegcobject(lua_State *L, void* udata, void *obj_ptr, int flags)
+bool LUACALL wxluaO_deletegcobject(lua_State *L, int stack_idx, int flags)
 {
-    if (obj_ptr == NULL) return false; // can happen
+    void* udata   = lua_touserdata(L, stack_idx);
+    void* obj_ptr = wxlua_touserdata(L, stack_idx, true); // clear lua userdata's ptr
+
+    //if (obj_ptr == NULL) return false; // can happen
 
     bool delete_all = WXLUA_HASBIT(flags, WXLUA_DELETE_OBJECT_ALL);
 
-    // Remove the weak ref to it
+    wxLuaBindClass *wxlClass = NULL;
+
+    if (lua_getmetatable(L, stack_idx))
+    {
+        lua_pushlightuserdata(L, &wxlua_metatable_wxluabindclass_key); // push key
+        lua_rawget(L, -2);                                   // get t[key] = value; pop key push value
+        wxlClass = (wxLuaBindClass *)lua_touserdata(L, -1);
+        lua_pop(L, 2); // pop metatable and lightuserdata value
+    }
+
+    // Remove the weak ref to it, will optionally clear all the metatables
+    // for an userdata created for this object to make them unusable.
     int udata_count = wxluaO_untrackweakobject(L, delete_all ? NULL : udata, obj_ptr);
 
     if (delete_all || (udata_count < 1))
     {
+        // remove any derived methods attached to this object
         wxlua_removederivedmethods(L, obj_ptr);
 
+        // check if we are really supposed to delete it
         lua_pushlightuserdata(L, &wxlua_lreg_gcobjects_key); // push key
         lua_rawget(L, LUA_REGISTRYINDEX);                    // pop key, push value (table)
 
         lua_pushlightuserdata(L, obj_ptr); // push key
         lua_rawget(L, -2);                 // get t[key] = value, pops key
 
-        if (lua_islightuserdata(L, -1)) // is the wxObject* we delete
+        if (wxlClass && lua_isnumber(L, -1)) // the wxLua type for it
         {
-            // delete the real object for the case where it's encapsulated
-            wxObject *wxobj = (wxObject*)lua_touserdata(L, -1);
-            delete wxobj;
-
-            lua_pop(L, 1); // pop lightuserdata value
+            lua_pop(L, 1); // pop number value
 
             lua_pushlightuserdata(L, obj_ptr); // push key
             lua_pushnil(L);                    // push value
             lua_rawset(L, -3);                 // set t[key] = value, pops key and value
 
             lua_pop(L, 1); // pop delobj table
+
+            // delete the object using the function stored in the wxLuaBindClass
+            if (obj_ptr)
+                wxlClass->delete_fn(&obj_ptr);
+            else
+                return false;
 
             return true;
         }
@@ -565,9 +601,9 @@ bool LUACALL wxluaO_undeletegcobject(lua_State *L, void *obj_ptr)
     lua_pushlightuserdata(L, obj_ptr); // push key
     lua_rawget(L, -2);                 // get t[key] = value, pops key
 
-    if (lua_islightuserdata(L, -1)) // is the wxObject* we delete
+    if (lua_isnumber(L, -1)) // is the wxLua type of the object
     {
-        lua_pop(L, 1); // pop lightuserdata
+        lua_pop(L, 1); // pop number
 
         lua_pushlightuserdata(L, obj_ptr); // push key
         lua_pushnil(L);                    // push value
@@ -590,7 +626,7 @@ bool LUACALL wxluaO_isgcobject(lua_State *L, void *obj_ptr)
     lua_pushlightuserdata(L, obj_ptr); // push key
     lua_rawget(L, -2);                 // get t[key] = value, pops key
 
-    bool found = lua_islightuserdata(L, -1);
+    bool found = (0 != lua_isnumber(L, -1));
     lua_pop(L, 2); // pop udata and table
 
     return found;
@@ -609,11 +645,10 @@ wxArrayString LUACALL wxluaO_getgcobjectinfo(lua_State *L)
         // value = -1, key = -2, table = -3
         wxString name(wxT("wxObject?"));
 
-        wxObject* obj = (wxObject*)lua_touserdata(L, -1);
-        if (obj && obj->GetClassInfo() && obj->GetClassInfo()->GetClassName())
-            name = obj->GetClassInfo()->GetClassName();
+        int wxl_type = (int)lua_tonumber(L, -1);
+        name = wxluaT_typename(L, wxl_type);
 
-        arrStr.Add(wxString::Format(wxT("%s(%p)"), name.c_str(), obj));
+        arrStr.Add(wxString::Format(wxT("%s(%p)"), name.c_str(), lua_touserdata(L, -2)));
 
         lua_pop(L, 1); // pop value, lua_next will pop key at end
     }
@@ -654,7 +689,10 @@ void LUACALL wxluaO_trackweakobject(lua_State *L, int udata_stack_idx, void *obj
         lua_pushnumber(L, wxl_type);
         lua_rawget(L, -2);
         // this must never happen
-        if (!lua_isnil(L, -1)) wxFAIL_MSG(wxT("Trying to push userdata for object with same wxLua type twice"));
+        if (!lua_isnil(L, -1))
+        {
+            wxFAIL_MSG(wxT("Trying to push userdata for object with same wxLua type twice"));
+        }
         lua_pop(L, 1); // pop nil
     }
 
@@ -983,7 +1021,7 @@ int LUACALL wxluaT_type(lua_State *L, int stack_idx)
 wxString LUACALL wxluaT_typename(lua_State* L, int wxl_type)
 {
     // try to use wxString's ref counting and return this existing copy
-    static wxString s[13] = {
+    static wxString s[14] = {
         wxT("unknown"),
         wxT("none"),
         wxT("nil"),
@@ -997,6 +1035,7 @@ wxString LUACALL wxluaT_typename(lua_State* L, int wxl_type)
         wxT("thread"),
         wxT("integer"),
         wxT("cfunction"),
+        wxT("pointer")
     };
 
     // Check for real type or this is a predefined WXLUA_TXXX type
@@ -1018,6 +1057,7 @@ wxString LUACALL wxluaT_typename(lua_State* L, int wxl_type)
 
             case WXLUA_TINTEGER :       return s[11];
             case WXLUA_TCFUNCTION :     return s[12];
+            case WXLUA_TPOINTER :       return s[13];
         }
     }
     else
@@ -1052,7 +1092,7 @@ int LUACALL wxluaT_gettype(lua_State* L, const char* class_name)
 
 const wxLuaBindClass* LUACALL wxluaT_getclass(lua_State* L, int wxl_type)
 {
-    // note: wxluaR_getref() doesn't leave anything on the stack on failure
+    // note: wxluaT_getmetatable() doesn't leave anything on the stack on failure
     if (wxluaT_getmetatable(L, wxl_type))
     {
         // t[wxluatype] = { [bindclass_key] = lightuserdata wxLuaBindClass... (or nil if not a wxLua class type)
@@ -1095,14 +1135,101 @@ bool wxluaT_isuserdatatype(lua_State* L, int stack_idx, int wxl_type)
     return false;
 }
 
+// Note about multiple inheritance in wxLua :
+// See wxLuaBindClass::baseclass_vtable_offsets
+//
+// class A { int x; }; class B { int y; }; class AB : public A, public B { int z; };
+// AB ab; void *v_ab_a = (A*)&ab; void *v_ab_b = (B*)&ab;
+// long int dummy = 0;
+// long int AB_diff = ((long int)(B*)(AB*)&dummy) - ((long int)(A*)(AB*)&dummy);
+// wxPrintf(wxT("AB*=%p, A*=%p, B*=%p, B*-A*=%d\n"), &ab, v_ab_a, v_ab_b, AB_diff);
+// prints: "AB*=0x614dfc, A*=0x614dfc, B*=0x614e00, B*-A*=4"
+//
+// In order to call B's functions from a void* pointer to an AB object :
+// 1) Ideally, we cast to an AB object and the compiler will appropriately lookup
+//    and handle calls to B's functions.
+// 2) Cast to an AB object then to a B object where the compiler has already
+//    shifted the pointer and calls to B's functions are made directly.
+// 3) Explicitly shift the void* pointer to the AB object to where the vtable for
+//    B is. We now have an object that only knows about B and what B was derived from.
+//    I'm sure this is frowned upon by C++ enthusiasts.
+//
+// Ways of doing 1 and 2 in wxLua with C++ constraints, wxLua does #3 above.
+//
+// 1) wxLua would duplicate all the the binding functions for second
+//    and higher base classes and therefore each binding function will cast the
+//    void* we get from Lua to exactly the object type that it is. This is best,
+//    but it adds bloat.
+// 2) Come up with a clever way using overloaded functions, templates,
+//    or some sort of variant class to convert the void* pointer from Lua to
+//    type of object that it really is (we know by the wxLuaType integer)
+//    and then the binding function will cast it whatever base class it may be.
+//    The problem is that we really need to overload this casting function by
+//    return type, the function takes void* and returns ClassXYZ*, but this
+//    is not allowed in C++.
+// 3) Store an array of the offsets in each classes' wxLuaBindClass struct
+//    to the second or higher base classes and automatically add this offset in
+//    wxluaT_getuserdatatype(). The offsets are calculated at compile time
+//    using the AB_diff method above.
+//
+// Various ways to cast a void* pointer to the second base class :
+// void* v_ab = &ab;   // compilier doesn't know what v_ab is anymore
+// AB* ab = (AB*)v_ab; // ok since we cast right back to original type
+// A*  a  = (A*)v_ab;  // ok in GCC & MSVC since we are casting to 1st base class
+// B*  b  = (B*)v_ab;  // segfault! since B*'s vtable is +4 bytes as shown above
+// B*  b1 = (B*)(AB*)v_ab; // ok since compiler converts to AB* and knows that B* is shifted
+// B*  b2 = (B*)((long int)v_ab + AB_diff); // ok since we've shifted to B
+
+
+// forward declaration
+static int wxluaT_isderivedtype_recurser(const wxLuaBindClass *wxlClass, int base_wxl_type, int levels, int* baseclass_n);
+
 void* LUACALL wxluaT_getuserdatatype(lua_State* L, int stack_idx, int wxl_type)
 {
     int stack_type = wxluaT_type(L, stack_idx);
 
     if (wxluatype_NULL == stack_type)
         return NULL;
-    else if (wxluaT_isderivedtype(L, stack_type, wxl_type) >= 0)
+
+    // Note: we directly use the recurser function since we may need the wxLuaBindClass
+    //int level = wxluaT_isderivedtype(L, stack_type, wxl_type);
+
+    int baseclass_n = 0;
+    const wxLuaBindClass* wxlClass = wxluaT_getclass(L, stack_type);
+    int level = wxluaT_isderivedtype_recurser(wxlClass, wxl_type, 0, &baseclass_n);
+
+    if ((level >= 0) && (baseclass_n == 0))
+    {
+        // We can directly cast the void* pointer to the baseclass if baseclass_n == 0
         return wxlua_touserdata(L, stack_idx, false);
+    }
+    else if (level > 0)
+    {
+        // The class on the stack is derived from a second or higher base class
+        // and therefore the pointer to the base class is not the same as the
+        // pointer to the class object on the stack. We need to shift the
+        // pointer by the number of bytes in wxLuaBindClass::baseclass_vtable_offsets
+        // so that when it is casted to the base class we don't segfault.
+        long int o = (long int)wxlua_touserdata(L, stack_idx, false);
+
+        if (wxlClass->baseclass_wxluatypes)
+        {
+            int i = 0;
+            while (wxlClass->baseclass_wxluatypes[i]) // NULL terminated, the baseclass_vtable_offsets is not
+            {
+                if (*(wxlClass->baseclass_wxluatypes[i]) == wxl_type)
+                {
+                    o += wxlClass->baseclass_vtable_offsets[i];
+                    break;
+                }
+                i++;
+            }
+        }
+
+        return (void*)o;
+    }
+
+
 
     wxlua_argerror(L, stack_idx, wxT("a '") + wxluaT_typename(L, wxl_type) + wxT("'"));
 
@@ -1194,10 +1321,11 @@ bool LUACALL wxluaT_pushuserdatatype(lua_State* L, const void *obj_ptr, int wxl_
 // Functions to get info about the wxLua types
 // ----------------------------------------------------------------------------
 
-static int wxluaT_isderivedtype_recurser(const wxLuaBindClass *wxlClass, int base_wxl_type, int levels)
+static int wxluaT_isderivedtype_recurser(const wxLuaBindClass *wxlClass, int base_wxl_type, int levels, int* baseclass_n)
 {
     if (wxlClass != NULL)
     {
+        // check that input isn't what we want first since this func is used in a couple places
         if (*wxlClass->wxluatype == base_wxl_type)
             return levels;
         else if (wxlClass->baseclassNames != NULL) // check baseclass by baseclass
@@ -1210,12 +1338,22 @@ static int wxluaT_isderivedtype_recurser(const wxLuaBindClass *wxlClass, int bas
                 if (baseClass != NULL)
                 {
                     if (*baseClass->wxluatype == base_wxl_type)
-                        return levels;
+                    {
+                        if (baseclass_n) *baseclass_n = wxMax(*baseclass_n, (int)i);
+                        return levels+1;
+                    }
                     else
                     {
-                        int ret = wxluaT_isderivedtype_recurser(baseClass, base_wxl_type, levels+1);
+                        // create a new baseclass_n since we may be going down the wrong path
+                        // and we do not want to change the original.
+                        int baseclass_n_tmp = wxMax(baseclass_n ? *baseclass_n : 0, (int)i);
+                        int ret = wxluaT_isderivedtype_recurser(baseClass, base_wxl_type, levels+1, &baseclass_n_tmp);
                         if (ret > -1)
+                        {
+                            // now set the baseclass_n var to the tmp one
+                            if (baseclass_n) *baseclass_n = wxMax(baseclass_n_tmp, (int)i);
                             return ret;
+                        }
                     }
                 }
             }
@@ -1225,22 +1363,24 @@ static int wxluaT_isderivedtype_recurser(const wxLuaBindClass *wxlClass, int bas
     return -1; // wxluatype is not derived from base_wxluatype
 }
 
-int LUACALL wxluaT_isderivedtype(lua_State* L, int wxl_type, int base_wxl_type)
+int LUACALL wxluaT_isderivedtype(lua_State* L, int wxl_type, int base_wxl_type, int* baseclass_n)
 {
     // couldn't possibly be derived from each other
     if (!wxlua_iswxuserdatatype(wxl_type) || !wxlua_iswxuserdatatype(base_wxl_type))
         return -1;
 
-    // These two types are the same
+    // These two types are the same, yes recurser also checks, but this is faster
     if (wxl_type == base_wxl_type)
         return 0;
 
     const wxLuaBindClass *wxlClass = wxluaT_getclass(L, wxl_type);
 
-    return wxluaT_isderivedtype_recurser(wxlClass, base_wxl_type, 1);
+    if (baseclass_n != NULL) *baseclass_n = 0;
+
+    return wxluaT_isderivedtype_recurser(wxlClass, base_wxl_type, 0, baseclass_n);
 }
 
-int LUACALL wxluaT_isderivedclass(const wxLuaBindClass* wxlClass, const wxLuaBindClass* base_wxlClass)
+int LUACALL wxluaT_isderivedclass(const wxLuaBindClass* wxlClass, const wxLuaBindClass* base_wxlClass, int* baseclass_n)
 {
     // Ok if either is NULL to allow blindly calling this
     if ((wxlClass == NULL) || (base_wxlClass == NULL))
@@ -1250,7 +1390,9 @@ int LUACALL wxluaT_isderivedclass(const wxLuaBindClass* wxlClass, const wxLuaBin
     if (wxlClass->wxluatype == base_wxlClass->wxluatype) // comparing pointers
         return 0;
 
-    return wxluaT_isderivedtype_recurser(wxlClass, *base_wxlClass->wxluatype, 1);
+    if (baseclass_n != NULL) *baseclass_n = 0;
+
+    return wxluaT_isderivedtype_recurser(wxlClass, *base_wxlClass->wxluatype, 1, baseclass_n);
 }
 
 int LUACALL wxlua_iswxluatype(int luatype, int wxl_type, lua_State* L /* = NULL */)
@@ -1303,6 +1445,14 @@ int LUACALL wxlua_iswxluatype(int luatype, int wxl_type, lua_State* L /* = NULL 
         case WXLUA_TCFUNCTION :
             ret = (luatype == LUA_TFUNCTION) ? 1 : 0;
             break;
+        case WXLUA_TPOINTER :
+            ret = (luatype == LUA_TLIGHTUSERDATA) || (luatype == LUA_TUSERDATA) ||
+                  (luatype == LUA_TFUNCTION) || (luatype == LUA_TTABLE) ||
+                  (luatype == LUA_TTHREAD) ? 1 : 0;
+            break;
+        case WXLUA_TANY :
+            ret = 1; // any type is acceptable
+            break;
     }
 
     // if we don't know the type (it's not predefined)
@@ -1342,6 +1492,7 @@ int wxlua_luatowxluatype(int luatype)
         case LUA_TTHREAD        : return WXLUA_TTHREAD;
         //case LUA_T???         : return WXLUA_TINTEGER;
         //case LUA_T???         : return WXLUA_TCFUNCTION;
+        //case LUA_T???         : return WXLUA_TPOINTER;
     }
 
     return WXLUA_TUNKNOWN;
@@ -1363,6 +1514,7 @@ int wxlua_wxluatoluatype(int wxlarg)
         case WXLUA_TTHREAD :        return LUA_TTHREAD;
         case WXLUA_TINTEGER :       return LUA_TNUMBER;
         case WXLUA_TCFUNCTION :     return LUA_TFUNCTION;
+        //case WXLUA_TPOINTER :       return LUA_T???; multiple types
     }
 
     return -1;
@@ -1513,6 +1665,18 @@ double LUACALL wxlua_getnumbertype(lua_State *L, int stack_idx)
         value = lua_toboolean(L, stack_idx) ? 1 : 0;
     else
         value = lua_tonumber(L, stack_idx);
+
+    return value;
+}
+
+void* LUACALL wxlua_getpointertype(lua_State* L, int stack_idx)
+{
+    int l_type = lua_type(L, stack_idx);
+
+    if (!wxlua_iswxluatype(l_type, WXLUA_TPOINTER))
+        wxlua_argerror(L, stack_idx, wxT("a 'pointer'"));
+
+    void* value = (void *)lua_topointer(L, stack_idx);
 
     return value;
 }
@@ -1816,6 +1980,7 @@ bool LUACALL wxlua_setderivedmethod(lua_State* L, void *obj_ptr, const char *met
         {
             // already have a method, delete it before replacing it
             wxLuaObject* o = (wxLuaObject*)lua_touserdata( L, -1 );
+            o->RemoveReference(L);
             delete o;
         }
 
@@ -1830,7 +1995,7 @@ bool LUACALL wxlua_setderivedmethod(lua_State* L, void *obj_ptr, const char *met
 
     return true;
 }
-bool LUACALL wxlua_hasderivedmethod(lua_State* L, void *obj_ptr, const char *method_name, bool push_method)
+bool LUACALL wxlua_hasderivedmethod(lua_State* L, const void *obj_ptr, const char *method_name, bool push_method)
 {
     bool found = false;
     wxLuaObject* wxlObj = NULL;
@@ -1858,7 +2023,7 @@ bool LUACALL wxlua_hasderivedmethod(lua_State* L, void *obj_ptr, const char *met
     if (wxlObj != NULL)
     {
         // if we've got the object, put it on top of the stack
-        if (push_method && wxlObj->GetObject())
+        if (push_method && wxlObj->GetObject(L))
             found = true;
         else if (!push_method)
             found = true;
@@ -1888,6 +2053,7 @@ bool LUACALL wxlua_removederivedmethods(lua_State* L, void *obj_ptr)
             if (lua_islightuserdata(L, -1))
             {
                 wxLuaObject* o = (wxLuaObject*)lua_touserdata(L, -1);
+                o->RemoveReference(L);
                 delete o;
             }
 
@@ -1917,7 +2083,7 @@ bool LUACALL wxlua_getcallbaseclassfunction(lua_State* L)
     lua_pushlightuserdata(L, &wxlua_lreg_callbaseclassfunc_key);
     lua_rawget( L, LUA_REGISTRYINDEX ); // pop key, push bool
 
-    bool call_base = (bool)lua_toboolean(L, -1); // nil == 0 too
+    bool call_base = (0 != lua_toboolean(L, -1)); // nil == 0 too
     lua_pop(L, 1);                               // pop bool
 
     return call_base;
@@ -2059,6 +2225,11 @@ bool wxLuaCleanupWindows(lua_State* L, bool only_check)
                 if (win->HasCapture())
                     win->ReleaseMouse();
 
+                // 2.9 insists that all pushed event handlers are popped before destroying window
+                // we assume (for now) that they're properly owned so we don't pop or delete them
+                //while (win->GetEventHandler() != win)
+                //    win->PopEventHandler(false);
+
                 // release capture for children since we may be abruptly ending
                 for ( wxWindowList::compatibility_iterator childNode = win->GetChildren().GetFirst();
                     childNode;
@@ -2072,6 +2243,11 @@ bool wxLuaCleanupWindows(lua_State* L, bool only_check)
 
                     if (child->HasCapture())
                         child->ReleaseMouse();
+
+                    // 2.9 insists that all pushed event handlers are popped before destroying window
+                    // we assume (for now) that they're properly owned so we don't pop or delete them
+                    //while (child->GetEventHandler() != child)
+                    //    child->PopEventHandler(false);
                 }
 
                 if (!win->IsBeingDeleted())
@@ -2210,31 +2386,6 @@ bool wxLuaStateRefData::CloseLuaState(bool force)
 
     ClearCallbacks();
 
-/*
-    // Let the Lua garbage collector do it for shutdown.
-
-    // Delete all the wxObject data
-    lua_pushlightuserdata(m_lua_State, &wxlua_lreg_gcobjects_key);
-    lua_rawget(m_lua_State, LUA_REGISTRYINDEX);
-
-    lua_pushnil(m_lua_State);
-    while (lua_next(m_lua_State, -2) != 0)
-    {
-        // value = -1, key = -2, table = -3
-        wxObject* o = (wxObject*)lua_touserdata(m_lua_State, -1); // delete object not key
-        delete o;
-
-        lua_pop(m_lua_State, 1); // pop value, lua_next will pop key at end
-    }
-
-    lua_pop(m_lua_State, 1); // pop table
-
-    // remove table since we've deleted everything in it
-    lua_pushlightuserdata(m_lua_State, &wxlua_lreg_gcobjects_key);
-    lua_newtable(m_lua_State);
-    lua_rawset(m_lua_State, LUA_REGISTRYINDEX);
-*/
-
     // remove refs table to try to clear memory gracefully
     wxlua_lreg_createtable(m_lua_State, &wxlua_lreg_refs_key);
     wxlua_lreg_createtable(m_lua_State, &wxlua_lreg_debug_refs_key);
@@ -2363,7 +2514,7 @@ bool wxLuaState::Create(lua_State* L, int state_type)
     if (WXLUA_HASBIT(state_type, wxLUASTATE_GETSTATE))
     {
         // returns an invalid, wxNullLuaState on failure
-        Ref(wxLuaState::GetwxLuaState(L));
+        Ref(wxLuaState::GetwxLuaState(L, WXLUA_HASBIT(state_type, wxLUASTATE_ROOTSTATE)));
     }
     else if (WXLUA_HASBIT(state_type, wxLUASTATE_SETSTATE))
     {
@@ -2443,12 +2594,17 @@ bool wxLuaState::Create(lua_State* L, int state_type)
         // Create a table for top level wxWindows
         wxlua_lreg_createtable(L, &wxlua_lreg_topwindows_key);
 
-        // copy Lua's print function in case someone really wants to use it
+        // copy Lua's print function in case someone wants to use it
         lua_pushlstring(L, "print", 5);
         lua_rawget( L, LUA_GLOBALSINDEX );  // pop key, push print function
         lua_pushlstring(L, "print_lua", 9);
         lua_pushvalue(L, -2);               // copy print function
         lua_rawset(L, LUA_GLOBALSINDEX);    // set t[key] = value, pops key and value
+
+        lua_pushlstring(L, "print_lua", 9); // also keep a permanent copy in registry
+        lua_pushvalue(L, -2);               // copy print function
+        lua_rawset(L, LUA_REGISTRYINDEX);   // set t[key] = value, pops key and value
+
         lua_pop(L, 1);                      // pop the print function
 
         // register wxLua's print handler to send events, replaces Lua's print function
@@ -2477,7 +2633,7 @@ bool wxLuaState::Create(lua_State* L, int state_type)
 
 // --------------------------------------------------------------------------
 
-bool wxLuaState::Ok() const
+bool wxLuaState::IsOk() const
 {
     return (m_refData != NULL) && (M_WXLSTATEDATA->m_lua_State != NULL);
 }
@@ -2521,13 +2677,14 @@ wxLuaStateData* wxLuaState::GetLuaStateData() const
     return M_WXLSTATEDATA->m_wxlStateData;
 }
 
-wxLuaState wxLuaState::GetwxLuaState(lua_State* L) // static function
+wxLuaState wxLuaState::GetwxLuaState(lua_State* L, bool get_root_state) // static function
 {
-    // try our hashtable for faster lookup
-    wxHashMapLuaState::iterator it = s_wxHashMapLuaState.find(L);
-    if (it != s_wxHashMapLuaState.end())
+    if (!get_root_state)
     {
-        return wxLuaState(*it->second);
+        // try our hashtable for faster lookup
+        wxHashMapLuaState::iterator it = s_wxHashMapLuaState.find(L);
+        if (it != s_wxHashMapLuaState.end())
+            return wxLuaState(*it->second);
     }
 
     // else it's a coroutine? look up the state data from Lua
@@ -2541,9 +2698,16 @@ wxLuaState wxLuaState::GetwxLuaState(lua_State* L) // static function
     if ( lua_islightuserdata(L, -1) )
         wxlState = (wxLuaState*)lua_touserdata( L, -1 );
 
-    lua_pop(L, 1); // pop the wxLuaStateRefData or nil on failure
+    lua_pop(L, 1); // pop the wxLuaState or nil on failure
 
-    if (wxlState && (wxlState->GetLuaState() != L))
+    if (!wxlState)
+        return wxNullLuaState;
+
+    if (get_root_state || (wxlState->GetLuaState() == L))
+    {
+        return wxLuaState(*wxlState); // Ref it
+    }
+    else
     {
         // Create a new wxLuaState for the coroutine and set the wxLuaStateData
         //  to the original wxLuaState's data
@@ -2558,10 +2722,6 @@ wxLuaState wxLuaState::GetwxLuaState(lua_State* L) // static function
         wxLuaState wxlState2(false);
         wxlState2.SetRefData(refData);
         return wxlState2;
-    }
-    else if (wxlState)
-    {
-        return wxLuaState(*wxlState); // Ref it
     }
 
     return wxNullLuaState;
@@ -2771,10 +2931,10 @@ void wxLuaState::ClearDebugHookBreak()
     wxCHECK_RET(Ok(), wxT("Invalid wxLuaState"));
 
     M_WXLSTATEDATA->m_wxlStateData->m_debug_hook_break = false;
-    SetLuaDebugHook(GetLuaDebugHookCount(),
+    SetLuaDebugHook(GetLuaDebugHook(),
+                    GetLuaDebugHookCount(),
                     GetLuaDebugHookYield(),
-                    GetLuaDebugHookSendEvt(),
-                    GetLuaDebugHook());
+                    GetLuaDebugHookSendEvt());
 }
 
 bool wxLuaState::GetDebugHookBreak() const
@@ -2860,20 +3020,8 @@ bool wxLuaState::RegisterBinding(wxLuaBinding* binding)
 bool wxLuaState::RegisterBindings()
 {
     wxCHECK_MSG(Ok(), false, wxT("Invalid wxLuaState"));
-    wxLuaBinding::InitAllBindings(); // only runs the first time through
 
-    // Register bindings
-    wxLuaBindingList::compatibility_iterator node = wxLuaBinding::GetBindingList()->GetFirst();
-    while (node)
-    {
-        wxLuaBinding* binding = node->GetData();
-        binding->RegisterBinding(*this);
-        lua_Pop(1); // pop the Lua table the binding was installed into
-
-        node = node->GetNext();
-    }
-
-    return true;
+    return wxLuaBinding::RegisterBindings(*this);
 }
 
 wxLuaBinding* wxLuaState::GetLuaBinding(const wxString& bindingName) const
@@ -2911,16 +3059,10 @@ const wxLuaBindClass* wxLuaState::GetBindClass(const wxLuaBindCFunc* wxlClass) c
     return wxLuaBinding::FindBindClass(wxlClass);
 }
 
-int wxLuaState::IsDerivedType(int wxl_type, int base_wxl_type) const
+int wxLuaState::IsDerivedType(int wxl_type, int base_wxl_type, int* baseclass_n) const
 {
     wxCHECK_MSG(Ok(), -1, wxT("Invalid wxLuaState"));
-    return wxluaT_isderivedtype(M_WXLSTATEDATA->m_lua_State, wxl_type, base_wxl_type);
-}
-
-const wxLuaBindEvent* wxLuaState::GetBindEvent(wxEventType eventType) const
-{
-    wxCHECK_MSG(Ok(), NULL, wxT("Invalid wxLuaState"));
-    return wxLuaBinding::FindBindEvent(eventType);
+    return wxluaT_isderivedtype(M_WXLSTATEDATA->m_lua_State, wxl_type, base_wxl_type, baseclass_n);
 }
 
 void wxLuaState::SetCallBaseClassFunction(bool call_base)
@@ -2937,21 +3079,16 @@ bool wxLuaState::GetCallBaseClassFunction()
 // ----------------------------------------------------------------------------
 // memory tracking functions
 
-void wxLuaState::AddGCObject(wxObject *wxobj)
+void wxLuaState::AddGCObject(void* obj_ptr, int wxl_type)
 {
-    AddGCObject(wxobj, wxobj);
+    wxCHECK_RET(Ok() && obj_ptr, wxT("Invalid wxLuaState or wxObject to track"));
+    wxluaO_addgcobject(M_WXLSTATEDATA->m_lua_State, obj_ptr, wxl_type);
 }
 
-void wxLuaState::AddGCObject(void* obj_ptr, wxObject *wxobj)
+bool wxLuaState::DeleteGCObject(int stack_idx, int flags)
 {
-    wxCHECK_RET(Ok() && wxobj, wxT("Invalid wxLuaState or wxObject to track"));
-    wxluaO_addgcobject(M_WXLSTATEDATA->m_lua_State, obj_ptr, wxobj);
-}
-
-bool wxLuaState::DeleteGCObject(void* udata, void *obj_ptr, int flags)
-{
-    wxCHECK_MSG(Ok() && obj_ptr, false, wxT("Invalid wxLuaState or object"));
-    return wxluaO_deletegcobject(M_WXLSTATEDATA->m_lua_State, udata, obj_ptr, flags);
+    wxCHECK_MSG(Ok(), false, wxT("Invalid wxLuaState or object"));
+    return wxluaO_deletegcobject(M_WXLSTATEDATA->m_lua_State, stack_idx, flags);
 }
 
 bool wxLuaState::IsGCObject(void *obj_ptr) const
@@ -3303,7 +3440,7 @@ bool wxLuaState::SetDerivedMethod(void *obj_ptr, const char *method_name, wxLuaO
     return wxlua_setderivedmethod(M_WXLSTATEDATA->m_lua_State, obj_ptr, method_name, wxlObj);
 }
 
-bool wxLuaState::HasDerivedMethod(void *obj_ptr, const char *method_name, bool push_method) const
+bool wxLuaState::HasDerivedMethod(const void *obj_ptr, const char *method_name, bool push_method) const
 {
     wxCHECK_MSG(Ok(), false, wxT("Invalid wxLuaState"));
     return wxlua_hasderivedmethod(M_WXLSTATEDATA->m_lua_State, obj_ptr, method_name, push_method);
@@ -3323,7 +3460,7 @@ wxLuaState wxLuaState::GetDerivedMethodState(void *obj_ptr, const char *method_n
     for (it = wxLuaState::s_wxHashMapLuaState.begin();
          it != wxLuaState::s_wxHashMapLuaState.end(); ++it)
     {
-        wxLuaState wxlState((wxLuaState*)it->second);
+        wxLuaState wxlState(*(wxLuaState*)it->second);
         if (wxlState.HasDerivedMethod(obj_ptr, method_name, false))
             return wxlState;
     }
@@ -3354,7 +3491,7 @@ void wxLuaState::lua_Remove(int index)
     wxCHECK_RET(Ok(), wxT("Invalid wxLuaState"));
     lua_remove(M_WXLSTATEDATA->m_lua_State, index);
 }
-void wxLuaState::lua_Pop(int count)
+void wxLuaState::lua_Pop(int count) const
 {
     wxCHECK_RET(Ok(), wxT("Invalid wxLuaState"));
     lua_pop(M_WXLSTATEDATA->m_lua_State, count);
@@ -4216,7 +4353,7 @@ VARIADIC(bor,  |=)
 VARIADIC(bxor, ^=)
 ARITHMETIC_SHIFT(lshift,  <<)
 LOGICAL_SHIFT(rshift,     >>)
-ARITHMETIC_SHIFT(arshift, >>)
+//ARITHMETIC_SHIFT(arshift, >>) // broken in 64 bit
 
 static const struct luaL_reg bitlib[] = {
   {"cast",    bit_cast},
@@ -4226,7 +4363,7 @@ static const struct luaL_reg bitlib[] = {
   {"bxor",    bit_bxor},
   {"lshift",  bit_lshift},
   {"rshift",  bit_rshift},
-  {"arshift", bit_arshift},
+  //{"arshift", bit_arshift},
 
   {NULL, NULL}
 };

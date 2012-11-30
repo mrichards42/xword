@@ -4,16 +4,16 @@
 // Any changes made to this file will be lost when the file is regenerated.
 // ---------------------------------------------------------------------------
 
+
+#include "wx/wxprec.h"
+
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
 
-#include "wx/wxprec.h"
-
 #ifndef WX_PRECOMP
      #include "wx/wx.h"
 #endif
-
 
 #include "wxlua/include/wxlstate.h"
 #include "wxbind/include/wxstc_bind.h"
@@ -1550,7 +1550,7 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCaretForeground(lua_State *L)
     // allocate a new object using the copy constructor
     wxColour* returns = new wxColour(self->GetCaretForeground());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxColour*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxColour);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxColour);
 
@@ -1572,7 +1572,7 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCaretLineBack(lua_State *L)
     // allocate a new object using the copy constructor
     wxColour* returns = new wxColour(self->GetCaretLineBack());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxColour*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxColour);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxColour);
 
@@ -1594,7 +1594,7 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCaretLineBackground(lua_State *L)
     // allocate a new object using the copy constructor
     wxColour* returns = new wxColour(self->GetCaretLineBackground());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxColour*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxColour);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxColour);
 
@@ -1833,7 +1833,7 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetEdgeColour(lua_State *L)
     // allocate a new object using the copy constructor
     wxColour* returns = new wxColour(self->GetEdgeColour());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxColour*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxColour);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxColour);
 
@@ -3337,7 +3337,7 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorGetForeground(lua_State *L)
     // allocate a new object using the copy constructor
     wxColour* returns = new wxColour(self->IndicatorGetForeground(indic));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxColour*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxColour);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxColour);
 
@@ -4303,7 +4303,7 @@ static int LUACALL wxLua_wxStyledTextCtrl_PointFromPosition(lua_State *L)
     // allocate a new object using the copy constructor
     wxPoint* returns = new wxPoint(self->PointFromPosition(pos));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxPoint((wxPoint*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxPoint);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxPoint);
 
@@ -7391,6 +7391,12 @@ static int LUACALL wxLua_wxStyledTextCtrl_constructor(lua_State *L)
 
 
 
+void wxLua_wxStyledTextCtrl_delete_function(void** p)
+{
+    wxStyledTextCtrl* o = (wxStyledTextCtrl*)(*p);
+    delete o;
+}
+
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxStyledTextCtrl_methods[] = {
     { "AddRefDocument", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_AddRefDocument, 1, NULL },
@@ -8677,7 +8683,7 @@ static int LUACALL wxLua_wxStyledTextEvent_constructor(lua_State *L)
     // call constructor
     wxStyledTextEvent* returns = new wxStyledTextEvent(commandType, id);
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxStyledTextEvent);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxStyledTextEvent);
 
@@ -8685,6 +8691,12 @@ static int LUACALL wxLua_wxStyledTextEvent_constructor(lua_State *L)
 }
 
 
+
+void wxLua_wxStyledTextEvent_delete_function(void** p)
+{
+    wxStyledTextEvent* o = (wxStyledTextEvent*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxStyledTextEvent_methods[] = {
@@ -8764,37 +8776,37 @@ wxLuaBindEvent* wxLuaGetEventList_wxstc(size_t &count)
 {
     static wxLuaBindEvent eventList[] =
     {
-        { "wxEVT_STC_AUTOCOMP_SELECTION", &wxEVT_STC_AUTOCOMP_SELECTION, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_CALLTIP_CLICK", &wxEVT_STC_CALLTIP_CLICK, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_CHANGE", &wxEVT_STC_CHANGE, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_CHARADDED", &wxEVT_STC_CHARADDED, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_DOUBLECLICK", &wxEVT_STC_DOUBLECLICK, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_DO_DROP", &wxEVT_STC_DO_DROP, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_DRAG_OVER", &wxEVT_STC_DRAG_OVER, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_DWELLEND", &wxEVT_STC_DWELLEND, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_DWELLSTART", &wxEVT_STC_DWELLSTART, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_HOTSPOT_CLICK", &wxEVT_STC_HOTSPOT_CLICK, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_HOTSPOT_DCLICK", &wxEVT_STC_HOTSPOT_DCLICK, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_KEY", &wxEVT_STC_KEY, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_MACRORECORD", &wxEVT_STC_MACRORECORD, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_MARGINCLICK", &wxEVT_STC_MARGINCLICK, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_MODIFIED", &wxEVT_STC_MODIFIED, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_NEEDSHOWN", &wxEVT_STC_NEEDSHOWN, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_PAINTED", &wxEVT_STC_PAINTED, &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_AUTOCOMP_SELECTION", WXLUA_GET_wxEventType_ptr(wxEVT_STC_AUTOCOMP_SELECTION), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_CALLTIP_CLICK", WXLUA_GET_wxEventType_ptr(wxEVT_STC_CALLTIP_CLICK), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_CHANGE", WXLUA_GET_wxEventType_ptr(wxEVT_STC_CHANGE), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_CHARADDED", WXLUA_GET_wxEventType_ptr(wxEVT_STC_CHARADDED), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_DOUBLECLICK", WXLUA_GET_wxEventType_ptr(wxEVT_STC_DOUBLECLICK), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_DO_DROP", WXLUA_GET_wxEventType_ptr(wxEVT_STC_DO_DROP), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_DRAG_OVER", WXLUA_GET_wxEventType_ptr(wxEVT_STC_DRAG_OVER), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_DWELLEND", WXLUA_GET_wxEventType_ptr(wxEVT_STC_DWELLEND), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_DWELLSTART", WXLUA_GET_wxEventType_ptr(wxEVT_STC_DWELLSTART), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_HOTSPOT_CLICK", WXLUA_GET_wxEventType_ptr(wxEVT_STC_HOTSPOT_CLICK), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_HOTSPOT_DCLICK", WXLUA_GET_wxEventType_ptr(wxEVT_STC_HOTSPOT_DCLICK), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_KEY", WXLUA_GET_wxEventType_ptr(wxEVT_STC_KEY), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_MACRORECORD", WXLUA_GET_wxEventType_ptr(wxEVT_STC_MACRORECORD), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_MARGINCLICK", WXLUA_GET_wxEventType_ptr(wxEVT_STC_MARGINCLICK), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_MODIFIED", WXLUA_GET_wxEventType_ptr(wxEVT_STC_MODIFIED), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_NEEDSHOWN", WXLUA_GET_wxEventType_ptr(wxEVT_STC_NEEDSHOWN), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_PAINTED", WXLUA_GET_wxEventType_ptr(wxEVT_STC_PAINTED), &wxluatype_wxStyledTextEvent },
 
 #if !wxCHECK_VERSION(2,6,0)
-        { "wxEVT_STC_POSCHANGED", &wxEVT_STC_POSCHANGED, &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_POSCHANGED", WXLUA_GET_wxEventType_ptr(wxEVT_STC_POSCHANGED), &wxluatype_wxStyledTextEvent },
 #endif // !wxCHECK_VERSION(2,6,0)
 
-        { "wxEVT_STC_ROMODIFYATTEMPT", &wxEVT_STC_ROMODIFYATTEMPT, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_SAVEPOINTLEFT", &wxEVT_STC_SAVEPOINTLEFT, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_SAVEPOINTREACHED", &wxEVT_STC_SAVEPOINTREACHED, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_START_DRAG", &wxEVT_STC_START_DRAG, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_STYLENEEDED", &wxEVT_STC_STYLENEEDED, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_UPDATEUI", &wxEVT_STC_UPDATEUI, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_URIDROPPED", &wxEVT_STC_URIDROPPED, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_USERLISTSELECTION", &wxEVT_STC_USERLISTSELECTION, &wxluatype_wxStyledTextEvent },
-        { "wxEVT_STC_ZOOM", &wxEVT_STC_ZOOM, &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_ROMODIFYATTEMPT", WXLUA_GET_wxEventType_ptr(wxEVT_STC_ROMODIFYATTEMPT), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_SAVEPOINTLEFT", WXLUA_GET_wxEventType_ptr(wxEVT_STC_SAVEPOINTLEFT), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_SAVEPOINTREACHED", WXLUA_GET_wxEventType_ptr(wxEVT_STC_SAVEPOINTREACHED), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_START_DRAG", WXLUA_GET_wxEventType_ptr(wxEVT_STC_START_DRAG), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_STYLENEEDED", WXLUA_GET_wxEventType_ptr(wxEVT_STC_STYLENEEDED), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_UPDATEUI", WXLUA_GET_wxEventType_ptr(wxEVT_STC_UPDATEUI), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_URIDROPPED", WXLUA_GET_wxEventType_ptr(wxEVT_STC_URIDROPPED), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_USERLISTSELECTION", WXLUA_GET_wxEventType_ptr(wxEVT_STC_USERLISTSELECTION), &wxluatype_wxStyledTextEvent },
+        { "wxEVT_STC_ZOOM", WXLUA_GET_wxEventType_ptr(wxEVT_STC_ZOOM), &wxluatype_wxStyledTextEvent },
 
         { 0, 0, 0 },
     };
@@ -9184,7 +9196,11 @@ wxLuaBindNumber* wxLuaGetDefineList_wxstc(size_t &count)
         { "wxSTC_ERLANG_NUMBER", wxSTC_ERLANG_NUMBER },
         { "wxSTC_ERLANG_OPERATOR", wxSTC_ERLANG_OPERATOR },
         { "wxSTC_ERLANG_RECORD", wxSTC_ERLANG_RECORD },
+
+#if !wxCHECK_VERSION(2,9,2)
         { "wxSTC_ERLANG_SEPARATOR", wxSTC_ERLANG_SEPARATOR },
+#endif // !wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_ERLANG_STRING", wxSTC_ERLANG_STRING },
         { "wxSTC_ERLANG_UNKNOWN", wxSTC_ERLANG_UNKNOWN },
         { "wxSTC_ERLANG_VARIABLE", wxSTC_ERLANG_VARIABLE },
@@ -9226,19 +9242,31 @@ wxLuaBindNumber* wxLuaGetDefineList_wxstc(size_t &count)
         { "wxSTC_FIND_REGEXP", wxSTC_FIND_REGEXP },
         { "wxSTC_FIND_WHOLEWORD", wxSTC_FIND_WHOLEWORD },
         { "wxSTC_FIND_WORDSTART", wxSTC_FIND_WORDSTART },
+
+#if !wxCHECK_VERSION(2,9,2)
         { "wxSTC_FOLDFLAG_BOX", wxSTC_FOLDFLAG_BOX },
+#endif // !wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_FOLDFLAG_LEVELNUMBERS", wxSTC_FOLDFLAG_LEVELNUMBERS },
         { "wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED", wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED },
         { "wxSTC_FOLDFLAG_LINEAFTER_EXPANDED", wxSTC_FOLDFLAG_LINEAFTER_EXPANDED },
         { "wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED", wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED },
         { "wxSTC_FOLDFLAG_LINEBEFORE_EXPANDED", wxSTC_FOLDFLAG_LINEBEFORE_EXPANDED },
         { "wxSTC_FOLDLEVELBASE", wxSTC_FOLDLEVELBASE },
+
+#if !wxCHECK_VERSION(2,9,2)
         { "wxSTC_FOLDLEVELBOXFOOTERFLAG", wxSTC_FOLDLEVELBOXFOOTERFLAG },
         { "wxSTC_FOLDLEVELBOXHEADERFLAG", wxSTC_FOLDLEVELBOXHEADERFLAG },
         { "wxSTC_FOLDLEVELCONTRACTED", wxSTC_FOLDLEVELCONTRACTED },
+#endif // !wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_FOLDLEVELHEADERFLAG", wxSTC_FOLDLEVELHEADERFLAG },
         { "wxSTC_FOLDLEVELNUMBERMASK", wxSTC_FOLDLEVELNUMBERMASK },
+
+#if !wxCHECK_VERSION(2,9,2)
         { "wxSTC_FOLDLEVELUNINDENT", wxSTC_FOLDLEVELUNINDENT },
+#endif // !wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_FOLDLEVELWHITEFLAG", wxSTC_FOLDLEVELWHITEFLAG },
         { "wxSTC_FORTH_COMMENT", wxSTC_FORTH_COMMENT },
         { "wxSTC_FORTH_COMMENT_ML", wxSTC_FORTH_COMMENT_ML },
@@ -9620,8 +9648,24 @@ wxLuaBindNumber* wxLuaGetDefineList_wxstc(size_t &count)
         { "wxSTC_MAKE_OPERATOR", wxSTC_MAKE_OPERATOR },
         { "wxSTC_MAKE_PREPROCESSOR", wxSTC_MAKE_PREPROCESSOR },
         { "wxSTC_MAKE_TARGET", wxSTC_MAKE_TARGET },
+
+#if wxCHECK_VERSION(2,9,2)
+        { "wxSTC_MARGIN_BACK", wxSTC_MARGIN_BACK },
+        { "wxSTC_MARGIN_FORE", wxSTC_MARGIN_FORE },
+#endif // wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_MARGIN_NUMBER", wxSTC_MARGIN_NUMBER },
+
+#if wxCHECK_VERSION(2,9,2)
+        { "wxSTC_MARGIN_RTEXT", wxSTC_MARGIN_RTEXT },
+#endif // wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_MARGIN_SYMBOL", wxSTC_MARGIN_SYMBOL },
+
+#if wxCHECK_VERSION(2,9,2)
+        { "wxSTC_MARGIN_TEXT", wxSTC_MARGIN_TEXT },
+#endif // wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_MARKER_MAX", wxSTC_MARKER_MAX },
         { "wxSTC_MARKNUM_FOLDER", wxSTC_MARKNUM_FOLDER },
         { "wxSTC_MARKNUM_FOLDEREND", wxSTC_MARKNUM_FOLDEREND },
@@ -9633,6 +9677,11 @@ wxLuaBindNumber* wxLuaGetDefineList_wxstc(size_t &count)
         { "wxSTC_MARK_ARROW", wxSTC_MARK_ARROW },
         { "wxSTC_MARK_ARROWDOWN", wxSTC_MARK_ARROWDOWN },
         { "wxSTC_MARK_ARROWS", wxSTC_MARK_ARROWS },
+
+#if wxCHECK_VERSION(2,9,2)
+        { "wxSTC_MARK_AVAILABLE", wxSTC_MARK_AVAILABLE },
+#endif // wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_MARK_BACKGROUND", wxSTC_MARK_BACKGROUND },
         { "wxSTC_MARK_BOXMINUS", wxSTC_MARK_BOXMINUS },
         { "wxSTC_MARK_BOXMINUSCONNECTED", wxSTC_MARK_BOXMINUSCONNECTED },
@@ -9649,6 +9698,11 @@ wxLuaBindNumber* wxLuaGetDefineList_wxstc(size_t &count)
         { "wxSTC_MARK_FULLRECT", wxSTC_MARK_FULLRECT },
         { "wxSTC_MARK_LCORNER", wxSTC_MARK_LCORNER },
         { "wxSTC_MARK_LCORNERCURVE", wxSTC_MARK_LCORNERCURVE },
+
+#if wxCHECK_VERSION(2,9,2)
+        { "wxSTC_MARK_LEFTRECT", wxSTC_MARK_LEFTRECT },
+#endif // wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_MARK_MINUS", wxSTC_MARK_MINUS },
         { "wxSTC_MARK_PIXMAP", wxSTC_MARK_PIXMAP },
         { "wxSTC_MARK_PLUS", wxSTC_MARK_PLUS },
@@ -9657,6 +9711,11 @@ wxLuaBindNumber* wxLuaGetDefineList_wxstc(size_t &count)
         { "wxSTC_MARK_SMALLRECT", wxSTC_MARK_SMALLRECT },
         { "wxSTC_MARK_TCORNER", wxSTC_MARK_TCORNER },
         { "wxSTC_MARK_TCORNERCURVE", wxSTC_MARK_TCORNERCURVE },
+
+#if wxCHECK_VERSION(2,9,2)
+        { "wxSTC_MARK_UNDERLINE", wxSTC_MARK_UNDERLINE },
+#endif // wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_MARK_VLINE", wxSTC_MARK_VLINE },
         { "wxSTC_MASK_FOLDERS", wxSTC_MASK_FOLDERS },
         { "wxSTC_MATLAB_COMMAND", wxSTC_MATLAB_COMMAND },
@@ -10064,6 +10123,11 @@ wxLuaBindNumber* wxLuaGetDefineList_wxstc(size_t &count)
         { "wxSTC_START", wxSTC_START },
         { "wxSTC_STYLE_BRACEBAD", wxSTC_STYLE_BRACEBAD },
         { "wxSTC_STYLE_BRACELIGHT", wxSTC_STYLE_BRACELIGHT },
+
+#if wxCHECK_VERSION(2,9,2)
+        { "wxSTC_STYLE_CALLTIP", wxSTC_STYLE_CALLTIP },
+#endif // wxCHECK_VERSION(2,9,2)
+
         { "wxSTC_STYLE_CONTROLCHAR", wxSTC_STYLE_CONTROLCHAR },
         { "wxSTC_STYLE_DEFAULT", wxSTC_STYLE_DEFAULT },
         { "wxSTC_STYLE_INDENTGUIDE", wxSTC_STYLE_INDENTGUIDE },
@@ -10244,8 +10308,10 @@ static wxLuaBindClass* wxluabaseclassbinds_wxStyledTextEvent[] = { NULL };
 
 extern wxLuaBindMethod wxStyledTextCtrl_methods[];
 extern int wxStyledTextCtrl_methodCount;
+extern void wxLua_wxStyledTextCtrl_delete_function(void** p);
 extern wxLuaBindMethod wxStyledTextEvent_methods[];
 extern int wxStyledTextEvent_methodCount;
+extern void wxLua_wxStyledTextEvent_delete_function(void** p);
 
 
 
@@ -10254,8 +10320,8 @@ wxLuaBindClass* wxLuaGetClassList_wxstc(size_t &count)
 {
     static wxLuaBindClass classList[] =
     {
-        { wxluaclassname_wxStyledTextCtrl, wxStyledTextCtrl_methods, wxStyledTextCtrl_methodCount, CLASSINFO(wxStyledTextCtrl), &wxluatype_wxStyledTextCtrl, wxluabaseclassnames_wxStyledTextCtrl, wxluabaseclassbinds_wxStyledTextCtrl, g_wxluanumberArray_None, 0, }, 
-        { wxluaclassname_wxStyledTextEvent, wxStyledTextEvent_methods, wxStyledTextEvent_methodCount, CLASSINFO(wxStyledTextEvent), &wxluatype_wxStyledTextEvent, wxluabaseclassnames_wxStyledTextEvent, wxluabaseclassbinds_wxStyledTextEvent, g_wxluanumberArray_None, 0, }, 
+        { wxluaclassname_wxStyledTextCtrl, wxStyledTextCtrl_methods, wxStyledTextCtrl_methodCount, CLASSINFO(wxStyledTextCtrl), &wxluatype_wxStyledTextCtrl, wxluabaseclassnames_wxStyledTextCtrl, wxluabaseclassbinds_wxStyledTextCtrl, NULL, NULL, NULL, 0, &wxLua_wxStyledTextCtrl_delete_function, }, 
+        { wxluaclassname_wxStyledTextEvent, wxStyledTextEvent_methods, wxStyledTextEvent_methodCount, CLASSINFO(wxStyledTextEvent), &wxluatype_wxStyledTextEvent, wxluabaseclassnames_wxStyledTextEvent, wxluabaseclassbinds_wxStyledTextEvent, NULL, NULL, NULL, 0, &wxLua_wxStyledTextEvent_delete_function, }, 
 
         { 0, 0, 0, 0, 0, 0, 0 }, 
     };
@@ -10280,19 +10346,21 @@ wxLuaBinding_wxstc::wxLuaBinding_wxstc() : wxLuaBinding()
     m_eventArray    = wxLuaGetEventList_wxstc(m_eventCount);
     m_objectArray   = wxLuaGetObjectList_wxstc(m_objectCount);
     m_functionArray = wxLuaGetFunctionList_wxstc(m_functionCount);
+    InitBinding();
 }
 
 
 
 // ---------------------------------------------------------------------------
 
-bool wxLuaBinding_wxstc_init()
+wxLuaBinding* wxLuaBinding_wxstc_init()
 {
     static wxLuaBinding_wxstc m_binding;
-    if (wxLuaBinding::GetBindingList()->Find(&m_binding)) return false;
 
-    wxLuaBinding::GetBindingList()->Append(&m_binding);
-    return true;
+    if (wxLuaBinding::GetBindingArray().Index(&m_binding) == wxNOT_FOUND)
+        wxLuaBinding::GetBindingArray().Add(&m_binding);
+
+    return &m_binding;
 }
 
 

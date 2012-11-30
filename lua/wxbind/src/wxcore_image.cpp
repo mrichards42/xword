@@ -4,16 +4,16 @@
 // Any changes made to this file will be lost when the file is regenerated.
 // ---------------------------------------------------------------------------
 
+
+#include "wx/wxprec.h"
+
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
 
-#include "wx/wxprec.h"
-
 #ifndef WX_PRECOMP
      #include "wx/wx.h"
 #endif
-
 
 #include "wxlua/include/wxlstate.h"
 #include "wxbind/include/wxcore_bind.h"
@@ -65,7 +65,7 @@ static int LUACALL wxLua_wxImage_Blur(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->Blur(radius));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -86,7 +86,7 @@ static int LUACALL wxLua_wxImage_BlurHorizontal(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->BlurHorizontal(radius));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -107,7 +107,7 @@ static int LUACALL wxLua_wxImage_BlurVertical(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->BlurVertical(radius));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -167,7 +167,7 @@ static int LUACALL wxLua_wxImage_ConvertToGreyscale(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->ConvertToGreyscale(lr, lg, lb));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -194,7 +194,7 @@ static int LUACALL wxLua_wxImage_ConvertToMono(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->ConvertToMono(r, g, b));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -213,7 +213,7 @@ static int LUACALL wxLua_wxImage_Copy(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->Copy());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -438,7 +438,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxImage_GetHandlers[1] = {{ wxLua_wxImag
 static int LUACALL wxLua_wxImage_GetHandlers(lua_State *L)
 {
     // call GetHandlers
-    wxList* returns = &wxImage::GetHandlers();
+    wxList* returns = (wxList*)&wxImage::GetHandlers();
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxList);
 
@@ -465,16 +465,16 @@ static int LUACALL wxLua_wxImage_GetHeight(lua_State *L)
 
 
 #if (wxUSE_STREAMS) && (wxLUA_USE_wxImage && wxUSE_IMAGE)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_GetImageCount1[] = { &wxluatype_wxInputStream, &wxluatype_TNUMBER, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_GetImageCount1[] = { &wxluatype_wxInputStream, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxImage_GetImageCount1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxImage_GetImageCount1[1] = {{ wxLua_wxImage_GetImageCount1, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 2, s_wxluatypeArray_wxLua_wxImage_GetImageCount1 }};
-//     static int GetImageCount(wxInputStream& stream, long type = wxBITMAP_TYPE_ANY)
+//     static int GetImageCount(wxInputStream& stream, wxBitmapType type = wxBITMAP_TYPE_ANY)
 static int LUACALL wxLua_wxImage_GetImageCount1(lua_State *L)
 {
     // get number of arguments
     int argCount = lua_gettop(L);
-    // long type = wxBITMAP_TYPE_ANY
-    long type = (argCount >= 2 ? (long)wxlua_getnumbertype(L, 2) : wxBITMAP_TYPE_ANY);
+    // wxBitmapType type = wxBITMAP_TYPE_ANY
+    wxBitmapType type = (argCount >= 2 ? (wxBitmapType)wxlua_getenumtype(L, 2) : wxBITMAP_TYPE_ANY);
     // wxInputStream stream
     wxInputStream * stream = (wxInputStream *)wxluaT_getuserdatatype(L, 1, wxluatype_wxInputStream);
     // call GetImageCount
@@ -487,16 +487,16 @@ static int LUACALL wxLua_wxImage_GetImageCount1(lua_State *L)
 
 #endif // (wxUSE_STREAMS) && (wxLUA_USE_wxImage && wxUSE_IMAGE)
 
-static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_GetImageCount[] = { &wxluatype_TSTRING, &wxluatype_TNUMBER, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_GetImageCount[] = { &wxluatype_TSTRING, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxImage_GetImageCount(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxImage_GetImageCount[1] = {{ wxLua_wxImage_GetImageCount, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 2, s_wxluatypeArray_wxLua_wxImage_GetImageCount }};
-//     static int GetImageCount(const wxString& filename, long type = wxBITMAP_TYPE_ANY)
+//     static int GetImageCount(const wxString& filename, wxBitmapType type = wxBITMAP_TYPE_ANY)
 static int LUACALL wxLua_wxImage_GetImageCount(lua_State *L)
 {
     // get number of arguments
     int argCount = lua_gettop(L);
-    // long type = wxBITMAP_TYPE_ANY
-    long type = (argCount >= 2 ? (long)wxlua_getnumbertype(L, 2) : wxBITMAP_TYPE_ANY);
+    // wxBitmapType type = wxBITMAP_TYPE_ANY
+    wxBitmapType type = (argCount >= 2 ? (wxBitmapType)wxlua_getenumtype(L, 2) : wxBITMAP_TYPE_ANY);
     // const wxString filename
     const wxString filename = wxlua_getwxStringtype(L, 1);
     // call GetImageCount
@@ -640,7 +640,7 @@ static int LUACALL wxLua_wxImage_GetPalette(lua_State *L)
     // allocate a new object using the copy constructor
     wxPalette* returns = new wxPalette(self->GetPalette());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxPalette*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxPalette);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxPalette);
 
@@ -685,7 +685,7 @@ static int LUACALL wxLua_wxImage_GetSubImage(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->GetSubImage(*rect));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -874,18 +874,18 @@ static int LUACALL wxLua_wxImage_LoadFile3(lua_State *L)
     return 1;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_LoadFile2[] = { &wxluatype_wxImage, &wxluatype_wxInputStream, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_LoadFile2[] = { &wxluatype_wxImage, &wxluatype_wxInputStream, &wxluatype_TINTEGER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxImage_LoadFile2(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxImage_LoadFile2[1] = {{ wxLua_wxImage_LoadFile2, WXLUAMETHOD_METHOD, 2, 4, s_wxluatypeArray_wxLua_wxImage_LoadFile2 }};
-//     bool LoadFile(wxInputStream& stream, long type = wxBITMAP_TYPE_ANY, int index = -1)
+//     bool LoadFile(wxInputStream& stream, wxBitmapType type = wxBITMAP_TYPE_ANY, int index = -1)
 static int LUACALL wxLua_wxImage_LoadFile2(lua_State *L)
 {
     // get number of arguments
     int argCount = lua_gettop(L);
     // int index = -1
     int index = (argCount >= 4 ? (int)wxlua_getnumbertype(L, 4) : -1);
-    // long type = wxBITMAP_TYPE_ANY
-    long type = (argCount >= 3 ? (long)wxlua_getnumbertype(L, 3) : wxBITMAP_TYPE_ANY);
+    // wxBitmapType type = wxBITMAP_TYPE_ANY
+    wxBitmapType type = (argCount >= 3 ? (wxBitmapType)wxlua_getenumtype(L, 3) : wxBITMAP_TYPE_ANY);
     // wxInputStream stream
     wxInputStream * stream = (wxInputStream *)wxluaT_getuserdatatype(L, 2, wxluatype_wxInputStream);
     // get this
@@ -924,18 +924,18 @@ static int LUACALL wxLua_wxImage_LoadFile1(lua_State *L)
     return 1;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_LoadFile[] = { &wxluatype_wxImage, &wxluatype_TSTRING, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_LoadFile[] = { &wxluatype_wxImage, &wxluatype_TSTRING, &wxluatype_TINTEGER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxImage_LoadFile(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxImage_LoadFile[1] = {{ wxLua_wxImage_LoadFile, WXLUAMETHOD_METHOD, 2, 4, s_wxluatypeArray_wxLua_wxImage_LoadFile }};
-//     bool LoadFile(const wxString& name, long type = wxBITMAP_TYPE_ANY, int index = -1)
+//     bool LoadFile(const wxString& name, wxBitmapType type = wxBITMAP_TYPE_ANY, int index = -1)
 static int LUACALL wxLua_wxImage_LoadFile(lua_State *L)
 {
     // get number of arguments
     int argCount = lua_gettop(L);
     // int index = -1
     int index = (argCount >= 4 ? (int)wxlua_getnumbertype(L, 4) : -1);
-    // long type = wxBITMAP_TYPE_ANY
-    long type = (argCount >= 3 ? (long)wxlua_getnumbertype(L, 3) : wxBITMAP_TYPE_ANY);
+    // wxBitmapType type = wxBITMAP_TYPE_ANY
+    wxBitmapType type = (argCount >= 3 ? (wxBitmapType)wxlua_getenumtype(L, 3) : wxBITMAP_TYPE_ANY);
     // const wxString name
     const wxString name = wxlua_getwxStringtype(L, 2);
     // get this
@@ -964,7 +964,7 @@ static int LUACALL wxLua_wxImage_Mirror(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->Mirror(horizontally));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1071,7 +1071,7 @@ static int LUACALL wxLua_wxImage_ResampleBicubic(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->ResampleBicubic(width, height));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1094,23 +1094,23 @@ static int LUACALL wxLua_wxImage_ResampleBox(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->ResampleBox(width, height));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
     return 1;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_Rescale1[] = { &wxluatype_wxImage, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_Rescale1[] = { &wxluatype_wxImage, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxImage_Rescale1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxImage_Rescale1[1] = {{ wxLua_wxImage_Rescale1, WXLUAMETHOD_METHOD, 3, 4, s_wxluatypeArray_wxLua_wxImage_Rescale1 }};
-//     %wxchkver_2_8 wxImage& Rescale( int width, int height, int quality = wxIMAGE_QUALITY_NORMAL )
+//     %wxchkver_2_8 wxImage& Rescale( int width, int height, wxImageResizeQuality quality = wxIMAGE_QUALITY_NORMAL )
 static int LUACALL wxLua_wxImage_Rescale1(lua_State *L)
 {
     // get number of arguments
     int argCount = lua_gettop(L);
-    // int quality = wxIMAGE_QUALITY_NORMAL
-    int quality = (argCount >= 4 ? (int)wxlua_getnumbertype(L, 4) : wxIMAGE_QUALITY_NORMAL);
+    // wxImageResizeQuality quality = wxIMAGE_QUALITY_NORMAL
+    wxImageResizeQuality quality = (argCount >= 4 ? (wxImageResizeQuality)wxlua_getenumtype(L, 4) : wxIMAGE_QUALITY_NORMAL);
     // int height
     int height = (int)wxlua_getnumbertype(L, 3);
     // int width
@@ -1118,7 +1118,7 @@ static int LUACALL wxLua_wxImage_Rescale1(lua_State *L)
     // get this
     wxImage * self = (wxImage *)wxluaT_getuserdatatype(L, 1, wxluatype_wxImage);
     // call Rescale
-    wxImage* returns = &self->Rescale(width, height, quality);
+    wxImage* returns = (wxImage*)&self->Rescale(width, height, quality);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1141,7 +1141,7 @@ static int LUACALL wxLua_wxImage_Rescale(lua_State *L)
     // get this
     wxImage * self = (wxImage *)wxluaT_getuserdatatype(L, 1, wxluatype_wxImage);
     // call Rescale
-    wxImage* returns = &self->Rescale(width, height);
+    wxImage* returns = (wxImage*)&self->Rescale(width, height);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1172,7 +1172,7 @@ static int LUACALL wxLua_wxImage_Resize(lua_State *L)
     // get this
     wxImage * self = (wxImage *)wxluaT_getuserdatatype(L, 1, wxluatype_wxImage);
     // call Resize
-    wxImage* returns = &self->Resize(*size, *pos, red, green, blue);
+    wxImage* returns = (wxImage*)&self->Resize(*size, *pos, red, green, blue);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1201,7 +1201,7 @@ static int LUACALL wxLua_wxImage_Rotate(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->Rotate(angle, *rotationCentre, interpolating, offsetAfterRotation));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1226,7 +1226,7 @@ static int LUACALL wxLua_wxImage_Rotate90(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->Rotate90(clockwise));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1309,16 +1309,16 @@ static int LUACALL wxLua_wxImage_SaveFile(lua_State *L)
 
 
 #if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxImage && wxUSE_IMAGE)) && (wxLUA_USE_wxImage && wxUSE_IMAGE)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_Scale1[] = { &wxluatype_wxImage, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_wxImage_Scale1[] = { &wxluatype_wxImage, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxImage_Scale1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxImage_Scale1[1] = {{ wxLua_wxImage_Scale1, WXLUAMETHOD_METHOD, 3, 4, s_wxluatypeArray_wxLua_wxImage_Scale1 }};
-//     %wxchkver_2_8 wxImage Scale( int width, int height, int quality = wxIMAGE_QUALITY_NORMAL ) const
+//     %wxchkver_2_8 wxImage Scale( int width, int height, wxImageResizeQuality quality = wxIMAGE_QUALITY_NORMAL ) const
 static int LUACALL wxLua_wxImage_Scale1(lua_State *L)
 {
     // get number of arguments
     int argCount = lua_gettop(L);
-    // int quality = wxIMAGE_QUALITY_NORMAL
-    int quality = (argCount >= 4 ? (int)wxlua_getnumbertype(L, 4) : wxIMAGE_QUALITY_NORMAL);
+    // wxImageResizeQuality quality = wxIMAGE_QUALITY_NORMAL
+    wxImageResizeQuality quality = (argCount >= 4 ? (wxImageResizeQuality)wxlua_getenumtype(L, 4) : wxIMAGE_QUALITY_NORMAL);
     // int height
     int height = (int)wxlua_getnumbertype(L, 3);
     // int width
@@ -1329,7 +1329,7 @@ static int LUACALL wxLua_wxImage_Scale1(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->Scale(width, height, quality));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1355,7 +1355,7 @@ static int LUACALL wxLua_wxImage_Scale(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->Scale(width, height));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1625,7 +1625,7 @@ static int LUACALL wxLua_wxImage_Size(lua_State *L)
     // allocate a new object using the copy constructor
     wxImage* returns = new wxImage(self->Size(*size, *pos, red, green, blue));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxImage*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1671,7 +1671,7 @@ static int LUACALL wxLua_wxImageFromBitmap_constructor(lua_State *L)
     // call constructor
     wxImage *returns = new wxImage(bitmap->ConvertToImage());
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
     // return the number of parameters
@@ -1702,7 +1702,7 @@ static int LUACALL wxLua_wxImageFromData_constructor(lua_State *L)
     // call constructor
     wxImage *returns = new wxImage(width, height, data, static_data);
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
     // return the number of parameters
@@ -1725,7 +1725,7 @@ static int LUACALL wxLua_wxImage_constructor3(lua_State *L)
     // call constructor
     wxImage* returns = new wxImage(name, type);
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1749,7 +1749,7 @@ static int LUACALL wxLua_wxImage_constructor2(lua_State *L)
     // call constructor
     wxImage* returns = new wxImage(width, height, clear);
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1767,7 +1767,7 @@ static int LUACALL wxLua_wxImage_constructor1(lua_State *L)
     // call constructor
     wxImage* returns = new wxImage(*image);
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1782,7 +1782,7 @@ static int LUACALL wxLua_wxImage_constructor(lua_State *L)
     // call constructor
     wxImage* returns = new wxImage();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxImage);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImage);
 
@@ -1930,6 +1930,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxImage_constructor_overload[] =
 static int s_wxluafunc_wxLua_wxImage_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxImage_constructor_overload)/sizeof(wxLuaBindCFunc);
 
 #endif // ((wxLUA_USE_wxBitmap) && (wxLUA_USE_wxImage && wxUSE_IMAGE))||(wxLUA_USE_wxImage && wxUSE_IMAGE)
+
+void wxLua_wxImage_delete_function(void** p)
+{
+    wxImage* o = (wxImage*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxImage_methods[] = {
@@ -2154,7 +2160,7 @@ static int LUACALL wxLua_wxImageHistogramEntry_constructor(lua_State *L)
     // call constructor
     wxImageHistogramEntry* returns = new wxImageHistogramEntry();
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxImageHistogramEntry((wxImageHistogramEntry*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxImageHistogramEntry);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImageHistogramEntry);
 
@@ -2163,6 +2169,12 @@ static int LUACALL wxLua_wxImageHistogramEntry_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxImageHistogramEntry_delete_function(void** p)
+{
+    wxImageHistogramEntry* o = (wxImageHistogramEntry*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxImageHistogramEntry_methods[] = {
@@ -2287,21 +2299,25 @@ static int LUACALL wxLua_wxImageHistogram_iterator_op_eq(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxImageHistogram_iterator_op_inc[] = { &wxluatype_wxImageHistogram_iterator, NULL };
 static int LUACALL wxLua_wxImageHistogram_iterator_op_inc(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxImageHistogram_iterator_op_inc[1] = {{ wxLua_wxImageHistogram_iterator_op_inc, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxImageHistogram_iterator_op_inc }};
-//     %operator wxImageHistogram::iterator& operator++()
+//     %operator void operator++() // it's best if we don't return the iterator
 static int LUACALL wxLua_wxImageHistogram_iterator_op_inc(lua_State *L)
 {
     // get this
     wxImageHistogram::iterator * self = (wxImageHistogram::iterator *)wxluaT_getuserdatatype(L, 1, wxluatype_wxImageHistogram_iterator);
     // call op_inc
-    wxImageHistogram::iterator* returns = &((*self)++);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_wxImageHistogram_iterator);
+    (*self)++;
 
-    return 1;
+    return 0;
 }
 
 
 
+
+void wxLua_wxImageHistogram_iterator_delete_function(void** p)
+{
+    wxImageHistogram::iterator* o = (wxImageHistogram::iterator*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxImageHistogram_iterator_methods[] = {
@@ -2356,16 +2372,16 @@ static int LUACALL wxLua_wxImageHistogram_MakeKey(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxImageHistogram_begin[] = { &wxluatype_wxImageHistogram, NULL };
 static int LUACALL wxLua_wxImageHistogram_begin(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxImageHistogram_begin[1] = {{ wxLua_wxImageHistogram_begin, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxImageHistogram_begin }};
-//     const wxImageHistogram::iterator begin() const
+//     wxImageHistogram::iterator begin() const // not const iterator since we create a new copy of it
 static int LUACALL wxLua_wxImageHistogram_begin(lua_State *L)
 {
     // get this
     wxImageHistogram * self = (wxImageHistogram *)wxluaT_getuserdatatype(L, 1, wxluatype_wxImageHistogram);
     // call begin
     // allocate a new object using the copy constructor
-    const wxImageHistogram::iterator* returns = new wxImageHistogram::iterator(self->begin());
+    wxImageHistogram::iterator* returns = new wxImageHistogram::iterator(self->begin());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxImageHistogram_iterator((wxImageHistogram::iterator*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxImageHistogram_iterator);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImageHistogram_iterator);
 
@@ -2426,16 +2442,16 @@ static int LUACALL wxLua_wxImageHistogram_empty(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxImageHistogram_end[] = { &wxluatype_wxImageHistogram, NULL };
 static int LUACALL wxLua_wxImageHistogram_end(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxImageHistogram_end[1] = {{ wxLua_wxImageHistogram_end, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxImageHistogram_end }};
-//     const wxImageHistogram::iterator end() const
+//     wxImageHistogram::iterator end() const // not const iterator since we create a new copy of it
 static int LUACALL wxLua_wxImageHistogram_end(lua_State *L)
 {
     // get this
     wxImageHistogram * self = (wxImageHistogram *)wxluaT_getuserdatatype(L, 1, wxluatype_wxImageHistogram);
     // call end
     // allocate a new object using the copy constructor
-    const wxImageHistogram::iterator* returns = new wxImageHistogram::iterator(self->end());
+    wxImageHistogram::iterator* returns = new wxImageHistogram::iterator(self->end());
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxImageHistogram_iterator((wxImageHistogram::iterator*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxImageHistogram_iterator);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImageHistogram_iterator);
 
@@ -2474,7 +2490,7 @@ static int LUACALL wxLua_wxImageHistogram_find(lua_State *L)
     // allocate a new object using the copy constructor
     wxImageHistogram::iterator* returns = new wxImageHistogram::iterator(self->find(key));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxImageHistogram_iterator((wxImageHistogram::iterator*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxImageHistogram_iterator);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImageHistogram_iterator);
 
@@ -2505,7 +2521,7 @@ static int LUACALL wxLua_wxImageHistogram_constructor(lua_State *L)
     // call constructor
     wxImageHistogram* returns = new wxImageHistogram();
     // add to tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxImageHistogram((wxImageHistogram*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxImageHistogram);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxImageHistogram);
 
@@ -2514,6 +2530,12 @@ static int LUACALL wxLua_wxImageHistogram_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxImageHistogram_delete_function(void** p)
+{
+    wxImageHistogram* o = (wxImageHistogram*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxImageHistogram_methods[] = {
@@ -2573,6 +2595,12 @@ static int LUACALL wxLua_wxQuantize_Quantize(lua_State *L)
 
 
 
+
+void wxLua_wxQuantize_delete_function(void** p)
+{
+    wxQuantize* o = (wxQuantize*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxQuantize_methods[] = {
@@ -2800,6 +2828,12 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxImageHandler_delete[1] = {{ wxlua_user
 
 
 
+void wxLua_wxImageHandler_delete_function(void** p)
+{
+    wxImageHandler* o = (wxImageHandler*)(*p);
+    delete o;
+}
+
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxImageHandler_methods[] = {
     { "GetExtension", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxImageHandler_GetExtension, 1, NULL },
@@ -2850,7 +2884,7 @@ static int LUACALL wxLua_wxBMPHandler_constructor(lua_State *L)
     // call constructor
     wxBMPHandler* returns = new wxBMPHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxBMPHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxBMPHandler);
 
@@ -2859,6 +2893,12 @@ static int LUACALL wxLua_wxBMPHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxBMPHandler_delete_function(void** p)
+{
+    wxBMPHandler* o = (wxBMPHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxBMPHandler_methods[] = {
@@ -2892,7 +2932,7 @@ static int LUACALL wxLua_wxICOHandler_constructor(lua_State *L)
     // call constructor
     wxICOHandler* returns = new wxICOHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxICOHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxICOHandler);
 
@@ -2901,6 +2941,12 @@ static int LUACALL wxLua_wxICOHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxICOHandler_delete_function(void** p)
+{
+    wxICOHandler* o = (wxICOHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxICOHandler_methods[] = {
@@ -2934,7 +2980,7 @@ static int LUACALL wxLua_wxCURHandler_constructor(lua_State *L)
     // call constructor
     wxCURHandler* returns = new wxCURHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxCURHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxCURHandler);
 
@@ -2943,6 +2989,12 @@ static int LUACALL wxLua_wxCURHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxCURHandler_delete_function(void** p)
+{
+    wxCURHandler* o = (wxCURHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxCURHandler_methods[] = {
@@ -2976,7 +3028,7 @@ static int LUACALL wxLua_wxANIHandler_constructor(lua_State *L)
     // call constructor
     wxANIHandler* returns = new wxANIHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxANIHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxANIHandler);
 
@@ -2985,6 +3037,12 @@ static int LUACALL wxLua_wxANIHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxANIHandler_delete_function(void** p)
+{
+    wxANIHandler* o = (wxANIHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxANIHandler_methods[] = {
@@ -3018,7 +3076,7 @@ static int LUACALL wxLua_wxIFFHandler_constructor(lua_State *L)
     // call constructor
     wxIFFHandler* returns = new wxIFFHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxIFFHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxIFFHandler);
 
@@ -3027,6 +3085,12 @@ static int LUACALL wxLua_wxIFFHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxIFFHandler_delete_function(void** p)
+{
+    wxIFFHandler* o = (wxIFFHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxIFFHandler_methods[] = {
@@ -3060,7 +3124,7 @@ static int LUACALL wxLua_wxGIFHandler_constructor(lua_State *L)
     // call constructor
     wxGIFHandler* returns = new wxGIFHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxGIFHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxGIFHandler);
 
@@ -3069,6 +3133,12 @@ static int LUACALL wxLua_wxGIFHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxGIFHandler_delete_function(void** p)
+{
+    wxGIFHandler* o = (wxGIFHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxGIFHandler_methods[] = {
@@ -3102,7 +3172,7 @@ static int LUACALL wxLua_wxJPEGHandler_constructor(lua_State *L)
     // call constructor
     wxJPEGHandler* returns = new wxJPEGHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxJPEGHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxJPEGHandler);
 
@@ -3111,6 +3181,12 @@ static int LUACALL wxLua_wxJPEGHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxJPEGHandler_delete_function(void** p)
+{
+    wxJPEGHandler* o = (wxJPEGHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxJPEGHandler_methods[] = {
@@ -3144,7 +3220,7 @@ static int LUACALL wxLua_wxPCXHandler_constructor(lua_State *L)
     // call constructor
     wxPCXHandler* returns = new wxPCXHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxPCXHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxPCXHandler);
 
@@ -3153,6 +3229,12 @@ static int LUACALL wxLua_wxPCXHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxPCXHandler_delete_function(void** p)
+{
+    wxPCXHandler* o = (wxPCXHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxPCXHandler_methods[] = {
@@ -3186,7 +3268,7 @@ static int LUACALL wxLua_wxPNGHandler_constructor(lua_State *L)
     // call constructor
     wxPNGHandler* returns = new wxPNGHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxPNGHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxPNGHandler);
 
@@ -3195,6 +3277,12 @@ static int LUACALL wxLua_wxPNGHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxPNGHandler_delete_function(void** p)
+{
+    wxPNGHandler* o = (wxPNGHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxPNGHandler_methods[] = {
@@ -3228,7 +3316,7 @@ static int LUACALL wxLua_wxPNMHandler_constructor(lua_State *L)
     // call constructor
     wxPNMHandler* returns = new wxPNMHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxPNMHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxPNMHandler);
 
@@ -3237,6 +3325,12 @@ static int LUACALL wxLua_wxPNMHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxPNMHandler_delete_function(void** p)
+{
+    wxPNMHandler* o = (wxPNMHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxPNMHandler_methods[] = {
@@ -3270,7 +3364,7 @@ static int LUACALL wxLua_wxTIFFHandler_constructor(lua_State *L)
     // call constructor
     wxTIFFHandler* returns = new wxTIFFHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxTIFFHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxTIFFHandler);
 
@@ -3279,6 +3373,12 @@ static int LUACALL wxLua_wxTIFFHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxTIFFHandler_delete_function(void** p)
+{
+    wxTIFFHandler* o = (wxTIFFHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxTIFFHandler_methods[] = {
@@ -3312,7 +3412,7 @@ static int LUACALL wxLua_wxTGAHandler_constructor(lua_State *L)
     // call constructor
     wxTGAHandler* returns = new wxTGAHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxTGAHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxTGAHandler);
 
@@ -3321,6 +3421,12 @@ static int LUACALL wxLua_wxTGAHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxTGAHandler_delete_function(void** p)
+{
+    wxTGAHandler* o = (wxTGAHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxTGAHandler_methods[] = {
@@ -3354,7 +3460,7 @@ static int LUACALL wxLua_wxXPMHandler_constructor(lua_State *L)
     // call constructor
     wxXPMHandler* returns = new wxXPMHandler();
     // add to tracked memory list
-    wxluaO_addgcobject(L, returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxXPMHandler);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxXPMHandler);
 
@@ -3363,6 +3469,12 @@ static int LUACALL wxLua_wxXPMHandler_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxXPMHandler_delete_function(void** p)
+{
+    wxXPMHandler* o = (wxXPMHandler*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxXPMHandler_methods[] = {
@@ -3424,7 +3536,7 @@ static int LUACALL wxLua_wxArtProvider_GetBitmap(lua_State *L)
     // allocate a new object using the copy constructor
     wxBitmap* returns = new wxBitmap(wxArtProvider::GetBitmap(id, client, *size));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxBitmap*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxBitmap);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxBitmap);
 
@@ -3452,7 +3564,7 @@ static int LUACALL wxLua_wxArtProvider_GetIcon(lua_State *L)
     // allocate a new object using the copy constructor
     wxIcon* returns = new wxIcon(wxArtProvider::GetIcon(id, client, *size));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxIcon*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxIcon);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxIcon);
 
@@ -3478,7 +3590,7 @@ static int LUACALL wxLua_wxArtProvider_GetSizeHint(lua_State *L)
     // allocate a new object using the copy constructor
     wxSize* returns = new wxSize(wxArtProvider::GetSizeHint(client, platform_dependent));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxSize((wxSize*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxSize);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxSize);
 
@@ -3545,7 +3657,7 @@ static int LUACALL wxLua_wxArtProvider_Remove(lua_State *L)
 {
     // wxArtProvider provider
     wxArtProvider * provider = (wxArtProvider *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArtProvider);
-    if (!wxluaO_isgcobject(L, provider)) wxluaO_addgcobject(L, provider);
+    if (!wxluaO_isgcobject(L, provider)) wxluaO_addgcobject(L, provider, wxluatype_wxArtProvider);
     // call Remove
     bool returns = (wxArtProvider::Remove(provider));
     // push the result flag
@@ -3557,6 +3669,12 @@ static int LUACALL wxLua_wxArtProvider_Remove(lua_State *L)
 #endif // (wxLUA_USE_wxArtProvider) && ((wxLUA_USE_wxArtProvider) && (wxCHECK_VERSION(2,8,0)))
 
 
+
+void wxLua_wxArtProvider_delete_function(void** p)
+{
+    wxArtProvider* o = (wxArtProvider*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxArtProvider_methods[] = {
@@ -3624,7 +3742,7 @@ static int LUACALL wxLua_wxLuaArtProvider_CreateBitmap(lua_State *L)
     // allocate a new object using the copy constructor
     wxBitmap* returns = new wxBitmap(self->CreateBitmap(id, client, *size));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (wxBitmap*)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxBitmap);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxBitmap);
 
@@ -3648,7 +3766,7 @@ static int LUACALL wxLua_wxLuaArtProvider_DoGetSizeHint(lua_State *L)
     // allocate a new object using the copy constructor
     wxSize* returns = new wxSize(self->DoGetSizeHint(client));
     // add the new object to the tracked memory list
-    wxluaO_addgcobject(L, (void*)returns, new wxLua_wxObject_wxSize((wxSize*)returns));
+    wxluaO_addgcobject(L, returns, wxluatype_wxSize);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxSize);
 
@@ -3671,7 +3789,7 @@ static int LUACALL wxLua_wxLuaArtProvider_constructor(lua_State *L)
     // call constructor
     wxLuaArtProvider *returns = new wxLuaArtProvider(wxlState);
     // add to tracked memory list
-    wxluaO_addgcobject(L, (wxLuaArtProvider *)returns);
+    wxluaO_addgcobject(L, returns, wxluatype_wxLuaArtProvider);
     // push the constructed class pointer
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxLuaArtProvider);
 
@@ -3681,6 +3799,12 @@ static int LUACALL wxLua_wxLuaArtProvider_constructor(lua_State *L)
 
 
 
+
+void wxLua_wxLuaArtProvider_delete_function(void** p)
+{
+    wxLuaArtProvider* o = (wxLuaArtProvider*)(*p);
+    delete o;
+}
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxLuaArtProvider_methods[] = {
