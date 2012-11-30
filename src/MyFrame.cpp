@@ -398,6 +398,7 @@ MyFrame::MyFrame()
       m_isIdleConnected(false),
       m_fileHistory(10, ID_FILE_HISTORY_1)
 { 
+#if 0
 #ifdef __WXDEBUG__
     // Debug window
     wxTextCtrl * logctrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString,
@@ -414,12 +415,12 @@ MyFrame::MyFrame()
                   .Caption(_T("Logger"))
                   .Name(_T("Logger")) );
 #endif // __WXDEBUG__
-
+#endif // 0
     // Set the initial timer amount
     m_timer.Start(1000);
     m_timer.Stop();
 
-    wxLogDebug(_T("Creating Frame"));
+    wxLogDebug("Creating Frame");
     wxImage::AddHandler(new wxPNGHandler());
 
     SetDropTarget(new XWordFileDropTarget(this));
@@ -448,8 +449,6 @@ MyFrame::MyFrame()
     LuaInit();
 #endif // XWORD_USE_LUA
 
-    ShowPuzzle();
-
     // See if we should open the last puzzle
     ConfigManager::FileHistory_t & history = wxGetApp().GetConfigManager().FileHistory;
     if (history.saveFileHistory() && history.reopenLastPuzzle())
@@ -458,9 +457,14 @@ MyFrame::MyFrame()
         {
             wxString fn = m_fileHistory.GetHistoryFile(0);
             if (! fn.empty() && wxIsReadable(fn))
+            {
                 LoadPuzzle(fn);
+                return;
+            }
         }
     }
+    // Otherwise show a blank puzzle
+    ShowPuzzle();
 }
 
 
@@ -567,6 +571,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
 
     LoadLayout(_T("(Current)"), false);
     RemoveLayout(_T("(Current)"));
+
     ShowPuzzle(false); // don't update
 
     wxFileName fn(filename);
@@ -725,9 +730,9 @@ MyFrame::ShowPuzzle(bool update)
 
     // Update the GUI
     ShowClues();
-    ShowNotes();
-    ShowGrid();
     ShowMetadata();
+    ShowGrid();
+    ShowNotes();
 
     // Timer
     StopTimer();
@@ -917,14 +922,17 @@ MyFrame::ShowMetadata()
         if (meta)
         {
             meta->UpdateLabel();
+#if USE_MY_AUI_MANAGER
             if (meta)
             {
                 wxAuiDockInfo & dock = m_mgr.FindDock(pane);
                 metadata_map[&dock].push_back(&pane);
             }
+#endif // USE_MY_AUI_MANAGER
         }
     }
 
+#if USE_MY_AUI_MANAGER
     // Adjust sizes of MetadataCtrls
     wxClientDC test_dc(this);
     std::map<wxAuiDockInfo *, pane_vector_t>::iterator it;
@@ -956,6 +964,7 @@ MyFrame::ShowMetadata()
             ++i;
         }
     }
+#endif // USE_MY_AUI_MANAGER
 }
 
 
@@ -963,12 +972,13 @@ void
 MyFrame::ShowNotes()
 {
     m_notes->SetPage(puz2wx(m_puz.GetNotes()));
+#if 0
     // Set the notes bitmap depending on whether there are notes or not
     if (m_puz.GetNotes().empty())
         m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
     else
         m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes_new"));
-
+#endif
 }
 
 void
@@ -2156,6 +2166,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnEditLayout(wxCommandEvent & evt)
 {
+#if USE_MY_AUI_MANAGER
     if (evt.IsChecked()) // Start Layout
     {
         m_mgr.StartEdit();
@@ -2167,6 +2178,7 @@ MyFrame::OnEditLayout(wxCommandEvent & evt)
         m_XGridCtrl->ConnectEvents();
     }
     m_mgr.Update();
+#endif // USE_MY_AUI_MANAGER
 }
 
 
@@ -2218,7 +2230,7 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
 
     // If the dialog is canceled, load the previous layout
     if (dlg.ShowModal() != wxID_OK)
-        m_mgr.LoadPerspective(layoutArray.front(), true);
+        LoadPerspective(layoutArray.front(), true);
 
 }
 
@@ -2252,9 +2264,11 @@ MyFrame::OnUpdateUI(wxUpdateUIEvent & evt)
         case ID_REBUS_ENTRY:
             evt.Check(m_XGridCtrl->IsRebusEntry());
             break;
+#if USE_MY_AUI_MANAGER
         case ID_EDIT_LAYOUT:
             evt.Check(m_mgr.IsEditing());
             break;
+#endif // USE_MY_AUI_MANAGER
     }
 }
 
@@ -2863,7 +2877,7 @@ MyFrame::OnDumpStatus(wxCommandEvent & WXUNUSED(evt))
 
     wxString str;
 
-    puz::Grid * grid = m_XGridCtrl->GetGrid();
+    puz::Grid * grid = &m_puz.GetGrid();
 
     str << _T("Grid size (w x h): ") << _T("\n")
         << (int)grid->GetWidth() << _T(" x ")
