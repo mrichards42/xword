@@ -193,9 +193,10 @@ ToolManager::GetBitmap(const ToolInfo * tool, int iconSize) const
      if (! tool->HasIcon())
          return wxNullBitmap;
 
-     wxASSERT(GetImage(tool, iconSize).IsOk());
+     wxImage img(GetImage(tool, iconSize));
+     wxASSERT(img.IsOk());
 
-    return wxBitmap(GetImage(tool, iconSize));
+    return wxBitmap(img);
 }
 
 
@@ -275,10 +276,11 @@ ToolManager::SetLabel(int id, const wxString & label)
 void
 ToolManager::SetIconName(int id, const wxString & iconName)
 {
+
     ToolInfo * tool = GetTool(id);
-
+    if (tool->m_iconName == iconName)
+        return;
     tool->m_iconName = iconName;
-
 
     FOR_AUI_TOOL_BARS(tool)
     {
@@ -293,7 +295,7 @@ ToolManager::SetIconName(int id, const wxString & iconName)
     {
         const int iconSize = tb->GetToolBitmapSize().GetWidth();
         wxASSERT( iconSize == tb->GetToolBitmapSize().GetHeight() );
-        tb->SetToolNormalBitmap(tool->GetId(), GetBitmap(tool, iconSize));
+        tb->SetToolNormalBitmap(tool->GetId(), GetBitmap(tool->GetId(), iconSize));
     }
 
     FOR_MENU_ITEMS(tool)
