@@ -972,13 +972,6 @@ void
 MyFrame::ShowNotes()
 {
     m_notes->SetPage(puz2wx(m_puz.GetNotes()));
-#if 0
-    // Set the notes bitmap depending on whether there are notes or not
-    if (m_puz.GetNotes().empty())
-        m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
-    else
-        m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes_new"));
-#endif
 }
 
 void
@@ -2260,6 +2253,11 @@ MyFrame::OnUpdateUI(wxUpdateUIEvent & evt)
     {
         case ID_SHOW_NOTES:
             evt.Check(m_mgr.GetPane(_T("Notes")).IsShown());
+            // Set the notes bitmap depending on whether there are notes or not
+            if (m_puz.GetNotes().empty())
+                m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
+            else
+                m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes_new"));
             break;
         case ID_REBUS_ENTRY:
             evt.Check(m_XGridCtrl->IsRebusEntry());
