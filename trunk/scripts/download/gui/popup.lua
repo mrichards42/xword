@@ -55,18 +55,12 @@ local function PopupWindow(parent, id, pos, size)
         end
 
         -- Add events to the parent window
-        -- We have to capture the mouse from the parent window . . .
-        -- Mac enter/leave window events don't work like windows events,
-        -- and this keeps everything consitent.
         local parent = self:GetParent()
         local handler = wx.wxEvtHandler()
         parent:PushEventHandler(handler)
 
         local is_destroyed = false
         local function on_leave(evt)
-            if parent:HasCapture() then
-                parent:ReleaseMouse()
-            end
             if not is_destroyed then
                 self:Destroy()
                 is_destroyed = true
@@ -78,22 +72,31 @@ local function PopupWindow(parent, id, pos, size)
             end
         end
 
-        -- The LEAVE_WINDOW event works well on windows, so we only need to
-        -- capture the mouse on Mac
-        if not wx.__WXMSW__ then
+        if wx.__WXMSW__ then
+            -- The LEAVE_WINDOW event works on windows . . .
+            handler:Connect(wx.wxEVT_LEAVE_WINDOW, on_leave)
+        else
+            -- . . . but not on mac.  Here we need to capture the mouse and
+            -- do our own processing of events to determine when we've left.
             parent:CaptureMouse()
+            -- We only need to release the mouse if we've captured it.
+            -- Under 2.9 this code caused problems with windows
+            local function on_leave_capture(evt)
+                if parent:HasCapture() then
+                    parent:ReleaseMouse()
+                end
+                on_leave(evt)
+            end
             handler:Connect(wx.wxEVT_MOTION, function (evt)
                 local rect = wx.wxRect(0, 0, parent.Size.Width, parent.Size.Height)
                 if not rect:Contains(evt:GetPosition()) then
-                    on_leave()
+                    on_leave_capture()
                 end
                 evt:Skip()
             end)
-            handler:Connect(wx.wxEVT_MOUSE_CAPTURE_LOST, on_leave)
-            handler:Connect(wx.wxEVT_DESTROY, on_leave)
+            handler:Connect(wx.wxEVT_MOUSE_CAPTURE_LOST, on_leave_capture)
+            handler:Connect(wx.wxEVT_DESTROY, on_leave_capture)
         end
-
-        handler:Connect(wx.wxEVT_LEAVE_WINDOW, on_leave)
 
         self:Show()
         return

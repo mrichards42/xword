@@ -173,6 +173,7 @@ local function PuzzleCtrl(parent, text, puzzle)
                          function (evt) download.add_download(puzzle) end)
             ctrl:PopupMenu(menu)
             menu:delete()
+            ctrl:Disconnect(wx.wxEVT_COMMAND_MENU_SELECTED)
         end)
 
     -- Keep track of this ctrl
