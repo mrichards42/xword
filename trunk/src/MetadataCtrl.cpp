@@ -113,20 +113,22 @@ MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame, bool useLua)
             }
             else // This is a metadata value
             {
+                str = GetMeta(str, frame);
 #if XWORD_USE_LUA
                 if (useLua)
                 {
-                    str = GetMeta(str, frame);
-                    if (str.empty())
-                        str = _T("nil");
-                    else
-                        str = _T("'") + str + _T("'");
-                    result << str;
+                    if (str.empty()) {
+                        result << _T("nil");
+                    }
+                    else {
+                        str.Replace("'", "\\'");
+                        result << _T("'") << str << _T("'");
+                    }
                 }
                 else // plain text
-                    result << GetMeta(str, frame);
+                    result << str;
 #else // ! XWORD_USE_LUA
-                result << GetMeta(str, frame);
+                result << str;
 #endif // XWORD_USE_LUA
             }
             ismeta = false; // The next token is plain text
