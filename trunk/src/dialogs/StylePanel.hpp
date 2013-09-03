@@ -79,6 +79,7 @@ enum BasicStyleFlag
 };
 
 #include "colorchoice.hpp"
+#include "../widgets/alignctrl.hpp"
 class BasicStyle : public StyleBase
 {
 public:
@@ -90,40 +91,12 @@ public:
 
     int GetAlignment()
     {
-        int align = 0;
-        if (m_flag & STYLE_HORIZONTAL_ALIGN)
-        {
-            if (m_center->GetValue())
-                align |= wxALIGN_CENTER_HORIZONTAL;
-            else if (m_right->GetValue())
-                align |= wxALIGN_RIGHT;
-        }
-        if (m_flag & STYLE_VERTICAL_ALIGN)
-        {
-            if (m_middle->GetValue())
-                align |= wxALIGN_CENTER_VERTICAL;
-            else if (m_bottom->GetValue())
-                align |= wxALIGN_BOTTOM;
-        }
-        return align;
+        return m_align->GetValue();
     }
 
     void SetAlignment(int align)
     {
-        if (m_flag & STYLE_HORIZONTAL_ALIGN)
-        {
-            if (align & wxALIGN_CENTER_HORIZONTAL)
-                m_center->SetValue(true);
-            else if (align & wxALIGN_RIGHT)
-                m_right->SetValue(true);
-        }
-        if (m_flag & STYLE_VERTICAL_ALIGN)
-        {
-            if (align & wxALIGN_CENTER_VERTICAL)
-                m_middle->SetValue(true);
-            else if (align & wxALIGN_BOTTOM)
-                m_bottom->SetValue(true);
-        }
+        m_align->SetValue(align);
     }
 
 protected:
@@ -132,13 +105,7 @@ protected:
     ColorChoice * m_textColor;
     ColorChoice * m_bgColor;
 
-    wxRadioButton * m_left;
-    wxRadioButton * m_center;
-    wxRadioButton * m_right;
-
-    wxRadioButton * m_top;
-    wxRadioButton * m_middle;
-    wxRadioButton * m_bottom;
+    AlignmentControl * m_align;
 
     virtual wxWindow * MakeStylePanel(wxWindow * parent)
     {
@@ -152,53 +119,23 @@ protected:
             sizer->Add(m_font, 0, wxALIGN_CENTER_VERTICAL);
         }
         // Alignment
-        wxSizer * align_sizer;
-        if (m_flag & STYLE_HORIZONTAL_ALIGN)
+        if (m_flag & STYLE_ALIGN)
         {
-            m_left = new wxRadioButton(panel, wxID_ANY, _T("Left"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-            m_center = new wxRadioButton(panel, wxID_ANY, _T("Center"));
-            m_right = new wxRadioButton(panel, wxID_ANY, _T("Right"));
-            wxSizer * halign_sizer = new wxGridSizer(0, 3, 5, 5);
-            halign_sizer->Add(m_left);
-            halign_sizer->Add(m_center);
-            halign_sizer->Add(m_right);
+            // Figure out the alignment orientation
+            wxOrientation orientation = wxBOTH;
+            if (m_flag & STYLE_HORIZONTAL_ALIGN)
+            {
+                if (m_flag & STYLE_VERTICAL_ALIGN)
+                    orientation = wxBOTH;
+                else
+                    orientation = wxHORIZONTAL;
+            }
+            else
+                orientation = wxVERTICAL;
+            // Create the control
+            m_align = new AlignmentControl(panel, wxID_ANY, orientation);
             sizer->Add(new wxStaticText(panel, wxID_ANY, _T("Alignment:")), 0, wxALIGN_CENTER_VERTICAL);
-            if ((m_flag & STYLE_VERTICAL_ALIGN) == 0)
-            {
-                sizer->Add(halign_sizer, 0, wxALIGN_CENTER_VERTICAL);
-            }
-            else
-            {
-                // If we have both alignments, wrap each in a static box
-                align_sizer = new wxBoxSizer(wxVERTICAL);
-                wxSizer * sbsizer = new wxStaticBoxSizer(wxVERTICAL, panel, _T("Horizontal"));
-                sbsizer->Add(halign_sizer, 0, wxALL, 3);
-                align_sizer->Add(sbsizer, 0, wxBOTTOM, 5);
-                sizer->Add(align_sizer, 0, wxALIGN_CENTER_VERTICAL);
-            }
-        }
-        if (m_flag & STYLE_VERTICAL_ALIGN)
-        {
-            m_top = new wxRadioButton(panel, wxID_ANY, _T("Top"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-            m_middle = new wxRadioButton(panel, wxID_ANY, _T("Middle"));
-            m_bottom = new wxRadioButton(panel, wxID_ANY, _T("Bottom"));
-            wxSizer * valign_sizer = new wxGridSizer(0, 3, 5, 5);
-            valign_sizer->Add(m_top);
-            valign_sizer->Add(m_middle);
-            valign_sizer->Add(m_bottom);
-
-            if ((m_flag & STYLE_HORIZONTAL_ALIGN) == 0)
-            {
-                sizer->Add(new wxStaticText(panel, wxID_ANY, _T("Alignment:")), 0, wxALIGN_CENTER_VERTICAL);
-                sizer->Add(valign_sizer, 0, wxALIGN_CENTER_VERTICAL);
-            }
-            else
-            {
-                // If we have both alignments, wrap each in a static box
-                wxSizer * sbsizer = new wxStaticBoxSizer(wxVERTICAL, panel, _T("Vertical"));
-                sbsizer->Add(valign_sizer, 0, wxALL, 3);
-                align_sizer->Add(sbsizer);
-            }
+            sizer->Add(m_align, 0, wxALIGN_CENTER_VERTICAL);
         }
         // Colors
         if (m_flag & STYLE_TEXT_COLOR)
