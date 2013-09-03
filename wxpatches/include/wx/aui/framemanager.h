@@ -497,7 +497,7 @@ public:
 
     virtual bool DetachPane(wxWindow* window);
 
-    void Update();
+    virtual void Update();
 
     wxString SavePaneInfo(wxAuiPaneInfo& pane);
     void LoadPaneInfo(wxString panePart, wxAuiPaneInfo &pane);
