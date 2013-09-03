@@ -21,7 +21,6 @@
 #include "../CluePanel.hpp"
 #include "../CluePrompt.hpp"
 #include "../XGridCtrl.hpp"
-#include "../widgets/SizedText.hpp"
 #include "../App.hpp" // For the ConfigManager
 #include "StyleEditors.hpp"
 #if XWORD_USE_LUA
@@ -73,6 +72,7 @@ void PreferencesDialog::OnInit(wxInitDialogEvent & evt)
     }
 #endif
     evt.Skip();
+    Fit();
 }
 
 //------------------------------------------------------------------------------
@@ -421,6 +421,7 @@ PreferencesDialog::OnStyleTreeSelection(wxTreeEvent & evt)
 
     m_styleSizer->Layout();
     m_stylePanel->Thaw();
+    m_stylePanel->Refresh();
 }
 
 void

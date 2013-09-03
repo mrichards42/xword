@@ -98,7 +98,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	solvePanel->SetSizer( bSizer3 );
 	solvePanel->Layout();
 	bSizer3->Fit( solvePanel );
-	m_notebook->AddPage( solvePanel, wxT("Solving"), false );
+	m_notebook->AddPage( solvePanel, wxT("Solving"), true );
 	styleTreePanel = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bsizer26;
 	bsizer26 = new wxBoxSizer( wxVERTICAL );
@@ -285,7 +285,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	printPanel->SetSizer( bSizer371 );
 	printPanel->Layout();
 	bSizer371->Fit( printPanel );
-	m_notebook->AddPage( printPanel, wxT("Printing"), true );
+	m_notebook->AddPage( printPanel, wxT("Printing"), false );
 	
 	sizer->Add( m_notebook, 1, wxEXPAND | wxALL, 5 );
 	
