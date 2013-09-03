@@ -383,6 +383,7 @@ public:
         m_config.Notes.foregroundColor = fgColor;
 
         wxColour bgColor = m_bgColor->GetColor();
+        m_config.Clue.headingBackgroundColor = bgColor;
         m_config.Clue.listBackgroundColor = bgColor;
         m_config.Clue.crossingBackgroundColor = bgColor;
         m_config.Clue.selectedForegroundColor = bgColor;
