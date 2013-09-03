@@ -38,7 +38,7 @@ default_disabled = {
     "Washington Post Puzzler"
 }
 download.styles = {
-    missing = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxBLUE },
+    missing = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(wx.wxBLUE) },
     downloaded = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(128, 0, 128) },
     progress = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },
     complete = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },
