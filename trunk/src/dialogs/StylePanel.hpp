@@ -372,7 +372,7 @@ public:
         SetFaceName(m_config.Grid.letterFont, font);
         SetFaceName(m_config.Grid.numberFont, font);
         SetFaceName(m_config.CluePrompt.font, font);
-        SetFaceName(m_config.Notes.font, font);
+        m_config.Notes.font = font;
 
         // Colors
         wxColour fgColor = m_textColor->GetColor();
@@ -405,7 +405,7 @@ public:
         ConfigManager::MetadataCtrls_t::iterator meta;
         for (meta = metadata.begin(); meta != metadata.end(); ++meta)
         {
-            SetFaceName(meta->font, font);
+            meta->font = font;
             meta->backgroundColor = bgColor;
             meta->foregroundColor = fgColor;
         }
@@ -487,8 +487,10 @@ protected:
 class MetadataStyle : public MetadataStyleBase
 {
 public:
-    MetadataStyle(ConfigManager::Metadata_t & config)
-        : MetadataStyleBase(FP_FACENAME | STYLE_ALIGN | STYLE_COLOR),
+    MetadataStyle(ConfigManager::Metadata_t & config,
+                  long flag = FP_FACENAME | FP_POINTSIZE |
+                              STYLE_ALIGN | STYLE_COLOR)
+        : MetadataStyleBase(flag),
           m_config(config)
     {}
 
@@ -544,7 +546,7 @@ class CluePromptStyle : public MetadataStyle
 {
 public:
     CluePromptStyle(ConfigManager::Metadata_t & config)
-        : MetadataStyle(config)
+        : MetadataStyle(config, FP_FACENAME | STYLE_ALIGN | STYLE_COLOR)
     {}
 protected:
     virtual wxArrayString GetMetadataFields()
@@ -563,7 +565,7 @@ class NotesStyle : public BasicStyle
 {
 public:
     NotesStyle(ConfigManager::Notes_t & config)
-        : BasicStyle(FP_FACENAME | STYLE_COLOR),
+        : BasicStyle(FP_FACENAME | FP_POINTSIZE | STYLE_COLOR),
           m_config(config)
     {}
 
