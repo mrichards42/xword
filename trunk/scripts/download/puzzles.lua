@@ -242,10 +242,11 @@ local sources = {
     local page = download(puzzle.url)
 
     -- Search for a download link
-    local url = page:match('<a href="(http://www.brendanemmettquigley.com/[^"]-.jpz)">')
+    local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
 
     -- Download the puzzle
-    if url then
+    if name then
+        local url = "http://www.brendanemmettquigley.com/xpuz/" .. name .. ".jpz"
         download(url, puzzle.filename)
     else
         return "Could not find a download link"
