@@ -2287,7 +2287,7 @@ wxSizer* wxAuiManager::LayoutAll(wxAuiPaneInfoArray& panes,
         // determine whether the dock has only toolbars
         bool action_pane_marked = false;
         dock.fixed = true;
-        dock.resizable = true;
+        dock.resizable = false;
         dock.toolbar = true;
         for (j = 0; j < dock_pane_count; ++j)
         {
