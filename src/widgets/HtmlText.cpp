@@ -128,7 +128,7 @@ void HtmlText::LayoutCell()
     const wxString & faceName = GetFont().GetFaceName();
     // Start with the last font size, clamped to min and max sizes
     int pointSize = std::min(std::max(m_lastFontSize, m_minFontSize), m_maxFontSize);
-    const bool fixedFontSize = HasFlag(HT_FIXED); // Check for fixed font size
+    const bool fixedFontSize = ! HasFlag(HT_FILL); // Check for fixed font size
     if (fixedFontSize)
         pointSize = GetFont().GetPointSize();
 

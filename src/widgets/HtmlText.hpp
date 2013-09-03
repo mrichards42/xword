@@ -30,8 +30,8 @@ enum HtmlTextStyles
     HT_TRUNCATE = 0x01,
     HT_NOWRAP = HT_TRUNCATE,
 
-    HT_FILL = 0x00, // Fill space by changing the font size
-    HT_FIXED = 0x02 // Don't adjust the font size to fill available space
+    HT_FIXED = 0x00, // Don't adjust the font size to fill available space
+    HT_FILL = 0x02, // Fill space by changing the font size
 };
 
 
