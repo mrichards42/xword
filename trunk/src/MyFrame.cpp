@@ -39,7 +39,6 @@
 #include <wx/aboutdlg.h>
 
 // Windows
-#include "widgets/SizedText.hpp"
 #include "ClueListBox.hpp"
 #include "CluePanel.hpp"
 #include "MetadataCtrl.hpp"
@@ -553,7 +552,7 @@ bool
 MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDesc * handler)
 {
     Freeze();
-    if ( ! ClosePuzzle(true, false) ) // Prompt for save, don't update
+    if (! ClosePuzzle(true, false)) // Prompt for save, don't update
         return false;
 
     wxStopWatch sw;
@@ -685,10 +684,8 @@ MyFrame::ClosePuzzle(bool prompt, bool update)
     if (prompt && m_isModified)
     {
         int ret = XWordMessage(this, MSG_SAVE_PUZ);
-
         if (ret == wxCANCEL)
             return false;
-
         if (ret == wxYES)
             SavePuzzle(m_filename);
     }
@@ -895,7 +892,7 @@ MyFrame::ShowClues()
         m_puz.GetClues().clear();
 
     // Update the UI
-    UpdateCluePanelConfig();
+    wxGetApp().GetConfigManager().Clue.Update();
 }
 
 
@@ -909,8 +906,7 @@ MyFrame::ShowMetadata()
         SetTitle(puz2wx(m_puz.GetTitle()) + _T(" - ") XWORD_APP_NAME);
 
 
-    // Update the metadata panels and adjust the size of panels
-    // proportionate to the length of their contents.
+    // Update the metadata panels
     typedef std::vector<wxAuiPaneInfo *> pane_vector_t;
     std::map<wxAuiDockInfo *, pane_vector_t> metadata_map;
 
@@ -922,23 +918,27 @@ MyFrame::ShowMetadata()
         if (meta)
         {
             meta->UpdateLabel();
+            if (! meta->GetPlainLabel().IsEmpty()) {
+                pane.Show();
 #if USE_MY_AUI_MANAGER
-            if (meta)
-            {
                 wxAuiDockInfo & dock = m_mgr.FindDock(pane);
                 metadata_map[&dock].push_back(&pane);
-            }
 #endif // USE_MY_AUI_MANAGER
+            }
+            else {
+                pane.Hide();
+            }
         }
     }
 
 #if USE_MY_AUI_MANAGER
     // Adjust sizes of MetadataCtrls
-    wxClientDC test_dc(this);
     std::map<wxAuiDockInfo *, pane_vector_t>::iterator it;
     for (it = metadata_map.begin(); it != metadata_map.end(); ++it)
     {
         pane_vector_t & panes = it->second;
+        if (panes.size() <= 1)
+            continue;
         // Calculate the total size of metadata panes in this dock
         std::vector<int> widths;
         int total_width = 0;
@@ -948,10 +948,8 @@ MyFrame::ShowMetadata()
             // This is a safe cast: we already know the type of window
             wxAuiPaneInfo & pane = *panes[i];
             MetadataCtrl * meta = (MetadataCtrl *)(pane.window);
-            int w, h;
-            test_dc.GetTextExtent(meta->GetPlainLabel(), &w, &h);
-            widths.push_back(w);
-            total_width += w;
+            widths.push_back(meta->GetLayoutWidth());
+            total_width += meta->GetLayoutWidth();
             total_proportion += pane.dock_proportion;
         }
         if (total_width <= 0 || total_proportion <= 0)
@@ -959,9 +957,8 @@ MyFrame::ShowMetadata()
         // Adjust the proportion based on calculated widths
         for (size_t i = 0; i < panes.size(); ++i)
         {
-            int proportion = total_proportion * (widths[i] / (double)total_width);
+            int proportion = total_proportion * (widths[i] / (double)total_width) + 0.5;
             panes[i]->dock_proportion = std::max(proportion, 1);
-            ++i;
         }
     }
 #endif // USE_MY_AUI_MANAGER
@@ -1310,7 +1307,6 @@ MyFrame::ManageWindows()
 
     m_mgr.AddPane(m_notes,
                   wxAuiPaneInfo(baseInfo)
-                  .CaptionVisible(true)
                   .Float()
                   .FloatingSize(250,250)
                   .Hide()
@@ -1319,6 +1315,7 @@ MyFrame::ManageWindows()
 
 #if USE_MY_AUI_MANAGER
     m_mgr.SetContextWindow(m_mgr.GetPane(m_cluePrompt), m_cluePrompt);
+    m_mgr.SetContextWindow(m_mgr.GetPane(m_notes), m_notes);
 #endif
 }
 
@@ -1603,12 +1600,6 @@ MyFrame::SetSaveFileHistory(bool doit)
     }
 }
 
-void
-MyFrame::UpdateCluePanelConfig()
-{
-    wxGetApp().GetConfigManager().Clue.Update();
-}
-
 
 void
 MyFrame::SaveWindowConfig()
@@ -1635,7 +1626,6 @@ MyFrame::SaveWindowConfig()
         }
         config.Window.maximized = IsMaximized();
     }
-
 }
 
 void
@@ -1974,9 +1964,8 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
         {
             square->SetText(puzT(""));
             square->RemoveFlag(puz::FLAG_BLACK |
-                               puz::FLAG_X |
-                               puz::FLAG_REVEALED |
-                               puz::FLAG_CORRECT);
+                               puz::FLAG_CHECK_MASK |
+                               puz::FLAG_PENCIL);
         }
     }
     if (is_diagramless)
@@ -1984,6 +1973,7 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
     m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite(), puz::ACROSS);
     m_XGridCtrl->Refresh();
     SetTime(0);
+    // Send puzzle updated event
 	wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
     evt.SetSquare(m_XGridCtrl->GetFocusedSquare());
     GetEventHandler()->ProcessEvent(evt);
@@ -2198,14 +2188,12 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
         nameArray.push_back(str);
         layoutArray.push_back(config->Read(str, wxEmptyString));
         wxLogDebug(_T("Layout %s = %s"), nameArray.back().c_str(), layoutArray.back().c_str());
-
         // Make sure this isn't an empty entry
         if (layoutArray.back() == wxEmptyString)
         {
             nameArray.pop_back();
             layoutArray.pop_back();
         }
-
         bCont = config->GetNextEntry(str, dummy);
     }
     config->SetPath(_T("/"));
@@ -2214,7 +2202,6 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
     wxASSERT(nameArray.size() > 0);
 
     // Show the dialog
-
     LayoutDialog dlg(this,
                      _T("Choose a layout"),
                      _T("Load Layout"),
@@ -2795,7 +2782,7 @@ MyFrame::OnClose(wxCloseEvent & evt)
         {
             wxGetApp().m_luaLog->Close();
             if (showerrors) {
-                XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename());
+                XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename().c_str());
             #ifdef __WXDEBUG__
                 wxShell(wxString::Format(_T("\"%s\""), GetLuaLogFilename().c_str()));
             #endif // __WXDEBUG__

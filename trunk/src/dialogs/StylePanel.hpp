@@ -367,8 +367,7 @@ public:
         // Fonts
         wxFont font = m_font->GetSelectedFont();
         m_config.Clue.font = font;
-        font.SetPointSize(font.GetPointSize() + 2);
-        m_config.Clue.headingFont = font;
+        m_config.Clue.headingFont = font.Scaled(1.2);
         SetFaceName(m_config.Grid.letterFont, font);
         SetFaceName(m_config.Grid.numberFont, font);
         SetFaceName(m_config.CluePrompt.font, font);
@@ -401,11 +400,19 @@ public:
         m_config.Grid.focusedWordColor = GetWordHighlight(letterHighlight);
 
         // Metadata
+        wxFont metaFont = font.Scaled(.9);
+        metaFont.SetPointSize(std::max(metaFont.GetPointSize(), 10));
+        wxFont copyFont = font.Scaled(.8);
+        copyFont.SetPointSize(std::max(copyFont.GetPointSize(), 8));
+
         ConfigManager::MetadataCtrls_t & metadata = m_config.MetadataCtrls;
         ConfigManager::MetadataCtrls_t::iterator meta;
         for (meta = metadata.begin(); meta != metadata.end(); ++meta)
         {
-            meta->font = font;
+            if (meta->m_name == "/Metadata/Copyright")
+                meta->font = copyFont;
+            else
+                meta->font = metaFont;
             meta->backgroundColor = bgColor;
             meta->foregroundColor = fgColor;
         }

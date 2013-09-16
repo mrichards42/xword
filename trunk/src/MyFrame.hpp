@@ -248,7 +248,6 @@ private:
     // Config
     //-------
     void LoadConfig();
-    void UpdateCluePanelConfig();
     void SaveConfig();
     void SaveWindowConfig();
 
