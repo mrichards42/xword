@@ -44,7 +44,7 @@ solution "XWord"
         defines { "WIN32", "_WINDOWS" }
 
     configuration "macoxs"
-        platforms "x32"
+        platforms { "native", "x32", "x64" }
 
     -- ------------------------------------------------------------------------
     -- General
