@@ -388,6 +388,21 @@ MyAuiManager::Update()
     ConstrainPanes(vertical_clue_panes);
 
     wxAuiManager::Update();
+#if __WXDEBUG__
+    wxLogDebug("AuiManager::Update() Frame size: %d, %d", m_frame->GetSize().x, m_frame->GetSize().y);
+    if (! m_frame->IsShown())
+        wxLogDebug("Frame is hidden");
+    for (size_t i = 0; i < m_docks.Count(); ++i)
+    {
+        wxAuiDockInfo & dock = m_docks.Item(i);
+        wxLogDebug("Dock Size: %d,%d", dock.rect.width,dock.rect.height);
+        for (size_t j = 0; j < dock.panes.Count(); ++j)
+        {
+            wxAuiPaneInfo * pane = dock.panes.Item(j);
+            wxLogDebug("    %s Proportion: %d", pane->name, pane->dock_proportion);
+        }
+    }
+#endif // __WXDEBUG__
 }
 
 

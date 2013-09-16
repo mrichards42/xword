@@ -76,6 +76,9 @@ public:
     void SetMaxFontSize(int size) { m_maxFontSize = size; }
     int GetMaxFontSize() const { return m_maxFontSize; }
 
+    // This is the width if the text were in one line
+    int GetLayoutWidth() const { return m_layoutWidth; }
+
     wxCoord GetPadding() const { return m_padding; }
     void SetPadding(wxCoord padding) { m_padding = padding; }
 
@@ -105,6 +108,7 @@ protected:
     wxHtmlWinParser *m_parser;
 
     int m_minFontSize, m_maxFontSize, m_lastFontSize;
+    int m_layoutWidth;
 
     void LayoutCell();
     void Parse(const wxString & label, int pointSize, const wxString & faceName);
@@ -115,6 +119,11 @@ protected:
         LayoutCell();
         Refresh();
         evt.Skip();
+    }
+
+    virtual wxSize DoGetBestClientSize() const {
+        return wxSize(m_cell->GetWidth() + 2 * m_padding,
+                      m_cell->GetHeight() + 2 * m_padding);
     }
 
     virtual wxBorder GetDefaultBorder() const { return wxBORDER_NONE; }

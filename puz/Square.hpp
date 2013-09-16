@@ -31,24 +31,27 @@ const int REBUS_ENTRY_LENGTH = 8;
 // GEXT flags
 enum GextFlag
 {
-    FLAG_CLEAR  = 0x00,
-    FLAG_PENCIL = 0x08,
-    FLAG_BLACK  = 0x10,
-    FLAG_X      = 0x20,
-    FLAG_REVEALED    = 0x40,
-    FLAG_CIRCLE = 0x80,
+    FLAG_CLEAR     = 0x00,
+    FLAG_PENCIL    = 0x08,
+    FLAG_BLACK     = 0x10,
+    FLAG_X         = 0x20,
+    FLAG_REVEALED  = 0x40,
+    FLAG_CIRCLE    = 0x80,
 
-    FLAG_COLOR = 0x100,
-    FLAG_MISSING = 0x200,
-    FLAG_CORRECT = 0x400,
+    FLAG_COLOR     = 0x100,
+    FLAG_MISSING   = 0x200,
+    FLAG_CORRECT   = 0x400,
 
     ACROSS_LITE_MASK = FLAG_CLEAR |
                        FLAG_PENCIL |
                        FLAG_BLACK |
                        FLAG_X |
                        FLAG_REVEALED |
-                       FLAG_CIRCLE
+                       FLAG_CIRCLE,
 
+   FLAG_CHECK_MASK = FLAG_X |
+                     FLAG_REVEALED |
+                     FLAG_CORRECT
 };
 
 

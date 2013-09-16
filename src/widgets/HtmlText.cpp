@@ -140,7 +140,7 @@ void HtmlText::LayoutCell()
     delete m_cell;
     m_cell = new wxHtmlCell();
     SetToolTip(wxEmptyString);
-    if (label.empty() || width < 10)
+    if (label.empty() || (width < 10 && ! fixedFontSize))
         return;
 
     // Font style
@@ -226,9 +226,13 @@ void HtmlText::LayoutCell()
             }
         }
     }
+    // Set m_layoutWidth
+    int lastWidth = m_cell->GetWidth();
+    m_cell->Layout(1);
+    m_layoutWidth = m_cell->GetMaxTotalWidth();
+    m_cell->Layout(lastWidth);
 
     m_lastFontSize = pointSize;
-
     SetToolTip(ToText((wxHtmlContainerCell*)m_cell));
 }
 

@@ -280,7 +280,7 @@ protected:
     {
     public:
         ConfigManager()
-            : MyGroup(&m_group) // Pass the pointer to our bas ConfigGroup
+            : MyGroup(&m_group) // Pass the pointer to our base ConfigGroup
         {}
 
         class MyGroup : public ConfigGroup
