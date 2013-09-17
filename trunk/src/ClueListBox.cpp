@@ -99,8 +99,8 @@ wxString ClueListBox::OnGetItem(size_t n) const
             _T("<td align=left valign=top>%s</td>")
         _T("</tr></table>"),
         GetNumberWidth(),
-        puz2wx((*m_clues)[n].GetNumber()).c_str(),
-        puz2wx((*m_clues)[n].GetText()).c_str()
+        (const wxChar *)puz2wx((*m_clues)[n].GetNumber()).c_str(),
+        (const wxChar *)puz2wx((*m_clues)[n].GetText()).c_str()
     );
 }
 
