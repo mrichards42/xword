@@ -35,7 +35,7 @@ SizerPrinter::Serialize(wxWindow * window, int tabs)
     wxString ret;
     AddLine( ret, tabs, wxString::Format(_T("[%d] %s"),
                                          window->GetId(),
-                                         window->GetClassInfo()->GetClassName()) );
+                                         (const wxChar * )window->GetClassInfo()->GetClassName()) );
 
     wxSizer * sizer = window->GetSizer();
     if (sizer != NULL)

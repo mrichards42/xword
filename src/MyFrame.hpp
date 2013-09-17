@@ -412,14 +412,14 @@ MyFrame::GetConfig()
 inline void
 MyFrame::SaveLayout(const wxString & name)
 {
-    GetConfig()->Write(wxString::Format(_T("/Layouts/%s"), name.c_str()),
+    GetConfig()->Write(wxString(_T("/Layouts/")) + name),
                        m_mgr.SavePerspective());
 }
 
 inline void
 MyFrame::RemoveLayout(const wxString & name)
 {
-    GetConfig()->DeleteEntry(wxString::Format(_T("/Layouts/%s"), name.c_str()));
+    GetConfig()->DeleteEntry(wxString(_T("/Layouts/%s")) + name);
 }
 
 
@@ -427,7 +427,7 @@ inline bool
 MyFrame::LoadLayout(const wxString & name, bool update)
 {
     wxString perspective;
-    if (! GetConfig()->Read(wxString::Format(_T("/Layouts/%s"), name.c_str()),
+    if (! GetConfig()->Read(wxString(_T("/Layouts/%s")) + name,
                             &perspective) )
         return false;
 
