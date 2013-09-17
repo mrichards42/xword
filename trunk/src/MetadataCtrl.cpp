@@ -145,7 +145,7 @@ MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame, bool useLua)
     // Compile a lua function taking a puzzle argument
     if (result.Find(_T("return")) == -1) // Make sure we're returning something
         result = _T("return ") + result;
-    wxLuaCharBuffer code(wxString::Format(_T("return function (puzzle) %s end"), result));
+    wxLuaCharBuffer code(wxString::Format(_T("return function (puzzle) %s end"), (const wxChar * )result.c_str()));
     // Compile and run the code
     if (luaL_loadbuffer(L, code.GetData(), code.Length(), "") == 0)
     {

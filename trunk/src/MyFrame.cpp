@@ -581,7 +581,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     {
         m_XGridCtrl->SetFocus();
         SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
-                                   filename.c_str(),
+                                   (const wxChar * )filename.c_str(),
                                    sw.Time()));
         if (m_autoStartTimer)
             StartTimer();
@@ -633,7 +633,7 @@ MyFrame::DoSavePuzzle(const wxString & filename,
     EnableSave(false);
 
     SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
-                               m_filename.c_str(),
+                               (const wxChar * )m_filename.c_str(),
                                sw.Time()));
 }
 
@@ -2784,7 +2784,7 @@ MyFrame::OnClose(wxCloseEvent & evt)
             if (showerrors) {
                 XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename().c_str());
             #ifdef __WXDEBUG__
-                wxShell(wxString::Format(_T("\"%s\""), GetLuaLogFilename().c_str()));
+                wxShell(wxString::Format(_T("\"%s\""), (const wxChar * )GetLuaLogFilename().c_str()));
             #endif // __WXDEBUG__
             }
         }
@@ -2821,7 +2821,7 @@ void
 MyFrame::ShowDebugDialog(const wxString & title, const wxString & str)
 {
     wxDialog dlg(this, wxID_ANY,
-                 wxString::Format(_T("Debug: %s"), title.c_str()),
+                 wxString::Format(_T("Debug: %s"), (const wxChar * )title.c_str()),
                  wxDefaultPosition, wxDefaultSize,
                  wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
 

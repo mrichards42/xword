@@ -177,7 +177,7 @@ ToolManager::GetImage(const ToolInfo * tool, int iconSize) const
         return wxNullImage;
 
     const wxString icon =
-        wxString::Format(_T("%s_%d.png"), tool->GetIconName().c_str(), iconSize);
+        wxString::Format(_T("%s_%d.png"), (const wxChar * )tool->GetIconName().c_str(), iconSize);
 
     wxFileName iconPath(icon);
     iconPath.MakeAbsolute(m_iconLocation);
