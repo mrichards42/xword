@@ -23,7 +23,7 @@
 #include <wx/tokenzr.h>
 #include <vector>
 #include "puz/word.hpp"
-#include "utils/string.hpp"
+#include "string.hpp"
 
 // A class for copying the text from a word of squares.
 // Data is stored as a series of tab-delimited strings and converted

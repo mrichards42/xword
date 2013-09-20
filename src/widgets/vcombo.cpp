@@ -83,7 +83,7 @@ public:
             wxVListBox::ScrollToLine(static_cast<size_t>(idx));
     }
 
-    wxSize VirtualComboPopup::GetAdjustedSize(int minWidth, int prefHeight, int maxHeight);
+    wxSize GetAdjustedSize(int minWidth, int prefHeight, int maxHeight);
 
 protected:
     VirtualComboBox * GetCombo() { return (VirtualComboBox*)m_combo; }
