@@ -412,7 +412,7 @@ MyFrame::GetConfig()
 inline void
 MyFrame::SaveLayout(const wxString & name)
 {
-    GetConfig()->Write(wxString(_T("/Layouts/")) + name),
+    GetConfig()->Write(wxString(_T("/Layouts/")) + name,
                        m_mgr.SavePerspective());
 }
 
