@@ -4,21 +4,22 @@
 //     lua -e"rulesFilename='xword_rules.lua'" genxwordbind.lua
 //----------------------------------------------------------------------------
 
-%include <vector>
+//#include <vector>
 
-%include "../MyFrame.hpp"
-%include "../PuzEvent.hpp"
-%include "../App.hpp"
-%include "../paths.hpp"
-%include "../../lua/luapuz/bind/luapuz.hpp"
-%include "../../lua/luapuz/bind/luapuz_puz_Puzzle_helpers.hpp"
-%include "../../lua/wxbind/include/wxaui_bind.h"
+#include "../MyFrame.hpp"
+#include "../PuzEvent.hpp"
+#include "../App.hpp"
+#include "../paths.hpp"
+#include "../../lua/luapuz/bind/luapuz.hpp"
+#include "../../lua/luapuz/bind/luapuz_puz_Puzzle_helpers.hpp"
+#include "../../lua/wxbind/include/wxaui_bind.h"
 
 //----------------------------------------------------------------------------
 // Gui stuff
 //----------------------------------------------------------------------------
 
-%class MyFrame, wxFrame
+class MyFrame : public wxFrame
+{
     // %override puz::Puzzle & GetPuzzle()
     int GetPuzzle()
     const wxString & GetFilename()
@@ -82,27 +83,26 @@
     // const puz::Clue * MyFrame::GetFocusedClue()
     int GetFocusedClue()
 
-%endclass
+};
 
 
 // %override MyFrame * GetFrame()
-%function MyFrame * GetFrame()
+MyFrame * GetFrame()
 
 // %override void logerror()
-%function void logerror()
+void logerror()
 
 
 //----------------------------------------------------------------------------
 // Events
 //----------------------------------------------------------------------------
 
-%class wxPuzEvent, wxCommandEvent
-
+class wxPuzEvent : public wxCommandEvent
+{
     // %override puz::Square * GetSquare()
     int GetSquare()
 
-    %define_event wxEVT_PUZ_GRID_FOCUS
-    %define_event wxEVT_PUZ_CLUE_FOCUS
-    %define_event wxEVT_PUZ_LETTER
-
-%endclass
+    %wxEventType wxEVT_PUZ_GRID_FOCUS
+    %wxEventType wxEVT_PUZ_CLUE_FOCUS
+    %wxEventType wxEVT_PUZ_LETTER
+};

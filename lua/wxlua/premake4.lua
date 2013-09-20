@@ -4,7 +4,7 @@ project "wxlua"
     -- --------------------------------------------------------------------
     kind "StaticLib"
     language "C++"
-    files { "src/*", "include/*" }
+    files { "*", "debug/*", "debugger/*" }
     includedirs { "../wxbind/setup", "../lua/include", "..",  }
     links { "lua" }
 
