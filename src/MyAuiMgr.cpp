@@ -388,7 +388,7 @@ MyAuiManager::Update()
     ConstrainPanes(vertical_clue_panes);
 
     wxAuiManager::Update();
-#if __WXDEBUG__
+#ifdef __WXDEBUG__
     wxLogDebug("AuiManager::Update() Frame size: %d, %d", m_frame->GetSize().x, m_frame->GetSize().y);
     if (! m_frame->IsShown())
         wxLogDebug("Frame is hidden");
