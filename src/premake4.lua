@@ -115,8 +115,8 @@ project "XWord"
             "cp ../../images/xword.icns $UNLOCALIZED_RESOURCES_FOLDER_PATH",
             -- Build the rest of the projects
             "cd ../../build/" .. _ACTION,
-            "xcodebuild -project lfs.xcodeproj -configuration $CONFIGURATION",
-            "xcodebuild -project luacurl.xcodeproj -configuration $CONFIGURATION",
-            "xcodebuild -project luatask.xcodeproj -configuration $CONFIGURATION",
+            'xcodebuild -project lfs.xcodeproj -configuration "$CONFIGURATION"',
+            'xcodebuild -project luacurl.xcodeproj -configuration "$CONFIGURATION"',
+            'xcodebuild -project luatask.xcodeproj -configuration "$CONFIGURATION"',
         }
 
