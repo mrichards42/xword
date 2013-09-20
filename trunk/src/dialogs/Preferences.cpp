@@ -384,7 +384,11 @@ StyleBase * GetStyleData(wxTreeCtrl * ctrl)
 void
 PreferencesDialog::OnStyleTreeSelection(wxTreeEvent & evt)
 {
-    m_stylePanel->Freeze();
+#if __WXMSW__
+    // Under wxCocoa this creates weird drawing problems
+    wxWindowUpdateLocker up(m_stylePanel);
+#endif // __WXMSW__
+
     // Destroy the old panel
     if (! m_styleSizer->GetChildren().empty())
     {
@@ -416,12 +420,8 @@ PreferencesDialog::OnStyleTreeSelection(wxTreeEvent & evt)
         vsizer->Add(hsizer, 1, wxALIGN_CENTER);
         newPanel->SetSizer(vsizer);
     }
-
     m_styleSizer->Add(newPanel, 1, wxEXPAND);
-
     m_styleSizer->Layout();
-    m_stylePanel->Thaw();
-    m_stylePanel->Refresh();
 }
 
 void
