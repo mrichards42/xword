@@ -15,7 +15,7 @@
      #include "wx/wx.h"
 #endif
 
-#include "wxlua/include/wxlstate.h"
+#include "wxlua/wxlstate.h"
 #include "xword_bind.h"
 #include "xword_bind_helpers.hpp"
 
@@ -742,7 +742,7 @@ wxLuaBindEvent* wxLuaGetEventList_xword(size_t &count)
 }
 
 // ---------------------------------------------------------------------------
-// wxLuaGetDefineList_xword() is called to register %define and %enum
+// wxLuaGetDefineList_xword() is called to register #define and enum
 // ---------------------------------------------------------------------------
 
 wxLuaBindNumber* wxLuaGetDefineList_xword(size_t &count)
@@ -758,7 +758,7 @@ wxLuaBindNumber* wxLuaGetDefineList_xword(size_t &count)
 
 // ---------------------------------------------------------------------------
 
-// wxLuaGetStringList_xword() is called to register %define %string
+// wxLuaGetStringList_xword() is called to register #define_string
 // ---------------------------------------------------------------------------
 
 wxLuaBindString* wxLuaGetStringList_xword(size_t &count)

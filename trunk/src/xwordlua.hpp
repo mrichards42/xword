@@ -28,6 +28,7 @@
 #define wxLUA_USEBINDING_WXMEDIA 0
 #define wxLUA_USEBINDING_WXRICHTEXT 0
 #define wxLUA_USEBINDING_WXSTC 0
+#define wxLUA_USEBINDING_WXLUADEBUGGER 0
 
 #include "paths.hpp"
 #include "wxlua/include/wxlua.h"
@@ -41,18 +42,6 @@ WXLUA_DECLARE_BIND_ALL
 #define XWORD_LUA_IMPLEMENT_BIND_ALL \
         WXLUA_IMPLEMENT_BIND_ALL     \
         wxLuaBinding_xword_init();
-
-/*
-// %override wxLua_function_addgcobject
-// %function void addgcobject(wxObject * object)
-static int LUACALL _addgcobject(lua_State *L)
-{
-    wxObject * o = (wxObject *)wxlua_touserdata(L, 1, false);
-    if (! wxluaO_isgcobject(L, o))
-        wxluaO_addgcobject(L, o);
-    return 0;
-}
-*/
 
 
 static void xword_setup_lua(wxLuaState & lua)
@@ -102,23 +91,6 @@ static void xword_setup_lua(wxLuaState & lua)
     lua_setfield(L, -2, "firstrun");
 
     lua_pop(L, 1);
-
-    /*
-        The only thing I was using this for was the wxFSFile pointer returned
-        by wxFileSyetem::OpenFile(), and I just fixed the problem at the
-        source
-
-
-    // Add a addgcobject method to the wxlua table.
-    // Ideally we wouldn't need this, but I think there are a few bugs in
-    // the way that wxLua decides what to gc.
-    lua_getglobal(L, "wxlua");
-
-    lua_pushcfunction(L, _addgcobject);
-    lua_setfield(L, -2, "addgcobject");
-
-    lua_pop(L, 1);
-    */
 }
 
 #endif // XWORD_LUA_H
