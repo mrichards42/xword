@@ -18,6 +18,7 @@
 #include <wx/wxprec.h>
 #include "fontface.hpp"
 #include <wx/fontenum.h>
+#include <wx/textctrl.h>
 
 #include <wx/thread.h>
 

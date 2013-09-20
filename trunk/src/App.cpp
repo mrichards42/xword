@@ -274,7 +274,7 @@ MyApp::ReadCommandLine(wxCmdLineParser & cmd)
     if (m_frame)
     {
         const size_t param_count = cmd.GetParamCount();
-        wxLogDebug(_T("Command count: %d"), param_count);
+        wxLogDebug("Command count: %lu", (unsigned long)param_count);
 
         // Open files
         for (unsigned int i = 0; i < param_count; ++i)
@@ -291,7 +291,7 @@ MyApp::ReadCommandLine(wxCmdLineParser & cmd)
                 if (FindLuaScript(fn.GetFullPath(), &result))
                     m_frame->RunLuaScript(result);
                 else
-                    XWordErrorMessage(NULL, _T("%s"), result.c_str());
+                    XWordErrorMessage(NULL, _T("%s"), (const char *)result.c_str());
             }
 #endif // XWORD_USE_LUA
         }
@@ -428,7 +428,7 @@ MyApp::RunLuaScript(const wxString & filename, int lastarg)
     wxString result;
     if (! FindLuaScript(filename, &result))
     {
-        XWordErrorMessage(NULL, _T("%s"), result.c_str());
+        XWordErrorMessage(NULL, _T("%s"), (const char *)result.c_str());
         return;
     }
 
@@ -466,6 +466,7 @@ MyApp::OnLuaError(wxLuaEvent & evt)
     LogLuaMessage(_T("(error) ") + evt.GetString());
 }
 
+#endif // XWORD_USE_LUA
 
 //------------------------------------------------------------------------------
 // Mac
@@ -478,5 +479,3 @@ void MyApp::MacOpenFile(const wxString & fileName)
         m_frame->LoadPuzzle(fileName);
 }
 #endif
-
-#endif // XWORD_USE_LUA

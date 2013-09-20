@@ -256,7 +256,7 @@ wxString ToText(wxHtmlContainerCell * container)
 wxString HtmlText::GetPlainLabel() const
 {
     wxToolTip * tip = GetToolTip();
-    return tip ? tip->GetTip() : wxEmptyString;
+    return tip ? tip->GetTip() : wxString(wxEmptyString);
 }
 
 

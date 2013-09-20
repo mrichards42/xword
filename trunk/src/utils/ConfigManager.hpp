@@ -103,165 +103,6 @@ private: // Can't assign or copy
 };
 
 
-template <typename T>
-class ConfigList : public ConfigGroup
-{
-public:
-    ConfigList(ConfigManagerBase * cfg)
-        : ConfigGroup(cfg)
-    {}
-
-    ConfigList(ConfigGroup * parent, const wxString & name)
-        : ConfigGroup(parent, name)
-    {}
-
-    virtual ~ConfigList()
-    {
-        // Delete the pointers from m_children
-        clear(false);
-    }
-
-public:
-    // Copy values from other config to this config
-    virtual void Copy(const ConfigGroup & other)
-    {
-        if (m_name != other.m_name)
-            throw ConfigManagerBase::CopyError();
-
-        // This is a bit of a convoluted process, since we need to avoid
-        // unnecessary deletion of the pointers in m_children (in case someone
-        // added a callback).
-
-        // Keep track of which entries we have copied
-        std::set<ConfigGroup *> entries(m_children.begin(), m_children.end());
-        // Copy the entires
-        std::list<ConfigGroup *>::const_iterator it;
-        for (it = other.m_children.begin(); it != other.m_children.end(); ++it)
-        {
-            // Find the old entry
-            std::list<ConfigGroup *>::iterator old;
-            for (old = m_children.begin(); old != m_children.end(); ++old)
-            {
-                if ((*old)->m_name == (*it)->m_name)
-                {
-                    entries.erase(*old);
-                    (*old)->Copy(**it);
-                    break;
-                }
-            }
-            if (old == m_children.end()) // Not found
-            {
-                // Create a new entry
-                // Get the name of this entry by removing the prefix of the
-                // parent's name.
-                wxString name;
-                (*it)->m_name.StartsWith(other.m_name + _T("/"), &name);
-                T * entry = push_back(name);
-                // Fill it with values from the other config
-                entry->Copy(**it);
-            }
-        }
-        // Remove entries that were not copied
-        std::set<ConfigGroup *>::iterator old;
-        for (old = entries.begin(); old != entries.end(); ++old)
-        {
-            std::list<ConfigGroup *>::iterator item =
-                std::find(m_children.begin(), m_children.end(), *old);
-            if (item != m_children.end())
-                m_children.remove(*item);
-        }
-    }
-
-protected:
-    // An iterator that automatically casts its pointers
-    template <class ITERATOR>
-    class iterator_t : public ITERATOR
-    {
-    public:
-        iterator_t() : ITERATOR() {}
-        iterator_t(ITERATOR & it) : ITERATOR(it) {}
-
-        T & operator *() { return *cast(ITERATOR::operator *()); }
-        const T & operator *() const { return *cast(ITERATOR::operator *()); }
-
-        T * operator->() { return cast(*ITERATOR::operator->()); }
-        const T * operator->() const { return cast(*ITERATOR::operator->()); }
-
-    protected:
-        T * cast(ConfigGroup * group) { return dynamic_cast<T *>(group); }
-        const T * cast(ConfigGroup * group) const { return dynamic_cast<const T *>(group); }
-    };
-
-public:
-    typedef iterator_t<std::list<ConfigGroup *>::iterator> iterator;
-    typedef iterator_t<std::list<ConfigGroup *>::const_iterator> const_iterator;
-
-    iterator begin() { return iterator(m_children.begin()); }
-    const_iterator begin() const { return const_iterator(m_children.begin()); }
-    iterator end() { return iterator(m_children.end()); }
-    const_iterator end() const { return const_iterator(m_children.end()); }
-
-    T * push_back(const wxString & name)
-    {
-        // This constructor automatically adds it to m_children
-        return new T(this, name);
-    }
-
-    bool remove(const wxString & name)
-    {
-        m_cfg->GetConfig()->DeleteEntry(name);
-        std::list<ConfigGroup *>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); ++it)
-        {
-            if ((*it)->m_name == name)
-            {
-                ConfigGroup * group = *it;
-                m_children.erase(it);
-                delete group;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void clear(bool delete_entries = true)
-    {
-        std::list<ConfigGroup *>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); ++it)
-        {
-            // Remove from the config
-            if (delete_entries)
-                m_cfg->GetConfig()->DeleteEntry((*it)->m_name);
-            // We own the pointers in m_children
-            delete *it;
-        }
-        m_children.clear();
-    }
-
-    bool empty() const { return m_children.empty(); }
-
-protected:
-    // Update m_children to reflect the current config state
-    virtual void UpdateLists()
-    {
-        clear(false);
-        wxConfigBase * cfg = m_cfg->GetConfig();
-        // Enumeration variables
-        long index;
-        wxString name;
-        cfg->SetPath(m_name);
-        if (cfg->GetFirstGroup(name, index))
-        {
-            do
-            {
-                push_back(name);
-            }
-            while (cfg->GetNextGroup(name, index));
-        }
-        cfg->SetPath(_T("/"));
-    }
-};
-
 
 /*  ***************************************************************************
     The ConfigManager base class.
@@ -442,6 +283,166 @@ inline void ConfigGroup::Copy(const ConfigGroup & other)
         (*group)->Copy(**otherGroup);
     }
 }
+
+template <typename T>
+class ConfigList : public ConfigGroup
+{
+public:
+    ConfigList(ConfigManagerBase * cfg)
+    : ConfigGroup(cfg)
+    {}
+    
+    ConfigList(ConfigGroup * parent, const wxString & name)
+    : ConfigGroup(parent, name)
+    {}
+    
+    virtual ~ConfigList()
+    {
+        // Delete the pointers from m_children
+        clear(false);
+    }
+    
+public:
+    // Copy values from other config to this config
+    virtual void Copy(const ConfigGroup & other)
+    {
+        if (m_name != other.m_name)
+            throw ConfigManagerBase::CopyError();
+        
+        // This is a bit of a convoluted process, since we need to avoid
+        // unnecessary deletion of the pointers in m_children (in case someone
+        // added a callback).
+        
+        // Keep track of which entries we have copied
+        std::set<ConfigGroup *> entries(m_children.begin(), m_children.end());
+        // Copy the entires
+        std::list<ConfigGroup *>::const_iterator it;
+        for (it = other.m_children.begin(); it != other.m_children.end(); ++it)
+        {
+            // Find the old entry
+            std::list<ConfigGroup *>::iterator old;
+            for (old = m_children.begin(); old != m_children.end(); ++old)
+            {
+                if ((*old)->m_name == (*it)->m_name)
+                {
+                    entries.erase(*old);
+                    (*old)->Copy(**it);
+                    break;
+                }
+            }
+            if (old == m_children.end()) // Not found
+            {
+                // Create a new entry
+                // Get the name of this entry by removing the prefix of the
+                // parent's name.
+                wxString name;
+                (*it)->m_name.StartsWith(other.m_name + _T("/"), &name);
+                T * entry = push_back(name);
+                // Fill it with values from the other config
+                entry->Copy(**it);
+            }
+        }
+        // Remove entries that were not copied
+        std::set<ConfigGroup *>::iterator old;
+        for (old = entries.begin(); old != entries.end(); ++old)
+        {
+            std::list<ConfigGroup *>::iterator item =
+            std::find(m_children.begin(), m_children.end(), *old);
+            if (item != m_children.end())
+                m_children.remove(*item);
+        }
+    }
+    
+protected:
+    // An iterator that automatically casts its pointers
+    template <class ITERATOR>
+    class iterator_t : public ITERATOR
+    {
+    public:
+        iterator_t() : ITERATOR() {}
+        iterator_t(ITERATOR & it) : ITERATOR(it) {}
+        iterator_t(const ITERATOR & it) : ITERATOR(it) {}
+        
+        T & operator *() { return *cast(ITERATOR::operator *()); }
+        const T & operator *() const { return *cast(ITERATOR::operator *()); }
+        
+        T * operator->() { return cast(*ITERATOR::operator->()); }
+        const T * operator->() const { return cast(*ITERATOR::operator->()); }
+        
+    protected:
+        T * cast(ConfigGroup * group) { return dynamic_cast<T *>(group); }
+        const T * cast(ConfigGroup * group) const { return dynamic_cast<const T *>(group); }
+    };
+    
+public:
+    typedef iterator_t<std::list<ConfigGroup *>::iterator> iterator;
+    typedef iterator_t<std::list<ConfigGroup *>::const_iterator> const_iterator;
+    
+    iterator begin() { return iterator(m_children.begin()); }
+    const_iterator begin() const { return const_iterator(m_children.begin()); }
+    iterator end() { return iterator(m_children.end()); }
+    const_iterator end() const { return const_iterator(m_children.end()); }
+    
+    T * push_back(const wxString & name)
+    {
+        // This constructor automatically adds it to m_children
+        return new T(this, name);
+    }
+    
+    bool remove(const wxString & name)
+    {
+        m_cfg->GetConfig()->DeleteEntry(name);
+        std::list<ConfigGroup *>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); ++it)
+        {
+            if ((*it)->m_name == name)
+            {
+                ConfigGroup * group = *it;
+                m_children.erase(it);
+                delete group;
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    void clear(bool delete_entries = true)
+    {
+        std::list<ConfigGroup *>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); ++it)
+        {
+            // Remove from the config
+            if (delete_entries)
+                m_cfg->GetConfig()->DeleteEntry((*it)->m_name);
+            // We own the pointers in m_children
+            delete *it;
+        }
+        m_children.clear();
+    }
+    
+    bool empty() const { return m_children.empty(); }
+    
+protected:
+    // Update m_children to reflect the current config state
+    virtual void UpdateLists()
+    {
+        clear(false);
+        wxConfigBase * cfg = m_cfg->GetConfig();
+        // Enumeration variables
+        long index;
+        wxString name;
+        cfg->SetPath(m_name);
+        if (cfg->GetFirstGroup(name, index))
+        {
+            do
+            {
+                push_back(name);
+            }
+            while (cfg->GetNextGroup(name, index));
+        }
+        cfg->SetPath(_T("/"));
+    }
+};
 
 
 /*  ***************************************************************************

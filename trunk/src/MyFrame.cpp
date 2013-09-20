@@ -580,7 +580,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     if (m_puz.IsOk())
     {
         m_XGridCtrl->SetFocus();
-        SetStatus(wxString::Format(_T("%s   Load time: %d ms"),
+        SetStatus(wxString::Format(_T("%s   Load time: %ld ms"),
                                    (const wxChar *)filename.c_str(),
                                    sw.Time()));
         if (m_autoStartTimer)
@@ -632,7 +632,7 @@ MyFrame::DoSavePuzzle(const wxString & filename,
 
     EnableSave(false);
 
-    SetStatus(wxString::Format(_T("%s   Save time: %d ms"),
+    SetStatus(wxString::Format(_T("%s   Save time: %ld ms"),
                                (const wxChar *)m_filename.c_str(),
                                sw.Time()));
 }
@@ -661,11 +661,11 @@ MyFrame::HandlePuzException()
     }
     catch (puz::Exception & err)
     {
-        XWordMessage(this, MSG_PUZ_ERROR, puz2wx(puz::decode_utf8(err.what())).c_str());
+        XWordMessage(this, MSG_PUZ_ERROR, (const wxChar *)puz2wx(puz::decode_utf8(err.what())).c_str());
     }
     catch (std::exception & err)
     {
-        XWordMessage(this, MSG_STD_EXCEPTION, puz2wx(puz::decode_utf8(err.what())).c_str());
+        XWordMessage(this, MSG_STD_EXCEPTION, (const wxChar *)puz2wx(puz::decode_utf8(err.what())).c_str());
     }
     catch (...)
     {
@@ -1338,7 +1338,7 @@ MyFrame::SetupToolManager()
     }
     else
     {
-        XWordErrorMessage(this, _T("Cannot find images directory:\n%s"), imagesdir.c_str());
+        XWordErrorMessage(this, _T("Cannot find images directory:\n%s"), (const wxChar *)imagesdir.c_str());
         m_toolMgr.SetIconLocation(_T(""));
     }
 }
@@ -2782,7 +2782,7 @@ MyFrame::OnClose(wxCloseEvent & evt)
         {
             wxGetApp().m_luaLog->Close();
             if (showerrors) {
-                XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), GetLuaLogFilename().c_str());
+                XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), (const wxChar *)GetLuaLogFilename().c_str());
             #ifdef __WXDEBUG__
                 wxShell(wxString::Format(_T("\"%s\""), (const wxChar *)GetLuaLogFilename().c_str()));
             #endif // __WXDEBUG__

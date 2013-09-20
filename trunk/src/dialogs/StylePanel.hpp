@@ -21,7 +21,7 @@
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
-#   include <wx/treectrl.hpp>
+#   include <wx/treectrl.h>
 #endif
 
 #include "../paths.hpp"

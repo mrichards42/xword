@@ -379,7 +379,7 @@ StyleBase * GetStyleData(wxTreeCtrl * ctrl, const wxTreeItemId & id)
 StyleBase * GetStyleData(wxTreeCtrl * ctrl)
 {
     return GetStyleData(ctrl, ctrl->GetSelection());
-}
+}   
 
 void
 PreferencesDialog::OnStyleTreeSelection(wxTreeEvent & evt)
