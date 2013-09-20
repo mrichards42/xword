@@ -281,8 +281,8 @@ XGridDrawer::ScaleFont(wxFont * font, int maxWidth, int maxHeight)
     GetTextExtent(text, &w, &h, NULL, NULL, font);
 
     // First "guess" should speed things up
-    font->SetPointSize(font->GetPointSize()
-                       * GetScale(w, h, maxWidth, maxHeight));
+    int scaledSize = font->GetPointSize() * GetScale(w, h, maxWidth, maxHeight);
+    font->SetPointSize(std::min(std::max(scaledSize, MIN_POINT_SIZE), MAX_POINT_SIZE));
 
     // Make the font larger if needed.
     GetTextExtent(text, &w, &h, NULL, NULL, font);
