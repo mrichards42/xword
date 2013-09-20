@@ -85,10 +85,10 @@ configuration { "linux", "Release" }
 elseif os.is("macosx") then
 
 configuration { "macosx", "Debug" }
-    linkoptions(wx_config("--debug --unicode --static --libs"))
+    linkoptions(wx_config("--debug --unicode --static --libs std aui"))
 
 configuration { "macosx", "Release" }
-    linkoptions(wx_config("--unicode --static --libs"))
+    linkoptions(wx_config("--unicode --static --libs std aui"))
 
 end
 
