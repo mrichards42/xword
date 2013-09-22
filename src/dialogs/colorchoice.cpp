@@ -21,12 +21,13 @@
 #endif
 
 #include "colorchoice.hpp"
+#include "../utils/color.hpp"
 #include "../App.hpp"
 #include <algorithm>
 #include <set>
 
 // A marker string to identify wxNullColour
-static const wxChar * custom_color = _T("Custom...");
+static const wxChar * other_color = _T("Other...");
 
 // ----------------------------------------------------------------------------
 // The ComboCtrl class
@@ -34,28 +35,36 @@ static const wxChar * custom_color = _T("Custom...");
 
 ColorChoice::ColorChoice(wxWindow * parent, wxWindowID id,
                          const wxColour & color)
-    : VirtualComboBox(parent, id, wxEmptyString, wxDefaultPosition,
-                      wxDefaultSize, wxCB_READONLY)
+#ifdef __WXOSX__
+    : wxChoice(parent, id)
+#else
+    : wxOwnerDrawnComboBox(parent, id, wxEmptyString, wxDefaultPosition,
+                           wxDefaultSize, wxArrayString(), wxCB_READONLY)
+#endif
 {
+    s_ctrls.push_back(this);
     // Make sure we have a list of colors
     if (s_colors.empty())
         InitColors();
-
-    // Set the first value
-    if (! color.IsOk())
-        SetColor(*wxWHITE);
     else
-        SetColor(color);
-    // Connect the "Custom..." event handler
+        UpdateCtrls();
+    // Set the initial value
+    SetColor(color.IsOk() ? color : *wxWHITE);
+    // Connect the event handler
     Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,
-            wxCommandEventHandler(ColorChoice::OnListSelected));
+            wxCommandEventHandler(ColorChoice::OnSelection));
 }
 
+ColorChoice::~ColorChoice()
+{
+    s_ctrls.erase(std::find(s_ctrls.begin(), s_ctrls.end(), this));
+}
 
-// The color vector
-//-----------------
+// The color vector and color syncing
+//-----------------------------------
 
 ColorChoice::ColorArray ColorChoice::s_colors;
+std::vector<ColorChoice *> ColorChoice::s_ctrls;
 
 // Helper function to gather all the colors
 void AddColors(std::set<wxString> & colors, const ConfigGroup * group)
@@ -71,8 +80,8 @@ void AddColors(std::set<wxString> & colors, const ConfigGroup * group)
 void ColorChoice::InitColors(ConfigManager * cfg)
 {
     s_colors.clear();
-    s_colors.push_back(wxNullColour, custom_color);
-
+    // Add the "Other..." item
+    s_colors.push_back(wxNullColour, other_color);
     // Add colors from config
     if (cfg)
     {
@@ -82,6 +91,7 @@ void ColorChoice::InitColors(ConfigManager * cfg)
         for (it = colors.begin(); it != colors.end(); ++it)
             s_colors.push_back(wxColour(*it));
     }
+    UpdateCtrls();
 }
 
 void ColorChoice::ClearColors()
@@ -89,106 +99,105 @@ void ColorChoice::ClearColors()
     s_colors.clear();
 }
 
+// Sort roughly by hue
+bool color_sort(ColorChoice::colorlabel_t a, ColorChoice::colorlabel_t b)
+{
+    return HCLColor(a.color) < HCLColor(b.color);
+}
+
+void ColorChoice::UpdateCtrls()
+{
+    if (s_ctrls.size() == 0)
+        return;
+    std::sort(s_colors.begin(), s_colors.end(), color_sort);
+    wxArrayString choices;
+    ColorChoice::ColorArray::const_iterator it;
+    for (it = s_colors.begin(); it != s_colors.end(); ++it)
+        choices.push_back(it->label);
+    // Set the choices for our managed ctrls
+    std::vector<ColorChoice *>::iterator ctrl;
+    for (ctrl = s_ctrls.begin(); ctrl != s_ctrls.end(); ++ctrl)
+    {
+        wxString selection = (*ctrl)->GetValue();
+        (*ctrl)->Set(choices);
+        (*ctrl)->SetStringSelection(selection);
+    }
+}
+
 
 void ColorChoice::SetValue(const wxString & value)
 {
+    if (value.empty())
+        return;
     wxColour color(value);
-    if (color.IsOk())
-        m_lastColor = color;
-    // Add it to the list if we don't already have it.
-    for (size_t i = 0; i < s_colors.size(); ++i)
+    if (! color.IsOk())
+        return;
+    m_lastColor = color;
+    // Set the selection
+    if (! SetStringSelection(color.GetAsString()))
     {
-        if (s_colors[i].color == color)
-        {
-            VirtualComboBox::SetValue(value);
-            return;
-        }
+        // If this color doesn't already exist in the ctrl, add it.
+        s_colors.push_back(color);
+        UpdateCtrls();
+        SetStringSelection(color.GetAsString());
     }
-    // If we didn't find this color, add it to the list
-    s_colors.push_back(color);
-    VirtualComboBox::SetValue(value);
 }
 
-
-// Find items
-//-----------
-int ColorChoice::FindItem(const wxString & s) const
-{
-    if (s == custom_color)
-        return 0;
-    wxColour color(s);
-    for (size_t i = 0; i < s_colors.size(); ++i)
-    {
-        if (color == s_colors[i].color)
-            return i;
-    }
-    return wxNOT_FOUND;
-}
-
-wxString ColorChoice::GetItem(size_t n) const
-{
-    if (n == 0)
-        return custom_color;
-    return s_colors.at(n).color.GetAsString();
-}
-
-size_t ColorChoice::GetCount() const
-{
-    return s_colors.size();
-}
-
-wxString ColorChoice::GetLabel(const wxColour & color) const
-{
-    for (size_t i = 0; i < s_colors.size(); ++i)
-    {
-        if (color == s_colors[i].color)
-            return s_colors[i].label;
-    }
-    return wxEmptyString;
-}
-
+#undef PARENT_SET_VALUE
 
 // Drawing
 //--------
+const int popupPadding = 3;
 
 void ColorChoice::Draw(wxDC& dc, const wxRect& rect,
                        const wxColour & color, const wxString & label) const
 {
     wxRect smallRect(rect);
-    smallRect.Deflate(s_popupBorder);
+    smallRect.Deflate(popupPadding);
     // Make a box for the color
     int h = smallRect.GetHeight();
     wxRect colorRect = wxRect(smallRect.GetTopLeft(), wxSize(h * 1.5, h));
-    smallRect.Offset(colorRect.width + s_popupBorder, 0);
+    smallRect.Offset(colorRect.width + popupPadding, 0);
     dc.SetBrush(wxBrush(color, wxSOLID));
     dc.SetPen(*wxBLACK_PEN);
     dc.DrawRectangle(colorRect);
     dc.DrawLabel(label, smallRect, wxALIGN_CENTER_VERTICAL);
 }
 
-void ColorChoice::OnDrawItem(wxDC& dc, const wxRect& rect, size_t n) const
+void ColorChoice::OnDrawItem(wxDC& dc, const wxRect& rect,
+                             int item, int flags) const
 {
+    if (item == wxNOT_FOUND)
+        return;
     wxRect smallRect = rect;
-    smallRect.Deflate(s_popupBorder);
-    if (! s_colors[n].color.IsOk())
-        dc.DrawLabel(custom_color, smallRect, wxALIGN_CENTER_VERTICAL);
+    smallRect.Deflate(popupPadding);
+    if (! s_colors[item].color.IsOk())
+        dc.DrawLabel(other_color, smallRect, wxALIGN_CENTER_VERTICAL);
     else
-        Draw(dc, rect, s_colors[n].color, s_colors[n].label);
+        Draw(dc, rect, s_colors[item].color, s_colors[item].label);
 }
 
+wxCoord ColorChoice::OnMeasureItem(size_t n) const
+{
+    return GetCharHeight() + popupPadding * 2;
+}
+
+/*
 void ColorChoice::OnDrawCtrl(wxDC & dc, const wxRect & rect)
 {
     wxColour color = GetColor();
     Draw(dc, rect, color, GetLabel(color));
 }
+*/
 
 // Events
 //-------
 #include <wx/colordlg.h>
 
-void ColorChoice::OnListSelected(wxCommandEvent & evt)
+void ColorChoice::OnSelection(wxCommandEvent & evt)
 {
-    if (evt.GetInt() == 0) // Select custom color
+    wxString selection = GetValue();
+    if (selection == other_color) // Select custom color
     {
         wxColor color = wxGetColourFromUser(this, m_lastColor);
         if (color.IsOk())
@@ -197,5 +206,8 @@ void ColorChoice::OnListSelected(wxCommandEvent & evt)
             SetColor(m_lastColor);
     }
     else
+    {
+        m_lastColor = wxColour(selection);
         evt.Skip();
+    }
 }
