@@ -122,7 +122,7 @@ void ColorChoice::UpdateCtrls()
     std::vector<ColorChoice *>::iterator ctrl;
     for (ctrl = s_ctrls.begin(); ctrl != s_ctrls.end(); ++ctrl)
     {
-        wxString selection = (*ctrl)->GetStringSelection();
+        wxString selection = (*ctrl)->GetValue();
         (*ctrl)->Set(choices);
         (*ctrl)->SetStringSelection(selection);
 #ifdef __WXOSX__
@@ -197,7 +197,7 @@ wxCoord ColorChoice::OnMeasureItem(size_t n) const
 
 void ColorChoice::OnSelection(wxCommandEvent & evt)
 {
-    wxString selection = GetStringSelection();
+    wxString selection = GetValue();
     if (selection == other_color) // Select custom color
     {
         wxColor color = wxGetColourFromUser(this, m_lastColor);
