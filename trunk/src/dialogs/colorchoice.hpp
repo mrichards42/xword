@@ -19,41 +19,45 @@
 #define COLOR_CHOICE_H
 
 // A combo box that lists colors.
-
-#include "../widgets/vcombo.hpp"
+#include <wx/odcombo.h>
 #include <wx/colour.h>
 #include <vector>
 
 class ConfigManager;
 
-class ColorChoice : public VirtualComboBox
+#ifdef __WXOSX__
+class ColorChoice : public wxChoice
+#else
+class ColorChoice : public wxOwnerDrawnComboBox
+#endif
 {
 public:
     ColorChoice(wxWindow * parent, wxWindowID id = wxID_ANY,
                 const wxColour & color = wxNullColour);
+    ~ColorChoice();
 
+    // Access
     wxColour GetColor() const { return wxColour(GetValue()); }
     void SetColor(const wxColour & color) { SetValue(color.GetAsString()); }
     void SetValue(const wxString & value);
 
+    // Color syncing
     static void InitColors(ConfigManager * cfg = NULL);
     static void ClearColors();
-protected:
-    virtual int FindItem(const wxString & s) const;
-    virtual wxString GetItem(size_t n) const;
-    virtual size_t GetCount() const;
-    wxString GetLabel(const wxColour & color) const;
 
+    struct colorlabel_t { wxColour color; wxString label; };
+
+protected:
+    // Drawing
+    wxCoord OnMeasureItem(size_t n) const;
     void Draw(wxDC & dc, const wxRect & rect, const wxColour & color,
               const wxString & label) const;
-    void OnDrawItem(wxDC& dc, const wxRect& rect, size_t n) const;
-    void OnDrawCtrl(wxDC & dc, const wxRect & rect);
+    void OnDrawItem(wxDC& dc, const wxRect& rect, int item, int flags) const;
 
     wxColour m_lastColor; // The last valid color
-    void OnListSelected(wxCommandEvent & evt);
+    void OnSelection(wxCommandEvent & evt);
 
-    // A color and label array
-    struct colorlabel_t { wxColour color; wxString label; };
+    // A static vector of all colors currently in use
     class ColorArray : public std::vector<colorlabel_t>
     {
     public:
@@ -66,6 +70,10 @@ protected:
         }
     };
     static ColorArray s_colors;
+
+    // A static vector of ColorChoices for syncing colors
+    static void UpdateCtrls();
+    static std::vector<ColorChoice *> s_ctrls;
 };
 
 #endif // COLOR_CHOICE_H

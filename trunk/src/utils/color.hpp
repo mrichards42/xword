@@ -58,6 +58,8 @@ public:
     double Chroma() const { return c; }
     double Luma() const { return l; }
 
+    bool operator<(const HCLColor & b) const;
+
 protected:
     double h, c, l;
 };

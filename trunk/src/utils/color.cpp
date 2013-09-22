@@ -103,3 +103,16 @@ void HCLColor::ToRGB(unsigned char * red, unsigned char * green, unsigned char *
     *green = std::max(std::min((g + m) * 255, 255.), 0.);
     *blue = std::max(std::min((b + m) * 255, 255.), 0.);
 }
+
+
+// Sorting
+bool HCLColor::operator<(const HCLColor & b) const
+{
+    if (h == b.h)
+    {
+        if (c == b.c)
+            return l < b.l;
+        return c < b.c;
+    }
+    return h < b.h;
+}
