@@ -78,6 +78,8 @@ enum BasicStyleFlag
     STYLE_ALL       = STYLE_DEFAULT | STYLE_ALIGN
 };
 
+#define XWORD_USE_ALIGNCTRL 0
+
 #include "colorchoice.hpp"
 #include "../widgets/alignctrl.hpp"
 class BasicStyle : public StyleBase
@@ -91,12 +93,62 @@ public:
 
     int GetAlignment()
     {
+#if XWORD_USE_ALIGNCTRL
         return m_align->GetValue();
+#else
+        int ret = wxALIGN_TOP | wxALIGN_LEFT;
+        if (m_halign)
+        {
+            switch (m_halign->GetSelection())
+            {
+            case 1:
+                ret |= wxALIGN_CENTER_HORIZONTAL;
+                break;
+            case 2:
+                ret |= wxALIGN_RIGHT;
+                break;
+            }
+        }
+        if (m_valign)
+        {
+            switch (m_valign->GetSelection())
+            {
+            case 1:
+                ret |= wxALIGN_CENTER_VERTICAL;
+                break;
+            case 2:
+                ret |= wxALIGN_BOTTOM;
+                break;
+            }
+        }
+        return ret;
+#endif
     }
 
     void SetAlignment(int align)
     {
+#if XWORD_USE_ALIGNCTRL
         m_align->SetValue(align);
+#else
+        if (m_halign)
+        {
+            if (align & wxALIGN_CENTER_HORIZONTAL)
+                m_halign->SetSelection(1);
+            else if (align & wxALIGN_RIGHT)
+                m_halign->SetSelection(2);
+            else
+                m_halign->SetSelection(0);
+        }
+        if (m_valign)
+        {
+            if (align & wxALIGN_CENTER_VERTICAL)
+                m_valign->SetSelection(1);
+            else if (align & wxALIGN_BOTTOM)
+                m_valign->SetSelection(2);
+            else
+                m_valign->SetSelection(0);
+        }
+#endif
     }
 
 protected:
@@ -105,7 +157,12 @@ protected:
     ColorChoice * m_textColor;
     ColorChoice * m_bgColor;
 
+#if XWORD_USE_ALIGNCTRL
     AlignmentControl * m_align;
+#else
+    wxChoice * m_halign;
+    wxChoice * m_valign;
+#endif
 
     virtual wxWindow * MakeStylePanel(wxWindow * parent)
     {
@@ -119,6 +176,7 @@ protected:
             sizer->Add(m_font, 0, wxALIGN_CENTER_VERTICAL);
         }
         // Alignment
+#if XWORD_USE_ALIGNCTRL
         if (m_flag & STYLE_ALIGN)
         {
             // Figure out the alignment orientation
@@ -137,6 +195,26 @@ protected:
             sizer->Add(new wxStaticText(panel, wxID_ANY, _T("Alignment:")), 0, wxALIGN_CENTER_VERTICAL);
             sizer->Add(m_align, 0, wxALIGN_CENTER_VERTICAL);
         }
+#else // ! XWORD_USE_ALIGNCTRL
+        m_halign = NULL;
+        m_valign = NULL;
+        if (m_flag & STYLE_HORIZONTAL_ALIGN)
+        {
+            wxString choices[] = { "Left", "Center", "Right" };
+            m_halign = new wxChoice(panel, wxID_ANY, wxDefaultPosition,
+                                    wxDefaultSize, 3, choices);
+            sizer->Add(new wxStaticText(panel, wxID_ANY, _T("Horizontal Alignment:")), 0, wxALIGN_CENTER_VERTICAL);
+            sizer->Add(m_halign, 0, wxALIGN_CENTER_VERTICAL);
+        }
+        if (m_flag & STYLE_VERTICAL_ALIGN)
+        {
+            wxString choices[] = { "Top", "Middle", "Bottom" };
+            m_valign = new wxChoice(panel, wxID_ANY, wxDefaultPosition,
+                                    wxDefaultSize, 3, choices);
+            sizer->Add(new wxStaticText(panel, wxID_ANY, _T("Vertical Alignment:")), 0, wxALIGN_CENTER_VERTICAL);
+            sizer->Add(m_valign, 0, wxALIGN_CENTER_VERTICAL);
+        }
+#endif //  XWORD_USE_ALIGNCTRL
         // Colors
         if (m_flag & STYLE_TEXT_COLOR)
         {
