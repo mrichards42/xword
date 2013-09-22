@@ -51,7 +51,11 @@ ColorChoice::ColorChoice(wxWindow * parent, wxWindowID id,
     // Set the initial value
     SetColor(color.IsOk() ? color : *wxWHITE);
     // Connect the event handler
+#ifndef __WXOSX__
     Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,
+#else
+    Connect(wxEVT_COMMAND_CHOICE_SELECTED,
+#endif
             wxCommandEventHandler(ColorChoice::OnSelection));
 }
 
@@ -118,9 +122,12 @@ void ColorChoice::UpdateCtrls()
     std::vector<ColorChoice *>::iterator ctrl;
     for (ctrl = s_ctrls.begin(); ctrl != s_ctrls.end(); ++ctrl)
     {
-        wxString selection = (*ctrl)->GetValue();
+        wxString selection = (*ctrl)->GetStringSelection();
         (*ctrl)->Set(choices);
         (*ctrl)->SetStringSelection(selection);
+#ifdef __WXOSX__
+        (*ctrl)->OSXUpdateAttributedStrings();
+#endif
     }
 }
 
@@ -143,7 +150,7 @@ void ColorChoice::SetValue(const wxString & value)
     }
 }
 
-#undef PARENT_SET_VALUE
+#ifndef __WXOSX__
 
 // Drawing
 //--------
@@ -182,13 +189,7 @@ wxCoord ColorChoice::OnMeasureItem(size_t n) const
     return GetCharHeight() + popupPadding * 2;
 }
 
-/*
-void ColorChoice::OnDrawCtrl(wxDC & dc, const wxRect & rect)
-{
-    wxColour color = GetColor();
-    Draw(dc, rect, color, GetLabel(color));
-}
-*/
+#endif //__WXOSX__
 
 // Events
 //-------
@@ -196,7 +197,7 @@ void ColorChoice::OnDrawCtrl(wxDC & dc, const wxRect & rect)
 
 void ColorChoice::OnSelection(wxCommandEvent & evt)
 {
-    wxString selection = GetValue();
+    wxString selection = GetStringSelection();
     if (selection == other_color) // Select custom color
     {
         wxColor color = wxGetColourFromUser(this, m_lastColor);

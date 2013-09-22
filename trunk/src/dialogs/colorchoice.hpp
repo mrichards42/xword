@@ -19,15 +19,16 @@
 #define COLOR_CHOICE_H
 
 // A combo box that lists colors.
-#include <wx/odcombo.h>
 #include <wx/colour.h>
 #include <vector>
 
 class ConfigManager;
 
 #ifdef __WXOSX__
+#include <wx/choice.h>
 class ColorChoice : public wxChoice
 #else
+#include <wx/odcombo.h>
 class ColorChoice : public wxOwnerDrawnComboBox
 #endif
 {
@@ -37,7 +38,7 @@ public:
     ~ColorChoice();
 
     // Access
-    wxColour GetColor() const { return wxColour(GetValue()); }
+    wxColour GetColor() const { return wxColour(GetStringSelection()); }
     void SetColor(const wxColour & color) { SetValue(color.GetAsString()); }
     void SetValue(const wxString & value);
 
@@ -48,11 +49,15 @@ public:
     struct colorlabel_t { wxColour color; wxString label; };
 
 protected:
+#ifndef __WXOSX__
     // Drawing
     wxCoord OnMeasureItem(size_t n) const;
     void Draw(wxDC & dc, const wxRect & rect, const wxColour & color,
               const wxString & label) const;
     void OnDrawItem(wxDC& dc, const wxRect& rect, int item, int flags) const;
+#else
+    void OSXUpdateAttributedStrings();
+#endif //__WXOSX__
 
     wxColour m_lastColor; // The last valid color
     void OnSelection(wxCommandEvent & evt);
@@ -73,6 +78,46 @@ protected:
 
     // A static vector of ColorChoices for syncing colors
     static void UpdateCtrls();
+    static std::vector<ColorChoice *> s_ctrls;
+};
+
+#else  // __WXOSX__
+
+#include <wx/choice.h>
+
+class ColorChoice : public wxChoice
+{
+public:
+    ColorChoice(wxWindow * parent, wxWindowID id = wxID_ANY,
+                const wxColour & color = wxNullColour);
+    ~ColorChoice();
+
+    wxColour GetColor() const { return wxColour(GetStringSelection()); }
+    void SetColor(const wxColour & color) { SetValue(color.GetAsString()); }
+    void SetValue(const wxString & value);
+    
+    static void InitColors(ConfigManager * cfg = NULL);
+    static void ClearColors();
+protected:
+    
+    wxColour m_lastColor; // The last valid color
+    void OnListSelected(wxCommandEvent & evt);
+    
+    // A color and label array
+    struct colorlabel_t { wxColour color; wxString label; };
+    class ColorArray : public std::vector<colorlabel_t>
+    {
+    public:
+        void push_back(const wxColour & color, const wxString & label = _T(""))
+        {
+            colorlabel_t c;
+            c.color = color;
+            c.label = label.empty() ? color.GetAsString() : label;
+            std::vector<colorlabel_t>::push_back(c);
+        }
+    };
+    static void UpdateCtrls();
+    static ColorArray s_colors;
     static std::vector<ColorChoice *> s_ctrls;
 };
 

@@ -11,6 +11,9 @@ project "XWord"
         -- Use WinMain() instead of main() for windows apps
         flags { "WinMain" }
 
+    configuration "macosx"
+        files { "**.mm" }
+
     -- --------------------------------------------------------------------
     -- wxWidgets
     -- --------------------------------------------------------------------
