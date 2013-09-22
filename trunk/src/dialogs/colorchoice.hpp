@@ -38,7 +38,10 @@ public:
     ~ColorChoice();
 
     // Access
-    wxColour GetColor() const { return wxColour(GetStringSelection()); }
+#ifdef __WXOSX__
+    wxString GetValue() const { return GetStringSelection(); }
+#endif
+    wxColour GetColor() const { return wxColour(GetValue()); }
     void SetColor(const wxColour & color) { SetValue(color.GetAsString()); }
     void SetValue(const wxString & value);
 
