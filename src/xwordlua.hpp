@@ -31,7 +31,7 @@
 #define wxLUA_USEBINDING_WXLUADEBUGGER 0
 
 #include "paths.hpp"
-#include "wxlua/include/wxlua.h"
+#include "wxlua/wxlua.h"
 #include "wxbind/include/wxbinddefs.h"
 
 WXLUA_DECLARE_BIND_ALL

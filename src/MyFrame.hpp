@@ -56,7 +56,7 @@ class ConfigManager;
 
 #ifdef XWORD_USE_LUA
 // wxLua
-#include "wxlua/include/wxlua.h"
+#include "wxlua/wxlua.h"
 #endif // XWORD_USE_LUA
 
 //#define USE_AUI_TOOLBAR
