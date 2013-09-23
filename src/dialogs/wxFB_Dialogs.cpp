@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 10 2012)
+// C++ code generated with wxFormBuilder (version Oct  8 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -356,6 +356,7 @@ LicenseDialog::LicenseDialog( wxWindow* parent, wxWindowID id, const wxString& t
 	bSizer22 = new wxBoxSizer( wxVERTICAL );
 	
 	m_textCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrl->SetMaxLength( 0 ); 
 	bSizer22->Add( m_textCtrl, 1, wxALL|wxEXPAND, 10 );
 	
 	m_sdbSizer2 = new wxStdDialogButtonSizer();
@@ -372,150 +373,6 @@ LicenseDialog::LicenseDialog( wxWindow* parent, wxWindowID id, const wxString& t
 
 LicenseDialog::~LicenseDialog()
 {
-}
-
-MetadataFormatHelpDialog::MetadataFormatHelpDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxBoxSizer* bSizer18;
-	bSizer18 = new wxBoxSizer( wxVERTICAL );
-	
-	m_panel = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer14;
-	bSizer14 = new wxBoxSizer( wxVERTICAL );
-	
-	m_staticText47 = new wxStaticText( m_panel, wxID_ANY, wxT("Plain text is displayed as-is.\n\nText that is enclosed in percent signs (%) is replaced with\nmetadata for the puzzle.  The most common metadata fields\nare displayed below with the values from the current puzzle."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText47->Wrap( -1 );
-	bSizer14->Add( m_staticText47, 0, wxALL, 5 );
-	
-	m_sizer = new wxFlexGridSizer( 0, 2, 5, 20 );
-	m_sizer->SetFlexibleDirection( wxBOTH );
-	m_sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText15 = new wxStaticText( m_panel, wxID_ANY, wxT("Field"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText15->Wrap( -1 );
-	m_sizer->Add( m_staticText15, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticText16 = new wxStaticText( m_panel, wxID_ANY, wxT("Value"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText16->Wrap( -1 );
-	m_sizer->Add( m_staticText16, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticline1 = new wxStaticLine( m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	m_sizer->Add( m_staticline1, 0, wxEXPAND, 5 );
-	
-	m_staticline2 = new wxStaticLine( m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	m_sizer->Add( m_staticline2, 0, wxEXPAND, 5 );
-	
-	
-	bSizer14->Add( m_sizer, 0, wxALL, 5 );
-	
-	m_staticline13 = new wxStaticLine( m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	bSizer14->Add( m_staticline13, 0, wxEXPAND | wxALL, 5 );
-	
-	m_sdbSizer3 = new wxStdDialogButtonSizer();
-	m_sdbSizer3OK = new wxButton( m_panel, wxID_OK );
-	m_sdbSizer3->AddButton( m_sdbSizer3OK );
-	m_sdbSizer3->Realize();
-	
-	bSizer14->Add( m_sdbSizer3, 0, wxALL|wxEXPAND, 5 );
-	
-	
-	m_panel->SetSizer( bSizer14 );
-	m_panel->Layout();
-	bSizer14->Fit( m_panel );
-	bSizer18->Add( m_panel, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( bSizer18 );
-	this->Layout();
-	
-	this->Centre( wxBOTH );
-	
-	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MetadataFormatHelpDialog::OnClose ) );
-	m_sdbSizer3OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MetadataFormatHelpDialog::OnOk ), NULL, this );
-}
-
-MetadataFormatHelpDialog::~MetadataFormatHelpDialog()
-{
-	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MetadataFormatHelpDialog::OnClose ) );
-	m_sdbSizer3OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MetadataFormatHelpDialog::OnOk ), NULL, this );
-	
-}
-
-DisplayFormatDialogBase::DisplayFormatDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxBoxSizer* bSizer17;
-	bSizer17 = new wxBoxSizer( wxVERTICAL );
-	
-	m_sizer = new wxBoxSizer( wxVERTICAL );
-	
-	m_functionStart = new wxStaticText( this, wxID_ANY, wxT("function(puzzle)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_functionStart->Wrap( -1 );
-	m_functionStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
-	
-	m_sizer->Add( m_functionStart, 0, wxBOTTOM, 5 );
-	
-	m_format = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_DONTWRAP|wxTE_MULTILINE );
-	m_format->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
-	
-	m_sizer->Add( m_format, 1, wxEXPAND|wxLEFT, 15 );
-	
-	m_functionEnd = new wxStaticText( this, wxID_ANY, wxT("end"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_functionEnd->Wrap( -1 );
-	m_functionEnd->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
-	
-	m_sizer->Add( m_functionEnd, 0, wxTOP, 5 );
-	
-	m_useLua = new wxCheckBox( this, wxID_ANY, wxT("Format as a lua script"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_sizer->Add( m_useLua, 0, wxTOP|wxBOTTOM, 10 );
-	
-	wxStaticBoxSizer* sbSizer12;
-	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Result") ), wxVERTICAL );
-	
-	m_result = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_result->Wrap( -1 );
-	sbSizer12->Add( m_result, 0, wxALL, 5 );
-	
-	
-	m_sizer->Add( sbSizer12, 0, wxEXPAND|wxTOP|wxBOTTOM, 5 );
-	
-	
-	bSizer17->Add( m_sizer, 1, wxEXPAND|wxALL, 10 );
-	
-	m_staticline4 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	bSizer17->Add( m_staticline4, 0, wxEXPAND | wxALL, 5 );
-	
-	m_sdbSizer4 = new wxStdDialogButtonSizer();
-	m_sdbSizer4OK = new wxButton( this, wxID_OK );
-	m_sdbSizer4->AddButton( m_sdbSizer4OK );
-	m_sdbSizer4Cancel = new wxButton( this, wxID_CANCEL );
-	m_sdbSizer4->AddButton( m_sdbSizer4Cancel );
-	m_sdbSizer4->Realize();
-	
-	bSizer17->Add( m_sdbSizer4, 0, wxEXPAND|wxALL, 5 );
-	
-	
-	this->SetSizer( bSizer17 );
-	this->Layout();
-	
-	this->Centre( wxBOTH );
-	
-	// Connect Events
-	m_format->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( DisplayFormatDialogBase::OnTextUpdated ), NULL, this );
-	m_useLua->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( DisplayFormatDialogBase::OnUseLua ), NULL, this );
-}
-
-DisplayFormatDialogBase::~DisplayFormatDialogBase()
-{
-	// Disconnect Events
-	m_format->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( DisplayFormatDialogBase::OnTextUpdated ), NULL, this );
-	m_useLua->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( DisplayFormatDialogBase::OnUseLua ), NULL, this );
-	
 }
 
 CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )

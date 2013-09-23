@@ -17,6 +17,8 @@
 
 
 #include "Preferences.hpp"
+#include "wxFB_Preferences.h"
+
 #include "../MyFrame.hpp"
 #include "../CluePanel.hpp"
 #include "../CluePrompt.hpp"
@@ -28,13 +30,23 @@
 #endif // XWORD_USE_LUA
 
 PreferencesDialog::PreferencesDialog(wxWindow * parent)
-    : PreferencesDialogBase(parent, wxID_ANY),
+    : wxPropertySheetDialog(parent, wxID_ANY, "Preferences"),
       m_config()
 {
-    // Set a dummy config so that we can use this variable.
-    m_config.SetConfig(new wxFileConfig);
     // Enumerate the font faces
     FontFaceCtrl::InitFaceNames();
+
+    // Add the pages
+    wxBookCtrlBase * book = GetBookCtrl();
+    GetBookCtrl()->AddPage(new fbSolvePanel(book), "Solving");
+    GetBookCtrl()->AddPage(new fbAppearancePanel(book), "Appearance");
+    GetBookCtrl()->AddPage(new fbStartupPanel(book), "Startup");
+    GetBookCtrl()->AddPage(new fbPrintPanel(book), "Printing");
+
+    LayoutDialog();
+
+    // Set a dummy config so that we can use this variable.
+    m_config.SetConfig(new wxFileConfig);
 }
 
 
@@ -44,7 +56,7 @@ PreferencesDialog::~PreferencesDialog()
     // Clear the font faces
     FontFaceCtrl::ClearFaceNames();
 }
-
+#if 0
 extern int wxluatype_wxNotebook;
 
 void PreferencesDialog::OnInit(wxInitDialogEvent & evt)
@@ -430,4 +442,20 @@ PreferencesDialog::SaveStyleTreeConfig()
     StyleBase * data = GetStyleData(m_styleTree);
     if (data)
         data->SaveConfig();
+}
+
+#endif // 0
+
+
+
+
+void MetadataFormatHelpDialog::OnOk(wxCommandEvent & evt)
+{
+    Close();
+}
+
+void MetadataFormatHelpDialog::OnClose(wxCloseEvent & evt)
+{
+    Destroy();
+    evt.Skip();
 }

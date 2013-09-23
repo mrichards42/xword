@@ -401,19 +401,6 @@ protected:
     }
 };
 
-void MetadataFormatHelpDialog::OnOk(wxCommandEvent & evt)
-{
-    Close();
-}
-
-void MetadataFormatHelpDialog::OnClose(wxCloseEvent & evt)
-{
-    Destroy();
-    evt.Skip();
-}
-
-
-
 
 
 // ---------------------------------------------------------------------------
