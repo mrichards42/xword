@@ -27,6 +27,12 @@ class PreferencesDialog : public wxPropertySheetDialog
 public:
     PreferencesDialog(wxWindow * parent);
     ~PreferencesDialog();
+
+#ifdef __WXOSX__
+protected:
+    virtual void DoMoveWindow(int x, int y, int width, int height);
+#endif
+    
 #if 0
 protected:
     // Load the window / config states
