@@ -19,15 +19,15 @@
 #ifndef PREFERENCES_DLG_H
 #define PREFERENCES_DLG_H
 
-#include "wxFB_Dialogs.h"
 #include "../config.hpp" // For ConfigManager
+#include <wx/propdlg.h>
 
-class PreferencesDialog : public PreferencesDialogBase
+class PreferencesDialog : public wxPropertySheetDialog
 {
 public:
     PreferencesDialog(wxWindow * parent);
     ~PreferencesDialog();
-
+#if 0
 protected:
     // Load the window / config states
     void LoadConfig();
@@ -52,9 +52,8 @@ protected:
 
     virtual void OnStyleTreeSelection(wxTreeEvent & evt);
     virtual void OnSimpleStyleButton(wxCommandEvent & evt);
-
+#endif // 0
     ConfigManager m_config;
 };
-
 
 #endif // PREFERENCES_DLG_H

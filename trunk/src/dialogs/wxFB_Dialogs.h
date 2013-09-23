@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 10 2012)
+// C++ code generated with wxFormBuilder (version Oct  8 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -32,8 +32,6 @@
 #include <wx/notebook.h>
 #include <wx/dialog.h>
 #include <wx/textctrl.h>
-#include <wx/statline.h>
-#include <wx/frame.h>
 #include <wx/choice.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -116,69 +114,6 @@ class LicenseDialog : public wxDialog
 		
 		LicenseDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("XWord License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 371,262 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~LicenseDialog();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class MetadataFormatHelpDialog
-///////////////////////////////////////////////////////////////////////////////
-class MetadataFormatHelpDialog : public wxFrame 
-{
-	private:
-	
-	protected:
-		wxStaticText* m_staticText47;
-		wxStaticText* m_staticText15;
-		wxStaticText* m_staticText16;
-		wxStaticLine* m_staticline1;
-		wxStaticLine* m_staticline2;
-		wxStaticLine* m_staticline13;
-		wxStdDialogButtonSizer* m_sdbSizer3;
-		wxButton* m_sdbSizer3OK;
-		
-		// Virtual event handlers, overide them in your derived class
-		void OnClose( wxCloseEvent& event );
-		void OnOk( wxCommandEvent& event );
-		
-	
-	public:
-		wxPanel* m_panel;
-		wxFlexGridSizer* m_sizer;
-		
-		MetadataFormatHelpDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Display Format Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_TOOL_WINDOW|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
-		
-		~MetadataFormatHelpDialog();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class DisplayFormatDialogBase
-///////////////////////////////////////////////////////////////////////////////
-class DisplayFormatDialogBase : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxBoxSizer* m_sizer;
-		wxStaticText* m_functionStart;
-		wxStaticText* m_functionEnd;
-		wxStaticText* m_result;
-		wxStaticLine* m_staticline4;
-		wxStdDialogButtonSizer* m_sdbSizer4;
-		wxButton* m_sdbSizer4OK;
-		wxButton* m_sdbSizer4Cancel;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnTextUpdated( wxCommandEvent& event ) = 0;
-		virtual void OnUseLua( wxCommandEvent& event ) = 0;
-		
-	
-	public:
-		wxTextCtrl* m_format;
-		wxCheckBox* m_useLua;
-		
-		DisplayFormatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Display Format"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,393 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
-		~DisplayFormatDialogBase();
 	
 };
 
