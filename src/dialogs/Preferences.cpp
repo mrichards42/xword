@@ -30,11 +30,18 @@
 #endif // XWORD_USE_LUA
 
 PreferencesDialog::PreferencesDialog(wxWindow * parent)
-    : wxPropertySheetDialog(parent, wxID_ANY, "Preferences"),
+    : wxPropertySheetDialog(),
       m_config()
 {
+#ifdef __WXOSX__
+    SetSheetStyle(wxPROPSHEET_DEFAULT | wxPROPSHEET_SHRINKTOFIT);
+#endif
+    Create(parent, wxID_ANY, "Preferences");
+
     // Enumerate the font faces
     FontFaceCtrl::InitFaceNames();
+    // Set a dummy config
+    m_config.SetConfig(new wxFileConfig);
 
     // Add the pages
     wxBookCtrlBase * book = GetBookCtrl();
@@ -44,9 +51,6 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
     GetBookCtrl()->AddPage(new fbPrintPanel(book), "Printing");
 
     LayoutDialog();
-
-    // Set a dummy config so that we can use this variable.
-    m_config.SetConfig(new wxFileConfig);
 }
 
 

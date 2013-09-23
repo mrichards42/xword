@@ -234,6 +234,7 @@ fbSolvePanel::fbSolvePanel( wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	
 	this->SetSizer( bSizer3 );
 	this->Layout();
+	bSizer3->Fit( this );
 }
 
 fbSolvePanel::~fbSolvePanel()
@@ -277,6 +278,7 @@ fbAppearancePanel::fbAppearancePanel( wxWindow* parent, wxWindowID id, const wxP
 	
 	this->SetSizer( bsizer26 );
 	this->Layout();
+	bsizer26->Fit( this );
 	
 	// Connect Events
 	m_styleTree->Connect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( fbAppearancePanel::OnStyleTreeSelection ), NULL, this );
@@ -350,6 +352,7 @@ fbStartupPanel::fbStartupPanel( wxWindow* parent, wxWindowID id, const wxPoint& 
 	
 	this->SetSizer( bSizer20 );
 	this->Layout();
+	bSizer20->Fit( this );
 	
 	// Connect Events
 	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( fbStartupPanel::OnSaveFileHistory ), NULL, this );
@@ -450,6 +453,7 @@ fbPrintPanel::fbPrintPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	
 	this->SetSizer( bSizer371 );
 	this->Layout();
+	bSizer371->Fit( this );
 	
 	// Connect Events
 	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( fbPrintPanel::OnPrintCustomFonts ), NULL, this );
