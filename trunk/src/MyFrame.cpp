@@ -1563,7 +1563,9 @@ MyFrame::LoadConfig()
                       wxAuiPaneInfo().Name(meta->m_name)
                       .Caption(name).CaptionVisible(false)
                       .CloseButton().Resizable(false).PaneBorder(false)
-                      .MinSize(25,25).Top().Layer(10));
+                      .MinSize(25,25).Layer(10)
+                      .Direction(name == "Copyright" ? wxAUI_DOCK_BOTTOM
+                                                     : wxAUI_DOCK_TOP));
 #if USE_MY_AUI_MANAGER
         m_mgr.SetContextWindow(m_mgr.GetPane(ctrl), ctrl);
 #endif
@@ -2208,7 +2210,7 @@ MyFrame::OnLoadLayout(wxCommandEvent & WXUNUSED(evt))
                      nameArray,
                      layoutArray);
 
-    // If the dialog is canceled, load the previous layout
+    // If the dialog is canceled, load the current layout
     if (dlg.ShowModal() != wxID_OK)
         LoadPerspective(layoutArray.front(), true);
 
