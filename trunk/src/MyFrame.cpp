@@ -1547,12 +1547,7 @@ MyFrame::LoadConfig()
             wxDefaultPosition, wxDefaultSize,
             meta->alignment() | (meta->useLua() ? META_USE_LUA : 0));
         // Metadata callbacks
-        meta->displayFormat.AddCallback(ctrl, &MetadataCtrl::SetDisplayFormat);
-        meta->font.AddCallback(ctrl, &MetadataCtrl::SetFont);
-        meta->foregroundColor.AddCallback(ctrl, &MetadataCtrl::SetForegroundColour);
-        meta->backgroundColor.AddCallback(ctrl, &MetadataCtrl::SetBackgroundColour);
-        meta->alignment.AddCallback(ctrl, &MetadataCtrl::SetAlignment);
-        meta->useLua.AddCallback(ctrl, &MetadataCtrl::SetLuaFormat);
+        ctrl->SetConfig(&*meta);
 
         // Add to AUI
         // Chop the metadata part of the name off

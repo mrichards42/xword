@@ -18,6 +18,7 @@
 #ifndef METADATA_CTRL_H
 #define METADATA_CTRL_H
 
+#include "config.hpp"
 #include "widgets/HtmlText.hpp"
 #include "puz/Puzzle.hpp"
 class MyFrame;
@@ -72,12 +73,18 @@ public:
     // Get a metadata value
     static wxString GetMeta(const wxString & str, MyFrame * frame);
 
+    // Assign the config key for this control
+    // This automatically adds config callbacks, and an alignment contenxt menu.
+    void SetConfig(ConfigManager::Metadata_t * cfg);
+
 protected:
     wxString FormatLabel() { return FormatLabel(m_displayFormat, m_frame, m_useLua); }
+    void OnContextMenu(wxContextMenuEvent & evt);
 
     wxString m_displayFormat;
     MyFrame * m_frame;
     bool m_useLua;
+    ConfigManager::Metadata_t * m_cfg;
 
     DECLARE_NO_COPY_CLASS(MetadataCtrl)
     DECLARE_DYNAMIC_CLASS(MetadataCtrl)
