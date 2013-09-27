@@ -279,9 +279,9 @@ public:
     int    GetLetterHeight() const { return m_drawer.GetLetterHeight(); }
 
     void SetBoxSize(int size)         { m_drawer.SetBoxSize(size); Scale(); }
-    void SetBorderSize(int size)      { m_drawer.SetBorderSize(size); Scale(); }
-    void SetLetterScale(long scale)   { m_drawer.SetLetterScale(scale / 100.); }
-    void SetNumberScale(long scale)   { m_drawer.SetNumberScale(scale / 100.); }
+    void SetBorderSize(int size)      { m_drawer.SetBorderSize(size); Scale(); if (! IsEmpty()) Refresh(); }
+    void SetLetterScale(long scale)   { m_drawer.SetLetterScale(scale / 100.); if (! IsEmpty()) Refresh(); }
+    void SetNumberScale(long scale)   { m_drawer.SetNumberScale(scale / 100.); if (! IsEmpty()) Refresh(); }
 
     // Zooming
     void FitGrid(bool fit = true)
