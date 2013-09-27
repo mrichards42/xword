@@ -259,6 +259,19 @@ public:
         m_config->Write(path, Convert<T, typename AdaptedType<T>::type>(val));
     }
 
+    template <typename T>
+    inline bool SetIfChanged(const wxString & path, const T & val)
+    {
+        // Check to see if this value has changed
+        typename AdaptedType<T>::type current;
+        typename AdaptedType<T>::type converted = Convert<T, typename AdaptedType<T>::type>(val);
+        if (m_config->Read(path, &current))
+            if (current == converted)
+                return false;
+        m_config->Write(path, converted);
+        return true;
+    }
+
     inline void Update(wxEvtHandler * h = NULL) { m_group.Update(h); }
     inline void RemoveCallbacks(wxEvtHandler * h) { m_group.RemoveCallbacks(h); }
 
