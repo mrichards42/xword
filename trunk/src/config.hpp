@@ -23,8 +23,9 @@
 class ConfigManager : public ConfigManagerBase
 {
 public:
-    ConfigManager()
-        : Window(&m_group),
+    ConfigManager(bool useDummy = false)
+        : ConfigManagerBase(useDummy),
+          Window(&m_group),
           Grid(&m_group),
           Clue(&m_group),
           CluePrompt(&m_group),
