@@ -19,6 +19,7 @@
 #define CONFIG_MGR_H
 
 #include <wx/config.h>
+#include <wx/memconf.h>
 #include <list>
 #include <map>
 #include <set>
@@ -168,18 +169,30 @@ private: // Can't assign or copy
         config.Update(); // Calls all callbacks in the config hierarchy.
 */
 
+static const bool CONFIG_DUMMY = true;
+
 class ConfigManagerBase
 {
 public:
-    ConfigManagerBase()
+    ConfigManagerBase(bool useDummy = false)
         : m_group(this),
           m_config(NULL),
-          m_autoUpdate(true)
+          m_autoUpdate(true),
+          m_isDummy(useDummy)
     {
+        if (useDummy)
+            m_config = new wxMemoryConfig;
+    }
+
+    virtual ~ConfigManagerBase()
+    {
+        if (m_isDummy)
+            delete GetConfig();
     }
 
     void SetConfig(wxConfigBase * cfg)
     {
+        wxASSERT_MSG(! m_isDummy, "ConfigManager already has a dummy wxMemory Config");
         m_config = cfg;
         // If we have ConfigLists, update their values.
         m_group.UpdateLists();
@@ -258,6 +271,7 @@ protected:
     wxConfigBase * m_config;
     bool m_autoUpdate;
     ConfigGroup m_group;
+    bool m_isDummy;
 };
 
 
@@ -500,8 +514,8 @@ public:
     inline void Set(const T & val)
     {
         ConfigManagerBase * cfg = GetConfig();
-        cfg->Set<T>(m_name, val);
-        if (cfg->AutoUpdate())
+        const bool different = cfg->SetIfChanged<T>(m_name, val);
+        if (different && cfg->AutoUpdate())
             Update(val);
     }
 
