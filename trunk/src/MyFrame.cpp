@@ -33,8 +33,9 @@
 #include "puz/Puzzle.hpp"
 
 // Dialogs
-#include "dialogs/Layout.hpp"
-#include "dialogs/Preferences.hpp"
+#include "dialogs/LayoutDialog.hpp"
+#include "dialogs/PreferencesDialog.hpp"
+#include "dialogs/PrintDialog.hpp"
 #include "dialogs/wxFB_Dialogs.h"
 #include <wx/aboutdlg.h>
 
@@ -1509,37 +1510,42 @@ MyFrame::LoadConfig()
 
     // Load the Metadata panels
     ConfigManager::MetadataCtrls_t & metadata = config.MetadataCtrls;
+    ConfigManager::MetadataCtrls_t::iterator meta;
+    // If we have no metadata panels, create Title, Author, and Copyright.
     if (metadata.empty())
     {
-        // If we have no metadata panels, create Title, Author, and Copyright
-        // panels.
-        // Title
-        ConfigManager::Metadata_t * title = metadata.push_back(_T("Title"));
-        title->displayFormat = _T("%title%");
-        // Author
-        ConfigManager::Metadata_t * author = metadata.push_back(_T("Author"));
-        author->displayFormat = _T("%author%");
-        // Copyright
-        ConfigManager::Metadata_t * copyright = metadata.push_back(_T("Copyright"));
-        copyright->displayFormat = _T("%copyright%");
-        // If we're using lua, make the author format smarter
-#if XWORD_USE_LUA
-        author->displayFormat =
-        _T("if %author% then\n\
-                if %editor% then\n\
-                    return %author% .. ' / edited by ' .. %editor%\n\
-                else\n\
-                    return %author%\n\
-                end\n\
-            elseif %editor% then\n\
-                return 'Edited by ' .. %editor%\n\
-            end");
-        author->useLua = true;
-#endif
+        metadata.push_back(_T("Title"));
+        metadata.push_back(_T("Author"));
+        metadata.push_back(_T("Copyright"));
+    }
+    // Set default values
+    for (meta = metadata.begin(); meta != metadata.end(); ++meta)
+    {
+        if (meta->m_name == "/Metadata/Title")
+            meta->displayFormat.SetDefault("%title%");
+        else if (meta->m_name == "/Metadata/Copyright")
+            meta->displayFormat.SetDefault(_T("%copyright%"));
+        else if (meta->m_name == "/Metadata/Author")
+        {
+            meta->displayFormat.SetDefault("%author%");
+        #if XWORD_USE_LUA
+            // If we're using lua, make the author format smarter
+            meta->displayFormat.SetDefault(
+                "if %author% then\n"
+                "  if %editor% then\n"
+                "    return %author% .. ' / edited by ' .. %editor%\n"
+                "  else\n"
+                "    return %author%\n"
+                "  end\n"
+                "elseif %editor% then\n"
+                "  return 'Edited by ' .. %editor%\n"
+                "end");
+            meta->useLua.SetDefault(true);
+        #endif
+        }
     }
 
     // Add the panels to our configuration
-    ConfigManager::MetadataCtrls_t::iterator meta;
     for (meta = metadata.begin(); meta != metadata.end(); ++meta)
     {
         MetadataCtrl * ctrl = new MetadataCtrl(

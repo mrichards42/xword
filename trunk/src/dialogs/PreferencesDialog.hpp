@@ -22,44 +22,38 @@
 #include "../config.hpp" // For ConfigManager
 #include <wx/propdlg.h>
 
+#ifdef __WXOSX__
+#   define XWORD_PREFERENCES_LIVE_PREVIEW 1
+#   define XWORD_PREFERENCES_SHRINK 1
+#else
+#   define XWORD_PREFERENCES_LIVE_PREVIEW 1
+#   define XWORD_PREFERENCES_SHRINK 0
+#endif
+
 class PreferencesDialog : public wxPropertySheetDialog
 {
 public:
     PreferencesDialog(wxWindow * parent);
     ~PreferencesDialog();
+    ConfigManager & GetConfig();
 
-#ifdef __WXOSX__
 protected:
+#ifdef __WXOSX__
     virtual void DoMoveWindow(int x, int y, int width, int height);
 #endif
-    
-#if 0
-protected:
     // Load the window / config states
     void LoadConfig();
     void SaveConfig();
-    void SetupStyleTree();
-    void SaveStyleTreeConfig();
+    void ResetConfig();
 
     // Event Handlers
-    virtual void OnInit(wxInitDialogEvent & evt);
-    virtual void OnOK(wxCommandEvent & evt)
-        { SaveConfig(); Close(); GetParent()->Refresh(); evt.Skip(); }
-    virtual void OnApply(wxCommandEvent & evt)
-        { SaveConfig(); GetParent()->Refresh(); evt.Skip(); }
-    virtual void OnCancel(wxCommandEvent & evt)
-        { Close(); evt.Skip(); }
+    void OnOK(wxCommandEvent & evt);
+    void OnApply(wxCommandEvent & evt);
+    void OnCancel(wxCommandEvent & evt);
+    void OnClose(wxCloseEvent & evt) { Destroy(); }
 
-    virtual void OnClose(wxCloseEvent & evt) { Destroy(); }
-
-    virtual void OnSaveFileHistory(wxCommandEvent & evt);
-    virtual void OnPrintCustomFonts(wxCommandEvent & evt);
-    virtual void OnBlackSquareBrightness(wxScrollEvent & evt);
-
-    virtual void OnStyleTreeSelection(wxTreeEvent & evt);
-    virtual void OnSimpleStyleButton(wxCommandEvent & evt);
-#endif // 0
-    ConfigManager m_config;
+    ConfigManager * m_config;
+    ConfigManager m_oldConfig;
 };
 
 #endif // PREFERENCES_DLG_H

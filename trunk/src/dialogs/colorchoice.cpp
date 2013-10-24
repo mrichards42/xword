@@ -42,6 +42,7 @@ ColorChoice::ColorChoice(wxWindow * parent, wxWindowID id,
                            wxDefaultSize, wxArrayString(), wxCB_READONLY)
 #endif
 {
+    SetMinSize(wxSize(150, -1));
     s_ctrls.push_back(this);
     // Make sure we have a list of colors
     if (s_colors.empty())
@@ -209,6 +210,6 @@ void ColorChoice::OnSelection(wxCommandEvent & evt)
     else
     {
         m_lastColor = wxColour(selection);
-        evt.Skip();
     }
+    SendEvent();
 }

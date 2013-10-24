@@ -16,7 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "CustomPrint.hpp"
+#include "PrintDialog.hpp"
 #include "../MyFrame.hpp"
 #include "../XGridDrawer.hpp" // Grid options
 

@@ -27,7 +27,7 @@
 #include "html/render.hpp" // Html text printing
 #include "XGridDrawer.hpp"
 #include "puz/Puzzle.hpp"
-#include "dialogs/CustomPrint.hpp" // PrintInfo
+#include "dialogs/PrintDialog.hpp" // PrintInfo
 
 class MyFrame;
 

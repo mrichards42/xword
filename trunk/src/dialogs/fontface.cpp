@@ -19,7 +19,6 @@
 #include "fontface.hpp"
 #include <wx/fontenum.h>
 #include <wx/textctrl.h>
-
 #include <wx/thread.h>
 
 // A critical section for our font thread
@@ -28,16 +27,14 @@ static wxCriticalSection s_fontCS;
 // ----------------------------------------------------------------------------
 // The ComboCtrl class
 // ----------------------------------------------------------------------------
-
 FontFaceCtrl::FontFaceCtrl(wxWindow * parent, wxWindowID id,
                            const wxString & faceName)
-    : VirtualComboBox(parent, id, wxEmptyString)
+    : wxComboBox(parent, id, wxEmptyString)
 {
+    SetMinSize(wxSize(150, -1));
     // Make sure we have a list of font faces
-    if (! s_facenamesComplete)
-        InitFaceNames();
-
-    SetPopupMinWidth(200);
+    if (! s_threadComplete)
+        InitFacenames();
 
     // Set the first value
     if (faceName == wxEmptyString)
@@ -45,33 +42,60 @@ FontFaceCtrl::FontFaceCtrl(wxWindow * parent, wxWindowID id,
     else
         SetValue(faceName);
     // Connect events
-    GetTextCtrl()->Connect(
-        wxEVT_KILL_FOCUS,
-        wxFocusEventHandler(FontFaceCtrl::OnKillFocus),
-        NULL, this);
+    Bind(wxEVT_KILL_FOCUS, &FontFaceCtrl::OnKillFocus, this);
+    Bind(wxEVT_SET_FOCUS, &FontFaceCtrl::OnSetFocus, this);
+    // I can't seem to get wxTE_PROCESS_ENTER and wxEVT_TEXT_ENTER to work,
+    // so we'll circumvent that with a CHAR_HOOK event
+    // Perhaps wxPropertySheetDialog is catching enter events?
+    Bind(wxEVT_CHAR_HOOK, &FontFaceCtrl::OnCharHook, this);
 }
 
+void FontFaceCtrl::OnSetFocus(wxFocusEvent & evt)
+{
+    evt.Skip();
+    // Set the combobox list contents
+    wxCriticalSectionLocker lock(s_fontCS);
+    wxString value = GetValue();
+    Set(s_facenames);
+    AutoComplete(s_facenames);
+    wxComboBox::SetValue(value);
+    if (s_threadComplete)
+        Unbind(wxEVT_SET_FOCUS, &FontFaceCtrl::OnSetFocus, this);
+}
+
+void FontFaceCtrl::OnCharHook(wxKeyEvent & evt)
+{
+    if (evt.GetKeyCode() == WXK_RETURN || evt.GetKeyCode() == WXK_NUMPAD_ENTER)
+        SetValue(GetValue());
+    else
+        evt.Skip();
+}
 
 void FontFaceCtrl::SetValue(const wxString & value)
 {
-    wxCriticalSectionLocker lock(s_fontCS);
-    wxString facename = value.Lower(); // case-insensitive
     // Look for the closest facename in the list.
+    wxString facename = value.Lower(); // case-insensitive
     bool hasMatch = false;
+    int selection = -1;
     for (size_t i = 0; i < s_facenames.size(); ++i)
     {
         const wxString & item = s_facenames[i].Lower();
         if (item.StartsWith(facename))
         {
             m_lastFaceName = s_facenames[i];
+            selection = i;
             break;
         }
         else if (facename.StartsWith(item))
         {
             m_lastFaceName = s_facenames[i];
+            selection = i;
         }
     }
-    VirtualComboBox::SetValue(m_lastFaceName);
+    // Set Value and send an event
+    SetSelection(selection);
+    wxComboBox::SetValue(m_lastFaceName);
+    SendSelectionChangedEvent(wxEVT_COMBOBOX); // from wxControlWithItems
 }
 
 
@@ -98,16 +122,16 @@ public:
         {
             wxCriticalSectionLocker lock(s_fontCS);
             FontFaceCtrl::s_facenames.clear();
-            FontFaceCtrl::s_facenamesComplete = false;
+            FontFaceCtrl::s_threadComplete = false;
         }
         EnumerateFacenames(); // The real work is done in OnFacename
         {
             wxCriticalSectionLocker lock(s_fontCS);
             FontFaceCtrl::s_facenames.Sort(SortNoCase);
             if (TestDestroy())
-                FontFaceCtrl::s_facenamesComplete = false;
+                FontFaceCtrl::s_threadComplete = false;
             else
-                FontFaceCtrl::s_facenamesComplete = true;
+                FontFaceCtrl::s_threadComplete = true;
             FontFaceCtrl::s_thread = NULL;
         }
         return (ExitCode)0;
@@ -127,56 +151,34 @@ public:
     }
 };
 
-// The facenames array
-//--------------------
+// Static thread functions
+//------------------------
 
 wxArrayString FontFaceCtrl::s_facenames;
-bool FontFaceCtrl::s_facenamesComplete = false;
+bool FontFaceCtrl::s_threadComplete = false;
 FontEnumeratorThread * FontFaceCtrl::s_thread = NULL;
 
-void FontFaceCtrl::InitFaceNames()
+void FontFaceCtrl::InitFacenames()
 {
-    {
-        wxCriticalSectionLocker lock(s_fontCS);
-        if (s_thread != NULL)
-            return;
-        s_facenames.clear();
-        s_thread = new FontEnumeratorThread;
-        s_thread->Create();
-        s_thread->Run();
-    }
+    wxCriticalSectionLocker lock(s_fontCS);
+    // Only start this thread once
+    if (s_thread != NULL)
+        return;
+    s_facenames.clear();
+    s_thread = new FontEnumeratorThread;
+    s_thread->Create();
+    s_thread->Run();
 }
 
 
-void FontFaceCtrl::ClearFaceNames()
+void FontFaceCtrl::ClearFacenames()
 {
     wxCriticalSectionLocker lock(s_fontCS);
     s_facenames.Clear();
-    s_facenamesComplete = false;
+    s_threadComplete = false;
     if (s_thread)
     {
         s_thread->Delete();
         s_thread = NULL;
     }
-}
-
-
-// Find items
-//-----------
-int FontFaceCtrl::FindItem(const wxString & s) const
-{
-    wxCriticalSectionLocker lock(s_fontCS);
-    return s_facenames.Index(s);
-}
-
-wxString FontFaceCtrl::GetItem(size_t n) const
-{
-    wxCriticalSectionLocker lock(s_fontCS);
-    return s_facenames[n];
-}
-
-size_t FontFaceCtrl::GetCount() const
-{
-    wxCriticalSectionLocker lock(s_fontCS);
-    return s_facenames.size();
 }

@@ -15,12 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef STYLE_EDITORS_H
-#define STYLE_EDITORS_H
+#ifndef FONT_PICKER_H
+#define FONT_PICKER_H
 
-// The style editors for our StylePanel.
+// A Fontn Picker Panel
 
-#include "wxFB_StylePanels.h"
+#include "wxFB_TreePanels.h"
+#include <wx/fontpicker.h> // wxFontPickerEvent
 
 //------------------------------------------------------------------------------
 // Font Panels
@@ -28,7 +29,7 @@
 
 #include <wx/fontenum.h>
 
-enum FontPanelStyles
+enum FontPickerPanelStyles
 {
     FP_FACENAME  = 1,
     FP_POINTSIZE = 1 << 1,
@@ -41,38 +42,47 @@ enum FontPanelStyles
     FP_DEFAULT = FP_FACENAME | FP_POINTSIZE | FP_STYLE
 };
 
-class FontPanel : public FontPanelBase
+class FontPickerPanel : public wxFB_FontPickerPanel
 {
 public:
-    FontPanel(wxWindow * parent, wxWindowID id = wxID_ANY,
+    FontPickerPanel(wxWindow * parent, wxWindowID id = wxID_ANY,
               const wxFont & font = wxNullFont, long style = FP_DEFAULT)
-        : FontPanelBase(parent, id)
+        : wxFB_FontPickerPanel(parent, id)
     {
-        wxSizer * sizer = GetSizer();
-
         // Hide unneeded ctrls
         wxASSERT(style != 0);
         if ((style & FP_FACENAME) == 0)
-            sizer->Hide(m_facename, true);
+            m_sizer->Hide(m_facename, true);
         if ((style & FP_POINTSIZE) == 0)
-            sizer->Hide(m_pointsize, true);
+        {
+            // If the pointsize ctrl is hidden, place the whole picker on
+            // one line
+            m_sizer->Hide(m_pointsize, true);
+            m_sizer->Detach(m_top);
+            m_sizer->Detach(m_bottom);
+            m_sizer->SetOrientation(wxHORIZONTAL);
+            m_sizer->Add(m_top);
+            m_sizer->Add(m_bottom);
+        }
         if ((style & FP_BOLD) == 0)
-            sizer->Hide(m_bold, true);
+            m_sizer->Hide(m_bold, true);
         if ((style & FP_ITALIC) == 0)
-            sizer->Hide(m_italic, true);
+            m_sizer->Hide(m_italic, true);
         if ((style & FP_UNDERLINE) == 0)
-            sizer->Hide(m_underline, true);
+            m_sizer->Hide(m_underline, true);
 
         // Make the buttons square
         int btnSize = m_facename->GetSize().y;
-        m_styles->GetItem(m_bold)->SetInitSize(btnSize, btnSize);
-        m_styles->GetItem(m_italic)->SetInitSize(btnSize, btnSize);
-        m_styles->GetItem(m_underline)->SetInitSize(btnSize, btnSize);
+        m_sizer->GetItem(m_bold, true)->SetInitSize(btnSize, btnSize);
+        m_sizer->GetItem(m_italic, true)->SetInitSize(btnSize, btnSize);
+        m_sizer->GetItem(m_underline, true)->SetInitSize(btnSize, btnSize);
 
-        // If we have styles, wrap the style sizer
-        // when necessary
-        if (style & FP_STYLE)
-            Connect(wxEVT_SIZE, wxSizeEventHandler(FontPanel::OnSize));
+        // Connect changed events
+        m_facename->Bind(wxEVT_COMBOBOX, &FontPickerPanel::OnChanged, this);
+        m_pointsize->Bind(wxEVT_SPINCTRL, &FontPickerPanel::OnChanged, this);
+        m_bold->Bind(wxEVT_TOGGLEBUTTON, &FontPickerPanel::OnChanged, this);
+        m_italic->Bind(wxEVT_TOGGLEBUTTON, &FontPickerPanel::OnChanged, this);
+        m_underline->Bind(wxEVT_TOGGLEBUTTON, &FontPickerPanel::OnChanged, this);
 
         Layout();
 
@@ -82,7 +92,7 @@ public:
             SetSelectedFont(*wxSWISS_FONT);
     }
 
-    wxFont GetSelectedFont()
+    wxFont GetSelectedFont() const
     {
         return wxFont(
             m_pointsize->GetValue(), wxFONTFAMILY_DEFAULT,
@@ -103,41 +113,19 @@ public:
     }
 
 protected:
-    // Put the style parts on a second line if necessary.
-    void OnSize(wxSizeEvent & evt)
+    // This event is called when any of the elements have been changed
+    void OnChanged(wxCommandEvent & evt)
     {
-        // Figure out how much extra space we have
-        wxSizer * container = GetContainingSizer();
-        wxSizerItem * item = container->GetItem(this);
-        const int maxWidth = container->GetSize().x - item->GetPosition().x;
-        const int width = item->GetSize().x;
-
-        // Check to see where the style sizer is now
-        wxSizer * mainSizer = GetSizer();
-        wxSizer * verticalSizer = m_facename->GetContainingSizer();
-        if (verticalSizer->GetItem(m_styles) != NULL) // Two lines
-        {
-            // Can we put this on one line?
-            if (maxWidth - width > m_styles->GetSize().x)
-            {
-                verticalSizer->Detach(m_styles);
-                mainSizer->Add(m_styles);
-                container->Layout();
-            }
-        }
-        else // One line
-        {
-            // Must we put this one two lines?
-            if (width > maxWidth)
-            {
-                mainSizer->Detach(m_styles);
-                verticalSizer->Add(m_styles);
-                container->Layout();
-            }
-        }
         evt.Skip();
+        SendEvent();
+    }
+
+    void SendEvent()
+    {
+        wxFontPickerEvent evt(this, GetId(), GetSelectedFont());
+        GetEventHandler()->ProcessEvent(evt);
     }
 };
 
 
-#endif // STYLE_EDITORS_H
+#endif // FONT_PICKER_H

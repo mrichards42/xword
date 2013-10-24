@@ -25,23 +25,25 @@ class ConfigManager : public ConfigManagerBase
 public:
     ConfigManager(bool useDummy = false)
         : ConfigManagerBase(useDummy),
-          Window(&m_group),
-          Grid(&m_group),
-          Clue(&m_group),
+          Window(this),
+          Appearance(this),
+          Grid(this),
+          Clue(this),
           CluePrompt(&m_group),
-          Notes(&m_group),
-          Printing(&m_group),
-          Timer(&m_group),
-          FileHistory(&m_group),
-          autoSaveInterval(&m_group, _T("autoSaveInterval"), 0),
+          Notes(this),
+          Printing(this),
+          Timer(this),
+          FileHistory(this),
+          autoSaveInterval(&m_group, _T("autoSaveInterval"), (long)0),
           MetadataCtrls(&m_group, _T("Metadata")),
           useSimpleStyle(&m_group, _T("useSimpleStyle"), true)
-    {}
+    {
+    }
 
     // Frame position
     class Window_t : public ConfigGroup {
     public:
-        Window_t(ConfigGroup * parent);
+        Window_t(ConfigManager * cfg);
 
         ConfigLong top;
         ConfigLong left;
@@ -50,10 +52,24 @@ public:
         ConfigBool maximized;
     } Window;
 
+    // Global Appearance Styles
+    // NB: These are used as default parameters in other config classes,
+    // So make sure this is declared first.
+    class Appearance_t : public ConfigGroup {
+    public:
+        Appearance_t(ConfigManager * cfg);
+
+        ConfigFont font;
+        ConfigColor foregroundColor;
+        ConfigColor backgroundColor;
+        ConfigColor listHighlightColor;
+        ConfigColor gridHighlightColor;
+    } Appearance;
+
     // Grid
     class Grid_t : public ConfigGroup {
     public:
-        Grid_t(ConfigGroup * parent);
+        Grid_t(ConfigManager * cfg);
 
         ConfigBool fit;
         ConfigLong boxSize;
@@ -76,7 +92,7 @@ public:
     // Clue box
     class Clue_t : public ConfigGroup {
     public:
-        Clue_t(ConfigGroup * parent);
+        Clue_t(ConfigManager * cfg);
 
         ConfigFont font;
         ConfigPoint spacing;
@@ -99,11 +115,7 @@ public:
         Metadata_t(ConfigGroup * parent,
             const wxString & name,
             const wxString & displayFormat_ = wxEmptyString,
-            bool useLua_ = false,
-            long alignment_ = wxALIGN_CENTER,
-            const wxFont & font_ = *wxSWISS_FONT,
-            const wxColour & foregroundColor_ = *wxBLACK,
-            const wxColour & backgroundColor_ = *wxWHITE);
+            bool useLua_ = false);
 
         ConfigString displayFormat;
         ConfigBool useLua;
@@ -119,13 +131,13 @@ public:
     // CluePrompt
     class CluePrompt_t : public Metadata_t {
     public:
-        CluePrompt_t(ConfigGroup * parent);
+        CluePrompt_t(ConfigGroup * cfg);
     } CluePrompt;
 
     // Notes
     class Notes_t : public ConfigGroup {
     public:
-        Notes_t(ConfigGroup * parent);
+        Notes_t(ConfigManager * cfg);
 
         ConfigFont font;
         ConfigColor foregroundColor;
@@ -135,7 +147,7 @@ public:
     // Printing
     class Printing_t : public ConfigGroup {
     public:
-        Printing_t(ConfigGroup * parent);
+        Printing_t(ConfigManager * cfg);
 
         ConfigLong blackSquareBrightness;
         ConfigLong gridAlignment;
@@ -169,7 +181,7 @@ public:
     // Timer
     class Timer_t : public ConfigGroup {
     public:
-        Timer_t(ConfigGroup * parent);
+        Timer_t(ConfigManager * cfg);
 
         ConfigBool autoStart;
     } Timer;
@@ -177,7 +189,7 @@ public:
     // FileHistory
     class FileHistory_t : public ConfigGroup {
     public:
-        FileHistory_t(ConfigGroup * parent);
+        FileHistory_t(ConfigManager * cfg);
 
         ConfigBool saveFileHistory;
         ConfigBool reopenLastPuzzle;

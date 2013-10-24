@@ -20,6 +20,9 @@
 #include <wx/colour.h>
 #include <cmath>
 
+// Compute a word highlight color from a letter highlight color
+extern wxColour GetWordHighlight(const wxColour & letter);
+
 // Return percieved brightness from 0 to 255
 static unsigned char GetBrightness(const wxColour & color)
 {
