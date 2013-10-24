@@ -56,6 +56,9 @@ public:
         GetEventHandler()->AddPendingEvent(evt);
     #endif
     }
+
+    virtual bool HasTransparentBackground() { return true; }
+
 protected:
     // Override from wxBookCtrlBase
     wxSize CalcSizeFromPage(const wxSize& sizePage) const
@@ -78,14 +81,12 @@ protected:
             return wxRect(wxPoint(), GetClientSize());
         return wxBookCtrlBase::GetPageRect();
     }
-
 };
 
 
 void AppearancePanel::SetupTree()
 {
     m_treebook = new MyTreebook(this, wxTR_TWIST_BUTTONS);
-    m_treebook->SetBackgroundColour(GetBackgroundColour());
 
     Bind(wxEVT_TREEBOOK_PAGE_CHANGED, &AppearancePanel::OnPageChanged, this);
 
