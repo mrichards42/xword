@@ -1,64 +1,62 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 10 2012)
+// C++ code generated with wxFormBuilder (version Oct  8 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#include "wxFB_StylePanels.h"
+#include "wxFB_TreePanels.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
-FontPanelBase::FontPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxFB_FontPickerPanel::wxFB_FontPickerPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-	wxBoxSizer* bSizer14;
-	bSizer14 = new wxBoxSizer( wxVERTICAL );
+	m_sizer = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* bSizer15;
-	bSizer15 = new wxBoxSizer( wxHORIZONTAL );
+	m_top = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_facename = new FontFaceCtrl(this, wxID_ANY);
-	bSizer15->Add( m_facename, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	m_top->Add( m_facename, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 0 );
 	
 	m_pointsize = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 5, 100, 5 );
 	m_pointsize->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
 	
-	bSizer15->Add( m_pointsize, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	m_top->Add( m_pointsize, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 2 );
 	
 	
-	bSizer14->Add( bSizer15, 0, 0, 5 );
+	m_sizer->Add( m_top, 0, wxEXPAND, 5 );
 	
-	m_styles = new wxBoxSizer( wxHORIZONTAL );
+	m_bottom = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_bold = new wxToggleButton( this, wxID_ANY, wxT("B"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	m_bold->SetFont( wxFont( 10, 72, 90, 92, false, wxEmptyString ) );
 	
-	m_styles->Add( m_bold, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	m_bottom->Add( m_bold, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2 );
 	
 	m_italic = new wxToggleButton( this, wxID_ANY, wxT("I"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	m_italic->SetFont( wxFont( 10, 72, 93, 90, false, wxEmptyString ) );
 	
-	m_styles->Add( m_italic, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	m_bottom->Add( m_italic, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2 );
 	
 	m_underline = new wxToggleButton( this, wxID_ANY, wxT("U"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	m_underline->SetFont( wxFont( 10, 72, 90, 90, true, wxEmptyString ) );
 	
-	m_styles->Add( m_underline, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_bottom->Add( m_underline, 0, wxALIGN_CENTER_VERTICAL, 2 );
 	
 	
-	bSizer14->Add( m_styles, 0, wxTOP, 5 );
+	m_sizer->Add( m_bottom, 0, 0, 5 );
 	
 	
-	this->SetSizer( bSizer14 );
+	this->SetSizer( m_sizer );
 	this->Layout();
-	bSizer14->Fit( this );
+	m_sizer->Fit( this );
 }
 
-FontPanelBase::~FontPanelBase()
+wxFB_FontPickerPanel::~wxFB_FontPickerPanel()
 {
 }
 
-GridTweaksPanel::GridTweaksPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxFB_GridTweaks::wxFB_GridTweaks( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxGridBagSizer* gbSizer1;
 	gbSizer1 = new wxGridBagSizer( 3, 3 );
@@ -127,6 +125,6 @@ GridTweaksPanel::GridTweaksPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	gbSizer1->Fit( this );
 }
 
-GridTweaksPanel::~GridTweaksPanel()
+wxFB_GridTweaks::~wxFB_GridTweaks()
 {
 }

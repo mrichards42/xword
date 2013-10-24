@@ -11,11 +11,11 @@
         <property name="embedded_files_path">res</property>
         <property name="encoding">UTF-8</property>
         <property name="event_generation">connect</property>
-        <property name="file">wxFB_StylePanels</property>
+        <property name="file">wxFB_TreePanels</property>
         <property name="first_id">1000</property>
         <property name="help_provider">none</property>
         <property name="internationalize">0</property>
-        <property name="name">wxFB_StylePanels</property>
+        <property name="name">wxFB_TreePanels</property>
         <property name="namespace"></property>
         <property name="path">.</property>
         <property name="precompiled_header"></property>
@@ -38,7 +38,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">FontPanelBase</property>
+            <property name="name">wxFB_FontPickerPanel</property>
             <property name="pos"></property>
             <property name="size">-1,-1</property>
             <property name="subclass">; </property>
@@ -78,21 +78,21 @@
             <event name="OnUpdateUI"></event>
             <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
-                <property name="name">bSizer14</property>
+                <property name="name">m_sizer</property>
                 <property name="orient">wxVERTICAL</property>
-                <property name="permission">none</property>
-                <object class="sizeritem" expanded="0">
+                <property name="permission">protected</property>
+                <object class="sizeritem" expanded="1">
                     <property name="border">5</property>
-                    <property name="flag"></property>
+                    <property name="flag">wxEXPAND</property>
                     <property name="proportion">0</property>
-                    <object class="wxBoxSizer" expanded="0">
+                    <object class="wxBoxSizer" expanded="1">
                         <property name="minimum_size"></property>
-                        <property name="name">bSizer15</property>
+                        <property name="name">m_top</property>
                         <property name="orient">wxHORIZONTAL</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <object class="sizeritem" expanded="0">
-                            <property name="border">5</property>
-                            <property name="flag">wxALIGN_CENTER_VERTICAL|wxRIGHT</property>
+                            <property name="border">0</property>
+                            <property name="flag">wxALIGN_CENTER_VERTICAL|wxEXPAND</property>
                             <property name="proportion">0</property>
                             <object class="CustomControl" expanded="0">
                                 <property name="BottomDockable">1</property>
@@ -176,8 +176,8 @@
                             </object>
                         </object>
                         <object class="sizeritem" expanded="0">
-                            <property name="border">5</property>
-                            <property name="flag">wxALIGN_CENTER_VERTICAL|wxRIGHT</property>
+                            <property name="border">2</property>
+                            <property name="flag">wxALIGN_CENTER_VERTICAL|wxLEFT</property>
                             <property name="proportion">0</property>
                             <object class="wxSpinCtrl" expanded="0">
                                 <property name="BottomDockable">1</property>
@@ -264,17 +264,17 @@
                         </object>
                     </object>
                 </object>
-                <object class="sizeritem" expanded="0">
+                <object class="sizeritem" expanded="1">
                     <property name="border">5</property>
-                    <property name="flag">wxTOP</property>
+                    <property name="flag"></property>
                     <property name="proportion">0</property>
-                    <object class="wxBoxSizer" expanded="0">
+                    <object class="wxBoxSizer" expanded="1">
                         <property name="minimum_size"></property>
-                        <property name="name">m_styles</property>
+                        <property name="name">m_bottom</property>
                         <property name="orient">wxHORIZONTAL</property>
                         <property name="permission">protected</property>
                         <object class="sizeritem" expanded="0">
-                            <property name="border">5</property>
+                            <property name="border">2</property>
                             <property name="flag">wxALIGN_CENTER_VERTICAL|wxRIGHT</property>
                             <property name="proportion">0</property>
                             <object class="wxToggleButton" expanded="0">
@@ -361,7 +361,7 @@
                             </object>
                         </object>
                         <object class="sizeritem" expanded="0">
-                            <property name="border">5</property>
+                            <property name="border">2</property>
                             <property name="flag">wxALIGN_CENTER_VERTICAL|wxRIGHT</property>
                             <property name="proportion">0</property>
                             <object class="wxToggleButton" expanded="0">
@@ -448,7 +448,7 @@
                             </object>
                         </object>
                         <object class="sizeritem" expanded="0">
-                            <property name="border">5</property>
+                            <property name="border">2</property>
                             <property name="flag">wxALIGN_CENTER_VERTICAL</property>
                             <property name="proportion">0</property>
                             <object class="wxToggleButton" expanded="0">
@@ -552,7 +552,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">GridTweaksPanel</property>
+            <property name="name">wxFB_GridTweaks</property>
             <property name="pos"></property>
             <property name="size">-1,-1</property>
             <property name="subclass"></property>

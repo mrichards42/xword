@@ -24,7 +24,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
-#include <wx/event.h> // wxEvtHandler, wxWindowDestroyEvent
+#include <wx/event.h> // wxEvtHandler
 
 
 
@@ -41,49 +41,16 @@ class ConfigGroup
 {
     friend class ConfigManagerBase;
 public:
-    ConfigGroup(ConfigManagerBase * cfg)
-        : m_name(_T("")),
-          m_cfg(cfg)
-    {
-    }
-
-    ConfigGroup(ConfigGroup * parent, const wxString & name)
-        : m_name(parent->m_name + _T("/") + name),
-          m_cfg(parent->m_cfg)
-    {
-        if (parent)
-            parent->m_children.push_back(this);
-    }
-
+    ConfigGroup(ConfigManagerBase * cfg);
+    ConfigGroup(ConfigGroup * parent, const wxString & name);
     virtual ~ConfigGroup() {}
 
-    virtual void Update(wxEvtHandler * h = NULL)
-    {
-        std::list<ConfigGroup *>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); ++it)
-            (*it)->Update(h);
-    }
-
-    virtual void RemoveCallbacks(wxEvtHandler * h)
-    {
-        std::list<ConfigGroup *>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); ++it)
-            (*it)->RemoveCallbacks(h);
-    }
+    virtual void Update(wxEvtHandler * h = NULL);
+    virtual void RemoveCallbacks(wxEvtHandler * h);
+    ConfigGroup * FindChild(const wxString & name);
 
     // Copy values from other config to this config
     virtual void Copy(const ConfigGroup & other);
-
-    ConfigGroup * FindChild(const wxString & name)
-    {
-        std::list<ConfigGroup *>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); ++it)
-        {
-            if ((*it)->m_name == name)
-                return *it;
-        }
-        return NULL;
-    }
 
     wxString m_name;
     std::list<ConfigGroup *> m_children;
@@ -91,12 +58,7 @@ public:
 
 protected:
     // Update our ConfigLists
-    virtual void UpdateLists()
-    {
-        std::list<ConfigGroup *>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); ++it)
-            (*it)->UpdateLists();
-    }
+    virtual void UpdateLists();
 
 private: // Can't assign or copy
     ConfigGroup(ConfigGroup &);
@@ -143,6 +105,7 @@ private: // Can't assign or copy
             ConfigBool MyBool;
             ConfigDouble MyDouble;
             ConfigFont MyFont;
+            ConfigFont MyOtherFont;
         } Group;
     };
 
@@ -197,6 +160,7 @@ public:
         // If we have ConfigLists, update their values.
         m_group.UpdateLists();
     }
+
     wxConfigBase * GetConfig() { return m_config; }
     const wxConfigBase * GetConfig() const { return m_config; }
     void AutoUpdate(bool doit) { m_autoUpdate = doit; }
@@ -206,34 +170,25 @@ public:
     class ConversionError : public std::exception {};
     class CopyError : public std::exception {};
 
-protected:
-    // A little metaprogramming :)
+    // A little metaprogramming
 
     // For types natively supported by wxConfigBase (wxString, bool,
     // long, double), this works transparently.
 
     // To define a type that must be adapted to one of the native types,
     // do the following (examples for wxFont and wxColour are at the bottom
-    // of this document):
+    // of this document) define an explicitly specialized struct Convert<T>
+    // with the following:
+    // typedef [wxConfig type] type;
+    // static [user type] FromConfig(const [wxConfig type] & val);
+    // static [wxConfig type] ToConfig(const [user type] & val);
+    template <typename T> struct Convert
+    {
+        typedef typename T type;
+        static T FromConfig(const T & val) { return val; }
+        static T ToConfig(const T & val) { return val; }
+    };
 
-    //  (1) Define an explicitly specialized struct AdaptedType<T> for your type
-    //      that defines a typedef for the basic type:
-    //          template <> struct AdaptedType<T> { typedef NATIVE_T type; }
-    template <typename T> struct AdaptedType { typedef T type; };
-
-    //  (2) Define two Convert<IN_T, OUT_T> functions to convert your type to
-    //      the native type, and the native type to your type:
-    //
-    //          template <> NATIVE_T Convert<T, NATIVE_T>(const T & )
-    //              { return your type converted to the native type; }
-    //
-    //          template <> T Convert<NATIVE_T, T>(const NATIVE_T & )
-    //              { return the native type converted to your type; }
-
-    template <typename IN_T, typename OUT_T>
-    inline OUT_T Convert(const IN_T & val) const { return val; }
-
-public:
     // Get and Set template functions.
     // These functions use TMP described above to deduce the return type and
     // the proper conversion (if any) using the value type to the function.
@@ -241,11 +196,11 @@ public:
     template <typename T>
     inline T Get(const wxString & path, const T & default_val) const
     {
-        typename AdaptedType<T>::type ret;
+        typename Convert<T>::type ret;
         if (m_config->Read(path, &ret))
         {
             try {
-                return Convert<typename AdaptedType<T>::type, T>(ret);
+                return Convert<T>::FromConfig(ret);
             } catch (ConversionError &) {
                 // default
             }
@@ -256,20 +211,7 @@ public:
     template <typename T>
     inline void Set(const wxString & path, const T & val)
     {
-        m_config->Write(path, Convert<T, typename AdaptedType<T>::type>(val));
-    }
-
-    template <typename T>
-    inline bool SetIfChanged(const wxString & path, const T & val)
-    {
-        // Check to see if this value has changed
-        typename AdaptedType<T>::type current;
-        typename AdaptedType<T>::type converted = Convert<T, typename AdaptedType<T>::type>(val);
-        if (m_config->Read(path, &current))
-            if (current == converted)
-                return false;
-        m_config->Write(path, converted);
-        return true;
+        m_config->Write(path, Convert<T>::ToConfig(val));
     }
 
     inline void Update(wxEvtHandler * h = NULL) { m_group.Update(h); }
@@ -288,97 +230,27 @@ protected:
 };
 
 
-
-// ConfigGroup functions (that use ConfigManagerBase)
-
-inline void ConfigGroup::Copy(const ConfigGroup & other)
-{
-    if (m_name != other.m_name ||
-        m_children.size() != other.m_children.size())
-    {
-        throw ConfigManagerBase::CopyError();
-    }
-    // Iterate all the groups within and copy the values over
-    std::list<ConfigGroup *>::iterator group;
-    std::list<ConfigGroup *>::const_iterator otherGroup;
-    group = m_children.begin();
-    otherGroup = other.m_children.begin();
-    for (;
-        group != m_children.end();
-        ++group, ++otherGroup)
-    {
-        (*group)->Copy(**otherGroup);
-    }
-}
-
+// A list of ConfigGroups
+// T *must* be a ConfigGroup-derived class
 template <typename T>
 class ConfigList : public ConfigGroup
 {
 public:
     ConfigList(ConfigManagerBase * cfg)
-    : ConfigGroup(cfg)
+        : ConfigGroup(cfg)
     {}
     
     ConfigList(ConfigGroup * parent, const wxString & name)
-    : ConfigGroup(parent, name)
+        : ConfigGroup(parent, name)
     {}
     
     virtual ~ConfigList()
     {
-        // Delete the pointers from m_children
-        clear(false);
+        clear(false); // Delete the pointers from m_children
     }
     
 public:
-    // Copy values from other config to this config
-    virtual void Copy(const ConfigGroup & other)
-    {
-        if (m_name != other.m_name)
-            throw ConfigManagerBase::CopyError();
-        
-        // This is a bit of a convoluted process, since we need to avoid
-        // unnecessary deletion of the pointers in m_children (in case someone
-        // added a callback).
-        
-        // Keep track of which entries we have copied
-        std::set<ConfigGroup *> entries(m_children.begin(), m_children.end());
-        // Copy the entires
-        std::list<ConfigGroup *>::const_iterator it;
-        for (it = other.m_children.begin(); it != other.m_children.end(); ++it)
-        {
-            // Find the old entry
-            std::list<ConfigGroup *>::iterator old;
-            for (old = m_children.begin(); old != m_children.end(); ++old)
-            {
-                if ((*old)->m_name == (*it)->m_name)
-                {
-                    entries.erase(*old);
-                    (*old)->Copy(**it);
-                    break;
-                }
-            }
-            if (old == m_children.end()) // Not found
-            {
-                // Create a new entry
-                // Get the name of this entry by removing the prefix of the
-                // parent's name.
-                wxString name;
-                (*it)->m_name.StartsWith(other.m_name + _T("/"), &name);
-                T * entry = push_back(name);
-                // Fill it with values from the other config
-                entry->Copy(**it);
-            }
-        }
-        // Remove entries that were not copied
-        std::set<ConfigGroup *>::iterator old;
-        for (old = entries.begin(); old != entries.end(); ++old)
-        {
-            std::list<ConfigGroup *>::iterator item =
-            std::find(m_children.begin(), m_children.end(), *old);
-            if (item != m_children.end())
-                m_children.remove(*item);
-        }
-    }
+    virtual void Copy(const ConfigGroup & other);
     
 protected:
     // An iterator that automatically casts its pointers
@@ -412,63 +284,16 @@ public:
     
     T * push_back(const wxString & name)
     {
-        // This constructor automatically adds it to m_children
+        // This ConfigGroup constructor adds the new group to m_children
         return new T(this, name);
     }
-    
-    bool remove(const wxString & name)
-    {
-        m_cfg->GetConfig()->DeleteEntry(name);
-        std::list<ConfigGroup *>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); ++it)
-        {
-            if ((*it)->m_name == name)
-            {
-                ConfigGroup * group = *it;
-                m_children.erase(it);
-                delete group;
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    void clear(bool delete_entries = true)
-    {
-        std::list<ConfigGroup *>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); ++it)
-        {
-            // Remove from the config
-            if (delete_entries)
-                m_cfg->GetConfig()->DeleteEntry((*it)->m_name);
-            // We own the pointers in m_children
-            delete *it;
-        }
-        m_children.clear();
-    }
-    
+    bool remove(const wxString & name);
+    void clear(bool delete_entries = true);
     bool empty() const { return m_children.empty(); }
     
 protected:
     // Update m_children to reflect the current config state
-    virtual void UpdateLists()
-    {
-        clear(false);
-        wxConfigBase * cfg = m_cfg->GetConfig();
-        // Enumeration variables
-        long index;
-        wxString name;
-        cfg->SetPath(m_name);
-        if (cfg->GetFirstGroup(name, index))
-        {
-            do
-            {
-                push_back(name);
-            }
-            while (cfg->GetNextGroup(name, index));
-        }
-        cfg->SetPath(_T("/"));
-    }
+    virtual void UpdateLists();
 };
 
 
@@ -479,41 +304,71 @@ protected:
     Usage is described in ConfigManagerBase.
     
 */
+
 template <typename T>
 class ConfigValue
-    : public wxEvtHandler, // Needed for wxWindowDestroyEvent
+    : public wxEvtHandler,
       public ConfigGroup
 {
     // Callback class
-    class CallbackBase
+    struct CallbackBase
     {
-    public:
         virtual ~CallbackBase() {}
         inline virtual void Call(T) =0;
     };
 
     template<typename OBJ, typename FUNC>
-    class Callback : public CallbackBase
+    struct Callback : public CallbackBase
     {
-    public:
         Callback(OBJ * obj, FUNC func) : m_obj(obj), m_func(func) {}
         inline virtual void Call(T val) { (m_obj->*m_func)(val); }
 		OBJ * m_obj;
         FUNC m_func;
     };
 
+    // Function pointer typedef for transforming linked config values
+    typedef T (*transformFunc_t)(const T &);
 public:
-    ConfigValue(ConfigGroup * parent,
-                const wxString & name,
-                T default_val)
+
+    // Constructor with no default value
+    // Must call SetDefault() later or trust that Get() returns something valid
+    ConfigValue(ConfigGroup * parent, const wxString & name)
         : wxEvtHandler(),
           ConfigGroup(parent, name),
+          m_hasDefault(false),
+          m_linkedValue(NULL),
+          m_transformFunc(NULL)
+    {
+    }
+
+    // Constructor taking a default value
+    ConfigValue(ConfigGroup * parent, const wxString & name,
+                                      const T & default_val,
+                                      ConfigValue<T> * linked_value = NULL,
+                                      transformFunc_t func = NULL)
+        : wxEvtHandler(),
+          ConfigGroup(parent, name),
+          m_hasDefault(true),
           m_default(default_val)
     {
+        LinkValue(linked_value, func);
+    }
+
+    // Constructor taking another ConfigValue to link
+    ConfigValue(ConfigGroup * parent, const wxString & name,
+                                      ConfigValue<T> * linked_value,
+                                      transformFunc_t func = NULL)
+        : wxEvtHandler(),
+          ConfigGroup(parent, name),
+          m_hasDefault(false)
+    {
+        LinkValue(linked_value, func);
     }
 
     ~ConfigValue()
     {
+        if (m_linkedValue)
+            m_linkedValue->RemoveCallbacks(this);
         // Callback windows should remove themselves.
         wxASSERT(m_callbacks.empty());
         typename map_t::iterator it;
@@ -522,19 +377,81 @@ public:
     }
 
     // Get and set functions
-    inline T Get() const { return GetConfig()->Get(m_name, m_default); }
-
-    inline void Set(const T & val)
+    inline T Get() const
     {
-        ConfigManagerBase * cfg = GetConfig();
-        const bool different = cfg->SetIfChanged<T>(m_name, val);
-        if (different && cfg->AutoUpdate())
+        // If we have a linked config value, use its default
+        if (!m_hasDefault && m_linkedValue)
+            return GetConfig()->Get(m_name, Transform(m_linkedValue->m_default));
+        return GetConfig()->Get(m_name, m_default);
+    }
+
+    inline void Set(const T & val, bool forceChildren = false)
+    {
+        // Check to see if this value has changed
+        T current = Get();
+        if (current == val && ! forceChildren)
+            return;
+        // Update linked values
+        std::list<ConfigValue<T> *>::iterator it;
+        for (it = m_linkedChildren.begin(); it != m_linkedChildren.end(); ++it)
+        {
+            // Respect the child's transformation
+            ConfigValue<T> * child = *it;
+            // Only update values that match our current value
+            if (forceChildren || child->Get() == child->Transform(current))
+                child->Set(child->Transform(val));
+        }
+        // Write
+        GetConfig()->Set(m_name, val);
+        // Callbacks
+        if (GetConfig()->AutoUpdate())
             Update(val);
     }
 
     // operators that substitute for Get and Set
     inline T operator()() const { return Get(); }
     inline void operator=(const T & val) { Set(val); }
+
+
+    // Default Values
+    void SetDefault(const T & default_val)
+    {
+        m_default = default_val;
+        m_hasDefault = true;
+    }
+
+    T GetDefault() const
+    {
+        return m_hasDefault ? m_default : Transform(m_linkedValue->Get());
+    }
+
+    bool HasDefault() const // Do we have a default anywhere up the chain?
+    {
+        return m_hasDefault || m_linkedValue;
+    }
+
+    void LinkValue(ConfigValue<T> * linked_value, transformFunc_t func = NULL)
+    {
+        m_linkedValue = linked_value;
+        // When m_linkedValue is changed, cascade the changes
+        if (linked_value)
+            m_linkedValue->m_linkedChildren.push_back(this);
+        m_transformFunc = func;
+    }
+
+    T Transform(const T & val) const
+    {
+        if (m_transformFunc)
+            return (*m_transformFunc)(val);
+        return val;
+    }
+
+    void Reset(bool forceChildren = true)
+    {
+        if (HasDefault())
+            Set(GetDefault(), forceChildren);
+    }
+
 
 
     // Callback functions
@@ -580,7 +497,15 @@ public:
 protected:
     ConfigManagerBase * GetConfig() { return m_cfg; }
     const ConfigManagerBase * GetConfig() const { return m_cfg; }
+    // Default values
+    bool m_hasDefault;
     T m_default;
+    // The linked config value to use as a default
+    ConfigValue<T> * m_linkedValue;
+    std::list<ConfigValue<T> *> m_linkedChildren;
+    // Transform from the linked value
+    transformFunc_t m_transformFunc;
+    // Callbacks
     typedef std::multimap<wxEvtHandler *, CallbackBase*> map_t;
     typedef std::pair<wxEvtHandler *, CallbackBase*> pair_t;
     map_t m_callbacks;
@@ -600,30 +525,25 @@ typedef ConfigValue<double>   ConfigDouble;
 #include <wx/font.h>
 
 // Tell ConfigManagerBase that this should be converted to a wxString
-template<>
-struct ConfigManagerBase::AdaptedType<wxFont> { typedef wxString type; };
-
-// Font to String conversion
 template <>
-inline wxString
-ConfigManagerBase::Convert<wxFont, wxString>(const wxFont & font) const
+struct ConfigManagerBase::Convert<wxFont>
 {
-    return font.GetNativeFontInfoDesc();
-}
-
-// String to Font conversion
-template <>
-inline wxFont
-ConfigManagerBase::Convert<wxString, wxFont>(const wxString & str) const
-{
-    wxFont font;
-    // We user to user NativeFontInfoUserDesc instead of NativeFontInfoDesc,
-    // So try both here.
-    if (! font.SetNativeFontInfo(str))
-        if (! font.SetNativeFontInfoUserDesc(str))
-            throw ConfigManagerBase::ConversionError();
-    return font;
-}
+    typedef wxString type;
+    static wxFont FromConfig(const wxString & str)
+    {
+        wxFont font;
+        // We used to used NativeFontInfoUserDesc instead of NativeFontInfoDesc,
+        // so try both here for backwards compatability
+        if (! font.SetNativeFontInfo(str))
+            if (! font.SetNativeFontInfoUserDesc(str))
+                throw ConfigManagerBase::ConversionError();
+        return font;
+    }
+    static wxString ToConfig(const wxFont & font)
+    {
+        return font.GetNativeFontInfoDesc();
+    }
+};
 
 // The ConfigValue typedef
 typedef ConfigValue<wxFont> ConfigFont;
@@ -637,25 +557,14 @@ typedef ConfigValue<wxFont> ConfigFont;
 // The ConfigValue typedef
 typedef ConfigValue<wxColour> ConfigColor;
 
-// Tell ConfigManagerBase that this should be converted to a wxString
-template<>
-struct ConfigManagerBase::AdaptedType<wxColour> { typedef wxString type; };
-
-// Color to String conversion
 template <>
-inline wxString
-ConfigManagerBase::Convert<wxColour, wxString>(const wxColour & color) const
+struct ConfigManagerBase::Convert<wxColour>
 {
-    return color.GetAsString();
-}
+    typedef wxString type;
+    static wxColour FromConfig(const wxString & str) { return wxColour(str); }
+    static wxString ToConfig(const wxColour & color) { return color.GetAsString(); }
+};
 
-// String to Color conversion
-template <>
-inline wxColour
-ConfigManagerBase::Convert<wxString, wxColour>(const wxString & str) const
-{
-    return wxColour(str);
-}
 
 // -----------------------------------------------------------------------
 // wxPoint adapted type
@@ -665,32 +574,135 @@ ConfigManagerBase::Convert<wxString, wxColour>(const wxString & str) const
 // The ConfigValue typedef
 typedef ConfigValue<wxPoint> ConfigPoint;
 
-// Tell ConfigManagerBase that this should be converted to a wxString
-template<>
-struct ConfigManagerBase::AdaptedType<wxPoint> { typedef wxString type; };
-
-// Point to String conversion
 template <>
-inline wxString
-ConfigManagerBase::Convert<wxPoint, wxString>(const wxPoint & pt) const
+struct ConfigManagerBase::Convert<wxPoint>
 {
-    return wxString::Format(_T("%d, %d"), pt.x, pt.y);
-}
+    typedef wxString type;
 
-// String to Point conversion
-template <>
-inline wxPoint
-ConfigManagerBase::Convert<wxString, wxPoint>(const wxString & str) const
-{
-    wxArrayString tokens = wxStringTokenize(str, _T(", "), wxTOKEN_STRTOK);
-    long x, y;
-    if (tokens.size() != 2 ||
-        ! (tokens[0].ToLong(&x) && tokens[1].ToLong(&y)) )
+    static wxPoint FromConfig(const wxString & str)
     {
-        return wxPoint();
+        wxArrayString tokens = wxStringTokenize(str, _T(", "), wxTOKEN_STRTOK);
+        long x, y;
+        if (tokens.size() != 2 ||
+            ! (tokens[0].ToLong(&x) && tokens[1].ToLong(&y)) )
+        {
+            return wxPoint();
+        }
+        return wxPoint(x, y);
     }
 
-    return wxPoint(x, y);
+    static wxString ToConfig(const wxPoint & pt)
+    {
+        return wxString::Format(_T("%d, %d"), pt.x, pt.y);
+    }
+};
+
+
+// -----------------------------------------------------------------------
+// ConfigList
+// -----------------------------------------------------------------------
+template <typename T>
+void ConfigList<T>::Copy(const ConfigGroup & other)
+{
+    if (m_name != other.m_name)
+        throw ConfigManagerBase::CopyError();
+    
+    // This is a bit of a convoluted process, since we need to avoid
+    // unnecessary deletion of the pointers in m_children (in case someone
+    // added a callback).
+
+    // Keep track of which entries we have copied
+    std::set<ConfigGroup *> entries(m_children.begin(), m_children.end());
+    // Copy the entires
+    std::list<ConfigGroup *>::const_iterator it;
+    for (it = other.m_children.begin(); it != other.m_children.end(); ++it)
+    {
+        // Find the old entry
+        std::list<ConfigGroup *>::iterator old;
+        for (old = m_children.begin(); old != m_children.end(); ++old)
+        {
+            if ((*old)->m_name == (*it)->m_name)
+            {
+                entries.erase(*old);
+                (*old)->Copy(**it);
+                break;
+            }
+        }
+        if (old == m_children.end()) // Not found
+        {
+            // Create a new entry
+            // Get the name of this entry by removing the prefix of the
+            // parent's name.
+            wxString name;
+            (*it)->m_name.StartsWith(other.m_name + _T("/"), &name);
+            T * entry = push_back(name);
+            // Fill it with values from the other config
+            entry->Copy(**it);
+        }
+    }
+    // Remove entries that were not copied
+    std::set<ConfigGroup *>::iterator old;
+    for (old = entries.begin(); old != entries.end(); ++old)
+    {
+        std::list<ConfigGroup *>::iterator item =
+        std::find(m_children.begin(), m_children.end(), *old);
+        if (item != m_children.end())
+            m_children.remove(*item);
+    }
 }
+    
+template <typename T>
+bool ConfigList<T>::remove(const wxString & name)
+{
+    m_cfg->GetConfig()->DeleteEntry(name);
+    std::list<ConfigGroup *>::iterator it;
+    for (it = m_children.begin(); it != m_children.end(); ++it)
+    {
+        if ((*it)->m_name == name)
+        {
+            ConfigGroup * group = *it;
+            m_children.erase(it);
+            delete group;
+            return true;
+        }
+    }
+    return false;
+}
+
+template <typename T>
+void ConfigList<T>::clear(bool delete_entries = true)
+{
+    std::list<ConfigGroup *>::iterator it;
+    for (it = m_children.begin(); it != m_children.end(); ++it)
+    {
+        // Remove from the config
+        if (delete_entries)
+            m_cfg->GetConfig()->DeleteEntry((*it)->m_name);
+        // We own the pointers in m_children
+        delete *it;
+    }
+    m_children.clear();
+}
+    
+template <typename T>
+void ConfigList<T>::UpdateLists()
+{
+    clear(false);
+    wxConfigBase * cfg = m_cfg->GetConfig();
+    // Enumeration variables
+    long index;
+    wxString name;
+    cfg->SetPath(m_name);
+    if (cfg->GetFirstGroup(name, index))
+    {
+        do
+        {
+            push_back(name);
+        }
+        while (cfg->GetNextGroup(name, index));
+    }
+    cfg->SetPath(_T("/"));
+}
+
 
 #endif // CONFIG_MGR_H

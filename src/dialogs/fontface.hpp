@@ -20,38 +20,33 @@
 
 // A combo box that lists all of the fonts installed on the system.
 
-#include "../widgets/vcombo.hpp"
+#include <wx/combobox.h>
 
 class FontEnumeratorThread;
 
-class FontFaceCtrl : public VirtualComboBox
+class FontFaceCtrl : public wxComboBox
 {
     friend class FontEnumeratorThread;
 public:
     FontFaceCtrl(wxWindow * parent, wxWindowID id = wxID_ANY,
                  const wxString & faceName = wxEmptyString);
 
-    virtual void SetValue(const wxString & value);
+    void SetValue(const wxString & value);
 
-    static void InitFaceNames();
-    static void ClearFaceNames();
+    static void InitFacenames();
+    static void ClearFacenames();
 protected:
-    virtual int FindItem(const wxString & s) const;
-    virtual wxString GetItem(size_t n) const;
-    virtual size_t GetCount() const;
-
     wxString m_lastFaceName;
 
+    // Initializing the facenames array takes some time, so we're going
+    // to do it in a thread
     static wxArrayString s_facenames;
-    static bool s_facenamesComplete;
+    static bool s_threadComplete;
     static FontEnumeratorThread * s_thread;
 
-    // Initializing the facenames array takes a lot of time, so we're
-    // going to do it on idle.
-    void OnIdle(wxIdleEvent & evt);
-    
-    void OnKillFocus(wxFocusEvent & evt)
-        { SetValue(GetValue()); evt.Skip(); }
+    void OnSetFocus(wxFocusEvent & evt);
+    void OnCharHook(wxKeyEvent & evt);
+    void OnKillFocus(wxFocusEvent & evt) { SetValue(GetValue()); evt.Skip(); }
 };
 
 #endif // FONT_FACE_H

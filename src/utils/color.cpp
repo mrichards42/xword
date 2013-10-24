@@ -116,3 +116,44 @@ bool HCLColor::operator<(const HCLColor & b) const
     }
     return h < b.h;
 }
+
+
+#include <wx/image.h>
+wxColour GetWordHighlight(const wxColour & letter)
+{
+    // HSV isn't the best color model, but wxWidgets already has
+    // conversion functions, and it's at least better than trying to
+    // mess with RGB.
+    wxImage::RGBValue rgb(letter.Red(), letter.Green(), letter.Blue());
+    wxImage::HSVValue hsv = wxImage::RGBtoHSV(rgb);
+    // Numbers here were established by trial and error.
+    if (hsv.value < .3) // Dark colors
+    {
+        hsv.value += .2;
+    }
+    else if (hsv.saturation < .4) // Gray colors
+    {
+        if (hsv.saturation > .1) // If it's not too gray, saturate it
+            hsv.saturation += .2;
+        // Adjust value up or down
+        if (hsv.value < .5)
+            hsv.value += .2;
+        else
+            hsv.value -= .2;
+    }
+    else // "Colorful" colors (saturated and medium to high value)
+    {
+        // Adjust saturation up or down
+        if (hsv.saturation > .5)
+            hsv.saturation = std::max(0., hsv.saturation * .25);
+        else
+            hsv.saturation = std::min(1., hsv.saturation / .25);
+        // Adjust value up or down
+        if (hsv.value > .5)
+            hsv.value = std::max(0., hsv.value * .9);
+        else
+            hsv.value = std::min(1., hsv.value / .9);
+    }
+    rgb = wxImage::HSVtoRGB(hsv);
+    return wxColour(rgb.red, rgb.green, rgb.blue);
+}

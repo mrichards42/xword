@@ -20,6 +20,7 @@
 
 // A combo box that lists colors.
 #include <wx/colour.h>
+#include <wx/clrpicker.h> // wxColourPickerEvent
 #include <vector>
 
 class ConfigManager;
@@ -64,6 +65,11 @@ protected:
 
     wxColour m_lastColor; // The last valid color
     void OnSelection(wxCommandEvent & evt);
+    void SendEvent()
+    {
+        wxColourPickerEvent evt(this, GetId(), GetColor());
+        GetEventHandler()->ProcessEvent(evt);
+    }
 
     // A static vector of all colors currently in use
     class ColorArray : public std::vector<colorlabel_t>
@@ -81,46 +87,6 @@ protected:
 
     // A static vector of ColorChoices for syncing colors
     static void UpdateCtrls();
-    static std::vector<ColorChoice *> s_ctrls;
-};
-
-#else  // __WXOSX__
-
-#include <wx/choice.h>
-
-class ColorChoice : public wxChoice
-{
-public:
-    ColorChoice(wxWindow * parent, wxWindowID id = wxID_ANY,
-                const wxColour & color = wxNullColour);
-    ~ColorChoice();
-
-    wxColour GetColor() const { return wxColour(GetStringSelection()); }
-    void SetColor(const wxColour & color) { SetValue(color.GetAsString()); }
-    void SetValue(const wxString & value);
-    
-    static void InitColors(ConfigManager * cfg = NULL);
-    static void ClearColors();
-protected:
-    
-    wxColour m_lastColor; // The last valid color
-    void OnListSelected(wxCommandEvent & evt);
-    
-    // A color and label array
-    struct colorlabel_t { wxColour color; wxString label; };
-    class ColorArray : public std::vector<colorlabel_t>
-    {
-    public:
-        void push_back(const wxColour & color, const wxString & label = _T(""))
-        {
-            colorlabel_t c;
-            c.color = color;
-            c.label = label.empty() ? color.GetAsString() : label;
-            std::vector<colorlabel_t>::push_back(c);
-        }
-    };
-    static void UpdateCtrls();
-    static ColorArray s_colors;
     static std::vector<ColorChoice *> s_ctrls;
 };
 

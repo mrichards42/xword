@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 10 2012)
+// C++ code generated with wxFormBuilder (version Oct  8 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __WXFB_STYLEPANELS_H__
-#define __WXFB_STYLEPANELS_H__
+#ifndef __WXFB_TREEPANELS_H__
+#define __WXFB_TREEPANELS_H__
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -27,31 +27,33 @@
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class FontPanelBase
+/// Class wxFB_FontPickerPanel
 ///////////////////////////////////////////////////////////////////////////////
-class FontPanelBase : public wxPanel 
+class wxFB_FontPickerPanel : public wxPanel 
 {
 	private:
 	
 	protected:
+		wxBoxSizer* m_sizer;
+		wxBoxSizer* m_top;
 		FontFaceCtrl * m_facename;
 		wxSpinCtrl* m_pointsize;
-		wxBoxSizer* m_styles;
+		wxBoxSizer* m_bottom;
 		wxToggleButton* m_bold;
 		wxToggleButton* m_italic;
 		wxToggleButton* m_underline;
 	
 	public:
 		
-		FontPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~FontPanelBase();
+		wxFB_FontPickerPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxFB_FontPickerPanel();
 	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GridTweaksPanel
+/// Class wxFB_GridTweaks
 ///////////////////////////////////////////////////////////////////////////////
-class GridTweaksPanel : public wxPanel 
+class wxFB_GridTweaks : public wxPanel 
 {
 	private:
 	
@@ -63,9 +65,9 @@ class GridTweaksPanel : public wxPanel
 		wxSpinCtrl* m_letterScale;
 		wxSpinCtrl* m_numberScale;
 		
-		GridTweaksPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~GridTweaksPanel();
+		wxFB_GridTweaks( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxFB_GridTweaks();
 	
 };
 
-#endif //__WXFB_STYLEPANELS_H__
+#endif //__WXFB_TREEPANELS_H__
