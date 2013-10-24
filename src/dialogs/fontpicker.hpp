@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2012 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -18,9 +18,12 @@
 #ifndef FONT_PICKER_H
 #define FONT_PICKER_H
 
-// A Fontn Picker Panel
+// A Font Picker Panel
 
-#include "wxFB_TreePanels.h"
+#include <wx/panel.h>
+#include "fontface.hpp"
+#include <wx/tglbtn.h>
+#include <wx/spinctrl.h>
 #include <wx/fontpicker.h> // wxFontPickerEvent
 
 //------------------------------------------------------------------------------
@@ -42,40 +45,61 @@ enum FontPickerPanelStyles
     FP_DEFAULT = FP_FACENAME | FP_POINTSIZE | FP_STYLE
 };
 
-class FontPickerPanel : public wxFB_FontPickerPanel
+class FontPickerPanel : public wxPanel
 {
 public:
     FontPickerPanel(wxWindow * parent, wxWindowID id = wxID_ANY,
               const wxFont & font = wxNullFont, long style = FP_DEFAULT)
-        : wxFB_FontPickerPanel(parent, id)
+        : wxPanel(parent, id)
     {
+        // Create controls
+        // Place on two lines if all controls are present
+        wxBoxSizer * sizer = new wxBoxSizer((style & FP_POINTSIZE) ? wxVERTICAL : wxHORIZONTAL);
+        wxBoxSizer * top = new wxBoxSizer(wxHORIZONTAL);
+        
+        m_facename = new FontFaceCtrl(this, wxID_ANY);
+        top->Add(m_facename, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 0);
+        
+        m_pointsize = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(50, -1), wxSP_ARROW_KEYS, 5, 100, 5);
+        top->Add(m_pointsize, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 2);
+        
+        sizer->Add(top, 0, wxEXPAND, 5);
+        
+        wxBoxSizer * bottom = new wxBoxSizer(wxHORIZONTAL);
+
+        wxSize buttonSize(m_pointsize->GetSize().y, m_pointsize->GetSize().y);
+    #ifdef __WXOSX__
+        int buttonStyle = wxBORDER_SIMPLE;
+    #else
+        int buttonStyle = 0;
+    #endif // __WXOSX__
+        m_bold = new wxToggleButton(this, wxID_ANY, wxT("B"), wxDefaultPosition, buttonSize, buttonStyle);
+        //m_bold->SetFont(wxFont(wxFontInfo().Family(wxFONTFAMILY_ROMAN).Bold()));
+        bottom->Add(m_bold, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+        
+        m_italic = new wxToggleButton(this, wxID_ANY, wxT("I"), wxDefaultPosition, buttonSize, buttonStyle);
+        m_italic->SetFont(wxFont(wxFontInfo().Family(wxFONTFAMILY_ROMAN).Italic()));
+        bottom->Add(m_italic, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+        
+        m_underline = new wxToggleButton(this, wxID_ANY, wxT("U"), wxDefaultPosition, buttonSize, buttonStyle);
+        m_underline->SetFont(wxFont(wxFontInfo().Family(wxFONTFAMILY_ROMAN).Underlined()));
+        bottom->Add(m_underline, 0, wxALIGN_CENTER_VERTICAL);
+        
+        sizer->Add(bottom, 0, 0, 5);
+        SetSizer(sizer);
+
         // Hide unneeded ctrls
         wxASSERT(style != 0);
         if ((style & FP_FACENAME) == 0)
-            m_sizer->Hide(m_facename, true);
+            sizer->Hide(m_facename, true);
         if ((style & FP_POINTSIZE) == 0)
-        {
-            // If the pointsize ctrl is hidden, place the whole picker on
-            // one line
-            m_sizer->Hide(m_pointsize, true);
-            m_sizer->Detach(m_top);
-            m_sizer->Detach(m_bottom);
-            m_sizer->SetOrientation(wxHORIZONTAL);
-            m_sizer->Add(m_top);
-            m_sizer->Add(m_bottom);
-        }
+            sizer->Hide(m_pointsize, true);
         if ((style & FP_BOLD) == 0)
-            m_sizer->Hide(m_bold, true);
+            sizer->Hide(m_bold, true);
         if ((style & FP_ITALIC) == 0)
-            m_sizer->Hide(m_italic, true);
+            sizer->Hide(m_italic, true);
         if ((style & FP_UNDERLINE) == 0)
-            m_sizer->Hide(m_underline, true);
-
-        // Make the buttons square
-        int btnSize = m_facename->GetSize().y;
-        m_sizer->GetItem(m_bold, true)->SetInitSize(btnSize, btnSize);
-        m_sizer->GetItem(m_italic, true)->SetInitSize(btnSize, btnSize);
-        m_sizer->GetItem(m_underline, true)->SetInitSize(btnSize, btnSize);
+            sizer->Hide(m_underline, true);
 
         // Connect changed events
         m_facename->Bind(wxEVT_COMBOBOX, &FontPickerPanel::OnChanged, this);
@@ -125,6 +149,12 @@ protected:
         wxFontPickerEvent evt(this, GetId(), GetSelectedFont());
         GetEventHandler()->ProcessEvent(evt);
     }
+
+    FontFaceCtrl * m_facename;
+    wxSpinCtrl * m_pointsize;
+    wxToggleButton * m_bold;
+    wxToggleButton * m_italic;
+    wxToggleButton * m_underline;
 };
 
 
