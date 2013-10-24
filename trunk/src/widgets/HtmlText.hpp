@@ -95,6 +95,7 @@ public:
     {
         SetWindowStyle(GetWindowStyle() & ~ wxALIGN_MASK | alignment);
         LayoutCell();
+        Refresh();
     }
 
     virtual long GetAlignment() const
@@ -102,6 +103,21 @@ public:
         return GetWindowStyle() & wxALIGN_MASK;
     }
 
+    virtual bool SetForegroundColour(const wxColour & c)
+    {
+        bool ret = wxControl::SetForegroundColour(c);
+        LayoutCell();
+        Refresh();
+        return ret;
+    }
+
+    virtual bool SetBackgroundColour(const wxColour & c)
+    {
+        bool ret = wxControl::SetBackgroundColour(c);
+        LayoutCell();
+        Refresh();
+        return ret;
+    }
 protected:
     wxCoord m_padding;
     wxHtmlCell *m_cell;

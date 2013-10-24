@@ -75,6 +75,7 @@ bool HtmlText::SetFont(const wxFont & font)
     if (m_parser)
         m_parser->SetStandardFonts(font.GetPointSize(), font.GetFaceName());
     LayoutCell();
+    Refresh();
     return true;
 }
 

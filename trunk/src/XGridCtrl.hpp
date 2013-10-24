@@ -449,7 +449,6 @@ XGridCtrl::SetFont(const wxFont & font)
 {
     SetNumberFont(font);
     SetLetterFont(font);
-    Refresh();
     return wxScrolledWindow::SetFont(font);
 }
 
@@ -457,12 +456,14 @@ inline void
 XGridCtrl::SetNumberFont(const wxFont & font)
 {
     m_drawer.SetNumberFont(font);
+    Refresh();
 }
 
 inline void
 XGridCtrl::SetLetterFont(const wxFont & font)
 {
     m_drawer.SetLetterFont(font);
+    Refresh();
 }
 
 
