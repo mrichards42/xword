@@ -13,6 +13,10 @@ project "XWord"
 
     configuration "macosx"
         files { "**.mm" }
+        excludes { "dialogs/wxFB_PreferencesPanels.*" }
+
+    configuration "not macosx"
+        excludes { "dialogs/wxFB_PreferencesPanelsOSX.*" }
 
     -- --------------------------------------------------------------------
     -- wxWidgets
