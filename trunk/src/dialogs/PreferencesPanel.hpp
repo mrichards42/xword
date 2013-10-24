@@ -19,9 +19,9 @@
 #define PREF_PANEL_H
 
 #ifdef __WXOSX__
-#   include "osx/wxFB_PreferencesPanels.h"
+#   include "wxFB_PreferencesPanelsOSX.h"
 #else
-#   include "generic/wxFB_PreferencesPanels.h"
+#   include "wxFB_PreferencesPanels.h"
 #endif
 #include "PreferencesDialog.hpp"
 #include "TreeCtrls.hpp"
