@@ -42,7 +42,8 @@ ColorChoice::ColorChoice(wxWindow * parent, wxWindowID id,
                            wxDefaultSize, wxArrayString(), wxCB_READONLY)
 #endif
 {
-    SetMinSize(wxSize(150, -1));
+    // If the ctrl is too small the color box gets messed up in wxOSX
+    SetMinSize(wxSize(GetCharWidth() * 20, -1));
     s_ctrls.push_back(this);
     // Make sure we have a list of colors
     if (s_colors.empty())
@@ -190,7 +191,7 @@ wxCoord ColorChoice::OnMeasureItem(size_t n) const
     return GetCharHeight() + popupPadding * 2;
 }
 
-#endif //__WXOSX__
+#endif //! __WXOSX__
 
 // Events
 //-------
