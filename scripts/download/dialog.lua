@@ -32,7 +32,7 @@ local function make_puzzles(parent)
     function scroller:set_dates(kind, start_date, end_date, custom_func)
         download.clear_stats()
         tablex.clear(download.puzzle_map)
-        self:Freeze()
+        --self:Freeze()
         local stats_filenames = {}
         for _, p in ipairs(puzzle_panels) do
             local filenames, now = p:set_dates(kind, start_date, end_date, custom_func)
@@ -50,7 +50,7 @@ local function make_puzzles(parent)
         self:Layout()
         self:FitInside()
         self:Refresh()
-        self:Thaw()
+        --self:Thaw()
     end
 
     function scroller:download_puzzles()
@@ -160,11 +160,11 @@ local function DownloadDialog(parent, id, title, pos, size)
     end
 
     function dialog:update()
-        self:Freeze()
+        --self:Freeze()
         puzzle_panel:update_puzzle_list()
         self:update_puzzles()
         self:ShowFilter(header:get_kind() == 'custom')
-        self:Thaw()
+        --self:Thaw()
     end
 
     if download.default_view == "previous view" then

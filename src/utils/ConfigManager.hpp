@@ -184,7 +184,7 @@ public:
     // static [wxConfig type] ToConfig(const [user type] & val);
     template <typename T> struct Convert
     {
-        typedef typename T type;
+        typedef T type;
         static T FromConfig(const T & val) { return val; }
         static T ToConfig(const T & val) { return val; }
     };
@@ -392,7 +392,7 @@ public:
         if (current == val && ! forceChildren)
             return;
         // Update linked values
-        std::list<ConfigValue<T> *>::iterator it;
+        typename std::list<ConfigValue<T> *>::iterator it;
         for (it = m_linkedChildren.begin(); it != m_linkedChildren.end(); ++it)
         {
             // Respect the child's transformation
@@ -670,7 +670,7 @@ bool ConfigList<T>::remove(const wxString & name)
 }
 
 template <typename T>
-void ConfigList<T>::clear(bool delete_entries = true)
+void ConfigList<T>::clear(bool delete_entries)
 {
     std::list<ConfigGroup *>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); ++it)
