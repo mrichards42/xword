@@ -31,7 +31,7 @@ FontFaceCtrl::FontFaceCtrl(wxWindow * parent, wxWindowID id,
                            const wxString & faceName)
     : wxComboBox(parent, id, wxEmptyString)
 {
-    SetMinSize(wxSize(150, -1));
+    SetMinSize(wxSize(GetCharWidth() * 20, -1));
     // Make sure we have a list of font faces
     if (! s_threadComplete)
         InitFacenames();
