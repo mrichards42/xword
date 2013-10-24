@@ -433,14 +433,18 @@ XGridDrawer::DrawSquare(wxDC & adc,
 
     // Check the square background to see if this text color works
     wxColour textColor = textColor_;
-    const bool lightBG = GetBrightness(bgColor) > 130,
-               lightFG = GetBrightness(textColor) > 130;
-    if (lightBG == lightFG)
+    //  If the user chose these colors, respect them
+    if (bgColor != GetWhiteSquareColor())
     {
-        // Invert the text color
-        textColor.Set(255 - textColor.Red(),
-                      255 - textColor.Green(),
-                      255 - textColor.Blue());
+        const signed short bgBrightness = GetBrightness(bgColor);
+        const signed short fgBrightness = GetBrightness(textColor);
+        if (std::abs(bgBrightness - fgBrightness) < 125)
+        {
+            // Invert the text color
+            textColor.Set(255 - textColor.Red(),
+                          255 - textColor.Green(),
+                          255 - textColor.Blue());
+        }
     }
 
 #if wxUSE_GRAPHICS_CONTEXT && XWORD_USE_GC
