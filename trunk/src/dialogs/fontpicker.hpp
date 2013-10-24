@@ -70,19 +70,21 @@ public:
         wxSize buttonSize(m_pointsize->GetSize().y, m_pointsize->GetSize().y);
     #ifdef __WXOSX__
         int buttonStyle = wxBORDER_SIMPLE;
+        int fontSize = -1;
     #else
         int buttonStyle = 0;
+        int fontSize = wxNORMAL_FONT->GetPointSize();
     #endif // __WXOSX__
         m_bold = new wxToggleButton(this, wxID_ANY, wxT("B"), wxDefaultPosition, buttonSize, buttonStyle);
-        //m_bold->SetFont(wxFont(wxFontInfo().Family(wxFONTFAMILY_ROMAN).Bold()));
+        m_bold->SetFont(wxFont(wxFontInfo(fontSize).Family(wxFONTFAMILY_ROMAN).Bold()));
         bottom->Add(m_bold, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
         
         m_italic = new wxToggleButton(this, wxID_ANY, wxT("I"), wxDefaultPosition, buttonSize, buttonStyle);
-        m_italic->SetFont(wxFont(wxFontInfo().Family(wxFONTFAMILY_ROMAN).Italic()));
+        m_italic->SetFont(wxFont(wxFontInfo(fontSize).Family(wxFONTFAMILY_ROMAN).Italic()));
         bottom->Add(m_italic, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
         
         m_underline = new wxToggleButton(this, wxID_ANY, wxT("U"), wxDefaultPosition, buttonSize, buttonStyle);
-        m_underline->SetFont(wxFont(wxFontInfo().Family(wxFONTFAMILY_ROMAN).Underlined()));
+        m_underline->SetFont(wxFont(wxFontInfo(fontSize).Family(wxFONTFAMILY_ROMAN).Underlined()));
         bottom->Add(m_underline, 0, wxALIGN_CENTER_VERTICAL);
         
         sizer->Add(bottom, 0, 0, 5);
