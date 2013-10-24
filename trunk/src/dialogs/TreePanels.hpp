@@ -70,7 +70,7 @@ protected:
     template <typename T>
     void BindChangedEvent(T handler)
     {
-        ::BindChangedEvent(handler, &AppearancePanelBase::OnChanged, this);
+        ::BindChangedEvent(handler, &AppearanceBase::OnChanged, this);
     }
 
     bool m_disableChangedEvent;
@@ -115,7 +115,7 @@ protected:
     typename T::ctrlType * AddConfigControl(T * info)
     {
         m_cfgCtrls.push_back(info);
-        T::ctrlType * ctrl = static_cast<T::ctrlType *>(info->NewCtrl(this));
+        typename T::ctrlType * ctrl = static_cast<typename T::ctrlType *>(info->NewCtrl(this));
         info->LoadConfig();
         BindChangedEvent(ctrl);
         return ctrl;

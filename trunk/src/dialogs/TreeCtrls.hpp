@@ -30,6 +30,7 @@
 #include "../config.hpp"
 #include "colorchoice.hpp"
 #include "fontpicker.hpp"
+#include <wx/odcombo.h>
 
 // Macros
 
@@ -87,7 +88,7 @@ void BindChangedEvent(wxWindow * handler, EVT eventType, FUNCTION function, SINK
 template <typename CTRL, typename T>
 struct ControlDescBase
 {
-    typedef typename CTRL ctrlType;
+    typedef CTRL ctrlType;
     virtual CTRL * NewCtrl(wxWindow * parent)=0;
     virtual void LoadConfig(CTRL * ctrl, const ConfigValue<T> & cfg)
         { SetValue(ctrl, cfg.Get()); }
@@ -211,7 +212,9 @@ struct MetadataFormatDesc : public ControlDesc<wxTextCtrl, wxString>
                                            wxTE_MULTILINE | wxTE_DONTWRAP);
         wxFont font = format->GetFont();
         font.SetFamily(wxFONTFAMILY_TELETYPE);
+    #ifdef __WXMSW__
         font.SetFaceName("consolas");
+    #endif // __WXMSW__
         format->SetFont(font);
         return format;
     }
@@ -278,7 +281,7 @@ public:
     typedef typename DESC::ctrlType ctrlType;
 protected:
     DESC m_desc;
-    typename ctrlType * m_ctrl;
+    ctrlType * m_ctrl;
     ConfigValue<T> & m_config;
 };
 

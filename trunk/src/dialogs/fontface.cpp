@@ -75,7 +75,6 @@ void FontFaceCtrl::SetValue(const wxString & value)
 {
     // Look for the closest facename in the list.
     wxString facename = value.Lower(); // case-insensitive
-    bool hasMatch = false;
     int selection = -1;
     for (size_t i = 0; i < s_facenames.size(); ++i)
     {
@@ -93,9 +92,17 @@ void FontFaceCtrl::SetValue(const wxString & value)
         }
     }
     // Set Value and send an event
-    SetSelection(selection);
+    if (selection == -1 && m_lastFaceName.empty())
+        m_lastFaceName = value;
+    if (selection > -1 && selection < GetCount())
+        SetSelection(selection);
     wxComboBox::SetValue(m_lastFaceName);
-    SendSelectionChangedEvent(wxEVT_COMBOBOX); // from wxControlWithItems
+    // Send the event
+    wxCommandEvent evt(wxEVT_COMBOBOX, GetId());
+    evt.SetEventObject(this);
+    evt.SetId(selection);
+    evt.SetString(m_lastFaceName);
+    ProcessCommand(evt);
 }
 
 
