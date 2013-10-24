@@ -471,9 +471,10 @@ puzzle_sources_panel = function(parent)
     panel:SetSizer(sizer)
 
     local listsizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    sizer:Add(listsizer, 2, wx.wxEXPAND + wx.wxALL, 5)
+    sizer:Add(listsizer, 0, wx.wxEXPAND + wx.wxALL, 5)
 
     local puzzle_list = wx.wxListBox(panel, wx.wxID_ANY)
+    puzzle_list.MaxSize = wx.wxSize(puzzle_list.CharWidth * 30, -1)
     listsizer:Add(puzzle_list, 1, wx.wxEXPAND)
 
     -- List buttons
@@ -496,7 +497,7 @@ puzzle_sources_panel = function(parent)
 
     -- Details panel
     local detailsizer = wx.wxBoxSizer(wx.wxVERTICAL)
-    sizer:Add(detailsizer, 3, wx.wxEXPAND + wx.wxALL, 5)
+    sizer:Add(detailsizer, 1, wx.wxEXPAND + wx.wxALL, 5)
 
     -- Public stuff
     panel.list = puzzle_list

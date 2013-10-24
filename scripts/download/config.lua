@@ -631,11 +631,12 @@ get_download_options_panel = function(parent, puzzle)
     local sizer = wx.wxBoxSizer(wx.wxVERTICAL)
     panel:SetSizer(sizer)
 
+    -- wxLua isn't updated for 2.9, which includes wxST_ELLIPSIZE_MIDDLE = 8
     local name = wx.wxStaticText(panel, wx.wxID_ANY, puzzle.name,
                                  wx.wxDefaultPosition, wx.wxDefaultSize,
-                                 wx.wxST_NO_AUTORESIZE)
+                                 wx.wxST_NO_AUTORESIZE + wx.wxALIGN_CENTER + 8)
     local font = name.Font
-    font.PointSize = font.PointSize + 2
+    font.PointSize = font.PointSize + 1
     name.Font = font
     sizer:Add(name, 0, wx.wxALIGN_CENTER + wx.wxALL, 5)
 
