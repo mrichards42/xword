@@ -12,88 +12,118 @@
 wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* bSizer3;
-	bSizer3 = new wxBoxSizer( wxHORIZONTAL );
+	bSizer3 = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer411;
+	bSizer411 = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText911 = new wxStaticText( this, wxID_ANY, wxT("Timer"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText911->Wrap( -1 );
+	m_staticText911->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizer411->Add( m_staticText911, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer1211;
+	bSizer1211 = new wxBoxSizer( wxVERTICAL );
+	
+	m_startTimer = new wxCheckBox( this, wxID_ANY, wxT("Start when a puzzle is opened"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer1211->Add( m_startTimer, 0, wxALL, 5 );
+	
+	
+	bSizer411->Add( bSizer1211, 0, wxLEFT, 20 );
+	
+	
+	bSizer3->Add( bSizer411, 0, 0, 5 );
+	
+	wxBoxSizer* bSizer41;
+	bSizer41 = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText91 = new wxStaticText( this, wxID_ANY, wxT("Solution"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText91->Wrap( -1 );
+	m_staticText91->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizer41->Add( m_staticText91, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer121;
+	bSizer121 = new wxBoxSizer( wxVERTICAL );
+	
+	m_checkWhileTyping = new wxCheckBox( this, wxID_ANY, wxT("Check solution while typing"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer121->Add( m_checkWhileTyping, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_strictRebus = new wxCheckBox( this, wxID_ANY, wxT("Strict rebus checking"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_strictRebus->SetToolTip( wxT("Require rebus entries to exactly match the solution") );
+	
+	bSizer121->Add( m_strictRebus, 0, wxALL, 5 );
+	
+	
+	bSizer41->Add( bSizer121, 0, wxLEFT, 20 );
+	
+	
+	bSizer3->Add( bSizer41, 0, 0, 5 );
 	
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
 	
-	wxStaticBoxSizer* sbSizer3;
-	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Cursor movement") ), wxVERTICAL );
+	m_staticText9 = new wxStaticText( this, wxID_ANY, wxT("Cursor Movement"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText9->Wrap( -1 );
+	m_staticText9->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 	
-	wxString m_afterLetterChoices[] = { wxT("Do not move"), wxT("Move to next square"), wxT("Move to next blank") };
-	int m_afterLetterNChoices = sizeof( m_afterLetterChoices ) / sizeof( wxString );
-	m_afterLetter = new wxRadioBox( this, wxID_ANY, wxT("After entering a letter"), wxDefaultPosition, wxDefaultSize, m_afterLetterNChoices, m_afterLetterChoices, 1, wxRA_SPECIFY_COLS );
-	m_afterLetter->SetSelection( 0 );
-	sbSizer3->Add( m_afterLetter, 0, wxALL|wxEXPAND, 5 );
+	bSizer4->Add( m_staticText9, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	wxStaticBoxSizer* sbSizer5;
-	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Move to a blank square") ), wxVERTICAL );
+	wxBoxSizer* bSizer12;
+	bSizer12 = new wxBoxSizer( wxVERTICAL );
 	
-	m_blankOnDirection = new wxCheckBox( this, wxID_ANY, wxT("After switching directions"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer5->Add( m_blankOnDirection, 0, wxALL, 5 );
+	m_moveAfterLetter = new wxCheckBox( this, wxID_ANY, wxT("Move cursor after entering a letter"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_moveAfterLetter->SetValue(true); 
+	bSizer12->Add( m_moveAfterLetter, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_blankOnNewWord = new wxCheckBox( this, wxID_ANY, wxT("After moving to a new word"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer5->Add( m_blankOnNewWord, 0, wxALL, 5 );
+	wxBoxSizer* bSizer13;
+	bSizer13 = new wxBoxSizer( wxVERTICAL );
 	
+	m_nextSquare = new wxRadioButton( this, wxID_ANY, wxT("Move to next square"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer13->Add( m_nextSquare, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	sbSizer3->Add( sbSizer5, 1, wxALL|wxEXPAND, 5 );
-	
-	wxString m_pauseOnSwitchChoices[] = { wxT("Move cursor"), wxT("Keep cursor on current square") };
-	int m_pauseOnSwitchNChoices = sizeof( m_pauseOnSwitchChoices ) / sizeof( wxString );
-	m_pauseOnSwitch = new wxRadioBox( this, wxID_ANY, wxT("When switching with arrow keys"), wxDefaultPosition, wxDefaultSize, m_pauseOnSwitchNChoices, m_pauseOnSwitchChoices, 1, wxRA_SPECIFY_COLS );
-	m_pauseOnSwitch->SetSelection( 0 );
-	sbSizer3->Add( m_pauseOnSwitch, 0, wxALL|wxEXPAND, 5 );
+	m_nextBlank = new wxRadioButton( this, wxID_ANY, wxT("Move to next blank"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer13->Add( m_nextBlank, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	bSizer4->Add( sbSizer3, 0, wxALL|wxEXPAND, 5 );
+	bSizer12->Add( bSizer13, 0, wxLEFT, 20 );
+	
+	m_blankOnDirection = new wxCheckBox( this, wxID_ANY, wxT("Move to blank after switching direction"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_blankOnDirection->SetValue(true); 
+	bSizer12->Add( m_blankOnDirection, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_blankOnNewWord = new wxCheckBox( this, wxID_ANY, wxT("Move to blank after moving to a new word"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_blankOnNewWord->SetValue(true); 
+	bSizer12->Add( m_blankOnNewWord, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_pauseOnSwitch = new wxCheckBox( this, wxID_ANY, wxT("Pause when switching direction"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_pauseOnSwitch->SetValue(true); 
+	bSizer12->Add( m_pauseOnSwitch, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_moveOnRightClick = new wxCheckBox( this, wxID_ANY, wxT("Move to mouse position on right click"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer12->Add( m_moveOnRightClick, 0, wxALL, 5 );
 	
 	
-	bSizer3->Add( bSizer4, 1, wxALL|wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer5;
-	bSizer5 = new wxBoxSizer( wxVERTICAL );
-	
-	wxStaticBoxSizer* sbSizer41;
-	sbSizer41 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Solution") ), wxVERTICAL );
-	
-	m_checkWhileTyping = new wxCheckBox( this, wxID_ANY, wxT("Check solution while typing"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer41->Add( m_checkWhileTyping, 0, wxALL, 5 );
-	
-	m_strictRebus = new wxCheckBox( this, wxID_ANY, wxT("Strict rebus checking"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer41->Add( m_strictRebus, 0, wxALL, 5 );
+	bSizer4->Add( bSizer12, 0, wxLEFT, 20 );
 	
 	
-	bSizer5->Add( sbSizer41, 0, wxALL|wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer4;
-	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Right mouse button") ), wxVERTICAL );
-	
-	m_moveOnRightClick = new wxCheckBox( this, wxID_ANY, wxT("Move to mouse position"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer4->Add( m_moveOnRightClick, 0, wxALL, 5 );
-	
-	
-	bSizer5->Add( sbSizer4, 0, wxALL|wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer411;
-	sbSizer411 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Timer") ), wxVERTICAL );
-	
-	m_startTimer = new wxCheckBox( this, wxID_ANY, wxT("Start when a puzzle is opened"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer411->Add( m_startTimer, 0, wxALL, 5 );
-	
-	
-	bSizer5->Add( sbSizer411, 0, wxEXPAND|wxALL, 5 );
-	
-	
-	bSizer3->Add( bSizer5, 1, wxALL|wxEXPAND, 5 );
+	bSizer3->Add( bSizer4, 0, wxALL, 5 );
 	
 	
 	this->SetSizer( bSizer3 );
 	this->Layout();
 	bSizer3->Fit( this );
+	
+	// Connect Events
+	m_moveAfterLetter->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnMoveAfterLetter ), NULL, this );
 }
 
 wxFB_SolvePanel::~wxFB_SolvePanel()
 {
+	// Disconnect Events
+	m_moveAfterLetter->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnMoveAfterLetter ), NULL, this );
+	
 }
 
 wxFB_AppearancePanel::wxFB_AppearancePanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )

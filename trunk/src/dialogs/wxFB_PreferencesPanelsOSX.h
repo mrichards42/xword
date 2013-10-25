@@ -11,20 +11,21 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/string.h>
-#include <wx/radiobox.h>
+#include <wx/stattext.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/checkbox.h>
 #include <wx/sizer.h>
-#include <wx/statbox.h>
+#include <wx/radiobut.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
 #include <wx/button.h>
-#include <wx/stattext.h>
+#include <wx/statbox.h>
 #include <wx/spinctrl.h>
 #include "fontpicker.hpp"
+#include <wx/radiobox.h>
 #include <wx/slider.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -37,14 +38,23 @@ class wxFB_SolvePanel : public wxPanel
 	private:
 	
 	protected:
-		wxRadioBox* m_afterLetter;
-		wxCheckBox* m_blankOnDirection;
-		wxCheckBox* m_blankOnNewWord;
-		wxRadioBox* m_pauseOnSwitch;
+		wxStaticText* m_staticText911;
+		wxCheckBox* m_startTimer;
+		wxStaticText* m_staticText91;
 		wxCheckBox* m_checkWhileTyping;
 		wxCheckBox* m_strictRebus;
+		wxStaticText* m_staticText9;
+		wxCheckBox* m_moveAfterLetter;
+		wxRadioButton* m_nextSquare;
+		wxRadioButton* m_nextBlank;
+		wxCheckBox* m_blankOnDirection;
+		wxCheckBox* m_blankOnNewWord;
+		wxCheckBox* m_pauseOnSwitch;
 		wxCheckBox* m_moveOnRightClick;
-		wxCheckBox* m_startTimer;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnMoveAfterLetter( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		

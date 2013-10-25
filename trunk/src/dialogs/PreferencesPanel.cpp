@@ -197,6 +197,16 @@ void SolvePanel::DoLoadConfig()
     // Grid Style
     const int gridStyle = m_config.Grid.style();
 
+#ifdef __WXOSX__
+    bool move = gridStyle & MOVE_AFTER_LETTER;
+    m_moveAfterLetter->SetValue(move);
+    m_nextBlank->Enable(move);
+    m_nextSquare->Enable(move);
+    if (gridStyle & MOVE_TO_NEXT_BLANK)
+        m_nextBlank->SetValue(1);
+    else
+        m_nextSquare->SetValue(1);
+#else // ! __WXOSX__
     if (gridStyle & MOVE_AFTER_LETTER)
     {
         if (gridStyle & MOVE_TO_NEXT_BLANK)
@@ -206,7 +216,7 @@ void SolvePanel::DoLoadConfig()
     }
     else
         m_afterLetter->SetSelection(0);
-
+#endif // ! __WXOSX__
     m_blankOnDirection->SetValue((gridStyle & BLANK_ON_DIRECTION) != 0);
     m_blankOnNewWord  ->SetValue((gridStyle & BLANK_ON_NEW_WORD) != 0);
     m_pauseOnSwitch   ->SetSelection((gridStyle & PAUSE_ON_SWITCH) != 0);
@@ -221,6 +231,15 @@ void SolvePanel::DoLoadConfig()
 void SolvePanel::DoSaveConfig()
 {
     long gridStyle = 0;
+#ifdef __WXOSX__
+    if (m_moveAfterLetter->GetValue())
+    {
+        if (m_nextBlank->GetValue())
+            gridStyle |= MOVE_TO_NEXT_BLANK;
+        else
+            gridStyle |= MOVE_AFTER_LETTER;
+    }
+#else // ! __WXOSX__
     switch (m_afterLetter->GetSelection())
     {
     case 2:
@@ -229,6 +248,7 @@ void SolvePanel::DoSaveConfig()
     case 1:
         gridStyle |= MOVE_AFTER_LETTER;
     }
+#endif // ! __WXOSX__
 
     if (m_blankOnDirection->GetValue())
         gridStyle |= BLANK_ON_DIRECTION;
@@ -260,6 +280,16 @@ void SolvePanel::ConnectChangedEvents()
     BindChangedEvent(m_strictRebus);
     BindChangedEvent(m_startTimer);
 }
+
+#ifdef __WXOSX__
+void SolvePanel::OnMoveAfterLetter(wxCommandEvent & evt)
+{
+    bool move = m_moveAfterLetter->GetValue();
+    m_nextBlank->Enable(move);
+    m_nextSquare->Enable(move);
+    evt.Skip();
+}
+#endif
 
 //------------------------------------------------------------------------------
 // StartupPanel
