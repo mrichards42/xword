@@ -82,6 +82,9 @@ protected:
     void DoLoadConfig();
     void DoSaveConfig();
     void ConnectChangedEvents();
+#ifdef __WXOSX__
+    void OnMoveAfterLetter(wxCommandEvent & evt);
+#endif
 };
 
 
