@@ -122,7 +122,7 @@ void AppearancePanel::SetupTree()
     tree->InvalidateBestSize();
     tree->SetMinSize(tree->GetBestSize());
 
-    GetSizer()->Insert(0, m_treebook, 1, wxALL | wxEXPAND, 5);
+    GetSizer()->Insert(0, m_treebook, 1, wxEXPAND | wxTOP | wxRIGHT | wxLEFT, 10);
     UpdateLayout();
 }
 
@@ -143,20 +143,25 @@ void AppearancePanel::OnAdvancedChoice(wxCommandEvent & evt)
 void AppearancePanel::UpdateLayout()
 {
     bool isSimple = m_config.useSimpleStyle();
+    // Show the global appearance panel, and set the wxChoice to 
     m_treebook->GetTreeCtrl()->Show(! isSimple);
-    m_treebook->SetSelection(0); // The simple / global appearance panel
     m_advancedChoice->SetSelection(isSimple ? 0 : 1);
+    if (isSimple)
+        m_treebook->SetSelection(0);
 
     // Update the layout
     m_treebook->InvalidateBestSize();
+    // Adjust the GlobalAppearance font picker layout
+    GlobalAppearance * panel = dynamic_cast<GlobalAppearance *>(m_treebook->GetPage(0));
+    if (panel)
+        panel->m_fontPicker->SetOrientation(isSimple ? wxHORIZONTAL : wxVERTICAL);
 #if XWORD_PREFERENCES_SHRINK
-    m_treebook->SetFitToCurrentPage(isSimple);
+   m_treebook->SetFitToCurrentPage(isSimple);
 #endif
     Layout();
     Fit();
-    // Just some quirk whereby using the SHRINK flag means we have to
-    // size the current window, whereas omitting it requires sizing the
-    // parent window.
+    // Using the SHRINK flag means we have to size the current window,
+    // whereas omitting it requires sizing the parent window.
 #if XWORD_PREFERENCES_SHRINK
     SendSizeEvent();
 #else
@@ -196,8 +201,6 @@ void SolvePanel::DoLoadConfig()
 {
     // Grid Style
     const int gridStyle = m_config.Grid.style();
-
-#ifdef __WXOSX__
     bool move = gridStyle & MOVE_AFTER_LETTER;
     m_moveAfterLetter->SetValue(move);
     m_nextBlank->Enable(move);
@@ -206,32 +209,32 @@ void SolvePanel::DoLoadConfig()
         m_nextBlank->SetValue(1);
     else
         m_nextSquare->SetValue(1);
-#else // ! __WXOSX__
-    if (gridStyle & MOVE_AFTER_LETTER)
-    {
-        if (gridStyle & MOVE_TO_NEXT_BLANK)
-            m_afterLetter->SetSelection(2);
-        else
-            m_afterLetter->SetSelection(1);
-    }
-    else
-        m_afterLetter->SetSelection(0);
-#endif // ! __WXOSX__
     m_blankOnDirection->SetValue((gridStyle & BLANK_ON_DIRECTION) != 0);
     m_blankOnNewWord  ->SetValue((gridStyle & BLANK_ON_NEW_WORD) != 0);
-    m_pauseOnSwitch   ->SetSelection((gridStyle & PAUSE_ON_SWITCH) != 0);
+    m_pauseOnSwitch   ->SetValue((gridStyle & PAUSE_ON_SWITCH) != 0);
     m_moveOnRightClick->SetValue((gridStyle & MOVE_ON_RIGHT_CLICK) != 0);
     m_checkWhileTyping->SetValue((gridStyle & CHECK_WHILE_TYPING) != 0);
     m_strictRebus->SetValue((gridStyle & STRICT_REBUS) != 0);
 
     // Timer
     m_startTimer->SetValue(m_config.Timer.autoStart());
+
+    // Autosave
+    m_useAutoSave->SetValue(m_config.autoSaveInterval() > 0);
+    m_autoSave->SetValue(m_config.autoSaveInterval());
+    m_stAfter->Enable(m_useAutoSave->GetValue());
+    m_autoSave->Enable(m_useAutoSave->GetValue());
+    m_stSeconds->Enable(m_useAutoSave->GetValue());
+
+    // File history
+    m_saveFileHistory->SetValue(m_config.FileHistory.saveFileHistory());
+    m_reopenLastPuzzle->SetValue(m_config.FileHistory.reopenLastPuzzle());
+    m_reopenLastPuzzle->Enable(m_saveFileHistory->GetValue());
 }
 
 void SolvePanel::DoSaveConfig()
 {
     long gridStyle = 0;
-#ifdef __WXOSX__
     if (m_moveAfterLetter->GetValue())
     {
         if (m_nextBlank->GetValue())
@@ -239,22 +242,11 @@ void SolvePanel::DoSaveConfig()
         else
             gridStyle |= MOVE_AFTER_LETTER;
     }
-#else // ! __WXOSX__
-    switch (m_afterLetter->GetSelection())
-    {
-    case 2:
-        gridStyle |= MOVE_TO_NEXT_BLANK;
-        // Fallthrough
-    case 1:
-        gridStyle |= MOVE_AFTER_LETTER;
-    }
-#endif // ! __WXOSX__
-
     if (m_blankOnDirection->GetValue())
         gridStyle |= BLANK_ON_DIRECTION;
     if (m_blankOnNewWord->GetValue())
         gridStyle |= BLANK_ON_NEW_WORD;
-    if(m_pauseOnSwitch->GetSelection() == 1)
+    if(m_pauseOnSwitch->GetValue())
         gridStyle |= PAUSE_ON_SWITCH;
     if (m_moveOnRightClick->GetValue())
         gridStyle |= MOVE_ON_RIGHT_CLICK;
@@ -266,22 +258,32 @@ void SolvePanel::DoSaveConfig()
     m_config.Grid.style = gridStyle;
 
     m_config.Timer.autoStart = m_startTimer->GetValue();
+
+    m_config.autoSaveInterval =
+        m_useAutoSave->IsChecked() ? m_autoSave->GetValue() : 0;
+
+    m_config.FileHistory.saveFileHistory = m_saveFileHistory->IsChecked();
+    m_config.FileHistory.reopenLastPuzzle = m_reopenLastPuzzle->IsChecked();
 }
 
 void SolvePanel::ConnectChangedEvents()
 {
-    BindChangedEvent(m_afterLetter);
+    BindChangedEvent(m_moveAfterLetter);
+    BindChangedEvent(m_nextSquare);
+    BindChangedEvent(m_nextBlank);
     BindChangedEvent(m_blankOnDirection);
-    BindChangedEvent(m_blankOnNewWord);
     BindChangedEvent(m_blankOnNewWord);
     BindChangedEvent(m_pauseOnSwitch);
     BindChangedEvent(m_moveOnRightClick);
     BindChangedEvent(m_checkWhileTyping);
     BindChangedEvent(m_strictRebus);
     BindChangedEvent(m_startTimer);
+    BindChangedEvent(m_useAutoSave);
+    BindChangedEvent(m_autoSave);
+    BindChangedEvent(m_saveFileHistory);
+    BindChangedEvent(m_reopenLastPuzzle);
 }
 
-#ifdef __WXOSX__
 void SolvePanel::OnMoveAfterLetter(wxCommandEvent & evt)
 {
     bool move = m_moveAfterLetter->GetValue();
@@ -289,39 +291,18 @@ void SolvePanel::OnMoveAfterLetter(wxCommandEvent & evt)
     m_nextSquare->Enable(move);
     evt.Skip();
 }
-#endif
 
-//------------------------------------------------------------------------------
-// StartupPanel
-//------------------------------------------------------------------------------
-void StartupPanel::DoLoadConfig()
+void SolvePanel::OnUseAutoSave(wxCommandEvent & evt)
 {
-    m_autoSave->SetValue(m_config.autoSaveInterval());
-    m_saveFileHistory->SetValue(m_config.FileHistory.saveFileHistory());
-    m_reopenLastPuzzle->SetValue(m_config.FileHistory.reopenLastPuzzle());
-    m_reopenLastPuzzle->Enable(m_saveFileHistory->GetValue());
+    m_stAfter->Enable(evt.IsChecked());
+    m_autoSave->Enable(evt.IsChecked());
+    m_stSeconds->Enable(evt.IsChecked());
 }
 
-void StartupPanel::DoSaveConfig()
-{
-    m_config.autoSaveInterval = m_autoSave->GetValue();
-    m_config.FileHistory.saveFileHistory = m_saveFileHistory->IsChecked();
-    m_config.FileHistory.reopenLastPuzzle = m_reopenLastPuzzle->IsChecked();
-
-}
-
-void StartupPanel::ConnectChangedEvents()
-{
-    BindChangedEvent(m_autoSave);
-    BindChangedEvent(m_saveFileHistory);
-    BindChangedEvent(m_reopenLastPuzzle);
-}
-
-void StartupPanel::OnSaveFileHistory(wxCommandEvent & evt)
+void SolvePanel::OnSaveFileHistory(wxCommandEvent & evt)
 {
     m_reopenLastPuzzle->Enable(evt.IsChecked());
 }
-
 
 //------------------------------------------------------------------------------
 // PrintPanel
@@ -338,19 +319,19 @@ void PrintPanel::DoLoadConfig()
     switch (printing.gridAlignment())
     {
         case wxALIGN_TOP | wxALIGN_LEFT:
-            m_printGridAlignment->SetSelection(0);
+            m_alignTL->SetValue(1);
             break;
         case wxALIGN_TOP | wxALIGN_RIGHT:
-            m_printGridAlignment->SetSelection(1);
+            m_alignTR->SetValue(1);
             break;
         case wxALIGN_BOTTOM | wxALIGN_LEFT:
-            m_printGridAlignment->SetSelection(2);
+            m_alignBL->SetValue(1);
             break;
         case wxALIGN_BOTTOM | wxALIGN_RIGHT:
-            m_printGridAlignment->SetSelection(3);
+            m_alignBR->SetValue(1);
             break;
         default:
-            m_printGridAlignment->SetSelection(1);
+            m_alignTR->SetValue(1);
             break;
     }
 
@@ -371,12 +352,14 @@ void PrintPanel::DoSaveConfig()
     ConfigManager::Printing_t & printing = m_config.Printing;
     printing.blackSquareBrightness = m_printBlackSquareBrightness->GetValue();
 
-    // The alignment options
-    long alignments[] = { wxALIGN_TOP | wxALIGN_LEFT,
-                          wxALIGN_TOP | wxALIGN_RIGHT,
-                          wxALIGN_BOTTOM | wxALIGN_LEFT,
-                          wxALIGN_BOTTOM | wxALIGN_RIGHT };
-    printing.gridAlignment = alignments[m_printGridAlignment->GetSelection()];
+    if (m_alignTL->GetValue())
+        printing.gridAlignment = wxALIGN_TOP | wxALIGN_LEFT;
+    else if (m_alignTR->GetValue())
+        printing.gridAlignment = wxALIGN_TOP | wxALIGN_RIGHT;
+    else if (m_alignBL->GetValue())
+        printing.gridAlignment = wxALIGN_BOTTOM | wxALIGN_LEFT;
+    else if (m_alignBR->GetValue())
+        printing.gridAlignment = wxALIGN_BOTTOM | wxALIGN_RIGHT;
 
     // Fonts
     printing.Fonts.useCustomFonts = m_printCustomFonts->IsChecked();

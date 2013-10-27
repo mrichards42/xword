@@ -11,19 +11,19 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/string.h>
-#include <wx/radiobox.h>
+#include <wx/checkbox.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/checkbox.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
+#include <wx/radiobut.h>
+#include <wx/stattext.h>
+#include <wx/spinctrl.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
 #include <wx/button.h>
-#include <wx/stattext.h>
-#include <wx/spinctrl.h>
 #include "fontpicker.hpp"
 #include <wx/slider.h>
 
@@ -37,14 +37,29 @@ class wxFB_SolvePanel : public wxPanel
 	private:
 	
 	protected:
-		wxRadioBox* m_afterLetter;
+		wxCheckBox* m_startTimer;
+		wxCheckBox* m_moveAfterLetter;
+		wxRadioButton* m_nextSquare;
+		wxRadioButton* m_nextBlank;
+		wxStaticText* m_staticText10;
 		wxCheckBox* m_blankOnDirection;
 		wxCheckBox* m_blankOnNewWord;
-		wxRadioBox* m_pauseOnSwitch;
+		wxCheckBox* m_pauseOnSwitch;
+		wxCheckBox* m_moveOnRightClick;
 		wxCheckBox* m_checkWhileTyping;
 		wxCheckBox* m_strictRebus;
-		wxCheckBox* m_moveOnRightClick;
-		wxCheckBox* m_startTimer;
+		wxCheckBox* m_saveFileHistory;
+		wxCheckBox* m_reopenLastPuzzle;
+		wxCheckBox* m_useAutoSave;
+		wxStaticText* m_stAfter;
+		wxSpinCtrl* m_autoSave;
+		wxStaticText* m_stSeconds;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnMoveAfterLetter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSaveFileHistory( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUseAutoSave( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
@@ -77,32 +92,6 @@ class wxFB_AppearancePanel : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxFB_StartupPanel
-///////////////////////////////////////////////////////////////////////////////
-class wxFB_StartupPanel : public wxPanel 
-{
-	private:
-	
-	protected:
-		wxCheckBox* m_saveFileHistory;
-		wxCheckBox* m_reopenLastPuzzle;
-		wxStaticText* m_staticText36;
-		wxSpinCtrl* m_autoSave;
-		wxStaticText* m_staticText351;
-		wxStaticText* m_staticText17;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnSaveFileHistory( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		wxFB_StartupPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxFB_StartupPanel();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
 /// Class wxFB_PrintPanel
 ///////////////////////////////////////////////////////////////////////////////
 class wxFB_PrintPanel : public wxPanel 
@@ -114,7 +103,10 @@ class wxFB_PrintPanel : public wxPanel
 		FontPickerPanel * m_printGridLetterFont;
 		FontPickerPanel * m_printGridNumberFont;
 		FontPickerPanel * m_printClueFont;
-		wxRadioBox* m_printGridAlignment;
+		wxRadioButton* m_alignTL;
+		wxRadioButton* m_alignTR;
+		wxRadioButton* m_alignBL;
+		wxRadioButton* m_alignBR;
 		wxStaticText* m_staticText13;
 		wxSlider* m_printBlackSquareBrightness;
 		wxStaticText* m_staticText14;

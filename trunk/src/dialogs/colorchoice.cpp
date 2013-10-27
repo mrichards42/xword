@@ -43,7 +43,7 @@ ColorChoice::ColorChoice(wxWindow * parent, wxWindowID id,
 #endif
 {
     // If the ctrl is too small the color box gets messed up in wxOSX
-    SetMinSize(wxSize(GetCharWidth() * 20, -1));
+    SetMinSize(wxSize(GetCharWidth() * 22, -1));
     s_ctrls.push_back(this);
     // Make sure we have a list of colors
     if (s_colors.empty())

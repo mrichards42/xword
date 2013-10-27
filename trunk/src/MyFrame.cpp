@@ -2382,8 +2382,7 @@ MyFrame::OnLuaError(wxLuaEvent & evt)
 void
 MyFrame::OnPreferences(wxCommandEvent & WXUNUSED(evt))
 {
-    // PreferencesDialog will destroy itself.
-    (new PreferencesDialog(this))->Show();
+    PreferencesDialog::ShowDialog(this);
 }
 
 

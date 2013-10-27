@@ -306,7 +306,7 @@ public:
     {
         // Standard Appearance
         Add(meta.font, "Font", FontDesc(flag));
-        Add(meta.alignment, "Horizontal Align", HAlignDesc());
+        Add(meta.alignment, "Alignment", HAlignDesc());
         Add(meta.alignment, "Vertical Align", VAlignDesc());
         Add(meta.foregroundColor, "Text");
         Add(meta.backgroundColor, "Background");
@@ -451,9 +451,10 @@ public:
         cfg.Set(font);
     }
 
+    FontPickerPanel * m_fontPicker;
+
 protected:
     ConfigManager & m_config;
-    FontPickerPanel * m_fontPicker;
 };
 
 #endif // APPEARANCE_PANEL_H

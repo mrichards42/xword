@@ -82,9 +82,9 @@ protected:
     void DoLoadConfig();
     void DoSaveConfig();
     void ConnectChangedEvents();
-#ifdef __WXOSX__
     void OnMoveAfterLetter(wxCommandEvent & evt);
-#endif
+    void OnUseAutoSave(wxCommandEvent & evt);
+    void OnSaveFileHistory( wxCommandEvent& event );
 };
 
 
@@ -109,23 +109,6 @@ protected:
     void OnResetDefaults(wxCommandEvent& WXUNUSED(event));
     void OnPageChanged(wxBookCtrlEvent& WXUNUSED(event));
     wxTreebook * m_treebook;
-};
-
-
-class StartupPanel : public wxFB_StartupPanel, public PreferencesPanelBase
-{
-public:
-    StartupPanel(wxWindow * parent, ConfigManager & cfg)
-        : wxFB_StartupPanel(parent),
-          PreferencesPanelBase(cfg)
-    {
-        ConnectChangedEvents();
-    }
-protected:
-    void DoLoadConfig();
-    void DoSaveConfig();
-    void ConnectChangedEvents();
-    void OnSaveFileHistory( wxCommandEvent& event );
 };
 
 
