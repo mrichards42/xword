@@ -11,12 +11,16 @@
 
 wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxVERTICAL );
+	
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxVERTICAL );
 	
 	wxBoxSizer* bSizer411;
 	bSizer411 = new wxBoxSizer( wxVERTICAL );
 	
+	wxStaticText* m_staticText911;
 	m_staticText911 = new wxStaticText( this, wxID_ANY, wxT("Timer"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText911->Wrap( -1 );
 	m_staticText911->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
@@ -27,10 +31,10 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer1211 = new wxBoxSizer( wxVERTICAL );
 	
 	m_startTimer = new wxCheckBox( this, wxID_ANY, wxT("Start when a puzzle is opened"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer1211->Add( m_startTimer, 0, wxALL, 5 );
+	bSizer1211->Add( m_startTimer, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	bSizer411->Add( bSizer1211, 0, wxLEFT, 20 );
+	bSizer411->Add( bSizer1211, 0, wxLEFT, 25 );
 	
 	
 	bSizer3->Add( bSizer411, 0, 0, 5 );
@@ -38,6 +42,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxBoxSizer* bSizer41;
 	bSizer41 = new wxBoxSizer( wxVERTICAL );
 	
+	wxStaticText* m_staticText91;
 	m_staticText91 = new wxStaticText( this, wxID_ANY, wxT("Solution"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText91->Wrap( -1 );
 	m_staticText91->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
@@ -53,10 +58,10 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	m_strictRebus = new wxCheckBox( this, wxID_ANY, wxT("Strict rebus checking"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_strictRebus->SetToolTip( wxT("Require rebus entries to exactly match the solution") );
 	
-	bSizer121->Add( m_strictRebus, 0, wxALL, 5 );
+	bSizer121->Add( m_strictRebus, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	bSizer41->Add( bSizer121, 0, wxLEFT, 20 );
+	bSizer41->Add( bSizer121, 0, wxLEFT, 25 );
 	
 	
 	bSizer3->Add( bSizer41, 0, 0, 5 );
@@ -64,6 +69,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
 	
+	wxStaticText* m_staticText9;
 	m_staticText9 = new wxStaticText( this, wxID_ANY, wxT("Cursor Movement"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText9->Wrap( -1 );
 	m_staticText9->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
@@ -87,7 +93,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer13->Add( m_nextBlank, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	bSizer12->Add( bSizer13, 0, wxLEFT, 20 );
+	bSizer12->Add( bSizer13, 0, wxLEFT, 25 );
 	
 	m_blankOnDirection = new wxCheckBox( this, wxID_ANY, wxT("Move to blank after switching direction"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_blankOnDirection->SetValue(true); 
@@ -102,27 +108,100 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer12->Add( m_pauseOnSwitch, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	m_moveOnRightClick = new wxCheckBox( this, wxID_ANY, wxT("Move to mouse position on right click"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer12->Add( m_moveOnRightClick, 0, wxALL, 5 );
+	bSizer12->Add( m_moveOnRightClick, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	bSizer4->Add( bSizer12, 0, wxLEFT, 20 );
+	bSizer4->Add( bSizer12, 0, wxLEFT, 25 );
 	
 	
-	bSizer3->Add( bSizer4, 0, wxALL, 5 );
+	bSizer3->Add( bSizer4, 0, 0, 5 );
+	
+	wxBoxSizer* bSizer42;
+	bSizer42 = new wxBoxSizer( wxVERTICAL );
+	
+	wxStaticText* m_staticText92;
+	m_staticText92 = new wxStaticText( this, wxID_ANY, wxT("Auto Saving"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText92->Wrap( -1 );
+	m_staticText92->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizer42->Add( m_staticText92, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer122;
+	bSizer122 = new wxBoxSizer( wxVERTICAL );
+	
+	m_useAutoSave = new wxCheckBox( this, wxID_ANY, wxT("Automatically save puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_useAutoSave->SetValue(true); 
+	bSizer122->Add( m_useAutoSave, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer241;
+	bSizer241 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText36 = new wxStaticText( this, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText36->Wrap( -1 );
+	bSizer241->Add( m_staticText36, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	
+	m_autoSave = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), wxSP_ARROW_KEYS, 0, 99, 0 );
+	bSizer241->Add( m_autoSave, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	m_staticText351 = new wxStaticText( this, wxID_ANY, wxT("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText351->Wrap( -1 );
+	bSizer241->Add( m_staticText351, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	this->SetSizer( bSizer3 );
+	bSizer122->Add( bSizer241, 0, wxLEFT, 25 );
+	
+	
+	bSizer42->Add( bSizer122, 0, wxLEFT, 25 );
+	
+	
+	bSizer3->Add( bSizer42, 0, 0, 5 );
+	
+	wxBoxSizer* bSizer421;
+	bSizer421 = new wxBoxSizer( wxVERTICAL );
+	
+	wxStaticText* m_staticText921;
+	m_staticText921 = new wxStaticText( this, wxID_ANY, wxT("File History"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText921->Wrap( -1 );
+	m_staticText921->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizer421->Add( m_staticText921, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer1221;
+	bSizer1221 = new wxBoxSizer( wxVERTICAL );
+	
+	m_saveFileHistory = new wxCheckBox( this, wxID_ANY, wxT("Save a history of recently opened puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer1221->Add( m_saveFileHistory, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_reopenLastPuzzle = new wxCheckBox( this, wxID_ANY, wxT("Open last puzzle when XWord starts"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_reopenLastPuzzle->SetValue(true); 
+	bSizer1221->Add( m_reopenLastPuzzle, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	
+	bSizer421->Add( bSizer1221, 0, wxLEFT, 25 );
+	
+	
+	bSizer3->Add( bSizer421, 0, 0, 5 );
+	
+	
+	bSizer24->Add( bSizer3, 1, wxEXPAND|wxRIGHT|wxLEFT, 20 );
+	
+	
+	this->SetSizer( bSizer24 );
 	this->Layout();
-	bSizer3->Fit( this );
+	bSizer24->Fit( this );
 	
 	// Connect Events
 	m_moveAfterLetter->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnMoveAfterLetter ), NULL, this );
+	m_useAutoSave->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnUseAutoSave ), NULL, this );
+	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnSaveFileHistory ), NULL, this );
 }
 
 wxFB_SolvePanel::~wxFB_SolvePanel()
 {
 	// Disconnect Events
 	m_moveAfterLetter->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnMoveAfterLetter ), NULL, this );
+	m_useAutoSave->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnUseAutoSave ), NULL, this );
+	m_saveFileHistory->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnSaveFileHistory ), NULL, this );
 	
 }
 
@@ -147,7 +226,7 @@ wxFB_AppearancePanel::wxFB_AppearancePanel( wxWindow* parent, wxWindowID id, con
 	bsizer26->Add( m_defaultsBtn, 0, wxALL, 5 );
 	
 	
-	bSizer11->Add( bsizer26, 0, wxEXPAND, 5 );
+	bSizer11->Add( bsizer26, 0, wxEXPAND|wxALL, 5 );
 	
 	
 	this->SetSizer( bSizer11 );
@@ -167,146 +246,120 @@ wxFB_AppearancePanel::~wxFB_AppearancePanel()
 	
 }
 
-wxFB_StartupPanel::wxFB_StartupPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
-{
-	wxBoxSizer* bSizer20;
-	bSizer20 = new wxBoxSizer( wxVERTICAL );
-	
-	wxBoxSizer* bSizer42;
-	bSizer42 = new wxBoxSizer( wxVERTICAL );
-	
-	wxStaticBoxSizer* sbSizer22;
-	sbSizer22 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("File history") ), wxHORIZONTAL );
-	
-	m_saveFileHistory = new wxCheckBox( this, wxID_ANY, wxT("Save a history of recently opened puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer22->Add( m_saveFileHistory, 0, wxALL, 5 );
-	
-	m_reopenLastPuzzle = new wxCheckBox( this, wxID_ANY, wxT("Open last puzzle when XWord starts"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_reopenLastPuzzle->SetValue(true); 
-	sbSizer22->Add( m_reopenLastPuzzle, 0, wxALL, 5 );
-	
-	
-	bSizer42->Add( sbSizer22, 0, wxALL|wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer4111;
-	sbSizer4111 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Auto Save") ), wxVERTICAL );
-	
-	wxBoxSizer* bSizer24;
-	bSizer24 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_staticText36 = new wxStaticText( this, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText36->Wrap( -1 );
-	bSizer24->Add( m_staticText36, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
-	
-	m_autoSave = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), wxSP_ARROW_KEYS, 0, 99, 0 );
-	bSizer24->Add( m_autoSave, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
-	m_staticText351 = new wxStaticText( this, wxID_ANY, wxT("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText351->Wrap( -1 );
-	bSizer24->Add( m_staticText351, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-	
-	
-	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_staticText17 = new wxStaticText( this, wxID_ANY, wxT("Set to 0 to disable auto save"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText17->Wrap( -1 );
-	m_staticText17->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 90, false, wxEmptyString ) );
-	
-	bSizer24->Add( m_staticText17, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sbSizer4111->Add( bSizer24, 1, wxEXPAND, 5 );
-	
-	
-	bSizer42->Add( sbSizer4111, 0, wxEXPAND|wxALL, 5 );
-	
-	
-	bSizer20->Add( bSizer42, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( bSizer20 );
-	this->Layout();
-	bSizer20->Fit( this );
-	
-	// Connect Events
-	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_StartupPanel::OnSaveFileHistory ), NULL, this );
-}
-
-wxFB_StartupPanel::~wxFB_StartupPanel()
-{
-	// Disconnect Events
-	m_saveFileHistory->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_StartupPanel::OnSaveFileHistory ), NULL, this );
-	
-}
-
 wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* bSizer371;
 	bSizer371 = new wxBoxSizer( wxVERTICAL );
 	
-	wxStaticBoxSizer* sbSizer14;
-	sbSizer14 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Fonts") ), wxVERTICAL );
+	wxBoxSizer* bSizer411;
+	bSizer411 = new wxBoxSizer( wxVERTICAL );
 	
-	m_printCustomFonts = new wxCheckBox( this, wxID_ANY, wxT("Use custom fonts"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer14->Add( m_printCustomFonts, 0, wxALL, 8 );
+	wxStaticText* m_staticText911;
+	m_staticText911 = new wxStaticText( this, wxID_ANY, wxT("Fonts"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText911->Wrap( -1 );
+	m_staticText911->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizer411->Add( m_staticText911, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer1211;
+	bSizer1211 = new wxBoxSizer( wxVERTICAL );
+	
+	m_printCustomFonts = new wxCheckBox( this, wxID_ANY, wxT("Use custom fonts for printing"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer1211->Add( m_printCustomFonts, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	wxFlexGridSizer* fgSizer5;
-	fgSizer5 = new wxFlexGridSizer( 3, 2, 10, 10 );
+	fgSizer5 = new wxFlexGridSizer( 3, 2, 5, 5 );
 	fgSizer5->SetFlexibleDirection( wxBOTH );
 	fgSizer5->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticText* m_staticText144;
 	m_staticText144 = new wxStaticText( this, wxID_ANY, wxT("Grid Text:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText144->Wrap( -1 );
-	fgSizer5->Add( m_staticText144, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer5->Add( m_staticText144, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	m_printGridLetterFont = new FontPickerPanel(this, wxID_ANY, wxNullFont, FP_DEFAULT & ~ FP_POINTSIZE);
-	fgSizer5->Add( m_printGridLetterFont, 0, 0, 5 );
+	fgSizer5->Add( m_printGridLetterFont, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxStaticText* m_printGridNumberFontLabel;
 	m_printGridNumberFontLabel = new wxStaticText( this, wxID_ANY, wxT("Grid Numbers:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_printGridNumberFontLabel->Wrap( -1 );
-	fgSizer5->Add( m_printGridNumberFontLabel, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer5->Add( m_printGridNumberFontLabel, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 5 );
 	
 	m_printGridNumberFont = new FontPickerPanel(this, wxID_ANY, wxNullFont, FP_DEFAULT & ~ FP_POINTSIZE);
-	fgSizer5->Add( m_printGridNumberFont, 0, 0, 5 );
+	fgSizer5->Add( m_printGridNumberFont, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxStaticText* m_staticText1412;
 	m_staticText1412 = new wxStaticText( this, wxID_ANY, wxT("Clues:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1412->Wrap( -1 );
-	fgSizer5->Add( m_staticText1412, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer5->Add( m_staticText1412, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	m_printClueFont = new FontPickerPanel(this, wxID_ANY, wxNullFont, FP_DEFAULT & ~ FP_POINTSIZE);
-	fgSizer5->Add( m_printClueFont, 0, 0, 5 );
+	fgSizer5->Add( m_printClueFont, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	sbSizer14->Add( fgSizer5, 0, wxALL, 5 );
+	bSizer1211->Add( fgSizer5, 0, wxLEFT, 25 );
 	
 	
-	bSizer371->Add( sbSizer14, 0, wxALL|wxEXPAND, 5 );
+	bSizer411->Add( bSizer1211, 0, wxLEFT, 25 );
 	
-	wxBoxSizer* bSizer58;
-	bSizer58 = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxString m_printGridAlignmentChoices[] = { wxT("Top left"), wxT("Top right"), wxT("Bottom left"), wxT("Bottom right") };
-	int m_printGridAlignmentNChoices = sizeof( m_printGridAlignmentChoices ) / sizeof( wxString );
-	m_printGridAlignment = new wxRadioBox( this, wxID_ANY, wxT("Grid alignment"), wxDefaultPosition, wxDefaultSize, m_printGridAlignmentNChoices, m_printGridAlignmentChoices, 2, wxRA_SPECIFY_COLS );
-	m_printGridAlignment->SetSelection( 0 );
-	bSizer58->Add( m_printGridAlignment, 0, wxALL|wxEXPAND, 5 );
+	bSizer371->Add( bSizer411, 1, wxEXPAND, 5 );
 	
-	wxStaticBoxSizer* sbSizer19;
-	sbSizer19 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Black square brightness") ), wxHORIZONTAL );
+	wxBoxSizer* bSizer4111;
+	bSizer4111 = new wxBoxSizer( wxVERTICAL );
+	
+	wxStaticText* m_staticText9111;
+	m_staticText9111 = new wxStaticText( this, wxID_ANY, wxT("Grid Alignment"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText9111->Wrap( -1 );
+	m_staticText9111->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizer4111->Add( m_staticText9111, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	wxGridSizer* gSizer3;
+	gSizer3 = new wxGridSizer( 0, 2, 0, 0 );
+	
+	m_alignTL = new wxRadioButton( this, wxID_ANY, wxT("Top left"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_alignTL->SetValue( true ); 
+	gSizer3->Add( m_alignTL, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_alignTR = new wxRadioButton( this, wxID_ANY, wxT("Top right"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer3->Add( m_alignTR, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_alignBL = new wxRadioButton( this, wxID_ANY, wxT("Bottom left"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer3->Add( m_alignBL, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_alignBR = new wxRadioButton( this, wxID_ANY, wxT("Bottom right"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer3->Add( m_alignBR, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	
+	bSizer4111->Add( gSizer3, 0, wxLEFT, 25 );
+	
+	
+	bSizer371->Add( bSizer4111, 0, wxTOP, 5 );
+	
+	wxBoxSizer* bSizer41111;
+	bSizer41111 = new wxBoxSizer( wxVERTICAL );
+	
+	wxStaticText* m_staticText91111;
+	m_staticText91111 = new wxStaticText( this, wxID_ANY, wxT("Black Square Color"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText91111->Wrap( -1 );
+	m_staticText91111->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizer41111->Add( m_staticText91111, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer33;
+	bSizer33 = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_staticText13 = new wxStaticText( this, wxID_ANY, wxT("White"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText13->Wrap( -1 );
-	sbSizer19->Add( m_staticText13, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer33->Add( m_staticText13, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	m_printBlackSquareBrightness = new wxSlider( this, wxID_ANY, 0, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_INVERSE );
-	sbSizer19->Add( m_printBlackSquareBrightness, 1, wxTOP|wxALIGN_CENTER_VERTICAL, 3 );
+	bSizer33->Add( m_printBlackSquareBrightness, 1, wxALIGN_CENTER_VERTICAL|wxTOP, 3 );
 	
 	m_staticText14 = new wxStaticText( this, wxID_ANY, wxT("Black"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
-	sbSizer19->Add( m_staticText14, 0, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer33->Add( m_staticText14, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	
 	m_panel8 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxSUNKEN_BORDER );
 	wxBoxSizer* bSizer21;
@@ -322,13 +375,13 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	m_panel8->SetSizer( bSizer21 );
 	m_panel8->Layout();
 	bSizer21->Fit( m_panel8 );
-	sbSizer19->Add( m_panel8, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	bSizer33->Add( m_panel8, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
 	
 	
-	bSizer58->Add( sbSizer19, 1, wxALL|wxEXPAND, 5 );
+	bSizer41111->Add( bSizer33, 0, wxLEFT, 25 );
 	
 	
-	bSizer371->Add( bSizer58, 0, wxEXPAND, 5 );
+	bSizer371->Add( bSizer41111, 1, wxEXPAND|wxTOP, 5 );
 	
 	
 	this->SetSizer( bSizer371 );

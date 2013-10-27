@@ -9,53 +9,6 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-wxFB_FontPickerPanel::wxFB_FontPickerPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
-{
-	m_sizer = new wxBoxSizer( wxVERTICAL );
-	
-	m_top = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_facename = new FontFaceCtrl(this, wxID_ANY);
-	m_top->Add( m_facename, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 0 );
-	
-	m_pointsize = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 5, 100, 5 );
-	m_pointsize->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
-	
-	m_top->Add( m_pointsize, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 2 );
-	
-	
-	m_sizer->Add( m_top, 0, wxEXPAND, 5 );
-	
-	m_bottom = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_bold = new wxToggleButton( this, wxID_ANY, wxT("B"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	m_bold->SetFont( wxFont( 10, 72, 90, 92, false, wxEmptyString ) );
-	
-	m_bottom->Add( m_bold, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2 );
-	
-	m_italic = new wxToggleButton( this, wxID_ANY, wxT("I"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	m_italic->SetFont( wxFont( 10, 72, 93, 90, false, wxEmptyString ) );
-	
-	m_bottom->Add( m_italic, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2 );
-	
-	m_underline = new wxToggleButton( this, wxID_ANY, wxT("U"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	m_underline->SetFont( wxFont( 10, 72, 90, 90, true, wxEmptyString ) );
-	
-	m_bottom->Add( m_underline, 0, wxALIGN_CENTER_VERTICAL, 2 );
-	
-	
-	m_sizer->Add( m_bottom, 0, 0, 5 );
-	
-	
-	this->SetSizer( m_sizer );
-	this->Layout();
-	m_sizer->Fit( this );
-}
-
-wxFB_FontPickerPanel::~wxFB_FontPickerPanel()
-{
-}
-
 wxFB_GridTweaks::wxFB_GridTweaks( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxGridBagSizer* gbSizer1;
@@ -77,7 +30,7 @@ wxFB_GridTweaks::wxFB_GridTweaks( wxWindow* parent, wxWindowID id, const wxPoint
 	gbSizer1->Add( m_staticText411, wxGBPosition( 0, 2 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticline1 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	gbSizer1->Add( m_staticline1, wxGBPosition( 1, 0 ), wxGBSpan( 1, 3 ), wxEXPAND|wxTOP|wxBOTTOM, 5 );
+	gbSizer1->Add( m_staticline1, wxGBPosition( 1, 0 ), wxGBSpan( 1, 3 ), wxTOP|wxBOTTOM|wxEXPAND, 5 );
 	
 	wxStaticText* m_staticText341;
 	m_staticText341 = new wxStaticText( this, wxID_ANY, wxT("Percent of the square taken up by text and number:"), wxDefaultPosition, wxDefaultSize, 0 );

@@ -17,32 +17,58 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
 	
+	wxStaticBoxSizer* sbSizer411;
+	sbSizer411 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Timer") ), wxVERTICAL );
+	
+	m_startTimer = new wxCheckBox( this, wxID_ANY, wxT("Start when a puzzle is opened"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_startTimer->SetValue(true); 
+	sbSizer411->Add( m_startTimer, 0, wxALL, 5 );
+	
+	
+	bSizer4->Add( sbSizer411, 0, wxEXPAND|wxALL, 5 );
+	
 	wxStaticBoxSizer* sbSizer3;
 	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Cursor movement") ), wxVERTICAL );
 	
-	wxString m_afterLetterChoices[] = { wxT("Do not move"), wxT("Move to next square"), wxT("Move to next blank") };
-	int m_afterLetterNChoices = sizeof( m_afterLetterChoices ) / sizeof( wxString );
-	m_afterLetter = new wxRadioBox( this, wxID_ANY, wxT("After entering a letter"), wxDefaultPosition, wxDefaultSize, m_afterLetterNChoices, m_afterLetterChoices, 1, wxRA_SPECIFY_COLS );
-	m_afterLetter->SetSelection( 0 );
-	sbSizer3->Add( m_afterLetter, 0, wxALL|wxEXPAND, 5 );
+	m_moveAfterLetter = new wxCheckBox( this, wxID_ANY, wxT("Move after entering a letter"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_moveAfterLetter->SetValue(true); 
+	sbSizer3->Add( m_moveAfterLetter, 0, wxALL, 5 );
 	
-	wxStaticBoxSizer* sbSizer5;
-	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Move to a blank square") ), wxVERTICAL );
+	wxBoxSizer* bSizer12;
+	bSizer12 = new wxBoxSizer( wxVERTICAL );
+	
+	m_nextSquare = new wxRadioButton( this, wxID_ANY, wxT("To the next square"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer12->Add( m_nextSquare, 0, wxALL, 5 );
+	
+	m_nextBlank = new wxRadioButton( this, wxID_ANY, wxT("To the next blank square"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer12->Add( m_nextBlank, 0, wxALL, 5 );
+	
+	
+	sbSizer3->Add( bSizer12, 0, wxLEFT, 20 );
+	
+	m_staticText10 = new wxStaticText( this, wxID_ANY, wxT("Move to a blank square"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText10->Wrap( -1 );
+	sbSizer3->Add( m_staticText10, 0, wxALL, 5 );
+	
+	wxBoxSizer* bSizer13;
+	bSizer13 = new wxBoxSizer( wxVERTICAL );
 	
 	m_blankOnDirection = new wxCheckBox( this, wxID_ANY, wxT("After switching directions"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer5->Add( m_blankOnDirection, 0, wxALL, 5 );
+	bSizer13->Add( m_blankOnDirection, 0, wxALL, 5 );
 	
 	m_blankOnNewWord = new wxCheckBox( this, wxID_ANY, wxT("After moving to a new word"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer5->Add( m_blankOnNewWord, 0, wxALL, 5 );
+	bSizer13->Add( m_blankOnNewWord, 0, wxALL, 5 );
 	
 	
-	sbSizer3->Add( sbSizer5, 1, wxALL|wxEXPAND, 5 );
+	sbSizer3->Add( bSizer13, 0, wxLEFT, 20 );
 	
-	wxString m_pauseOnSwitchChoices[] = { wxT("Move cursor"), wxT("Keep cursor on current square") };
-	int m_pauseOnSwitchNChoices = sizeof( m_pauseOnSwitchChoices ) / sizeof( wxString );
-	m_pauseOnSwitch = new wxRadioBox( this, wxID_ANY, wxT("When switching with arrow keys"), wxDefaultPosition, wxDefaultSize, m_pauseOnSwitchNChoices, m_pauseOnSwitchChoices, 1, wxRA_SPECIFY_COLS );
-	m_pauseOnSwitch->SetSelection( 0 );
-	sbSizer3->Add( m_pauseOnSwitch, 0, wxALL|wxEXPAND, 5 );
+	m_pauseOnSwitch = new wxCheckBox( this, wxID_ANY, wxT("Pause when switching direction"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_pauseOnSwitch->SetValue(true); 
+	sbSizer3->Add( m_pauseOnSwitch, 0, wxALL, 5 );
+	
+	m_moveOnRightClick = new wxCheckBox( this, wxID_ANY, wxT("Move to mouse on right click"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_moveOnRightClick->SetValue(true); 
+	sbSizer3->Add( m_moveOnRightClick, 0, wxALL, 5 );
 	
 	
 	bSizer4->Add( sbSizer3, 0, wxALL|wxEXPAND, 5 );
@@ -60,28 +86,53 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	sbSizer41->Add( m_checkWhileTyping, 0, wxALL, 5 );
 	
 	m_strictRebus = new wxCheckBox( this, wxID_ANY, wxT("Strict rebus checking"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_strictRebus->SetToolTip( wxT("Require rebus entries to exactly match the solution") );
+	
 	sbSizer41->Add( m_strictRebus, 0, wxALL, 5 );
 	
 	
 	bSizer5->Add( sbSizer41, 0, wxALL|wxEXPAND, 5 );
 	
-	wxStaticBoxSizer* sbSizer4;
-	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Right mouse button") ), wxVERTICAL );
+	wxStaticBoxSizer* sbSizer22;
+	sbSizer22 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("File history") ), wxVERTICAL );
 	
-	m_moveOnRightClick = new wxCheckBox( this, wxID_ANY, wxT("Move to mouse position"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer4->Add( m_moveOnRightClick, 0, wxALL, 5 );
+	m_saveFileHistory = new wxCheckBox( this, wxID_ANY, wxT("Save a history of recent puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_saveFileHistory->SetValue(true); 
+	sbSizer22->Add( m_saveFileHistory, 0, wxALL, 5 );
 	
-	
-	bSizer5->Add( sbSizer4, 0, wxALL|wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer411;
-	sbSizer411 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Timer") ), wxVERTICAL );
-	
-	m_startTimer = new wxCheckBox( this, wxID_ANY, wxT("Start when a puzzle is opened"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer411->Add( m_startTimer, 0, wxALL, 5 );
+	m_reopenLastPuzzle = new wxCheckBox( this, wxID_ANY, wxT("Open last puzzle on startup"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_reopenLastPuzzle->SetValue(true); 
+	sbSizer22->Add( m_reopenLastPuzzle, 0, wxALL, 5 );
 	
 	
-	bSizer5->Add( sbSizer411, 0, wxEXPAND|wxALL, 5 );
+	bSizer5->Add( sbSizer22, 0, wxALL|wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer4111;
+	sbSizer4111 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Auto Save") ), wxVERTICAL );
+	
+	m_useAutoSave = new wxCheckBox( this, wxID_ANY, wxT("Automatically save puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_useAutoSave->SetValue(true); 
+	sbSizer4111->Add( m_useAutoSave, 0, wxALL, 5 );
+	
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_stAfter = new wxStaticText( this, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stAfter->Wrap( -1 );
+	bSizer24->Add( m_stAfter, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	
+	m_autoSave = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), wxSP_ARROW_KEYS, 0, 99, 10 );
+	bSizer24->Add( m_autoSave, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	m_stSeconds = new wxStaticText( this, wxID_ANY, wxT("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stSeconds->Wrap( -1 );
+	bSizer24->Add( m_stSeconds, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	
+	
+	sbSizer4111->Add( bSizer24, 0, wxLEFT, 20 );
+	
+	
+	bSizer5->Add( sbSizer4111, 0, wxEXPAND|wxALL, 5 );
 	
 	
 	bSizer3->Add( bSizer5, 1, wxALL|wxEXPAND, 5 );
@@ -90,10 +141,20 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	this->SetSizer( bSizer3 );
 	this->Layout();
 	bSizer3->Fit( this );
+	
+	// Connect Events
+	m_moveAfterLetter->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnMoveAfterLetter ), NULL, this );
+	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnSaveFileHistory ), NULL, this );
+	m_useAutoSave->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnUseAutoSave ), NULL, this );
 }
 
 wxFB_SolvePanel::~wxFB_SolvePanel()
 {
+	// Disconnect Events
+	m_moveAfterLetter->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnMoveAfterLetter ), NULL, this );
+	m_saveFileHistory->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnSaveFileHistory ), NULL, this );
+	m_useAutoSave->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_SolvePanel::OnUseAutoSave ), NULL, this );
+	
 }
 
 wxFB_AppearancePanel::wxFB_AppearancePanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -117,7 +178,7 @@ wxFB_AppearancePanel::wxFB_AppearancePanel( wxWindow* parent, wxWindowID id, con
 	bsizer26->Add( m_defaultsBtn, 0, wxALL, 5 );
 	
 	
-	bSizer11->Add( bsizer26, 0, wxEXPAND, 5 );
+	bSizer11->Add( bsizer26, 0, wxEXPAND|wxALL, 5 );
 	
 	
 	this->SetSizer( bSizer11 );
@@ -134,78 +195,6 @@ wxFB_AppearancePanel::~wxFB_AppearancePanel()
 	// Disconnect Events
 	m_advancedChoice->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( wxFB_AppearancePanel::OnAdvancedChoice ), NULL, this );
 	m_defaultsBtn->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxFB_AppearancePanel::OnResetDefaults ), NULL, this );
-	
-}
-
-wxFB_StartupPanel::wxFB_StartupPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
-{
-	wxBoxSizer* bSizer20;
-	bSizer20 = new wxBoxSizer( wxVERTICAL );
-	
-	wxBoxSizer* bSizer42;
-	bSizer42 = new wxBoxSizer( wxVERTICAL );
-	
-	wxStaticBoxSizer* sbSizer22;
-	sbSizer22 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("File history") ), wxHORIZONTAL );
-	
-	m_saveFileHistory = new wxCheckBox( this, wxID_ANY, wxT("Save a history of recently opened puzzles"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer22->Add( m_saveFileHistory, 0, wxALL, 5 );
-	
-	m_reopenLastPuzzle = new wxCheckBox( this, wxID_ANY, wxT("Open last puzzle when XWord starts"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_reopenLastPuzzle->SetValue(true); 
-	sbSizer22->Add( m_reopenLastPuzzle, 0, wxALL, 5 );
-	
-	
-	bSizer42->Add( sbSizer22, 0, wxALL|wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer4111;
-	sbSizer4111 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Auto Save") ), wxVERTICAL );
-	
-	wxBoxSizer* bSizer24;
-	bSizer24 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_staticText36 = new wxStaticText( this, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText36->Wrap( -1 );
-	bSizer24->Add( m_staticText36, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
-	
-	m_autoSave = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), wxSP_ARROW_KEYS, 0, 99, 0 );
-	bSizer24->Add( m_autoSave, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
-	m_staticText351 = new wxStaticText( this, wxID_ANY, wxT("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText351->Wrap( -1 );
-	bSizer24->Add( m_staticText351, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-	
-	
-	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_staticText17 = new wxStaticText( this, wxID_ANY, wxT("Set to 0 to disable auto save"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText17->Wrap( -1 );
-	m_staticText17->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 90, false, wxEmptyString ) );
-	
-	bSizer24->Add( m_staticText17, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sbSizer4111->Add( bSizer24, 1, wxEXPAND, 5 );
-	
-	
-	bSizer42->Add( sbSizer4111, 0, wxEXPAND|wxALL, 5 );
-	
-	
-	bSizer20->Add( bSizer42, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( bSizer20 );
-	this->Layout();
-	bSizer20->Fit( this );
-	
-	// Connect Events
-	m_saveFileHistory->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_StartupPanel::OnSaveFileHistory ), NULL, this );
-}
-
-wxFB_StartupPanel::~wxFB_StartupPanel()
-{
-	// Disconnect Events
-	m_saveFileHistory->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_StartupPanel::OnSaveFileHistory ), NULL, this );
 	
 }
 
@@ -253,16 +242,34 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	sbSizer14->Add( fgSizer5, 0, wxALL, 5 );
 	
 	
-	bSizer371->Add( sbSizer14, 0, wxALL|wxEXPAND, 5 );
+	bSizer371->Add( sbSizer14, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 10 );
 	
 	wxBoxSizer* bSizer58;
 	bSizer58 = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxString m_printGridAlignmentChoices[] = { wxT("Top left"), wxT("Top right"), wxT("Bottom left"), wxT("Bottom right") };
-	int m_printGridAlignmentNChoices = sizeof( m_printGridAlignmentChoices ) / sizeof( wxString );
-	m_printGridAlignment = new wxRadioBox( this, wxID_ANY, wxT("Grid alignment"), wxDefaultPosition, wxDefaultSize, m_printGridAlignmentNChoices, m_printGridAlignmentChoices, 2, wxRA_SPECIFY_COLS );
-	m_printGridAlignment->SetSelection( 0 );
-	bSizer58->Add( m_printGridAlignment, 0, wxALL|wxEXPAND, 5 );
+	wxStaticBoxSizer* sbSizer8;
+	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Grid alignment") ), wxVERTICAL );
+	
+	wxGridSizer* gSizer1;
+	gSizer1 = new wxGridSizer( 0, 2, 0, 0 );
+	
+	m_alignTL = new wxRadioButton( this, wxID_ANY, wxT("Top left"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer1->Add( m_alignTL, 0, wxALL, 5 );
+	
+	m_alignTR = new wxRadioButton( this, wxID_ANY, wxT("Top right"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer1->Add( m_alignTR, 0, wxALL, 5 );
+	
+	m_alignBL = new wxRadioButton( this, wxID_ANY, wxT("Bottom left"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer1->Add( m_alignBL, 0, wxALL, 5 );
+	
+	m_alignBR = new wxRadioButton( this, wxID_ANY, wxT("Bottom right"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer1->Add( m_alignBR, 0, wxALL, 5 );
+	
+	
+	sbSizer8->Add( gSizer1, 1, wxEXPAND, 5 );
+	
+	
+	bSizer58->Add( sbSizer8, 0, wxEXPAND|wxALL, 5 );
 	
 	wxStaticBoxSizer* sbSizer19;
 	sbSizer19 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Black square brightness") ), wxHORIZONTAL );
@@ -298,7 +305,7 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer58->Add( sbSizer19, 1, wxALL|wxEXPAND, 5 );
 	
 	
-	bSizer371->Add( bSizer58, 0, wxEXPAND, 5 );
+	bSizer371->Add( bSizer58, 0, wxEXPAND|wxALL, 5 );
 	
 	
 	this->SetSizer( bSizer371 );

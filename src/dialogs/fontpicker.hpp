@@ -63,7 +63,7 @@ public:
         m_pointsize = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(50, -1), wxSP_ARROW_KEYS, 5, 100, 5);
         top->Add(m_pointsize, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 2);
         
-        sizer->Add(top, 0, wxEXPAND, 5);
+        sizer->Add(top, 0, wxEXPAND | wxRIGHT, 2);
         
         wxBoxSizer * bottom = new wxBoxSizer(wxHORIZONTAL);
 
@@ -87,7 +87,7 @@ public:
         m_underline->SetFont(wxFont(wxFontInfo(fontSize).Family(wxFONTFAMILY_ROMAN).Underlined()));
         bottom->Add(m_underline, 0, wxALIGN_CENTER_VERTICAL);
         
-        sizer->Add(bottom, 0, 0, 5);
+        sizer->Add(bottom);
         SetSizer(sizer);
 
         // Hide unneeded ctrls
@@ -136,6 +136,20 @@ public:
         m_bold->SetValue(font.GetWeight() == wxFONTWEIGHT_BOLD);
         m_italic->SetValue(font.GetStyle() == wxFONTSTYLE_ITALIC);
         m_underline->SetValue(font.GetUnderlined());
+    }
+
+    void SetOrientation(int orient)
+    {
+        wxBoxSizer * sizer = wxDynamicCast(GetSizer(), wxBoxSizer);
+        if (sizer->GetOrientation() == orient)
+            return;
+        wxSizer * top = sizer->GetItem((size_t)0)->GetSizer();
+        wxSizer * bottom = sizer->GetItem((size_t)1)->GetSizer();
+        sizer->Detach(top);
+        sizer->Detach(bottom);
+        sizer->SetOrientation(orient);
+        sizer->Add(top, 0, wxEXPAND | wxRIGHT, 2);
+        sizer->Add(bottom);
     }
 
 protected:

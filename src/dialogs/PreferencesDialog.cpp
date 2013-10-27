@@ -55,9 +55,8 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
 
     // Add the pages
     wxBookCtrlBase * book = GetBookCtrl();
-    GetBookCtrl()->AddPage(new SolvePanel(book, *m_config), "Solving");
+    GetBookCtrl()->AddPage(new SolvePanel(book, *m_config), "General");
     GetBookCtrl()->AddPage(new AppearancePanel(book, *m_config), "Appearance");
-    GetBookCtrl()->AddPage(new StartupPanel(book, *m_config), "Startup");
     GetBookCtrl()->AddPage(new PrintPanel(book, *m_config), "Printing");
 
     LoadConfig();
@@ -105,6 +104,17 @@ PreferencesDialog::~PreferencesDialog()
     delete m_config;
 #endif
     FontFaceCtrl::ClearFacenames();
+    if (this == s_dialog)
+        s_dialog = NULL;
+}
+
+PreferencesDialog * PreferencesDialog::s_dialog = NULL;
+void PreferencesDialog::ShowDialog(wxWindow * parent)
+{
+    if (! s_dialog)
+        s_dialog = new PreferencesDialog(parent);
+    s_dialog->Raise();
+    s_dialog->Show();
 }
 
 void PreferencesDialog::LoadConfig()

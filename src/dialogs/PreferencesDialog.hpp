@@ -32,8 +32,12 @@
 
 class PreferencesDialog : public wxPropertySheetDialog
 {
-public:
+protected:
     PreferencesDialog(wxWindow * parent);
+public:
+    // Only allow one instance of this dialog
+    static void ShowDialog(wxWindow * parent);
+
     ~PreferencesDialog();
     ConfigManager & GetConfig();
 
@@ -54,6 +58,7 @@ protected:
 
     ConfigManager * m_config;
     ConfigManager m_oldConfig;
+    static PreferencesDialog * s_dialog;
 };
 
 #endif // PREFERENCES_DLG_H
