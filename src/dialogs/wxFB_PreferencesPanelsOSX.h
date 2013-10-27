@@ -47,9 +47,9 @@ class wxFB_SolvePanel : public wxPanel
 		wxCheckBox* m_pauseOnSwitch;
 		wxCheckBox* m_moveOnRightClick;
 		wxCheckBox* m_useAutoSave;
-		wxStaticText* m_staticText36;
+		wxStaticText* m_stAfter;
 		wxSpinCtrl* m_autoSave;
-		wxStaticText* m_staticText351;
+		wxStaticText* m_stSeconds;
 		wxCheckBox* m_saveFileHistory;
 		wxCheckBox* m_reopenLastPuzzle;
 		

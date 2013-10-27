@@ -24,7 +24,7 @@
         <property name="skip_python_events">1</property>
         <property name="use_enum">1</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Panel" expanded="0">
+        <object class="Panel" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -76,16 +76,16 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="0">
+            <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
                 <property name="name">bSizer24</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
-                <object class="sizeritem" expanded="0">
+                <object class="sizeritem" expanded="1">
                     <property name="border">20</property>
                     <property name="flag">wxEXPAND|wxRIGHT|wxLEFT</property>
                     <property name="proportion">1</property>
-                    <object class="wxBoxSizer" expanded="0">
+                    <object class="wxBoxSizer" expanded="1">
                         <property name="minimum_size"></property>
                         <property name="name">bSizer3</property>
                         <property name="orient">wxVERTICAL</property>
@@ -1296,7 +1296,7 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="0">
+                        <object class="sizeritem" expanded="1">
                             <property name="border">5</property>
                             <property name="flag">wxBOTTOM</property>
                             <property name="proportion">0</property>
@@ -1534,7 +1534,7 @@
                                                         <property name="minimize_button">0</property>
                                                         <property name="minimum_size"></property>
                                                         <property name="moveable">1</property>
-                                                        <property name="name">m_staticText36</property>
+                                                        <property name="name">m_stAfter</property>
                                                         <property name="pane_border">1</property>
                                                         <property name="pane_position"></property>
                                                         <property name="pane_size"></property>
@@ -1704,7 +1704,7 @@
                                                         <property name="minimize_button">0</property>
                                                         <property name="minimum_size"></property>
                                                         <property name="moveable">1</property>
-                                                        <property name="name">m_staticText351</property>
+                                                        <property name="name">m_stSeconds</property>
                                                         <property name="pane_border">1</property>
                                                         <property name="pane_position"></property>
                                                         <property name="pane_size"></property>
@@ -2294,7 +2294,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="1">
+        <object class="Panel" expanded="0">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -2346,21 +2346,21 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="1">
+            <object class="wxBoxSizer" expanded="0">
                 <property name="minimum_size"></property>
                 <property name="name">bSizer34</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
-                <object class="sizeritem" expanded="1">
+                <object class="sizeritem" expanded="0">
                     <property name="border">20</property>
                     <property name="flag">wxEXPAND|wxRIGHT|wxLEFT</property>
                     <property name="proportion">1</property>
-                    <object class="wxBoxSizer" expanded="1">
+                    <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
                         <property name="name">bSizer371</property>
                         <property name="orient">wxVERTICAL</property>
                         <property name="permission">none</property>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND|wxBOTTOM</property>
                             <property name="proportion">1</property>
@@ -3075,11 +3075,11 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxBOTTOM</property>
                             <property name="proportion">0</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size"></property>
                                 <property name="name">bSizer4111</property>
                                 <property name="orient">wxVERTICAL</property>
@@ -3167,11 +3167,11 @@
                                         <event name="OnUpdateUI"></event>
                                     </object>
                                 </object>
-                                <object class="sizeritem" expanded="1">
+                                <object class="sizeritem" expanded="0">
                                     <property name="border">25</property>
                                     <property name="flag">wxLEFT</property>
                                     <property name="proportion">0</property>
-                                    <object class="wxGridSizer" expanded="1">
+                                    <object class="wxGridSizer" expanded="0">
                                         <property name="cols">2</property>
                                         <property name="hgap">0</property>
                                         <property name="minimum_size"></property>
@@ -3535,11 +3535,11 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxBOTTOM</property>
                             <property name="proportion">0</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size"></property>
                                 <property name="name">bSizer41111</property>
                                 <property name="orient">wxVERTICAL</property>
@@ -3627,11 +3627,11 @@
                                         <event name="OnUpdateUI"></event>
                                     </object>
                                 </object>
-                                <object class="sizeritem" expanded="1">
+                                <object class="sizeritem" expanded="0">
                                     <property name="border">25</property>
                                     <property name="flag">wxLEFT</property>
                                     <property name="proportion">0</property>
-                                    <object class="wxBoxSizer" expanded="1">
+                                    <object class="wxBoxSizer" expanded="0">
                                         <property name="minimum_size"></property>
                                         <property name="name">bSizer33</property>
                                         <property name="orient">wxHORIZONTAL</property>

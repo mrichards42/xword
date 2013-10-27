@@ -37,7 +37,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer411->Add( bSizer1211, 0, wxLEFT, 25 );
 	
 	
-	bSizer3->Add( bSizer411, 0, 0, 5 );
+	bSizer3->Add( bSizer411, 0, wxBOTTOM, 5 );
 	
 	wxBoxSizer* bSizer41;
 	bSizer41 = new wxBoxSizer( wxVERTICAL );
@@ -64,7 +64,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer41->Add( bSizer121, 0, wxLEFT, 25 );
 	
 	
-	bSizer3->Add( bSizer41, 0, 0, 5 );
+	bSizer3->Add( bSizer41, 0, wxBOTTOM, 5 );
 	
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
@@ -114,7 +114,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer4->Add( bSizer12, 0, wxLEFT, 25 );
 	
 	
-	bSizer3->Add( bSizer4, 0, 0, 5 );
+	bSizer3->Add( bSizer4, 0, wxBOTTOM, 5 );
 	
 	wxBoxSizer* bSizer42;
 	bSizer42 = new wxBoxSizer( wxVERTICAL );
@@ -136,16 +136,16 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxBoxSizer* bSizer241;
 	bSizer241 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText36 = new wxStaticText( this, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText36->Wrap( -1 );
-	bSizer241->Add( m_staticText36, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	m_stAfter = new wxStaticText( this, wxID_ANY, wxT("After"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stAfter->Wrap( -1 );
+	bSizer241->Add( m_stAfter, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	m_autoSave = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), wxSP_ARROW_KEYS, 0, 99, 0 );
 	bSizer241->Add( m_autoSave, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
-	m_staticText351 = new wxStaticText( this, wxID_ANY, wxT("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText351->Wrap( -1 );
-	bSizer241->Add( m_staticText351, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_stSeconds = new wxStaticText( this, wxID_ANY, wxT("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stSeconds->Wrap( -1 );
+	bSizer241->Add( m_stSeconds, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer122->Add( bSizer241, 0, wxLEFT, 25 );
@@ -154,7 +154,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer42->Add( bSizer122, 0, wxLEFT, 25 );
 	
 	
-	bSizer3->Add( bSizer42, 0, 0, 5 );
+	bSizer3->Add( bSizer42, 0, wxBOTTOM, 5 );
 	
 	wxBoxSizer* bSizer421;
 	bSizer421 = new wxBoxSizer( wxVERTICAL );
@@ -180,7 +180,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer421->Add( bSizer1221, 0, wxLEFT, 25 );
 	
 	
-	bSizer3->Add( bSizer421, 0, 0, 5 );
+	bSizer3->Add( bSizer421, 0, wxBOTTOM, 5 );
 	
 	
 	bSizer24->Add( bSizer3, 1, wxEXPAND|wxRIGHT|wxLEFT, 20 );
@@ -248,6 +248,9 @@ wxFB_AppearancePanel::~wxFB_AppearancePanel()
 
 wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
+	wxBoxSizer* bSizer34;
+	bSizer34 = new wxBoxSizer( wxVERTICAL );
+	
 	wxBoxSizer* bSizer371;
 	bSizer371 = new wxBoxSizer( wxVERTICAL );
 	
@@ -303,7 +306,7 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer411->Add( bSizer1211, 0, wxLEFT, 25 );
 	
 	
-	bSizer371->Add( bSizer411, 1, wxEXPAND, 5 );
+	bSizer371->Add( bSizer411, 1, wxEXPAND|wxBOTTOM, 5 );
 	
 	wxBoxSizer* bSizer4111;
 	bSizer4111 = new wxBoxSizer( wxVERTICAL );
@@ -335,7 +338,7 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer4111->Add( gSizer3, 0, wxLEFT, 25 );
 	
 	
-	bSizer371->Add( bSizer4111, 0, wxTOP, 5 );
+	bSizer371->Add( bSizer4111, 0, wxBOTTOM, 5 );
 	
 	wxBoxSizer* bSizer41111;
 	bSizer41111 = new wxBoxSizer( wxVERTICAL );
@@ -381,12 +384,15 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	bSizer41111->Add( bSizer33, 0, wxLEFT, 25 );
 	
 	
-	bSizer371->Add( bSizer41111, 1, wxEXPAND|wxTOP, 5 );
+	bSizer371->Add( bSizer41111, 0, wxBOTTOM, 5 );
 	
 	
-	this->SetSizer( bSizer371 );
+	bSizer34->Add( bSizer371, 1, wxEXPAND|wxRIGHT|wxLEFT, 20 );
+	
+	
+	this->SetSizer( bSizer34 );
 	this->Layout();
-	bSizer371->Fit( this );
+	bSizer34->Fit( this );
 	
 	// Connect Events
 	m_printCustomFonts->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxFB_PrintPanel::OnPrintCustomFonts ), NULL, this );
