@@ -323,7 +323,6 @@ public:
         m_useLua->SetToolTip("Format as a lua script");
 
         // Help button
-        SetBackgroundColour(*wxWHITE);
         m_helpBtn = new wxBitmapButton(
             this, wxID_ANY, wxArtProvider::GetBitmap(wxART_HELP, wxART_OTHER, wxSize(16,16)), wxDefaultPosition,
             wxDefaultSize, wxBORDER_NONE);
