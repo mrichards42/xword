@@ -417,6 +417,7 @@ public:
         Add(config.Appearance.backgroundColor, "Background");
         Add(config.Appearance.listHighlightColor, "List Highlight");
         Add(config.Appearance.gridHighlightColor, "Grid Highlight");
+        GetSizer()->AddSpacer(5);
     }
 
     void DoSaveConfig()
