@@ -152,9 +152,11 @@ void AppearancePanel::UpdateLayout()
     // Update the layout
     m_treebook->InvalidateBestSize();
     // Adjust the GlobalAppearance font picker layout
+#ifndef __WXOSX__
     GlobalAppearance * panel = dynamic_cast<GlobalAppearance *>(m_treebook->GetPage(0));
     if (panel)
         panel->m_fontPicker->SetOrientation(isSimple ? wxHORIZONTAL : wxVERTICAL);
+#endif // __WXOSX__
 #if XWORD_PREFERENCES_SHRINK
    m_treebook->SetFitToCurrentPage(isSimple);
 #endif
@@ -307,6 +309,19 @@ void SolvePanel::OnSaveFileHistory(wxCommandEvent & evt)
 //------------------------------------------------------------------------------
 // PrintPanel
 //------------------------------------------------------------------------------
+PrintPanel::PrintPanel(wxWindow * parent, ConfigManager & cfg)
+    : wxFB_PrintPanel(parent),
+      PreferencesPanelBase(cfg)
+{
+#ifdef __WXOSX__
+    // Make the font panels layout on two lines for dialog sizing
+    m_printGridLetterFont->SetOrientation(wxVERTICAL);
+    m_printGridNumberFont->SetOrientation(wxVERTICAL);
+    m_printClueFont->SetOrientation(wxVERTICAL);
+#endif // __WXOSX__
+    ConnectChangedEvents();
+}
+
 void PrintPanel::DoLoadConfig()
 {
     ConfigManager::Printing_t & printing = m_config.Printing;
