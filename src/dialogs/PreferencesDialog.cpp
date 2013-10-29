@@ -55,9 +55,9 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
 
     // Add the pages
     wxBookCtrlBase * book = GetBookCtrl();
-    GetBookCtrl()->AddPage(new SolvePanel(book, *m_config), "General");
-    GetBookCtrl()->AddPage(new AppearancePanel(book, *m_config), "Appearance");
-    GetBookCtrl()->AddPage(new PrintPanel(book, *m_config), "Printing");
+    book->AddPage(new SolvePanel(book, *m_config), "General");
+    book->AddPage(new AppearancePanel(book, *m_config), "Appearance");
+    book->AddPage(new PrintPanel(book, *m_config), "Printing");
 
     LoadConfig();
 
@@ -95,6 +95,16 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
 #endif // XWORD_USE_LUA
     InvalidateBestSize();
     LayoutDialog();
+
+#ifdef XWORD_PREFERENCES_SHRINK
+    // Make min sizes for the preferences panels so the dialog doesn't
+    // resize every time
+    wxSize minSize(book->GetPage(2)->GetSize().x + 5, -1);
+    book->GetPage(0)->SetMinSize(minSize);
+    book->GetPage(1)->SetMinSize(minSize);
+    book->GetPage(2)->SetMinSize(minSize);
+    LayoutDialog(0);
+#endif // XWORD_PREFERENCES_SHRINK
 }
 
 
