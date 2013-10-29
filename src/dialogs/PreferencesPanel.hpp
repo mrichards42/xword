@@ -115,12 +115,7 @@ protected:
 class PrintPanel : public wxFB_PrintPanel, public PreferencesPanelBase
 {
 public:
-    PrintPanel(wxWindow * parent, ConfigManager & cfg)
-        : wxFB_PrintPanel(parent),
-          PreferencesPanelBase(cfg)
-    {
-        ConnectChangedEvents();
-    }
+    PrintPanel(wxWindow * parent, ConfigManager & cfg);
 protected:
     void DoLoadConfig();
     void DoSaveConfig();
