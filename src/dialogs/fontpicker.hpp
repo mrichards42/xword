@@ -166,6 +166,20 @@ protected:
         GetEventHandler()->ProcessEvent(evt);
     }
 
+#ifdef __WXOSX__
+    // For some reason Enable() doesn't recursively work on the children of this panel
+    void DoEnable(bool enable)
+    {
+        wxPanel::DoEnable(enable);
+        m_facename->Enable(enable);
+        m_pointsize->Enable(enable);
+        m_bold->Enable(enable);
+        m_italic->Enable(enable);
+        m_underline->Enable(enable);
+    }
+#endif // __WXOSX__
+
+
     FontFaceCtrl * m_facename;
     wxSpinCtrl * m_pointsize;
     wxToggleButton * m_bold;

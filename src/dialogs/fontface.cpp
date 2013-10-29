@@ -24,9 +24,6 @@
 // A critical section for our font thread
 static wxCriticalSection s_fontCS;
 
-// ----------------------------------------------------------------------------
-// The ComboCtrl class
-// ----------------------------------------------------------------------------
 FontFaceCtrl::FontFaceCtrl(wxWindow * parent, wxWindowID id,
                            const wxString & faceName)
     : wxComboBox(parent, id, wxEmptyString)
