@@ -59,9 +59,10 @@ RebusTextCtrl::RebusTextCtrl(wxWindow * parent, XGridCtrl * grid)
       m_grid(grid)
 {
     m_text = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
-                            wxDefaultSize, wxBORDER_NONE);
+                            wxDefaultSize, wxBORDER_NONE | wxTE_PROCESS_ENTER);
     m_text->Connect(m_text->GetId(), wxEVT_COMMAND_TEXT_PASTE,
         wxClipboardTextEventHandler(RebusTextCtrl::OnPaste), NULL, this);
+
     m_text->Connect(wxEVT_CHAR,
         wxKeyEventHandler(RebusTextCtrl::OnChar), NULL, this);
 
