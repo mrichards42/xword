@@ -101,7 +101,7 @@ class GridCheckSelectionClass;
 class ConfigManager;
 
 class XGridCtrl
-    : public wxScrolledWindow
+    : public wxScrolledCanvas
 {
     friend class XGridRebusCtrl;
     friend class GridSelectionHandler;
@@ -449,7 +449,7 @@ XGridCtrl::SetFont(const wxFont & font)
 {
     SetNumberFont(font);
     SetLetterFont(font);
-    return wxScrolledWindow::SetFont(font);
+    return wxScrolledCanvas::SetFont(font);
 }
 
 inline void

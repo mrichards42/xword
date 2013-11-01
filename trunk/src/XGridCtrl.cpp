@@ -131,13 +131,13 @@ const puz::Square * XGridCtrl::LastWhite() const
 //     EVT_CHAR
 //     EVT_LEFT_DOWN
 //     EVT_RIGHT_DOWN
-BEGIN_EVENT_TABLE(XGridCtrl, wxScrolledWindow)
+BEGIN_EVENT_TABLE(XGridCtrl, wxScrolledCanvas)
     EVT_PAINT           (XGridCtrl::OnPaint)
     EVT_SIZE            (XGridCtrl::OnSize)
     EVT_CONTEXT_MENU    (XGridCtrl::OnContextMenu)
 END_EVENT_TABLE()
 
-IMPLEMENT_DYNAMIC_CLASS(XGridCtrl, wxScrolledWindow)
+IMPLEMENT_DYNAMIC_CLASS(XGridCtrl, wxScrolledCanvas)
 
 const int UNDEFINED_BOX_SIZE = -1;
 
@@ -217,7 +217,7 @@ XGridCtrl::Create(wxWindow * parent,
                   const wxString & name)
 {
     style |= wxWANTS_CHARS;
-    if (! wxScrolledWindow::Create(parent, id, pos, size, style, name))
+    if (! wxScrolledCanvas::Create(parent, id, pos, size, style, name))
         return false;
 
     // Have to do this here, or wxMac will break
@@ -1241,11 +1241,11 @@ XGridCtrl::ConnectEvents()
     // Prevent double-connecting events
     if (! m_areEventsConnected)
     {
-        Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
-        Connect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
-        Connect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
-        Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
-        Connect(wxEVT_MOTION,     wxMouseEventHandler(XGridCtrl::OnMouseMove));
+        Bind(wxEVT_KEY_DOWN, &XGridCtrl::OnKeyDown, this);
+        Bind(wxEVT_CHAR, &XGridCtrl::OnChar, this);
+        Bind(wxEVT_LEFT_DOWN, &XGridCtrl::OnLeftDown, this);
+        Bind(wxEVT_RIGHT_DOWN, &XGridCtrl::OnRightDown, this);
+        Bind(wxEVT_MOTION, &XGridCtrl::OnMouseMove, this);
     }
     m_areEventsConnected = true;
 }
@@ -1256,11 +1256,12 @@ XGridCtrl::DisconnectEvents()
 {
     if (m_areEventsConnected)
     {
-        Disconnect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (XGridCtrl::OnKeyDown));
-        Disconnect(wxEVT_CHAR,       wxKeyEventHandler  (XGridCtrl::OnChar));
-        Disconnect(wxEVT_LEFT_DOWN,  wxMouseEventHandler(XGridCtrl::OnLeftDown));
-        Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(XGridCtrl::OnRightDown));
-        Disconnect(wxEVT_MOTION,     wxMouseEventHandler(XGridCtrl::OnMouseMove));
+        Unbind(wxEVT_KEY_DOWN, &XGridCtrl::OnKeyDown, this);
+        Unbind(wxEVT_CHAR, &XGridCtrl::OnChar, this);
+        Unbind(wxEVT_LEFT_DOWN, &XGridCtrl::OnLeftDown, this);
+        Unbind(wxEVT_RIGHT_DOWN, &XGridCtrl::OnRightDown, this);
+        Unbind(wxEVT_MOTION, &XGridCtrl::OnMouseMove, this);
+
     }
     m_areEventsConnected = false;
 }
@@ -1765,7 +1766,7 @@ XGridCtrl::SetFocus()
     if (m_rebusCtrl)
         m_rebusCtrl->SetFocus();
     else
-        SetFocusIgnoringChildren();
+        wxScrolledCanvas::SetFocus();
 }
 
 
