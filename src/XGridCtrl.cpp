@@ -348,6 +348,7 @@ XGridCtrl::IsCorrect() const
 void
 XGridCtrl::GetStats(GridStats * stats) const
 {
+    stats->blank_correct = 0;
     stats->blank = 0;
     stats->black = 0;
     stats->white = 0;
@@ -367,19 +368,27 @@ XGridCtrl::GetStats(GridStats * stats) const
             if (square->IsBlank())
             {
                 ++stats->blank;
+                if (square->IsSolutionBlank())
+                    ++stats->blank_correct;
             }
-            else if (stats->blank == 0 && correct
+            // If the puzzle is correct so far, and without blanks (that do
+            // not also have a blank solution), check this square
+            else if (stats->blank == stats->blank_correct
+                     && correct
                      && ! square->Check(puz::NO_CHECK_BLANK, strictRebus))
             {
                 correct = false;
             }
         }
     }
-    // We *can* test scrambled puzzles!  Not sure why I didn't think of
-    // this before.  (Inspired by Alex Boisvert:
-    // http://alexboisvert.com/software.html#check)
+    // Set the correct flag
+    // If we have a puzzle with a partially blank solution, don't alert the
+    // user if there are incorrect letters since that would give away the
+    // blank entries
     if (stats->blank == 0)
         stats->correct = GetCorrectStatus(m_grid, correct);
+    else if (stats->blank == stats->blank_correct && correct)
+        stats->correct = CORRECT_PUZZLE;
     else
         stats->correct = INCOMPLETE_PUZZLE;
 }

@@ -85,6 +85,8 @@ struct GridStats
     int blank;
     int black;
     int white;
+    // blank_correct squares are blank with a blank solution
+    int blank_correct;
 };
 
 
