@@ -470,7 +470,7 @@ if wx then
     if xword.frame then
         xword.frame:Connect(wx.wxEVT_IDLE, function()
             task.dump_queue(task.DEBUG_QUEUE)
-            task.dump_queue(task.ERROR_QUEUE)
+            task.dump_queue(task.ERROR_QUEUE, xword.logerror)
         end)
     end
 
