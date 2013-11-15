@@ -429,7 +429,7 @@ local function CreateDialog()
     end
 
     function dlg.printError(msg)
-        dlg.errorctrl:AppendText(msg .. '\n')
+        dlg.errorctrl:AppendText(tostring(msg) .. '\n')
     end
 
 
@@ -598,28 +598,34 @@ local function CreateDialog()
                 if window and window:IsTopLevel() then
                     window = nil
                 end
-                local dc = wx.wxScreenDC()
                 if last_window ~= window then
                     if last_window then
                         last_window:Refresh()
                     end
-                    if window then
-                        dc:SetPen(wx.wxRED_PEN)
-                        dc:SetBrush(wx.wxTRANSPARENT_BRUSH)
-                        local pos = window:GetScreenPosition()
-                        local size = window:GetSize()
-                        dc:DrawRectangle(pos.X, pos.Y, size.Width, size.Height)
-                    end
                     last_window = window
+                end
+                local dc = wx.wxScreenDC()
+                if window then
+                    dc:SetPen(wx.wxPen(wx.wxRED, 3, wx.wxSOLID))
+                    dc:SetBrush(wx.wxTRANSPARENT_BRUSH)
+                    local pos = window:GetScreenPosition()
+                    local size = window:GetSize()
+                    dc:DrawRectangle(pos.X+1, pos.Y+1, size.Width-2, size.Height-2)
                 end
                 dc:delete()
             end
 
             local function leftdown(evt)
-                window = wx.wxFindWindowAtPointer(evt:GetPosition())
-                dlg.printError("Window is available as variable 'window'")
-                dlg.printError("window = ", window)
+                local success
+                local window = wx.wxFindWindowAtPointer(evt:GetPosition())
                 if window then
+                    -- Try to convert this window to its classname
+                    dlg.printError(window.ClassInfo:IsDynamic())
+                    success, w = pcall(function() return window:DynamicCast(window.ClassInfo.ClassName) end)
+                    if not success then w = window end
+                    dlg.printError("Window is available as variable 'w'")
+                    dlg.printError("w = " .. tostring(w))
+                    -- Erase the red line
                     window:Refresh()
                 end
                 dlg:Disconnect(wx.wxEVT_LEFT_DOWN)
