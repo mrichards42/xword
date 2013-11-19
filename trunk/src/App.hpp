@@ -68,6 +68,8 @@ public:
 #ifdef XWORD_USE_LUA
     bool LogLuaMessage(const wxString & msg);
     bool HasLuaLog() const;
+    void SetLuaMessageCount(int count);
+    int GetLuaMessageCount() const { return m_luaMessages; }
 #endif // XWORD_USE_LUA
 
     void ShowHelp();

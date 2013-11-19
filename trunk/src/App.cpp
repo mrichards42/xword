@@ -155,6 +155,13 @@ MyApp::OnExit()
     if (m_luaLog)
     {
         m_luaLog->Close();
+        // Check to see if we have lua messages
+        if (m_luaMessages) {
+            XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), (const wxChar *)GetLuaLogFilename().c_str());
+        #ifdef __WXDEBUG__
+            wxShell(wxString::Format(_T("\"%s\""), (const wxChar *)GetLuaLogFilename().c_str()));
+        #endif // __WXDEBUG__
+        }
         delete m_luaLog;
     }
 #endif
@@ -242,19 +249,24 @@ bool MyApp::LogLuaMessage(const wxString & msg)
         else
             m_luaLog->Write(_T("Lua log for ") + wxDateTime::Now().FormatDate() + _T("\n") +
                             _T("==========================================================\n"));
-        ++m_luaMessages;
-        if (m_frame)
-        {
-            MyStatusBar * status = dynamic_cast<MyStatusBar *>(m_frame->GetStatusBar());
-            if (status)
-                status->SetLuaErrors(m_luaMessages);
-        }
+        SetLuaMessageCount(m_luaMessages + 1);
     }
     m_luaLog->Write(wxDateTime::Now().FormatTime());
     m_luaLog->Write(_T(": "));
     m_luaLog->Write(msg);
     m_luaLog->Write(_T("\n"));
     return true;
+}
+
+void MyApp::SetLuaMessageCount(int count)
+{
+    ++m_luaMessages = count;
+    if (m_frame)
+    {
+        MyStatusBar * status = dynamic_cast<MyStatusBar *>(m_frame->GetStatusBar());
+        if (status)
+            status->SetLuaErrors(m_luaMessages);
+    }
 }
 
 bool MyApp::HasLuaLog() const

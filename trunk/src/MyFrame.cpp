@@ -2770,26 +2770,7 @@ MyFrame::OnClose(wxCloseEvent & evt)
             (*it)->Hide();
 
 #ifdef XWORD_USE_LUA
-        // Check to see if we should show lua errors:
-        bool showerrors = false;
-        lua_State * L = m_lua.GetLuaState();
-        lua_getglobal(L, "xword");
-        lua_getfield(L, -1, "showerrors");
-        showerrors = lua_toboolean(L, -1);
-        lua_pop(L, 2);
-
         LuaUninit();
-        // Check to see if we have lua messages
-        if (wxGetApp().HasLuaLog())
-        {
-            wxGetApp().m_luaLog->Close();
-            if (showerrors) {
-                XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), (const wxChar *)GetLuaLogFilename().c_str());
-            #ifdef __WXDEBUG__
-                wxShell(wxString::Format(_T("\"%s\""), (const wxChar *)GetLuaLogFilename().c_str()));
-            #endif // __WXDEBUG__
-            }
-        }
 #endif
         if (wxTheClipboard->Open())
         {
