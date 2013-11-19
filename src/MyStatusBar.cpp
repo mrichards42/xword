@@ -16,6 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#include "App.hpp"
 #include "MyStatusBar.hpp"
 #include "utils/wrap.hpp"
 #include <wx/tooltip.h>
@@ -163,18 +164,20 @@ private:
 
 void MyStatusBar::OnDoubleClick(wxMouseEvent & evt)
 {
-    wxRect rect;
 #ifdef XWORD_USE_LUA
+    wxRect rect;
     if (! GetFieldRect(STATUS_LUA, rect))
         return;
 
-    if (rect.Contains(evt.GetPosition()))
+    if (rect.Contains(evt.GetPosition()) && wxGetApp().HasLuaLog())
     {
         wxWindow * errors = wxDynamicCast(evt.GetEventObject(), wxWindow);
         if (errors)
         {
             LuaErrorsDlg dlg(this, GetLuaLogFilename());
             dlg.ShowModal();
+            // Reset messages if the user has already looked at them
+            wxGetApp().SetLuaMessageCount(0);
         }
     }
 #endif // XWORD_USE_LUA
