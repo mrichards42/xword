@@ -796,18 +796,11 @@ wxLuaBindObject* wxLuaGetObjectList_xword(size_t &count)
 // This is a lua-only function (it can't be accessed through the XWord C++ API)
 int wxLua_function_GetFrame(lua_State *L)
 {
-    // Assume that the MyFrame pointer was given in the original wxLuaState
-    // constructor
-    wxLuaState wxlua(L);
-    MyFrame * frame = wxDynamicCast(wxlua.GetEventHandler(), MyFrame);
-
-    if (frame == NULL) // This should never happen
-    {
-        wxFAIL_MSG(_T("Frame pointer shouldn't be NULL"));
-        lua_pushnil(L);
-    }
-    else
+    MyFrame * frame = wxGetApp().GetFrame();
+    if (frame)
         wxluaT_pushuserdatatype(L, frame, wxluatype_MyFrame);
+    else
+        lua_pushnil(L);        
     return 1; // One object on the stack for lua.
 }
 

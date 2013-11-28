@@ -54,11 +54,6 @@ class ConfigManager;
 
 #include <map>
 
-#ifdef XWORD_USE_LUA
-// wxLua
-#include "wxlua/wxlua.h"
-#endif // XWORD_USE_LUA
-
 //#define USE_AUI_TOOLBAR
 #define USE_MY_AUI_MANAGER 1
 
@@ -156,11 +151,7 @@ public:
     void SetFocusedClue(puz::Clue * clue);
     void SetFocusedDirection(short direction);
     bool SetSquareText(puz::Square * square, const wxString & text = _T(""));
-#ifdef XWORD_USE_LUA
-    // Lua
-    void RunLuaScript(const wxString & filename);
-    wxLuaState & GetwxLuaState() { return m_lua; }
-#endif // XWORD_USE_LUA
+
 private:
     // Windows
     //--------
@@ -360,15 +351,6 @@ private:
     void OnClose       (wxCloseEvent & evt);
     void OnLinkClicked (wxHtmlLinkEvent & evt);
     void OnSize        (wxSizeEvent & evt);
-
-#ifdef XWORD_USE_LUA
-    wxLuaState m_lua;
-    void LuaInit();
-    void LuaUninit();
-    // Logging
-    void OnLuaPrint   (wxLuaEvent & evt);
-    void OnLuaError   (wxLuaEvent & evt);
-#endif // XWORD_USE_LUA
 
 private:
     // Debugging

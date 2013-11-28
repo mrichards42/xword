@@ -30,6 +30,10 @@
 #    include "wx/msw/helpchm.h"
 #endif // __WXMSW__
 
+#ifdef XWORD_USE_LUA
+#    include "wxlua/wxlua.h"
+#endif // XWORD_USE_LUA
+
 class MyFrame;
 class wxPrintData;
 class wxPageSetupDialogData;
@@ -54,9 +58,6 @@ class MyApp : public wxApp
     friend class MyFrame; // So we can set m_frame to NULL when it is deleted
 public:
     bool OnInit();
-    // expects an already parsed command line
-    void ReadCommandLine(wxCmdLineParser & cmd);
-
     int OnExit();
 
     ConfigManager & GetConfigManager() { return *m_config; }
@@ -64,8 +65,9 @@ public:
     bool FirstRun() { return m_firstRun; }
     MyFrame * GetFrame() { return m_frame; }
 
-    // Lua logging
+    // Public lua stuff
 #ifdef XWORD_USE_LUA
+    wxLuaState & GetwxLuaState() { return m_lua; }
     bool LogLuaMessage(const wxString & msg);
     bool HasLuaLog() const;
     void SetLuaMessageCount(int count);
@@ -98,14 +100,9 @@ private:
     bool m_firstRun;
 
 #ifdef XWORD_USE_LUA
-    enum CmdLineScriptValue {
-        NO_SCRIPT,
-        GUI_SCRIPT,
-        CONSOLE_SCRIPT
-    };
-    CmdLineScriptValue CheckCommandLineForLua();
     // Lua
-    void RunLuaScript(const wxString & filename, int lastarg = -1);
+    wxLuaState m_lua;
+    bool m_isscript;
     void OnLuaPrint(wxLuaEvent & evt);
     void OnLuaError(wxLuaEvent & evt);
     wxFile * m_luaLog;
