@@ -119,6 +119,8 @@ bool MyApp::OnInit()
     // Execute statement and script
     if (m_isscript)
     {
+    // Initialize xword package
+    wxGetApp().GetwxLuaState().RunFile(GetScriptsDir() + "/xword/init.lua");
     #ifdef __WXMSW__
         // Attach to the console
         if (! AttachConsole(ATTACH_PARENT_PROCESS))
