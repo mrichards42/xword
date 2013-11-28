@@ -199,9 +199,6 @@ bool MyApp::OnInit()
 int MyApp::OnExit()
 {
 #ifdef XWORD_USE_LUA
-    // cleanup xword package
-    if (! m_isscript)
-        wxGetApp().GetwxLuaState().RunFile(GetScriptsDir() + "/xword/cleanup.lua");
     // Close lua itself
     m_lua.CloseLuaState(true);
     // Clean up lua log file

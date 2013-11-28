@@ -2704,6 +2704,9 @@ MyFrame::OnClose(wxCloseEvent & evt)
         for (it = begin; it != end; ++it)
             (*it)->Hide();
 
+        // cleanup xword package
+        wxGetApp().GetwxLuaState().RunFile(GetScriptsDir() + "/xword/cleanup.lua");
+
         // Close the clipboard
         if (wxTheClipboard->Open())
         {
