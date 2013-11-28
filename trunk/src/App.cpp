@@ -77,11 +77,6 @@ bool MyApp::OnInit()
 
     wxLogDebug(_T("Starting App"));
 
-    srand( time(NULL) ); // random numbers for grid scrambling
-    wxImage::AddHandler(new wxPNGHandler());
-    SetupConfig();
-    SetupPrinting();
-
     // Parse the command line
     wxCmdLineParser cmd(cmdLineDesc, argc, argv);
     cmd.Parse(false); // don't show usage
@@ -92,6 +87,11 @@ bool MyApp::OnInit()
     wxFileName file_test(argv[0]);
     file_test.SetFullName("portable_mode_enabled");
     m_isPortable = file_test.FileExists() || cmd.Found("portable");
+
+    srand( time(NULL) ); // random numbers for grid scrambling
+    wxImage::AddHandler(new wxPNGHandler());
+    SetupConfig();
+    SetupPrinting();
 
 #ifdef XWORD_USE_LUA
     m_isscript = false;
