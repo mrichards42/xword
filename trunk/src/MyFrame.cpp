@@ -2144,7 +2144,8 @@ MyFrame::OnEditLayout(wxCommandEvent & evt)
     else // End Layout
     {
         m_mgr.EndEdit();
-        m_XGridCtrl->ConnectEvents();
+        if (m_puz.IsOk())
+            m_XGridCtrl->ConnectEvents();
     }
     m_mgr.Update();
 #endif // USE_MY_AUI_MANAGER
