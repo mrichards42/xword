@@ -23,7 +23,7 @@
 #include "../CluePanel.hpp"
 #include "../CluePrompt.hpp"
 #include "../XGridCtrl.hpp"
-#include "../App.hpp" // For the ConfigManager
+#include "../App.hpp" // For the ConfigManager and lua
 #include "fontface.hpp" // FontFaceCtrl::Init/ClearFacenames()
 #if XWORD_USE_LUA
 #   include "../xwordlua.hpp"
@@ -79,7 +79,7 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
     wxASSERT(frame);
     if (frame)
     {
-        wxLuaState & lua = frame->GetwxLuaState();
+        wxLuaState & lua = wxGetApp().GetwxLuaState();
         lua_State * L = lua.GetLuaState();
         // Find the function xword.OnInitPreferencesDialog
         lua_getglobal(L, "xword");
@@ -153,22 +153,16 @@ void PreferencesDialog::SaveConfig()
     }
 #if XWORD_USE_LUA
     // Save preferences from lua
-    MyFrame * frame = wxDynamicCast(GetParent(), MyFrame);
-    wxASSERT(frame);
-    if (frame)
+    lua_State * L = wxGetApp().GetwxLuaState().GetLuaState();
+    // Find the function xword.OnSavePreferences
+    lua_getglobal(L, "xword");
+    lua_getfield(L, -1, "OnSavePreferences");
+    if (lua_isfunction(L, -1))
     {
-        wxLuaState & lua = frame->GetwxLuaState();
-        lua_State * L = lua.GetLuaState();
-        // Find the function xword.OnSavePreferences
-        lua_getglobal(L, "xword");
-        lua_getfield(L, -1, "OnSavePreferences");
-        if (lua_isfunction(L, -1))
-        {
-            // Call the function with our notebook argument
-            lua_pcall(L, 0, 0, 0);
-        }
-        lua_pop(L, 1); // remove the xword table from the stack
+        // Call the function with our notebook argument
+        lua_pcall(L, 0, 0, 0);
     }
+    lua_pop(L, 1); // remove the xword table from the stack
 #endif
 #if ! XWORD_PREFERENCES_LIVE_PREVIEW
     wxGetApp().GetConfigManager().Copy(*m_config);

@@ -49,7 +49,6 @@
 #include "NotesPanel.hpp"
 
 #ifdef XWORD_USE_LUA
-#   include "xwordlua.hpp"
     // This is for luapuz_Load_Puzzle
 #   include "../lua/luapuz/bind/luapuz_puz_Puzzle_helpers.hpp"
 #endif // XWORD_USE_LUA
@@ -154,11 +153,6 @@ enum toolIds
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_TIMER          (ID_CLOCK_TIMER,             MyFrame::OnTimerNotify)
     EVT_TIMER          (ID_AUTOSAVE_TIMER,          MyFrame::OnAutoSaveNotify)
-
-#ifdef XWORD_USE_LUA
-    EVT_LUA_PRINT      (wxID_ANY,             MyFrame::OnLuaPrint)
-    EVT_LUA_ERROR      (wxID_ANY,             MyFrame::OnLuaError)
-#endif // XWORD_USE_LUA
 
     EVT_PUZ_GRID_FOCUS (                      MyFrame::OnGridFocus)
     EVT_PUZ_CLUE_FOCUS (                      MyFrame::OnClueFocus)
@@ -366,15 +360,7 @@ public:
     virtual bool OnDropFiles(wxCoord WXUNUSED(x), wxCoord WXUNUSED(y),
                              const wxArrayString & filenames)
     {
-
-#if XWORD_USE_LUA
-        // Run the file as a script if it ends with .lua
-        if (filenames.Item(0).EndsWith(_T(".lua")))
-            m_frame->RunLuaScript(filenames.Item(0));
-        // Otherwise try to open as a puzzle
-        else
-#endif
-            m_frame->LoadPuzzle(filenames.Item(0));
+        m_frame->LoadPuzzle(filenames.Item(0));
         return true;
     }
 
@@ -421,7 +407,6 @@ MyFrame::MyFrame()
     m_timer.Stop();
 
     wxLogDebug("Creating Frame");
-    wxImage::AddHandler(new wxPNGHandler());
 
     SetDropTarget(new XWordFileDropTarget(this));
 
@@ -445,11 +430,8 @@ MyFrame::MyFrame()
     SetIcon(wxIcon(xword_xpm));
 #endif // __WXMSW__ && ! __WXPM__
 
-#ifdef XWORD_USE_LUA
-    LuaInit();
-#endif // XWORD_USE_LUA
-
     // See if we should open the last puzzle
+    bool has_puzzle = false;
     ConfigManager::FileHistory_t & history = wxGetApp().GetConfigManager().FileHistory;
     if (history.saveFileHistory() && history.reopenLastPuzzle())
     {
@@ -459,12 +441,13 @@ MyFrame::MyFrame()
             if (! fn.empty() && wxIsReadable(fn))
             {
                 LoadPuzzle(fn);
-                return;
+                has_puzzle = true;
             }
         }
     }
     // Otherwise show a blank puzzle
-    ShowPuzzle();
+    if (! has_puzzle)
+        ShowPuzzle();
 }
 
 
@@ -520,7 +503,7 @@ MyFrame::LoadPuzzle(const wxString & filename)
     // Load a puzzle without a handler
 #if XWORD_USE_LUA
     // If we dont' have a handler, use import.load
-    lua_State * L = GetwxLuaState().GetLuaState();
+    lua_State * L = wxGetApp().GetwxLuaState().GetLuaState();
 
     // Push import.load function for luapuz_Load_Puzzle.
     lua_getglobal(L, "import");
@@ -2329,54 +2312,6 @@ MyFrame::OnAutoSaveNotify(wxTimerEvent & WXUNUSED(evt))
     }
 }
 
-
-
-#ifdef XWORD_USE_LUA
-
-void
-MyFrame::LuaInit()
-{
-    // Initialze wxLua.
-    XWORD_LUA_IMPLEMENT_BIND_ALL
-    m_lua = wxLuaState(this, wxID_ANY);
-    xword_setup_lua(m_lua);
-
-    // Initialize the lua additions to the xword package
-    RunLuaScript(GetScriptsDir() + _T("/xword/init.lua"));
-}
-
-void
-MyFrame::LuaUninit()
-{
-    // Cleanup the lua additions to the xword package
-    RunLuaScript(GetScriptsDir() + _T("/xword/cleanup.lua"));
-
-    // Close lua itself
-    m_lua.CloseLuaState(true);
-}
-
-void
-MyFrame::RunLuaScript(const wxString & filename)
-{
-    m_lua.RunFile(filename);
-}
-
-void
-MyFrame::OnLuaPrint(wxLuaEvent & evt)
-{
-    wxLogDebug(_T("%s"), evt.GetString().c_str());
-}
-
-void
-MyFrame::OnLuaError(wxLuaEvent & evt)
-{
-    wxLogDebug(_T("(error) %s"), evt.GetString().c_str());
-    // Write to the log file
-    wxGetApp().LogLuaMessage(_T("(error) ") + evt.GetString());
-}
-
-#endif // XWORD_USE_LUA
-
 // Preferences
 //------------
 void
@@ -2769,9 +2704,7 @@ MyFrame::OnClose(wxCloseEvent & evt)
         for (it = begin; it != end; ++it)
             (*it)->Hide();
 
-#ifdef XWORD_USE_LUA
-        LuaUninit();
-#endif
+        // Close the clipboard
         if (wxTheClipboard->Open())
         {
             wxTheClipboard->Flush();

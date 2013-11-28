@@ -18,7 +18,7 @@
 #include "MetadataCtrl.hpp"
 #include "MyFrame.hpp"
 #include "utils/string.hpp"
-#include "App.hpp" // GetApp
+#include "App.hpp"
 #include <wx/tokenzr.h>
 #ifdef XWORD_USE_LUA
 #   include "../lua/luapuz/bind/luapuz_puz_Puzzle.hpp"
@@ -65,8 +65,7 @@ MetadataCtrl::~MetadataCtrl()
 }
 
 
-wxString
-MetadataCtrl::GetMeta(const wxString & str_, MyFrame * frame)
+wxString MetadataCtrl::GetMeta(const wxString & str_, MyFrame * frame)
 {
     wxString str = str_.Lower();
     if (str == _T("cluenumber"))
@@ -89,8 +88,8 @@ MetadataCtrl::GetMeta(const wxString & str_, MyFrame * frame)
         return puz2wx(frame->GetPuzzle().GetMeta(wx2puz(str)));
 }
 
-wxString
-MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame, bool useLua)
+wxString MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame,
+                                   bool useLua)
 {
     if (! frame || ! frame->GetPuzzle().IsOk())
         return wxEmptyString;
@@ -139,9 +138,7 @@ MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame, bool useLua)
     if (! useLua)
         return result;
     // Process this with lua
-    wxLuaState & luastate = frame->GetwxLuaState();
-    if (! luastate.Ok())
-        return wxEmptyString;
+    wxLuaState & luastate = wxGetApp().GetwxLuaState();
     lua_State * L = luastate.GetLuaState();
     // Compile a lua function taking a puzzle argument
     if (result.Find(_T("return")) == -1) // Make sure we're returning something

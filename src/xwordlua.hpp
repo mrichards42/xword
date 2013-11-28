@@ -48,6 +48,13 @@ static void xword_setup_lua(wxLuaState & lua)
 {
     lua_State * L = lua.GetLuaState();
 
+    // Open the luapuz library
+    // NB: We have to use require instead of directly calling luaopen_luapuz
+    // since luapuz is loaded as a dll
+    lua_getglobal(L, "require");
+    lua_pushstring(L, "luapuz");
+    lua_pcall(L, 1, 0, 0);
+
     // Set package.path and package.cpath
     lua_getglobal(L, "package");
 
