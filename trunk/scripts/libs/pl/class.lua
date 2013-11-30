@@ -1,38 +1,63 @@
---- Wrapper classes: Map and Set.
--- @class module
--- @name pl.class
+--- Provides a reuseable and convenient framework for creating classes in Lua.
+-- Two possible notations:
+--
+--    B = class(A)
+--    class.B(A)
+--
+-- The latter form creates a named class within the current environment. Note
+-- that this implicitly brings in `pl.utils` as a dependency.
+--
+-- See the Guide for further @{01-introduction.md.Simplifying_Object_Oriented_Programming_in_Lua|discussion}
+-- @module pl.class
 
-local function module(...) end
-module 'pl.class'
-
-
--- utils keeps the predefined metatables for these useful interfaces,
--- so that other modules (such as tablex) can tag their output accordingly.
--- However, users are not required to use this module.
-local tablex = require 'pl.tablex'
-local utils = require 'pl.utils'
-local stdmt = utils.stdmt
-local List = require 'pl.list' . List
-local is_callable = utils.is_callable
-local tmakeset,deepcompare,merge,keys,difference,tupdate = tablex.makeset,tablex.deepcompare,tablex.merge,tablex.keys,tablex.difference,tablex.update
-local pretty_write = require 'pl.pretty' . write
-local Map = stdmt.Map
-local Set = stdmt.Set
-local List = stdmt.List
-
-pl.class = {Set = Set, Map = Map}
-
+local error, getmetatable, io, pairs, rawget, rawset, setmetatable, tostring, type =
+    _G.error, _G.getmetatable, _G.io, _G.pairs, _G.rawget, _G.rawset, _G.setmetatable, _G.tostring, _G.type
+local compat
 
 -- this trickery is necessary to prevent the inheritance of 'super' and
 -- the resulting recursive call problems.
 local function call_ctor (c,obj,...)
     -- nice alias for the base class ctor
-    if c._base then obj.super = c._base._init end
+    local base = rawget(c,'_base')
+    if base then
+        local parent_ctor = rawget(base,'_init')
+        while not parent_ctor do
+            base = rawget(base,'_base')
+            if not base then break end
+            parent_ctor = rawget(base,'_init')
+        end
+        if parent_ctor then
+            rawset(obj,'super',function(obj,...)
+                call_ctor(base,obj,...)
+            end)
+        end
+    end
     local res = c._init(obj,...)
-    obj.super = nil
+    rawset(obj,'super',nil)
     return res
 end
 
+--- initializes an __instance__ upon creation.
+-- @function class:_init
+-- @param ... parameters passed to the constructor
+-- @usage local Cat = class()
+-- function Cat:_init(name)
+--   --self:super(name)   -- call the ancestor initializer if needed
+--   self.name = name
+-- end
+--
+-- local pussycat = Cat("pussycat")
+-- print(pussycat.name)  --> pussycat
+
+--- checks whether an __instance__ is derived from some class.
+-- Works the other way around as `class_of`.
+-- @function instance:is_a
+-- @param some_class class to check against
+-- @return `true` if `instance` is derived from `some_class`
+-- @usage local pussycat = Lion()  -- assuming Lion derives from Cat
+-- if pussycat:is_a(Cat) then
+--   -- it's true
+-- end
 local function is_a(self,klass)
     local m = getmetatable(self)
     if not m then return false end --*can't be an object!
@@ -43,10 +68,28 @@ local function is_a(self,klass)
     return false
 end
 
+--- checks whether an __instance__ is derived from some class.
+-- Works the other way around as `is_a`.
+-- @function some_class:class_of
+-- @param some_instance instance to check against
+-- @return `true` if `some_instance` is derived from `some_class`
+-- @usage local pussycat = Lion()  -- assuming Lion derives from Cat
+-- if Cat:class_of(pussycat) then
+--   -- it's true
+-- end
 local function class_of(klass,obj)
     if type(klass) ~= 'table' or not rawget(klass,'is_a') then return false end
     return klass.is_a(obj,klass)
 end
+
+--- cast an object to another class.
+-- It is not clever (or safe!) so use carefully.
+-- @param some_instance the object to be changed
+-- @function some_class:cast
+local function cast (klass, obj)
+    return setmetatable(obj,klass)
+end
+
 
 local function _class_tostring (obj)
     local mt = obj._class
@@ -58,47 +101,67 @@ local function _class_tostring (obj)
     return str
 end
 
-local function _class(base,c_arg,c)
-    c = c or {}     -- a new class instance, which is the metatable for all objects of this type
-    -- the class will be the metatable for all its objects,
-    -- and they will look up their methods in it.
-    local mt = {}   -- a metatable for the class instance
+local function tupdate(td,ts,dont_override)
+    for k,v in pairs(ts) do
+        if not dont_override or td[k] == nil then
+            td[k] = v
+        end
+    end
+end
 
+local function _class(base,c_arg,c)
+    -- the class `c` will be the metatable for all its objects,
+    -- and they will look up their methods in it.
+    local mt = {}   -- a metatable for the class to support __call and _handler
+    -- can define class by passing it a plain table of methods
+    local plain = type(base) == 'table' and not getmetatable(base)
+    if plain then
+        c = base
+        base = c._base
+    else
+        c = c or {}
+    end
+   
     if type(base) == 'table' then
         -- our new class is a shallow copy of the base class!
-        tupdate(c,base)
+        -- but be careful not to wipe out any methods we have been given at this point!
+        tupdate(c,base,plain)
         c._base = base
         -- inherit the 'not found' handler, if present
-        if c._handler then mt.__index = c._handler end
+        if rawget(c,'_handler') then mt.__index = c._handler end
     elseif base ~= nil then
-        error("must derive from a table type")
+        error("must derive from a table type",3)
     end
 
     c.__index = c
     setmetatable(c,mt)
-    c._init = nil
+    if not plain then
+        c._init = nil
+    end
 
-    if base and base._class_init then
+    if base and rawget(base,'_class_init') then
         base._class_init(c,c_arg)
     end
 
     -- expose a ctor which can be called by <classname>(<args>)
     mt.__call = function(class_tbl,...)
-        local obj = {}
+        local obj
+        if rawget(c,'_create') then obj = c._create(...) end
+        if not obj then obj = {} end
         setmetatable(obj,c)
 
-        if c._init then -- explicit constructor
+        if rawget(c,'_init') then -- explicit constructor
             local res = call_ctor(c,obj,...)
             if res then -- _if_ a ctor returns a value, it becomes the object...
                 obj = res
                 setmetatable(obj,c)
             end
-        elseif base and base._init then -- default constructor
+        elseif base and rawget(base,'_init') then -- default constructor
             -- make sure that any stuff from the base class is initialized!
             call_ctor(base,obj,...)
         end
 
-        if base and base._post_init then
+        if base and rawget(base,'_post_init') then
             base._post_init(obj)
         end
 
@@ -108,236 +171,80 @@ local function _class(base,c_arg,c)
         return obj
     end
     -- Call Class.catch to set a handler for methods/properties not found in the class!
-    c.catch = function(handler)
+    c.catch = function(self, handler)
+        if type(self) == "function" then
+            -- called using . instead of :
+            handler = self
+        end
         c._handler = handler
         mt.__index = handler
     end
     c.is_a = is_a
     c.class_of = class_of
+    c.cast = cast
     c._class = c
-    -- any object can have a specified delegate which is called with unrecognized methods
-    -- if _handler exists and obj[key] is nil, then pass onto handler!
-    c.delegate = function(self,obj)
-        mt.__index = function(tbl,key)
-            local method = obj[key]
-            if method then
-                return function(self,...)
-                    return method(obj,...)
-                end
-            elseif self._handler then
-                return self._handler(tbl,key)
-            end
-        end
-    end
+
     return c
 end
 
 --- create a new class, derived from a given base class.
--- supporting two class creation syntaxes:
--- either 'Name = class()' or'class.Name()'
--- @class function
--- @name class
+-- Supporting two class creation syntaxes:
+-- either `Name = class(base)` or `class.Name(base)`.
+-- The first form returns the class directly and does not set its `_name`.
+-- The second form creates a variable `Name` in the current environment set
+-- to the class, and also sets `_name`.
+-- @function class
 -- @param base optional base class
--- @param c_arg optional parameter to class ctor
+-- @param c_arg optional parameter to class constructor
 -- @param c optional table to be used as class
-local class = setmetatable({},{
+local class
+class = setmetatable({},{
     __call = function(fun,...)
         return _class(...)
     end,
     __index = function(tbl,key)
-        local env = getfenv(2)
+        if key == 'class' then
+            io.stderr:write('require("pl.class").class is deprecated. Use require("pl.class")\n')
+            return class
+        end
+        compat = compat or require 'pl.compat'
+        local env = compat.getfenv(2)
         return function(...)
             local c = _class(...)
             c._name = key
-            env[key] = c
+            rawset(env,key,c)
             return c
         end
     end
 })
 
-pl.class.class = class
+class.properties = class()
 
-
--- the Map class ---------------------
-class(nil,nil,Map)
-
-local function makemap (m)
-    return setmetatable(m,Map)
-end
-
-function Map:_init (t)
-    local mt = getmetatable(t)
-    if mt == Set or mt == Map then
-        self:update(t)
-    else
-        return t -- otherwise assumed to be a map-like table
+function class.properties._class_init(klass)
+    klass.__index = function(t,key)
+        -- normal class lookup!
+        local v = klass[key]
+        if v then return v end
+        -- is it a getter?
+        v = rawget(klass,'get_'..key)
+        if v then
+            return v(t)
+        end
+        -- is it a field?
+        return rawget(t,'_'..key)
+    end
+    klass.__newindex = function (t,key,value)
+        -- if there's a setter, use that, otherwise directly set table
+        local p = 'set_'..key
+        local setter = klass[p]
+        if setter then
+            setter(t,value)
+        else
+            rawset(t,key,value)
+        end
     end
 end
 
-local values,keys = tablex.values,tablex.keys
 
---- list of keys.
-function Map:keys ()
-    return List(keys(self))
-end
+return class
 
---- list of values.
-function Map:values ()
-    return List(values(self))
-end
-
---- return an iterator over all key-value pairs.
-function Map:iter ()
-    return pairs(self)
-end
-
---- size of map.
--- note: this is a relatively expensive operation!
--- @class function
--- @name Map:len
-Map.len = tablex.size
-
---- put a value into the map.
--- @param key the key
--- @param val the value
-function Map:set (key,val)
-    self[key] = val
-end
-
---- get a value from the map.
--- @param key the key
--- @return the value, or nil if not found.
-function Map:get (key)
-    return self[key]
-end
-
-local index_by = tablex.index_by
-
--- get a list of values indexed by a list of keys.
--- @param keys a list-like table of keys
--- @return a new list
-function Map:getvalues (keys)
-    return List(index_by(self,keys))
-end
-
-Map.iter = pairs
-
-Map.update = tablex.update
-
-function Map:__eq (m)
-    -- note we explicitly ask deepcompare _not_ to use __eq!
-    return deepcompare(self,m,true)
-end
-
-function Map:__tostring ()
-    return pretty_write(self,'')
-end
-
--- the Set class --------------------
-class(Map,nil,Set)
-
-local function makeset (t)
-    return setmetatable(t,Set)
-end
-
-function Set:_init (t)
-    local mt = getmetatable(t)
-    if mt == Set or mt == Map then
-        for k in pairs(t) do self[k] = true end
-    else
-        for _,v in ipairs(t) do self[v] = true end
-    end
-end
-
-function Set:__tostring ()
-    return '['..self:keys():join ','..']'
-end
-
---- add a value to a set.
--- @param key a value
-function Set:set (key)
-    self[key] = true
-end
-
---- remove a value from a set.
--- @param key a value
-function Set:unset (key)
-    self[key] = nil
-end
-
---- get a list of the values in a set.
--- @class function
--- @name Set:values
-Set.values = Map.keys
-
---- map a function over the values of a set.
--- @param fn a function
--- @param ... extra arguments to pass to the function.
--- @return a new set
-function Set:map (fn,...)
-    fn = utils.function_arg(fn)
-    local res = {}
-    for k in pairs(self) do
-        res[fn(k,...)] = true
-    end
-    return makeset(res)
-end
-
---- union of two sets (also +).
--- @param set another set
--- @return a new set
-function Set:union (set)
-    return makeset(merge(self,set,true))
-end
-Set.__add = Set.union
-
---- intersection of two sets (also *).
--- @param set another set
--- @return a new set
-function Set:intersection (set)
-    return makeset(merge(self,set,false))
-end
-Set.__mul = Set.intersection
-
---- new set with elements in the set that are not in the other (also -).
--- @param set another set
--- @return a new set
-function Set:difference (set)
-    return makeset(difference(self,set,false))
-end
-Set.__sub = Set.difference
-
--- a new set with elements in _either_ the set _or_ other but not both (also ^).
--- @param set another set
--- @return a new set
-function Set:symmetric_difference (set)
-    return makeset(difference(self,set,true))
-end
-Set.__pow = Set.symmetric_difference
-
---- is the first set a subset of the second?.
--- @return true or false
-function Set:issubset (set)
-    for k in pairs(self) do
-        if not set[k] then return false end
-    end
-    return true
-end
-Set.__lt = Set.subset
-
---- is the set empty?.
--- @return true or false
-function Set:issempty ()
-    return next(self) == nil
-end
-
---- are the sets disjoint? (no elements in common).
--- Uses naive definition, i.e. that intersection is empty
--- @param set another set
--- @return true or false
-function Set:isdisjoint (set)
-    return self:intersection(set):isempty()
-end
-
-
-return pl.class
