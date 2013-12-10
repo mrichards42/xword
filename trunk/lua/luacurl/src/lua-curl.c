@@ -9,6 +9,7 @@
    - Remove support for curl http forms (not important for XWord, and I
      couldn't get it to compile)
    - Add support for CURLOPT_COOKIELIST
+   - Add c:cleanup() method
 
    All changes to the original file are marked with 
    XWORD START
@@ -1265,9 +1266,17 @@ return 1;
  */ 
 static int luacurl_easy_cleanup(lua_State* L) {
 struct L_curl_bag* c = L_checkcurluserdata(L);
+
 int i;
 
+/* XWORD START */
+if (c->handler == NULL)
+    return 0;
+/* XWORD END */
 curl_easy_cleanup(c->handler);
+/* XWORD START */
+c->handler = NULL;
+/* XWORD END */
 for(i = 0 ; i < STR_SIZE ; i++)
 	free(c->strings[i]);
 curl_slist_free_all(c->headlist);
@@ -1436,6 +1445,9 @@ static const struct luaL_reg curl_f [] = {
 static const struct luaL_reg curl_easy_m [] = {
   {"setopt",luacurl_easy_setopt},
   {"perform",luacurl_easy_perform},
+/* XWORD START */
+  {"cleanup",luacurl_easy_cleanup},
+/* XWORD END */
   {NULL,NULL}
 };
 
