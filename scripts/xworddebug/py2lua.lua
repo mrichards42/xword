@@ -11,6 +11,10 @@
 --                   NB: This only really works for wxPanels
 -- ============================================================================
 
+local oldprint = print
+require 'wx'
+print = oldprint
+
 -- Events we know how to handle
 -- { wxPythonEventBinder = wxWidgetsEventId }
 events = {
@@ -27,7 +31,8 @@ events = {
         'EVT_SCROLL_THUMBTRACK',
         'EVT_SCROLL_THUMBRELEASE',
         'EVT_SCROLL_CHANGED',
-    },    
+    },
+    EVT_CLOSE = 'EVT_CLOSE_WINDOW'
 }
 
 -- Convert the wxFormBuilder python code to lua code
@@ -36,49 +41,99 @@ function convert(filename, writefile)
     local text = f:read('*a')
     f:close()
 
-    -- Remove imports
-    text = text:gsub('import [^\n]+\n', '')
+    -- Remove coding
+    text = text:gsub('#.-coding:.-\n', '\n')
+
+
+    -- Custom subclasses must require their class
+    local needs_relative_require = false
+    text = text:gsub('from (.-) import (.-)\n', function(file, class)
+        if file:match("[\"']") or file:match('_R') then
+            needs_relative_require = true
+            if class:match("BmpButton") then
+                 -- Insure that we have bmp if we have BmpButton
+                return 'local bmp = require(_R .. "bmp")\n' ..
+                       string.format('local %s = require(%s)\n', class, file)
+            end
+            return string.format('local %s = require(%s)\n', class, file)
+        end
+        return string.format('local %s = require %q\n', class, file)
+    end)
+
+    -- Remove other imports (wx libraries)
+    text = text:gsub('import .-\n', '')
+
 
     -- Comments
     text = text:gsub('##', '--')
     text = text:gsub('%-%-#', '---')
     text = text:gsub('# ', '-- ')
 
+
     -- Strings
     text = text:gsub(' u"', ' "')
     text = text:gsub('wx%.EmptyString', '""')
 
+
     -- Events
     text = text:gsub('\t\t([%w_%.]+)%.Bind%( wx%.([%w_]+), self%.([%w_]+) %)',
     function(obj, evt, func)
+        -- Look up in the event override table
         luaevents = events[evt]
-        eventtext = {}
+        -- Try wx.wxEVT . . .
+        if not luaevents then
+            assert(wx['wx' .. evt], 'Unknown event: ' .. evt)
+            luaevents = evt
+        end
         if type(luaevents) ~= 'table' then
             luaevents = {luaevents}
         end
+        local eventtext = {}
         for _, luaevent in ipairs(luaevents) do
             table.insert(eventtext, string.format('\t\t%s:Connect(wx.%s, function(evt) self:%s(evt) end)', obj, luaevent, func))
         end
         return table.concat(eventtext, '\n')
     end)
 
+
     -- Bitwise operators
     text = text:gsub('|', '+')
+
 
     -- Lists
     text = text:gsub('%[', '{')
     text = text:gsub('%]', '}')
 
+
+    -- Add 'local' to local variables
+    -- Only variables defined at function level (two indents) should be
+    -- considered
+    text = text:gsub('\t\t(%S+) =', function(obj)
+        if obj:sub(1, 4) ~= 'self' then
+            return '\t\tlocal ' .. obj .. ' ='
+        end
+    end)
+    -- If there were any local variables before, we made them doubly local
+    text = text:gsub('local local', 'local')
+
+
+
     -- Missing functions and constants
     text = text:gsub('wx.SL_INVERSE', '4096')
     text = text:gsub('AddSpacer%( %( (%d+), (%d+)%), (%d+)[^%)]+%)', 'Add(%1, %2, %3)')
     text = text:gsub('SetToolTipString', 'SetToolTip')
+    text = text:gsub('wx.ICON%(([^%)]+)%)', '%1') -- the wxICON macro doesn't exist
+    text = text:gsub('SetSizeHintsSz', 'SetSizeHints')
+    
+
 
     -- Constructor
-    constructor = text:match('[^\n]*%.__init__[^\n]*')
-    constructor = constructor:gsub('([%w_%.]+)%.__init__ %( self,', 'local self = %1 (')
-    constructor = constructor:gsub(', [%w_]+ = ', ', ')
-    text = text:gsub('[^\n]*%.__init__[^\n]*', constructor)
+    text = text:gsub('[^\n]*%.__init__[^\n]*', function(constructor)
+        constructor = constructor:gsub('([%w_%.]+)%.__init__ %( self,', 'local self = %1 (')
+        constructor = constructor:gsub(', [%w_]+ = ', ', ')
+        return constructor
+    end)
+
 
     -- Turn class into a function
     local classes = {}
@@ -90,14 +145,17 @@ function convert(filename, writefile)
     -- Return forms as a table from this file
     text = text .. '\n\nreturn {\n    ' .. table.concat(classes, ',\n    ') .. '\n}'
 
+
     -- Destructor
     text = text:gsub('def __del__[^:]+:', '\t\treturn self\nend')
     text = text:gsub('\t\tpass', '')
+
 
     -- Dangling event-handling functions
     text = text:gsub('def [^:]+:', '')
     text = text:gsub('\t\event.Skip%(%)', '')
     text = text:gsub('-- Virtual event handlers, overide them in your derived class', '')
+
 
     -- Figure out function/table semantic differences
     -- It is a function if there are ()
@@ -106,12 +164,20 @@ function convert(filename, writefile)
     text = text:gsub('%.([%w_]+)%(', ':%1(')
     text = text:gsub('wx_', 'wx%.wx')
 
+
     -- Indents to spaces
     text = text:gsub('\t\t', '    ')
     text = text:gsub('\t', '')
 
+
     -- Collapse multiple newlines
     text = text:gsub('\n\n+', '\n\n')
+
+
+    -- Relative require
+    if needs_relative_require then
+        text = 'local _R = (string.match(..., "^.+%.") or ... .. ".") -- relative require' .. text
+    end
 
 
     if writefile ~= false then
@@ -156,7 +222,7 @@ function main()
         if filename == '--test' or filename == '-t' then
             dotest = true
         else
-            local success = pcall(function()
+            local success, err = pcall(function()
                 print('Converting file', filename)
                 text, newfile = convert(filename)
                 table.insert(all_files, text)
@@ -164,6 +230,7 @@ function main()
             end)
             if not success then
                 print('Failed!')
+                print(err)
             end
         end
     end

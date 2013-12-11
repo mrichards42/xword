@@ -644,8 +644,7 @@ end
 local function init()
     xword.frame:AddMenuItem({'Debug'}, 'Interpreter\tCtrl+I',
         function(evt)
-            interp = CreateDialog()
-            interp:Show()
+            CreateDialog():Show()
         end
     )
 end

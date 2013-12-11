@@ -57,7 +57,7 @@ end
 function P.load_packages()
     require 'serialize'
     collectgarbage('stop')
-    errors = {}
+    local errors = {}
     -- Load the table of enabled/disabled packages
     local packages = P.load_enabled_packages()
     -- Walk the scripts directory and load all the packages
