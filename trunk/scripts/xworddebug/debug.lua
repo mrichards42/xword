@@ -69,5 +69,5 @@ old_print = print
 print = xword.debug
 
 -- Set task debug handler
-local task = require 'wxtask'
+local task = require 'task'
 task.debug_handler = xword.debug
