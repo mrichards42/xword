@@ -1,7 +1,9 @@
 -- Common setup for lua shared libs
 
-configuration "Debug"   targetdir "../bin/Debug/scripts/libs"
-configuration "Release" targetdir "../bin/Release/scripts/libs"
+configuration "Debug"
+    targetdir "../bin/Debug/scripts/libs"
+configuration "Release"
+    targetdir "../bin/Release/scripts/libs"
 configuration {}
 
 includedirs { "lua", "lua/include" }
