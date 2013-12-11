@@ -16,15 +16,13 @@ local function write_to_file(fp)
     end
 end
 
--- Progress callback function: Post '{dlnow, dltotal}'
+-- Progress callback function: Post dlnow, dltotal
 local function progress(dltotal, dlnow, ultotal, ulnow)
-    task.post(1, {dlnow, dltotal}, P.DL_PROGRESS)
-
+    task.post(P.DL_PROGRESS, dlnow, dltotal)
     -- Check to see if we should abort the download
-    if task.checkAbort() then return 1 end
+    if task.check_abort() then return 1 end
     return 0
 end
-
 
 -- ----------------------------------------------------------------------------
 -- download the updates
@@ -35,7 +33,6 @@ local dl_dir = join(xword.userdatadir, 'updates')
 if not lfs.attributes(dl_dir) then
     lfs.mkdir(dl_dir)
 end
-
 
 -- Parse the http error response message and spit out an error code
 local function get_http_error(err)
@@ -49,9 +46,8 @@ for _, pkg in ipairs(arg) do
     local f = io.open(filename, 'wb')
 
     if not f then
-        task.post(1, download, P.DL_START)
-        task.post(1, { -1, { name, "unable to open file for writing: "..filename} },
-                  P.DL_END)
+        task.post(P.DL_START, download)
+        task.post(P.DL_END, -1, name, "unable to open file for writing: "..filename )
     else
         -- Setup the cURL object
         local c = curl.easy_init()
@@ -63,7 +59,7 @@ for _, pkg in ipairs(arg) do
         c:setopt(curl.OPT_FAILONERROR, 1) -- e.g. 404 errors
 
         -- Run the download
-        task.post(1, download, P.DL_START)
+        task.post(P.DL_START, download)
         local rc, msg = c:perform()
 
         -- Post download end
@@ -79,7 +75,7 @@ for _, pkg in ipairs(arg) do
             msg = { name, tostring(msg or "Unknown error")}
         end
 
-        task.post(1, {rc, msg}, P.DL_END)
+        task.post(P.DL_END, rc, msg)
 
         -- Cleanup
         f:close()
