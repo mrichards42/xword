@@ -12,7 +12,7 @@ return {
         requires = "0.5",
         download = "http://sourceforge.net/projects/wx-xword/files/scripts/a2z_1.0.tar.gz",
         description = "Presents a dialog with all possible letters filled in for the current square.",
-        version = "2.0",
+        version = "3.0",
     },
     {
         name = "Blogs",
@@ -193,5 +193,6 @@ Changes for version 1.1:\
         download = "http://sourceforge.net/projects/wx-xword/files/Binary/XWord_0.6.exe",
         name = "XWord",
         version = "0.7",
+        changelog = "http://sourceforge.net/projects/wx-xword/files/Binary",
     },
 }
