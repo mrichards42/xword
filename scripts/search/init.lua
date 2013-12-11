@@ -40,6 +40,7 @@ end
 function search.init()
     -- Search handlers
     require 'search.wikipedia'
+    require 'search.xwordnexus'
     require 'search.oneacross'
     require 'search.google'
 
