@@ -2,7 +2,7 @@
 -- here's a simple join function
 if wx then
     return function(...)
-        t = {}
+        local t = {}
         for _, s in ipairs({...}) do
             while s:sub(-1) == '/' or s:sub(-1) == '\\' do
                 s = s:sub(0, -2)

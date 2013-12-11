@@ -82,8 +82,6 @@ local function init()
         end
     end
 
-    p = xword.frame.Puzzle
-    g = p.Grid
 
     require 'xworddebug.debug'
     require 'xworddebug.globals'

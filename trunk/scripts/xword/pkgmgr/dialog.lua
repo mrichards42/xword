@@ -591,7 +591,7 @@ function P.PackageDialog(opts)
 
     dlg:Center()
 
-    if do_check ~= false then
+    if opts.check ~= false then
         P.updater.CheckForUpdates(function() if P.dlg then P.dlg:RefreshUpdates() end end)
     end
 
