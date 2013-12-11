@@ -2,13 +2,13 @@ P = require 'xword.pkgmgr'
 require 'xword.pkgmgr.updater'
 
 require 'serialize'
-require 'luacurl'
+local curl = require 'luacurl'
 
 -- Args
 local packages_url, updates_filename = unpack(arg)
 
 -- Load the remote and local updates
-local remote_updates = serialize.loadstring(curl.download(packages_url)) or {}
+local remote_updates = serialize.loadstring(curl.get(packages_url)) or {}
 local updates = serialize.loadfile(updates_filename) or {}
 
 -- Replace packages in updates with packages from remoted_updates, copying
