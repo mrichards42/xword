@@ -99,19 +99,9 @@ local function init()
         local updates = serialize.loadfile(P.updater.updates_filename) or {}
 
         -- Check to see if there is an update to XWord first
-        if updates.xword and not updates.xword.ignored
-            and P.is_newer(updates.xword.version, xword.version)
-        then
-            if xword.Prompt(
-                "There is a new version of XWord available (version %s).\n"
-                .."Would you like to go to the download page?",
-                updates.xword.version
-            ) then
-                wx.wxLaunchDefaultBrowser(updates.xword.download)
+        if updates.xword and not updates.xword.ignored then
+            if P.show_xword_update_dialog(updates) then
                 return
-            else
-                updates.xword.ignored = true
-                serialize.pdump(updates, P.updater.updates_filename)
             end
         end
 
@@ -166,13 +156,21 @@ end
 
 function P.get_all_scripts()
     local t = {}
+    local has_xworddebug -- Make sure xworddebug is loaded first
     for d in lfs.dir(xword.scriptsdir) do
         if d ~= 'xword' and d ~= 'libs'
             and d:sub(1,1) ~= '.'
             and lfs.attributes(join(xword.scriptsdir, d), 'mode') == 'directory'
         then
-            table.insert(t, d)
+            if d == 'xworddebug' then
+                has_xworddebug = true
+            else
+                table.insert(t, d)
+            end
         end
+    end
+    if has_xworddebug then
+        table.insert(t, 1, 'xworddebug')
     end
     return t
 end
@@ -206,6 +204,42 @@ function P.load_packages_info()
         packages[packagename] = info
     end
     return packages
+end
+
+function P.show_xword_update_dialog(updates)
+--if true then return false end
+    if P.is_newer(updates.xword.version, xword.version) then
+        -- Create the dialog
+        local dlg = wx.wxMessageDialog(xword.frame,
+            string.format(
+                "There is a new version of XWord available (version %s).\n"
+                .. "Would you like to go to the download page?",
+                updates.xword.version
+            ),
+            "New XWord Version",
+            wx.wxYES_NO + (updates.xword.changelog and wx.wxHELP or 0)
+        )
+        dlg:SetYesNoLabels("Download", "No")
+        if has_changelog then
+            dlg:SetHelpLabel("Read Changelog")
+        end
+        -- Show the dialog
+        local result = dlg:ShowModal()
+        -- Clean up
+        dlg:Destroy()
+        dlg = nil
+        -- Process the result
+        if result == wx.wxID_YES then
+            wx.wxLaunchDefaultBrowser(updates.xword.download)
+            return true
+        elseif result == wx.wxID_HELP then
+            wx.wxLaunchDefaultBrowser(updates.xword.changelog)
+            return true
+        else
+            updates.xword.ignored = true
+            serialize.pdump(updates, P.updater.updates_filename)
+        end
+    end
 end
 
 -- xword.pkgmgr isn't actually managed as a separate package, so we need
