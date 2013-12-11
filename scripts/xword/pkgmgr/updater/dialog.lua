@@ -41,17 +41,17 @@ function P.DownloadDialog(parent)
         gauge.knownLength = false
     end
 
-    function dlg.OnDownloadEnd(rc, msg)
+    function dlg.OnDownloadEnd(success, name, err)
         gauge:SetValue(gauge:GetRange())
         overallGauge:SetValue(overallGauge:GetValue() + 1)
         overallStatus:SetLabel(
             string.format("%d / %d",
                 overallGauge:GetValue(),
                 overallGauge:GetRange()))
-        if rc == 0 then
-            table.insert(dlg.to_install, msg)
+        if success then
+            table.insert(dlg.to_install, name)
         else
-            add_error(msg[1], msg[2])
+            add_error(name, err)
         end
     end
 
