@@ -41,8 +41,7 @@ function P.DownloadDialog(parent)
         gauge.knownLength = false
     end
 
-    function dlg.OnDownloadEnd(data)
-        local rc, msg = unpack(data)
+    function dlg.OnDownloadEnd(rc, msg)
         gauge:SetValue(gauge:GetRange())
         overallGauge:SetValue(overallGauge:GetValue() + 1)
         overallStatus:SetLabel(
@@ -56,8 +55,7 @@ function P.DownloadDialog(parent)
         end
     end
 
-    function dlg.OnDownloadProgress(data)
-        local dlnow, dltotal = unpack(data)
+    function dlg.OnDownloadProgress(dlnow, dltotal)
         if not gauge.knownLength then
             if dltotal > 0 then -- We know the content-length
                 gauge.knownLength = true
@@ -141,18 +139,14 @@ function P.DownloadDialog(parent)
     -- ------------------------------------------------------------------------
     function dlg:DoUpdate(downloads)
         overallGauge:SetRange(#downloads)
-        dlg.taskHandler = task.handleEvents(
-            task.create(join(xword.scriptsdir, 'xword', 'pkgmgr',
-                             'updater', 'download_task.lua'),
-                        downloads),
-            {
-                [P.DL_START]    = dlg.OnDownloadStart,
-                [P.DL_END]      = dlg.OnDownloadEnd,
-                [P.DL_PROGRESS] = dlg.OnDownloadProgress,
-                [task.END]      = dlg.OnDownloadTaskEnd,
-            },
-            dlg
-        )
+        local t = task.new('xword.pkgmgr.updater.download_task')
+        t:connect{
+            [P.DL_START]    = dlg.OnDownloadStart,
+            [P.DL_END]      = dlg.OnDownloadEnd,
+            [P.DL_PROGRESS] = dlg.OnDownloadProgress,
+            [task.EVT_END]  = dlg.OnDownloadTaskEnd,
+        }
+        t:start(unpack(downloads))
     end
 
     -- Layout
