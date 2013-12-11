@@ -14,6 +14,38 @@ function xword.OnCleanup(func)
     table.insert(xword.cleanup, func)
 end
 
+-- Export some globals for all tasks
+local task = require 'wxtask'
+task.globals.xword = {
+    scriptsdir  = xword.scriptsdir,
+    imagesdir   = xword.imagesdir,
+    configdir   = xword.configdir,
+    userdatadir = xword.userdatadir,
+    isportable  = xword.isportable,
+}
+
+-- Set task error handler
+task.error_handler = xword.logerror
+
+-- Abort all tasks on cleanup
+xword.OnCleanup(function()
+    while true do
+        local is_done = true
+        -- Try to abort each thread
+        for id, _ in pairs(task.list()) do
+            if id ~= 1 then
+                is_done = false
+                task.find(id):abort()
+            end
+        end
+        -- Main thread is the only one left
+        if is_done then return end
+        -- Wait a bit, then check the list of tasks again
+        task.sleep(10)
+    end
+end)
+
+
 -- Require the xword packages
 require 'xword.preferences'
 require 'xword.menu'
