@@ -5,6 +5,7 @@
 
 local join = require 'pl.path'.join
 local lfs = require 'lfs'
+local startswith = require 'pl.stringx'.startswith
 
 local P = xword.pkgmgr
 
@@ -41,11 +42,12 @@ function P.load_package(name)
     local init = package.loaded[name].init
     if init then
         local success, err = xpcall(init, debug.traceback)
+        if not success then
+            xword.Message(err)
+            return false, err
+        end
     else
         return false, "Package must return an initialization function"
-    end
-    if not success then
-        return false, err
     end
     return true
 end
@@ -94,6 +96,14 @@ function P.unload_package(name)
     end
     if type(funcs) == "table" and funcs.uninit then
         funcs.uninit()
+        -- Remove all references in package.loaded
+        package.loaded[name] = nil
+        local namedot = name .. '.'
+        for k, _ in pairs(package.loaded) do
+            if startswith(k, namedot) then
+                package.loaded[k] = nil
+            end
+        end
         return true
     end
     return false
