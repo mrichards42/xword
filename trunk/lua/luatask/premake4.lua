@@ -3,7 +3,9 @@ project "luatask"
     language "C"
 
     -- Output
-    targetname "task"
+    -- This is the C half of luatask.  The lua half calls require 'c-task' to
+    -- initialize the library.
+    targetname "c-task"
 
     -- Source files
     files { "src/*.c", }
