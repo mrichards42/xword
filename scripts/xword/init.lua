@@ -37,7 +37,7 @@ function xword.OnCleanup(func)
 end
 
 -- Export some globals for all tasks
-local task = require 'wxtask'
+local task = require 'task'
 task.globals.xword = {
     scriptsdir  = xword.scriptsdir,
     imagesdir   = xword.imagesdir,

@@ -1,4 +1,4 @@
-local task = require 'wxtask'
+local task = require 'task'
 require 'serialize'
 
 local dirname = require 'pl.path'.dirname
