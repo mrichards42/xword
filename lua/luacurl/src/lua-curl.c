@@ -186,6 +186,16 @@ static const struct L_const curl_easy_c [] = {
   {NULL,0}
 };
 
+/* XWORD START */
+/* Error codes */
+static const struct L_const curl_easy_error_c [] = {
+#include "curl_error.h"
+  {NULL,0}
+};
+
+/* XWORD END */
+
+
 /******************************************************************************
  * table created with this script:
  * 
@@ -658,7 +668,7 @@ LUACURL_CB_FUNC_END()
  *
  */
 /* We can't use the LUA_CB_FUNC_START template because the progress function
-   recieves different parameters than the read / write functions */
+   receives different parameters than the read / write functions */
 
 /* The lua_State is passed as the CURLOPT_PROGRESSDATA parameter (void * ptr) */
 static size_t  L_callback_progressdata (void * ptr,
@@ -1483,6 +1493,9 @@ int luacurl_open(lua_State* L) {
 	L_openconst(L,curl_easy_httpver_c);
 	L_openconst(L,curl_easy_form_c);
 	L_openconst(L,curl_easy_closepolicy_c);
+/* XWORD START */
+    L_openconst(L,curl_easy_error_c);
+/* XWORD END */
 #if CURL_NEWER(7,9,8)
 	L_openconst(L,curl_easy_netrc_c);
 #endif
