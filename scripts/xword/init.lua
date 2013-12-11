@@ -3,6 +3,7 @@
 -- @module xword
 
 require 'luapuz'
+require 'pl.compat' -- Add table.pack
 
 -- table xword is already created in a C++ function
 
