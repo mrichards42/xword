@@ -7,37 +7,8 @@ require 'luacurl'
 -- Args
 local packages_url, updates_filename = unpack(arg)
 
--- cURL Callbacks
--- Write to a table
-local function write_to_table(t)
-    return function(str, length)
-        table.insert(t, str)
-        return length -- Return length to continue download
-    end
-end
-
--- Progress callback function: Check for abort
-local function progress_func()
-    -- Check to see if we should abort the download
-    if task.checkAbort() then return 1 end
-    return 0
-end
-
-
--- Download the table and load it
-local t = {}
-
-local c = curl.easy_init()
-c:setopt(curl.OPT_URL, packages_url)
-c:setopt(curl.OPT_FOLLOWLOCATION, 1)
-c:setopt(curl.OPT_WRITEFUNCTION, write_to_table(t))
-c:setopt(curl.OPT_PROGRESSFUNCTION, progress_func)
-c:setopt(curl.OPT_NOPROGRESS, 0)
-
-local rc, err = c:perform()
-
 -- Load the remote and local updates
-local remote_updates = serialize.loadstring(table.concat(t)) or {}
+local remote_updates = serialize.loadstring(curl.download(packages_url)) or {}
 local updates = serialize.loadfile(updates_filename) or {}
 
 -- Replace packages in updates with packages from remoted_updates, copying
