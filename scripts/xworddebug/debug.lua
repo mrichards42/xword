@@ -44,30 +44,30 @@ local function get_dialog()
         local text = wx.wxTextCtrl(panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxTE_MULTILINE)
         sizer:Add(text, 1, wx.wxEXPAND + wx.wxALL, 10)
         panel:SetSizer(sizer)
-        function dlg:add_message(msg)
-            text:AppendText(msg .. '\n')
-        end
         local dlgsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
         dlgsizer:Add(panel, 1, wx.wxEXPAND)
         dlg:SetSizer(dlgsizer)
+        -- Just hide on close
+        dlg:Connect(wx.wxEVT_CLOSE_WINDOW, function(evt)
+            dlg:Hide()
+        end)
+        function dlg:add_message(msg)
+            text:AppendText(msg .. '\n')
+        end
     end
     return dlg
 end
 
---[[
-    xword.debug (the public function)
-    Use in place of print to see output
 
-    Call as in string.format:
-        xword.debug('%s: %d', 'hello world', 15)
-            -> "hello world: 15"
-
-    Extra arguments will be added to the string:
-        xword.debug('%s: %d', 'hello world', 15, "interesting")
-            -> "hello world: 15    interesting"
-]]
+-- Replace print with a debug dialog
 function xword.debug(...)
     local dlg = get_dialog()
     dlg:add_message(get_message(...))
     dlg:Show()
 end
+old_print = print
+print = xword.debug
+
+-- Set task debug handler
+local task = require 'wxtask'
+task.debug_handler = xword.debug
