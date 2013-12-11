@@ -1,647 +1,555 @@
--- ============================================================================
--- Modifications to the LuaTask library
---     Allow LuaTask to be used with multiple add-ons:
---         - task.post prepends the id of the calling task to the message for
---           identification.
---         - task.receive takes an additional task_id parameter, and will only
---           return messages from the given task.
---           if task_id is omitted or is -1, return the first message from a
---           thread using LuaTask directly (not through this post/receive API).
+------------------------------------------------------------------------------
+-- Modifications to the LuaTask library for wxWidgets.
 --
---     This is sort of hackish and should incur a small performance penalty,
---     but otherwise, only one add-on could use LuaTask without the message
---     queues getting tangled.
+-- Implements an event loop using task.post and task.receive.
 --
---     Give unique ids to threads: [incrementing number].."wxtask"
+-- See `task.connect` for a usage example.
 --
---     Preserve package.path and package.cpath when creating a new thread.
---
---     Allow threads to tap into the wxWigets event handling system.
--- ============================================================================
+-- @module task
 
-require 'task'
-require 'wxtask.queue'
-require 'serialize'
+local _R = (string.match(..., '^.+%.') or ... .. '.') -- Relative require
 
+require 'c-task' -- Load the luatask library
+local serialize = require 'serialize'
+local Queue = require(_R .. 'queue')
 
--- ============================================================================
--- local functions and data
--- ============================================================================
-
+-- These functions will be overridden
 local task_post = task.post
 local task_receive = task.receive
 local task_create = task.create
-local task_id = task.id
 local task_isrunning = task.isrunning
 
--- Queue ids
-task.UNUSED_QUEUE = -10
-task.UNKNOWN_QUEUE = -1
-task.DEBUG_QUEUE = -2
-task.ERROR_QUEUE = -3
+-- Override the global task table
+local _task = task
+task = {sleep = _task.sleep, list = _task.list}
+
+local SHOULD_ABORT = false -- Set if task.EVT_ABORT is posted to the task
+
+-- Events
+
+--- Start of a task
+task.EVT_START = -100
+--- End of a task.  Any values returned are passed to this handler.
+task.EVT_END   = -101
+--- Error messages
+task.EVT_ERROR = -103
+--- Debug messages
+task.EVT_DEBUG = -104
+--- Posted to abort a task
+task.EVT_ABORT = -200
 
 
--- ============================================================================
--- Unique thread ids
--- ============================================================================
--- Functions on the posting end need to convert using find_id
--- Functions on the receiving end need to convert using find_name
-
-task.task_aliases = {}
-local task_aliases = task.task_aliases
-local last_task_id = 1
-local function new_id()
-    last_task_id = last_task_id + 1
-    return tostring(last_task_id)..".wxtask"
+-- Post a message to the task with id, evt_id, and event data
+local function _post(id, evt_id, ...)
+    local data = serialize({id=_task.id(), data={...}})
+    return task_post(id, data, evt_id)
 end
 
-local function find_id(name)
-    if type(name) == "number" then return name end
-    return task.find(name)
-end
-
-local function find_name(id)
-    if type(id) == "string" then return id end
-    return task_aliases[id]
-end
-
-local function register_name(id, name)
-    task_aliases[id] = name
-end
-
-register_name(1, 1) -- main thread is always 1
-register_name(task.UNKNOWN_QUEUE, "wxtask.unknown")
-register_name(task.DEBUG_QUEUE, "wxtask.debug")
-register_name(task.ERROR_QUEUE, "wxtask.error")
-register_name(task.UNUSED_QUEUE, "wxtask.unused")
-
-function task.isrunning(id)
-    return task_isrunning(find_id(id))
-end
-
-
--- ============================================================================
--- post functions
--- ============================================================================
-
--- Data is serialized before being posted.  When reconstructed, the data will
--- appear as follows: { 'id' = wxtask_id, 'data' = the_data }
--- data can be a number, string, or non-cyclic table of any valid data.
-task.post = function(id, data, flag)
-    return task_post(find_id(id), serialize({id=task.id(), data=data}), flag)
-end
-
--- Post with id 1 to the specified queue.
--- This is used to circumvent custom task.post behavior, which posts with
--- a given id to the queue designated for the current task.
-task.post_to_queue = function(queue_id, data, flag)
-    if type(data) == 'string' then
-        data = task.id() .. ': ' .. data
+-- Receive a message and return task_id, evt_id, a data table
+-- Used by task.receive and task.peek
+local function _receive(timeout)
+    local msg, evt_id, rc = task_receive(timeout)
+    if rc ~= 0 then return nil, 'timed out' end
+    -- Note abort events
+    if evt_id == task.EVT_ABORT then SHOULD_ABORT = true end
+    -- Deserialize the data
+    -- Serialized data must begin with "return "
+    local success, data, task_id
+    if msg:sub(1, 7) == 'return ' then
+        success, data = pcall(loadstring(msg))
     end
-    return task_post(1, serialize({id=queue_id, data=data}), flag)
-end
-
-function task.error(data) task.post_to_queue(task.ERROR_QUEUE, data) end
-
-function task.debug(data) task.post_to_queue(task.DEBUG_QUEUE, data) end
-
-
-
--- ============================================================================
--- receive functions
--- ============================================================================
-
--- A table that holds the messages for each task as we receive them.
-local queues = {}
-task.queues = queues
-
--- Recieve the next message in the queue, but don't remove it
-function task.peek(timeout, task_id)
-    local task_id = find_name(task_id) or task.UNKNOWN_QUEUE
-
-    -- See if we already have a message in the queue for the specified task
-    if not queues[task_id] then queues[task_id] = task.newQueue() end
-
-    local ret = queues[task_id]:get_last()
-    -- Return the message if there is one
-    if ret then
-        return unpack(ret)
+    -- If the data cannot be deserialized, report this as an error
+    if not success then
+        task.error_handler(string.format("unable to deserialize task event data: %q", msg))
+        return nil, 'unable to deserialize task event data'
     end
-
-    -- No message in the local queue, look to the global task queue.
-
-    -- Find the first message (using the timeout if specified)
-    local msg, flags, rc = task_receive(timeout)
-
-    -- Read messages until we get one from the specified task, or we run
-    -- out of messages.
-    while rc == 0 do
-        local success, data
-        -- Serialized messages must begin with "return "
-        if msg:sub(1, 7) == 'return ' then
-            -- Read the serialized message
-            success, data = pcall(loadstring(msg))
-        end
-        -- If the message cannot be deserialized, assume it came from an
-        -- unknown thread.
-        if type(data) ~= 'table' then
-            data = {id = task.UNKNOWN_QUEUE, data = msg}
-        end
-
-        -- Add the message to the local queue
-        data.id = find_name(data.id)
-        if not queues[data.id] then queues[data.id] = task.newQueue() end
-        queues[data.id]:push({data.data, flags, rc})
-
-        -- If this message is from the specified thread, return the message
-        if data.id == task_id then
-            return data.data, flags, rc
-        end
-
-        -- Get the next message
-        msg, flags, rc = task_receive(0) -- No timeout
+    -- Look for the sending thread's id
+    if type(data) == 'table' and data.id then
+        task_id = data.id
+        data = data.data
     end
-
-    -- If we've gotten here, there are no messages from the specified thread,
-    -- and all other messages have been read from the global queue into the
-    -- local queue.
-    return nil, nil, rc
+    return task_id, evt_id, data
 end
 
--- Receive the next message in the queue and remove it
-function task.receive(timeout, task_id)
-    local task_id = find_name(task_id)
-    local msg, flags, rc = task.peek(timeout, task_id)
-    if rc == 0 then
-        queues[task_id]:pop()
+if _task.id() == 1 then
+
+-------------------------------------------------------------------------------
+--- Main Thread.
+-- These functions and fields are only available in the main thread.
+-- @section main_thread
+
+local tablex = require 'pl.tablex'
+local package_path = require 'pl.path'.package_path
+
+local Task = {} -- Declare the task object
+Task.__index = Task
+
+--- Is this the main thread?
+-- true in the main thread, nil in secondary threads.
+task.is_main = true
+
+--- Create a new `Task`.
+-- If the first character of string is "=", run with `loadstring`, otherwise
+-- try `package.loaders`.
+-- *Does does not start a new thread.*  
+-- If script is a module name, the module directory is added to package.path
+-- @param opts Options table or script
+-- @param opts.1 Lua string chunk or module name.
+-- @param opts.script Alternative to opts[1]
+-- @param opts.name[opt] A name for this task
+-- @param opts.globals[opt] Table of globals set in the new task.
+-- @param opts.events[opt] An event table for this task.
+-- @return The `Task` object.
+-- @see Task:start
+-- @see Task:connect
+-- @see Task.globals
+-- @usage
+-- -- Run a task that posts "Hello world!" to the main thread
+-- task.new([[=task.post(MY_CUSTOM_EVT, "Hello world!")]]):start()
+--
+-- -- Run the threading.long_task script/module in a new thread
+-- task.new("threading.long_task"):start()
+--
+-- -- Create a task with an existing talble
+-- my_task = { EVT_CUSTOM = 500, some_key = "some value" }
+-- task.new{"task_script", obj=my_task}
+-- -- Existing values are preserved
+-- print(my_task.EVT_CUSTOM, my_task.some_key) >> 500    "some_value"
+function task.new(opts)
+    if type(opts) == 'string' then
+        opts = { script = opts }
+    elseif opts[1] and not opts.script then
+        opts.script = opts[1]
     end
-    return msg, flags, rc
-end
-
-
-function task.find_queue(queue_id)
-    return queues[find_name(queue_id)]
-end
-
--- print all messages from a given queue
-function task.dump_queue(queue_id, print_func)
-    print_func = print_func or print
-    task.flush_queues()
-    local queue = task.find_queue(queue_id)
-    if not queue then return end
-    for val in queue:iter() do
-        local msg, flags, rc = unpack(val)
-        print_func(msg)
+    local self = opts.obj or {}
+    self._script = opts.script
+    self.name = opts.name
+    self.globals = opts.globals or {}
+    setmetatable(self, Task)
+    if opts.events then
+        self:connect(opts.events)
     end
-    task.clear_queue(queue_id)
+    return self
 end
 
--- Clear all messages from a given queue
-function task.clear_queue(queue_id)
-    task.queues[find_name(queue_id)]:clear()
-end
+-- Create and run a one-off `Task`.
+-- See below for usage and an option table overload.
+-- @param script The script
+-- @param callback A `task.EVT_END` callback.
+-- @param args A table of arguments to start the task.
+-- @function task.run
 
--- Push all messages into their respecitve queues
-function task.flush_queues()
-    -- task.receive will read messages until it gets a message from the
-    -- given queue / thread or it runs out of messages.  There should never
-    -- be messages in the UNUSED_QUEUE, so this just reads until we run
-    -- out of all messages.
-    msg, flags, rc = task.receive(0, task.UNUSED_QUEUE)
-end
-
--- Flush messages and return the count of messages for a given queue
-function task.pending(queue_id)
-    task.flush_queues()
-    local q = task.queues[find_name(queue_id)]
-    if q then return q:length() else return 0 end
-end
-
--- Dump the debug queue
-function task.dump_debug()
-    print '===============      DEBUG       ==============='
-    task.dump_queue(task.DEBUG_QUEUE)
-    print '===============   END OF DEBUG   ==============='
-end
-
--- Dump the error queue
-function task.dump_errors()
-    print '===============      ERRORS      ==============='
-    task.dump_queue(task.ERROR_QUEUE)
-    print '===============   END OF ERRORS  ==============='
-end
-
-
-
--- ============================================================================
--- create thread function
--- ============================================================================
-
---- Create a new thread.
--- @param s Lua string chunk, module name, or filename.
---     <ul>
---         <li>If the first character of the string is "=" the code will be
---             executed using loadstring.</li>
---         <li>Otherwise the script will be loaded using <code>require</code>, or
---             <code>loadfile</code> if this fails.</li>
---     </ul>
--- @param args A table of arguments passed to the new task.
---     <ul>
---         <li>Arguments are available in the <code>arg</code> table.</li>
---         <li>String keys are available as global variables.</li>
---     </ul>
--- @return The task id.
-
-task.create = function(s, args, globals)
-    local task_name = new_id()
-    args = args or {}
-    globals = globals or {}
-    assert(type(args) == "table", "args must be a table")
-    s = s or ""
-
-    local command = [[=
-        local success, err = xpcall(function()
-
-        -- Set the package.paths
-        package.path = arg[1]
-        package.cpath = arg[2]
-
-        -- Add global variables
-        -- Deserialize the function arguments
-        local success, globals = pcall(loadstring(arg[4]))
-        for k,v in pairs(globals) do
-            -- Protect preexisting globals
-            if type(k) == "string" and not _G[k] then
-                _G[k] = v
-            end
-        end
-
-        require "wxtask"
-
-        -- Set this task's unique id
-        function task.id()
-            return "]]..task_name..[["
-        end
-        task.register(task.id())
-    ]]
-
-    -- Load the script
-    if s:sub(1,1) == '=' then -- Script is a string
-        -- Remove the equals sign
-        s = s:sub(2)
-        command = command .. [[
-            -- Load the string that was passed to task.create
-           local func, err = loadstring(arg[3])
-        ]]
-    else -- Script is a file name
-        command = command .. [[
-            -- Load the file that was passed to task.create
-
-            -- Try to load the file using package.loaders
-            local errors = {}
-            local func, err
-            for _, loader in ipairs(package.loaders) do
-                func = loader(arg[3])
-                if type(func) == "function" then
-                    break
-                else
-                    table.insert(errors, func)
-                    func = nil
-                end
-            end
-
-            -- Try to load the file itself
-            if not func then
-                func, err = loadfile(arg[3])
-                if not func then
-                    table.insert(errors, err)
-                    err = table.concat(errors, '\n')
-                end
-            end
-        ]]
+--- Create and run a one-off `Task`.
+-- *Starts a new thread.*
+-- @param opts See `task.new` for most options.
+-- @param opts.2 A callback function used for `task.EVT_END`.
+-- @param opts.callback Alternative to opt[2].
+-- @param opts.args Table of arguments to pass to the task
+-- @return The `Task` object.
+-- @usage
+-- -- Run a task that prints "Hello world!"
+-- task.run([[=return "Hello world!"]], print)
+function task.run(opts, callback, args)
+    if type(opts) == 'table' then
+        args = opts.args
+        callback = opts[2] or opts.callback
     end
-
-    -- Run the script with the remaining arguments
-    command = command .. [[
-            if not func then error(err) end
-
-            -- Deserialize the function arguments
-            local success, fargs = pcall(loadstring(arg[5]))
-
-            -- The arg variable is a global variable that was initialized when
-            -- the currently executing function started.
-            -- We need to make sure that arg holds the arguments to our
-            -- function, because we can't call a string or file with arguments.
-            arg = fargs
-
-            -- Execute the script
-            task.post(1, task.id(), task.START)
-            func()
-
-        end, -- end of xpcall function
-        -- Error handler
-        debug.traceback
-        )
-
-        -- Report any errors
-        if err then
-            task.error(err)
-        end
-        -- Make sure task.END is posted
-        task.post(1, task.id(), task.END)
-        ]]
-
-    -- Create the task
-    local id = task_create(command,
-                           {package.path, package.cpath, s, serialize(globals), serialize(args)})
-    if id > 0 then
-        register_name(id, task_name)
-        return task_name
+    local self = task.new(opts)
+    -- Connect the EVT_END event
+    if callback then
+        self:connect(task.EVT_END, callback)
     end
-    -- If the task did not create, return the error code
-    return id
+    -- Run the task
+    self:start(unpack(args or {}))
+    return self
 end
 
+local TASK_LIST = {}
 
--- ============================================================================
--- Abort functions
--- ============================================================================
-task.START = -100
-task.END   = -101
-task.ABORT = -102
+--- Find a `Task` by its internal id.
+-- @param id The task id
+-- @return A Task or nil
+function task.find(id)
+    return TASK_LIST[id]
+end
 
-if task.id() == 1 then
-    -- Inject xword data into task.create
-    xword.task_exports = {
-        scriptsdir  = xword.scriptsdir,
-        imagesdir   = xword.imagesdir,
-        configdir   = xword.configdir,
-        userdatadir = xword.userdatadir,
-        isportable  = xword.isportable,
-    }
-
-    local task_create = task.create
-    function task.create(s, args, globals)
-        globals = globals or {}
-        globals.xword = xword.task_exports
-        return task_create(s, args, globals)
-    end
-
-    -- Abort tasks
-    function task.abort(id)
-        task.post(id, "", task.ABORT)
-    end
-
-    local function abortTasks()
-        while true do
-            local shouldBreak = true
-            -- Abort each thread
-            for id, _ in pairs(task.list()) do
-                if id ~= 1 then
-                    shouldBreak = false
-                    task.abort(id)
-                end
-            end
-            -- Main thread is the only one left
-            if shouldBreak then break end
-            -- Wait a bit
-            task.sleep(10)
-        end
-        -- Dump debug and error messages
-        task.flush_queues()
-        local debug_queue = task.find_queue(task.DEBUG_QUEUE)
-        if debug_queue and debug_queue:length() > 0 then
-            print '===============    TASK DEBUG    ==============='
-            task.dump_queue(task.DEBUG_QUEUE)
-            print '===============  END TASK DEBUG  ==============='
-        end
-        local error_queue = task.find_queue(task.ERROR_QUEUE)
-        if error_queue and error_queue:length() > 0 then
-            xword.logerror '===============    TASK ERRORS   ==============='
-            task.dump_queue(task.ERROR_QUEUE, xword.logerror)
-            xword.logerror '===============  END TASK ERRORS ==============='
-        end
-    end
-    xword.OnCleanup(abortTasks)
-else
-    function task.checkAbort(timeout, cleanupFunc)
-        local function doCheck(msg, flag, rc)
-            if rc == 0 and flag == task.ABORT then
-                if cleanupFunc then
-                    cleanupFunc()
-                end
-                return true
-            end
-        end
-
-        -- Check the first message in the queue (with a timeout)
-        local msg, flag, rc = task.peek(timeout or 0, 1)
-        if doCheck(msg, flag, rc) then return true end
-
-        -- Check all other messages in the queue
-        task.flush_queues()
-        for val in task.queues[1]:iter() do
-            local msg, flag, rc = unpack(val)
-            if doCheck(msg, flag, rc) then return true end
+-- Recursively replace keys in t1 with values from t2
+local function update(t1, t2)
+    for k,v in pairs(t2) do
+        if type(v) == 'table' then
+            if not t1[k] then t1[k] = {} end
+            update(t1[k], v)
+        else
+            t1[k] = v
         end
     end
 end
 
+-- Auto create keys for EVENT_TABLE
+local EVENT_TABLE = setmetatable({}, {
+    __index = function(t, k)
+        t[k] = setmetatable({}, getmetatable(t))
+        return t[k]
+    end})
 
--- ============================================================================
--- wxWidgets event handling
-
--- Essentially this implements a custom message loop that runs on EVT_IDLE.
-
--- Tasks post their events to a global table that maps the task id to an event
--- table.
--- Anything can connect a function to a task event by supplying the task id,
--- the custom event id, and a function.
-
--- The easiest way to work with task events is by using task.handleEvents()
--- which takes the task ID, a table mapping custom event ids to a list of
--- functions, and an optional event handler parameter.
--- ============================================================================
-
-if wx then
-    task.evtHandlers = {}
-
-    -- For debug purposes, dump debug/error queues on idle.
-    if xword.frame then
-        xword.frame:Connect(wx.wxEVT_IDLE, function()
-            task.dump_queue(task.DEBUG_QUEUE)
-            task.dump_queue(task.ERROR_QUEUE, xword.logerror)
-        end)
-    end
-
-
-    -- Create a new event handler to process task events
-    function task.newEvtHandler(window)
-        local self = wx.wxEvtHandler()
-        self.tasks = {}     -- wxtask ids
-        self.callbacks = {} -- { [msgId] = {function(data, [id]), ...}, ... }
-        self.window = false
-
-        local function idleEvent(evt)
-            local nTasks = #self.tasks
-
-            -- No more tasks, disconnect this event handler
-            if nTasks == 0 then
-                --print("Disconnect(wx.wxEVT_IDLE): "..tostring(self).." "..tostring(self.window))
-                self:Disconnect(wx.wxEVT_IDLE)
-            end
-
-            -- Check the message queue for each task and dispatch events
-            -- Iterate backwards so that we can remove dead tasks
-            for i=nTasks,1,-1 do
-                local id = self.tasks[i]
-                local data, flag, rc = task.receive(0, id)
-                if rc == 0 then
-                    local callbacks = self.callbacks[flag]
-                    if callbacks then
-                        for _, func in ipairs(callbacks) do
-                            ----print('callback: ', flag, func)
-                            func(data)
-                        end
-                    end
-                    if flag == task.END then
-                        --print 'task.END'
-                        table.remove(self.tasks, i)
-                    end
-                end
-            end
-            evt:Skip()
-        end
-
-        function self.addTask(id)
-            table.insert(self.tasks, id)
-            -- If this is the first task, connect the idle event
-            if #self.tasks == 1 then
-                --print("Connect(wx.wxEVT_IDLE): "..tostring(self).." "..tostring(self.window))
-                self:Connect(wx.wxEVT_IDLE, idleEvent)
-            end
-        end
-
-        function self.removeTask(id)
-            for i, task_id in pairs(self.tasks) do
-                if id == task_id then
-                    table.remove(self.tasks, i)
-                    break
-                end
-            end
-        end
-
-        function self.addCallback(flag, func)
-            --print("addCallback: "..tostring(flag)..", "..tostring(func))
-            local t = self.callbacks[flag]
-            if not t then
-                t = {}
-                self.callbacks[flag] = t
-            end
-            table.insert(t, func)
-        end
-        self.pushCallback = self.addCallback
-
-        function self.removeCallback(flag, func)
-            local t = self.callbacks[flag]
-            if t then
-                for i, f in ipairs(t) do 
-                    if f == func then
-                        table.remove(t, i)
-                        break
-                    end
-                end
-            end
-        end
-
-        function self.popCallback(flag)
-            local t = self.callbacks[flag]
-            if t then
-                table.remove(t, i)
-            end
-        end
-
-        -- Make sure to use this instead of wxWindow::PushEventHandler()
-        -- so that we can clean up after ourselves.
-        function self.startEventHandling(window)
-            if self.window == window then
-                return
-            elseif self.window then
-                self.endEventHandling()
-            end
-            --print("PushEventHandler: "..tostring(self).." "..tostring(window))
-            window:PushEventHandler(self)
-            self.window = window
-            -- If our window is destroyed, endEventHandling
-            self:Connect(self.window:GetId(), wx.wxEVT_DESTROY, self.endEventHandling)
-        end
-
-        function self.endEventHandling()
-            --pcall(function() print("RemoveEventHandler: "..tostring(self).." "..self.name) end)
-            --print("RemoveEventHandler: "..tostring(self).." "..tostring(window))
-            self.window:RemoveEventHandler(self)
-            self.window = false
-            self:Disconnect(wx.wxEVT_IDLE)
-            self:Disconnect(wx.wxEVT_DESTROY)
-        end
-
-        if window then
-            self.startEventHandling(window)
-        end
-
-        table.insert(task.evtHandlers, self)
-        return self
-    end
-
-    -- A shortcut method to run a thread and handle its callbacks.
-    -- Callbacks is a table of callback functions:
-    -- { [evtid] = { func1, ... }, [evtid] = func, ... }
-    function task.handleEvents(task_id, callbacks, window)
-        -- The window that will receive idle events.
-        window = window or wx.wxGetApp():GetTopWindow()
-        local evtHandler = task.newEvtHandler(window)
-
-        -- Destroy this evtHandler when the thread is complete
-        function evtHandler.OnEnd()
-            evtHandler.endEventHandling()
-            for i, handler in ipairs(task.evtHandlers) do
-                if handler == evtHandler then
-                    table.remove(task.evtHandlers, i)
-                    break
-                end
-            end
-            evtHandler = nil -- this is now garbage
-        end
-        -- This handler should always be the first for task.END
-        -- And don't destroy the window before task.END
-        evtHandler.addCallback(task.END, evtHandler.OnEnd)
-
-        -- Add the callbacks.
-        callbacks = callbacks or {}
-        for evtid, funcs in pairs(callbacks) do
-            if type(funcs) == "function" then
-                evtHandler.addCallback(evtid, funcs)
+--- Connect an event or an event table to a task.
+-- Also a metamethod of `Task` objects
+-- @param key The `Task` object or wx.wxID_ANY for all tasks
+-- @param[opt] evt_id The event id, if connecting a single callback
+-- @param callback The callback function, or a table mapping event ids to
+--   callback functions
+-- @usage
+-- local MY_CUSTOM_EVT = 100
+-- local MY_CUSTOM_EVT2 = 101
+-- local the_task = task.new("my_module.my_long_task")
+--
+-- -- Connect an event
+-- the_task:connect(MY_CUSTOM_EVT, function() print('hello world') end)
+--
+-- -- Start a task and connect all events
+-- the_task:connect({
+--     -- Connect one callback function to an event
+--     [task.EVT_START] = function() print('starting task') end
+--     [task.EVT_END] = function() print('task complete') end,
+--     -- Data from `task.post` are passed as arguments to callbacks
+--     [MY_CUSTOM_EVT] = function(str, num) print('My event', str, num) end
+--     -- Connect several callback functions to an event
+--     [MY_CUSTOM_EVT2] = {
+--         function() print('Custom event 2') end,
+--         function() print('Another callback') end,
+--     },
+-- })
+-- the_task:start()
+--
+-- -- Connect to debug events from any thread
+-- task.connect(wx.wxID_ANY, task.EVT_DEBUG,
+--              function(msg) print('debug:', task.evt_task.name, msg) end)
+function task.connect(key, evt_id, callback)
+    local events = EVENT_TABLE[key]
+    if evt_id and callback then -- Single callback
+        table.insert(events[evt_id], callback)
+    else -- Event table
+        local event_table = evt_id
+        for evt_id, callbacks in pairs(event_table) do
+            if type(callbacks) ~= 'table' then
+                table.insert(events[evt_id], callbacks)
             else
-                for _, func in ipairs(funcs) do
-                    evtHandler.addCallback(evtid, func)
-                end
+                tablex.insert_values(events[evt_id], callbacks)
             end
         end
-
-        evtHandler.addTask(task_id)
-        return evtHandler
     end
-
-    xword.OnCleanup(function()
-        -- Remove all event handlers from their windows
-        for _, handler in ipairs(task.evtHandlers) do
-            --print("Cleanup event handler: "..tostring(handler))
-            if handler.window then
-                --print("Removing event handler: "..tostring(handler).." from window: "..tostring(handler.window))
-                handler.endEventHandling()
-            end
-        end
-    end)
 end
+
+--- Remove an event handler from a task.
+-- Also a metamethod of Task objects
+-- If no callback is given, remove all callbacks for the event.
+-- If no evt_id, remove callback from all events.
+-- If neither is given, remove all callbacks for this event
+-- @param key The Task object or wx.wxID_ANY for all tasks
+-- @param[opt] evt_id The message type flag
+-- @param callback[opt] The callback function
+function task.disconnect(key, evt_id, callback)
+    if not (evt_id or callback) then
+        EVENT_TABLE[key] = nil
+        return
+    end
+    local events = EVENT_TABLE[key]
+    -- Single callback overload
+    if not callback and type(evt_id) == 'function' then
+        callback = evt_id
+        evt_id = nil
+    elseif evt_id then -- If we have an evt_id, just search its callback table
+        events = { events[evt_id] }
+    end
+    -- Search through event tables and remove the callback function
+    for _, callbacks in pairs(events) do
+        if callback then
+            -- Search for the callback and remove it
+            local i = tablex.find(callbacks, callback)
+            if i then table.remove(callbacks, i) end
+        else -- No callback argument: clear all callbacks from this event
+            tablex.clear(callbacks)
+        end
+    end
+end
+
+--- A table of globals set for all tasks.
+task.globals = {}
+
+--- The function called to handle error messages.
+-- Defaults to `print`.
+task.error_handler = print
+
+--- The function called to handle debug messages.
+-- Defaults to `print`.
+task.debug_handler = print
+
+--- The `Task` object that posted the current event.
+--- @field task.evt_task
+
+--- The id of the current event.
+-- @field task.evt_id
+
+-- Process an event.  Used in the EVT_IDLE handler below
+local function _process_event(t, evt_id, data)
+    -- Set current task and evt for task.evt_id/task.evt_task
+    task.evt_task = t
+    task.evt_id = evt_id
+    -- Find callbacks for this task/event combination
+    -- Include wxID_ANY tasks/events
+    local event_table_list = {
+        EVENT_TABLE[task.evt_task][evt_id],
+        EVENT_TABLE[task.evt_task][-1],
+        EVENT_TABLE[-1][evt_id],
+        EVENT_TABLE[-1][-1]
+    }
+    for _, callbacks in ipairs(event_table_list) do
+        for _, callback in ipairs(callbacks) do
+           callback(unpack(data))
+        end
+    end
+    task.evt_task = nil
+    task.evt_id = nil
+end
+
+-- Insert a message loop as an idle event
+wx.wxGetApp():Connect(wx.wxEVT_IDLE, function()
+    -- Check for messages
+    while true do
+        local task_id, evt_id, data = _receive(0)
+        if not task_id then break end
+        print(task.find(task_id).name, evt_id, data)
+        _process_event(task.find(task_id), evt_id, data)
+    end
+end)
+
+-------------------------------------------------------------------------------
+--- The Task object.
+-- @type Task
+
+--- The internal task id.
+-- @field Task.id
+
+--- An optional user-readable name for the task.
+-- @field Task.name Defaults to the task's id
+
+--- The table of globals set for the task.
+-- @field Task.globals
+
+-- Get the filename of task_script.lua which is passed to _task.create
+CREATE_SCRIPT = package_path(_R .. 'task_create')
+
+--- Start the task in a new thread.
+-- @param ... Arguments passed to the new task.
+-- @return[1] true on success
+-- @return[2] nil
+-- @return[2] error code
+function Task:start(...)
+    -- Setup task globals
+    local globals = {}
+    update(globals, task.globals)
+    update(globals, self.globals)
+    -- Add package.path and package.cpath
+    update(globals, {package = {path = package.path, cpath = package.cpath}})
+    -- Create the task
+    local id = task_create(CREATE_SCRIPT, {
+        serialize(globals), self._script, serialize({...})
+    })
+    -- We don't need these values any more
+    self._script = nil
+    self.globals = nil
+    -- Return the error code
+    if id < 0 then
+        return nil, id
+    end
+    -- Setup the task id and name
+    TASK_LIST[id] = self
+    self.id = id
+    if not self.name then
+        self.name = tostring(id)
+    end
+    -- If we have queued events, post them
+    if self._post_queue then
+        for data in self._post_queue:iter() do
+            self:post(unpack(data))
+        end
+        self._post_queue = nil
+    end
+    return true
+end
+
+--- Post an event to the task.
+-- @param evt_id The (user-defined) event id.
+-- @param ...  data.  (numbers, strings, or tables)
+function Task:post(evt_id, ...)
+    if self.id then
+        return _post(self.id, evt_id, ...)
+    else
+        -- If the task has not started, add events to a queue.
+        if not self._post_queue then
+            self._post_queue = Queue()
+        end
+        self._post_queue:push({evt_id, ...})
+    end
+end
+
+--- Simulate an event being sent to each event handler.
+-- @param evt_id The (user-defined) event id.
+-- @param ...  data.  (numbers, strings, or tables)
+function Task:send_event(evt_id, ...)
+    _process_event(self, evt_id, {...})
+end
+
+--- Connect event handlers to a task.
+-- @function Task:connect
+-- @see task.connect
+-- @param[opt] evt_id The event id, if connecting a single callback
+-- @param callback The callback function, or a table mapping event ids to
+--   callback functions
+Task.connect = task.connect
+
+--- Remove an event handler from a task.
+-- @function Task:disconnect
+-- @see task.disconnect
+-- @param[opt] evt_id The message type flag
+-- @param callback[opt] The callback function
+Task.disconnect = task.disconnect
+
+--- Is this task currently running?
+-- @return true/false
+function Task:is_running()
+    task_isrunning(self.id)
+end
+
+--- Request that a task be aborted.
+-- The task is resposible for aborting itself by calling `task.check_abort`.
+function Task:abort()
+    self:post(task.EVT_ABORT)
+end
+
+--- @section end
+
+-- Report errors and debug messages
+task.connect(wx.wxID_ANY, task.EVT_ERROR, function(msg)
+    task.error_handler(string.format('Task Error (%s): %s', task.evt_task.name, msg))
+end)
+
+task.connect(wx.wxID_ANY, task.EVT_DEBUG, function(msg)
+    task.debug_handler(string.format('(%s): %s', task.evt_task.name, msg))
+end)
+
+-- Disconnect events and remove from the task list when a task ends
+task.connect(wx.wxID_ANY, task.EVT_END, function()
+    local t = task.evt_task
+    t:disconnect()
+    TASK_LIST[t.id] = nil
+end)
+
+else -- task.id() ~= 1
+
+-------------------------------------------------------------------------------
+--- Secondary Thread.
+-- These functions are not available in the main thread.
+-- @section thread_functions
+
+-- task.is_main is nil
+
+--- Post an event to the main task.
+-- @param evt_id The (user-defined) event id.
+-- @param ...  data.  (numbers, strings, or tables)
+function task.post(evt_id, ...)
+    _post(1, evt_id, ...)
+end
+
+local peeked = Queue() -- Messages that have gone through peek but not receive
+
+--- Receive an event from the main task.
+-- @param[opt=forever] timeout Timeout in milliseconds; -1 = forever. 
+-- @return Sending task's id
+-- @return[1] Event id
+-- @return[1] A table of event data
+-- @return[2] nil
+-- @return[2] error message
+-- @see task.post
+function task.receive(timeout)
+    -- Look at peeked first
+    local data = peeked:pop()
+    if data then return unpack(data) end
+    -- Otherwise we have to actually recieve
+    return _receive(timeout)
+end
+
+--- Get at an event but leave it in the queue.
+-- @return same as `task.receive`
+function task.peek()
+    -- Look at peeked first
+    if not peeked:empty() then
+        return unpack(peeked:top())
+    end
+    -- Receive and place into peeked queue
+    local data = {_receive(0)}
+    if not data[1] then return end
+    peeked:push(data)
+    return unpack(data)
+end
+
+--- Search the queue for an event.
+-- Messages will be left in the peeked queue
+-- @see task.check_abort
+local function has_message(timeout, evt_id)
+    -- Start with already peeked messages
+    for data in peeked:iter() do
+        if data[2] == evt_id then return true end
+    end
+    -- Receive messages and put them in the peeked queue
+    while true do 
+        local data = {_receive(timeout)}
+        if not data[1] then return end -- No message
+        peeked:push(data)
+        timeout = 0 -- Only use a timeout the first time
+        if data[2] == evt_id then return true end
+    end
+end
+
+--- Are we being asked to abort?
+-- @param[opt=0] timeout Check timeout
+-- @param[opt] cleanup A fuction to execute before aborting
+-- @return true/false
+function task.check_abort(timeout, cleanup)
+    -- Check for abort anywhere in the queue
+    if SHOULD_ABORT or has_message(timeout or 0, task.EVT_ABORT) then
+        if cleanup then cleanup()
+            return true
+        end
+    end
+end
+
+-- Format a string for task.debug and task.error
+local function format_string(fmt, ...)
+    if type(fmt) == 'string' and select('#', ...) > 0 then
+        return string.format(fmt, ...)
+    else
+        return tostring(fmt)
+    end
+end
+
+--- Report a task error.
+-- Posts to the main task if called from a running task.
+-- @param fmt The message.
+-- @param ... Arguments passed to `string.format`
+function task.error(fmt, ...)
+    _post(1, task.EVT_ERROR, format_string(fmt, ...))
+end
+
+--- Log a debug message from a task.
+-- Posts to the main task if called from a running task.
+-- @param fmt The message.
+-- @param ... Arguments passed to `string.format`
+function task.debug(fmt, ...)
+    _post(1, task.EVT_DEBUG, format_string(fmt, ...))
+end
+
+
+end -- task.is_main / not task.is_main
 
 return task
