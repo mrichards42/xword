@@ -12,6 +12,51 @@ local function get_http_error(err)
     return tonumber(err:match("The requested URL returned error: (%d+)"))
 end
 
+--- Return a progress function
+-- If in a secondary thread, make sure to try check_abort on progress.
+local function get_progress_function(curlopts)
+    local func = curlopts[curl.OPT_PROGRESSFUNCTION]
+    if task and not task.is_main and task.check_abort then
+        -- Set NOPROGRESS to 0 if we have a progess function
+        curlopts[curl.OPT_NOPROGRESS] = 0
+        if func then
+            return function(...)
+                local ret = func(...)
+                return task.check_abort() and 1 or ret
+            end
+        else
+            return function()
+                return task.check_abort() and 1 or 0
+            end
+        end
+    end
+    -- Else we're in the main thread.
+    -- Return the original progress function.
+    -- Set NOPROGRESS to 0 if we have a progess function
+    if func then
+        curlopts[curl.OPT_NOPROGRESS] = 0
+    end
+    return func
+end
+
+-- Encode and format a table of post data
+local function get_post(curlopts)
+    local data = curlopts[curl.OPT_POSTFIELDS]
+    if type(data) ~= 'table' then
+        return data
+    end
+    local encoded = {}
+    for k,v in pairs(data) do
+        -- Accept both { k = v, ... } and { {k,v}, ... }
+        -- The second syntax is necessary for duplicate keys.
+        if type(v) == 'table' then
+            k,v = unpack(v)
+        end
+        table.insert(encoded, curl.escape(k) .. '=' .. curl.escape(k))
+    end
+    return table.concat(encoded, '&')
+end
+
 --- Download a URL, providing a callback function for the data.
 -- @param url The URL
 -- @param opts A table mapping curl options to values
@@ -33,7 +78,7 @@ local function _perform(url, opts)
     local rc, err = c:perform()
     c:cleanup()
     -- Check the return code
-    if rc == 22 then -- CURLE_HTTP_RETURNED_ERROR
+    if rc == curl.HTTP_RETURNED_ERROR then
         local code = get_http_error(err)
         if code == 404 or code == 410 then
             err = "HTTP error " .. code .. " URL not found"
@@ -41,8 +86,11 @@ local function _perform(url, opts)
             err = "HTTP error " .. code
         end
         return nil, rc, err
-    else
+    end
+    if rc == curl.OK then
         return true
+    else
+        return nil, rc, err
     end
 end
 
@@ -114,17 +162,14 @@ end
 -- @param opts.1 The URL.
 -- @param opts.url Alternative to opts.1
 -- @param opts.filename A file to save to.
--- @param opts.OPT_XXX additional curl options.
--- @param opts.write `function(data, length)` called as data is read.
---   Return `length` to continue.
---   Alias for `OPT_WRITEFUNCTION`.
--- @param opts.progress `function(dltotal, dlnow, uptotal, upnow)`
---   called periodically. Return 0 to continue.
---   Alias for `OPT_PROGRESSFUNCTION`.
--- @param opts.post A string or an associative table of post data.
---   Alias for `OPT_POSTFIELDS`.
---   Unlike cURL, if a table is sent, the data *will* be encoded and formatted.
--- @param opts.curlopts A table of curl options. An alternative `opts.OPT_XXX`.
+-- @param opts.OPT_XXX additional curl options.  
+--   e.g. `opts.OPT_COOKIEJAR`.  Can be given without the prefix as `opts.cookiejar`.
+-- @param opts.write Synonym for `OPT_WRITEFUNCTION`.
+-- @param opts.progress  Synonym for `OPT_PROGRESSFUNCTION`.
+-- @param opts.post Synonym for `OPT_POSTFIELDS`.
+--   If this is a table the data *will* be encoded and formatted.
+-- @param opts.curlopts A table of curl options.
+--   An alternative to the above syntax.
 -- @return[1] true
 -- @return[2] A string of data if neither filename nor write are given
 -- @return[3] nil, curl return code, error message
@@ -135,14 +180,13 @@ end
 -- -- Download to a file
 -- curl.get("www.example.com", "output.htm")
 --
--- -- Save cookies
--- curl.get{"www.example.com",
---               filename="output.htm",
---               OPT_COOKIEJAR="cookies.txt"}
--- -- or
+-- -- Save cookies using OPT_COOKIEJAR
+-- curl.get{"www.example.com", filename="output.htm", OPT_COOKIEJAR="cookies.txt"}
+-- -- . . . using the "cookiejar" key . . .
+-- curl.get{"www.example.com", filename="ouput.htm", cookiejar="cookies.txt"}
+-- -- . . . or using a curlopts table.
 -- local curlopts = { [curl.OPT_COOKIEJAR] = "cookies.txt" }
 -- curl.get("www.example.com", "output.htm", curlopts)
--- curl.get{"www.example.com", filename="ouput.htm", curlopts=curlopts}
 --
 -- -- Using a custom callback function
 -- function print_data(data, length)
@@ -170,59 +214,37 @@ function curl.get(opts, ...)
             end
         end
     end
-    -- Read the opts table
-    local url = opts[1] or opts.url
-    local filename = opts.filename
-    local curlopts = opts.curlopts or {}
+    -- Read the opts table (and remove options as we go so we don't get errors)
+    local url = opts[1] or opts.url;         opts.url = nil
+    local filename = opts.filename;          opts.filename = nil
+    local curlopts = opts.curlopts or {};    opts.curlopts = nil
     -- Named options
-    if opts.write then
-        curlopts[curl.OPT_WRITEFUNCTION] = opts.write
-    end
-    if opts.progress then
-        curlopts[curl.OPT_PROGRESSFUNCTION] = opts.progress
-    end
-    if opts.post then
-        curlopts[curl.OPT_POSTFIELDS] = opts.post
-    end
-    -- Copy opts.OPT_XXX to curlopts[curl.OPT_XXX]
+    local named_opts = {
+        write = curl.OPT_WRITEFUNCTION,
+        progress = curl.OPT_PROGRESSFUNCTION,
+        post = curl.OPT_POSTFIELDS,
+    }
+    -- Copy values from opts table to curlopts.
+    -- Keys may be one of the following:
+    --   A named opt (e.g. "write"),
+    --   A curl option (e.g. "OPT_COOKIEJAR")
+    --   Text following OPT_ (e.g. "cookiejar")
     for k,v in pairs(opts) do
-        if curl[k] then
-            curlopts[curl[k]] = v
-        elseif tostring(k):sub(1,4) == "OPT_" then
-            error("No curl option: " .. k, 2)
+        if type(k) == 'string' then
+            -- Look for key in named_opts or as a curl.OPT option
+            local id = named_opts[k] or curl[k] or curl['OPT_' .. k:upper()]
+            if id then
+                curlopts[id] = v
+            else -- We don't want to fail silently
+                error("No cURL option: " .. k, 2)
+            end
         end
-    end
-    -- Set NOPROGRESS to 0 if we have a progess function
-    if curlopts[curl.OPT_PROGRESSFUNCTION] then
-        curlopts[curl.OPT_NOPROGRESS] = 0
     end
     -- Encode and format post fields
-    local post = curlopts[curl.OPT_POSTFIELDS]
-    if post and type(post) == 'table' then
-        local encoded = {}
-        for k,v in pairs(post) do
-            -- Accept both { k = v, ... } and { {k,v}, ... }
-            -- The second syntax is necessary for duplicate keys.
-            if type(v) == 'table' then
-                k,v = unpack(v)
-            end
-            table.insert(encoded, curl.escape(k) .. '=' .. curl.escape(k))
-        end
-        curlopts[curl.OPT_POSTFIELDS] = table.concat(encoded, '&')
-    end
-    -- If this is a secondary thread, check for abort on progress
-    if task and not task.is_main and task.check_abort then
-        if progress then
-            curlopts[curl.OPT_PROGRESSFUNCTION] = function(...)
-                return task.check_abort() and 1 or progress(...)
-            end
-        else
-            curlopts[curl.OPT_PROGRESSFUNCTION] = function()
-                return task.check_abort() and 1 or 0
-            end
-        end
-    end
-    -- Only one truly required argument
+    curlopts[curl.OPT_POSTFIELDS] = get_post(curlopts)
+    -- Get the progress function (add task.check_abort if necessary)
+    curlopts[curl.OPT_PROGRESSFUNCTION] = get_progress_function(curlopts)
+    -- Only one required argument
     assert(url)
     -- Figure out which variant to call
     local has_write_callback = curlopts[curl.OPT_WRITEFUNCTION]
@@ -241,7 +263,7 @@ end
 -- @param post A string or table of post data.
 -- @param ... A filename, write function, progress function, or table of curl
 -- option and value pairs.
-function curl.post(url, post, ...)
+function curl.post(opts, post, ...)
     if type(opts) == 'table' then
         opts.post = opts.post or opts[2]
     else
