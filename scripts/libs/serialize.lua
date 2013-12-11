@@ -177,6 +177,7 @@ end
 -- Pretty print a non-recursive table of number, string, or boolean values
 -- Returns a string
 local function _pprint(t, indent, prev_tables)
+    if t == nil then return 'nil' end
     prev_tables[t] = true
 
     -- Helper functions
