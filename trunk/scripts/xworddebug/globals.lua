@@ -39,18 +39,26 @@ local function tableTree(parent, t)
 
     -- Populate the tree control with a table (on demand)
     local addTable = function(parent, t)
-        for i, k in ipairs(sortedKeys(t)) do
-            local v = t[k]
-            k = tostring(k)
-            local text = k .. ' ' .. string.rep(' ', 25 - #k) .. tostring(v)
+        local function add_item(k, v)
+            local is_self = (v == t)
+            local text = k .. ' ' .. string.rep(' ', 25 - #k) .. tostring(is_self and '(self)' or v)
             local item = tree:AppendItem(parent, text)
             -- Add the value to the tree's data table
             setData(item, v)
-
-            -- Let the wxTreeCtrl know that tables will eventually have
-            -- children
-            if type(v) == 'table' then
+            -- Let the wxTreeCtrl know that tables will have children
+            if not is_self and type(v) == 'table' or (type(v) == 'userdata' and getmetatable(v)) then
                 tree:SetItemHasChildren(item, true)
+            end
+        end
+        -- Add the metatable:
+        local meta = getmetatable(t)
+        if meta then
+            add_item('[metatable]', meta)
+        end
+        if type(t) == 'table' then
+            for i, k in ipairs(sortedKeys(t)) do
+                local v = t[k]
+                add_item(tostring(k), v)
             end
         end
     end
@@ -68,7 +76,7 @@ local function tableTree(parent, t)
             local item = evt:GetItem()
             local value = getData(item)
             local text  = getText(item)
-            if value and type(value) == 'table' then
+            if value and type(value) == 'table' or type(value) == 'userdata' then
                 tree:DeleteChildren(item)
                 tree:SetItemHasChildren(item, true)
                 addTable(item, value)
