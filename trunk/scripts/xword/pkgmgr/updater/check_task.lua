@@ -1,7 +1,7 @@
 P = require 'xword.pkgmgr'
 require 'xword.pkgmgr.updater'
 
-require 'serialize'
+local serialize = require 'serialize'
 local curl = require 'luacurl'
 
 -- Args
@@ -38,4 +38,4 @@ for _, p in ipairs(updates) do
 end
 
 -- Save the updates to file
-serialize.pdump(remote_updates, updates_filename)
+serialize.dump(remote_updates, updates_filename)

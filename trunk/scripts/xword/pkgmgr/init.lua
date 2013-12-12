@@ -235,7 +235,7 @@ function P.show_xword_update_dialog(updates)
             return true
         else
             updates.xword.ignored = true
-            serialize.pdump(updates, P.updater.updates_filename)
+            serialize.dump(updates, P.updater.updates_filename)
         end
     end
 end

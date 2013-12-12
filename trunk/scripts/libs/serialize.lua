@@ -13,7 +13,6 @@
 -- as the original serialize function.
 --     serialize.pprint() is used for pretty-printing
 --     serialize.dump() is used for output to a file
---     serialize.pdump() is used for output to a file (pretty printed)
 --     serialize.loadfile() safely loads a file
 --     serialize.loadstring() safely loads a string
 --------------------------------------------------------------------------------
@@ -284,11 +283,12 @@ end
 --- Write serialized data to a file.
 -- @param obj The object to serialize
 -- @param filename The file
--- @param[opt=false] pretty Pretty print
+-- @param[opt=true] pretty Pretty print
 -- @return true or nil, error
 function M.dump(obj, filename, pretty)
     local f, err = io.open(filename, 'wb')
     if not f then return nil, err end
+    if pretty == nil then pretty = true end
     if pretty then
         f:write("return ")
         f:write(M.pprint(obj))
