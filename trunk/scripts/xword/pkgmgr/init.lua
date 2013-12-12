@@ -14,13 +14,11 @@ require 'xword.pkgmgr.install'
 require 'xword.pkgmgr.load'
 
 local function init()
-    require 'safe_exec'
-
     -- Check to see if we have any packages to install or uninstall
     -- (these should be dlls that have to be updated after XWord is restarted)
     do
         -- pending_install format is { name = filename, ... }
-        local install = safe_dofile(join(xword.userdatadir, 'pending_install.lua'))
+        local install = serialize.loadfile(join(xword.userdatadir, 'pending_install.lua'))
         os.remove(join(xword.userdatadir, 'pending_install.lua'))
         for name, filename in pairs(install or {}) do
             local success, err = P.install_package(filename)
@@ -34,7 +32,7 @@ local function init()
         lfs.rmdir(join(xword.userdatadir, 'updates'))
 
         -- pending_uninstall format is { name = delete_config, ... }
-        local uninstall = safe_dofile(join(xword.userdatadir, 'pending_uninstall.lua'))
+        local uninstall = serialize.loadfile(join(xword.userdatadir, 'pending_uninstall.lua'))
         os.remove(join(xword.userdatadir, 'pending_uninstall.lua'))
         for packagename, delete_config in pairs(uninstall or {}) do
             P.uninstall_package(packagename, delete_config)
