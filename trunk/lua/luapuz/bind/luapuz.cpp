@@ -34,6 +34,8 @@ LUAPUZ_API int luaopen_luapuz (lua_State *L) {
     // Register (sub)tables
     luapuz_openpuzlib(L);
 
+    // Return the library
+    lua_getglobal(L, "puz");
     return 1;
 }
 

@@ -99,6 +99,8 @@ extern "C" {
 
     f:write(self:fmt([[
 
+    // Return the library
+    lua_getglobal(L, "[table]");
     return 1;
 }
 
