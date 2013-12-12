@@ -198,7 +198,7 @@ local function ScriptItem(parent, pkg)
             local filename = join(xword.userdatadir, 'pending_uninstall.lua')
             local uninstall = serialize.loadfile(filename) or {}
             uninstall[win.pkg.packagename] = nil
-            serialize.pdump(uninstall, filename)
+            serialize.dump(uninstall, filename)
             win.pkg.uninstalled = false
             win:UpdateSettings()
             return
@@ -209,7 +209,7 @@ local function ScriptItem(parent, pkg)
             local filename = join(xword.userdatadir, 'pending_install.lua')
             local install = serialize.loadfile(filename) or {}
             install[win.pkg.packagename] = nil
-            serialize.pdump(install, filename)
+            serialize.dump(install, filename)
             win.pkg.installed = false
             win:UpdateSettings()
             P.dlg:RefreshUpdates()
@@ -351,7 +351,7 @@ local function UpdatePanel(parent)
                 end
             end
         end
-        serialize.pdump(update_packages, P.updater.updates_filename)
+        serialize.dump(update_packages, P.updater.updates_filename)
 
         if #to_install > 0 then
             local dlg = P.updater.DownloadDialog()
@@ -513,7 +513,7 @@ function P.PackageDialog(opts)
                 return
             else
                 updates.xword.ignored = true
-                serialize.pdump(updates, P.updater.updates_filename)
+                serialize.dump(updates, P.updater.updates_filename)
             end
         end
 
