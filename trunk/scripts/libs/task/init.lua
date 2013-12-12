@@ -11,6 +11,8 @@ local _R = (string.match(..., '^.+%.') or ... .. '.') -- Relative require
 
 require 'c-task' -- Load the luatask library
 local serialize = require 'serialize'
+local path = require 'pl.path'
+
 local Queue = require(_R .. 'queue')
 
 -- These functions will be overridden
@@ -80,10 +82,12 @@ if _task.id() == 1 then
 -- @section main_thread
 
 local tablex = require 'pl.tablex'
-local package_path = require 'pl.path'.package_path
 
 local Task = {} -- Declare the task object
 Task.__index = Task
+
+-- Add to the task table
+task.Task = Task
 
 --- Is this the main thread?
 -- true in the main thread, nil in secondary threads.
@@ -322,7 +326,9 @@ wx.wxGetApp():Connect(wx.wxEVT_IDLE, function()
     while true do
         local task_id, evt_id, data = _receive(0)
         if not task_id then break end
-        print(task.find(task_id).name, evt_id, data)
+        if evt_id ~= task.EVT_DEBUG then
+            print(task.find(task_id).name, evt_id, serialize.pprint(data))
+        end
         _process_event(task.find(task_id), evt_id, data)
     end
 end)
@@ -345,7 +351,7 @@ end
 -- @field Task.globals
 
 -- Get the filename of task_script.lua which is passed to _task.create
-local CREATE_SCRIPT = package_path(_R .. 'task_create')
+local CREATE_SCRIPT = path.package_path(_R .. 'task_create')
 
 --- Start the task in a new thread.
 -- If a task has completed, it can be restarted with this method.
@@ -533,10 +539,14 @@ end
 
 -- Format a string for task.debug and task.error
 local function format_string(fmt, ...)
-    if type(fmt) == 'string' and select('#', ...) > 0 then
-        return string.format(fmt, ...)
+    if type(fmt) == 'string' then
+        if select('#', ...) > 0 then
+            return string.format(fmt, ...)
+        else
+            return fmt
+        end
     else
-        return tostring(fmt)
+        return serialize.pprint(fmt)
     end
 end
 
@@ -556,6 +566,40 @@ function task.debug(fmt, ...)
     _post(1, task.EVT_DEBUG, format_string(fmt, ...))
 end
 
+--- Load a script inside a task.
+-- If the first character of script is "=", use `loadstring`, otherwise
+-- try `package.loaders`.
+-- If script is a module name, the module directory is added to package.path.
+-- @param script A module name, or "=" followed by a string chunk.
+function task.load(script)
+    -- Try loadstring
+    if script:sub(1,1) == '=' then
+        -- Remove the equals sign and load the string
+        return loadstring(script:sub(2))
+    end
+    -- Try package.loaders
+    local errors = {}
+    for _, loader in ipairs(package.loaders) do
+        local success, result = pcall(loader, script)
+        if not success then return nil, result end
+        if type(result) == "function" then
+            -- Add module directory to package.path
+            local p = path.package_path(script)
+            if p then
+                local dir = path.dirname(p)
+                package.path = path.join(dir, '?.lua') .. ';' ..
+                               path.join(dir, '?', 'init.lua') .. ';' ..
+                               package.path
+            end
+            -- Return the loader
+            return result
+        else
+            table.insert(errors, result)
+        end
+    end
+    -- Return nil, errors
+    return nil, table.concat(errors, '\n')
+end
 
 end -- task.is_main / not task.is_main
 

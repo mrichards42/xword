@@ -28,39 +28,14 @@ package.loaded['c-task'] = package.loaded['task']
 package.loaded['task'] = nil
 task = require 'task'
 
-local path = require('pl.path')
--- Load a script using package.loaders
-local function loadscript(script)
-    local errors = {}
-    -- Try package.loaders
-    for _, loader in ipairs(package.loaders) do
-        local result = loader(script)
-        if type(result) == "function" then
-            -- Add module directory to package.path
-            local p = path.package_path(script)
-            if p then
-                package.path = package.path .. ';' .. path.dirname(p)
-            end
-            return result
-        else
-            table.insert(errors, result)
-        end
-    end
-    -- Return nil, errors
-    return nil, table.concat(errors, '\n')
-end
-
 local function run_script()
     -- Load the script
-    local func, err
-    if script:sub(1,1) == '=' then -- Script is a string
-        -- Remove the equals sign and load the string
-        func, err = loadstring(script:sub(2))
-    else -- Script is a file name
-        func, err = loadscript(script)
+    local func, err = task.load(script)
+    -- Report loading errors immediately
+    if not func then
+        task.error(err)
+        return
     end
-    -- If we don't have a function from the loaders, we're done
-    if not func then error(err) end
     -- Set the global arg variable
     arg = deserialize(args)
     -- Run the script
