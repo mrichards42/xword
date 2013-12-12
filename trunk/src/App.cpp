@@ -333,8 +333,8 @@ bool MyApp::LogLuaMessage(const wxString & msg)
         else
             m_luaLog->Write(_T("Lua log for ") + wxDateTime::Now().FormatDate() + _T("\n") +
                             _T("==========================================================\n"));
-        SetLuaMessageCount(m_luaMessages + 1);
     }
+    SetLuaMessageCount(m_luaMessages + 1);
     m_luaLog->Write(wxDateTime::Now().FormatTime());
     m_luaLog->Write(_T(": "));
     m_luaLog->Write(msg);
