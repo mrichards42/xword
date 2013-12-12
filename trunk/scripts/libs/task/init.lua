@@ -348,11 +348,13 @@ end
 local CREATE_SCRIPT = package_path(_R .. 'task_create')
 
 --- Start the task in a new thread.
+-- If a task has completed, it can be restarted with this method.
 -- @param ... Arguments passed to the new task.
 -- @return[1] true on success
 -- @return[2] nil
 -- @return[2] error code
 function Task:start(...)
+    if self:is_running() then return true end
     -- Setup task globals
     local globals = {}
     update(globals, task.globals)
@@ -420,7 +422,7 @@ Task.disconnect = task.disconnect
 --- Is this task currently running?
 -- @return true/false
 function Task:is_running()
-    task_isrunning(self.id)
+    return self.id and task_isrunning(self.id)
 end
 
 --- Request that a task be aborted.
@@ -440,28 +442,13 @@ task.connect(wx.wxID_ANY, task.EVT_DEBUG, function(msg)
     task.debug_handler(string.format('(%s): %s', task.evt_task.name, msg))
 end)
 
--- Metatable for dead tasks
-local DeadTask = {
-    __index = function(t)
-        error(string.format('Task (%q) is dead.', tostring(t.name or t.id)), 3)
-    end,
-    __tostring = function(t)
-        return string.format('Dead Task (%q).', tostring(t.name or t.id))
-    end
-}
-
 -- Cleanup when the task ends:
--- Disconnect events
 -- Remove from TASK_LIST
--- Set a new metatable so the user doesn't accidentally post messages to a
--- different task (_task.create reuses ids)
+-- Remove task.id so we can't post to this task
 task.connect(wx.wxID_ANY, task.EVT_END, function()
     local t = task.evt_task
-    if t then
-        t:disconnect()
-        TASK_LIST[t.id] = nil
-        setmetatable(t, DeadTask)
-    end
+    TASK_LIST[t.id] = nil
+    t.id = nil
 end)
 
 else -- task.id() ~= 1
