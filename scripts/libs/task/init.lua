@@ -23,7 +23,8 @@ local task_isrunning = task.isrunning
 local _task = task
 task = {sleep = _task.sleep, list = _task.list}
 
-local SHOULD_ABORT = false -- Set if task.EVT_ABORT is posted to the task
+--- True once task.EVT_ABORT has been received
+task.should_abort = false
 
 -- Events
 
@@ -32,11 +33,11 @@ task.EVT_START = -100
 --- End of a task.  Any values returned are passed to this handler.
 task.EVT_END   = -101
 --- Error messages
-task.EVT_ERROR = -103
+task.EVT_ERROR = -102
 --- Debug messages
-task.EVT_DEBUG = -104
+task.EVT_DEBUG = -103
 --- Posted to abort a task
-task.EVT_ABORT = -200
+task.EVT_ABORT = -104
 
 
 -- Post a message to the task with id, evt_id, and event data
@@ -51,7 +52,7 @@ local function _receive(timeout)
     local msg, evt_id, rc = task_receive(timeout)
     if rc ~= 0 then return nil, 'timed out' end
     -- Note abort events
-    if evt_id == task.EVT_ABORT then SHOULD_ABORT = true end
+    if evt_id == task.EVT_ABORT then task.should_abort = true end
     -- Deserialize the data
     -- Serialized data must begin with "return "
     local success, data, task_id
@@ -91,7 +92,7 @@ task.is_main = true
 local next_task = 2
 
 --- Create a new `Task`.
--- If the first character of string is "=", run with `loadstring`, otherwise
+-- If the first character of script is "=", run with `loadstring`, otherwise
 -- try `package.loaders`.
 -- *Does does not start a new thread.*  
 -- If script is a module name, the module directory is added to package.path
@@ -362,9 +363,6 @@ function Task:start(...)
     local id = task_create(CREATE_SCRIPT, {
         serialize(globals), self._script, serialize({...})
     })
-    -- We don't need these values any more
-    self._script = nil
-    self.globals = nil
     -- Return the error code
     if id < 0 then
         return nil, id
@@ -538,10 +536,11 @@ end
 -- @return true/false
 function task.check_abort(timeout, cleanup)
     -- Check for abort anywhere in the queue
-    if SHOULD_ABORT or has_message(timeout or 0, task.EVT_ABORT) then
-        if cleanup then cleanup()
-            return true
+    if task.should_abort or has_message(timeout or 0, task.EVT_ABORT) then
+        if cleanup then
+            cleanup()
         end
+        return true
     end
 end
 
