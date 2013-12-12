@@ -2,6 +2,7 @@
 -- Serialize an object into a source code string. This string, when passed as
 -- an argument to loadstring()(), returns an object structurally identical
 -- to the original one. The following are currently supported:
+--
 -- * strings, numbers, booleans, nil
 -- * functions without upvalues
 -- * tables thereof. Tables can have shared part, but can't be recursive yet.
@@ -16,6 +17,8 @@
 --     serialize.loadfile() safely loads a file
 --     serialize.loadstring() safely loads a string
 --------------------------------------------------------------------------------
+
+-- Private functions
 
 -- The original serialize function
 local no_identity = { number=1, boolean=1, string=1, ['nil']=1 }
@@ -32,7 +35,7 @@ local function _serialize(x)
       gensym_max = gensym_max + 1 ;  return gensym_max
    end
    
-   -----------------------------------------------------------------------------
+   -- --------------------------------------------------------------------------
    -- nest_points are places where a table appears within itself, directly or not.
    -- for instance, all of these chunks create nest points in table x:
    -- "x = { }; x[x] = 1", "x = { }; x[1] = x", "x = { }; x[1] = { y = { x } }".
@@ -48,7 +51,7 @@ local function _serialize(x)
    -- in table parent. It also marks `parent' as occuring multiple times, since
    -- several references to it will be required in order to patch the nest
    -- points.
-   -----------------------------------------------------------------------------
+   -- --------------------------------------------------------------------------
    local function mark_nest_point (parent, k, v)
       local nk, nv = nested[k], nested[v]
       assert (not nk or seen_once[k] or multiple[k])
@@ -62,9 +65,9 @@ local function _serialize(x)
       seen_once [parent], multiple [parent]  = nil, true
    end
    
-   -----------------------------------------------------------------------------
+   -- --------------------------------------------------------------------------
    -- First pass, list the tables and functions which appear more than once in x
-   -----------------------------------------------------------------------------
+   -- --------------------------------------------------------------------------
    local function mark_multiple_occurences (x)
       if no_identity [type(x)] then return end
       if     seen_once [x]     then seen_once [x], multiple [x] = nil, true
@@ -90,11 +93,11 @@ local function _serialize(x)
    -- mutually recursive functions:
    local dump_val, dump_or_ref_val
 
-   --------------------------------------------------------------------
+   -- -----------------------------------------------------------------
    -- if x occurs multiple times, dump the local var rather than the
    -- value. If it's the first time it's dumped, also dump the content
    -- in localdefs.
-   --------------------------------------------------------------------            
+   -- -----------------------------------------------------------------            
    function dump_or_ref_val (x)
       if nested[x] then return 'false' end -- placeholder for recursive reference
       if not multiple[x] then return dump_val (x) end
@@ -107,11 +110,11 @@ local function _serialize(x)
       return "_[" .. var .. "]"
    end
 
-   -----------------------------------------------------------------------------
+   -- --------------------------------------------------------------------------
    -- Second pass, dump the object; subparts occuring multiple times are dumped
    -- in local variables which can be referenced multiple times;
    -- care is taken to dump locla vars in asensible order.
-   -----------------------------------------------------------------------------
+   -- --------------------------------------------------------------------------
    function dump_val(x)
       local  t = type(x)
       if     x==nil        then return 'nil'
@@ -169,14 +172,9 @@ local function _serialize(x)
    end
 end
 
-
--------------------------------------------------------------------------------
--- Pretty-print function
--------------------------------------------------------------------------------
-
 -- Pretty print a non-recursive table of number, string, or boolean values
 -- Returns a string
-local function _pprint(t, indent, prev_tables)
+local function _pprint(t, indent, prev_tables, max_width)
     if t == nil then return 'nil' end
     prev_tables[t] = true
 
@@ -200,8 +198,9 @@ local function _pprint(t, indent, prev_tables)
         local tp = type(v)
         if tp == "table" then
             if prev_tables[v] then error("Recursive table found: "..tostring(v)) end
+            local result = _pprint(v, indent + 2, prev_tables, max_width - indent - 2)
             -- Remove the indent
-            return _pprint(v, indent + 1, prev_tables):match('^ *([^ ].*)$')
+            return result:match('^ *([^ ].*)$')
         elseif tp == "string" then
             return string.format("%q", v)
         elseif tp == "number" or tp == "boolean" then
@@ -239,67 +238,98 @@ local function _pprint(t, indent, prev_tables)
     end
 
     -- If the representation is too long, break it up with newlines
-    if len > 50 then
+    if len > max_width then
         -- Indent each line
         for i, s in ipairs(ret) do
-            ret[i] = string.rep(" ", 4*(indent+1))..s
+            ret[i] = string.rep(" ", indent+2)..s
         end
         -- Add the braces
-        table.insert(ret, 1, string.rep(" ", 4*indent).."{")
-        table.insert(ret, string.rep(" ", 4*indent).."}")
+        table.insert(ret, 1, string.rep(" ", indent).."{")
+        table.insert(ret, string.rep(" ", indent).."}")
 
         return table.concat(ret, "\n")
     else
         -- Add the braces
-        table.insert(ret, 1, string.rep(" ", 4*indent).."{")
+        table.insert(ret, 1, string.rep(" ", indent).."{")
         table.insert(ret, "}")
         return table.concat(ret, " ")
     end
 end
 
--------------------------------------------------------------------------------
--- serialize table
--------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+-- Public stuff
+-- -----------------------------------------------------------------------------
 
-serialize = {}
--- The serialize 'function'
-setmetatable(serialize, {
+local M = { serialize = _serialize }
+-- _serialize is also a metamethod
+setmetatable(M, {
     __call = function(self, obj)
         return _serialize(obj)
     end
 })
 
--- pretty print
-function serialize.pprint(obj)
-    return _pprint(obj, 0, {})
+--- Serialize an object.
+-- @param obj The object
+-- @return a string suitable for passing to `loadstring`.
+-- @function serialize
+
+--- Pretty print an object.
+-- @param obj The object
+-- @param[opt=80] max_width Maximum width of a line
+-- @return A string representation of this object
+function M.pprint(obj, max_width)
+    return _pprint(obj, 0, {}, max_width or 80)
 end
 
--- dump serialized data to a file
-function serialize.dump(obj, filename)
-    local f = io.open(filename, 'wb')
-    if f then
-        f:write(serialize(obj))
-        f:close()
-        return true
-    end
-    return false
-end
-
--- dump pretty-printed data to a file
-function serialize.pdump(obj, filename)
-    local f = io.open(filename, 'wb')
-    if f then
+--- Write serialized data to a file.
+-- @param obj The object to serialize
+-- @param filename The file
+-- @param[opt=false] pretty Pretty print
+-- @return true or nil, error
+function M.dump(obj, filename, pretty)
+    local f, err = io.open(filename, 'wb')
+    if not f then return nil, err end
+    if pretty then
         f:write("return ")
-        f:write(serialize.pprint(obj))
-        f:close()
-        return true
+        f:write(M.pprint(obj))
+    else
+        f:write(_serialize(obj))
     end
-    return false
+    f:close()
+    return true
 end
 
--- load data from a file or string (safely)
-require 'safe_exec'
-serialize.loadfile = safe_dofile
-serialize.loadstring = safe_dostring
+--- Safely call a function in a protected environment.
+-- @param func An untrusted function
+-- @param[opt=empty] env The environment
+local function safe_call(func, env)
+    setfenv(func, env or {})
+    local success, result = pcall(func)
+    if success then
+        return result
+    else
+        return nil, result
+    end
+end
 
-return serialize
+--- Safely load a string.
+-- @param str An untrusted string
+-- @param[opt=empty] env The environment to use
+-- @return same as `loadstring`
+function M.loadstring(str, env)
+    local func, err = loadstring(str)
+    if not func then return nil, err end
+    return safe_call(func, env)
+end
+
+--- Safely load a file.
+-- @param filename An untrusted file
+-- @param[opt=empty] env The environment to use
+-- @return same as `loadfile`
+function M.loadfile(filename, env)
+    local func, err = loadfile(filename)
+    if not func then return nil, err end
+    return safe_call(func, env)
+end
+
+return M
