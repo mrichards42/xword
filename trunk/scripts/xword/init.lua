@@ -51,19 +51,9 @@ task.error_handler = xword.logerror
 
 -- Abort all tasks on cleanup
 xword.OnCleanup(function()
-    while true do
-        local is_done = true
-        -- Try to abort each thread
-        for id, _ in pairs(task.list()) do
-            if id ~= 1 then
-                is_done = false
-                task.find(id):abort()
-            end
-        end
-        -- Main thread is the only one left
-        if is_done then return end
-        -- Wait a bit, then check the list of tasks again
-        task.sleep(10)
+    -- Abort each thread
+    for id, t in ipairs(task.list()) do
+        t:abort()
     end
 end)
 
