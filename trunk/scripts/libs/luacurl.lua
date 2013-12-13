@@ -3,6 +3,7 @@
 
 require 'c-luacurl'
 local path = require 'pl.path'
+local copy = require 'pl.tablex'.copy
 local makepath = require 'pl.dir'.makepath
 
 --- Parse an HTTP error message.
@@ -215,9 +216,12 @@ function curl.get(opts, ...)
         end
     end
     -- Read the opts table (and remove options as we go so we don't get errors)
-    local url = opts[1] or opts.url;         opts.url = nil
-    local filename = opts.filename;          opts.filename = nil
-    local curlopts = opts.curlopts or {};    opts.curlopts = nil
+    local url = opts[1] or opts.url;
+    local filename = opts.filename;
+    -- Make of copy of curlopts since we're going to manipulate it
+    local curlopts = copy(opts.curlopts or {});
+    -- Remove the already processed options
+    opts.url = nil; opts.filename = nil; opts.curlopts = nil
     -- Named options
     local named_opts = {
         write = curl.OPT_WRITEFUNCTION,
