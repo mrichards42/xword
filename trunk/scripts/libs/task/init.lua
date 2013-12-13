@@ -348,7 +348,11 @@ end)
 -- @type Task
 
 function Task:__tostring()
-    return string.format('Task (%q).', tostring(self.name or self.id))
+    return string.format(
+        '%s (%s Task).',
+        tostring(self.name),
+        self:is_running() and 'Running' or 'Not Running'
+    )
 end
 
 --- The internal task id.
