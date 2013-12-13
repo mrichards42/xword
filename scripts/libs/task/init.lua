@@ -20,10 +20,11 @@ local task_post = task.post
 local task_receive = task.receive
 local task_create = task.create
 local task_isrunning = task.isrunning
+local task_list = task.list
 
 -- Override the global task table
 local _task = task
-task = {sleep = _task.sleep, list = _task.list}
+task = {sleep = _task.sleep}
 
 --- True once task.EVT_ABORT has been received
 task.should_abort = false
@@ -97,6 +98,20 @@ task.is_main = true
 local NEXT_ID = 2
 local TASK_LIST = {} -- {Task.id = Task}
 local TASK_ID_LIST = {} -- {Task._task_id = Task}
+
+--- List currently running Tasks.
+-- Does not list the main thread.
+-- @return a list of `Task` objects for currently running tasks.
+function task.list()
+    local tasks = task_list()
+    -- Replace task info with actual Task objects
+    for id=2,#tasks do
+        tasks[id] = TASK_ID_LIST[id]
+    end
+    -- Remove the main task from this list
+    table.remove(tasks, 1)
+    return tasks
+end
 
 --- Create a new `Task`.
 -- If the first character of script is "=", run with `loadstring`, otherwise
