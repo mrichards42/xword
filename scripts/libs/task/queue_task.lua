@@ -16,6 +16,13 @@ if not task.is_main then return M end
 local Task = task.Task
 
 M.__index = M
+function M:__tostring()
+    return string.format(
+        '%s (%s QueueTask).',
+        tostring(self.name),
+        self:is_running() and 'Running' or 'Not Running'
+    )
+end
 setmetatable(M, Task)
 
 --- Create a new QueueTask.
