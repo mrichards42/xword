@@ -1,5 +1,5 @@
 -- This file is a script to be passed to task.create
-local globals, script, args = unpack(arg)
+local globals, id, script, args = unpack(arg)
 
 -- Recursively replace keys in t1 with values from t2
 local function update(t1, t2)
@@ -27,6 +27,9 @@ update(_G, deserialize(globals) or {})
 package.loaded['c-task'] = package.loaded['task']
 package.loaded['task'] = nil
 task = require 'task'
+
+-- Set the unique id
+task.id = id
 
 local function run_script()
     -- Load the script
