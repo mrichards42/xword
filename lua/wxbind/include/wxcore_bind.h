@@ -348,6 +348,10 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
     #include "wx/imaglist.h"
 #endif // wxLUA_USE_wxImageList
 
+#if wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
+    #include "wx/infobar.h"
+#endif // wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
+
 #if wxLUA_USE_wxListBox && wxUSE_LISTBOX
     #include "wx/listbox.h"
 #endif // wxLUA_USE_wxListBox && wxUSE_LISTBOX
@@ -997,6 +1001,10 @@ extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxWindowUpdateLocker;
 #if wxLUA_USE_wxImageList
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxImageList;
 #endif // wxLUA_USE_wxImageList
+
+#if wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxInfoBar;
+#endif // wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
 
 #if wxLUA_USE_wxListBox && wxUSE_LISTBOX
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxListBox;
