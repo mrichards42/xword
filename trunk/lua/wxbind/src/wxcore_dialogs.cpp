@@ -1209,10 +1209,11 @@ int wxDirDialog_methodCount = sizeof(wxDirDialog_methods)/sizeof(wxLuaBindMethod
 // Lua MetaTable Tag for Class 'wxMessageDialog'
 int wxluatype_wxMessageDialog = WXLUA_TUNKNOWN;
 
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetCancelLabel[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetCancelLabel(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetCancelLabel[1] = {{ wxLua_wxMessageDialog_GetCancelLabel, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetCancelLabel }};
-//     wxString GetCancelLabel() const;
+//     %wxchkver_2_9_0 wxString GetCancelLabel() const;
 static int LUACALL wxLua_wxMessageDialog_GetCancelLabel(lua_State *L)
 {
     // get this
@@ -1224,6 +1225,8 @@ static int LUACALL wxLua_wxMessageDialog_GetCancelLabel(lua_State *L)
 
     return 1;
 }
+
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetCaption[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetCaption(lua_State *L);
@@ -1257,10 +1260,12 @@ static int LUACALL wxLua_wxMessageDialog_GetEffectiveIcon(lua_State *L)
     return 1;
 }
 
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetExtendedMessage[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetExtendedMessage(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetExtendedMessage[1] = {{ wxLua_wxMessageDialog_GetExtendedMessage, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetExtendedMessage }};
-//     wxString GetExtendedMessage() const;
+//     %wxchkver_2_9_0 wxString GetExtendedMessage() const;
 static int LUACALL wxLua_wxMessageDialog_GetExtendedMessage(lua_State *L)
 {
     // get this
@@ -1273,10 +1278,13 @@ static int LUACALL wxLua_wxMessageDialog_GetExtendedMessage(lua_State *L)
     return 1;
 }
 
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetHelpLabel[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetHelpLabel(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetHelpLabel[1] = {{ wxLua_wxMessageDialog_GetHelpLabel, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetHelpLabel }};
-//     wxString GetHelpLabel() const;
+//     %wxchkver_2_9_3 wxString GetHelpLabel() const;
 static int LUACALL wxLua_wxMessageDialog_GetHelpLabel(lua_State *L)
 {
     // get this
@@ -1289,10 +1297,13 @@ static int LUACALL wxLua_wxMessageDialog_GetHelpLabel(lua_State *L)
     return 1;
 }
 
+#endif // (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetMessage[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetMessage(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetMessage[1] = {{ wxLua_wxMessageDialog_GetMessage, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetMessage }};
-//     wxString GetMessage() const;
+//     %wxchkver_2_9_0 wxString GetMessage() const;
 static int LUACALL wxLua_wxMessageDialog_GetMessage(lua_State *L)
 {
     // get this
@@ -1308,7 +1319,7 @@ static int LUACALL wxLua_wxMessageDialog_GetMessage(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetMessageDialogStyle[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetMessageDialogStyle(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetMessageDialogStyle[1] = {{ wxLua_wxMessageDialog_GetMessageDialogStyle, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetMessageDialogStyle }};
-//     long GetMessageDialogStyle() const;
+//     %wxchkver_2_9_0 long GetMessageDialogStyle() const;
 static int LUACALL wxLua_wxMessageDialog_GetMessageDialogStyle(lua_State *L)
 {
     // get this
@@ -1324,7 +1335,7 @@ static int LUACALL wxLua_wxMessageDialog_GetMessageDialogStyle(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetNoLabel[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetNoLabel(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetNoLabel[1] = {{ wxLua_wxMessageDialog_GetNoLabel, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetNoLabel }};
-//     wxString GetNoLabel() const;
+//     %wxchkver_2_9_0 wxString GetNoLabel() const;
 static int LUACALL wxLua_wxMessageDialog_GetNoLabel(lua_State *L)
 {
     // get this
@@ -1340,7 +1351,7 @@ static int LUACALL wxLua_wxMessageDialog_GetNoLabel(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetOKLabel[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetOKLabel(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetOKLabel[1] = {{ wxLua_wxMessageDialog_GetOKLabel, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetOKLabel }};
-//     wxString GetOKLabel() const;
+//     %wxchkver_2_9_0 wxString GetOKLabel() const;
 static int LUACALL wxLua_wxMessageDialog_GetOKLabel(lua_State *L)
 {
     // get this
@@ -1356,7 +1367,7 @@ static int LUACALL wxLua_wxMessageDialog_GetOKLabel(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetYesLabel[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetYesLabel(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetYesLabel[1] = {{ wxLua_wxMessageDialog_GetYesLabel, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetYesLabel }};
-//     wxString GetYesLabel() const;
+//     %wxchkver_2_9_0 wxString GetYesLabel() const;
 static int LUACALL wxLua_wxMessageDialog_GetYesLabel(lua_State *L)
 {
     // get this
@@ -1372,7 +1383,7 @@ static int LUACALL wxLua_wxMessageDialog_GetYesLabel(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_HasCustomLabels[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_HasCustomLabels(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_HasCustomLabels[1] = {{ wxLua_wxMessageDialog_HasCustomLabels, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_HasCustomLabels }};
-//     bool HasCustomLabels() const;
+//     %wxchkver_2_9_0 bool HasCustomLabels() const;
 static int LUACALL wxLua_wxMessageDialog_HasCustomLabels(lua_State *L)
 {
     // get this
@@ -1388,7 +1399,7 @@ static int LUACALL wxLua_wxMessageDialog_HasCustomLabels(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetExtendedMessage[] = { &wxluatype_wxMessageDialog, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetExtendedMessage(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetExtendedMessage[1] = {{ wxLua_wxMessageDialog_SetExtendedMessage, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetExtendedMessage }};
-//     void SetExtendedMessage(const wxString& extendedMessage);
+//     %wxchkver_2_9_0 void SetExtendedMessage(const wxString& extendedMessage);
 static int LUACALL wxLua_wxMessageDialog_SetExtendedMessage(lua_State *L)
 {
     // const wxString extendedMessage
@@ -1401,10 +1412,13 @@ static int LUACALL wxLua_wxMessageDialog_SetExtendedMessage(lua_State *L)
     return 0;
 }
 
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetHelpLabel1[] = { &wxluatype_wxMessageDialog, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetHelpLabel1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetHelpLabel1[1] = {{ wxLua_wxMessageDialog_SetHelpLabel1, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetHelpLabel1 }};
-//     bool SetHelpLabel(int help);
+//     %wxchkver_2_9_3 bool SetHelpLabel(int help);
 static int LUACALL wxLua_wxMessageDialog_SetHelpLabel1(lua_State *L)
 {
     // int help
@@ -1422,7 +1436,7 @@ static int LUACALL wxLua_wxMessageDialog_SetHelpLabel1(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetHelpLabel[] = { &wxluatype_wxMessageDialog, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetHelpLabel(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetHelpLabel[1] = {{ wxLua_wxMessageDialog_SetHelpLabel, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetHelpLabel }};
-//     bool SetHelpLabel(const wxString& help);
+//     %wxchkver_2_9_3 bool SetHelpLabel(const wxString& help);
 static int LUACALL wxLua_wxMessageDialog_SetHelpLabel(lua_State *L)
 {
     // const wxString help
@@ -1437,10 +1451,13 @@ static int LUACALL wxLua_wxMessageDialog_SetHelpLabel(lua_State *L)
     return 1;
 }
 
+#endif // (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetMessage[] = { &wxluatype_wxMessageDialog, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetMessage(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetMessage[1] = {{ wxLua_wxMessageDialog_SetMessage, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetMessage }};
-//     void SetMessage(const wxString& message);
+//     %wxchkver_2_9_0 void SetMessage(const wxString& message);
 static int LUACALL wxLua_wxMessageDialog_SetMessage(lua_State *L)
 {
     // const wxString message
@@ -1456,7 +1473,7 @@ static int LUACALL wxLua_wxMessageDialog_SetMessage(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetOKCancelLabels1[] = { &wxluatype_wxMessageDialog, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetOKCancelLabels1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetOKCancelLabels1[1] = {{ wxLua_wxMessageDialog_SetOKCancelLabels1, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMessageDialog_SetOKCancelLabels1 }};
-//     bool SetOKCancelLabels(int ok, int cancel);
+//     %wxchkver_2_9_0 bool SetOKCancelLabels(int ok, int cancel);
 static int LUACALL wxLua_wxMessageDialog_SetOKCancelLabels1(lua_State *L)
 {
     // int cancel
@@ -1476,7 +1493,7 @@ static int LUACALL wxLua_wxMessageDialog_SetOKCancelLabels1(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetOKCancelLabels[] = { &wxluatype_wxMessageDialog, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetOKCancelLabels(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetOKCancelLabels[1] = {{ wxLua_wxMessageDialog_SetOKCancelLabels, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMessageDialog_SetOKCancelLabels }};
-//     bool SetOKCancelLabels(const wxString& ok, const wxString& cancel);
+//     %wxchkver_2_9_0 bool SetOKCancelLabels(const wxString& ok, const wxString& cancel);
 static int LUACALL wxLua_wxMessageDialog_SetOKCancelLabels(lua_State *L)
 {
     // const wxString cancel
@@ -1496,7 +1513,7 @@ static int LUACALL wxLua_wxMessageDialog_SetOKCancelLabels(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetOKLabel1[] = { &wxluatype_wxMessageDialog, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetOKLabel1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetOKLabel1[1] = {{ wxLua_wxMessageDialog_SetOKLabel1, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetOKLabel1 }};
-//     bool SetOKLabel(int ok);
+//     %wxchkver_2_9_0 bool SetOKLabel(int ok);
 static int LUACALL wxLua_wxMessageDialog_SetOKLabel1(lua_State *L)
 {
     // int ok
@@ -1514,7 +1531,7 @@ static int LUACALL wxLua_wxMessageDialog_SetOKLabel1(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetOKLabel[] = { &wxluatype_wxMessageDialog, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetOKLabel(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetOKLabel[1] = {{ wxLua_wxMessageDialog_SetOKLabel, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetOKLabel }};
-//     bool SetOKLabel(const wxString& ok);
+//     %wxchkver_2_9_0 bool SetOKLabel(const wxString& ok);
 static int LUACALL wxLua_wxMessageDialog_SetOKLabel(lua_State *L)
 {
     // const wxString ok
@@ -1532,7 +1549,7 @@ static int LUACALL wxLua_wxMessageDialog_SetOKLabel(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoCancelLabels1[] = { &wxluatype_wxMessageDialog, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetYesNoCancelLabels1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetYesNoCancelLabels1[1] = {{ wxLua_wxMessageDialog_SetYesNoCancelLabels1, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoCancelLabels1 }};
-//     bool SetYesNoCancelLabels(int yes, int no, int cancel);
+//     %wxchkver_2_9_0 bool SetYesNoCancelLabels(int yes, int no, int cancel);
 static int LUACALL wxLua_wxMessageDialog_SetYesNoCancelLabels1(lua_State *L)
 {
     // int cancel
@@ -1554,7 +1571,7 @@ static int LUACALL wxLua_wxMessageDialog_SetYesNoCancelLabels1(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoCancelLabels[] = { &wxluatype_wxMessageDialog, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetYesNoCancelLabels(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetYesNoCancelLabels[1] = {{ wxLua_wxMessageDialog_SetYesNoCancelLabels, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoCancelLabels }};
-//     bool SetYesNoCancelLabels(const wxString& yes, const wxString& no, const wxString& cancel);
+//     %wxchkver_2_9_0 bool SetYesNoCancelLabels(const wxString& yes, const wxString& no, const wxString& cancel);
 static int LUACALL wxLua_wxMessageDialog_SetYesNoCancelLabels(lua_State *L)
 {
     // const wxString cancel
@@ -1576,7 +1593,7 @@ static int LUACALL wxLua_wxMessageDialog_SetYesNoCancelLabels(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoLabels1[] = { &wxluatype_wxMessageDialog, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetYesNoLabels1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetYesNoLabels1[1] = {{ wxLua_wxMessageDialog_SetYesNoLabels1, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoLabels1 }};
-//     bool SetYesNoLabels(int yes, int no);
+//     %wxchkver_2_9_0 bool SetYesNoLabels(int yes, int no);
 static int LUACALL wxLua_wxMessageDialog_SetYesNoLabels1(lua_State *L)
 {
     // int no
@@ -1596,7 +1613,7 @@ static int LUACALL wxLua_wxMessageDialog_SetYesNoLabels1(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoLabels[] = { &wxluatype_wxMessageDialog, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMessageDialog_SetYesNoLabels(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetYesNoLabels[1] = {{ wxLua_wxMessageDialog_SetYesNoLabels, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoLabels }};
-//     bool SetYesNoLabels(const wxString& yes, const wxString& no);
+//     %wxchkver_2_9_0 bool SetYesNoLabels(const wxString& yes, const wxString& no);
 static int LUACALL wxLua_wxMessageDialog_SetYesNoLabels(lua_State *L)
 {
     // const wxString no
@@ -1613,6 +1630,7 @@ static int LUACALL wxLua_wxMessageDialog_SetYesNoLabels(lua_State *L)
     return 1;
 }
 
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 
 #if (wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_constructor[] = { &wxluatype_wxWindow, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TNUMBER, &wxluatype_wxPoint, NULL };
@@ -1647,48 +1665,81 @@ static int LUACALL wxLua_wxMessageDialog_constructor(lua_State *L)
 
 
 
-#if (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+#if ((wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetHelpLabel_overload[] =
 {
+
+#if (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetHelpLabel1, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetHelpLabel1 },
+#endif // (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetHelpLabel, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetHelpLabel },
+#endif // (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 };
 static int s_wxluafunc_wxLua_wxMessageDialog_SetHelpLabel_overload_count = sizeof(s_wxluafunc_wxLua_wxMessageDialog_SetHelpLabel_overload)/sizeof(wxLuaBindCFunc);
 
+#endif // ((wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG))
+
+#if ((wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetOKCancelLabels_overload[] =
 {
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetOKCancelLabels1, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMessageDialog_SetOKCancelLabels1 },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetOKCancelLabels, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMessageDialog_SetOKCancelLabels },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 };
 static int s_wxluafunc_wxLua_wxMessageDialog_SetOKCancelLabels_overload_count = sizeof(s_wxluafunc_wxLua_wxMessageDialog_SetOKCancelLabels_overload)/sizeof(wxLuaBindCFunc);
 
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetOKLabel_overload[] =
 {
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetOKLabel1, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetOKLabel1 },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetOKLabel, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMessageDialog_SetOKLabel },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 };
 static int s_wxluafunc_wxLua_wxMessageDialog_SetOKLabel_overload_count = sizeof(s_wxluafunc_wxLua_wxMessageDialog_SetOKLabel_overload)/sizeof(wxLuaBindCFunc);
 
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetYesNoCancelLabels_overload[] =
 {
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetYesNoCancelLabels1, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoCancelLabels1 },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetYesNoCancelLabels, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoCancelLabels },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 };
 static int s_wxluafunc_wxLua_wxMessageDialog_SetYesNoCancelLabels_overload_count = sizeof(s_wxluafunc_wxLua_wxMessageDialog_SetYesNoCancelLabels_overload)/sizeof(wxLuaBindCFunc);
 
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_SetYesNoLabels_overload[] =
 {
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetYesNoLabels1, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoLabels1 },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { wxLua_wxMessageDialog_SetYesNoLabels, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMessageDialog_SetYesNoLabels },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 };
 static int s_wxluafunc_wxLua_wxMessageDialog_SetYesNoLabels_overload_count = sizeof(s_wxluafunc_wxLua_wxMessageDialog_SetYesNoLabels_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+#endif // ((wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG))
 
 void wxLua_wxMessageDialog_delete_function(void** p)
 {
@@ -1698,11 +1749,22 @@ void wxLua_wxMessageDialog_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxMessageDialog_methods[] = {
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { "GetCancelLabel", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetCancelLabel, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
     { "GetCaption", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetCaption, 1, NULL },
     { "GetEffectiveIcon", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetEffectiveIcon, 1, NULL },
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { "GetExtendedMessage", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetExtendedMessage, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { "GetHelpLabel", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetHelpLabel, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { "GetMessage", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetMessage, 1, NULL },
     { "GetMessageDialogStyle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetMessageDialogStyle, 1, NULL },
     { "GetNoLabel", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetNoLabel, 1, NULL },
@@ -1710,19 +1772,22 @@ wxLuaBindMethod wxMessageDialog_methods[] = {
     { "GetYesLabel", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetYesLabel, 1, NULL },
     { "HasCustomLabels", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_HasCustomLabels, 1, NULL },
     { "SetExtendedMessage", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_SetExtendedMessage, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 
-#if (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+#if ((wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG))
     { "SetHelpLabel", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_SetHelpLabel_overload, s_wxluafunc_wxLua_wxMessageDialog_SetHelpLabel_overload_count, 0 },
-#endif // (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+#endif // ((wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG))
 
+#if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { "SetMessage", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_SetMessage, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 
-#if (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+#if ((wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG))
     { "SetOKCancelLabels", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_SetOKCancelLabels_overload, s_wxluafunc_wxLua_wxMessageDialog_SetOKCancelLabels_overload_count, 0 },
     { "SetOKLabel", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_SetOKLabel_overload, s_wxluafunc_wxLua_wxMessageDialog_SetOKLabel_overload_count, 0 },
     { "SetYesNoCancelLabels", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_SetYesNoCancelLabels_overload, s_wxluafunc_wxLua_wxMessageDialog_SetYesNoCancelLabels_overload_count, 0 },
     { "SetYesNoLabels", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_SetYesNoLabels_overload, s_wxluafunc_wxLua_wxMessageDialog_SetYesNoLabels_overload_count, 0 },
-#endif // (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
+#endif // ((wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG))
 
 #if (wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { "wxMessageDialog", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxMessageDialog_constructor, 1, NULL },
