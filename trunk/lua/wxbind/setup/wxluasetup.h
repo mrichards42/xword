@@ -93,6 +93,7 @@
 #define wxLUA_USE_wxID_XXX                      1
 #define wxLUA_USE_wxImage                       1
 #define wxLUA_USE_wxImageList                   1
+#define wxLUA_USE_wxInfoBar                     1
 #define wxLUA_USE_wxJoystick                    1
 #define wxLUA_USE_wxLayoutConstraints           1
 #define wxLUA_USE_wxList                        1
