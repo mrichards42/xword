@@ -1221,6 +1221,7 @@ wxLuaBindNumber* wxLuaGetDefineList_wxcore(size_t &count)
         { "wxICON_HAND", wxICON_HAND },
         { "wxICON_INFORMATION", wxICON_INFORMATION },
         { "wxICON_MASK", wxICON_MASK },
+        { "wxICON_NONE", wxICON_NONE },
         { "wxICON_QUESTION", wxICON_QUESTION },
         { "wxICON_STOP", wxICON_STOP },
         { "wxICON_WARNING", wxICON_WARNING },
