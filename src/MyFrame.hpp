@@ -135,6 +135,8 @@ public:
 
     // File history
     void SetSaveFileHistory(bool doit = true);
+    const wxFileHistory & GetFileHistory() const { return m_fileHistory; }
+    wxFileHistory & GetFileHistory() { return m_fileHistory; }
 
     void OnAppDeactivate();
     void OnAppActivate();

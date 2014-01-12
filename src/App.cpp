@@ -120,7 +120,7 @@ bool MyApp::OnInit()
     if (m_isscript)
     {
     // Initialize xword package
-    wxGetApp().GetwxLuaState().RunFile(GetScriptsDir() + "/xword/init.lua");
+    GetwxLuaState().RunFile(GetScriptsDir() + "/xword/init.lua");
     #ifdef __WXMSW__
         // Attach to the console
         if (! AttachConsole(ATTACH_PARENT_PROCESS))
@@ -171,13 +171,32 @@ bool MyApp::OnInit()
     // Initialize xword package
     wxGetApp().GetwxLuaState().RunFile(GetScriptsDir() + "/xword/init.lua");
 #endif // XWORD_USE_LUA
-    // Open the first valid puzzle
+    // Open a puzzle from the command line
+    bool has_puzzle = false;
     for (size_t i = 0; i < cmd.GetParamCount(); ++i)
     {
         wxFileName fn(cmd.GetParam(i));
         if (fn.FileExists() && puz::Puzzle::CanLoad(wx2file(fn.GetFullPath())))
             if (m_frame->LoadPuzzle(fn.GetFullPath()))
+            {
+                has_puzzle = true;
                 break;
+            }
+    }
+    // Open the last puzzle in the history
+    ConfigManager::FileHistory_t & history = GetConfigManager().FileHistory;
+    wxFileHistory & fileHistory = m_frame->GetFileHistory();
+    if (! has_puzzle && history.saveFileHistory() && history.reopenLastPuzzle())
+    {
+        if (fileHistory.GetCount() > 0)
+        {
+            wxString fn = fileHistory.GetHistoryFile(0);
+            if (! fn.empty() && wxIsReadable(fn))
+            {
+                m_frame->LoadPuzzle(fn);
+                has_puzzle = true;
+            }
+        }
     }
 
 #ifdef XWORD_USE_LUA

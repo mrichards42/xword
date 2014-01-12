@@ -422,32 +422,27 @@ MyFrame::MyFrame()
     // Save window state on size
     Connect(wxEVT_SIZE, wxSizeEventHandler(MyFrame::OnSize));
 
-    LoadLayout(_T("(Previous)"));
-
 #if defined(__WXMSW__) && !defined(__WXPM__)
     SetIcon(wxIcon(_T("aa_main_icon")));
 #else
     SetIcon(wxIcon(xword_xpm));
 #endif // __WXMSW__ && ! __WXPM__
 
-    // See if we should open the last puzzle
-    bool has_puzzle = false;
-    ConfigManager::FileHistory_t & history = wxGetApp().GetConfigManager().FileHistory;
-    if (history.saveFileHistory() && history.reopenLastPuzzle())
-    {
-        if (m_fileHistory.GetCount() > 0)
-        {
-            wxString fn = m_fileHistory.GetHistoryFile(0);
-            if (! fn.empty() && wxIsReadable(fn))
-            {
-                LoadPuzzle(fn);
-                has_puzzle = true;
-            }
-        }
-    }
-    // Otherwise show a blank puzzle
-    if (! has_puzzle)
-        ShowPuzzle();
+    // Load a layout and after we've had a chance to setup the frame
+    // so that we don't have weird sizing problems.
+    // Unfortunately we can only call void member functions with CallAfter,
+    // so we need a functor.
+    struct load_layout {
+        load_layout(MyFrame * frame, const wxString & str) : frame(frame), str(str) {}
+        MyFrame * frame;
+        wxString str;
+        void operator()() { frame->LoadLayout(str); }
+    };
+
+    CallAfter(load_layout(this, "(Previous)"));
+
+    // Show a blank puzzle
+    ShowPuzzle();
 }
 
 
