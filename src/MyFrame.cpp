@@ -428,18 +428,7 @@ MyFrame::MyFrame()
     SetIcon(wxIcon(xword_xpm));
 #endif // __WXMSW__ && ! __WXPM__
 
-    // Load a layout and after we've had a chance to setup the frame
-    // so that we don't have weird sizing problems.
-    // Unfortunately we can only call void member functions with CallAfter,
-    // so we need a functor.
-    struct load_layout {
-        load_layout(MyFrame * frame, const wxString & str) : frame(frame), str(str) {}
-        MyFrame * frame;
-        wxString str;
-        void operator()() { frame->LoadLayout(str); }
-    };
-
-    CallAfter(load_layout(this, "(Previous)"));
+    LoadLayout("(Previous)");
 
     // Show a blank puzzle
     ShowPuzzle();
