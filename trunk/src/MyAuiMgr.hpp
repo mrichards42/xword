@@ -23,10 +23,10 @@
 #include <list>
 
 // Enhancements to the wxAuiManager class:
-// * Panes retain their size as best possible by setting best_size on Update()
-//     * Update() override sets best_size
-// * CluePanel panes retain the same size whenever possible.
-//     * Update() sets dock_proportion or dock.size
+// * When the Frame is resized, the layout is intelligently adapted by giving
+//   the grid as much space as possible and filling the rest.
+//   This should take care of older hacks to, e.g. keep clue panes the
+//   same size.
 // * LoadPerspective() caches panes that have not yet been added to the manager.
 //     * AddPane() checks to see if this pane has been cached;
 //       the wxAuiPaneInfo parameters can be thought of as default values.
@@ -40,8 +40,6 @@
 // * The user can supply a menu that gets filled with panes and their state.
 //     * public function UpdateMenu()
 //     * UpdateMenu() is called in AddPane() and DetachPane()
-// * AuiManager keeps track of the frame size and resizes panes proportionally
-//   when the frame is resized.
 // * An AuiPaneClose event is fired when panes are closed
 
 // NB: Many of these changes require a hacked version of wxAuiManager
@@ -99,10 +97,6 @@ public:
     void RemoveContextWindow(wxWindow * window);
     void RemoveContextWindow(wxAuiPaneInfo & info);
 
-    // Proportional resizing
-    //--------------------
-    virtual void Update();
-
     // Edit Mode
     // ---------
     void StartEdit();
@@ -158,8 +152,6 @@ protected:
     // Proportional resizing
     wxSize m_frameSize;
     void OnFrameSize(wxSizeEvent & evt);
-    void ResizeDocks(const wxSize & oldSize, const wxSize & newSize);
-    void ConstrainPanes(std::list<wxAuiPaneInfo *> & panes);
 
     void SavePaneSize(wxAuiPaneInfo & pane);
 
