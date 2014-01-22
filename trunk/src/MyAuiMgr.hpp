@@ -103,6 +103,10 @@ public:
     void EndEdit();
     bool IsEditing() const { return m_isEditing; }
 
+    // NB: This won't override anything unless wxAuiManager::Update is
+    // made virtual (in include/wx/aui/framemanager.h)
+    void Update();
+
     // Misc
     //-----
 
@@ -152,6 +156,7 @@ protected:
     // Proportional resizing
     wxSize m_frameSize;
     void OnFrameSize(wxSizeEvent & evt);
+    void ResizeDocks(const wxSize & size_change);
 
     void SavePaneSize(wxAuiPaneInfo & pane);
 
