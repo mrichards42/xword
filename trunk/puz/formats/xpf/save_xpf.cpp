@@ -48,13 +48,15 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
     puzzles.append_attribute("Version") = "1.0";
     xml::node puzzle = puzzles.append_child("Puzzle");
     // Metadata
-    xml::Append(puzzle, "Title", puz->GetTitle());
-    xml::Append(puzzle, "Author", puz->GetAuthor());
-    xml::Append(puzzle, "Copyright", puz->GetCopyright());
-    xml::Append(puzzle, "Notepad", puz->GetNotes());
-    xml::Append(puzzle, "Publisher", puz->GetMeta(puzT("publisher")));
-    xml::Append(puzzle, "Editor", puz->GetMeta(puzT("editor")));
-    xml::Append(puzzle, "Date", puz->GetMeta(puzT("date")));
+    puz::Puzzle::metamap_t & meta = puz->GetMetadata();
+    puz::Puzzle::metamap_t::iterator it;
+    for (it = meta.begin(); it != meta.end(); ++it)
+    {
+        if (it->first == puzT("notes")) // "notes" -> "Notepad"
+            xml::Append(puzzle, "Notepad", it->second);
+        else
+            xml::Append(puzzle, xml::CamelCase(it->first).c_str(), it->second);
+    }
 
     // Grid
     if (grid.GetType() == TYPE_DIAGRAMLESS)

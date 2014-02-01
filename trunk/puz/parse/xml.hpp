@@ -18,9 +18,13 @@
 #ifndef PUZ_XML_H
 #define PUZ_XML_H
 
+#include "pugixml/pugixml.hpp"
+
 #include "Puzzle.hpp"
 #include "puzstring.hpp"
-#include "pugixml/pugixml.hpp"
+
+#include <string>
+#include <set>
 
 namespace puz {
 namespace xml {
@@ -28,6 +32,11 @@ namespace xml {
 typedef pugi::xml_document document;
 typedef pugi::xml_node node;
 typedef pugi::xml_attribute attribute;
+
+// Convert an element name to/from CamelCase and snake_case.
+string_t snake_case(const char * name);
+std::string CamelCase(const string_t & name);
+
 
 class Parser
 {
@@ -49,8 +58,15 @@ public:
     // Utility functions
     //------------------
 
+    // Keep track of visited nodes
+    std::set<size_t> m_visited;
+    node Visit(node n) { m_visited.insert(n.hash_value()); return n; }
+    bool HasVisited(node n) { return m_visited.find(n.hash_value()) != m_visited.end(); }
+
     // Throw an exception if the child node does not exist.  Return the node
-    node RequireChild(node, const char * name);
+    node RequireChild(node n, const char * name);
+    // Visit this child but don't require it
+    node GetChild(node n, const char * name) { return Visit(n.child(name)); }
 
     // Text functions
 
@@ -74,7 +90,7 @@ Parser::RequireChild(node n, const char * name)
     node child = n.child(name);
     if (! child)
         throw LoadError(std::string("Missing required element: \"") + name + "\"");
-    return child;
+    return Visit(child);
 }
 
 inline string_t
