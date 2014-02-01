@@ -77,15 +77,6 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     xml::node puzzle = RequireChild(doc.child("Puzzles"), "Puzzle");
 
-    // Metadata
-    puz->SetTitle(GetText(puzzle, "Title"));
-    puz->SetAuthor(GetText(puzzle, "Author"));
-    puz->SetCopyright(GetText(puzzle, "Copyright"));
-    puz->SetNotes(GetText(puzzle, "Notepad"));
-    puz->SetMeta(puzT("publisher"), GetText(puzzle, "Publisher"));
-    puz->SetMeta(puzT("editor"), GetText(puzzle, "Editor"));
-    puz->SetMeta(puzT("date"), GetText(puzzle, "Date"));
-
     // Grid
     if (GetText(puzzle, "Type") == puzT("diagramless"))
         grid.SetType(TYPE_DIAGRAMLESS);
@@ -140,7 +131,7 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     // Circles
     {
-        xml::node circle = puzzle.child("Circles").child("Circle");
+        xml::node circle = GetChild(puzzle, "Circles").child("Circle");
         for (; circle; circle = circle.next_sibling("Circle"))
         {
             Square * square = GetSquare(puz, circle);
@@ -152,7 +143,7 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     // Rebus
     {
-        xml::node rebus = puzzle.child("RebusEntries").child("Rebus");
+        xml::node rebus = GetChild(puzzle, "RebusEntries").child("Rebus");
         for (; rebus; rebus = rebus.next_sibling("Rebus"))
         {
             Square * square = GetSquare(puz, rebus);
@@ -181,7 +172,7 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     // Shade
     {
-        xml::node shade = puzzle.child("Shades").child("Shade");
+        xml::node shade = GetChild(puzzle, "Shades").child("Shade");
         for (; shade; shade = shade.next_sibling("Shade"))
         {
             Square * square = GetSquare(puz, shade);
@@ -201,7 +192,7 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
         std::vector<string_t> all_clues;
         Clues & clues = puz->GetClues();
 
-        xml::node clue = puzzle.child("Clues").child("Clue");
+        xml::node clue = GetChild(puzzle, "Clues").child("Clue");
         for (; clue; clue = clue.next_sibling("Clue"))
         {
             string_t clue_text = GetText(clue);
@@ -226,9 +217,9 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     {
         int row_n = 0;
         Square * square = grid.First();
-        xml::node row = puzzle.child("UserGrid").child("Row");
+        xml::node row = GetChild(puzzle, "UserGrid").child("Row");
         if (! row)
-            row = puzzle.child("User").child("Grid").child("Row");
+            row = GetChild(puzzle, "User").child("Grid").child("Row");
         for (; row; row = row.next_sibling("Row"))
         {
             if (row_n >= height)
@@ -250,9 +241,9 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     // Rebus
     {
-        xml::node rebus = puzzle.child("UserRebusEntries").child("Rebus");
+        xml::node rebus = GetChild(puzzle, "UserRebusEntries").child("Rebus");
         if (! rebus)
-            rebus = puzzle.child("User").child("RebusEntries").child("Rebus");
+            rebus = GetChild(puzzle, "User").child("RebusEntries").child("Rebus");
         for (; rebus; rebus = rebus.next_sibling("Rebus"))
         {
             Square * square = GetSquare(puz, rebus);
@@ -269,9 +260,9 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     // Flags
     {
-        xml::node flag = puzzle.child("SquareFlags").child("Flag");
+        xml::node flag = GetChild(puzzle, "SquareFlags").child("Flag");
         if (! flag)
-            flag = puzzle.child("User").child("Flags").child("Flag");
+            flag = GetChild(puzzle, "User").child("Flags").child("Flag");
         for (; flag; flag = flag.next_sibling("Flag"))
         {
             Square * square = GetSquare(puz, flag);
@@ -298,12 +289,20 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     // Timer
     {
-        xml::node timer = puzzle.child("Timer");
+        xml::node timer = GetChild(puzzle, "Timer");
         if (! timer)
-            timer = puzzle.child("User").child("Timer");
+            timer = GetChild(puzzle, "User").child("Timer");
         puz->SetTime(timer.attribute("Seconds").as_int());
         puz->SetTimerRunning(timer.attribute("Running").value() == std::string("true"));
     }
+
+    // Metadata
+    // Only this a different XML element name than the metadata key (notes)
+    puz->SetNotes(GetText(puzzle, "Notepad"));
+    // Consider all unvisited nodes to be metadata
+    for (xml::node child = puzzle.first_child(); child; child = child.next_sibling())
+        if (child.type() == pugi::node_element && ! HasVisited(child))
+            puz->SetMeta(xml::snake_case(child.name()), GetText(child));
 
     return false; // Delete the doc
 }

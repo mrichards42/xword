@@ -22,6 +22,64 @@
 namespace puz {
 namespace xml {
 
+// From CamelCase to snake_case
+string_t snake_case(const char * name)
+{
+    // Read the char string into a std::string, replacing
+    // capital letters with '_' plus the lower case letter
+    // utf-8 issues shouldn't be a problem since isupper is only
+    // true for < 128
+    std::string str;
+    for (const char * c = name; *c; ++c)
+    {
+        if (::isupper(*c))
+        {
+            if (c > name)
+                str.push_back('_');
+            str.push_back(::tolower(*c));
+        }
+        else
+            str.push_back(*c);
+    }
+    return decode_utf8(str);
+}
+
+// From CamelCase to snake_case
+std::string CamelCase(const string_t & name)
+{
+    // Replace '_' + a lowercase letter with an upper case letter
+    string_t str;
+    str.reserve(name.size());
+    for (size_t i = 0; i < name.size(); ++i)
+    {
+        if (name[i] == puzT('_'))
+        {
+            ++i;
+            if (i < name.size())
+            {
+            #if PUZ_UNICODE
+                if (::iswlower(name[i]))
+                    str.push_back(::towupper(name[i]));
+            #else // ! PUZ_UNICODE
+                if (::islower(name[i]))
+                    str.push_back(::toupper(name[i]));
+            #endif // PUZ_UNICODE/! PUZ_UNICODE
+                else // Not lower case: so push both the hyphen and letter
+                {
+                    str.push_back(name[i-1]);
+                    str.push_back(name[i]);
+                }
+            }
+            else // At the end of the string: push the hypen
+                str.push_back(name[i-1]);
+        }
+        else // Not a hypen: push the letter
+            str.push_back(name[i]);
+    }
+    return encode_utf8(str);
+}
+
+// Load functions
 void Parser::LoadFromFilename(Puzzle * puz, const std::string & filename)
 {
     std::ifstream stream(filename.c_str(),
@@ -71,6 +129,7 @@ void TextToStream(node n, std::ostringstream & stream)
 
 string_t Parser::GetText(node n)
 {
+    Visit(n);
     std::ostringstream stream;
     TextToStream(n, stream);
     return decode_utf8(stream.str());
@@ -78,6 +137,7 @@ string_t Parser::GetText(node n)
 
 string_t Parser::GetInnerXML(node n)
 {
+    Visit(n);
     std::ostringstream stream;
     for (node child = n.first_child(); child; child = child.next_sibling())
         child.print(stream, "", pugi::format_raw);
