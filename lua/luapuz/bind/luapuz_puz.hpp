@@ -24,6 +24,7 @@ extern "C" {
 #include <algorithm>
 #include "puz/Clue.hpp"
 #include "puz/Square.hpp"
+#include "puz/Puzzle.hpp"
 
 // enum GridDirection
 //------------
@@ -178,6 +179,12 @@ inline bool luapuz_isFindOptions(lua_State * L, int index)
 LUAPUZ_API void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * cluelist);
 
 LUAPUZ_API int luapuz_pushClueList(lua_State * L, puz::ClueList * cluelist);
+
+
+// typedef Puzzle::metamap_t
+//-------------
+
+LUAPUZ_API int luapuz_push_metamap_t(lua_State * L, puz::Puzzle::metamap_t * meta);
 
 void luapuz_openpuzlib (lua_State *L);
 #endif // luapuz_puz_hpp

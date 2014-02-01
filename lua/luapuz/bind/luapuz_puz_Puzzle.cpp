@@ -15,8 +15,8 @@ extern "C" {
 
 #include "luapuz_puz_Puzzle_helpers.hpp"
 #include "luapuz_puz_Puzzle.hpp"
-#include "luapuz_puz.hpp"
 #include "luapuz_puz_Grid.hpp"
+#include "luapuz_puz.hpp"
 // ---------------------------------------------------------------------------
 // class Puzzle
 // ---------------------------------------------------------------------------
@@ -166,7 +166,8 @@ int Puzzle_Load(lua_State * L)
     }
     lua_error(L); // We should have returned by now
     return 0;
-}// void Save(const std::string & filename)
+}
+// void Save(const std::string & filename)
 // void Save(const std::string & filename, FileHandlerDesc * desc)
 int Puzzle_Save(lua_State * L)
 {
@@ -285,6 +286,14 @@ static int Puzzle_SetGrid(lua_State * L)
     puz::Grid * grid = luapuz_checkGrid(L, 2);
     puzzle->SetGrid(*grid);
     return 0;
+}
+// Puzzle::metamap_t GetMetadata()
+static int Puzzle_GetMetadata(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::Puzzle::metamap_t * returns = &puzzle->GetMetadata();
+    luapuz_push_metamap_t(L, returns);
+    return 1;
 }
 // puz::string_t GetMeta(puz::string_t name)
 static int Puzzle_GetMeta(lua_State * L)
@@ -493,6 +502,7 @@ static const luaL_reg Puzzlelib[] = {
     {"TestOk", Puzzle_TestOk},
     {"GetGrid", Puzzle_GetGrid},
     {"SetGrid", Puzzle_SetGrid},
+    {"GetMetadata", Puzzle_GetMetadata},
     {"GetMeta", Puzzle_GetMeta},
     {"SetMeta", Puzzle_SetMeta},
     {"HasMeta", Puzzle_HasMeta},

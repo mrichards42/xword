@@ -1,7 +1,7 @@
 overrides = {
 
 -- ===================================================================
--- Load/Save functions
+-- Puzzle functions
 -- ===================================================================
 Puzzle_Puzzle = [[
 // Puzzle()
@@ -87,7 +87,8 @@ int Puzzle_Load(lua_State * L)
     }
     lua_error(L); // We should have returned by now
     return 0;
-}]],
+}
+]],
 
 Puzzle_Save = [[
 // void Save(const std::string & filename)
@@ -127,6 +128,30 @@ int Puzzle_Save(lua_State * L)
 }
 ]],
 
+-- ===================================================================
+-- Typedef puz::Puzzle::metamap_t
+-- ===================================================================
+
+push_metamap_t = [[
+// NB: setting keys on this metadata table won't actually do anything.
+// [lua table] GetMetadata()
+int luapuz_push_metamap_t(lua_State * L, puz::Puzzle::metamap_t * meta)
+{
+    // The table
+    lua_newtable(L);
+    puz::Puzzle::metamap_t::iterator it;
+    for (it = meta->begin(); it != meta->end(); ++it)
+    {
+        if (! it->first.empty())
+        {
+            // t[key] = value
+            luapuz_pushstring_t(L, it->second);
+            lua_setfield(L, -2, puz::encode_utf8(it->first).c_str());
+        }
+    }
+    return 1;
+}
+]],
 
 -- ===================================================================
 -- Grid

@@ -20,6 +20,12 @@ typedef{"ClueList", luatype="LUA_TTABLE",
         check_func=overrides.checkClueList,
         push_func=overrides.pushClueList}
 
+typedef{"Puzzle::metamap_t", luatype="LUA_TTABLE",
+        headers={"puz/Puzzle.hpp"},
+        push = "luapuz_push_metamap_t",
+        push_func=overrides.push_metamap_t,
+        subst_var="meta"}
+
 enum{ "GridDirection", header="puz/Square.hpp",
     "ACROSS",
     "DOWN",
@@ -240,6 +246,7 @@ class{"Puzzle", header="puz/Puzzle.hpp", cppheader="luapuz_puz_Puzzle_helpers.hp
 
     -- Data
     property{"Grid &", "Grid"}
+    func{"GetMetadata", returns="Puzzle::metamap_t"}
     func{"GetMeta", arg("puz::string_t", "name"), returns="puz::string_t"}
     func{"SetMeta", arg("puz::string_t", "name"), arg("puz::string_t", "value")}
     func{"HasMeta", arg("puz::string_t", "name"), returns="bool"}
