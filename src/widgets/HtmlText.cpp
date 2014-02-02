@@ -234,7 +234,11 @@ void HtmlText::LayoutCell()
     m_cell->Layout(lastWidth);
 
     m_lastFontSize = pointSize;
-    SetToolTip(ToText((wxHtmlContainerCell*)m_cell));
+    wxString tip(ToText((wxHtmlContainerCell*)m_cell));
+    // Truncate to 1024 chars
+    if (tip.size() > 1024)
+        tip = tip.Left(1024) + "[...]";
+    SetToolTip(tip);
 }
 
 
