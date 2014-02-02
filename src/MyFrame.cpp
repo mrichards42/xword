@@ -933,10 +933,86 @@ MyFrame::ShowMetadata()
 }
 
 
+// Does this metadata key have "notes" in it?
+bool IsNotes(const puz::string_t & str)
+{
+    // str == "notes" is the real notepad
+    // Starts with "notes_"
+    if (str.compare(0, 6, puzT("notes_")) == 0)
+        return true;
+    // Ends with "_notes"
+    int start = str.length() - 6;
+    if (start >= 0 && str.compare(start, puz::string_t::npos, puzT("_notes")) == 0)
+        return true;
+    // Contains "-notes-"
+    if (str.find(puzT("_notes_")) != puz::string_t::npos)
+        return true;
+    return false;
+}
+
+// Turn a string in snake_case into title case
+wxString TitleCase(const wxString & str)
+{
+    wxString ret(str);
+    for (size_t i = 0; i < ret.size(); ++i)
+    {
+        if (i == 0)
+        {
+            ret[i] = wxToupper(str[i]);
+        }
+        else if (str[i] == '_' || str[i] == ' ')
+        {
+            ret[i] = ' ';
+            ++i;
+            if (i < ret.size())
+                ret[i] = wxToupper(str[i]);
+        }
+    }
+    return ret;
+}
+
 void
 MyFrame::ShowNotes()
 {
-    m_notes->SetPage(puz2wx(m_puz.GetNotes()));
+    wxString notes(puz2wx(m_puz.GetNotes()));
+    // Notes is not just the notepad but any other metadata with
+    // "note" in the name
+    wxString value;
+    // Add extra notes sections as table rows
+    const puz::Puzzle::metamap_t & meta = m_puz.GetMetadata();
+    puz::Puzzle::metamap_t::const_iterator it;
+    for (it = meta.begin(); it != meta.end(); ++it)
+    {
+        if (IsNotes(it->first))
+        {
+            value.append("<tr bgcolor=#dddddd><td>");
+            value.append(TitleCase(puz2wx(it->first)));
+            value.append("</td></tr>");
+            value.append("<tr><td>");
+            value.append(puz2wx(it->second));
+            value.append("</td></tr>");
+        }
+    }
+    // Set the value of the notes pane
+    if (value.empty())
+    {
+        m_notes->SetPage(notes);
+    }
+    else
+    {
+        // If we have notes, add them as a table row as well
+        wxString notes_table;
+        if (! notes.empty())
+        {
+            notes_table.append("<tr bgcolor=#eeeeee><td>");
+            notes_table.append("Notes");
+            notes_table.append("</td></tr>");
+            notes_table.append("<tr><td>");
+            notes_table.append(notes);
+            notes_table.append("</td></tr>");
+        }
+        m_notes->SetPage("<table>" + notes_table + value + "</table>");
+    }
 }
 
 void
