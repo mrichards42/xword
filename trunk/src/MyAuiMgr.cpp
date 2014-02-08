@@ -31,7 +31,6 @@ typedef std::list<wxAuiDockInfo *> dock_list_t;
 
 BEGIN_EVENT_TABLE(MyAuiManager, wxAuiManager)
     EVT_AUI_PANE_BUTTON    (MyAuiManager::OnPaneButton)
-    EVT_CONTEXT_MENU       (MyAuiManager::OnContextMenu)
     EVT_SIZE               (MyAuiManager::OnFrameSize)
     EVT_MOUSE_CAPTURE_LOST (MyAuiManager::OnCaptureLost)
 END_EVENT_TABLE()
@@ -39,7 +38,6 @@ END_EVENT_TABLE()
 MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
         : wxAuiManager(managed_wnd, flags),
           m_menu(NULL),
-          m_contextPane(NULL),
           m_isEditing(false)
 {
 }
@@ -113,7 +111,7 @@ MyAuiManager::GetPaneByCaption(const wxString & caption)
     return wxAuiNullPaneInfo;
 }
 
-bool HasCluePane(wxAuiDockInfo & dock)
+bool IsClueListDock(const wxAuiDockInfo & dock)
 {
     for (size_t i = 0; i < dock.panes.Count(); ++i)
         if (dock.panes.Item(i)->name.StartsWith("ClueList"))
@@ -131,28 +129,41 @@ void MyAuiManager::OnFrameSize(wxSizeEvent & evt)
     wxSize newSize = m_frame->GetClientSize();
     if (newSize != m_frameSize)
     {
-        ResizeDocks(newSize - m_frameSize);
+        ResizeDocks(true);
         m_frameSize = newSize;
         wxAuiManager::Update();
     }
 }
 
+// this function is used to sort panes by dock position
+static int PaneSortFunc(wxAuiPaneInfo** p1, wxAuiPaneInfo** p2)
+{
+    return ((*p1)->dock_pos < (*p2)->dock_pos) ? -1 : 1;
+}
+
 
 // Make the grid as large as possible, then fill in the space with other panes.
-void MyAuiManager::ResizeDocks(const wxSize & size_change)
+// If we are resizing the frame, all resizable docks are scaled.
+// If we are updating the position of some panes, only clue lists are resized.
+void MyAuiManager::ResizeDocks(bool is_frame_resize)
 {
-    wxSize window_change = size_change;
-    // Add docks
+    int sash_size = m_art->GetMetric(wxAUI_DOCKART_SASH_SIZE);
+    int border_size = m_art->GetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE);
+
+    // Recalc all dock sizes.
     // This happems in LayoutAll, but we can't control dock size from there
+
+    // Remove panes from all docks
+    for (size_t i = 0; i < m_docks.Count(); ++i)
+        m_docks.Item(i).panes.Empty();
+    // Add panes to docks; create docks as needed
     for (size_t i = 0; i < m_panes.Count(); ++i)
     {
         wxAuiPaneInfo & pane = m_panes.Item(i);
-        // Ignore pane best_size
-        pane.best_size = wxDefaultSize;
-        // Check for newly shown panes
-        if (pane.IsShown() && ! pane.window->IsShown())
+        // Add panes to the dock
+        wxAuiDockInfo * dock = &FindDock(pane);
+        if (pane.IsShown() && pane.IsDocked())
         {
-            wxAuiDockInfo * dock = &FindDock(pane);
             if (! dock->IsOk())
             {
                 // Create the dock
@@ -165,14 +176,31 @@ void MyAuiManager::ResizeDocks(const wxSize & size_change)
             }
             dock->panes.Add(&pane);
         }
+        else if (! pane.IsFixed() && pane.window->IsShown() && ! pane.frame)
+        {
+            // If the pane is about to be hidden or floated, save the
+            // pane size
+            wxSize pane_size = pane.rect.GetSize();
+            if (pane.HasBorder()) // Add the border
+                pane_size += wxSize(2*border_size, 2*border_size);
+            // Change best size in the resizable direction
+            if (pane.dock_direction == wxAUI_DOCK_BOTTOM || pane.dock_direction == wxAUI_DOCK_TOP)
+                pane.best_size.y = pane_size.y;
+            else
+                pane.best_size.x = pane_size.x;
+        }
     }
-    // Remove docks if they are empty
-    // Calc min size for new docks
+    // Calc sizes and remove empty docks
+    wxSize dock_min_size(0,0); // min size of all docks
+    wxSize old_dock_size(0,0); // current size of all docks
+    dock_list_t vertical; // Docks to resize
+    dock_list_t horizontal;
     for (int i = m_docks.Count()-1; i >= 0; --i)
     {
         wxAuiDockInfo & dock = m_docks.Item(i);
-        // Does this dock have panes that are on screen?
-        bool is_shown = false;
+        if (dock.dock_direction == wxAUI_DOCK_CENTER)
+            continue;
+        bool is_shown = false; // Does this dock have panes that are on screen?
         for (size_t j = 0; j < dock.panes.Count(); ++j)
         {
             if (dock.panes.Item(j)->IsShown())
@@ -183,168 +211,207 @@ void MyAuiManager::ResizeDocks(const wxSize & size_change)
         }
         if (! is_shown)
         {
-            // If this was a fixed dock, add it to the window size
-            if (dock.fixed)
-            {
-                if (dock.IsHorizontal())
-                    window_change.y += dock.size;
-                else
-                    window_change.x += dock.size;
-            }
-            // Remove if no panes
+            // Remove empty docks
             m_docks.RemoveAt(i);
+            continue;
         }
-        else if (dock.size == 0)
+        // Recalc dock size
+        // Adapted from LayoutAll
+        int size = 0;
+        int min_size = 0;
+        dock.fixed = true;
+        for (size_t j = 0; j < dock.panes.Count(); ++j)
         {
-            // Calc size, min_size, and dock.fixed
-            // Adapted from LayoutAll
-            int size = 0;
-            int min_size = 0;
-            dock.fixed = true;
-            for (size_t j = 0; j < dock.panes.Count(); ++j)
+            wxAuiPaneInfo& pane = *dock.panes.Item(j);
+            wxSize pane_size = pane.best_size;
+            if (pane_size == wxDefaultSize)
+                pane_size = pane.min_size;
+            if (pane_size == wxDefaultSize)
+                pane_size = pane.window->GetSize();
+
+            wxSize pane_min_size = pane.min_size;
+            // Use the window's best size as another min_size.
+            // NB: This only works after Update(), since window sizes
+            // won't get changed until the end of Update().
+            // See MyAuiMgr::Update for the workaround.
+            wxSize window_best_size = pane.IsFixed() ? pane.window->GetBestSize() : wxDefaultSize;
+
+            if (dock.IsHorizontal())
             {
-                wxAuiPaneInfo& pane = *dock.panes.Item(j);
-                wxSize pane_size = pane.min_size;
-                if (pane_size == wxDefaultSize)
-                    pane_size = pane.window->GetSize();
-
-                wxSize pane_min_size = pane.min_size;
-                if (pane_min_size == wxDefaultSize)
-                    pane_min_size = pane.window->GetMinSize();
-
-                if (dock.IsHorizontal())
-                {
-                    size = std::max(pane_size.y, size);
-                    min_size = std::max(pane_min_size.y, min_size);
-                }
-                else
-                {
-                    size = std::max(pane_size.x, size);
-                    min_size = std::max(pane_min_size.x, min_size);
-                }
-                // Check if this is a fixed pane
-                if (! pane.IsFixed())
-                    dock.fixed = false;
-                if (pane.HasFlag(wxAuiPaneInfo::optionDockFixed))
-                    dock.fixed = true;
+                size = std::max(pane_size.y, size);
+                min_size = std::max(std::max(pane_min_size.y, window_best_size.y), min_size);
             }
+            else
+            {
+                size = std::max(pane_size.x, size);
+                min_size = std::max(std::max(pane_min_size.x, window_best_size.x), min_size);
+            }
+            // Check if this is a fixed dock
+            if (! pane.IsFixed())
+                dock.fixed = false;
+        }
+        // Update size of new or fixed docks
+        if (dock.size == 0 || dock.fixed)
             dock.size = size;
-            dock.min_size = min_size;
-            // If this is a new fixed dock, subtract it from the window size
-            if (dock.fixed)
+        dock.min_size = min_size;
+        if (dock.size < dock.min_size)
+            dock.size = dock.min_size;
+        // Adjust pane positions and sizes to fill fixed docks
+        if (dock.fixed)
+        {
+            dock.panes.Sort(PaneSortFunc);
+            wxArrayInt pane_positions, pane_sizes;
+            GetPanePositionsAndSizes(dock, pane_positions, pane_sizes);
+            int pane_count = dock.panes.Count();
+            // Find the total size of panes, and the total dock size
+            // NB: whereas earlier "size" meant the resizable direction,
+            // here it means the opposite.
+            int total_pane_size = 0;
+            for (int j = 0; j < pane_count; ++j)
+                total_pane_size += pane_sizes[j];
+            int dock_size = dock.IsHorizontal() ? dock.rect.x : dock.rect.y;
+            int pos = 0;
+            if (dock_size > 0 && total_pane_size > 0)
             {
-                if (dock.IsHorizontal())
-                    window_change.y -= dock.size;
-                else
-                    window_change.x -= dock.size;
+                double proportion = (double)dock_size / total_pane_size;
+                // Adjust pane positions and size proportionate to the dock size
+                for (int j = 0; j < pane_count; ++j)
+                {
+                    wxAuiPaneInfo& pane = *(dock.panes.Item(j));
+                    int pane_size = pane_sizes[j] * proportion;
+                    if (j == pane_count - 1) // Last pane gets the rest
+                        pane_size = dock_size - pos;
+                    if (dock.IsHorizontal())
+                        pane.best_size.x = pane_size;
+                    else
+                        pane.best_size.y = pane_size;
+                    pane.dock_pos = pos;
+                    pos += pane_size;
+                }
             }
+            // Fixed docks sizes get reset during wxAuiManager::LayoutAll,
+            // but we can trick LayoutAll() by setting dock.fixed = false here.
+            // This will not affect any layout operations, since LayoutAll()
+            // recalculates dock.fixed.
+            dock.fixed = false;
         }
     }
 
-    // Space calculations
-    wxSize min_size(0,0); // min size of all docks
-    wxSize dock_size(0,0); // current size of all docks
-    dock_list_t vertical; // Docks to resize
-    dock_list_t horizontal;
-    int vertical_clue_size = 0, n_vertical_clues = 0; // Make clue docks the same size
-    int horizontal_clue_size = 0, n_horizontal_clues = 0;
-    for (size_t i = 0; i < m_docks.Count(); ++i)
+    // Calculate the resizable area.
+
+    wxSize resizable = m_frame->GetClientSize(); // Resizable area
+    double frame_proportion_x, frame_proportion_y; // % change in frame size
+    if (is_frame_resize)
+    {
+        wxSize new_size = m_frame->GetClientSize();
+        frame_proportion_x = (double)new_size.x / m_frameSize.x;
+        frame_proportion_y = (double)new_size.y / m_frameSize.y;
+    }
+    for (int i = m_docks.Count()-1; i >= 0; --i)
     {
         wxAuiDockInfo & dock = m_docks.Item(i);
-        // Fixed docks and the center dock dont't count
-        if (dock.fixed || dock.dock_direction == wxAUI_DOCK_CENTER)
+        if (dock.dock_direction == wxAUI_DOCK_CENTER)
             continue;
-        // Vertical == LEFT or RIGHT
-        // Horizontal == BOTTOM or TOP
-        if (dock.IsVertical())
+        // Remove sashes from the resizable area.
+        if (! dock.fixed)
         {
-            if (HasCluePane(dock))
+            if (dock.IsHorizontal())
+                resizable.y -= sash_size;
+            else
+                resizable.x -= sash_size;
+        }
+        // Only docks with a ClueList are truly resizable.
+        if (IsClueListDock(dock))
+        {
+            if (dock.IsHorizontal())
             {
-                vertical_clue_size += dock.size;
-                ++n_vertical_clues;
+                old_dock_size.y += dock.size;
+                dock_min_size.y += dock.min_size;
+                horizontal.push_back(&dock);
             }
-            vertical.push_back(&dock);
-            min_size.x += dock.min_size;
-            dock_size.x += dock.size;
+            else
+            {
+                old_dock_size.x += dock.size;
+                dock_min_size.x += dock.min_size;
+                resizable.x -= sash_size;
+                vertical.push_back(&dock);
+            }
         }
         else
         {
-            if (HasCluePane(dock))
-            {
-                horizontal_clue_size += dock.size;
-                ++n_horizontal_clues;
-            }
-            horizontal.push_back(&dock);
-            min_size.y += dock.min_size;
-            dock_size.y += dock.size;
+            // If the frame is being resized, resize docks proportionate to
+            // the new frame size.
+            if (is_frame_resize)
+                dock.size *= dock.IsHorizontal() ? frame_proportion_y : frame_proportion_x;
+            // Otherwise, do not resize these docks.
+            if (dock.IsHorizontal())
+                resizable.y -= dock.size;
+            else
+                resizable.x -= dock.size;
         }
     }
-    // Average clue sizes
-    if (n_horizontal_clues > 0)
-        horizontal_clue_size /= n_horizontal_clues;
-    if (n_vertical_clues > 0)
-        vertical_clue_size /= n_vertical_clues;
-    wxSize resizable = dock_size - min_size; // How much can the layout change?
+
+    // Expand the grid to fill the resizable area.
 
     // Calculate the new grid size
     wxAuiPaneInfo & grid = GetPane("Grid");
-    wxSize grid_size = grid.rect.GetSize() + window_change + resizable;
+    wxSize grid_size = resizable - dock_min_size;
     // Make the grid square
     int grid_square = std::min(grid_size.x, grid_size.y);
     grid_size.x = grid_square;
     grid_size.y = grid_square;
 
-    // Resize docks
-    // Amount of space we need to adjust for the grid
-    wxSize change = grid.rect.GetSize() - grid_size + window_change;
-    // Change per dock in each direction
-    int dx = vertical.size() > 0 ? change.x / (int)vertical.size() : 0;
-    int dy = horizontal.size() > 0 ? change.y / (int)horizontal.size() : 0;
-    // Check min size of each dock.
-    // If we can't resize a given pane, set it to the min size and remove
-    // the dock from our calculations.
-    dock_list_t::iterator it = vertical.begin();
-    while (it != vertical.end())
-    {
-        wxAuiDockInfo & dock = **it;
-        if (HasCluePane(dock))
-            dock.size = vertical_clue_size;
-        if (dock.size + dx < dock.min_size) {
-            change.x -= (dock.size - dock.min_size);
-            dock.size = dock.min_size;
-            it = vertical.erase(it);
-        }
-        else
-            ++it;
-    }
-    it = horizontal.begin();
-    while (it != horizontal.end())
-    {
-        wxAuiDockInfo & dock = **it;
-        if (HasCluePane(dock))
-            dock.size = horizontal_clue_size;
-        if (dock.size + dy < dock.min_size) {
-            change.y -= (dock.size - dock.min_size);
-            dock.size = dock.min_size;
-            it = horizontal.erase(it);
-        }
-        else
-            ++it;
-    }
-    // Recalculate and resize docks
-    dx = vertical.size() > 0 ? change.x / (int)vertical.size() : 0;
-    dy = horizontal.size() > 0 ? change.y / (int)horizontal.size() : 0;
+    // Resize the ClueList docks to take up remaining space.
+
+    wxSize new_dock_size = resizable - grid_size;
+    dock_list_t::iterator it;;
     for (it = vertical.begin(); it != vertical.end(); ++it)
-        (*it)->size += dx;
+    {
+        wxAuiDockInfo & dock = **it;
+        dock.size = new_dock_size.x / vertical.size();
+    }
     for (it = horizontal.begin(); it != horizontal.end(); ++it)
-        (*it)->size += dy;
+    {
+        wxAuiDockInfo & dock = **it;
+        dock.size = new_dock_size.y / horizontal.size();
+    }
 }
 
 
 void MyAuiManager::Update()
 {
-    ResizeDocks(wxSize(0,0));
+    // Save fixed pane sizes
+    std::map<wxAuiPaneInfo *, int> sizes;
+    for (size_t i = 0; i < m_panes.Count(); ++i)
+    {
+        wxAuiPaneInfo & pane = m_panes.Item(i);
+        if (pane.IsFixed())
+        {
+            wxSize best_size = pane.window->GetBestSize();
+            bool is_horizontal = pane.dock_direction == wxAUI_DOCK_BOTTOM
+                                 || pane.dock_direction == wxAUI_DOCK_TOP;
+            sizes[&pane] = is_horizontal ? best_size.y : best_size.x;
+        }
+    }
+    // Run the custom layout engine
+    ResizeDocks(false);
+    // Update
     wxAuiManager::Update();
+    // If sizes have changed, we need to update again to see changes.
+    std::map<wxAuiPaneInfo *, int>::iterator it;
+    for (it = sizes.begin(); it != sizes.end(); ++it)
+    {
+        wxAuiPaneInfo & pane = *it->first;
+        int last_size = it->second;
+        wxSize best_size = pane.window->GetBestSize();
+        bool is_horizontal = pane.dock_direction == wxAUI_DOCK_BOTTOM
+                             || pane.dock_direction == wxAUI_DOCK_TOP;
+        if (last_size != (is_horizontal ? best_size.y : best_size.x))
+        {
+            Update();
+            return;
+        }
+    }
 }
 
 
@@ -534,8 +601,8 @@ MyAuiManager::HasCachedPane(const wxString & name)
 
 // AddPane checks the pane cache and loads whatever it finds in the cache.
 // AddPane also adds the pane to our managed menu.
-// DetachPane removes the context window from the pane, removes the pane
-// from our managed menu, and adds the pane to the cache.
+// DetachPane removes the pane from our managed menu, and adds the pane to
+// the cache.
 
 bool
 MyAuiManager::AddPane(wxWindow * window, const wxAuiPaneInfo & pane_info)
@@ -569,17 +636,14 @@ MyAuiManager::AddPane(wxWindow * window, const wxAuiPaneInfo & pane_info)
 bool
 MyAuiManager::DetachPane(wxWindow * window)
 {
-    // Remove this window from our menu, and remove the context handler
+    // Remove this window from our menu
     wxAuiPaneInfo & pane = GetPane(window);
-    RemoveContextWindow(pane);
     if (m_menu)
         RemoveFromMenu(pane);
     // Add this to the cache
     m_paneCache[pane.name] = SavePaneInfo(pane);
     // Remove the pane
-    if (! wxAuiManager::DetachPane(window))
-        return false;
-    return true;
+    return wxAuiManager::DetachPane(window);
 }
 
 
@@ -687,279 +751,6 @@ MyAuiManager::OnUpdateUI(wxUpdateUIEvent & evt)
 
 
 // ----------------------------------------------------------------------------
-// Context menu
-// ----------------------------------------------------------------------------
-
-// Set a window that recieves the context menu event.  Pane captions always
-// get a context menu event.
-void
-MyAuiManager::SetContextWindow(wxAuiPaneInfo & info, wxWindow * window)
-{
-    wxASSERT(info.IsOk() && GetPane(info.window).IsOk());
-    if (! window)
-        RemoveContextWindow(info);
-    else
-        m_contextWindows[window] = &info;
-}
-
-void
-MyAuiManager::RemoveContextWindow(wxAuiPaneInfo & info)
-{
-    wxASSERT(info.IsOk() && GetPane(info.window).IsOk());
-    std::map<wxWindow *, wxAuiPaneInfo *>::iterator it;
-    for (it = m_contextWindows.begin(); it != m_contextWindows.end(); ++it)
-    {
-        if (it->second->window == info.window)
-        {
-            m_contextWindows.erase(it);
-            return;
-        }
-    }
-}
-
-void
-MyAuiManager::RemoveContextWindow(wxWindow * window)
-{
-    m_contextWindows.erase(window);
-}
-
-
-// The context menu displays the pane caption and a list of items:
-//   * Float
-//   * Dock
-//   -------
-//   X Resizable
-//   -------
-//   X Border
-//   -------
-//     Close
-//   -------
-
-enum MyAuiManagerContextId
-{
-    ID_AUI_CONTEXT_FLOATING = wxID_HIGHEST,
-    ID_AUI_CONTEXT_DOCKED,
-    ID_AUI_CONTEXT_RESIZABLE,
-    ID_AUI_CONTEXT_BORDER,
-    ID_AUI_CONTEXT_CLOSE
-};
-
-wxMenu *
-MyAuiManager::NewContextMenu(wxAuiPaneInfo & pane)
-{
-    wxMenu * menu = new wxMenu(pane.caption);
-    wxMenuItem * item;
-
-    item = menu->AppendRadioItem(ID_AUI_CONTEXT_FLOATING, _T("Floating"));
-    item->Check(pane.IsFloating());
-    item->Enable(pane.IsFloatable());
-
-    item = menu->AppendRadioItem(ID_AUI_CONTEXT_DOCKED, _T("Docked"));
-    item->Check(pane.IsDocked());
-    item->Enable(pane.HasFlag(wxAuiPaneInfo::optionLeftDockable |
-                              wxAuiPaneInfo::optionRightDockable |
-                              wxAuiPaneInfo::optionTopDockable |
-                              wxAuiPaneInfo::optionBottomDockable));
-
-    menu->AppendSeparator();
-
-    item = menu->AppendCheckItem(ID_AUI_CONTEXT_RESIZABLE, _T("Resizable"));
-    if (! IsEditing())
-        item->Check(pane.IsResizable());
-    else
-        item->Check(m_editCache[pane.name].IsResizable());
-    item->Enable(pane.IsDocked());
-
-    menu->AppendSeparator();
-
-    item = menu->AppendCheckItem(ID_AUI_CONTEXT_BORDER, _T("Border"));
-    if (! IsEditing())
-        item->Check(pane.HasBorder());
-    else
-        item->Check(m_editCache[pane.name].HasBorder());
-
-    menu->AppendSeparator();
-
-    item = menu->Append(ID_AUI_CONTEXT_CLOSE, _T("Close"));
-    item->Enable(pane.HasCloseButton());
-
-    return menu;
-}
-
-// Show a context menu for this pane, process the event, and delete the menu.
-void
-MyAuiManager::ShowContextMenu(wxAuiPaneInfo & pane)
-{
-    wxASSERT(pane.IsOk());
-    wxMenu * menu = NewContextMenu(pane);
-    m_contextPane = &pane;
-    pane.window->Connect(wxEVT_COMMAND_MENU_SELECTED,
-                         wxCommandEventHandler(MyAuiManager::OnContextMenuClick),
-                         NULL, this);
-    pane.window->PopupMenu(menu);
-    pane.window->Disconnect(wxEVT_COMMAND_MENU_SELECTED,
-                            wxCommandEventHandler(MyAuiManager::OnContextMenuClick),
-                            NULL, this);
-    m_contextPane = NULL;
-    delete menu;
-}
-
-
-void
-MyAuiManager::OnContextMenuClick(wxCommandEvent & evt)
-{
-    wxCHECK_RET(m_contextPane, _T("Context menu needs an AUI Pane"));
-    wxAuiPaneInfo & pane = *m_contextPane;
-
-    switch (evt.GetId()) {
-        case ID_AUI_CONTEXT_FLOATING:
-            pane.Float();
-            Update();
-            break;
-
-        case ID_AUI_CONTEXT_DOCKED:
-            pane.Dock();
-            Update();
-            break;
-
-        case ID_AUI_CONTEXT_RESIZABLE:
-            if (! IsEditing())
-                pane.Resizable(evt.IsChecked());
-            else
-                m_editCache[pane.name].Resizable(evt.IsChecked());
-            Update();
-            break;
-
-        case ID_AUI_CONTEXT_BORDER:
-            if (! IsEditing())
-                pane.PaneBorder(evt.IsChecked());
-            else
-                m_editCache[pane.name].PaneBorder(evt.IsChecked());
-            Update();
-            break;
-
-        case ID_AUI_CONTEXT_CLOSE:
-            if (FireCloseEvent(pane))
-            {
-                // close the pane, but check that it
-                // still exists in our pane array first
-                // (the event handler above might have removed it)
-                if (GetPane(pane.window).IsOk())
-                    ClosePane(pane);
-                Update();
-            }
-            break;
-
-        default:
-            // The "title" menu item was clicked.
-            break;
-    }
-}
-
-
-// Determine if we should show a context menu
-
-void
-MyAuiManager::OnFloatingContextMenu(wxContextMenuEvent &evt)
-{
-    // Find the frame that this window belongs to
-    wxWindow * window = wxDynamicCast(evt.GetEventObject(), wxWindow);
-    wxCHECK_RET(window, _T("OnFloatingContextMenu has no window"));
-    wxFrame * frame = wxDynamicCast(wxGetTopLevelParent(window), wxFrame);
-    wxCHECK_RET(frame, _T("OnFloatingContextMenu has no frame"));
-
-    // The user clicked on part of the floating frame (the caption)
-    if (window == wxDynamicCast(frame, wxWindow))
-    {
-        // Find the wxAuiPaneInfo inside the frame
-        for (size_t i = 0; i < m_panes.Count(); ++i)
-        {
-            wxAuiPaneInfo & pane = m_panes.Item(i);
-            if (pane.frame == frame)
-                ShowContextMenu(pane);
-        }
-    }
-    // The user clicked the pane itself
-    else
-    {
-        // This will pass through to OnContextMenu.
-        evt.Skip();
-    }
-}
-
-void
-MyAuiManager::OnContextMenu(wxContextMenuEvent &evt)
-{
-    wxASSERT(GetManagedWindow());
-
-    wxWindow * window = wxDynamicCast(evt.GetEventObject(), wxWindow);
-    wxCHECK_RET(window, _T("OnFloatingContextMenu has no window"));
-
-    if (window == GetManagedWindow())
-    {
-        // The user clicked on a pane sizer or caption, etc.
-        // Figure out which pane this belongs to.
-        wxPoint pos = evt.GetPosition();
-        if (pos == wxDefaultPosition)
-            pos = wxGetMousePosition();
-        pos = window->ScreenToClient(pos);
-        wxAuiPaneInfo & pane = HitTestPane(pos.x, pos.y);
-        if (pane.IsOk())
-            ShowContextMenu(pane);
-        else
-            evt.Skip();
-    }
-    else
-    {
-        // Walk the window hierarchy until we get to a window that
-        // has been supplied through SetContextWindow.
-        for (;;)
-        {
-            // Top of the window hierarchy
-            if (! window)
-            {
-                evt.Skip();
-                return;
-            }
-            // The window we've been looking for
-            if (m_contextWindows.find(window) != m_contextWindows.end())
-                break;
-            window = window->GetParent();
-        }
-        wxAuiPaneInfo & pane = *m_contextWindows[window];
-        if (pane.IsOk())
-            ShowContextMenu(pane);
-        else
-            evt.Skip();
-    }
-}
-
-// Add a context menu to the floating pane
-wxAuiFloatingFrame *
-MyAuiManager::CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo & pane)
-{
-    // Create the frame
-    wxAuiFloatingFrame * frame = wxAuiManager::CreateFloatingFrame(parent, pane);
-    // Attach a ContextMenu event
-    frame->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MyAuiManager::OnFloatingContextMenu), NULL, this);
-    return frame;
-}
-
-
-// ----------------------------------------------------------------------------
-// Pane state and position
-// ----------------------------------------------------------------------------
-
-wxAuiPaneInfo &
-MyAuiManager::HitTestPane(int x, int y)
-{
-    wxAuiDockUIPart * part = HitTest(x, y);
-    if (part && part->pane)
-        return *(part->pane);
-    return wxAuiNullPaneInfo;
-}
-
-// ----------------------------------------------------------------------------
 // Edit Mode
 // ----------------------------------------------------------------------------
 
@@ -997,8 +788,9 @@ MyAuiManager::StartEdit()
     {
         wxAuiPaneInfo & pane = m_panes.Item(i);
         m_editCache[pane.name] = pane; // Cache the old wxAuiPaneInfos
-        pane.Resizable(true);          // Make all panes resizable
         pane.PaneBorder(true);         // Show borders
+        pane.Dockable(pane.dock_direction != wxAUI_DOCK_CENTER);
+        pane.Floatable(pane.dock_direction != wxAUI_DOCK_CENTER);
     }
     // Connect mouse events to the panes
     for (size_t i = 0; i < m_panes.Count(); ++i)
@@ -1007,8 +799,6 @@ MyAuiManager::StartEdit()
             wxMouseEventHandler(MyAuiManager::OnLeftDown),  NULL, this);
         ConnectRecursive(m_panes.Item(i).window, wxEVT_SET_CURSOR,
             wxSetCursorEventHandler(MyAuiManager::OnSetCursor),  NULL, this);
-        ConnectRecursive(m_panes.Item(i).window, wxEVT_CONTEXT_MENU,
-            wxContextMenuEventHandler(MyAuiManager::OnEditContextMenu),  NULL, this);
     }
 }
 
@@ -1022,6 +812,8 @@ MyAuiManager::EndEdit()
     for (size_t i = 0; i < m_panes.Count(); ++i)
     {
         wxAuiPaneInfo & pane = m_panes.Item(i);
+        pane.Dockable(false);
+        pane.Floatable(false);
         // Find the pane in the cache
         std::map<wxString, wxAuiPaneInfo>::iterator it
             = m_editCache.find(pane.name);
@@ -1029,7 +821,6 @@ MyAuiManager::EndEdit()
         {
             // Restore old settings
             wxAuiPaneInfo & oldPane = it->second;
-            pane.Resizable(oldPane.IsResizable());
             pane.PaneBorder(oldPane.HasBorder());
         }
     }
@@ -1041,8 +832,6 @@ MyAuiManager::EndEdit()
             wxMouseEventHandler(MyAuiManager::OnLeftDown),  NULL, this);
         DisconnectRecursive(m_panes.Item(i).window, wxEVT_SET_CURSOR,
             wxSetCursorEventHandler(MyAuiManager::OnSetCursor),  NULL, this);
-        DisconnectRecursive(m_panes.Item(i).window, wxEVT_CONTEXT_MENU,
-            wxContextMenuEventHandler(MyAuiManager::OnEditContextMenu),  NULL, this);
     }
 }
 
@@ -1065,16 +854,6 @@ MyAuiManager::OnLeftDown(wxMouseEvent & evt)
     {
         evt.Skip();
     }
-}
-
-void
-MyAuiManager::OnEditContextMenu(wxContextMenuEvent & evt)
-{
-    wxAuiPaneInfo & pane = FindPane(wxDynamicCast(evt.GetEventObject(), wxWindow));
-    if (pane.IsOk())
-        ShowContextMenu(pane);
-    else
-        evt.Skip();
 }
 
 

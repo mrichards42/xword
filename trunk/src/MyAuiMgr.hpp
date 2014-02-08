@@ -30,13 +30,6 @@
 // * LoadPerspective() caches panes that have not yet been added to the manager.
 //     * AddPane() checks to see if this pane has been cached;
 //       the wxAuiPaneInfo parameters can be thought of as default values.
-// * Context menus allow for docking, floating, and closing panes.
-//     * SetContextWindow() sets the window that can be right clicked to
-//       pop up a context menu.
-//     * Context menus are always allowed on pane captions.
-//     * Override DetachPane() so that RemoveContextWindow() is called
-//       first.
-//     * CreateFloatingFrame() override adds a context window
 // * The user can supply a menu that gets filled with panes and their state.
 //     * public function UpdateMenu()
 //     * UpdateMenu() is called in AddPane() and DetachPane()
@@ -45,9 +38,6 @@
 // NB: Many of these changes require a hacked version of wxAuiManager
 //     which is supplied in trunk/wxpatches
 // Enhancements via wxAuiManager hacks:
-// * wxAuiPaneInfo ::resizable and ::fixed are independent values.
-//     * Fixed panes work with absolute coordinates, while non-Resizable
-//       panes merely omit the resize sash, and maintain relative coordinates.
 // * Various wxAuiManager functions are made virtual
 
 class MyAuiManager : public wxAuiManager
@@ -82,21 +72,6 @@ public:
     virtual bool AddPane(wxWindow * window, const wxAuiPaneInfo & pane_info);
     // InsertPane uses AddPane in the implementation already
 
-    // Context Menu
-    //-------------
-    void SetContextWindow(wxWindow * pane_window, wxWindow * window)
-    {
-        SetContextWindow(GetPane(pane_window), window);
-    }
-    void SetContextWindow(const wxString & name, wxWindow * window)
-    {
-        SetContextWindow(GetPane(name), window);
-    }
-    void SetContextWindow(wxAuiPaneInfo & info, wxWindow * window);
-
-    void RemoveContextWindow(wxWindow * window);
-    void RemoveContextWindow(wxAuiPaneInfo & info);
-
     // Edit Mode
     // ---------
     void StartEdit();
@@ -110,7 +85,7 @@ public:
     // Misc
     //-----
 
-    // Clean up context and pane menus
+    // Clean up pane menu
     virtual bool DetachPane(wxWindow * window);
 
     wxAuiPaneInfo & GetPaneByCaption(const wxString & caption);
@@ -128,11 +103,6 @@ protected:
     bool FireCloseEvent(wxAuiPaneInfo & pane);
     void OnPaneButton(wxAuiManagerEvent & evt);
 
-    // Context Menu
-    wxAuiPaneInfo & HitTestPane(int x, int y);
-    wxAuiFloatingFrame* CreateFloatingFrame(wxWindow* parent,
-                                            const wxAuiPaneInfo& pane_info);
-
     // Menu
     wxMenu * m_menu;
     void AddToMenu(wxAuiPaneInfo & pane);
@@ -141,28 +111,16 @@ protected:
     void OnMenu(wxCommandEvent & evt);
     void OnUpdateUI(wxUpdateUIEvent & evt);
 
-    // Context menus
-    std::map<wxWindow *, wxAuiPaneInfo *> m_contextWindows;
-    wxAuiPaneInfo * m_contextPane;
-    wxMenu * NewContextMenu(wxAuiPaneInfo & pane);
-    void OnContextMenu(wxContextMenuEvent & evt);
-    void OnFloatingContextMenu(wxContextMenuEvent & evt);
-    void ShowContextMenu(wxAuiPaneInfo & pane);
-    void OnContextMenuClick(wxCommandEvent & evt);
-
     // Cache
     std::map<wxString, wxString> m_paneCache;
 
     // Proportional resizing
     wxSize m_frameSize;
     void OnFrameSize(wxSizeEvent & evt);
-    void ResizeDocks(const wxSize & size_change);
-
-    void SavePaneSize(wxAuiPaneInfo & pane);
+    void ResizeDocks(bool is_frame_resize);
 
     // Edit Mode
     void OnLeftDown(wxMouseEvent & evt);
-    void OnEditContextMenu(wxContextMenuEvent & evt);
     void OnSetCursor(wxSetCursorEvent & evt);
     void OnCaptureLost(wxMouseCaptureLostEvent & evt);
     bool m_isEditing;
