@@ -30,16 +30,16 @@ string_t snake_case(const char * name)
     // utf-8 issues shouldn't be a problem since isupper is only
     // true for < 128
     std::string str;
-    for (const char * c = name; *c; ++c)
+    for (int i = 0; name[i]; ++i)
     {
-        if (::isupper(*c))
+        if (::isupper(name[i]))
         {
-            if (c > name)
+            if (i > 0)
                 str.push_back('_');
-            str.push_back(::tolower(*c));
+            str.push_back(::tolower(name[i]));
         }
         else
-            str.push_back(*c);
+            str.push_back(name[i]);
     }
     return decode_utf8(str);
 }
@@ -52,9 +52,10 @@ std::string CamelCase(const string_t & name)
     str.reserve(name.size());
     for (size_t i = 0; i < name.size(); ++i)
     {
-        if (name[i] == puzT('_'))
+        if (i == 0 || name[i] == puzT('_'))
         {
-            ++i;
+            if (i > 0)
+                ++i;
             if (i < name.size())
             {
             #if PUZ_UNICODE
@@ -64,13 +65,14 @@ std::string CamelCase(const string_t & name)
                 if (::islower(name[i]))
                     str.push_back(::toupper(name[i]));
             #endif // PUZ_UNICODE/! PUZ_UNICODE
-                else // Not lower case: so push both the hyphen and letter
+                else // Not lower case: so push both the underscore and letter
                 {
-                    str.push_back(name[i-1]);
+                    if (i > 0)
+                        str.push_back(name[i-1]);
                     str.push_back(name[i]);
                 }
             }
-            else // At the end of the string: push the hypen
+            else if (i > 0) // At the end of the string: push the underscore
                 str.push_back(name[i-1]);
         }
         else // Not a hypen: push the letter
