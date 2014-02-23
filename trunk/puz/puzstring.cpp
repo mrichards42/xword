@@ -305,6 +305,19 @@ int ToInt(const string_t & str)
     return n;
 }
 
+
+bool StartsWith(const string_t & str, const string_t & cmp)
+{
+    return str.size() >= cmp.size() &&
+           str.compare(0, cmp.size(), cmp) == 0;
+}
+
+bool EndsWith(const string_t & str, const string_t & cmp)
+{
+    return str.size() >= cmp.size() &&
+           str.compare(str.size() - cmp.size(), cmp.size(), cmp) == 0;
+}
+
 //----------------------------------------------------------------------------
 // Convert between formatted / unformatted
 //----------------------------------------------------------------------------

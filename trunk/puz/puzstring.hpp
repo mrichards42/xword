@@ -81,6 +81,9 @@ std::string GetExtension(const std::string & filename);
 string_t ToString(int number);
 int ToInt(const string_t & str);
 
+bool StartsWith(const string_t & str, const string_t & cmp);
+bool EndsWith(const string_t & str, const string_t & cmp);
+
 // XML stuff
 enum {
     UNESCAPE_BR = 1,
