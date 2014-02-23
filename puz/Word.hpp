@@ -66,6 +66,8 @@ public:
     square_reverse_iterator rbegin() const;
     square_reverse_iterator rend() const;
 
+    typedef square_iterator iterator;
+    typedef square_reverse_iterator reverse_iterator;
 
     // Search functions
     square_iterator find(Square * start)
