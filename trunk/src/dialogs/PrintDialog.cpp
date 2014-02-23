@@ -76,6 +76,7 @@ void CustomPrintDialog::UpdatePrintInfo()
     m_numbers->SetValue(m_info.grid_options & XGridDrawer::DRAW_NUMBER);
     m_text->SetValue(m_info.grid_options & XGridDrawer::DRAW_USER_TEXT);
     m_solution->SetValue(m_info.grid_options & XGridDrawer::DRAW_SOLUTION);
+    m_theme->SetValue(m_info.grid_options & XGridDrawer::DRAW_THEME);
 
     m_numbers->Enable(m_info.grid);
     m_text->Enable(m_info.grid);
@@ -211,6 +212,17 @@ void CustomPrintDialog::OnGridNumbersChecked(wxCommandEvent & evt)
     UpdatePrintInfo();
     evt.Skip();
 }
+
+void CustomPrintDialog::OnThemeChecked(wxCommandEvent & evt)
+{
+    if (evt.IsChecked())
+        m_info.grid_options |= XGridDrawer::DRAW_THEME;
+    else
+        m_info.grid_options &= ~XGridDrawer::DRAW_THEME;
+    UpdatePrintInfo();
+    evt.Skip();
+}
+
 
 void CustomPrintDialog::OnCluesChecked(wxCommandEvent & evt)
 {

@@ -324,6 +324,7 @@ MyPrintout::ReadConfig()
 
     const long brightness = config.Printing.blackSquareBrightness();
     m_drawer.SetBlackSquareColor(wxColour(brightness, brightness, brightness));
+    m_drawer.SetThemeColor(config.Grid.themeSquareColor());
 }
 
 

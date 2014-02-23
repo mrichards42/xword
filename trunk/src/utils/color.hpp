@@ -23,6 +23,9 @@
 // Compute a word highlight color from a letter highlight color
 extern wxColour GetWordHighlight(const wxColour & letter);
 
+// Compute the theme square color from the letter highlight color
+extern wxColour GetThemeColor(const wxColour & letter);
+
 // Return percieved brightness from 0 to 255
 static unsigned char GetBrightness(const wxColour & color)
 {

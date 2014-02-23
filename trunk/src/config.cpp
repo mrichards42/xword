@@ -18,7 +18,7 @@
 #include "config.hpp"
 #include "XGridCtrl.hpp" // DEFAULT_GRID_STYLE
 #include <wx/settings.h> // wxSystemSettings
-#include "utils/color.hpp" // GetWordHighlight
+#include "utils/color.hpp" // GetWordHighlight, GetThemeColor
 
 // Frame position
 ConfigManager::Window_t::Window_t(ConfigManager * cfg)
@@ -55,6 +55,8 @@ ConfigManager::Grid_t::Grid_t(ConfigManager * cfg)
       focusedWordColor(this, _T("focusedWordColor"), &cfg->Appearance.gridHighlightColor, &GetWordHighlight),
       whiteSquareColor(this, _T("whiteSquareColor"), *wxWHITE),
       blackSquareColor(this, _T("blackSquareColor"), *wxBLACK),
+      highlightTheme(this, _T("highlightTheme"), false),
+      themeSquareColor(this, _T("themeSquareColor"), &cfg->Appearance.gridHighlightColor, &GetThemeColor),
       selectionColor(this, _T("selectionColor"), &cfg->Appearance.listHighlightColor),
       penColor(this, _T("penColor"), &cfg->Appearance.foregroundColor),
       pencilColor(this, _T("pencilColor"), wxColor(200,200,200)),

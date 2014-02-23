@@ -581,6 +581,23 @@ static int Square_SetMissing(lua_State * L)
     square->SetMissing(doit);
     return 0;
 }
+// bool IsTheme()
+static int Square_IsTheme(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->IsTheme();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// void SetTheme(bool doit = true)
+static int Square_SetTheme(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L);
+    bool doit = (argCount >= 2 ? luapuz_checkboolean(L, 2) : true);
+    square->SetTheme(doit);
+    return 0;
+}
 // bool HasColor()
 static int Square_HasColor(lua_State * L)
 {
@@ -744,6 +761,8 @@ static const luaL_reg Squarelib[] = {
     {"SetCircle", Square_SetCircle},
     {"IsMissing", Square_IsMissing},
     {"SetMissing", Square_SetMissing},
+    {"IsTheme", Square_IsTheme},
+    {"SetTheme", Square_SetTheme},
     {"HasColor", Square_HasColor},
     {"SetColor", Square_SetColor},
     {"GetHtmlColor", Square_GetHtmlColor},

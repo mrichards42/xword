@@ -87,6 +87,7 @@ XGridDrawer::Init()
 
     SetWhiteSquareColor(*wxWHITE);
     SetBlackSquareColor(*wxBLACK);
+    SetThemeColor(*wxWHITE);
     UpdateHighlightColor();
     SetPenColor(*wxBLACK);
     SetRevealedColor(wxColour(246, 36, 0));
@@ -731,6 +732,8 @@ XGridDrawer::GetSquareColor(const puz::Square & square) const
                 return GetHighlightColor();
             else if (square.HasColor())
                 return wxColor(square.m_red, square.m_green, square.m_blue);
+            else if (HasFlag(DRAW_THEME) && square.IsTheme())
+                return GetThemeColor();
             else
                 return GetWhiteSquareColor();
         }
@@ -747,6 +750,8 @@ XGridDrawer::GetSquareColor(const puz::Square & square) const
                 return GetHighlightColor();
             else if (square.HasColor())
                 return wxColor(square.m_red, square.m_green, square.m_blue);
+            else if (HasFlag(DRAW_THEME) && square.IsTheme())
+                return GetThemeColor();
             else
                 return GetWhiteSquareColor();
         }

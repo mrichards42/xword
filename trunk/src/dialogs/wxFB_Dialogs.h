@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Nov  6 2013)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -60,6 +60,7 @@ class CustomPrintDialogBase : public wxDialog
 		wxCheckBox* m_numbers;
 		wxCheckBox* m_text;
 		wxCheckBox* m_solution;
+		wxCheckBox* m_theme;
 		wxCheckBox* m_clues;
 		wxCheckBox* m_title;
 		wxCheckBox* m_author;
@@ -76,6 +77,7 @@ class CustomPrintDialogBase : public wxDialog
 		virtual void OnGridNumbersChecked( wxCommandEvent& event ) = 0;
 		virtual void OnGridTextChecked( wxCommandEvent& event ) = 0;
 		virtual void OnGridSolutionChecked( wxCommandEvent& event ) = 0;
+		virtual void OnThemeChecked( wxCommandEvent& event ) = 0;
 		virtual void OnCluesChecked( wxCommandEvent& event ) = 0;
 		virtual void OnTitleChecked( wxCommandEvent& event ) = 0;
 		virtual void OnAuthorChecked( wxCommandEvent& event ) = 0;

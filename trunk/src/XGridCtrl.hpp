@@ -241,15 +241,19 @@ public:
 
     // Colors
     void SetFocusedLetterColor(const wxColor & color)
-        { m_colors[LETTER]  = color; if (! IsEmpty()) RefreshSquare();}
+        { m_colors[LETTER]  = color; if (! IsEmpty()) RefreshSquare(); }
     void SetFocusedWordColor(const wxColor & color)
         { m_colors[WORD] = color; if (! IsEmpty()) RefreshWord(); }
     void SetSelectionColor(const wxColor & color)
         { m_colors[SELECTION] = color; if (HasSelection()) Refresh(); }
     void SetWhiteSquareColor(const wxColor & color)  
-        { m_drawer.SetWhiteSquareColor(color); if (! IsEmpty()) Refresh();}
+        { m_drawer.SetWhiteSquareColor(color); if (! IsEmpty()) Refresh(); }
     void SetBlackSquareColor(const wxColor & color)  
-        { m_drawer.SetBlackSquareColor(color); if (! IsEmpty()) Refresh();}
+        { m_drawer.SetBlackSquareColor(color); if (! IsEmpty()) Refresh(); }
+    void ShowThemeHighlight(bool doit = true)
+        { m_drawer.ShowThemeHighlight(doit); if (! IsEmpty()) Refresh(); }
+    void SetThemeSquareColor(const wxColor & color)  
+        { m_drawer.SetThemeColor(color); if (! IsEmpty()) Refresh(); }
     void SetPenColor(const wxColor & color)
         { m_drawer.SetPenColor(color); if (! IsEmpty()) Refresh(); }
     void SetPencilColor(const wxColor & color)
@@ -262,6 +266,8 @@ public:
         { return m_drawer.GetWhiteSquareColor(); }
     const wxColor & GetBlackSquareColor()   const
         { return m_drawer.GetBlackSquareColor(); }
+    const wxColor & GetThemeSquareColor()   const
+        { return m_drawer.GetThemeColor(); }
     const wxColor & GetPenColor()           const
         { return m_drawer.GetPenColor(); }
     const wxColor & GetPencilColor()        const { return m_colors[PENCIL]; }

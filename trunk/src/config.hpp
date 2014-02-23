@@ -82,6 +82,8 @@ public:
         ConfigColor focusedWordColor;
         ConfigColor whiteSquareColor;
         ConfigColor blackSquareColor;
+        ConfigBool highlightTheme;
+        ConfigColor themeSquareColor;
         ConfigColor selectionColor;
         ConfigColor penColor;
         ConfigColor pencilColor;

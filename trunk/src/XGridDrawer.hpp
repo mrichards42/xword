@@ -102,6 +102,7 @@ public:
     const wxColour & GetWhiteSquareColor() const { return m_whiteSquareColor; }
     const wxColour & GetBlackSquareColor() const { return m_blackSquareColor; }
     const wxColour & GetHighlightColor()   const { return m_highlightColor; }
+    const wxColour & GetThemeColor()       const { return m_themeColor; }
     const wxColour & GetPenColor()         const { return m_penColor; }
     const wxColour & GetCorrectColor()     const { return m_correctColor; }
     const wxColour & GetCheckedColor()     const { return m_checkedColor; }
@@ -112,6 +113,7 @@ public:
         { m_whiteSquareColor = color; }
     void SetBlackSquareColor(const wxColour & color)
         { m_blackSquareColor = color; UpdateHighlightColor(); }
+    void SetThemeColor(const wxColour & color) { m_themeColor = color; }
     void SetPenColor(const wxColour & color) { m_penColor = color; }
     void SetCorrectColor(const wxColour & color) { m_correctColor = color; }
     void SetCheckedColor(const wxColour & color) { m_checkedColor = color; }
@@ -131,12 +133,14 @@ public:
         DRAW_CIRCLE     = 0x20,
         DRAW_OUTLINE    = 0x40,
         DRAW_BLANK_DIAGRAMLESS = 0x80,
+        DRAW_THEME      = 0x100,
 
         DRAW_ALL = DRAW_USER_TEXT
                  | DRAW_NUMBER
                  | DRAW_FLAG
                  | DRAW_X
-                 | DRAW_CIRCLE,
+                 | DRAW_CIRCLE
+                 | DRAW_THEME,
 
         // Text Mask
         DRAW_TEXT = DRAW_USER_TEXT
@@ -147,6 +151,14 @@ public:
     void AddFlag   (int flag)       { m_drawOptions |= flag; }
     void RemoveFlag(int flag)       { m_drawOptions &= ~ flag; }
     void SetFlags  (int flags)      { m_drawOptions = flags; }
+
+    void ShowThemeHighlight(bool doit = true)
+    {
+        if (doit)
+            AddFlag(DRAW_THEME);
+        else
+            RemoveFlag(DRAW_THEME);
+    }
 
     // Grid
     //------
@@ -219,6 +231,7 @@ private:
     wxColour m_whiteSquareColor;
     wxColour m_blackSquareColor;
     wxColour m_highlightColor;
+    wxColour m_themeColor;
     wxColour m_penColor;
     wxColour m_revealedColor;
     wxColour m_correctColor;
