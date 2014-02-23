@@ -17,10 +17,11 @@ extern "C" {
 // namespace puz
 // ---------------------------------------------------------------------------
 
+#include "luapuz_puz.hpp"
 #include "luapuz_puz_Grid.hpp"
 #include "luapuz_puz_Puzzle.hpp"
+#include "luapuz_puz_Clue.hpp"
 #include "luapuz_puz_Square.hpp"
-#include "luapuz_puz.hpp"
 // GridDirection ConstrainDirection(unsigned short dir)
 static int puz_ConstrainDirection(lua_State * L)
 {
@@ -219,36 +220,43 @@ void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * clues)
         lua_pushvalue(L, -2);
         lua_insert(L, -3);
 
-        // key is index -2
-        // value is index -1
-        puz::string_t number = luapuz_checkstring_t(L, -2);
-        puz::string_t text;
-        if (lua_istable(L, -1))
+        if (luapuz_isClue(L, -1))
         {
-            // Look for data:
-
-            // number
-            lua_getfield(L, -1, "number");
-            if (! lua_isnil(L, -1))
-                number = luapuz_checkstring_t(L, -1);
-            lua_pop(L, 1);
-
-            // text
-            lua_getfield(L, -1, "text");
-            if (! lua_isnil(L, -1))
-                text = luapuz_checkstring_t(L, -1);
-            lua_pop(L, 1);
-        }
-        else if (lua_isstring(L, -1))
-        {
-            text = luapuz_checkstring_t(L, -1);
+            clues->push_back(*luapuz_checkClue(L, -1));
         }
         else
         {
-            luaL_error(L, "table or string expected for clue; got %s", luaL_typename(L, -1));
-        }
+            // key is index -2
+            // value is index -1
+            puz::string_t number = luapuz_checkstring_t(L, -2);
+            puz::string_t text;
+            if (lua_istable(L, -1))
+            {
+                // Look for data:
 
-        clues->push_back(puz::Clue(number, text));
+                // number
+                lua_getfield(L, -1, "number");
+                if (! lua_isnil(L, -1))
+                    number = luapuz_checkstring_t(L, -1);
+                lua_pop(L, 1);
+
+                // text
+                lua_getfield(L, -1, "text");
+                if (! lua_isnil(L, -1))
+                    text = luapuz_checkstring_t(L, -1);
+                lua_pop(L, 1);
+            }
+            else if (lua_isstring(L, -1))
+            {
+                text = luapuz_checkstring_t(L, -1);
+            }
+            else
+            {
+                luaL_error(L, "puz::Clue, table, or string expected for clue; got %s", luaL_typename(L, -1));
+            }
+
+            clues->push_back(puz::Clue(number, text));
+        }
 
         /* removes 'value'; keeps 'key' for next iteration */
         lua_pop(L, 1);
@@ -267,22 +275,33 @@ int luapuz_pushClueList(lua_State * L, puz::ClueList * clues)
     lua_newtable(L);
 
     int i = 1;
-    for (puz::ClueList::iterator it = clues->begin();
-         it != clues->end();
-         ++it)
+    puz::ClueList::iterator it;
+    for (it = clues->begin(); it != clues->end(); ++it)
     {
-        // t[i] = { number = number, text = text, square = square }
-        lua_pushnumber(L, i++);
+        luapuz_pushClue(L, &*it);
+        lua_rawseti(L, -2, i++);
+    }
 
-        lua_newtable(L);
+    return 1;
+}
 
-        luapuz_pushstring_t(L, it->GetNumber());
-        lua_setfield(L, -2, "number");
 
-        luapuz_pushstring_t(L, it->GetText());
-        lua_setfield(L, -2, "text");
+// typedef Word
+//------------
 
-        lua_settable(L, -3);
+int luapuz_pushWord(lua_State * L, puz::Word * word)
+{
+    // The squares table
+    lua_newtable(L);
+
+    int i = 1;
+    puz::Word::iterator it;
+    for (it = word->begin(); it != word->end(); ++it)
+    {
+        // t[number] = square
+        luapuz_pushSquare(L, &*it);
+        lua_rawseti(L, -2, i);
+        ++i;
     }
 
     return 1;
@@ -322,6 +341,7 @@ void luapuz_openpuzlib (lua_State *L) {
     luapuz_registerEnum(L, GridType_meta, GridType_reg);
     luapuz_registerEnum(L, FindOptions_meta, FindOptions_reg);
     luapuz_openSquarelib(L);
+    luapuz_openCluelib(L);
     luapuz_openGridlib(L);
     luapuz_openPuzzlelib(L);
     lua_pop(L, 1);

@@ -441,8 +441,9 @@ static int Square_HasClue(lua_State * L)
 }
 ]],
 
+
 -- ===================================================================
--- Typedef ClueList
+-- Typedef puz::ClueList
 -- ===================================================================
 pushClueList = [[
 int luapuz_pushClueList(lua_State * L, puz::ClueList * clues)
@@ -451,22 +452,11 @@ int luapuz_pushClueList(lua_State * L, puz::ClueList * clues)
     lua_newtable(L);
 
     int i = 1;
-    for (puz::ClueList::iterator it = clues->begin();
-         it != clues->end();
-         ++it)
+    puz::ClueList::iterator it;
+    for (it = clues->begin(); it != clues->end(); ++it)
     {
-        // t[i] = { number = number, text = text, square = square }
-        lua_pushnumber(L, i++);
-
-        lua_newtable(L);
-
-        luapuz_pushstring_t(L, it->GetNumber());
-        lua_setfield(L, -2, "number");
-
-        luapuz_pushstring_t(L, it->GetText());
-        lua_setfield(L, -2, "text");
-
-        lua_settable(L, -3);
+        luapuz_pushClue(L, &*it);
+        lua_rawseti(L, -2, i++);
     }
 
     return 1;
@@ -490,36 +480,43 @@ void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * clues)
         lua_pushvalue(L, -2);
         lua_insert(L, -3);
 
-        // key is index -2
-        // value is index -1
-        puz::string_t number = luapuz_checkstring_t(L, -2);
-        puz::string_t text;
-        if (lua_istable(L, -1))
+        if (luapuz_isClue(L, -1))
         {
-            // Look for data:
-
-            // number
-            lua_getfield(L, -1, "number");
-            if (! lua_isnil(L, -1))
-                number = luapuz_checkstring_t(L, -1);
-            lua_pop(L, 1);
-
-            // text
-            lua_getfield(L, -1, "text");
-            if (! lua_isnil(L, -1))
-                text = luapuz_checkstring_t(L, -1);
-            lua_pop(L, 1);
-        }
-        else if (lua_isstring(L, -1))
-        {
-            text = luapuz_checkstring_t(L, -1);
+            clues->push_back(*luapuz_checkClue(L, -1));
         }
         else
         {
-            luaL_error(L, "table or string expected for clue; got %s", luaL_typename(L, -1));
-        }
+            // key is index -2
+            // value is index -1
+            puz::string_t number = luapuz_checkstring_t(L, -2);
+            puz::string_t text;
+            if (lua_istable(L, -1))
+            {
+                // Look for data:
 
-        clues->push_back(puz::Clue(number, text));
+                // number
+                lua_getfield(L, -1, "number");
+                if (! lua_isnil(L, -1))
+                    number = luapuz_checkstring_t(L, -1);
+                lua_pop(L, 1);
+
+                // text
+                lua_getfield(L, -1, "text");
+                if (! lua_isnil(L, -1))
+                    text = luapuz_checkstring_t(L, -1);
+                lua_pop(L, 1);
+            }
+            else if (lua_isstring(L, -1))
+            {
+                text = luapuz_checkstring_t(L, -1);
+            }
+            else
+            {
+                luaL_error(L, "puz::Clue, table, or string expected for clue; got %s", luaL_typename(L, -1));
+            }
+
+            clues->push_back(puz::Clue(number, text));
+        }
 
         /* removes 'value'; keeps 'key' for next iteration */
         lua_pop(L, 1);
@@ -530,6 +527,29 @@ void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * clues)
     // Sort the clues, because there is no guarantee that the lua table is
     // sorted.
     std::sort(clues->begin(), clues->end());
+}
+]],
+
+-- ===================================================================
+-- Typedef puz::Word
+-- ===================================================================
+pushWord = [[
+int luapuz_pushWord(lua_State * L, puz::Word * word)
+{
+    // The squares table
+    lua_newtable(L);
+
+    int i = 1;
+    puz::Word::iterator it;
+    for (it = word->begin(); it != word->end(); ++it)
+    {
+        // t[number] = square
+        luapuz_pushSquare(L, &*it);
+        lua_rawseti(L, -2, i);
+        ++i;
+    }
+
+    return 1;
 }
 ]],
 
@@ -549,7 +569,7 @@ int luapuz_pushSquareVector(lua_State * L, std::vector<puz::Square*> * squares)
          it != squares->end();
          ++it)
     {
-        // t[number] = text
+        // t[number] = square
         luapuz_pushSquare(L, *it);
         lua_rawseti(L, -2, i);
         ++i;

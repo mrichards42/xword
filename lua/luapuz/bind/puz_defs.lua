@@ -15,17 +15,6 @@ typedef{"vector<puz::Square*>", luatype="LUA_TTABLE",
 
 namespace "puz"
 
-typedef{"ClueList", luatype="LUA_TTABLE",
-        headers={"puz/Clue.hpp", "<algorithm>"},
-        check_func=overrides.checkClueList,
-        push_func=overrides.pushClueList}
-
-typedef{"Puzzle::metamap_t", luatype="LUA_TTABLE",
-        headers={"puz/Puzzle.hpp"},
-        push = "luapuz_push_metamap_t",
-        push_func=overrides.push_metamap_t,
-        subst_var="meta"}
-
 enum{ "GridDirection", header="puz/Square.hpp",
     "ACROSS",
     "DOWN",
@@ -188,6 +177,23 @@ func{"GetDirection",       returns="unsigned short",
                                 arg("Square &", "second")}
 
 
+class()
+typedef{"ClueList", luatype="LUA_TTABLE",
+        headers={"puz/Clue.hpp", "<algorithm>"},
+        check_func=overrides.checkClueList,
+        push_func=overrides.pushClueList}
+
+class()
+typedef{"Word", luatype="LUA_TTABLE",
+        headers={"puz/Word.hpp"},
+        push_func=overrides.pushWord}
+
+class{"Clue", header="puz/Clue.hpp"}
+    func{"GetInt", returns="int"}
+    property{"puz::string_t", "Number"}
+    property{"puz::string_t", "Text"}
+    func{"GetWord", returns="Word"}
+
 class{"Grid", header="puz/Grid.hpp"}
     func{"_index", override=overrides.Grid__index}
     func{"_newindex", override=overrides.Grid__newindex}
@@ -232,6 +238,14 @@ class{"Grid", header="puz/Grid.hpp"}
     -- Find functions
     func{"FindSquare", override=overrides.Grid_FindSquare,
                        arg("GridDirection", "direction")}
+
+
+class()
+typedef{"Puzzle::metamap_t", luatype="LUA_TTABLE",
+        headers={"puz/Puzzle.hpp"},
+        push = "luapuz_push_metamap_t",
+        push_func=overrides.push_metamap_t,
+        subst_var="meta"}
 
 class{"Puzzle", header="puz/Puzzle.hpp", cppheader="luapuz_puz_Puzzle_helpers.hpp"}
 

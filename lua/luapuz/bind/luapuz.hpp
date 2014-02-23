@@ -22,8 +22,9 @@ extern "C" {
 
 #include "luapuz_std.hpp"
 #include "luapuz_puz.hpp"
-#include "luapuz_puz_Puzzle.hpp"
 #include "luapuz_puz_Square.hpp"
+#include "luapuz_puz_Puzzle.hpp"
+#include "luapuz_puz_Clue.hpp"
 #include "luapuz_puz_Grid.hpp"
 
 LUAPUZ_API int luaopen_luapuz (lua_State *L);

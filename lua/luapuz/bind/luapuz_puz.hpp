@@ -21,6 +21,7 @@ extern "C" {
 // ---------------------------------------------------------------------------
 
 #include "puz/Grid.hpp"
+#include "puz/Word.hpp"
 #include <algorithm>
 #include "puz/Clue.hpp"
 #include "puz/Square.hpp"
@@ -179,6 +180,12 @@ inline bool luapuz_isFindOptions(lua_State * L, int index)
 LUAPUZ_API void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * cluelist);
 
 LUAPUZ_API int luapuz_pushClueList(lua_State * L, puz::ClueList * cluelist);
+
+
+// typedef Word
+//-------------
+
+LUAPUZ_API int luapuz_pushWord(lua_State * L, puz::Word * word);
 
 
 // typedef Puzzle::metamap_t

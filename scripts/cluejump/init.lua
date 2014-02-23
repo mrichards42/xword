@@ -42,15 +42,18 @@ end
 
 
 local function ClueJump()
-    -- Get the current clue
-    local focused_number, text = xword.frame:GetFocusedClue()
     local focused_direction = xword.frame:GetFocusedDirection()
+    -- Get the current clue
+    local clue, _text = xword.frame:GetFocusedClue()
+    if type(clue) == "string" then -- Accommodate the old API
+        clue = { number = clue, text = text }
+    end
 
     -- Find a match
     local number, direction
-    number, direction = find_reference(text)
+    number, direction = find_reference(clue.text)
     if not number then
-        number, direction = search_clues(focused_number, focused_direction)
+        number, direction = search_clues(clue.number, focused_direction)
         if not number then
             xword.Message("Could not find a clue reference.")
             return
