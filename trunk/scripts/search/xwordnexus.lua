@@ -13,9 +13,9 @@ end
 
 local function CrosswordNexusSearch()
     -- Get the current clue
-    local number, clue = xword.frame:GetFocusedClue()
+    local clue = xword.frame:GetFocusedClue()
     local pattern = search.makePattern()
-    wx.wxLaunchDefaultBrowser(makeURL(clue, pattern))
+    wx.wxLaunchDefaultBrowser(makeURL(clue.text, pattern))
 end
 
 search.addEntry('CrosswordNexus', CrosswordNexusSearch)

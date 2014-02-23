@@ -53,7 +53,7 @@ int luapuz_pushSquareVector(lua_State * L, std::vector<puz::Square*> * squares)
          it != squares->end();
          ++it)
     {
-        // t[number] = text
+        // t[number] = square
         luapuz_pushSquare(L, *it);
         lua_rawseti(L, -2, i);
         ++i;

@@ -7,9 +7,9 @@
 
 local function TryAZ()
     -- Read the currently selected word
-    local word = xword.frame:GetFocusedWord()
     local focusedSquare = xword.frame:GetFocusedSquare()
-    local _, clue = xword.frame:GetFocusedClue()
+    local clue = xword.frame:GetFocusedClue()
+    local word = clue.word
     local pattern = ''
     for _, square in ipairs(word) do
         if square == focusedSquare then
@@ -31,7 +31,7 @@ local function TryAZ()
             table.insert(wordstable, word)
         end
     end
-    local sel = wx.wxGetSingleChoiceIndex(clue, 'A-Z', wordstable) + 1
+    local sel = wx.wxGetSingleChoiceIndex(clue.text, 'A-Z', wordstable) + 1
     if sel > 0 then
         local letter = order:sub(sel, sel)
         if letter ~= ' ' then

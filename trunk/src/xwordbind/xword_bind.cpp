@@ -109,20 +109,18 @@ static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L)
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
     // call GetFocusedClue
-    const puz::Clue * clue =  self->GetFocusedClue();
+    puz::Clue * clue = const_cast<puz::Clue *>(self->GetFocusedClue());
 
     // Return two nils if there is no focused clue
-    if (clue == NULL)
+    if (clue)
     {
-        lua_pushnil(L);
-        lua_pushnil(L);
+        luapuz_pushClue(L, clue);
+        // This function used to return number, text instead of just clue
+        // Returning clue, text will allow for some backwards compat
+        luapuz_pushstring_t(L, clue->GetText());
         return 2;
     }
-
-    // Return a pair (number, text)
-    lua_pushnumber(L, clue->GetInt());
-    luapuz_pushstring_t(L, clue->GetText());
-    return 2;
+    return 0;
 }
 
 
@@ -170,30 +168,13 @@ static int LUACALL wxLua_MyFrame_GetFocusedWord(lua_State *L)
     MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
 
     // call GetFocusedWord
-    const puz::Word * word = self->GetFocusedWord();
-
-    // Return nil if there is no focused word
-    if (word == NULL)
+    puz::Word * word = const_cast<puz::Word *>(self->GetFocusedWord());
+    if (word)
     {
-        lua_pushnil(L);
+        luapuz_pushWord(L, word);
         return 1;
     }
-
-    // Assemble a table of all squares in the focused word.
-
-    lua_newtable(L);
-
-    int i = 1; // lua indicies start with 1 not 0
-    puz::square_iterator it;
-    for (it = word->begin(); it != word->end(); ++it)
-    {
-        lua_pushnumber(L, i++);
-        luapuz_pushSquare(L, &*it);
-        // t[i] = square
-        lua_settable(L, -3); // -3 = third from the top of the stack
-    }
-
-    return 1; // One object on the stack for lua.
+    return 0;
 }
 
 

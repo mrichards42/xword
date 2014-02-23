@@ -16,9 +16,6 @@ function search.addEntry(name, func)
 end
 
 function search.makePattern()
-    -- Get the current clue
-    local number, clue = xword.frame:GetFocusedClue()
-
     -- Assemble the search pattern for the current word
     local word = xword.frame:GetFocusedWord()
     local pattern = ''
