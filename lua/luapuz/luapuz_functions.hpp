@@ -189,6 +189,28 @@ static void luapuz_registerConstructor(lua_State * L, lua_CFunction func)
     lua_setmetatable(L, -2);
 }
 
+// From sname_case to CamelCase
+static char * to_camel(const char * name)
+{
+    char * camel = (char *)malloc(strlen(name)+1);
+    // Replace '_' + a lowercase letter with an upper case letter
+    int i = 0;
+    for (; name[i]; ++i)
+    {
+        if (i == 0)
+            camel[i] = toupper(name[i]);
+        else if (name[i] == '_')
+        {
+            ++i;
+            if (name[i])
+                camel[i] = toupper(name[i]);
+        }
+        else // Not an underscore: push the letter
+            camel[i] = name[i];
+    }
+    camel[i] = '\0';
+    return camel;
+}
 
 
 
@@ -221,7 +243,9 @@ static int luapuz_index(lua_State * L)
         lua_pop(L, 1);
 
         // Search for a GetXXX method and call it if it exists.
-        lua_pushfstring(L, "%s%s", "Get", name);
+        char * camel = to_camel(name);
+        lua_pushfstring(L, "%s%s", "Get", camel);
+        free(camel);
         lua_rawget(L, -2);
         if (lua_isfunction(L, -1))
         {
@@ -297,7 +321,9 @@ static int luapuz_newindex(lua_State * L)
         const char * name = luaL_checkstring(L, 2);
 
         // Search for a SetXXX method.
-        lua_pushfstring(L, "%s%s", "Set", name);
+        char * camel = to_camel(name);
+        lua_pushfstring(L, "%s%s", "Set", camel);
+        free(camel);
         lua_rawget(L, -2);
         if (lua_isfunction(L, -1))
         {
