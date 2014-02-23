@@ -250,6 +250,7 @@ public:
         Add(grid.focusedLetterColor, "Selected Letter");
         Add(grid.focusedWordColor, "Selected Word");
         Add(grid.selectionColor, "Multi-square\nSelection");
+        Add(grid.themeSquareColor, "Theme Square Color");
     }
 };
 
@@ -417,11 +418,15 @@ public:
         Add(config.Appearance.backgroundColor, "Background");
         Add(config.Appearance.listHighlightColor, "List Highlight");
         Add(config.Appearance.gridHighlightColor, "Grid Highlight");
+        Add(config.Grid.highlightTheme, "Highlight Theme Squares");
         GetSizer()->AddSpacer(5);
     }
 
     void DoSaveConfig()
     {
+        // Update the grid focus colors
+        m_config.Grid.focusedLetterColor.Reset();
+        m_config.Grid.focusedWordColor.Reset();
         // The user expects all fonts to change point size as the global font
         // is adjusted, but the ComfigManager mechanism for linking
         // ConfigValues isn't smart enough for that, so we'll do it manually.

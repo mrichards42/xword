@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Nov  6 2013)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -80,6 +80,11 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	m_solution = new wxCheckBox( this, wxID_ANY, wxT("Solution"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer21->Add( m_solution, 1, wxALL|wxEXPAND, 5 );
 	
+	m_theme = new wxCheckBox( this, wxID_ANY, wxT("Highlight Theme"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_theme->Hide();
+	
+	bSizer21->Add( m_theme, 0, wxALL, 5 );
+	
 	
 	sbSizer13->Add( bSizer21, 3, wxLEFT|wxEXPAND, 25 );
 	
@@ -149,6 +154,7 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	m_numbers->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridNumbersChecked ), NULL, this );
 	m_text->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridTextChecked ), NULL, this );
 	m_solution->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridSolutionChecked ), NULL, this );
+	m_theme->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnThemeChecked ), NULL, this );
 	m_clues->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnCluesChecked ), NULL, this );
 	m_title->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnTitleChecked ), NULL, this );
 	m_author->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnAuthorChecked ), NULL, this );
@@ -168,6 +174,7 @@ CustomPrintDialogBase::~CustomPrintDialogBase()
 	m_numbers->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridNumbersChecked ), NULL, this );
 	m_text->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridTextChecked ), NULL, this );
 	m_solution->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnGridSolutionChecked ), NULL, this );
+	m_theme->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnThemeChecked ), NULL, this );
 	m_clues->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnCluesChecked ), NULL, this );
 	m_title->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnTitleChecked ), NULL, this );
 	m_author->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CustomPrintDialogBase::OnAuthorChecked ), NULL, this );

@@ -40,6 +40,7 @@ Puzzle::DoLoad(const std::string & filename, const FileHandlerDesc * desc)
         desc->handler(this, filename.c_str(), desc->data);
         if (! m_clues.HasWords())
             GenerateWords();
+        MarkThemeSquares();
         TestOk();
     }
     catch (std::ios::failure &) {
@@ -325,6 +326,30 @@ bool Puzzle::UsesNumberAlgorithm() const
     return true;
 }
 
+//------------------------------------------------------------------------------
+// Theme Squares
+//------------------------------------------------------------------------------
+void Puzzle::MarkThemeSquares()
+{
+    // Theme words have a star (*) to start or end them.
+    Clues::iterator it;
+    for (it = m_clues.begin(); it != m_clues.end(); ++it)
+    {
+        ClueList & list = it->second;
+        ClueList::iterator clue;
+        for (clue = list.begin(); clue != list.end(); ++clue)
+        {
+            const string_t & text = clue->GetText();
+            if (StartsWith(text, puzT("*")) || EndsWith(text, puzT("*")))
+            {
+                Word & word = clue->GetWord();
+                Word::iterator square;
+                for (square = word.begin(); square != word.end(); ++square)
+                    square->SetTheme(true);
+            }
+        }
+    }
+}
 
 //------------------------------------------------------------------------------
 // Find functions

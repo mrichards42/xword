@@ -68,6 +68,7 @@ protected:
     virtual void OnGridNumbersChecked(wxCommandEvent & evt);
     virtual void OnGridTextChecked(wxCommandEvent & evt);
     virtual void OnGridSolutionChecked(wxCommandEvent & evt);
+    virtual void OnThemeChecked(wxCommandEvent & evt);
     virtual void OnCluesChecked(wxCommandEvent & evt);
     virtual void OnTitleChecked(wxCommandEvent & evt);
     virtual void OnAuthorChecked(wxCommandEvent & evt);

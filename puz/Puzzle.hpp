@@ -164,6 +164,9 @@ public:
     // where they are expected to, and there must be no unclued words.
     bool UsesNumberAlgorithm() const;
 
+    // Find theme squares and mark them as such.
+    void MarkThemeSquares();
+
     // -------------------------------------------------------------------
     // Load / Save
     // -------------------------------------------------------------------

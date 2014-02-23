@@ -199,6 +199,8 @@ void XGridCtrl::Init()
     grid.backgroundColor.AddCallback(this, &XGridCtrl::SetBackgroundColour);
     grid.whiteSquareColor.AddCallback(this, &XGridCtrl::SetWhiteSquareColor);
     grid.blackSquareColor.AddCallback(this, &XGridCtrl::SetBlackSquareColor);
+    grid.highlightTheme.AddCallback(this, &XGridCtrl::ShowThemeHighlight);
+    grid.themeSquareColor.AddCallback(this, &XGridCtrl::SetThemeSquareColor);
     grid.selectionColor.AddCallback(this, &XGridCtrl::SetSelectionColor);
     grid.penColor.AddCallback(this, &XGridCtrl::SetPenColor);
     grid.pencilColor.AddCallback(this, &XGridCtrl::SetPencilColor);

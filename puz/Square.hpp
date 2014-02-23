@@ -31,16 +31,13 @@ const int REBUS_ENTRY_LENGTH = 8;
 // GEXT flags
 enum GextFlag
 {
-    FLAG_CLEAR     = 0x00,
-    FLAG_PENCIL    = 0x08,
-    FLAG_BLACK     = 0x10,
-    FLAG_X         = 0x20,
-    FLAG_REVEALED  = 0x40,
-    FLAG_CIRCLE    = 0x80,
-
-    FLAG_COLOR     = 0x100,
-    FLAG_MISSING   = 0x200,
-    FLAG_CORRECT   = 0x400,
+    // Across Lite flags
+    FLAG_CLEAR     = 0x00, // Nothing
+    FLAG_PENCIL    = 0x08, // Pencil entry
+    FLAG_BLACK     = 0x10, // Checked/was incorrect
+    FLAG_X         = 0x20, // Checked/currently incorrect
+    FLAG_REVEALED  = 0x40, // Revealed
+    FLAG_CIRCLE    = 0x80, // Has a circle
 
     ACROSS_LITE_MASK = FLAG_CLEAR |
                        FLAG_PENCIL |
@@ -49,9 +46,16 @@ enum GextFlag
                        FLAG_REVEALED |
                        FLAG_CIRCLE,
 
-   FLAG_CHECK_MASK = FLAG_X |
-                     FLAG_REVEALED |
-                     FLAG_CORRECT
+    // Additional Flags
+    FLAG_COLOR     = 0x100, // Has a color
+    FLAG_MISSING   = 0x200, // No square
+    FLAG_CORRECT   = 0x400, // Checked/correct
+    FLAG_THEME     = 0x800, // A theme square
+
+    // Check square options
+    FLAG_CHECK_MASK = FLAG_X |
+                      FLAG_REVEALED |
+                      FLAG_CORRECT
 };
 
 
@@ -265,6 +269,9 @@ public:
 
     bool IsMissing() const { return HasFlag(FLAG_MISSING); }
     void SetMissing(bool doit = true) { AddFlag(FLAG_MISSING, doit); }
+
+    bool IsTheme() const { return HasFlag(FLAG_THEME); }
+    void SetTheme(bool doit = true) { AddFlag(FLAG_THEME, doit); }
 
     bool HasColor() const { return HasFlag(FLAG_COLOR); }
     void SetColor(unsigned char red, unsigned char green, unsigned char blue);

@@ -157,3 +157,17 @@ wxColour GetWordHighlight(const wxColour & letter)
     rgb = wxImage::HSVtoRGB(hsv);
     return wxColour(rgb.red, rgb.green, rgb.blue);
 }
+
+
+wxColour GetThemeColor(const wxColour & letter)
+{
+    // Inver the color and make it very light
+    wxImage::RGBValue rgb(letter.Red(), letter.Green(), letter.Blue());
+    wxImage::HSVValue hsv = wxImage::RGBtoHSV(rgb);
+    hsv.hue = hsv.hue / .5;
+    if (hsv.hue > 1)
+        hsv.hue -= 1;
+    hsv.saturation /= 7;
+    rgb = wxImage::HSVtoRGB(hsv);
+    return wxColour(rgb.red, rgb.green, rgb.blue);
+}

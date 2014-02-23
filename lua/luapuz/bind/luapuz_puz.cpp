@@ -141,6 +141,9 @@ const luapuz_enumReg GextFlag_reg[] = {
     {"ACROSS_LITE_MASK", puz::ACROSS_LITE_MASK},
     {"FLAG_COLOR", puz::FLAG_COLOR},
     {"FLAG_MISSING", puz::FLAG_MISSING},
+    {"FLAG_CORRECT", puz::FLAG_CORRECT},
+    {"FLAG_THEME", puz::FLAG_THEME},
+    {"FLAG_CHECK_MASK", puz::FLAG_CHECK_MASK},
     {NULL, NULL}
 };
 
