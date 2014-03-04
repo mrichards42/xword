@@ -737,6 +737,19 @@
 		date_epoch = setmetatable({},{__index = function() error("failed to get the epoch date") end})
 	end
 
+    
+-- XWORD IMPROVEMENTS
+    local BIAS = date():getbias() * SECPERMIN
+    -- Convert to os.time compatible format
+    function dobj:ostime()
+        return (self.daynum - DATE_EPOCH) * SECPERDAY + self.dayfrc / TICKSPERSEC + BIAS
+    end
+    -- Using os.date() formats is ~10x faster, but less flexible
+    function dobj:format(fmt)
+        return osdate(fmt, self:ostime())
+    end
+-- END XWORD
+
 --#if not DATE_OBJECT_AFX then
 return date
 --#else
