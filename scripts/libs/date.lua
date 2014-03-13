@@ -740,13 +740,24 @@
     
 -- XWORD IMPROVEMENTS
     local BIAS = date():getbias() * SECPERMIN
+    if os.date('*t').isdst then BIAS = BIAS + SECPERHOUR end -- Adjust BIAS for DST
+    local BIAS_DST = BIAS - SECPERHOUR
     -- Convert to os.time compatible format
-    function dobj:ostime()
-        return (self.daynum - DATE_EPOCH) * SECPERDAY + self.dayfrc / TICKSPERSEC + BIAS
+    local function date2ostime(daynum, dayfrc)
+        return (daynum - DATE_EPOCH) * SECPERDAY + dayfrc / TICKSPERSEC + BIAS
+    end
+    -- Are we in DST?
+    function dobj:isdst()
+        return self:getbias() ~= BIAS
     end
     -- Using os.date() formats is ~10x faster, but less flexible
+    -- NB: This time will be 1 hour off (ahead) during DST, so this function
+    -- should only be used for formatting dates.
+    -- This is better than being 1 hour behind during standard time, since
+    -- dates wthout times are usually represented as midnight, and would
+    -- otherwise be off by a day.
     function dobj:format(fmt)
-        return osdate(fmt, self:ostime())
+        return osdate(fmt, date2ostime(self.daynum, self.dayfrc))
     end
 -- END XWORD
 
