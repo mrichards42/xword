@@ -62,7 +62,7 @@ end
 -- @param url The URL
 -- @param opts A table mapping curl options to values
 -- @return[1] true on success
--- @return [2] nil, curl return code, error message
+-- @return [2] nil, error message, curl return code
 local function _perform(url, opts)
     -- Setup the cURL object
     local c = curl.easy_init()
@@ -86,12 +86,12 @@ local function _perform(url, opts)
         else
             err = "HTTP error " .. code
         end
-        return nil, rc, err
+        return nil, err, rc
     end
     if rc == curl.OK then
         return true
     else
-        return nil, rc, err
+        return nil, err, rc
     end
 end
 
@@ -101,7 +101,7 @@ end
 -- @param filename The file to write to
 -- @param opts A table mapping curl options to values
 -- @return [1] true on success
--- @return [2] nil, curl return code, error message
+-- @return [2] nil, error message, curl return code
 local function download_to_file(url, filename, opts)
     opts = opts or {}
     -- Open a file
@@ -109,18 +109,24 @@ local function download_to_file(url, filename, opts)
     local f, err = io.open(filename, 'wb')
     if not f then return nil, err end
     -- Callback function: write to a file
+    local has_length = false
     opts[curl.OPT_WRITEFUNCTION] = function(str, length)
+        if not has_length and length > 0 then has_length = true end
         f:write(str)
         return length -- Return length to continue download
     end
     -- Download
-    local success, rc, err = _perform(url, opts)
+    local success, err, rc = _perform(url, opts)
     -- Cleanup
     f:close()
+    if success and not has_length then
+        success = false
+        err = "Empty file"
+    end
     -- Return
     if not success then
         os.remove(filename)
-        return nil, rc, err
+        return nil, err, rc
     else
         return true
     end
@@ -130,7 +136,7 @@ end
 -- @param url The URL
 -- @param opts A table mapping curl options to values
 -- @return [1] The remote file as a string
--- @return [2] nil, curl return code, error message
+-- @return [2] nil, error message, curl return code
 local function download_to_string(url, opts)
     opts = opts or {}
     local t = {}
@@ -140,12 +146,12 @@ local function download_to_string(url, opts)
         return length -- Return length to continue download
     end
     -- Download
-    local success, rc, err = _perform(url, opts)
+    local success, err, rc = _perform(url, opts)
     -- Return the string
     if success then
         return table.concat(t)
     else
-        return nil, rc, err
+        return nil, err, rc
     end
 end
 
@@ -173,7 +179,7 @@ end
 --   An alternative to the above syntax.
 -- @return[1] true
 -- @return[2] A string of data if neither filename nor write are given
--- @return[3] nil, curl return code, error message
+-- @return[3] nil, error message, curl return code
 -- @usage
 -- -- Return a string
 -- str = curl.get("www.example.com")
