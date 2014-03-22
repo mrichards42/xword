@@ -44,7 +44,7 @@ local function loop_through_queue(func)
         local data = queue:pop()
         if data then
             -- Do something with it
-            local success, err = xpcall(function() func(data) end, debug.traceback)
+            local success, err = xpcall(function() return func(data) end, debug.traceback)
             -- Report errors but continue processing
             if not success then
                 task.error(err)

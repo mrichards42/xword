@@ -8,6 +8,9 @@ local M = {
     APPEND = -200,
     PREPEND = -201,
     CLEAR = -202,
+    --- Sent when the queue has been changed (append, prepend, or clear)
+    -- @field M.EVT_QUEUE_UPDATED
+    EVT_QUEUE_UPDATED = -203
 }
 -- Return the events to secondary tasks
 if not task.is_main then return M end
@@ -33,6 +36,10 @@ setmetatable(M, Task)
 -- @param[opt=true] opts.unique Should items be unique?  See `Queue.new`.
 -- @param opts.key If items are tables this key is used to determine equality.  
 --   Tables are equal if `t1[key] == t2[key]`.
+-- @param[opt=false] opts.queue Should this QueueTask keep a local queue?
+--   Usually items are passed to the task, and the queue itself is kept
+--   in a secondary thread.  If true, keep a copy of that queue in the
+--   main thread
 -- @return A new QueueTask
 -- @usage
 -- -- Create a task that posts back each item in the queue
@@ -50,6 +57,10 @@ function M.new(opts)
         if opts.unique == nil then opts.unique = true end
         self._unique = opts.unique
         self._key = opts.key
+        if opts.queue then
+            local Queue = require 'task.queue'
+            self.queue = Queue{unique=unique, key=key}
+        end
     else
         self._unique = true
     end
@@ -96,6 +107,12 @@ end
 -- @param ... Items
 function M:append(...)
     self._check(...)
+    if self.queue then
+        for _, item in ipairs({...}) do
+            self.queue:push(item)
+        end
+        self:send_event(M.EVT_QUEUE_UPDATED)
+    end
     self:post(M.APPEND, ...)
 end
 
@@ -103,11 +120,22 @@ end
 -- @param ... Items
 function M:prepend(...)
     self._check(...)
+    if self.queue then
+        local data = {...}
+        for i=#data,1,-1 do
+            self.queue:pushfront(data[i])
+        end
+        self:send_event(M.EVT_QUEUE_UPDATED)
+    end
     self:post(M.PREPEND, ...)
 end
 
 --- Clear all items from the task's queue
 function M:clear()
+    if self.queue then
+        self.queue:clear()
+        self:send_event(M.EVT_QUEUE_UPDATED)
+    end
     self:post(M.CLEAR)
 end
 
