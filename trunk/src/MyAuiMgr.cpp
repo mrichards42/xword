@@ -22,6 +22,23 @@
 #    include <wx/wx.h>
 #endif
 
+// Define macro XWORD_CHECK_CLUE to check the clue prompt size
+// in debug mode and print a message when it changes.
+#if __WXDEBUG__
+int __CLUE_SIZE = 0;
+#define XWORD_CHECK_CLUE()                                        \
+    int __NEW_SIZE = GetPaneByCaption("Clue Prompt").rect.height; \
+    if (__CLUE_SIZE == 0)                                         \
+        __CLUE_SIZE = __NEW_SIZE;                                 \
+    else if (__CLUE_SIZE != __NEW_SIZE) {                         \
+        __CLUE_SIZE = __NEW_SIZE;                                 \
+        wxLogDebug("New Clue Size: %d", __NEW_SIZE);              \
+    }
+#else // ! __WXDEBUG__
+#define XWORD_CHECK_CLUE
+#endif // __WXDEBUG__
+
+
 // ----------------------------------------------------------------
 // MyAuiManager
 // ----------------------------------------------------------------
@@ -38,7 +55,8 @@ END_EVENT_TABLE()
 MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
         : wxAuiManager(managed_wnd, flags),
           m_menu(NULL),
-          m_isEditing(false)
+          m_isEditing(false),
+          m_frameSize(-1,-1)
 {
 }
 
@@ -127,11 +145,14 @@ void MyAuiManager::OnFrameSize(wxSizeEvent & evt)
 {
     evt.Skip();
     wxSize newSize = m_frame->GetClientSize();
-    if (newSize != m_frameSize)
+    if (! m_frameSize.IsFullySpecified())
+        m_frameSize = newSize;
+    else if (newSize != m_frameSize)
     {
         ResizeDocks(true);
         m_frameSize = newSize;
         wxAuiManager::Update();
+        XWORD_CHECK_CLUE();
     }
 }
 
@@ -260,25 +281,22 @@ void MyAuiManager::ResizeDocks(bool is_frame_resize)
         if (dock.fixed)
         {
             dock.panes.Sort(PaneSortFunc);
-            wxArrayInt pane_positions, pane_sizes;
-            GetPanePositionsAndSizes(dock, pane_positions, pane_sizes);
-            int pane_count = dock.panes.Count();
-            // Find the total size of panes, and the total dock size
-            // NB: whereas earlier "size" meant the resizable direction,
+            // Find the total pane proportion and the dock size.
+            // NB: wherease usually "size" means the resizable direction,
             // here it means the opposite.
-            int total_pane_size = 0;
+            int pane_count = dock.panes.Count();
+            int total_proportion = 0;
             for (int j = 0; j < pane_count; ++j)
-                total_pane_size += pane_sizes[j];
+                total_proportion += dock.panes.Item(j)->dock_proportion;
             int dock_size = dock.IsHorizontal() ? dock.rect.x : dock.rect.y;
+            // Adjust pane positions and size proportionate to the dock size
             int pos = 0;
-            if (dock_size > 0 && total_pane_size > 0)
+            if (dock_size > 0 && total_proportion > 0)
             {
-                double proportion = (double)dock_size / total_pane_size;
-                // Adjust pane positions and size proportionate to the dock size
                 for (int j = 0; j < pane_count; ++j)
                 {
                     wxAuiPaneInfo& pane = *(dock.panes.Item(j));
-                    int pane_size = pane_sizes[j] * proportion;
+                    int pane_size = 0.5 + (double)dock_size * pane.dock_proportion / total_proportion;
                     if (j == pane_count - 1) // Last pane gets the rest
                         pane_size = dock_size - pos;
                     if (dock.IsHorizontal())
@@ -340,10 +358,11 @@ void MyAuiManager::ResizeDocks(bool is_frame_resize)
         else
         {
             // If the frame is being resized, resize docks proportionate to
-            // the new frame size.
+            // the new frame size.  Since we're dealing with integer values
+            // add 0.5 for rounding.
             if (is_frame_resize)
-                dock.size *= dock.IsHorizontal() ? frame_proportion_y : frame_proportion_x;
-            // Otherwise, do not resize these docks.
+                dock.size = 0.5 + dock.size * (dock.IsHorizontal() ? frame_proportion_y : frame_proportion_x);
+            // Subtract from the resizable area
             if (dock.IsHorizontal())
                 resizable.y -= dock.size;
             else
@@ -397,6 +416,7 @@ void MyAuiManager::Update()
     ResizeDocks(false);
     // Update
     wxAuiManager::Update();
+    XWORD_CHECK_CLUE();
     // If sizes have changed, we need to update again to see changes.
     std::map<wxAuiPaneInfo *, int>::iterator it;
     for (it = sizes.begin(); it != sizes.end(); ++it)
@@ -501,8 +521,6 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
         processed_layout.Replace(_T("\b"), _T("\\;"));
     }
 
-    wxSize frameSize = m_frame->GetClientSize();
-
     if (! wxAuiManager::LoadPerspective(processed_layout, false))
         return false;
 
@@ -520,14 +538,7 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
         }
         else if (info_str.StartsWith(_T("frame_size")))
         {
-            // Adjust the dock proportion for the current window size.
-            long x, y;
-            info_str = info_str.AfterFirst(_T('='));
-            if (info_str.BeforeFirst(_T(',')).ToLong(&x)
-                && info_str.AfterFirst(_T(',')).ToLong(&y))
-            {
-                frameSize = wxSize(x, y);
-            }
+            // Nothing here
         }
         else if (info_str.StartsWith(_T("__"))) // Old tabs
         {
@@ -549,8 +560,6 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
                 m_paneCache[pane.name] = info_str;
         }
     }
-
-    m_frameSize = m_frame->GetClientSize();
 
     UpdateMenu();
     // Reset the edit status to reflect change in borders, etc.
@@ -877,3 +886,6 @@ MyAuiManager::OnSetCursor(wxSetCursorEvent & evt)
     else
         evt.SetCursor(wxNullCursor);
 }
+
+
+#undef XWORD_CHECK_CLUE
