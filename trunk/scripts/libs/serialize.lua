@@ -173,7 +173,7 @@ end
 
 -- Pretty print a non-recursive table of number, string, or boolean values
 -- Returns a string
-local function _pprint(t, indent, prev_tables, max_width)
+local function _pprint(t, indent, prev_tables, max_width, fail_on_error)
     if t == nil then return 'nil' end
     prev_tables[t] = true
 
@@ -188,24 +188,34 @@ local function _pprint(t, indent, prev_tables, max_width)
             end
         elseif tp == "number" or tp == "boolean" then
             return '['..tostring(k)..']'
-        else
+        elseif fail_on_error then
             error("Can't serialize key type: "..tp)
+        else
+            return '<' .. tostring(k) .. '>'
         end
     end
 
     local function _serialize_value(v)
         local tp = type(v)
         if tp == "table" then
-            if prev_tables[v] then error("Recursive table found: "..tostring(v)) end
-            local result = _pprint(v, indent + 2, prev_tables, max_width - indent - 2)
+            if prev_tables[v] then
+                if fail_on_error then
+                    error("Recursive table found: "..tostring(v))
+                else
+                    return '<recursive ' .. tostring(v) .. '>'
+                end
+            end
+            local result = _pprint(v, indent + 2, prev_tables, max_width - indent - 2, fail_on_error)
             -- Remove the indent
             return result:match('^ *([^ ].*)$')
         elseif tp == "string" then
             return string.format("%q", v)
         elseif tp == "number" or tp == "boolean" then
             return tostring(v)
-        else
+        elseif fail_on_error then
             error("Can't serialize value type: "..tp)
+        else
+            return '<' .. tostring(v) .. '>'
         end
     end
 
@@ -276,8 +286,8 @@ setmetatable(M, {
 -- @param obj The object
 -- @param[opt=80] max_width Maximum width of a line
 -- @return A string representation of this object
-function M.pprint(obj, max_width)
-    return _pprint(obj, 0, {}, max_width or 80)
+function M.pprint(obj, max_width, fail_on_error)
+    return _pprint(obj, 0, {}, max_width or 80, fail_on_error)
 end
 
 --- Write serialized data to a file.
@@ -291,7 +301,7 @@ function M.dump(obj, filename, pretty)
     if pretty == nil then pretty = true end
     if pretty then
         f:write("return ")
-        f:write(M.pprint(obj))
+        f:write(M.pprint(obj, 80, true)) -- Fail on error
     else
         f:write(_serialize(obj))
     end
