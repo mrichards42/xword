@@ -37,6 +37,11 @@ function Queue.new(opts)
     end
 end
 
+--- Retrieve an item by index.
+function Queue:at(idx)
+    return self[self._front + idx-1]
+end
+
 --- Retrieve the first item in the queue.
 function Queue:front()
     return self[self._front]
@@ -98,7 +103,7 @@ function Queue:clear()
 end
 
 --- Retrieve the length of the queue.
--- If using lua 5.1, Queue:__len is also defined, so the # operator can be used.
+-- If using lua 5.2, Queue:__len is also defined, so the # operator can be used.
 function Queue:length()
     return self._back - self._front + 1
 end
