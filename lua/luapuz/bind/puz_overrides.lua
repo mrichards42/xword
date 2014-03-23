@@ -443,6 +443,28 @@ static int Square_HasClue(lua_State * L)
 
 
 -- ===================================================================
+-- Typedef puz::Clues
+-- ===================================================================
+pushClues = [[
+int luapuz_pushClues(lua_State * L, puz::Clues * clues)
+{
+    // The clue table
+    lua_newtable(L);
+
+    int i = 1;
+    puz::Clues::iterator it;
+    for (it = clues->begin(); it != clues->end(); ++it)
+    {
+        luapuz_pushClueList(L, &it->second);
+        lua_setfield(L, -2, puz::encode_utf8(it->first).c_str());
+    }
+
+    return 1;
+}
+]],
+
+
+-- ===================================================================
 -- Typedef puz::ClueList
 -- ===================================================================
 pushClueList = [[

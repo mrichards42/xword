@@ -178,6 +178,11 @@ func{"GetDirection",       returns="unsigned short",
 
 
 class()
+typedef{"Clues", luatype="LUA_TTABLE",
+        headers={"puz/Clue.hpp"},
+        push_func=overrides.pushClues}
+
+class()
 typedef{"ClueList", luatype="LUA_TTABLE",
         headers={"puz/Clue.hpp", "<algorithm>"},
         check_func=overrides.checkClueList,
@@ -279,6 +284,7 @@ class{"Puzzle", header="puz/Puzzle.hpp", cppheader="luapuz_puz_Puzzle_helpers.hp
     func{"IsTimerRunning", returns="bool"}
     func{"SetTimerRunning", arg("bool", "running")}
 
+    func{"GetClues", returns="Clues &"}
     func{"GetClueList", arg("puz::string_t", "name"), returns="ClueList &", throws=true}
     func{"SetClueList", arg("puz::string_t", "name"), arg("ClueList &", "cluelist"), returns="ClueList &"}
 

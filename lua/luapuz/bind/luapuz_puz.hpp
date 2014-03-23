@@ -174,6 +174,12 @@ inline bool luapuz_isFindOptions(lua_State * L, int index)
 }
 
 
+// typedef Clues
+//-------------
+
+LUAPUZ_API int luapuz_pushClues(lua_State * L, puz::Clues * clues);
+
+
 // typedef ClueList
 //-------------
 
