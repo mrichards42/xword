@@ -15,8 +15,8 @@ extern "C" {
 
 #include "luapuz_puz_Puzzle_helpers.hpp"
 #include "luapuz_puz_Puzzle.hpp"
-#include "luapuz_puz_Grid.hpp"
 #include "luapuz_puz.hpp"
+#include "luapuz_puz_Grid.hpp"
 // ---------------------------------------------------------------------------
 // class Puzzle
 // ---------------------------------------------------------------------------
@@ -418,6 +418,14 @@ static int Puzzle_SetTimerRunning(lua_State * L)
     puzzle->SetTimerRunning(running);
     return 0;
 }
+// Clues & GetClues()
+static int Puzzle_GetClues(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    puz::Clues * returns = &puzzle->GetClues();
+    luapuz_pushClues(L, returns);
+    return 1;
+}
 // ClueList & GetClueList(puz::string_t name)
 static int Puzzle_GetClueList(lua_State * L)
 {
@@ -518,6 +526,7 @@ static const luaL_reg Puzzlelib[] = {
     {"SetTime", Puzzle_SetTime},
     {"IsTimerRunning", Puzzle_IsTimerRunning},
     {"SetTimerRunning", Puzzle_SetTimerRunning},
+    {"GetClues", Puzzle_GetClues},
     {"GetClueList", Puzzle_GetClueList},
     {"SetClueList", Puzzle_SetClueList},
     {"NumberClues", Puzzle_NumberClues},
