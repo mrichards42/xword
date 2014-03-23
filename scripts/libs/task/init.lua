@@ -51,26 +51,31 @@ local function _post(id, evt_id, ...)
     return task_post(id, data, evt_id)
 end
 
--- Receive a message and return task_id, evt_id, a data table
--- Used by task.receive and task.peek
-local function _receive(timeout)
-    local msg, evt_id, rc = task_receive(timeout)
-    if rc ~= 0 then return nil, 'timed out' end
+-- Deserialize a message from task.receive
+local function _deserialize_message(evt_id, msg)
     -- Note abort events
     if evt_id == task.EVT_ABORT then task.should_abort = true end
     -- Deserialize the data
     local data = serialize.loadstring(msg)
     -- If the data cannot be deserialized, report this as an error
     if not data then
-        task.error_handler(string.format("unable to deserialize task data: %q", msg))
+        task.error_handler(("unable to deserialize task data: %q"):format(msg))
         return nil, 'unable to deserialize task data'
     end
     -- If we got the wrong info, report an error
     if type(data) ~= 'table' or not data.id then
-        task.error_handler(string.format("incorrect task data format: %q", msg))
+        task.error_handler(("incorrect task data format: %q"):format(msg))
         return nil, 'incorrect task data format'
     end
     return data.id, evt_id, data.data
+end
+
+-- Receive a message and return task_id, evt_id, a data table
+-- Used by task.receive and task.peek
+local function _receive(timeout)
+    local msg, evt_id, rc = task_receive(timeout)
+    if rc ~= 0 then return nil, 'timed out' end
+    return _deserialize_message(evt_id, msg)
 end
 
 if _task.id() == 1 then
@@ -333,13 +338,27 @@ local function _process_event(t, evt_id, data)
     task.evt_id = nil
 end
 
--- Insert a message loop as an idle event
-wx.wxGetApp():Connect(wx.wxEVT_IDLE, function()
-    -- Check for messages
-    while true do
-        local id, evt_id, data = _receive(0)
-        if not id then break end -- No message
-        _process_event(TASK_LIST[id], evt_id, data)
+-- xword creates an event xword.EVT_LUATASK that is used for passing messages
+-- from secondary threads to the main thread.  This allows immediate processing
+-- of events, whereas the old EVT_IDLE implementation required the user to
+-- generate events in order to complete processing.
+-- Note that the main thread still uses the standard task.post to send messages,
+-- and secondary threads still use task.receive to get messages.
+wx.wxGetApp():Connect(xword.EVT_LUATASK, function(evt)
+    -- evt.Int == event id, evt.String == event message
+    local id, evt_id, data = _deserialize_message(evt:GetInt(), evt:GetString())
+    if not id then return end -- No message
+    -- Find the task and process events
+    local t = TASK_LIST[id]
+    if t == nil then
+        local msg = {}
+        table.insert(msg, ("No task.  Task id: %d, evt id: %d, data: %s"):format(id, evt_id, serialize.pprint(data)))
+        table.insert(msg, "Main running? " .. (wx.wxGetApp():IsMainLoopRunning() and "true" or "false"))
+        table.insert(msg, "TASK_LIST = " .. serialize.pprint(TASK_LIST))
+        table.insert(msg, "TASK_ID_LIST = " .. serialize.pprint(TASK_ID_LIST))
+        task.error_handler(table.concat(msg, '\n'))
+    else
+        _process_event(t, evt_id, data)
     end
 end)
 
@@ -348,8 +367,7 @@ end)
 -- @type Task
 
 function Task:__tostring()
-    return string.format(
-        '%s (%s Task).',
+    return ('%s (%s Task).'):format(
         tostring(self.name),
         self:is_running() and 'Running' or 'Not Running'
     )
@@ -464,11 +482,11 @@ end
 
 -- Report errors and debug messages
 task.connect(wx.wxID_ANY, task.EVT_ERROR, function(msg)
-    task.error_handler(string.format('Task Error (%s): %s', task.evt_task.name, msg))
+    task.error_handler(('Task Error (%s): %s'):format(task.evt_task.name, msg))
 end)
 
 task.connect(wx.wxID_ANY, task.EVT_DEBUG, function(msg)
-    task.debug_handler(string.format('(%s): %s', task.evt_task.name, msg))
+    task.debug_handler(('(%s): %s'):format(task.evt_task.name, msg))
 end)
 
 -- Cleanup when the task ends:

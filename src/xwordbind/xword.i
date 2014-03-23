@@ -106,3 +106,7 @@ class wxPuzEvent : public wxCommandEvent
     %wxEventType wxEVT_PUZ_CLUE_FOCUS
     %wxEventType wxEVT_PUZ_LETTER
 };
+
+typedef wxCommandEvent wxluataskevent {
+    %wxEventType EVT_LUATASK
+};

@@ -272,7 +272,17 @@ static int reg_taskcreate(lua_State *L) {
     size_t flon;
     const char *fname = luaL_checklstring(L, 1, &flon);
     lua_State *TL = lua_open();
-        
+
+    /* Copy TASK_INIT to the new state if it is a function. */
+    lua_getglobal(L, "TASK_INIT");
+    if (lua_iscfunction(L, -1)) {
+        /* Copy this function to the new state */
+        lua_CFunction func = lua_tocfunction(L, -1);
+        lua_pushcfunction(TL, func);
+        lua_setglobal(TL, "TASK_INIT");
+    }
+    lua_pop(L, 1);
+
     lua_newtable(TL);
     lua_pushnumber(TL, 0);
     lua_pushlstring(TL, fname, flon);
@@ -583,6 +593,14 @@ static OS_THREAD_FUNC taskthread( void *vp) {
 	lua_gc(te->L, LUA_GCSTOP, 0);  /* stop collector during initialization */
 	luaL_openlibs(te->L);  /* open libraries */
     luaopen_task(te->L);
+    /* Call TASK_INIT, set in reg_taskcreate */
+    lua_getglobal(te->L, "TASK_INIT");
+    if (lua_iscfunction(te->L, -1)) {
+        lua_CFunction func = lua_tocfunction(te->L, -1);
+        func(te->L);
+    }
+    lua_pop(te->L, 1);
+    /* Restart the garbage collector */
 	lua_gc(te->L, LUA_GCRESTART, 0);
     if( LRT_LIB_OVERRIDE != NULL)
         LRT_LIB_OVERRIDE( te->L);

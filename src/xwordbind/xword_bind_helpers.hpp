@@ -2,10 +2,17 @@
 #define XWORD_BIND_HELP_H
 
 #include <algorithm> // clue list sorting
+#include "../xwordluatask.hpp" // EVT_LUATASK
 
 // This file should *only* be included from xword_bind.cpp
 // It does *not* have the requisite headers for wxLua, because they will be
 // included before this file.
+
+// This is using a weird hack of genwxbind.lua
+// Using typedef { %wxEventType EVT_WHATEVER} creates an event with
+// a type of "wxluatype_globals", which doesn't exist.
+// Define this as the correct event.
+#define wxluatype_globals wxluatype_wxCommandEvent
 
 //----------------------------------------------------------------------------
 // XWord wxString conversion
