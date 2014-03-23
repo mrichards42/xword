@@ -712,6 +712,7 @@ wxLuaBindEvent* wxLuaGetEventList_xword(size_t &count)
 {
     static wxLuaBindEvent eventList[] =
     {
+        { "EVT_LUATASK", WXLUA_GET_wxEventType_ptr(EVT_LUATASK), &wxluatype_globals },
         { "wxEVT_PUZ_CLUE_FOCUS", WXLUA_GET_wxEventType_ptr(wxEVT_PUZ_CLUE_FOCUS), &wxluatype_wxPuzEvent },
         { "wxEVT_PUZ_GRID_FOCUS", WXLUA_GET_wxEventType_ptr(wxEVT_PUZ_GRID_FOCUS), &wxluatype_wxPuzEvent },
         { "wxEVT_PUZ_LETTER", WXLUA_GET_wxEventType_ptr(wxEVT_PUZ_LETTER), &wxluatype_wxPuzEvent },

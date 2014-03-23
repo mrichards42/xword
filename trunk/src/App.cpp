@@ -104,7 +104,7 @@ bool MyApp::OnInit()
     // Initialze wxLua.
     XWORD_LUA_IMPLEMENT_BIND_ALL
     m_lua.Create(this, wxID_ANY);
-    xword_setup_lua(m_lua);
+    lua_openxword(m_lua.GetLuaState());
 
     // Make sure that lua isn't allowed to call wx.wxGetApp:MainLoop()
     // return true from this function will handle MainLoop

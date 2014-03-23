@@ -30,7 +30,6 @@
 #define wxLUA_USEBINDING_WXSTC 0
 #define wxLUA_USEBINDING_WXLUADEBUGGER 0
 
-#include "paths.hpp"
 #include "wxlua/wxlua.h"
 #include "wxbind/include/wxbinddefs.h"
 
@@ -43,61 +42,6 @@ WXLUA_DECLARE_BIND_ALL
         WXLUA_IMPLEMENT_BIND_ALL     \
         wxLuaBinding_xword_init();
 
-
-static void xword_setup_lua(wxLuaState & lua)
-{
-    lua_State * L = lua.GetLuaState();
-
-    // Open the luapuz library
-    // NB: We have to use require instead of directly calling luaopen_luapuz
-    // since luapuz is loaded as a dll
-    lua_getglobal(L, "require");
-    lua_pushstring(L, "luapuz");
-    lua_pcall(L, 1, 0, 0);
-
-    // Set package.path and package.cpath
-    lua_getglobal(L, "package");
-
-    lua_pushstring(L, wx2lua(GetLuaPath()));
-    lua_setfield(L, -2, "path");
-
-    lua_pushstring(L, wx2lua(GetLuaCPath()));
-    lua_setfield(L, -2, "cpath");
-
-    lua_pop(L, 1);
-
-
-    // Set values in xword table:
-    //    configdir
-    //    scriptsdir
-    //    imagesdir
-    //    userdatadir
-    //    isportable
-    //    firstrun
-    lua_getglobal(L, "xword");
-
-    lua_pushstring(L, wx2lua(GetConfigDir().c_str()));
-    lua_setfield(L, -2, "configdir");
-
-    lua_pushstring(L, wx2lua(GetScriptsDir().c_str()));
-    lua_setfield(L, -2, "scriptsdir");
-
-    lua_pushstring(L, wx2lua(GetImagesDir().c_str()));
-    lua_setfield(L, -2, "imagesdir");
-
-    lua_pushstring(L, wx2lua(GetUserDataDir().c_str()));
-    lua_setfield(L, -2, "userdatadir");
-
-    lua_pushboolean(L, wxGetApp().IsPortable());
-    lua_setfield(L, -2, "isportable");
-
-    lua_pushstring(L, wx2lua(XWORD_VERSION_STRING));
-    lua_setfield(L, -2, "version");
-
-    lua_pushboolean(L, wxGetApp().FirstRun());
-    lua_setfield(L, -2, "firstrun");
-
-    lua_pop(L, 1);
-}
+void lua_openxword(lua_State * L);
 
 #endif // XWORD_LUA_H

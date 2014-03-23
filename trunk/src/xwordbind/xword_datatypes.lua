@@ -20,6 +20,7 @@ xword_typedefTable =
   wxTextCoord = "long",
   wxTraceMask = "unsigned long",
   wxTreeItemIdValue = "double",
+  wxluataskevent = "wxCommandEvent",
 }
 
 
@@ -5282,6 +5283,11 @@ xword_dataTypeTable =
     IsNumber = true,
     Name = "wxXmlResourceFlags",
     ValueType = "enum",
+  },
+  wxluataskevent = {
+    IsNumber = false,
+    Name = "wxluataskevent",
+    ValueType = "class",
   },
 }
 
