@@ -168,6 +168,18 @@ function UniqueQueue:pushfront(v)
     post_insert(self, self._hash(v), self._front)
 end
 
+function UniqueQueue:front()
+    for i=self._front,self._back do
+        if self[i] then return self[i] end
+    end
+end
+
+function UniqueQueue:back()
+    for i=self._back,self._front,-1 do
+        if self[i] then return self[i] end
+    end
+end
+
 -- Remove an item via pop or popback
 local function do_remove(self, func)
     -- Get the first non-nil value
@@ -187,8 +199,9 @@ function UniqueQueue:pop(hash)
         local idx = self._map[hash]
         local v = idx and self[idx]
         if (not idx) or (v == nil) then return end
-        self[idx] = nil
         self._map[hash] = nil
+        self[idx] = nil
+        if idx == self._front then self._front = self._front + 1 end
         self._length = self._length - 1
         return v
     else
@@ -207,16 +220,50 @@ function UniqueQueue:get(hash)
 end
 
 function UniqueQueue:iter()
-    local i = self._front - 1
-    return function()
-        -- Get the first non-nil value
-        local v
-        repeat
-            i = i + 1
-            v = self[i]
-        until v ~= nil or i > self._back
-        return v
+    -- If this queue has no nils, use the standard iteration function
+    if self:isnormal() then
+        return Queue.iter(self)
     end
+    -- Otherwise iterate and remove nils
+    local offset = 0
+    local i=self._front - 1
+    return function()
+        local v
+        while true do
+            i = i + 1
+            -- Check to see if we're done
+            if i > self._back then
+                -- Done: no nils, so we can reset self._back based on length
+                self._back = self._front + self._length - 1
+                return nil
+            end
+            v = self[i]
+            if v ~= nil then
+                -- We have a non-nil item
+                if offset > 0 then
+                    -- Remove nils between the previous item and this one
+                    local new_idx = i-offset
+                    self[new_idx] = v
+                    self._map[self._hash(v)] = new_idx
+                    self[i] = nil
+                end
+                return v
+            else
+                -- skip nils
+                offset = offset + 1
+            end
+        end
+    end
+end
+
+function UniqueQueue:normalize()
+    if not self:isnormal() then
+        for _ in self:iter() do end
+    end
+end
+
+function UniqueQueue:isnormal()
+    return Queue.length(self) == self._length
 end
 
 function UniqueQueue:clear()
