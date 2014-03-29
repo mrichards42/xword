@@ -3,7 +3,7 @@
 --
 -- Implements an event loop using task.post and task.receive.
 --
--- See `task.connect` for a usage example.
+-- See `task.new` for a usage example.
 --
 -- @module task
 
@@ -86,9 +86,11 @@ if _task.id() == 1 then
 -- @section main_thread
 
 local tablex = require 'pl.tablex'
+local EvtHandler = require(_R..'event')
 
 local Task = {} -- Declare the task object
 Task.__index = Task
+setmetatable(Task, EvtHandler)
 
 -- Add to the task table
 task.Task = Task
@@ -129,6 +131,7 @@ end
 -- @param opts.name[opt] A name for this task
 -- @param opts.globals[opt] Table of globals set in the new task.
 -- @param opts.events[opt] An event table for this task.
+-- @param opts.obj[opt] An object to use as the table for this task.
 -- @return The `Task` object.
 -- @see Task:start
 -- @see Task:connect
@@ -199,106 +202,6 @@ function task.run(opts, callback, args)
     return self
 end
 
--- Recursively replace keys in t1 with values from t2
-local function update(t1, t2)
-    for k,v in pairs(t2) do
-        if type(v) == 'table' then
-            if not t1[k] then t1[k] = {} end
-            update(t1[k], v)
-        else
-            t1[k] = v
-        end
-    end
-end
-
--- Auto create keys for EVENT_TABLE
-local EVENT_TABLE = setmetatable({}, {
-    __index = function(t, k)
-        t[k] = setmetatable({}, getmetatable(t))
-        return t[k]
-    end})
-
---- Connect an event or an event table to a task.
--- Also a metamethod of `Task` objects
--- @param key The `Task` object or wx.wxID_ANY for all tasks
--- @param[opt] evt_id The event id, if connecting a single callback
--- @param callback The callback function, or a table mapping event ids to
---   callback functions
--- @usage
--- local MY_CUSTOM_EVT = 100
--- local MY_CUSTOM_EVT2 = 101
--- local the_task = task.new("my_module.my_long_task")
---
--- -- Connect an event
--- the_task:connect(MY_CUSTOM_EVT, function() print('hello world') end)
---
--- -- Start a task and connect all events
--- the_task:connect({
---     -- Connect one callback function to an event
---     [task.EVT_START] = function() print('starting task') end
---     [task.EVT_END] = function() print('task complete') end,
---     -- Data from `task.post` are passed as arguments to callbacks
---     [MY_CUSTOM_EVT] = function(str, num) print('My event', str, num) end
---     -- Connect several callback functions to an event
---     [MY_CUSTOM_EVT2] = {
---         function() print('Custom event 2') end,
---         function() print('Another callback') end,
---     },
--- })
--- the_task:start()
---
--- -- Connect to debug events from any thread
--- task.connect(wx.wxID_ANY, task.EVT_DEBUG,
---              function(msg) print('debug:', task.evt_task.name, msg) end)
-function task.connect(key, evt_id, callback)
-    local events = EVENT_TABLE[key]
-    if evt_id and callback then -- Single callback
-        table.insert(events[evt_id], callback)
-    else -- Event table
-        local event_table = evt_id
-        for evt_id, callbacks in pairs(event_table) do
-            if type(callbacks) ~= 'table' then
-                table.insert(events[evt_id], callbacks)
-            else
-                tablex.insert_values(events[evt_id], callbacks)
-            end
-        end
-    end
-end
-
---- Remove an event handler from a task.
--- Also a metamethod of Task objects
--- If no callback is given, remove all callbacks for the event.
--- If no evt_id, remove callback from all events.
--- If neither is given, remove all callbacks for this event
--- @param key The Task object or wx.wxID_ANY for all tasks
--- @param[opt] evt_id The message type flag
--- @param callback[opt] The callback function
-function task.disconnect(key, evt_id, callback)
-    if not (evt_id or callback) then
-        EVENT_TABLE[key] = nil
-        return
-    end
-    local events = EVENT_TABLE[key]
-    -- Single callback overload
-    if not callback and type(evt_id) == 'function' then
-        callback = evt_id
-        evt_id = nil
-    elseif evt_id then -- If we have an evt_id, just search its callback table
-        events = { events[evt_id] }
-    end
-    -- Search through event tables and remove the callback function
-    for _, callbacks in pairs(events) do
-        if callback then
-            -- Search for the callback and remove it
-            local i = tablex.find(callbacks, callback)
-            if i then table.remove(callbacks, i) end
-        else -- No callback argument: clear all callbacks from this event
-            tablex.clear(callbacks)
-        end
-    end
-end
-
 --- A table of globals set for all tasks.
 task.globals = {}
 
@@ -310,34 +213,7 @@ task.error_handler = print
 -- Defaults to `print`.
 task.debug_handler = print
 
---- The `Task` object that posted the current event.
---- @field task.evt_task
-
---- The id of the current event.
--- @field task.evt_id
-
--- Process an event.  Used in the EVT_IDLE handler below
-local function _process_event(t, evt_id, data)
-    -- Set current task and evt for task.evt_id/task.evt_task
-    task.evt_task = t
-    task.evt_id = evt_id
-    -- Find callbacks for this task/event combination
-    -- Include wxID_ANY tasks/events
-    local event_table_list = {
-        EVENT_TABLE[t][evt_id],
-        EVENT_TABLE[t][-1],
-        EVENT_TABLE[-1][evt_id],
-        EVENT_TABLE[-1][-1]
-    }
-    for _, callbacks in ipairs(event_table_list) do
-        for _, callback in ipairs(callbacks) do
-           callback(unpack(data))
-        end
-    end
-    task.evt_task = nil
-    task.evt_id = nil
-end
-
+-- The task event loop.
 -- xword creates an event xword.EVT_LUATASK that is used for passing messages
 -- from secondary threads to the main thread.  This allows immediate processing
 -- of events, whereas the old EVT_IDLE implementation required the user to
@@ -358,7 +234,7 @@ wx.wxGetApp():Connect(xword.EVT_LUATASK, function(evt)
         table.insert(msg, "TASK_ID_LIST = " .. serialize.pprint(TASK_ID_LIST))
         task.error_handler(table.concat(msg, '\n'))
     else
-        _process_event(t, evt_id, data)
+        t:send_event(evt_id, unpack(data))
     end
 end)
 
@@ -384,6 +260,19 @@ end
 
 -- Get the filename of task_script.lua which is passed to _task.create
 local CREATE_SCRIPT = path.package_path(_R .. 'task_create')
+
+-- Recursively replace keys in t1 with values from t2
+local function update(t1, t2)
+    for k,v in pairs(t2) do
+        if type(v) == 'table' then
+            if not t1[k] then t1[k] = {} end
+            update(t1[k], v)
+        else
+            t1[k] = v
+        end
+    end
+end
+
 
 --- Start the task in a new thread.
 -- If a task has completed, it can be restarted with this method.
@@ -445,26 +334,22 @@ function Task:post(evt_id, ...)
 end
 
 --- Simulate an event being sent to each event handler.
+-- @function Task:send_event
 -- @param evt_id The (user-defined) event id.
--- @param ...  data.  (numbers, strings, or tables)
-function Task:send_event(evt_id, ...)
-    _process_event(self, evt_id, {...})
-end
+-- @param ... Data.  (numbers, strings, or tables)
 
 --- Connect event handlers to a task.
 -- @function Task:connect
--- @see task.connect
--- @param[opt] evt_id The event id, if connecting a single callback
+-- @see EvtHandler.connect
+-- @param[opt] evt_id The event id, if connecting a single callback.
 -- @param callback The callback function, or a table mapping event ids to
---   callback functions
-Task.connect = task.connect
+--   callback functions.
 
 --- Remove an event handler from a task.
 -- @function Task:disconnect
--- @see task.disconnect
--- @param[opt] evt_id The message type flag
+-- @see EvtHandler.disconnect
+-- @param[opt] evt_id The event id.
 -- @param callback[opt] The callback function
-Task.disconnect = task.disconnect
 
 --- Is this task currently running?
 -- @return true/false
@@ -481,19 +366,20 @@ end
 --- @section end
 
 -- Report errors and debug messages
-task.connect(wx.wxID_ANY, task.EVT_ERROR, function(msg)
-    task.error_handler(('Task Error (%s): %s'):format(task.evt_task.name, msg))
+EvtHandler.connect(wx.wxID_ANY, task.EVT_ERROR, function(msg)
+    task.error_handler(('Task Error (%s): %s'):format(EvtHandler.evt_handler.name, msg))
 end)
 
-task.connect(wx.wxID_ANY, task.EVT_DEBUG, function(msg)
-    task.debug_handler(('(%s): %s'):format(task.evt_task.name, msg))
+EvtHandler.connect(wx.wxID_ANY, task.EVT_DEBUG, function(msg)
+    task.debug_handler(('(%s): %s'):format(EvtHandler.evt_handler.name, msg))
 end)
 
 -- Cleanup when the task ends:
 -- Remove from TASK_LISTs
 -- Remove _task_id so we can't post to this task
-task.connect(wx.wxID_ANY, task.EVT_END, function()
-    local t = task.evt_task
+EvtHandler.connect(wx.wxID_ANY, task.EVT_END, function()
+    local t = EvtHandler.evt_handler
+    t:disconnect() -- Remove event handlers
     TASK_LIST[t.id] = nil
     if t._task_id then
         TASK_ID_LIST[t._task_id] = nil
