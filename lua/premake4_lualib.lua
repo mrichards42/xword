@@ -6,9 +6,12 @@ configuration "Release"
     targetdir "../bin/Release/scripts/libs"
 configuration {}
 
-includedirs { "lua", "lua/include" }
+
+-- lua
+includedirs { "../deps/luajit/include" }
 defines { "LUA_LIB" }
-links { "lua" }
+libdirs { "../deps/luajit/lib" }
+links { "lua51" }
 
 configuration "windows"
     defines {

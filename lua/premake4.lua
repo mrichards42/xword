@@ -1,7 +1,7 @@
-include "lua"
 include "wxlua"
 include "wxbind"
 include "luatask"
 include "lfs"
+include "lxp"
 include "luacurl"
 include "luapuz"

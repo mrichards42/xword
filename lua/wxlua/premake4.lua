@@ -5,9 +5,14 @@ project "wxlua"
     kind "StaticLib"
     language "C++"
     files { "*", "debug/*", "debugger/*" }
-    includedirs { "../wxbind/setup", "../lua/include", "..", "." }
-
-    links { "lua" }
+    includedirs {
+        "../wxbind/setup",
+        "../../deps/luajit/include",
+        "..",
+        "."
+    }
+    libdirs { "../../deps/luajit/lib" }
+    links { "lua51" }
 
     configuration "Debug"   targetdir "../../lib/Debug"
     configuration "Release" targetdir "../../lib/Release"

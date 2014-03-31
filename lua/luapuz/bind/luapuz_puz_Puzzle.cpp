@@ -15,8 +15,8 @@ extern "C" {
 
 #include "luapuz_puz_Puzzle_helpers.hpp"
 #include "luapuz_puz_Puzzle.hpp"
-#include "luapuz_puz.hpp"
 #include "luapuz_puz_Grid.hpp"
+#include "luapuz_puz.hpp"
 // ---------------------------------------------------------------------------
 // class Puzzle
 // ---------------------------------------------------------------------------
@@ -90,7 +90,7 @@ int Puzzle_tostring(lua_State * L)
 // Puzzle()
 // Puzzle(const std::string & filename)
 // Puzzle(const std::string & filename, const FileHandlerDesc * desc)
-int Puzzle_Puzzle(lua_State * L)
+int Puzzle_Puzzle_try(lua_State * L)
 {
     try {
         puz::Puzzle * returns;
@@ -129,12 +129,19 @@ int Puzzle_Puzzle(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // Error on the stack
+}
+
+int Puzzle_Puzzle(lua_State * L)
+{
+    int code = Puzzle_Puzzle_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // void Load(const std::string & filename)
 // void Load(const std::string & filename, FileHandlerDesc * desc)
-int Puzzle_Load(lua_State * L)
+int Puzzle_Load_try(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     const char * filename = luaL_checkstring(L, 2);
@@ -164,8 +171,15 @@ int Puzzle_Load(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // Error on the stack
+}
+
+int Puzzle_Load(lua_State * L)
+{
+    int code = Puzzle_Load_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // void Save(const std::string & filename)
 // void Save(const std::string & filename, FileHandlerDesc * desc)
@@ -258,7 +272,8 @@ static int Puzzle_SetOk(lua_State * L)
     return 0;
 }
 // void TestOk()
-static int Puzzle_TestOk(lua_State * L)
+// Separate try/catch function
+static int Puzzle_TestOk_try(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     try {
@@ -268,8 +283,15 @@ static int Puzzle_TestOk(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Puzzle_TestOk(lua_State * L)
+{
+    int code = Puzzle_TestOk_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // Grid & GetGrid()
 static int Puzzle_GetGrid(lua_State * L)
@@ -427,7 +449,8 @@ static int Puzzle_GetClues(lua_State * L)
     return 1;
 }
 // ClueList & GetClueList(puz::string_t name)
-static int Puzzle_GetClueList(lua_State * L)
+// Separate try/catch function
+static int Puzzle_GetClueList_try(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     puz::string_t name = luapuz_checkstring_t(L, 2);
@@ -440,8 +463,15 @@ static int Puzzle_GetClueList(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Puzzle_GetClueList(lua_State * L)
+{
+    int code = Puzzle_GetClueList_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // ClueList & SetClueList(puz::string_t name, puz::ClueList & cluelist)
 static int Puzzle_SetClueList(lua_State * L)
@@ -455,7 +485,8 @@ static int Puzzle_SetClueList(lua_State * L)
     return 1;
 }
 // void NumberClues()
-static int Puzzle_NumberClues(lua_State * L)
+// Separate try/catch function
+static int Puzzle_NumberClues_try(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     try {
@@ -465,8 +496,15 @@ static int Puzzle_NumberClues(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Puzzle_NumberClues(lua_State * L)
+{
+    int code = Puzzle_NumberClues_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // void NumberGrid()
 static int Puzzle_NumberGrid(lua_State * L)
@@ -484,7 +522,8 @@ static int Puzzle_UsesNumberAlgorithm(lua_State * L)
     return 1;
 }
 // void GenerateWords()
-static int Puzzle_GenerateWords(lua_State * L)
+// Separate try/catch function
+static int Puzzle_GenerateWords_try(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     try {
@@ -494,8 +533,15 @@ static int Puzzle_GenerateWords(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Puzzle_GenerateWords(lua_State * L)
+{
+    int code = Puzzle_GenerateWords_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 static const luaL_reg Puzzlelib[] = {
     {"Load", Puzzle_Load},

@@ -6,6 +6,8 @@
 ** Copyright (C) 2003-2007 Daniel Quintela.  All rights reserved.
 */
 
+#include <vld.h>
+
 #include <lauxlib.h>
 #include <lua.h>
 #include "lualib.h"

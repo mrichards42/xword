@@ -7,7 +7,7 @@ Puzzle_Puzzle = [[
 // Puzzle()
 // Puzzle(const std::string & filename)
 // Puzzle(const std::string & filename, const FileHandlerDesc * desc)
-int Puzzle_Puzzle(lua_State * L)
+int Puzzle_Puzzle_try(lua_State * L)
 {
     try {
         puz::Puzzle * returns;
@@ -46,8 +46,15 @@ int Puzzle_Puzzle(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // Error on the stack
+}
+
+int Puzzle_Puzzle(lua_State * L)
+{
+    int code = Puzzle_Puzzle_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 ]],
 
@@ -55,7 +62,7 @@ int Puzzle_Puzzle(lua_State * L)
 Puzzle_Load = [[
 // void Load(const std::string & filename)
 // void Load(const std::string & filename, FileHandlerDesc * desc)
-int Puzzle_Load(lua_State * L)
+int Puzzle_Load_try(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     const char * filename = luaL_checkstring(L, 2);
@@ -85,8 +92,15 @@ int Puzzle_Load(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // Error on the stack
+}
+
+int Puzzle_Load(lua_State * L)
+{
+    int code = Puzzle_Load_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 ]],
 
