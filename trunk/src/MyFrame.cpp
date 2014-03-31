@@ -529,7 +529,25 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     {
         m_isModified = false;
         m_puz.Load(wx2file(filename), handler);
-
+        // Mark the theme squares
+        // call import.mark_theme_squares() from lua
+    #if XWORD_USE_LUA
+        wxLuaState & wxL = wxGetApp().GetwxLuaState();
+        lua_State * L = wxL.GetLuaState();
+        lua_getglobal(L, "import");
+        if (lua_istable(L, -1))
+        {
+            lua_getfield(L, -1, "mark_theme_squares");
+            if (! lua_isfunction(L, -1))
+                lua_pop(L, 1);
+            else
+            {
+                luapuz_pushPuzzle(L, &m_puz);
+                wxL.LuaPCall(1, 0);
+            }
+        }
+        lua_pop(L, 1); // Pop the import table
+    #endif
     }
     catch (...)
     {
