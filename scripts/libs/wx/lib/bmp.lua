@@ -38,10 +38,11 @@ end
 -- my_bitmap = require("wx.lib.bmp")("images.my_bitmap.bmp")
 -- @function require_bmp
 return function(name, class)
+    class = class or wx.wxBitmap
     local filename = find_file(name)
     if filename then
-        print(filename)
-        return (class or wx.wxBitmap)(filename)
+        return class(filename)
     end
-    error("Unable to load bitmap: " .. tostring(name))
+    wx.wxLogWarning("Unable to load bitmap: " .. tostring(name))
+    return class()
 end
