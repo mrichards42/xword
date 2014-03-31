@@ -13,31 +13,42 @@ local function get_http_error(err)
     return tonumber(err:match("The requested URL returned error: (%d+)"))
 end
 
+--- Progress function hook.
+-- If this is not nil, called on progress.
+-- This is an alternate way to specify a progress function.
+-- @see curl.get
+curl.progress_func = nil
+
 --- Return a progress function
 -- If in a secondary thread, make sure to try check_abort on progress.
 local function get_progress_function(curlopts)
     local func = curlopts[curl.OPT_PROGRESSFUNCTION]
+    local hook = curl.progress_func
     if task and not task.is_main and task.check_abort then
-        -- Set NOPROGRESS to 0 if we have a progess function
-        curlopts[curl.OPT_NOPROGRESS] = 0
         if func then
             return function(...)
                 local ret = func(...)
-                return task.check_abort() and 1 or ret
+                local ret2 = hook and hook(...) or 0
+                return task.check_abort() and 1 or ret == 0 and ret2 or ret
             end
         else
-            return function()
-                return task.check_abort() and 1 or 0
+            return function(...)
+                local ret = hook and hook(...) or 0
+                return task.check_abort() and 1 or ret
             end
         end
     end
     -- Else we're in the main thread.
     -- Return the original progress function.
-    -- Set NOPROGRESS to 0 if we have a progess function
-    if func then
-        curlopts[curl.OPT_NOPROGRESS] = 0
+    if hook then
+        return function(...)
+            local ret = func(...)
+            local ret2 = hook(...)
+            return ret == 0 and ret2 or ret
+        end
+    else
+        return func
     end
-    return func
 end
 
 -- Encode and format a table of post data
@@ -253,7 +264,11 @@ function curl.get(opts, ...)
     -- Encode and format post fields
     curlopts[curl.OPT_POSTFIELDS] = get_post(curlopts)
     -- Get the progress function (add task.check_abort if necessary)
-    curlopts[curl.OPT_PROGRESSFUNCTION] = get_progress_function(curlopts)
+    local progress = get_progress_function(curlopts)
+    if progress then
+        curlopts[curl.OPT_PROGRESSFUNCTION] = progress
+        curlopts[curl.OPT_NOPROGRESS] = 0
+    end
     -- Only one required argument
     assert(url)
     -- Figure out which variant to call
