@@ -171,19 +171,23 @@ function mt:writeexec(f, name)
 
     -- methods are named [class]_[function];
     -- free functions are named [prefix]_[function]
-    -- methods take as their first parameter the class object.
-
-    if self.is_method and not self.is_static then
+    if self.throws then
         f:write(self:fmt([[
-static int [cfunc](lua_State * L)
+// Separate try/catch function
+static int [cfunc]_try(lua_State * L)
 {
-    [ptype] * [pvar] = [pcheckfunc](L, 1);
-]], { cfunc = name }))
+]], { cfunc=name }))
     else
         f:write(self:fmt([[
 static int [cfunc](lua_State * L)
 {
-]], { cfunc = name }))
+]], { cfunc=name }))
+    end
+    -- methods take as their first parameter the class object.
+    if self.is_method and not self.is_static then
+        f:write(self:fmt([[
+    [ptype] * [pvar] = [pcheckfunc](L, 1);
+]]))
     end
 
     -- Collect the arguments
@@ -277,9 +281,16 @@ static int [cfunc](lua_State * L)
     catch (...) {
         [prefix]_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
-]]))
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int [cfunc](lua_State * L)
+{
+    int code = [cfunc]_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
+]], { cfunc=name }))
     else -- No throw
         f:write("    "..fstring..";\n")
 

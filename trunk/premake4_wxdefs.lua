@@ -8,7 +8,7 @@ configuration "Debug"
 if os.is("windows") then
 
 configuration "windows"
-    defines { "__WXMSW__" }
+    defines { "__WXMSW__", "_CRT_SECURE_NO_WARNINGS" }
     includedirs { _OPTIONS["wx-prefix"].."/include" }
 
     configuration { "windows", "Release" }

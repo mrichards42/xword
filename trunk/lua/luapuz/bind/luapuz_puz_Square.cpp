@@ -168,7 +168,8 @@ static int Square_GetPlainText(lua_State * L)
     return 1;
 }
 // int GetTextSymbol()
-static int Square_GetTextSymbol(lua_State * L)
+// Separate try/catch function
+static int Square_GetTextSymbol_try(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     int returns;
@@ -180,11 +181,19 @@ static int Square_GetTextSymbol(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Square_GetTextSymbol(lua_State * L)
+{
+    int code = Square_GetTextSymbol_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // void SetText(puz::string_t text)
-static int Square_SetText(lua_State * L)
+// Separate try/catch function
+static int Square_SetText_try(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     puz::string_t text = luapuz_checkstring_t(L, 2);
@@ -195,8 +204,15 @@ static int Square_SetText(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Square_SetText(lua_State * L)
+{
+    int code = Square_SetText_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // bool HasTextRebus()
 static int Square_HasTextRebus(lua_State * L)
@@ -231,7 +247,8 @@ static int Square_GetPlainSolution(lua_State * L)
     return 1;
 }
 // int GetSolutionSymbol()
-static int Square_GetSolutionSymbol(lua_State * L)
+// Separate try/catch function
+static int Square_GetSolutionSymbol_try(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     int returns;
@@ -243,11 +260,19 @@ static int Square_GetSolutionSymbol(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Square_GetSolutionSymbol(lua_State * L)
+{
+    int code = Square_GetSolutionSymbol_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // void SetSolution(puz::string_t solution)
-static int Square_SetSolution1(lua_State * L)
+// Separate try/catch function
+static int Square_SetSolution1_try(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     puz::string_t solution = luapuz_checkstring_t(L, 2);
@@ -258,11 +283,19 @@ static int Square_SetSolution1(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Square_SetSolution1(lua_State * L)
+{
+    int code = Square_SetSolution1_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // void SetSolution(puz::string_t solution, char plain)
-static int Square_SetSolution2(lua_State * L)
+// Separate try/catch function
+static int Square_SetSolution2_try(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     puz::string_t solution = luapuz_checkstring_t(L, 2);
@@ -274,8 +307,15 @@ static int Square_SetSolution2(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Square_SetSolution2(lua_State * L)
+{
+    int code = Square_SetSolution2_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // SetSolution overload resolution
 static int Square_SetSolution(lua_State * L)
@@ -307,7 +347,8 @@ static int Square_SetPlainSolution(lua_State * L)
     return 0;
 }
 // void SetSolutionRebus(puz::string_t rebus)
-static int Square_SetSolutionRebus(lua_State * L)
+// Separate try/catch function
+static int Square_SetSolutionRebus_try(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     puz::string_t rebus = luapuz_checkstring_t(L, 2);
@@ -318,11 +359,19 @@ static int Square_SetSolutionRebus(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Square_SetSolutionRebus(lua_State * L)
+{
+    int code = Square_SetSolutionRebus_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // void SetSolutionSymbol(int symbol)
-static int Square_SetSolutionSymbol(lua_State * L)
+// Separate try/catch function
+static int Square_SetSolutionSymbol_try(lua_State * L)
 {
     puz::Square * square = luapuz_checkSquare(L, 1);
     int symbol = luaL_checknumber(L, 2);
@@ -333,8 +382,15 @@ static int Square_SetSolutionSymbol(lua_State * L)
     catch (...) {
         luapuz_handleExceptions(L);
     }
-    lua_error(L); // We should have returned by now
-    return 0;
+    return -1; // An error is on the stack
+}
+// The lua function (no exceptions)
+static int Square_SetSolutionSymbol(lua_State * L)
+{
+    int code = Square_SetSolutionSymbol_try(L);
+    if (code == -1)
+        lua_error(L);
+    return code;
 }
 // bool HasSolutionRebus()
 static int Square_HasSolutionRebus(lua_State * L)

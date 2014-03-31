@@ -688,11 +688,11 @@ bool wxLuaState::Create(lua_State* L, int state_type)
             lua_pushcfunction(L, luaopen_bit);
             lua_pushstring(L, "bit");
             lua_call(L, 1, 0);
-
+    #ifndef LUA_JITLIBNAME
             lua_pushcfunction(L, luaopen_bit32);
             lua_pushstring(L, "bit32");
             lua_call(L, 1, 0);
-
+    #endif // LUA_JITLIBNAME
             RegisterBindings();
         }
     }
@@ -2302,6 +2302,7 @@ wxLuaEvent::wxLuaEvent( const wxLuaEvent &event )
 {
 }
 
+#ifndef LUA_JITLIBNAME
 
 //-----------------------------------------------------------------------------
 // bitlib release 25 - Bitwise operations library
@@ -2460,3 +2461,5 @@ int LUACALL luaopen_bit (lua_State *L) {
   lua_setfield(L, -2, "bits");
   return 1;
 }
+
+#endif // LUA_JITLIBNAME
