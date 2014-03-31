@@ -11,9 +11,16 @@ if xword.logerror then
 end
 
 if wx then
+    local function fmt(msg, ...)
+        if select('#', ...) > 0 then
+            return msg:format(...)
+        else
+            return msg
+        end
+    end
     function xword.Message(message, ...)
         wx.wxMessageBox(
-            string.format(message, ...),
+            fmt(message, ...),
             "XWord Message",
             wx.wxOK + wx.wxICON_INFORMATION
         )
@@ -21,7 +28,7 @@ if wx then
 
     function xword.Prompt(message, ...)
         return wx.wxMessageBox(
-            string.format(message, ...),
+            fmt(message, ...),
             "XWord Message",
             wx.wxYES_NO + wx.wxICON_QUESTION
         ) == wx.wxYES
@@ -29,7 +36,7 @@ if wx then
 
     function xword.Error(message, ...)
         wx.wxMessageBox(
-            string.format(message, ...),
+            fmt(message, ...),
             "XWord Error",
             wx.wxOK + wx.wxICON_ERROR
         )
