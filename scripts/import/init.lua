@@ -1,6 +1,9 @@
 -- The package table
 import = {}
 
+-- Theme algorithm
+import.mark_theme_squares = require 'import.theme'
+
 
 --[[
 handler table format:
