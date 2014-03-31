@@ -24,7 +24,7 @@
 
 // Define macro XWORD_CHECK_CLUE to check the clue prompt size
 // in debug mode and print a message when it changes.
-#if __WXDEBUG__
+#ifdef __WXDEBUG__
 int __CLUE_SIZE = 0;
 #define XWORD_CHECK_CLUE()                                        \
     int __NEW_SIZE = GetPaneByCaption("Clue Prompt").rect.height; \
