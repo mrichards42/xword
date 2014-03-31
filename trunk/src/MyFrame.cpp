@@ -380,7 +380,7 @@ MyFrame::MyFrame()
       m_autoStartTimer(false),
       m_autoSaveTimer(this, ID_AUTOSAVE_TIMER),
       m_autoSaveInterval(0),
-      m_mgr(this),
+      m_mgr(),
       m_isIdleConnected(false),
       m_fileHistory(10, ID_FILE_HISTORY_1)
 { 
@@ -529,6 +529,7 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
     {
         m_isModified = false;
         m_puz.Load(wx2file(filename), handler);
+
     }
     catch (...)
     {
@@ -536,8 +537,8 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
         HandlePuzException();
     }
 
-    LoadLayout(_T("(Current)"), false);
-    RemoveLayout(_T("(Current)"));
+//    LoadLayout(_T("(Current)"), false);
+//    RemoveLayout(_T("(Current)"));
 
     ShowPuzzle(false); // don't update
 
@@ -746,6 +747,7 @@ MyFrame::ShowClues()
     }
 
     // Remove the old clue lists from m_clues, but keep the windows alive
+    wxAuiPaneInfo * existingInfo = NULL;
     std::map<wxString, CluePanel *> old_panels; // AUI_name = CluePanel *
     {
         std::map<wxString, CluePanel *>::iterator it;
@@ -754,6 +756,7 @@ MyFrame::ShowClues()
 #if USE_MY_AUI_MANAGER
             wxAuiPaneInfo & info = m_mgr.FindPane(it->second);
             old_panels[info.name] = it->second;
+            existingInfo = &info;
 #else
             // The equivalent of FindPane()
             wxWindow * window = it->second;
@@ -778,12 +781,15 @@ MyFrame::ShowClues()
     // an existing pane and replace the clue list contents.
     // If we have more clue lists than panels, create new panels.
     // If we have more panels than clue lists, destroy some panels.
-
     wxAuiPaneInfo baseInfo;
+    // If we have a wxAuiPaneInfo for an existing clue pane, use it as the base
+    // for new panes.
+    if (existingInfo)
+        baseInfo.SafeSet(*existingInfo);
+    // Set some basic flags
     baseInfo.CaptionVisible(false)
-            .CloseButton()
-            .MinSize(15,15);
-
+            .MinSize(50,50)
+            .Layer(0); // Closest to the grid
     {
         // AUI names for the clue lists are as follows:
         //  Across -> "Cluelist1"
@@ -821,6 +827,7 @@ MyFrame::ShowClues()
                 info.Caption(label);
                 clues = old_panels[id];
                 old_panels.erase(id);
+                info.Show();
             }
             else
             {
@@ -828,11 +835,9 @@ MyFrame::ShowClues()
                 clues = new CluePanel(this, wxID_ANY);
                 m_mgr.AddPane(clues,
                               wxAuiPaneInfo(baseInfo)
-                              .BestSize(300,-1)
                               .Caption(label)
-                              .Left()
-                              .Layer(50)
-                              .Name(id) );
+                              .Name(id)
+                              .Show());
             }
             // Set the heading and clue list for the panel
             clues->SetHeading(label);
@@ -840,13 +845,10 @@ MyFrame::ShowClues()
             if (no_clues)
                 clues->ClearClueList();
             m_clues[label] = clues;
-#if USE_MY_AUI_MANAGER
-            m_mgr.SetContextWindow(m_mgr.GetPane(clues), clues->m_heading);
-#endif
         }
     }
 
-    // Delete and detach the left over CLuePanels
+    // Delete and detach the left over CluePanels
     {
         std::map<wxString, CluePanel *>::iterator it;
         for (it = old_panels.begin(); it != old_panels.end(); ++it)
@@ -996,7 +998,10 @@ MyFrame::ShowNotes()
     // Set the value of the notes pane
     if (value.empty())
     {
-        m_notes->SetPage(notes);
+        if (notes.empty())
+            m_notes->SetPage("[Notes]");
+        else
+            m_notes->SetPage(notes);
     }
     else
     {
@@ -1273,6 +1278,7 @@ MyFrame::CreateMenuBar()
 void
 MyFrame::SetupWindowManager()
 {
+    m_mgr.SetManagedWindow(this);
     wxAuiDockArt * art = m_mgr.GetArtProvider();
 
     wxColor active = wxSystemSettings::GetColour(
@@ -1343,7 +1349,7 @@ MyFrame::ManageWindows()
 
     m_mgr.AddPane(m_cluePrompt,
                   wxAuiPaneInfo(baseInfo)
-                  .BestSize(-1, 75)
+                  .MinSize(50, 50)
                   .Layer(2)
                   .Top()
                   .Caption(_T("Clue Prompt"))
@@ -1352,15 +1358,11 @@ MyFrame::ManageWindows()
     m_mgr.AddPane(m_notes,
                   wxAuiPaneInfo(baseInfo)
                   .Float()
+                  .MinSize(50, 50)
                   .FloatingSize(250,250)
                   .Hide()
                   .Caption(_T("Notes"))
                   .Name(_T("Notes")));
-
-#if USE_MY_AUI_MANAGER
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_cluePrompt), m_cluePrompt);
-    m_mgr.SetContextWindow(m_mgr.GetPane(m_notes), m_notes);
-#endif
 }
 
 
@@ -1610,9 +1612,6 @@ MyFrame::LoadConfig()
                       .MinSize(25,25).Layer(10)
                       .Direction(name == "Copyright" ? wxAUI_DOCK_BOTTOM
                                                      : wxAUI_DOCK_TOP));
-#if USE_MY_AUI_MANAGER
-        m_mgr.SetContextWindow(m_mgr.GetPane(ctrl), ctrl);
-#endif
     }
 
     // Update the config of our controls
