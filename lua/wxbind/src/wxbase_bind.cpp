@@ -383,10 +383,13 @@ wxLuaBindNumber* wxLuaGetDefineList_wxbase(size_t &count)
 
 #if wxUSE_FSWATCHER && wxCHECK_VERSION(2,9,4)
         { "wxFSW_EVENT_WARNING", wxFSW_EVENT_WARNING },
+#endif // wxUSE_FSWATCHER && wxCHECK_VERSION(2,9,4)
+
+#if (wxUSE_FSWATCHER && wxCHECK_VERSION(2,9,4)) && (wxCHECK_VERSION(3,0,0))
         { "wxFSW_WARNING_GENERAL", wxFSW_WARNING_GENERAL },
         { "wxFSW_WARNING_NONE", wxFSW_WARNING_NONE },
         { "wxFSW_WARNING_OVERFLOW", wxFSW_WARNING_OVERFLOW },
-#endif // wxUSE_FSWATCHER && wxCHECK_VERSION(2,9,4)
+#endif // (wxUSE_FSWATCHER && wxCHECK_VERSION(2,9,4)) && (wxCHECK_VERSION(3,0,0))
 
 #if (wxUSE_STREAMS) && (wxUSE_FILESYSTEM)
         { "wxFS_READ", wxFS_READ },

@@ -1228,10 +1228,11 @@ static int LUACALL wxLua_wxMessageDialog_GetCancelLabel(lua_State *L)
 
 #endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 
+#if (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetCaption[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetCaption(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetCaption[1] = {{ wxLua_wxMessageDialog_GetCaption, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetCaption }};
-//     wxString GetCaption() const;
+//     %wxchkver_2_9_3 wxString GetCaption() const;
 static int LUACALL wxLua_wxMessageDialog_GetCaption(lua_State *L)
 {
     // get this
@@ -1247,7 +1248,7 @@ static int LUACALL wxLua_wxMessageDialog_GetCaption(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetEffectiveIcon[] = { &wxluatype_wxMessageDialog, NULL };
 static int LUACALL wxLua_wxMessageDialog_GetEffectiveIcon(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMessageDialog_GetEffectiveIcon[1] = {{ wxLua_wxMessageDialog_GetEffectiveIcon, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMessageDialog_GetEffectiveIcon }};
-//     long GetEffectiveIcon() const;
+//     %wxchkver_2_9_3 long GetEffectiveIcon() const;
 static int LUACALL wxLua_wxMessageDialog_GetEffectiveIcon(lua_State *L)
 {
     // get this
@@ -1260,6 +1261,7 @@ static int LUACALL wxLua_wxMessageDialog_GetEffectiveIcon(lua_State *L)
     return 1;
 }
 
+#endif // (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 
 #if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMessageDialog_GetExtendedMessage[] = { &wxluatype_wxMessageDialog, NULL };
@@ -1753,8 +1755,10 @@ wxLuaBindMethod wxMessageDialog_methods[] = {
     { "GetCancelLabel", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetCancelLabel, 1, NULL },
 #endif // (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 
+#if (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { "GetCaption", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetCaption, 1, NULL },
     { "GetEffectiveIcon", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetEffectiveIcon, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,3)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
 
 #if (wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG)
     { "GetExtendedMessage", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMessageDialog_GetExtendedMessage, 1, NULL },

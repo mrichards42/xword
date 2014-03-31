@@ -4652,17 +4652,17 @@ static int LUACALL wxLua_wxLuaListCtrl_SetItemCount(lua_State *L)
     return 0;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLuaListCtrl_delete[] = { &wxluatype_wxLuaListCtrl, NULL };
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLuaListCtrl_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxLuaListCtrl_delete }};
 
+#if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL)) && (wxLUA_USE_wxPointSizeRect)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxLuaListCtrl_constructor[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxLuaListCtrl_constructor(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLuaListCtrl_constructor[1] = {{ wxLua_wxLuaListCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxLuaListCtrl_constructor[1] = {{ wxLua_wxLuaListCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 2, 7, s_wxluatypeArray_wxLua_wxLuaListCtrl_constructor }};
 // %override wxLua_wxLuaListCtrl_constructor
 // wxLuaListCtrl(const wxLuaState& wxlState);
 // wxLuaListCtrl(const wxLuaState& wxlState,
 //               wxWindow *parent, wxWindowID id,
 //               const wxPoint &pos=wxDefaultPosition,
-//               const wxSize &size=wxDefaultSize, long style=wxLC_ICON,
+//               const wxSize &size=wxDefaultSize, long style=wxLC_REPORT|wxLC_VIRTUAL,
 //               const wxValidator &validator=wxDefaultValidator,
 //               const wxString &name=wxListCtrlNameStr);
 static int LUACALL wxLua_wxLuaListCtrl_constructor(lua_State *L)
@@ -4684,7 +4684,7 @@ static int LUACALL wxLua_wxLuaListCtrl_constructor(lua_State *L)
         // const wxValidator validator = wxDefaultValidator
         const wxValidator * validator = (argCount >= 6 ? (const wxValidator *)wxluaT_getuserdatatype(L, 6, wxluatype_wxValidator) : &wxDefaultValidator);
         // long style = wxLC_ICON
-        long style = (argCount >= 5 ? (long)wxlua_getnumbertype(L, 5) : wxLC_ICON);
+        long style = (argCount >= 5 ? (long)wxlua_getnumbertype(L, 5) : wxLC_REPORT|wxLC_VIRTUAL);
         // const wxSize size = wxDefaultSize
         const wxSize * size = (argCount >= 4 ? (const wxSize *)wxluaT_getuserdatatype(L, 4, wxluatype_wxSize) : &wxDefaultSize);
         // const wxPoint pos = wxDefaultPosition
@@ -4705,6 +4705,7 @@ static int LUACALL wxLua_wxLuaListCtrl_constructor(lua_State *L)
 }
 
 
+#endif // ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL)) && (wxLUA_USE_wxPointSizeRect)
 
 
 
@@ -4717,8 +4718,10 @@ void wxLua_wxLuaListCtrl_delete_function(void** p)
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxLuaListCtrl_methods[] = {
     { "SetItemCount", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLuaListCtrl_SetItemCount, 1, NULL },
-    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxLuaListCtrl_delete, 1, NULL },
+
+#if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL)) && (wxLUA_USE_wxPointSizeRect)
     { "wxLuaListCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxLuaListCtrl_constructor, 1, NULL },
+#endif // ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL)) && (wxLUA_USE_wxPointSizeRect)
 
     { 0, 0, 0, 0 },
 };
@@ -12542,7 +12545,7 @@ int wxGenericDirCtrl_methodCount = sizeof(wxGenericDirCtrl_methods)/sizeof(wxLua
 #endif  // wxLUA_USE_wxGenericDirCtrl && wxUSE_DIRDLG
 
 
-#if wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
+#if wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1)
 // ---------------------------------------------------------------------------
 // Bind class wxInfoBar
 // ---------------------------------------------------------------------------
@@ -12553,7 +12556,7 @@ int wxluatype_wxInfoBar = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxInfoBar_AddButton[] = { &wxluatype_wxInfoBar, &wxluatype_TNUMBER, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxInfoBar_AddButton(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxInfoBar_AddButton[1] = {{ wxLua_wxInfoBar_AddButton, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxInfoBar_AddButton }};
-//     void AddButton(wxWindowID btnid, const wxString &label=wxEmptyString );
+//     void AddButton(wxWindowID btnid, const wxString &label = wxEmptyString );
 static int LUACALL wxLua_wxInfoBar_AddButton(lua_State *L)
 {
     // get number of arguments
@@ -12623,7 +12626,7 @@ static int LUACALL wxLua_wxInfoBar_RemoveButton(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxInfoBar_ShowMessage[] = { &wxluatype_wxInfoBar, &wxluatype_TSTRING, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxInfoBar_ShowMessage(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxInfoBar_ShowMessage[1] = {{ wxLua_wxInfoBar_ShowMessage, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxInfoBar_ShowMessage }};
-//     void ShowMessage(const wxString &msg, int flags=wxICON_INFORMATION );
+//     void ShowMessage(const wxString &msg, int flags = wxICON_INFORMATION );
 static int LUACALL wxLua_wxInfoBar_ShowMessage(lua_State *L)
 {
     // get number of arguments
@@ -12678,7 +12681,7 @@ static int LUACALL wxLua_wxInfoBar_constructor(lua_State *L)
 
 
 
-#if (wxLUA_USE_wxInfoBar && wxUSE_INFOBAR)
+#if (wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxInfoBar_constructor_overload[] =
 {
@@ -12687,7 +12690,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxInfoBar_constructor_overload[] =
 };
 static int s_wxluafunc_wxLua_wxInfoBar_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxInfoBar_constructor_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // (wxLUA_USE_wxInfoBar && wxUSE_INFOBAR)
+#endif // (wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1))
 
 void wxLua_wxInfoBar_delete_function(void** p)
 {
@@ -12703,14 +12706,14 @@ wxLuaBindMethod wxInfoBar_methods[] = {
     { "RemoveButton", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxInfoBar_RemoveButton, 1, NULL },
     { "ShowMessage", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxInfoBar_ShowMessage, 1, NULL },
 
-#if (wxLUA_USE_wxInfoBar && wxUSE_INFOBAR)
+#if (wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1))
     { "wxInfoBar", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxInfoBar_constructor_overload, s_wxluafunc_wxLua_wxInfoBar_constructor_overload_count, 0 },
-#endif // (wxLUA_USE_wxInfoBar && wxUSE_INFOBAR)
+#endif // (wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1))
 
     { 0, 0, 0, 0 },
 };
 
 int wxInfoBar_methodCount = sizeof(wxInfoBar_methods)/sizeof(wxLuaBindMethod) - 1;
 
-#endif  // wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
+#endif  // wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1)
 

@@ -2184,6 +2184,32 @@ static int LUACALL wxLua_wxWindow_Hide(lua_State *L)
     return 1;
 }
 
+
+#if wxCHECK_VERSION(2,9,0)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxWindow_HideWithEffect[] = { &wxluatype_wxWindow, &wxluatype_TINTEGER, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxWindow_HideWithEffect(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxWindow_HideWithEffect[1] = {{ wxLua_wxWindow_HideWithEffect, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxWindow_HideWithEffect }};
+//     virtual bool HideWithEffect(wxShowEffect effect, unsigned int timeout = 0 );
+static int LUACALL wxLua_wxWindow_HideWithEffect(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // unsigned int timeout = 0
+    unsigned int timeout = (argCount >= 3 ? (unsigned int)wxlua_getuintegertype(L, 3) : 0);
+    // wxShowEffect effect
+    wxShowEffect effect = (wxShowEffect)wxlua_getenumtype(L, 2);
+    // get this
+    wxWindow * self = (wxWindow *)wxluaT_getuserdatatype(L, 1, wxluatype_wxWindow);
+    // call HideWithEffect
+    bool returns = (self->HideWithEffect(effect, timeout));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // wxCHECK_VERSION(2,9,0)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxWindow_InheritAttributes[] = { &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxWindow_InheritAttributes(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxWindow_InheritAttributes[1] = {{ wxLua_wxWindow_InheritAttributes, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxWindow_InheritAttributes }};
@@ -3807,6 +3833,32 @@ static int LUACALL wxLua_wxWindow_Show(lua_State *L)
     return 1;
 }
 
+
+#if wxCHECK_VERSION(2,9,0)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxWindow_ShowWithEffect[] = { &wxluatype_wxWindow, &wxluatype_TINTEGER, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxWindow_ShowWithEffect(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxWindow_ShowWithEffect[1] = {{ wxLua_wxWindow_ShowWithEffect, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxWindow_ShowWithEffect }};
+//     virtual bool ShowWithEffect(wxShowEffect effect, unsigned int timeout = 0 );
+static int LUACALL wxLua_wxWindow_ShowWithEffect(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // unsigned int timeout = 0
+    unsigned int timeout = (argCount >= 3 ? (unsigned int)wxlua_getuintegertype(L, 3) : 0);
+    // wxShowEffect effect
+    wxShowEffect effect = (wxShowEffect)wxlua_getenumtype(L, 2);
+    // get this
+    wxWindow * self = (wxWindow *)wxluaT_getuserdatatype(L, 1, wxluatype_wxWindow);
+    // call ShowWithEffect
+    bool returns = (self->ShowWithEffect(effect, timeout));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // wxCHECK_VERSION(2,9,0)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxWindow_Thaw[] = { &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxWindow_Thaw(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxWindow_Thaw[1] = {{ wxLua_wxWindow_Thaw, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxWindow_Thaw }};
@@ -4401,6 +4453,11 @@ wxLuaBindMethod wxWindow_methods[] = {
     { "HasScrollbar", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_HasScrollbar, 1, NULL },
     { "HasTransparentBackground", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_HasTransparentBackground, 1, NULL },
     { "Hide", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_Hide, 1, NULL },
+
+#if wxCHECK_VERSION(2,9,0)
+    { "HideWithEffect", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_HideWithEffect, 1, NULL },
+#endif // wxCHECK_VERSION(2,9,0)
+
     { "InheritAttributes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_InheritAttributes, 1, NULL },
     { "InitDialog", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_InitDialog, 1, NULL },
     { "InvalidateBestSize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_InvalidateBestSize, 1, NULL },
@@ -4574,6 +4631,11 @@ wxLuaBindMethod wxWindow_methods[] = {
     { "SetWindowVariant", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_SetWindowVariant, 1, NULL },
     { "ShouldInheritColours", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_ShouldInheritColours, 1, NULL },
     { "Show", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_Show, 1, NULL },
+
+#if wxCHECK_VERSION(2,9,0)
+    { "ShowWithEffect", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_ShowWithEffect, 1, NULL },
+#endif // wxCHECK_VERSION(2,9,0)
+
     { "Thaw", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_Thaw, 1, NULL },
     { "TransferDataFromWindow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_TransferDataFromWindow, 1, NULL },
     { "TransferDataToWindow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxWindow_TransferDataToWindow, 1, NULL },
