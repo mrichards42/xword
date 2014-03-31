@@ -348,10 +348,6 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
     #include "wx/imaglist.h"
 #endif // wxLUA_USE_wxImageList
 
-#if wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
-    #include "wx/infobar.h"
-#endif // wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
-
 #if wxLUA_USE_wxListBox && wxUSE_LISTBOX
     #include "wx/listbox.h"
 #endif // wxLUA_USE_wxListBox && wxUSE_LISTBOX
@@ -510,6 +506,10 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
     #include "wx/cmndata.h"
     #include "wx/fontdlg.h"
 #endif // wxUSE_FONTDLG && wxLUA_USE_wxFontDialog
+
+#if wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1)
+    #include "wx/infobar.h"
+#endif // wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1)
 
 #if wxUSE_PROGRESSDLG && wxLUA_USE_wxProgressDialog
     #include "wx/progdlg.h"
@@ -929,6 +929,7 @@ extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxWindowUpdateLocker;
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxFileDropTarget;
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxLuaFileDropTarget;
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxLuaTextDropTarget;
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxLuaURLDropTarget;
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxTextDropTarget;
 #endif // wxLUA_USE_wxDragDrop && wxUSE_DRAG_AND_DROP
 
@@ -1001,10 +1002,6 @@ extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxWindowUpdateLocker;
 #if wxLUA_USE_wxImageList
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxImageList;
 #endif // wxLUA_USE_wxImageList
-
-#if wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
-    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxInfoBar;
-#endif // wxLUA_USE_wxInfoBar && wxUSE_INFOBAR
 
 #if wxLUA_USE_wxListBox && wxUSE_LISTBOX
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxListBox;
@@ -1222,6 +1219,10 @@ extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxWindowUpdateLocker;
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxFontData;
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxFontDialog;
 #endif // wxUSE_FONTDLG && wxLUA_USE_wxFontDialog
+
+#if wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1)
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxInfoBar;
+#endif // wxUSE_INFOBAR && wxCHECK_VERSION(2,9,1)
 
 #if wxUSE_PROGRESSDLG && wxLUA_USE_wxProgressDialog
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxProgressDialog;
