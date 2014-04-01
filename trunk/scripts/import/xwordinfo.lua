@@ -1,5 +1,7 @@
 require 'import.json'
 
+local date = require 'date'
+
 -- iterate index, v1, v2, v[n]
 local function izip(...)
     local tables = {...}

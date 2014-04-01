@@ -1,4 +1,4 @@
-require 'date'
+local date = require 'date'
 
 -- The package table
 blog = {}
