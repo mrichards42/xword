@@ -1,6 +1,10 @@
-require 'import.json'
-
+local yajl = require 'luayajl'
 local date = require 'date'
+
+-- Yajl uses yajl.null to represent null values instead of nil
+local function ornil(obj)
+    return obj ~= yajl.null and obj or nil
+end
 
 -- iterate index, v1, v2, v[n]
 local function izip(...)
@@ -41,7 +45,7 @@ end
 function import.xwordinfoJSON(p, filename)
     -- Open the file and parse it
     local f = assert(io.open(filename))
-    local success, doc = pcall(json.decode, f:read('*a'))
+    local success, doc = pcall(yajl.to_value, f:read('*a'))
     f:close()
 
     if not success or not (doc.size and doc.grid and doc.gridnums) then
@@ -63,7 +67,7 @@ function import.xwordinfoJSON(p, filename)
 
     -- Add the copyright symbol (utf8)
     if #p.Copyright > 0 then p.Copyright = "\194\169 " .. p.Copyright end
-    p.Notes = doc.notepad or ""
+    p.Notes = ornil(doc.notepad) or ""
 
     -- Grid
     local g = p.Grid
@@ -71,8 +75,7 @@ function import.xwordinfoJSON(p, filename)
 
     local s = g:First()
     local shade = doc.shadecircles or false
-    for _, letter, number, circle in izip(doc.grid, doc.gridnums,
-                                                 doc.circles) do
+    for _, letter, number, circle in izip(doc.grid, doc.gridnums, ornil(doc.circles)) do
         s.Solution = letter
         if circle == 1 then
             if shade then
