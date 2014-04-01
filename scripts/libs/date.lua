@@ -403,6 +403,7 @@
 	end
 --#end -- not DATE_OBJECT_AFX
  	local function date_from(...)
+        local arg = {...}
  		local y, m, d = fix(arg[1]), getmontharg(arg[2]), fix(arg[3])
 		local h, r, s, t = tonumber(arg[4] or 0), tonumber(arg[5] or 0), tonumber(arg[6] or 0), tonumber(arg[7] or 0)
 		if y and m and d and h and r and s and t then
@@ -700,11 +701,10 @@
  	end
 
 	function date:__call(...)
-        local arg = {..., n=select('#', ...)}
-		local n = arg.n
-		if n  > 1 then return (date_from(unpack(arg)))
+		local n = select('#', ...)
+		if n  > 1 then return (date_from(...))
 		elseif n == 0 then return (date_getdobj(false))
-		else local o, r = date_getdobj(arg[1]);	return r and o:copy() or o end
+		else local o, r = date_getdobj(...); return r and o:copy() or o end
 	end
 
 	date.diff = dobj.__sub
