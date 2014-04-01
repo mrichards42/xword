@@ -8,15 +8,27 @@ local M = {
     APPEND = -200,
     PREPEND = -201,
     CLEAR = -202,
+
+    EVT_INTERNAL_START = -210, -- The internal item start event
+    EVT_INTERNAL_END = -211, -- The internal item end event
+
+    --- Sent by the main task to start an item.
+    -- Callback is passed the item.
+    EVT_ITEM_START = -220,
+
+    --- Sent by the secondary thread to return results.
+    -- Callback is pass the item and any values returned by the thread.
+    EVT_ITEM_END = -221,
+
     --- Sent when the queue has been changed (append, prepend, or clear)
-    -- @field M.EVT_QUEUE_UPDATED
-    EVT_QUEUE_UPDATED = -203
+    EVT_QUEUE_UPDATED = -223
 }
 -- Return the events to secondary tasks
 if not task.is_main then return M end
 
--- The original Task metatable
 local Task = task.Task
+local Queue = require 'task.queue'
+local assert_arg = require 'pl.utils'.assert_arg
 
 M.__index = M
 function M:__tostring()
@@ -27,6 +39,12 @@ function M:__tostring()
     )
 end
 setmetatable(M, Task)
+
+--- Currently processing item.
+-- @field M.current
+
+--- Item queue.
+-- @field M.queue
 
 --- Create a new QueueTask.
 -- Inherits from `Task`.  
@@ -46,10 +64,10 @@ setmetatable(M, Task)
 -- t = QueueTask.new('=return function(item) task.debug(item) end')
 -- -- Start the task with two items
 -- t:start('hello', 'world')
--- Add some items to the queue
+-- -- Add some items to the queue
 -- t:append('a', 'few', 'more', 'strings')
 -- t:prepend('these', 'go', 'to', 'the', 'top', 'of', 'the', 'queue')
--- Clear any that have not yet been processed
+-- -- Clear any that have not yet been processed
 -- t:clear()
 function M.new(opts)
     local self = setmetatable(task.new(opts), M)
@@ -57,15 +75,9 @@ function M.new(opts)
         if opts.unique == nil then opts.unique = true end
         self._unique = opts.unique
         self._key = opts.key
-        if opts.queue then
-            local Queue = require 'task.queue'
-            self.queue = Queue{unique=unique, key=key}
-        end
-    else
-        self._unique = true
+        self.queue = Queue{unique=opts.unique, key=opts.key}
     end
     -- self._check is used to check arguments for prepend and append
-    local assert_arg = require 'pl.utils'.assert_arg
     if self._unique and self._key then
         local function has_key(t)
             return t[self._key] ~= nil
@@ -86,6 +98,15 @@ function M.new(opts)
     self._userscript = self._script
     -- This is the helper script that is actually started via Task.start
     self._script = 'task.queue_task_create'
+    -- Connect to internal events
+    self:connect(M.EVT_INTERNAL_START, function(key)
+        self.current = self.queue:get(key)
+        self:send_event(M.EVT_ITEM_START, self.current)
+    end)
+    self:connect(M.EVT_INTERNAL_END, function(key, ...)
+        self.current = nil
+        self:send_event(M.EVT_ITEM_END, self.queue:pop(key), ...)
+    end)
     return self
 end
 
@@ -107,36 +128,31 @@ end
 -- @param ... Items
 function M:append(...)
     self._check(...)
-    if self.queue then
-        for _, item in ipairs({...}) do
-            self.queue:push(item)
-        end
-        self:send_event(M.EVT_QUEUE_UPDATED)
+    for _, item in ipairs({...}) do
+        self.queue:push(item)
     end
     self:post(M.APPEND, ...)
+    self:send_event(M.EVT_QUEUE_UPDATED)
+
 end
 
 --- Prepend items to the front of the task's queue
 -- @param ... Items
 function M:prepend(...)
     self._check(...)
-    if self.queue then
-        local data = {...}
-        for i=#data,1,-1 do
-            self.queue:pushfront(data[i])
-        end
-        self:send_event(M.EVT_QUEUE_UPDATED)
+    local items = {...}
+    for i=#items,1,-1 do
+        self.queue:pushfront(items[i])
     end
     self:post(M.PREPEND, ...)
+    self:send_event(M.EVT_QUEUE_UPDATED)
 end
 
---- Clear all items from the task's queue
+--- Clear all items from the task's queue.
 function M:clear()
-    if self.queue then
-        self.queue:clear()
-        self:send_event(M.EVT_QUEUE_UPDATED)
-    end
     self:post(M.CLEAR)
+    self.queue:clear()
+    self:send_event(M.EVT_QUEUE_UPDATED)
 end
 
 return M

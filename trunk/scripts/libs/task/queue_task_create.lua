@@ -40,14 +40,22 @@ end
 -- @param func The function used to process each item.
 local function loop_through_queue(func)
     while true do
-        -- Get the first item in the queue
-        local data = queue:pop()
-        if data then
-            -- Do something with it
-            local success, err = xpcall(function() return func(data) end, debug.traceback)
-            -- Report errors but continue processing
+        -- Get an item
+        local item = queue:pop()
+        if item == 'abort' then -- Check for abort
+            return
+        elseif item then
+            -- NB: QueueTask will convert INTERNAL_START and INTERNAL_END into
+            -- the actual item, not the key.
+            task.post(msg.EVT_INTERNAL_START, key and item[key] or item)
+            -- Do something with the item
+            local results = {xpcall(function() return func(item) end, debug.traceback)}
+            local success = table.remove(results, 1)
+            -- Post item[key] or item, and the results
+            task.post(msg.EVT_INTERNAL_END, key and item[key] or item, unpack(results))
+            -- Report errors
             if not success then
-                task.error(err)
+                task.error(results[1])
             end
             -- If the callback tried task.check_abort() we should break here
             if task.should_abort then
