@@ -82,7 +82,12 @@ local function init()
         end
     end
 
+    function rerequire(modname)
+        package.loaded[modname] = nil
+        return require(modname)
+    end
 
+    require 'xworddebug.py2lua'
     require 'xworddebug.debug'
     require 'xworddebug.globals'
 --    require 'xworddebug.test_files'
