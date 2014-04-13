@@ -40,8 +40,8 @@ end
 -- @param func The function used to process each item.
 local function loop_through_queue(func)
     while true do
-        -- Get an item
-        local item = queue:pop()
+        -- Get an item, but keep it in the queue to prevent duplicates
+        local item = queue:front()
         if item == 'abort' then -- Check for abort
             return
         elseif item then
@@ -61,6 +61,8 @@ local function loop_through_queue(func)
             if task.should_abort then
                 return
             end
+            -- Done with this item, now we can remove it.
+            queue:pop()
         else
             -- Nothing to do until the queue has data.
             -- Wait forever for new messages
