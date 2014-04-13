@@ -338,12 +338,26 @@ end
 -- @param evt_id The (user-defined) event id.
 -- @param ... Data.  (numbers, strings, or tables)
 
---- Connect event handlers to a task.
+--- Connect event handlers to a task.  
+-- NB: Use extreme caution to avoid race conditions when wx.wxYield is called
+--   from a callback function.  See usage for an example.
 -- @function Task:connect
 -- @see EvtHandler.connect
 -- @param[opt] evt_id The event id, if connecting a single callback.
 -- @param callback The callback function, or a table mapping event ids to
 --   callback functions.
+-- @usage
+-- -- Careful! The following code may produce unexpected results.
+-- t = Task.new([[=while true do task.post(EVT_START) task.post(EVT_END) end]])
+-- t:connect(EVT_START, function() status = 'start' print(status) end)
+-- t:connect(EVT_END, function() status = 'end' wx.wxYield() print(status) end)
+-- task:run()
+-- -- Expected result:
+-- -- start  end  start  end  start  end
+-- -- Possible result:
+-- -- start  end  start  start  start  end  start  start  start  start  start
+-- -- Since wx.wxYield() processes messages in the queue (including task.post)
+-- -- status may be either 'start' or 'end' after the wx.wxYield() call.
 
 --- Remove an event handler from a task.
 -- @function Task:disconnect

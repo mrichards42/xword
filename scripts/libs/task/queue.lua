@@ -266,6 +266,12 @@ function UniqueQueue:isnormal()
     return Queue.length(self) == self._length
 end
 
+function UniqueQueue:index(item)
+    self:normalize()
+    local idx = self._map[item]
+    return idx and idx - self._front + 1 or -1
+end
+
 function UniqueQueue:clear()
     Queue.clear(self)
     for k,_ in pairs(self._map) do

@@ -101,11 +101,19 @@ function M.new(opts)
     -- Connect to internal events
     self:connect(M.EVT_INTERNAL_START, function(key)
         self.current = self.queue:get(key)
-        self:send_event(M.EVT_ITEM_START, self.current)
+        if self.current ~= nil then
+            self:send_event(M.EVT_ITEM_START, self.current)
+        end
     end)
     self:connect(M.EVT_INTERNAL_END, function(key, ...)
+        self.queue:pop(key)
+        -- Call send_event *last* to make sure we avoid a wxYield race
+        -- See Task:connect for details.
+        local obj = self.current
         self.current = nil
-        self:send_event(M.EVT_ITEM_END, self.queue:pop(key), ...)
+        if obj ~= nil then
+            self:send_event(M.EVT_ITEM_END, obj, ...)
+        end
     end)
     return self
 end
