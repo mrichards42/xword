@@ -74,7 +74,7 @@ function import.xwordinfoJSON(p, filename)
     g:SetSize(doc.size.cols, doc.size.rows)
 
     local s = g:First()
-    local shade = doc.shadecircles or false
+    local shade = ornil(doc.shadecircles) or false
     for _, letter, number, circle in izip(doc.grid, doc.gridnums, ornil(doc.circles)) do
         s.Solution = letter
         if circle == 1 then
