@@ -52,7 +52,7 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
          square = square->Next())
     {
         if (square->IsSolutionBlank()
-            || square->GetFlag() & ~ (ACROSS_LITE_MASK | FLAG_CORRECT)
+            || square->GetFlag() & ~ (ACROSS_LITE_MASK | FLAG_CORRECT | FLAG_THEME)
             || square->HasImage())
         {
             throw ConversionError();
