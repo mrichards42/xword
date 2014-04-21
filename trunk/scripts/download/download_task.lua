@@ -1,271 +1,254 @@
--- A task that downloads puzzles
-require 'download.queue_task'
-require 'luacurl'
-require 'luapuz'
-require 'import'
-require 'os'
-path = require 'pl.path' -- make this global for custom download functions
-require 'lfs'
-require 'date'
+-- The main puzzle downloading task
+local os = require 'os'
+local date = require 'date'
+local curl = require 'luacurl'
+local puz = require 'luapuz'
+require 'import' -- Additional puzzle file types
 
-local function makedirs(dirname)
-    if lfs.attributes(dirname, 'mode') then return true end
-    -- Find the directories we need to make
-    local to_make = {}
-    local dir
-    repeat
-        dirname, dir = path.splitpath(dirname)
-        table.insert(to_make, dir)
-    until lfs.attributes(dirname, 'mode') ~= nil
-    -- Make the directories
-    for i=#to_make,1,-1 do
-        dirname = path.join(dirname, to_make[i])
-        local success, err = lfs.mkdir(dirname)
-        if not success then return nil, err end
+-- Messages
+local mgr = require 'download.manager'
+
+-- Expose pl.path for custom functions
+path = require 'pl.path'
+
+-- Allow custom functions to set the statusbar text in the download manager
+function set_status(text)
+    task.post(mgr.EVT_UPDATE_STATUS, text)
+end
+
+-- ---------------------------------------------------------------------------
+-- Custom Download Function API
+-- ---------------------------------------------------------------------------
+
+--- Prompt the user for information.
+-- @param msg The dialog message.
+-- @param ... Field names
+-- @return A table mapping field names to values
+function prompt(msg, ...)
+    task.post(mgr.PROMPT, msg, ...)
+    return wait_for_message(mgr.PROMPT)
+end
+
+local CURRENT_PUZZLE
+--- Get the cookie file for this puzzle.
+-- @param[opt] puzzle The puzzle table, or CURRENT_PUZZLE
+-- @return The cookie filename
+function get_cookie_file(puzzle)
+    puzzle = puzzle or CURRENT_PUZZLE
+    assert(puzzle.auth and puzzle.auth.url, "Missing authentication url")
+    -- Use authentication url as the cookie file
+    local name = puzzle.auth.url:gsub("[:/]", "-")
+    local cookies = path.join(xword.configdir, 'download', name .. ".txt")
+    -- Strip invalid chars
+    return cookies:gsub('[?<>:*|"%%]\t\r\n\v\f', "")
+end
+
+--- Does this puzzle have the associated cookie file?
+-- @param[opt] puzzle The puzzle table, or CURRENT_PUZZLE
+-- @return true/false
+function has_cookie(puzzle)
+    puzzle = puzzle or CURRENT_PUZZLE
+    -- Look for the cookies
+    local f = io.open(get_cookie_file(puzzle), 'rb')
+    if not f then return false end
+    local text = f:read("*a")
+    f:close()
+    return #text > 1
+end
+
+local function get_login_form(page, puzzle)
+    local auth = (puzzle or CURRENT_PUZZLE).auth
+    -- Find the login form
+    for form in page:gmatch("<form(.-)</form>") do
+        -- Check method == "POST"
+        local method = form:match('method%s*=%s*"(.-)"')
+        if method and method:upper() == "POST" then
+            -- Get action url (or use the page url)
+            local action = form:match('action%s*=%s*"(.-)"')
+            if not action or action:sub(1,1) == "#" then
+                action = auth.url
+            end
+            -- Look for the <input> and keep default values (except username/password)
+            local has_user = false -- Make sure this is the login form
+            local has_pw = false
+            local postdata = {}
+            for input in form:gmatch("<input([^>]*)>") do
+                local name = input:match('name%s*=%s*"(.-)"')
+                if name == auth.user_id then
+                    has_user = true
+                elseif name == auth.password_id then
+                    has_pw = true
+                else
+                    local value = input:match('value%s*=%s*"(.-)"')
+                    table.insert(postdata, {name, value})
+                end
+            end
+            if has_user and has_pw then
+                return action, postdata
+            end
+        end
+    end
+end
+
+--- Login for a subscription crossword.
+-- @param[opt] puzzle The puzzle table, or CURRENT_PUZZLE
+-- @param[opt] page The login page
+-- Uses puzzle.auth fields.
+function login(puzzle, page)
+    puzzle = puzzle or CURRENT_PUZZLE
+    local auth = puzzle.auth
+    -- Prompt for username and password
+    local authdata = prompt('Login for ' .. puzzle.name, 'Username', 'Password')
+    if not authdata or type(authdata) ~= 'table' or not authdata.Username or not authdata.Password then
+        return nil, "Username or password not specified"
+    end
+    -- Setup cookie options
+    local cookie_file = get_cookie_file(puzzle)
+    local opts = puzzle.curlopts or {}
+    opts[curl.OPT_COOKIEJAR] = cookie_file -- Save cookies
+    opts[curl.OPT_COOKIEFILE] = cookie_file -- Read cookies
+    -- Download authentication page
+    if not page then
+        local err
+        page, err = curl.get(auth.url, opts)
+        if not page then return nil, err end
+    end
+    -- Find the login form
+    local action, postdata = get_login_form(page, puzzle)
+    if not action then
+        return nil, "Could not find login form"
+    end
+    -- Add authentication info
+    table.insert(postdata, {auth.user_id, authdata.Username})
+    table.insert(postdata, {auth.password_id, authdata.Password})
+    -- Send the POST request and save the cookie
+    local str, err = curl.post(action, postdata, opts)
+    if not str then
+        return nil, err
+    elseif not has_cookie(puzzle) then
+        return nil, "Incorrect username or password"
+    end
+    -- Read the cookies file and remove expiration times
+    local f = io.open(cookie_file, 'rb')
+    if f then
+        local text = {}
+        for line in f:lines() do
+            line = line:gsub("(.-)\t(.-)\t(.-)\t(.-)\t(.-)\t(.-)\t(.-)",
+                              "%1\t%2\t%3\t%4\t0\t%6\t%7")
+            table.insert(text, line)
+        end
+        f:close()
+        -- Write the new cookies file
+        f = io.open(cookie_file, 'wb')
+        f:write(table.concat(text, '\n'))
+        f:close()
     end
     return true
 end
 
--- Parse the http error response message and spit out an error code
-local function get_http_error(err)
-    return tonumber(err:match("The requested URL returned error: (%d+)"))
+-- ---------------------------------------------------------------------------
+-- QueueTask Functions
+-- ---------------------------------------------------------------------------
+
+-- Use this custom function in place of assert for custom download functions
+-- so that the custom function can call, for instance, assert(curl.get())
+-- and the error message will not have location information attached
+local ASSERT_ERROR
+local function myassert(v, msg, ...)
+    if v then return v, msg, ... end
+    ASSERT_ERROR = msg
+    -- Error to jump out of this function
+    error(msg)
 end
 
--- Progress callback
-local function progress(dltotal, dlnow, ultotal, ulnow)
-    -- Check to see if we should abort the download
-    if task.checkAbort() then
-        return 1 -- abort
-    end
-    return 0 -- continue
-end
-
-local function check_return_code(rc, err)
-    if rc ~= 0 then
-        if rc == 22 then -- CURLE_HTTP_RETURNED_ERROR
-            local code = get_http_error(err)
-            if code == 404 or code == 410 then
-                err = "URL not found: "..url
-            end
-        elseif rc == 42 then -- abort from the progress function
-            error({'abort'})
+-- Download a puzzle, return the error code if any
+local function download(puzzle)
+    if puzzle.func then
+        local func, err = loadstring([[return function(puzzle, download, assert) ]]..puzzle.func..[[ end]])
+        if err then return err end
+        -- Compile this function
+        func = func()
+        -- We need to have a real date for custom functions
+        puzzle.date = date(puzzle.date)
+        -- This function can return error, nil + error, or throw an error, in
+        -- which case we should differentiate between user-called asserts
+        -- (using myassert and ASSERT_ERROR), or an actual programming error.
+        ASSERT_ERROR = false
+        local success, result, err = xpcall(function() return func(puzzle, curl.get, myassert) end, debug.traceback)
+        if ASSERT_ERROR then
+            -- User called assert
+            return ASSERT_ERROR
+        elseif type(result) == 'string' and not err then
+            -- User returned an error string, or this is a programming error
+            return result
+        else
+            -- User returned nil, err OR the function returned true
+            return err
         end
-        return nil, err
     else
-        return true
-    end
-end
-
--- Download a file
-local function do_download(url, callback, opts)
-    -- Setup the cURL object
-    local c = curl.easy_init()
-
-    c:setopt(curl.OPT_URL, url)
-    c:setopt(curl.OPT_FOLLOWLOCATION, 1)
-    c:setopt(curl.OPT_WRITEFUNCTION, callback)
-    c:setopt(curl.OPT_PROGRESSFUNCTION, progress)
-    c:setopt(curl.OPT_NOPROGRESS, 0)
-    c:setopt(curl.OPT_FAILONERROR, 1) -- e.g. 404 errors
-    c:setopt(curl.OPT_SSL_VERIFYPEER, 0) -- Authentication doesn't really work
-
-    -- Set user-defined options
-    for k,v in pairs(opts or {}) do c:setopt(k, v) end
-
-    -- Run the download
-    rc, err = c:perform()
-
-    -- Check the return code
-    if rc ~= 0 then
-        if rc == 22 then -- CURLE_HTTP_RETURNED_ERROR
-            local code = get_http_error(err)
-            if code == 404 or code == 410 then
-                err = "URL not found: "..url
-            end
-        elseif rc == 42 then -- abort from the progress function
-            return 'abort'
-        end
-        return nil, err
-    else
-        return c
-    end
-end
-
-local function download_to_file(url, filename, opts)
-    local f, result, err
-    makedirs(path.dirname(filename))
-    f, err = io.open(filename, 'wb')
-    if not f then
-        return nil, err
-    end
-
-    -- Write to a file
-    local function write_to_file(str, length)
-        f:write(str)
-        return length -- Return length to continue download
-    end
-
-    -- Download
-    result, err = do_download(url, write_to_file, opts)
-
-    -- Cleanup
-    f:close()
-
-    if not result then
-        os.remove(filename)
-        return nil, err
-    else
-        return result
-    end
-end
-
-local function download_to_string(url, opts)
-    local t = {}
-
-    -- Write to the table
-    local function write_to_table(str, length)
-        table.insert(t, str)
-        return length -- Return length to continue download
-    end
-
-    -- Download
-    local result, err = do_download(url, write_to_table, opts)
-
-    -- Return the string
-    if result then
-        return table.concat(t), result
-    else
-        return nil, err
-    end
-end
-
---[[
-    Download something
-    -----------------
-
-    To a file
-    ---------
-    download.download{url = url, filename = filename, [curl]opts = opts}
-        or
-    download.download(url, filename, opts)
-        -> curl_handle or nil, err
-
-    With a callback function
-    ------------------------
-
-        function callback(str, length)
-            return length -- to continue downloading
-        end
-
-    download.download{url = url, callback = callback, [curl]opts = opts}
-        or 
-    download.download(url, callback, opts)
-        -> curl_handle or nil, err
-
-    To a string
-    -----------
-    download.download{url = url, [curl]opts = opts}
-        or 
-    download.download(url, opts)
-        -> str or nil, curl_handle or err
-]]
-function download.download(opts, filename, curlopts)
-    -- Gather the arguments
-    local url, callback
-    if type(opts) == 'table' then
-        url = opts.url or opts[1]
-        filename = opts.filename or opts[2]
-        callback = opts.callback
-        curlopts = opts.opts or opts.curlopts or opts[3]
-    else
-        url = opts
-    end
-    if type(filename) == 'function' then
-        callback = filename
-        filename = nil
-    elseif type(filename) == 'table' then
-        curlopts = filename
-        filename = nil
-    end
-
-    assert(url)
-
-    -- Figure out which variant to call
-    local result, err
-    if callback then
-        result, err = do_download(url, callback, curlopts)
-    elseif filename then
-        result, err = download_to_file(url, filename, curlopts)
-    else
-        result, err = download_to_string(url, curlopts)
-    end
-    -- Check for abort
-    if result == 'abort' then
-        -- wrapped in a table so that location info isn't added
-        error({'abort'})
-    elseif not result then
-        error({err})
-    else
-        return result, err
-    end
-end
-
--- This can be called from custom functions to update the status pane
-function set_status(text)
-    task.post(1, {text}, download.UPDATE_STATUS)
-end
-
-local deepcopy = require 'pl.tablex'.deepcopy
-local function download_puzzle(puzzle)
-    -- If we don't copy the date, we could accidentally set the metatable
-    -- twice (the date mt is "protected" and doesn't allow that).
-    puzzle = deepcopy(puzzle)
-    setmetatable(puzzle.date, getmetatable(date()))
-
-    task.post(1, {puzzle}, download.START)
-
-    local success, err = xpcall(
-        function ()
-            -- Download the puzzle
-            if puzzle.func then
-                local func, err = loadstring([[return function(puzzle, download) ]]..puzzle.func..[[ end]])
-                if not err then
-                    err = func()(puzzle, download.download)
+        local success, err
+        local opts = puzzle.curlopts or {}
+        -- Check puzzle authentication
+        if puzzle.auth and type(puzzle.auth) == 'table' then
+            local cookie_file = get_cookie_file(puzzle)
+            -- Add cookie file to curlopts
+            opts[curl.OPT_COOKIEFILE] = cookie_file -- Read
+            opts[curl.OPT_COOKIEJAR] = cookie_file -- Write
+            local login_page -- Save the login page if it is returned
+            if has_cookie(puzzle) then
+                -- Download the puzle
+                success, err = curl.get(puzzle.url, puzzle.filename, opts)
+                if not success then return err end
+                -- Check the result to make sure it's not an error/login page
+                local f = io.open(puzzle.filename, 'rb')
+                login_page = f:read('*a')
+                f:close()
+                -- If we didn't get a login page, assume this is the right puzzle
+                if not get_login_form(login_page) then
+                    return
                 end
-                if err and err ~= true then
-                    return err
-                end
-            else
-                download.download(puzzle.url, puzzle.filename, puzzle.curlopts)
             end
-        end,
-        -- error handler . . . separates user errors from programming errors
-        function (e)
-            if type(e) == 'table' and type(e[1]) == 'string' then
-                return e[1]
-            else
-                return debug.traceback(e)
-            end
+            -- If we haven't returned, login failed.
+            -- Try to login (use the existing login page if any)
+            success, err = login(puzzle, login_page)
+            if not success then return err end
         end
-    )
+        success, err = curl.get(puzzle.url, puzzle.filename, opts)
+        if not success then return err end
+    end
+end
 
-    if err then
-        os.remove(puzzle.filename)
-        if err == 'abort' then
-            error({'abort'})
-        end
-    elseif puz.Puzzle.CanLoad(puzzle.filename) then
-        -- Try to open the file
+-- Send progress events if the dl is taking too long
+local LONG_DL_SECS = 1
+local time
+curl.progress_func = function(dltotal, dlnow)
+    if os.clock() - time > LONG_DL_SECS then
+        task.post(mgr.EVT_PROGRESS, dltotal, dlnow)
+    end
+    return 0
+end
+curl.progress_func = nil -- Turn off for now
+
+-- This function is called for each puzzle in the queue
+return function(puzzle)
+    -- Download the puzzle
+    time = os.clock()
+    CURRENT_PUZZLE = puzzle
+    local success, err = xpcall(function() return download(puzzle) end, debug.traceback)
+    CURRENT_PUZZLE = nil
+    -- Try to open to make sure the puzzle was completely downloaded
+    if success and not err and not puzzle.not_puzzle and puz.Puzzle.CanLoad(puzzle.filename) then
         local success, result = pcall(puz.Puzzle, puzzle.filename)
         if success then
-            result:__gc() -- This is a puzzle
+            result:__gc()
         else
-            os.remove(puzzle.filename)
             err = result
         end
     end
-
-    task.post(1, {puzzle, err}, download.END)
+    if err then
+        -- Remove the puzzle if there was an error
+        os.remove(puzzle.filename)
+        -- Report errors if any
+        return err
+    end
 end
-
-loop_through_queue(download_puzzle, function(t) return t.filename end)

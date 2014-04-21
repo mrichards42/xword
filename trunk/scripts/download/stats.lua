@@ -1,103 +1,149 @@
-require 'wxtask'
-require 'download.messages'
-local join = require 'pl.path'.join
-local clear = require 'pl.tablex'.clear
+--- Puzzle statistics.
+-- Implemented as a singleton class that derives from `task.QueueTask`.
 
+local task = require 'task'
+local QueueTask = require 'task.queue_task'
 
--- ------------------------------------------------------------------------
--- Stats thread management
--- ------------------------------------------------------------------------
+local M = {
+    --- Puzzle does not exist.
+    MISSING = 1,
+    --- Puzzle exists, but has not been opened.
+    EXISTS = 2,
+    --- User has started solving the puzzle.
+    SOLVING = 3,
+    --- User has completely solved the puzzle
+    COMPLETE = 4,
+    --- Sent when stats have been fetched.
+    -- Callback is passed filename and status value.
+    EVT_STATS = QueueTask.EVT_ITEM_END,
+}
 
-if not download then download = {} end
-download.status_map = {} -- filename = status
-download.puzzle_map = {} -- filename = PuzzlePanel
-local ctrls = {} -- filename = PuzzleCtrl
-local task_id
+-- Secondary threads just need these fields
+if not task.is_main then return M end
 
-local function update_ctrl(filename, status)
-    -- Update the status of the PuzzleCtrl
-    ctrl = ctrls[filename]
-    if not ctrl then return end
-    status = status or download.status_map[ctrl.puzzle.filename]
-    if not status then return end
-    ctrl:set_status(status)
+local path = require 'pl.path'
+
+local function clear(t)
+    for k,_ in pairs(t) do
+        t[k] = nil
+    end
 end
 
--- ---------------------------------------------------------------------------
--- Public functions
--- ---------------------------------------------------------------------------
+local _R = string.match(..., "^.+%.") or "" -- relative require
 
--- Fetch stats, with some options:
--- force = fetch even if we already have this file
--- prepend = get these stats before queued stats
-function download.fetch_stats(filenames)
-    if not type(filenames) == 'table' then
-        filenames = { filenames }
+-- Create the stats thread
+QueueTask.new{
+    obj = M,
+    script = _R .. 'stats_task',
+    name = 'Puzzle Stats'
+}
+
+--- @type Stats
+
+--- Table mapping filename to stats.
+M.map = {}
+
+local puzzle_map = {} -- {filename = PuzzlePanel}
+local ctrls = {} -- {filename = PuzzleCtrl}
+
+-- Connect events
+M:connect(M.EVT_STATS, function(filename, flag)
+    if not filename then return end
+    M.map[filename] = flag
+    -- Update the stats for the PuzzlePanel
+    local panel = puzzle_map[filename]
+    if panel then
+        panel:update_stats()
     end
-    -- This can be called as a table: fetch_stats{filenames, force = true}
-    local force, prepend
-    if type(filenames[1]) == 'table' then
-        filenames, force, prepend =
-            filenames[1], filenames.force, filenames.prepend
+end)
+
+--- Fetch stats for the supplied files
+-- @param opts Table of parameters, or filenames
+-- @param opts.1 filenames
+-- @param opts.force
+-- @param opts.prepend
+-- @usage
+-- local filenames = {"file1", "file2", "file3", ...}
+-- stats:fetch(filenames)
+-- stats:fetch{filenames, force=true} -- Recheck any stats that are cached
+-- stats:fetch{filenames, prepend=true} -- Add to the front of the queue
+--
+-- Can also be called with a single file:
+-- stats:fetch("filename")
+-- stats:fetch{"filename", force=true}
+-- stats:fetch{"filename", prepend=true}
+function M:fetch(opts)
+    -- Gather options
+    local force, prepend, filenames
+    if type(opts) == 'table' and #opts == 1 then -- options
+        filenames = opts[1]
+        force, prepend = opts.force, opts.prepend
+    else -- no options
+        filenames = opts
     end
-    -- See if we've already fetched this data
-    local task_filenames = {}
-    for _, fn in ipairs(filenames) do
-        local status = download.status_map[fn]
-        if status and not force then
-            update_ctrl(filename, status)
-        else
-            table.insert(task_filenames, fn)
+    if type(filenames) == 'string' then -- Single filename
+        filenames = {filenames}
+    end
+    -- Make a list of uncached files (unless force=true)
+    local task_filenames
+    if force then
+        task_filenames = filenames
+    else
+        task_filenames = {}
+        for _, filename in ipairs(filenames) do
+            local status = self.map[filename]
+            if status then
+                self:send_event(M.EVT_STATS, filename, status)
+            else
+                table.insert(task_filenames, filename)
+            end
         end
     end
-    -- Fetch the missing data
-    if task_id and task.isrunning(task_id) then
-        task.post(task_id, task_filenames,
-                  prepend and download.PREPEND or download.APPEND)
+    -- Fetch stats
+    if not self:is_running() then self:start() end
+    if prepend then
+        self:prepend(unpack(task_filenames))
     else
-        task_id = task.create(
-                join(xword.scriptsdir, 'download', 'stats_task.lua'),
-                task_filenames)
-        task.handleEvents(task_id,
-            {
-                [download.STATS] = function (data)
-                    local filename, status = unpack(data)
-                    download.status_map[filename] = status
-                    update_ctrl(filename, status)
-                    -- Update the stats for the PuzzlePanel
-                    local panel = download.puzzle_map[filename]
-                    if panel then
-                        panel:update_stats()
-                    end
-                end,
-            }
-        )
+        self:append(unpack(task_filenames))
     end
 end
 
-function download.add_ctrl(ctrl)
+-- TODO: move this somewhere else (download dialog or puzzle panel or something)
+function M:add_ctrl(ctrl)
     ctrls[ctrl.puzzle.filename] = ctrl
-    update_ctrl(ctrl.puzzle.filename)
 end
 
-function download.clear_stats()
-    if task_id and task.isrunning(task_id) then
-        task.post(task_id, nil, download.CLEAR)
-    end
+-- TODO: we shouldn't need thie method
+function M:clear()
+    QueueTask.clear(self)
     clear(ctrls)
-    --clear(download.status_map)
 end
 
-function download.erase_stats()
-    download.clear_stats()
-    clear(download.status_map)
+--- Clear and delete cached stats.
+function M:erase()
+    self:clear()
+    clear(self.map)
 end
 
-function download.puzzle_exists(filename)
-    local status = download.status_map[filename]
-    if status then
-        return status ~= download.MISSING
+-------------------------------------------------------------------------------
+-- Static/module-level functions
+-- @section static
+
+--- Does this puzzle exist?
+-- @param filename The puzzle
+-- @return true/false
+function M.exists(filename)
+    local stats = M.map[filename]
+    if stats then
+        return stats ~= M.MISSING
     else
-        return lfs.attributes(filename, 'mode') == 'file'
+        local size = path.getsize(filename) or 0
+        if size == 0 then
+            M.map[filename] = M.MISSING
+            return false
+        end
+        return true
     end
 end
+
+return M
