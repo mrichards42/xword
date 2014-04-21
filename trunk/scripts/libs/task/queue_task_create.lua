@@ -12,14 +12,18 @@ local queue = Queue{unique=unique, key=key}
 
 --- Process messages received from the calling thread
 -- @param[opt=0] timeout -1 means wait forever
+-- @param[opt] evt_id Return if a message with this event id is encountered
 -- @return 'abort' if task.check_abort() returned true
-local function process_messages(timeout)
+local function process_messages(timeout, evt)
     while true do
         if task.check_abort() then return 'abort' end
         local task_id, evt_id, data = task.receive(timeout or 0)
-        if not task_id then return end -- No messages
-        if evt_id == task.EVT_ABORT then
+        if not task_id then
+            return -- No messages
+        elseif evt_id == task.EVT_ABORT then
             return 'abort'
+        elseif evt_id == evt and evt_id ~= nil then
+            return evt_id, data
         elseif evt_id == msg.APPEND then
             for _, item in ipairs(data) do
                 queue:push(item)
@@ -33,6 +37,21 @@ local function process_messages(timeout)
             queue:clear()
         end
         timeout = 0 -- Check for more messages
+    end
+end
+
+--- Wait for a message from the main thread.
+-- @param evt_id Return data from this event
+-- @rturn 'abort' or unpacked event data
+function wait_for_message(evt_id)
+    while true do
+        local evt, data = process_messages(timeout or -1, evt_id)
+        if evt == 'abort' then
+            return 'abort'
+        elseif evt == evt_id then
+            return unpack(data)
+        end
+        -- Else no messages, so keep looking
     end
 end
 
