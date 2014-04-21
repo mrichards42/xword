@@ -1,108 +1,91 @@
-local function PopupWindow(parent, id, pos, size)
-    -- Create a dialog without a border
-    local win = wx.wxDialog(
-        parent, id, '', wx.wxDefaultPosition, size or wx.wxDefaultSize,
+local AnimateMove = require 'wx.lib.animate'
+local MOUSE_OFFSET = 10
+local SCREEN_TOLERANCE = 30
+local ANIMATE = false
+
+local function PopupWindow(parent)
+    -- A borderless dialog
+    local self = wx.wxDialog(
+        parent, wx.wxID_ANY, '', wx.wxDefaultPosition, wx.wxDefaultSize,
         wx.wxFRAME_NO_TASKBAR + wx.wxFRAME_FLOAT_ON_PARENT + wx.wxWS_EX_TRANSIENT 
     )
-
-    -- The corner that we are anchored to
-    local anchor = wx.wxALIGN_TOP + wx.wxALIGN_LEFT
-    local fit = win.Fit
-    function win:Fit()
-        -- wxWindow:Fit is simply SetSize(GetBestSize()), so we adjust both
-        -- position and sized here
-        -- Move the window after fit based on where the window should be
-        -- anchored (set in win:Popup)
-        local old_size = self.Size
-        local best_size = self.BestSize
-        local offsetx, offsety = 0,0
-        if bit.band(anchor, wx.wxALIGN_RIGHT) ~= 0 then
-            offsetx = old_size.Width - best_size.Width
+    
+    -- wxWindow:Fit is simply SetSize(GetBestSize()), but we need to adjust
+    -- both position and size
+    function self:Fit()
+        -- Figur out where we should anchor the window
+        local screenx = wx.wxSystemSettings.GetMetric(wx.wxSYS_SCREEN_X)
+        local screeny = wx.wxSystemSettings.GetMetric(wx.wxSYS_SCREEN_Y)
+        local size = self:GetBestSize()
+        local pos = wx.wxGetMousePosition()
+        local offsetx, offsety = MOUSE_OFFSET, MOUSE_OFFSET
+        -- Check right edge
+        if pos.X + size.Width + SCREEN_TOLERANCE > screenx then
+            offsetx = -size.Width - MOUSE_OFFSET
         end
-        if bit.band(anchor, wx.wxALIGN_BOTTOM) ~= 0  then
-            offsety = old_size.Height - best_size.Height
+        -- Check bottom edge
+        if pos.Y + size.Height + SCREEN_TOLERANCE> screeny then
+            offsety = -size.Height - MOUSE_OFFSET
         end
-        local pos = self.Position
-        self:SetSize(pos.X + offsetx, pos.Y + offsety, best_size.Width, best_size.Height)
+        -- Move the window (animate if already on screen)
+        local Move = self:IsShown() and ANIMATE and AnimateMove or self.SetSize
+        Move(self, pos.X + offsetx, pos.Y + offsety, size.Width, size.Height)
     end
 
-    function win:Popup(at_pos)
-        -- If we are given a position, use that.
-        -- If we were given a position in the constructor, use that
-        -- Otherwise use the current pointer coordinates
+    -- Remove the parent event handler and release the mouse on destroy.
+    local evt_handler
+    self:Connect(self:GetId(), wx.wxEVT_DESTROY, function(evt)
+        evt:Skip()
+        if evt_handler then
+            parent:RemoveEventHandler(evt_handler)
+        end
+        if parent:HasCapture() then
+            parent:ReleaseMouse()
+        end
+    end)
 
-        pos = at_pos or pos
-        if pos then
-            self:Move(pos)
+    --- Popup the window
+    function self:Popup(effect, timeout)
+        -- Move to the best position based on the current mouse pointer
+        self:Fit()
+        if effect then
+            self:ShowWithEffect(effect, timeout or 0)
         else
-            -- Move the popup off of the cursor, and make the popup fit on the screen
-            local screenx = wx.wxSystemSettings.GetMetric(wx.wxSYS_SCREEN_X)
-            local screeny = wx.wxSystemSettings.GetMetric(wx.wxSYS_SCREEN_Y)
-            local size = self.Size
-            local pos = wx.wxGetMousePosition()
-            local offsetx, offsety = 10,10
-            -- Check right edge
-            if pos.X + size.Width + 30 > screenx then
-                offsetx = -size.Width - 10
-                anchor = anchor + wx.wxALIGN_RIGHT
-            end
-            -- Check bottom edge
-            if pos.Y + size.Height + 30 > screeny then
-                offsety = -size.Height - 10
-                anchor = anchor + wx.wxALIGN_BOTTOM
-            end
-            self:Move(pos.X + offsetx, pos.Y + offsety)
+            self:Show()
         end
 
-        -- Add events to the parent window
+        -- Destroy the popup when the mouse leaves the parent window.
+        if evt_handler then return end
+
+        -- Push an event handler
         local parent = self:GetParent()
-        local handler = wx.wxEvtHandler()
-        parent:PushEventHandler(handler)
-
-        local is_destroyed = false
+        evt_handler = wx.wxEvtHandler()
+        parent:PushEventHandler(evt_handler)
+        -- Used for a few event handlers
         local function on_leave(evt)
-            if not is_destroyed then
-                self:Destroy()
-                is_destroyed = true
-            end
-            parent:RemoveEventHandler(handler)
-            if evt then
-                evt:Skip()
-                parent:ProcessEvent(evt)
-            end
+            self:Destroy()
+            if evt then evt:Skip() end
         end
-
         if wx.__WXMSW__ then
             -- The LEAVE_WINDOW event works on windows . . .
-            handler:Connect(wx.wxEVT_LEAVE_WINDOW, on_leave)
+            evt_handler:Connect(parent:GetId(), wx.wxEVT_LEAVE_WINDOW, on_leave)
         else
-            -- . . . but not on mac.  Here we need to capture the mouse and
-            -- do our own processing of events to determine when we've left.
-            parent:CaptureMouse()
-            -- We only need to release the mouse if we've captured it.
-            -- Under 2.9 this code caused problems with windows
-            local function on_leave_capture(evt)
-                if parent:HasCapture() then
-                    parent:ReleaseMouse()
-                end
-                on_leave(evt)
-            end
-            handler:Connect(wx.wxEVT_MOTION, function (evt)
-                local rect = wx.wxRect(0, 0, parent.Size.Width, parent.Size.Height)
+            -- . . . but not on mac.
+            -- Check to see if the cursor is within the parent rect
+            evt_handler:Connect(wx.wxEVT_MOTION, function (evt)
+                local rect = wx.wxRect(parent:GetSize())
                 if not rect:Contains(evt:GetPosition()) then
-                    on_leave_capture()
+                    on_leave()
                 end
                 evt:Skip()
             end)
-            handler:Connect(wx.wxEVT_MOUSE_CAPTURE_LOST, on_leave_capture)
-            handler:Connect(wx.wxEVT_DESTROY, on_leave_capture)
+            evt_handler:Connect(wx.wxEVT_MOUSE_CAPTURE_LOST, on_leave)
+            -- Capture the mouse and handle motion events
+            parent:CaptureMouse()
         end
-
-        self:Show()
-        return
     end
 
-    return win
+    return self
 end
 
 return PopupWindow

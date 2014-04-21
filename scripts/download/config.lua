@@ -1,31 +1,75 @@
-local join = require 'pl.path'.join
+-- Save the current directory for relative require
+local _R = (string.match(..., '^.+%.') or ... .. '.')
+
+local path = require 'pl.path'
 local tablex = require 'pl.tablex'
 local stringx = require 'pl.stringx'
-require 'safe_exec'
-require 'os'
-require 'lfs'
-require 'date'
+local serialize = require 'serialize'
+local os = require 'os'
+local date = require 'date'
 
-require 'luacurl'
-local curl_opt_names = {}
-local curl_opt_table = {}
+-- ----------------------------------------------------------------------------
+-- cURL string -> enum conversion
+-- ----------------------------------------------------------------------------
+local curl = require 'luacurl'
+local _curl_to_config = {}
+local _curl_from_config = {}
 for k, v in pairs(curl) do
     if k:sub(1,4) == "OPT_" then
         k = k:sub(5)
-        curl_opt_names[v] = k
-        curl_opt_table[k] = v
+        _curl_to_config[v] = k
+        _curl_from_config[k] = v
     end
 end
 
--- ============================================================================
--- Default config
--- ============================================================================
-download.puzzle_directory = join(xword.userdatadir, "puzzles")
-download.separate_directories = true
-download.auto_download = 0
-download.default_view = "Day"
-download.previous_view = {}
-default_disabled = {
+-- Convert a table with numeric keys to use curl options
+local function curl_to_config(opts)
+    if not opts then return end
+    local ret = {}
+    for id, value in pairs(opts) do
+        pcall(function()
+            ret[_curl_to_config[id]] = value
+        end)
+    end
+    return ret
+end
+
+-- Convert a table with curl options to numeric keys
+local function curl_from_config(opts)
+    if not opts then return end
+    local ret = {}
+    for id, value in pairs(opts) do
+        if type(id) == 'string' then
+            pcall(function()
+                ret[_curl_from_config[id]] = value
+            end)
+        else
+            ret[id] = value
+        end
+    end
+    return ret
+end
+
+
+-- ----------------------------------------------------------------------------
+-- Default configuration
+-- ----------------------------------------------------------------------------
+local config = {}
+config.puzzle_directory = path.join(xword.userdatadir, "puzzles")
+config.separate_directories = true
+config.auto_download = 0
+config.default_view = "Day"
+config.previous_view = {}
+config.styles = {
+    missing = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(wx.wxBLUE) },
+    downloaded = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(128, 0, 128) },
+    progress = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },
+    complete = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },
+    unknown = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(wx.wxBLACK) },
+}
+config.styles.progress.font.Weight = wx.wxFONTWEIGHT_BOLD
+
+local default_disabled = {
     "NY Times Premium",
     "NY Times PDF",
     "Newsday",
@@ -37,239 +81,236 @@ default_disabled = {
     "I Swear",
     "Washington Post Puzzler"
 }
-download.styles = {
-    missing = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(wx.wxBLUE) },
-    downloaded = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(128, 0, 128) },
-    progress = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },
-    complete = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },
-}
 
-download.styles.progress.font.Weight = wx.wxFONTWEIGHT_BOLD
+-- Keep a list of original keys to the config table
+local config_keys = tablex.keys(config)
 
 
--- ============================================================================
--- Load config
--- ============================================================================
-local function get_config_filename()
-    return join(xword.configdir, 'download', 'config.lua')
-end
+-- ----------------------------------------------------------------------------
+-- Helpers
+-- ----------------------------------------------------------------------------
 
-local config, err = safe_dofile(get_config_filename())
-if not config and lfs.attributes(get_config_filename(), 'mode') == 'file' then
-    local msg =
-        "Error while loading Puzzle Downloader configuration file.\n" ..
-        "Would you like to reset Puzzle Downloader settings permanently?"
-    if type(err) == 'string' and #err > 0 then
-        msg = msg .. "\n\nDetails:\n" .. err
+-- Recursively update keys from t1 with values from t2
+local function deep_update(t1, t2)
+    if type(t1) ~= 'table' or type(t2) ~= 'table' then return end
+    -- Set nil values
+    for _, k in ipairs(t2._nil or {}) do
+        t1[k] = nil
     end
-    local rc = wx.wxMessageBox(msg, "XWord Error", wx.wxYES_NO + wx.wxICON_ERROR)
-    if rc == wx.wxYES then
-        os.remove(get_config_filename())
-    end
-end
-
-if type(config) ~= 'table' then
-    config = {}
-end
-
--- Basic options
-local basic_options = {
-    'puzzle_directory', 'separate_directories',
-    'auto_download','default_view', 'previous_view'}
-
-for _, name in ipairs(basic_options) do
-    if config[name] ~= nil then
-        download[name] = config[name]
-    end
-end
-
--- Previous view
-if not config.previous_view then config.previous_view = {} end
-if config.previous_view.start_date then
-    config.previous_view.start_date = date(config.previous_view.start_date)
-end
-if config.previous_view.end_date then
-    config.previous_view.end_date = date(config.previous_view.end_date)
-end
-
--- Styles
-if not config.styles then config.styles = {} end
-for k, style in pairs(download.styles) do
-    local config_style = config.styles[k]
-    if config_style then
-        if config_style.font then
-            style.font:SetNativeFontInfo(config_style.font)
-        end
-        if config_style.color then
-            style.color:Set(config_style.color)
+    t2._nil = nil
+    -- Copy values
+    for k, v in pairs(t2) do
+        if type(t1[k]) == 'table' then
+            deep_update(t1[k], t2[k])
+        else
+            t1[k] = v
         end
     end
 end
 
--- Add download sources
-for _, puzzle in ipairs(config.added or {}) do
-    download.puzzles:insert(puzzle)
-end
-
--- Disabled
-local dl_list = config.disabled or default_disabled
-for _, id in ipairs(dl_list) do
-    local puzzle = download.puzzles[id]
-    if puzzle then
-        puzzle.disabled = true
+-- Load the SourceList config
+local function load_sources_config(data)
+    local sources = require(_R .. 'sources')
+    -- Added
+    for _, src in ipairs(data.added or {}) do
+        src.curlopts = curl_from_config(src.curlopts)
+        sources:insert(src)
+    end
+    -- Disabled
+    for _, id in ipairs(data.disabled or default_disabled) do
+        local src = sources[id]
+        if src then
+            src.disabled = true
+        end
+    end
+    -- Changed
+    for k, changes in pairs(data.changed or {}) do
+        local src = sources[k]
+        if src then
+            deep_update(src, changes)
+            -- Turn curl strings into numbers
+            src.curlopts = curl_from_config(src.curlopts)
+        end
+    end
+    -- Place sources in the order specified
+    local oldorder = sources._order
+    sources._order = {}
+    for _, id in ipairs(data.order or {}) do
+        for i, oldid in ipairs(oldorder) do
+            if oldid == id then
+                table.insert(sources._order, table.remove(oldorder, i))
+                break
+            end
+        end
+    end
+    -- Add the remaining (unordered) sources in their default order
+    for _, id in ipairs(oldorder) do
+        table.insert(sources._order, id)
     end
 end
 
--- Changed sources
-for key, data in pairs(config.changed or {}) do
-    local function update(puz1, puz2)
-        -- Update nil values
-        for _, k in ipairs(puz2._nil or {}) do
-            puz1[k] = nil
+-- Return differences between two tables, optionally ignoring some keys
+-- a is the original, b is the new table
+local function get_changes(original, new, ...)
+    local ignored = tablex.makeset({...})
+    local changes = { _nil = {} } -- _nil is a table of keys with nil values
+    -- Check for removed / nil values
+    for k,_ in pairs(original) do
+        if new[k] == nil then
+            table.insert(changes._nil, k)
         end
-        puz2._nil = nil
-        -- Copy puz2 to puz1
-        for k,v in pairs(puz2) do
-            if type(v) == 'table' then
-                if type(puz1[k]) ~= 'table' then
-                    puz1[k] = {}
-                end
-                update(puz1[k], puz2[k])
+    end
+    if #changes._nil == 0 then changes._nil = nil end
+    -- Check for changed values
+    for k,v in pairs(new) do
+        if original[k] ~= v and not ignored[k] then
+            if type(original[k]) == 'table' and type(new[k]) == 'table' then
+                -- tables should be checked recursively
+                changes[k] = get_changes(original[k], new[k])
             else
-                puz1[k] = v
+                changes[k] = tablex.deepcopy(v)
             end
         end
     end
-
-    local puzzle = download.puzzles[key]
-    if puzzle then
-        -- Make string curl options into numbers
-        if data.curlopts then
-            local curlopts = tablex.deepcopy(data.curlopts)
-            tablex.clear(data.curlopts)
-            for id, value in pairs(curlopts) do
-                if type(id) == 'string' then
-                    data.curlopts[curl_opt_table[id]] = value
-                else
-                    data.curlopts[id] = value
-                end
-            end
-        end
-        update(puzzle, data)
+    -- Only return if there are changes
+    if next(changes) ~= nil then
+        return changes
     end
 end
 
--- Adjust the order
-local oldorder = download.puzzles._order
-download.puzzles._order = {}
-for _, id in ipairs(config.order or {}) do
-    -- Look for this id in the order.
-    for i, puzid in ipairs(oldorder) do
-        if puzid == id then
-            table.insert(download.puzzles._order, id)
-            table.remove(oldorder, i)
-        end
-    end
-end
-
--- Add the rest of the puzzles in order
-for _, id in ipairs(oldorder) do
-    table.insert(download.puzzles._order, id)
-end
-
-
--- ============================================================================
--- Save config
--- ============================================================================
-function download.save_config()
-    local config = {
-        puzzle_directory = download.puzzle_directory,
-        separate_directories = download.separate_directories,
-        auto_download = download.auto_download,
-        default_view = download.default_view,
-        previous_view = {
-            kind = download.previous_view.kind,
-        },
+-- Return the sources section of the config file
+local function get_sources_config()
+    local sources = require(_R .. 'sources')
+    local data = {
         disabled = {},
         added = {},
         changed = {},
-        order = download.puzzles._order,
-        styles = {}
+        order = sources._order
     }
-    -- Previous view
-    if download.previous_view.start_date then
-        config.previous_view.start_date = download.previous_view.start_date:fmt("%m/%d/%Y")
-    end
-    if download.previous_view.end_date then
-        config.previous_view.end_date = download.previous_view.end_date:fmt("%m/%d/%Y")
-    end
-    -- disabled
-    for id, puzzle in pairs(download.puzzles or {}) do
-        if puzzle.disabled then
-            table.insert(config.disabled, id)
+    -- Disabled sources
+    for id, src in pairs(sources or {}) do
+        if src.disabled then
+            table.insert(data.disabled, id)
         end
-    end
-    -- Styles
-    for k, style in pairs(download.styles) do
-        config.styles[k] = { font = style.font:GetNativeFontInfoDesc(),
-                             color = style.color:GetAsString() }
     end
     -- Figure out what has changed from the defaults
-    local defaults = download.get_default_puzzles()
-    for _, puzzle in download.puzzles:iterall() do
-        local default = defaults[puzzle.id]
-        if default then
-            local function get_changes(puz1, puz2)
-                local changes = { _nil = {} }
-                local changed = false
-                -- Check for changed values
-                for k,v in pairs(puz1) do
-                    if puz2[k] ~= v then
-                        if type(puz1[k]) == 'table' and type(puz2[k]) == 'table' then
-                            changes[k] = get_changes(puz1[k], puz2[k])
-                            changed = changed or changes[k]
-                        elseif k ~= "disabled" then
-                            changes[k] = v
-                            changed = true
-                        end
-                    end
-                end
-                -- Check for removed / nil values
-                for k,v in pairs(puz2) do
-                    if puz1[k] == nil then
-                        table.insert(changes._nil, k)
-                    end
-                end
-                if #changes._nil == 0 then
-                    changes._nil = nil
-                else
-                    changed = true
-                end
-                if changed then return changes end
-            end
-            config.changed[puzzle.id] = get_changes(puzzle, default)
-            -- Make curl options into strings
-            if config.changed[puzzle.id] then
-                config.changed[puzzle.id] = tablex.deepcopy(config.changed[puzzle.id])
-                local opts = config.changed[puzzle.id].curlopts
-                if opts then
-                    local curlopts = tablex.deepcopy(opts)
-                    tablex.clear(opts)
-                    for id, value in pairs(curlopts) do
-                        opts[curl_opt_names[id]] = value
-                    end
-                end
-            end
+    local defaults = sources.get_default_sources()
+    for _, src in sources:iterall() do
+        local default = defaults[src.id]
+        if not default then
+            -- If this source doesn't exist in the defaults, the user
+            -- added it
+            local p = tablex.deepcopy(src)
+            p.curlopts = curl_to_config(p.curlopts)
+            table.insert(data.added, p)
         else
-            table.insert(config.added, puzzle)
+            -- Get changes (ignoring the 'disabled' key)
+            local changes = get_changes(default, src, 'disabled')
+            data.changed[src.id] = changes
+            -- Turn curl options into strings
+            if changes then
+                changes.curlopts = curl_to_config(changes.curlopts)
+            end
         end
     end
-
-    serialize.pdump(config, get_config_filename())
+    return data
 end
 
-xword.OnCleanup(download.save_config)
+-- ----------------------------------------------------------------------------
+-- Public functions
+-- ----------------------------------------------------------------------------
 
+function config.get_config_filename()
+    return path.join(xword.configdir, 'download', 'config.lua')
+end
+
+local LOAD_ERROR = false
+function config.load()
+    local data, err = serialize.loadfile(config.get_config_filename())
+    -- Check for errors
+    if not data and path.isfile(config.get_config_filename()) then
+        local msg =
+            "Error while loading Puzzle Downloader configuration file.\n" ..
+            "Would you like to reset Puzzle Downloader settings?"
+        if type(err) == 'string' and #err > 0 then
+            msg = msg .. "\n\nDetails:\n" .. err
+        end
+        local rc = wx.wxMessageBox(msg, "XWord Error", wx.wxYES_NO + wx.wxICON_ERROR)
+        if rc == wx.wxYES then
+            os.remove(config.get_config_filename())
+        else
+            LOAD_ERROR = true
+        end
+    end
+    if type(data) ~= 'table' then return end
+    -- Update the configuration values
+    for _, k in ipairs(config_keys) do
+        if k ~= 'styles' then -- we need special processing for colors/fonts
+            if type(config[k]) == 'table' then
+                deep_update(config[k], data[k])
+            else
+                config[k] = data[k]
+            end
+        end
+    end
+    -- Create dates from strings
+    for _, k in ipairs({'start_date', 'end_date'}) do
+        if type(config.previous_view[k]) == 'string' then
+            config.previous_view[k] = date(config.previous_view[k])
+        end
+    end
+    -- Create fonts and colors from strings
+    for k, style in pairs(data.styles) do
+        local config_style = config.styles[k]
+        if config_style then
+            if type(style.font) == 'string' then
+                config_style.font:SetNativeFontInfo(style.font)
+            end
+            if type(style.color) == 'string' then
+                config_style.color:Set(style.color)
+            end
+        end
+    end
+    -- Update sources config
+    load_sources_config(data)
+end
+
+function config.save()
+    if LOAD_ERROR then
+        xword.Message(
+            "Download configuration settings will not be saved due to errors when loading the file.\n" ..
+            "Please fix errors in the file, or delete it: " .. config.get_config_filename()
+        )
+        return
+    end
+    -- Copy the configuration values to a data table
+    local data = {}
+    for _, k in ipairs(config_keys) do
+        data[k] = tablex.deepcopy(config[k])
+    end
+    -- Turn dates into strings
+    for _, k in ipairs({'start_date', 'end_date'}) do
+        if config.previous_view[k] then
+            data.previous_view[k] = config.previous_view[k]:fmt("%m/%d/%Y")
+        end
+    end
+    -- Turn fonts and colors into strings
+    for k, style in pairs(config.styles) do
+        data.styles[k] = { font = style.font:GetNativeFontInfoDesc(),
+                           color = style.color:GetAsString() }
+    end
+    -- Get the sources configuration data
+    tablex.update(data, get_sources_config())
+    -- Save to a file
+    serialize.dump(data, config.get_config_filename())
+end
+
+
+if true then
+return config
+end
+
+-- TODO: Move this somewhere else
 -- ============================================================================
 -- GUI
 -- ============================================================================

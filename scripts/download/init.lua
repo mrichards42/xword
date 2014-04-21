@@ -4,66 +4,62 @@
 --     of sources.
 
 --     This add-on is implemented as a package and contains many files and even
---     sub-projects (layouts, images).
+--     sub-projects.
 --     Add-ons with multiple files must be placed into their own directory.
 --     An init.lua script is the only script that will be called to initialize
 --     the add-on.
 -- ============================================================================
 
+local _R = (string.match(..., '^.+%.') or ... .. '.') -- Relative require
 
--- Create the download table
-download = {}
-local download = download
+local function show_dialog()
+    local DownloadDialog = require(_R .. 'gui.dialog')
+    local dlg = DownloadDialog(xword.frame)
+    dlg:SetSize(wx.wxSize(500,300))
+    dlg:Raise()
+    dlg:Show()
+    return dlg
+end
 
-local DownloadDialog = require 'download.dialog'
 
 -- ----------------------------------------------------------------------------
 -- init
 -- ----------------------------------------------------------------------------
 
 local function init()
+    local config = require(_R .. 'config')
+    config.load()
     -- Add the download menu item
-    local menuItem = xword.frame:AddMenuItem({'Tools'}, 'Download puzzles\tCtrl+D',
-        function(evt)
-            local dlg = DownloadDialog()
-            dlg:update()
-            dlg:Raise()
-            dlg:Show()
-        end
+    xword.frame:AddMenuItem({'Tools'}, 'Download puzzles\tCtrl+D',
+        function(evt) show_dialog() end
     )
     -- Check auto_download
-    if download.auto_download > 0 then
-        require 'download.puzzles'
-        require 'download.config'
-        require 'download.download'
-        require 'download.stats'
-        require 'date'
-        local end_date = date():sethours(0,0,0,0):adddays(1)
-        local start_date = end_date:copy():adddays(-download.auto_download)
-        -- Find downloads
-        local downloads = {}
-        local d = start_date:copy()
-        while d < end_date do
-            for _, puzzle in download.puzzles:iter() do
-                if puzzle.days[d:getisoweekday()] then
-                    local data = download.get_download_data(puzzle, d)
-                    if not download.puzzle_exists(data.filename) then
-                        table.insert(downloads, data)
-                    end
-                end
-            end
-            d:adddays(1)
-        end
-        if #downloads > 0 then
-            for k,v in pairs(downloads) do print(v.filename) end
-            download.add_downloads(downloads)
-        end
+    if config.auto_download > 0 then
+        local sources = require(_R .. 'sources')
+        local mgr = require(_R .. 'manager')
+        -- Download puzzles we don't have yet
+        local date = require 'date'
+        local end_date = date()
+        local start_date = end_date:copy():adddays(-config.auto_download)
+        sources:download(start_date, end_date)
     end
 end
 
 local function uninit()
     xword.frame:RemoveMenuItem('Tools', 'Download puzzles')
-    -- Save configuration and sources
+    require(_R .. 'config').save()
+    -- Reset the sources
+    package.loaded[_R .. 'sources'] = nil
+end
+
+if not xword.frame then
+    local config = require(_R .. 'config')
+    config.load()
+    local dlg = show_dialog()
+    dlg:Connect(wx.wxEVT_CLOSE_WINDOW, function (evt)
+        dlg:Destroy()
+        evt:Skip()
+    end)
 end
 
 return { init, uninit }
