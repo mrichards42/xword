@@ -2,7 +2,6 @@
 -- This package is loaded by XWord to initialize lua extensions.
 -- @module xword
 
-require 'luapuz'
 require 'pl.compat' -- Add table.pack
 
 -- table xword is already created in a C++ function
@@ -36,19 +35,28 @@ function xword.OnCleanup(func)
     table.insert(xword.cleanup, func)
 end
 
--- Export some globals for all tasks
+--- Compute a relative module path.
+-- @param path The path passed to require.
+-- @param[opt=1] level Level up from this path.
+-- @usage
+-- -- At the top of a module
+-- local PATH = mod_path(...)
+-- local PARENT = mod_path(..., 2)
+-- -- Later
+-- require(PATH.."relative_module")
+-- require(PARENT.."module_relative_to_parent")
+function mod_path(path, level)
+    for i=1,(level or 1) do
+        -- Find the part of the path before the last dot
+        path = path:match('^(.+)%.[^%.]+') or path
+    end
+    -- Add a dot so we can use this as require(PATH .. 'module')
+    return path .. '.'
+end
+
+-- Setup task library
 local task = require 'task'
-task.globals.xword = {
-    scriptsdir  = xword.scriptsdir,
-    imagesdir   = xword.imagesdir,
-    configdir   = xword.configdir,
-    userdatadir = xword.userdatadir,
-    isportable  = xword.isportable,
-}
-
--- Set task error handler
 task.error_handler = xword.logerror
-
 -- Abort all tasks on cleanup
 xword.OnCleanup(function()
     -- Abort each thread
