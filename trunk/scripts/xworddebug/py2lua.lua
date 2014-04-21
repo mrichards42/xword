@@ -101,6 +101,9 @@ local function convert(filename, writefile, luafile)
         text = 'local require_bmp = require("wx.lib.bmp") -- require function for images\n' .. text
     end
 
+    -- Add empty string for button label if using a stock id
+    text = text:gsub('(wx.Button%( self, wx.ID_%S+) %)', '%1, "" )')
+
     -- Remove other imports (wx libraries)
     text = text:gsub('import .-\n', '')
 
@@ -186,9 +189,8 @@ local function convert(filename, writefile, luafile)
 
 
     -- Replace wx.XXX with wx.wxXXXX
-    -- Figure out function/table semantic differences
-    -- It is a function if there are ()
-    -- It is a member if not
+    -- Figure out function/table semantic differences:
+    --   if (), it's a function, otherwise table
     text = text:gsub('wx%.', 'wx_')
     text = text:gsub('%.([%w_]+)%(', ':%1(')
     text = text:gsub('wx_', 'wx.wx')
