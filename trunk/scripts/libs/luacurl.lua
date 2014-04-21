@@ -3,8 +3,23 @@
 
 require 'c-luacurl'
 local path = require 'pl.path'
-local copy = require 'pl.tablex'.copy
+local tablex = require 'pl.tablex'
 local makepath = require 'pl.dir'.makepath
+
+-- Get shortcurl names
+-- e.g. curl.cookiejar == curl.OPT_COOKIEJAR
+local named_opts = {
+    write = curl.OPT_WRITEFUNCTION,
+    progress = curl.OPT_PROGRESSFUNCTION,
+    post = curl.OPT_POSTFIELDS,
+}
+local function get_curl_opt(key)
+    if type(key) == 'string' then
+        -- Look for key in named_opts or as a curl.OPT option
+        local ukey = key:upper()
+        return named_opts[key] or curl[ukey] or curl['OPT_' .. ukey]
+    end
+end
 
 --- Parse an HTTP error message.
 -- @param err An error message returned from curl_easy:perform().
@@ -64,7 +79,7 @@ local function get_post(curlopts)
         if type(v) == 'table' then
             k,v = unpack(v)
         end
-        table.insert(encoded, curl.escape(k) .. '=' .. curl.escape(k))
+        table.insert(encoded, curl.escape(k) .. '=' .. curl.escape(v))
     end
     return table.concat(encoded, '&')
 end
@@ -80,6 +95,9 @@ local function _perform(url, opts)
     c:setopt(curl.OPT_URL, url)
     c:setopt(curl.OPT_FOLLOWLOCATION, 1)
     c:setopt(curl.OPT_FAILONERROR, 1) -- e.g. 404 errors
+    c:setopt(curl.OPT_CONNECTTIMEOUT, 60) -- 60 seconds connection timeout
+    c:setopt(curl.OPT_LOW_SPEED_TIME, 60) -- Abort after 60 seconds at < 100 bytes per sec
+    c:setopt(curl.OPT_LOW_SPEED_LIMIT, 100)
     -- Authentication doesn't seem to work
     c:setopt(curl.OPT_SSL_VERIFYPEER, 0)
     -- Set user-defined options
@@ -217,50 +235,50 @@ function curl.get(opts, ...)
     -- Build an opts table if we got multiple arguments
     if type(opts) ~= 'table' then
         opts = {url=opts}
-        for _, v in ipairs({...}) do
-            local type_ = type(v)
-            if type_ == 'table' then
-                opts.curlopts = v
-            elseif type_ == 'string' then
-                opts.filename = v
-            elseif type_ == 'function' then
-                if opts.filename or opts.write then
-                    opts.progress = v
-                else
-                    opts.write = v
-                end
+    end
+    -- Process varargs
+    for _, v in ipairs({...}) do
+        local type_ = type(v)
+        if type_ == 'table' then
+            opts.curlopts = v
+        elseif type_ == 'string' then
+            opts.filename = v
+        elseif type_ == 'function' then
+            if opts.filename or opts.write then
+                opts.progress = v
+            else
+                opts.write = v
             end
         end
     end
     -- Read the opts table (and remove options as we go so we don't get errors)
     local url = opts[1] or opts.url;
-    local filename = opts.filename;
+    local filename = opts[2] or opts.filename;
     -- Make of copy of curlopts since we're going to manipulate it
-    local curlopts = copy(opts.curlopts or {});
-    -- Remove the already processed options
-    opts.url = nil; opts.filename = nil; opts.curlopts = nil
-    -- Named options
-    local named_opts = {
-        write = curl.OPT_WRITEFUNCTION,
-        progress = curl.OPT_PROGRESSFUNCTION,
-        post = curl.OPT_POSTFIELDS,
-    }
     -- Copy values from opts table to curlopts.
     -- Keys may be one of the following:
     --   A named opt (e.g. "write"),
     --   A curl option (e.g. "OPT_COOKIEJAR")
     --   Text following OPT_ (e.g. "cookiejar")
-    for k,v in pairs(opts) do
-        if type(k) == 'string' then
-            -- Look for key in named_opts or as a curl.OPT option
-            local id = named_opts[k] or curl[k] or curl['OPT_' .. k:upper()]
-            if id then
-                curlopts[id] = v
-            else -- We don't want to fail silently
-                error("No cURL option: " .. k, 2)
+    local curlopts = {}
+    local function add_opts(t)
+        for k,v in pairs(t or {}) do
+            if type(k) == 'string' then
+                local id = get_curl_opt(k)
+                if id then
+                    curlopts[id] = v
+                else -- We don't want to fail silently
+                    error("No cURL option: " .. k, 2)
+                end
+            elseif type(k) == 'number' then
+                curlopts[k] = v
             end
         end
     end
+    add_opts(opts.curlopts)
+    -- Remove the already processed options
+    opts.url = nil; opts.filename = nil; opts.curlopts = nil
+    add_opts(opts)
     -- Encode and format post fields
     curlopts[curl.OPT_POSTFIELDS] = get_post(curlopts)
     -- Get the progress function (add task.check_abort if necessary)
@@ -270,7 +288,7 @@ function curl.get(opts, ...)
         curlopts[curl.OPT_NOPROGRESS] = 0
     end
     -- Only one required argument
-    assert(url)
+    assert(url, "Missing required url argument")
     -- Figure out which variant to call
     local has_write_callback = curlopts[curl.OPT_WRITEFUNCTION]
     if has_write_callback then
@@ -291,6 +309,7 @@ end
 function curl.post(opts, post, ...)
     if type(opts) == 'table' then
         opts.post = opts.post or opts[2]
+        opts[2] = nil -- curl.get expects the second opt to be a filename
     else
         opts = {url=opts, post=post}
     end
