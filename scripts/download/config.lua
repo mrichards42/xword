@@ -61,6 +61,7 @@ config.auto_download = 0
 config.default_view = "Day"
 config.previous_view = {}
 config.styles = {
+    error = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(180, 0, 0) },
     missing = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(wx.wxBLUE) },
     downloaded = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(128, 0, 128) },
     progress = { font = wx.wxFont(wx.wxSWISS_FONT), color = wx.wxColour(34, 139, 34) },

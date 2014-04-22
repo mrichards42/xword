@@ -68,12 +68,18 @@ M:connect{
         puzzle.status = "Downloading"
     end,
     [M.EVT_DOWNLOAD_END] = function(puzzle, err)
+        -- Add to done table and update errors/status
         table.insert(M.done, puzzle)
-        stats:fetch{puzzle.filename, force = true}
         if err == true then err = nil end
-        -- Add to done table and update error_count
-        puzzle.status = err or "Done"
-        if err then M.error_count = M.error_count + 1 end
+        if err then
+            puzzle.status = err
+            M.error_count = M.error_count + 1
+            stats:update(puzzle.filename, err)
+        else
+            stats:update(puzzle.filename, stats.EXISTS)
+            stats:fetch{puzzle.filename, force = true}
+            puzzle.status = "Done"
+        end
         -- Open if specified
         if M.open_after_download == puzzle.filename then
             M.open_after_download = nil
