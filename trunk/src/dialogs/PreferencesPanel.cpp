@@ -99,6 +99,7 @@ void AppearancePanel::SetupTree()
         m_treebook->AddSubPage(new ClueListCrossingAppearance(m_treebook, m_config.Clue), "Crossing Clue");
         m_treebook->AddSubPage(new ClueListHeadingAppearance(m_treebook, m_config.Clue), "Heading");
     m_treebook->AddPage(new CluePromptAppearance(m_treebook, m_config.CluePrompt), "Clue Prompt");
+    m_treebook->AddPage(new StatusAppearance(m_treebook, m_config.Status), "Status Bar");
     m_treebook->AddPage(new wxStaticText(m_treebook, wxID_ANY, "Select a sub-item"), "Metadata");
         m_treebook->AddSubPage(new NotesAppearance(m_treebook, m_config.Notes), "Notes");
 

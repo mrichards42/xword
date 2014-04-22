@@ -133,6 +133,15 @@ ConfigManager::Notes_t::Notes_t(ConfigManager * cfg)
       backgroundColor(this, _T("backgroundColor"), &cfg->Appearance.backgroundColor)
 {}
 
+// Status bar
+ConfigManager::Status_t::Status_t(ConfigManager * cfg)
+    : ConfigGroup(&cfg->m_group, _T("StatusBar")),
+      completeColor(this, _T("completeColor"), *wxGREEN),
+      incorrectColor(this, _T("incorrectColor"), *wxRED),
+      uncheckableColor(this, _T("uncheckableColor"), *wxCYAN),
+      brightnessCutoff(this, _T("brightnessCutoff"), 200)
+{}
+
 // Printing
 ConfigManager::Printing_t::Printing_t(ConfigManager * cfg)
     : ConfigGroup(&cfg->m_group, _T("Printing")),

@@ -31,6 +31,7 @@ public:
           Clue(this),
           CluePrompt(&m_group),
           Notes(this),
+          Status(this),
           Printing(this),
           Timer(this),
           FileHistory(this),
@@ -145,6 +146,17 @@ public:
         ConfigColor foregroundColor;
         ConfigColor backgroundColor;
     } Notes;
+
+    // Status bar
+    class Status_t : public ConfigGroup {
+    public:
+        Status_t(ConfigManager * cfg);
+
+        ConfigColor completeColor;
+        ConfigColor incorrectColor;
+        ConfigColor uncheckableColor;
+        ConfigLong brightnessCutoff;
+    } Status;
 
     // Printing
     class Printing_t : public ConfigGroup {

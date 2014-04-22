@@ -1048,18 +1048,18 @@ MyFrame::CheckPuzzle()
         case CORRECT_PUZZLE:
             StopTimer();
             m_status->SetAlert(_T("The puzzle is filled correctly!"),
-                              *wxWHITE, *wxGREEN);
+                wxGetApp().GetConfigManager().Status.completeColor());
             break;
         case UNCHECKABLE_PUZZLE:
             StopTimer();
             m_status->SetAlert(
                 _T("The puzzle is completely filled."),
-                *wxWHITE, *wxCYAN);
+                wxGetApp().GetConfigManager().Status.uncheckableColor());
             break;
         case INCORRECT_PUZZLE:
             m_status->SetAlert(
                 _T("The puzzle contains incorrect letters."),
-                *wxWHITE, *wxRED);
+                wxGetApp().GetConfigManager().Status.incorrectColor());
             break;
         case INCOMPLETE_PUZZLE:
         default:
