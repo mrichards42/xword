@@ -113,7 +113,7 @@ local function DownloadList(parent)
     end
 
     -- Update labels and list size
-    local function update_count(puzzle)
+    local function update_count()
         --wx.wxGetApp():Yield(true)
         self.label:SetLabel(
             ("%d Queued, %d Error%s"):format(
@@ -138,6 +138,8 @@ local function DownloadList(parent)
     function self:OnCancelDownloads()
         mgr:clear()
     end
+
+    update_count() -- Initial setup
 
     return self
 end

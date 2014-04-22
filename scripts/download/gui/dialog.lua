@@ -66,7 +66,7 @@ local function DownloadDialog(parent)
         local sizer = self.prev_week:GetContainingSizer()
         sizer:Show(self.prev_week, is_day)
         sizer:Show(self.next_week, is_day)
-        self:Layout()
+        sizer:Layout()
         -- Change labels
         self.prev:SetToolTip("Previous " .. kind)
         self.next:SetToolTip("Next " .. kind)
