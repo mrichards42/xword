@@ -1,8 +1,10 @@
 local puz = require 'luapuz'
 local date = require 'date'
 
-local _R = (string.match(..., '^.+%.') or ... .. '.')
+local _R = mod_path(...)
+local _RR = mod_path(..., 2)
 local PopupWindow = require(_R .. 'popup')
+local stats = require(_RR .. 'stats')
 
 -- draw_puzzle globals
 local box_size = 13
@@ -104,7 +106,14 @@ local function PuzzlePopup(parent, puzzle)
         elseif puzzle:exists() then
             sizer:Add(wx.wxStaticText(self, wx.wxID_ANY, tostring(puzzle.filename)))
         else
-            sizer:Add(wx.wxStaticText(self, wx.wxID_ANY, tostring(puzzle.url)))
+            local msg = tostring(puzzle.url)
+            local err = stats.error[puzzle.filename]
+            if err then
+                msg = msg .. '\n' .. err
+            end
+            local st = wx.wxStaticText(self, wx.wxID_ANY, msg)
+            st:Wrap(250)
+            sizer:Add(st)
         end
         self:Layout()
         self:Fit()

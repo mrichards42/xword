@@ -190,7 +190,9 @@ end -- end function TextGrid
 
 --- Return the config style given a stats flag.
 local function get_style(flag)
-    if flag == stats.MISSING then
+    if flag == stats.ERROR then
+        return config.styles.error
+    elseif flag == stats.MISSING then
         return config.styles.missing
     elseif flag == stats.EXISTS then
         return config.styles.downloaded
@@ -213,28 +215,26 @@ local function copy_text(text)
 end
 
 -- Update when stats are updated
-local CTRLS = {} -- CTRLS[PuzzleGrid][filename] = puzzle
+local CTRLS = {} -- CTRLS[filename] = {PuzzleGrid, puzzle}
 stats:connect(stats.EVT_STATS, function(filename)
-    for ctrl, puzzles in pairs(CTRLS) do
-        local puzzle = puzzles[filename]
-        if puzzle then
-            ctrl:RefreshItem(puzzle)
-            return
-        end
+    local ctrl, puzzle = unpack(CTRLS[filename] or {})
+    if ctrl and puzzle then
+        ctrl:RefreshItem(puzzle)
     end
 end)
 
 --- A TextGrid of puzzles
 local function PuzzleGrid(parent, x_gap, y_gap)
     local self = TextGrid(parent, x_gap, y_gap)
-    CTRLS[self] = {}
+    local filenames = {}
 
-    -- Save puzzles in the CTRLS[self] table
+    -- Save puzzles in the CTRLS table
     local add = self.Add
     function self:Add(text, col, row, puzzle)
         add(self, text, col, row, puzzle)
         if puzzle then
-            CTRLS[self][puzzle.filename] = puzzle
+            CTRLS[puzzle.filename] = {self, puzzle}
+            table.insert(filenames, puzzle.filename)
         end
     end
 
@@ -243,7 +243,6 @@ local function PuzzleGrid(parent, x_gap, y_gap)
     function self:Update(opts)
         self:Connect(wx.wxEVT_IDLE, function()
             self:Disconnect(wx.wxEVT_IDLE) -- Only do this once
-            local filenames = tablex.keys(CTRLS[self])
             stats:fetch{filenames, prepend=true, force=(opts and opts.force)}
         end)
     end
@@ -328,7 +327,10 @@ local function PuzzleGrid(parent, x_gap, y_gap)
     
     -- Cleanup when we are destroyed
     self:Connect(self:GetId(), wx.wxEVT_DESTROY, function(evt)
-        CTRLS[self] = nil
+        for _, filename in ipairs(filenames) do
+            CTRLS[filename] = nil
+        end
+        filenames = nil
         menu:delete()
         evt:Skip()
     end)

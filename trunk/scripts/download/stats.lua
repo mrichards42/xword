@@ -5,6 +5,8 @@ local task = require 'task'
 local QueueTask = require 'task.queue_task'
 
 local M = {
+    --- Last download attempt was an error
+    ERROR = 0,
     --- Puzzle does not exist.
     MISSING = 1,
     --- Puzzle exists, but has not been opened.
@@ -42,19 +44,15 @@ QueueTask.new{
 
 --- Table mapping filename to stats.
 M.map = {}
-
-local puzzle_map = {} -- {filename = PuzzlePanel}
-local ctrls = {} -- {filename = PuzzleCtrl}
+--- Table mapping filename to download errors.
+M.error = {}
 
 -- Connect events
-M:connect(M.EVT_STATS, function(filename, flag)
+M:connect(M.EVT_STATS, function(filename, flag, err)
     if not filename then return end
+    if flag == M.ERROR and not err then print(debug.traceback()) end
     M.map[filename] = flag
-    -- Update the stats for the PuzzlePanel
-    local panel = puzzle_map[filename]
-    if panel then
-        panel:update_stats()
-    end
+    M.error[filename] = err
 end)
 
 --- Fetch stats for the supplied files
@@ -93,7 +91,7 @@ function M:fetch(opts)
         for _, filename in ipairs(filenames) do
             local status = self.map[filename]
             if status then
-                self:send_event(M.EVT_STATS, filename, status)
+                self:send_event(M.EVT_STATS, filename, status, self.error[filename])
             else
                 table.insert(task_filenames, filename)
             end
@@ -108,21 +106,24 @@ function M:fetch(opts)
     end
 end
 
--- TODO: move this somewhere else (download dialog or puzzle panel or something)
-function M:add_ctrl(ctrl)
-    ctrls[ctrl.puzzle.filename] = ctrl
-end
-
--- TODO: we shouldn't need thie method
-function M:clear()
-    QueueTask.clear(self)
-    clear(ctrls)
-end
-
 --- Clear and delete cached stats.
 function M:erase()
     self:clear()
     clear(self.map)
+    clear(self.error)
+end
+
+--- Set stats.
+-- Sends stats.EVT_STATUS
+-- @param filename The puzzle filename.
+-- @param[opt] flag The status flag.
+-- @param[opt] err An error message.  Sets status to stats.ERROR
+function M:update(filename, flag, err)
+    if type(flag) == 'string' then
+        err = flag
+        flag = M.ERROR
+    end
+    self:send_event(self.EVT_STATS, filename, flag, err)
 end
 
 -------------------------------------------------------------------------------
@@ -133,13 +134,13 @@ end
 -- @param filename The puzzle
 -- @return true/false
 function M.exists(filename)
-    local stats = M.map[filename]
-    if stats then
-        return stats ~= M.MISSING
+    local flag = M.map[filename]
+    if flag then
+        return flag > M.MISSING
     else
         local size = path.getsize(filename) or 0
         if size == 0 then
-            M.map[filename] = M.MISSING
+            M:update(filename, M.MISSING)
             return false
         end
         return true
