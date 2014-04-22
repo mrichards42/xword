@@ -176,6 +176,19 @@ public:
     }
 };
 
+// Status Bar
+class StatusAppearance : public AppearancePanelBase
+{
+public:
+    StatusAppearance(wxWindow * parent, ConfigManager::Status_t & status)
+        : AppearancePanelBase(parent)
+    {
+        Add(status.completeColor, "Complete Puzzle");
+        Add(status.incorrectColor, "Incorrect Puzzle");
+        Add(status.uncheckableColor, "No Solution");
+    }
+};
+
 // Clue List
 class ClueListAppearance : public AppearancePanelBase
 {

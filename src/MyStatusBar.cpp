@@ -22,6 +22,7 @@
 #include <wx/tooltip.h>
 #include "widgets/SizedText.hpp"
 #include "messages.hpp"
+#include "utils/color.hpp"
 
 enum StatusIds
 {
@@ -85,10 +86,14 @@ void MyStatusBar::SetLuaErrors(int num)
 #endif // XWORD_USE_LUA
 
 
-void MyStatusBar::SetAlert(const wxString & text, const wxColour & fgColor, const wxColour & bgColor)
+void MyStatusBar::SetAlert(const wxString & text, const wxColour & bgColor)
 {
     m_alert->SetBackgroundColour(bgColor);
-    m_alert->SetForegroundColour(fgColor);
+    long cutoff = wxGetApp().GetConfigManager().Status.brightnessCutoff();
+    if (bgColor == wxNullColour || GetBrightness(bgColor) > cutoff)
+        m_alert->SetForegroundColour(*wxBLACK);
+    else
+        m_alert->SetForegroundColour(*wxWHITE);
     m_alert->SetToolTip(text);
     m_alert->SetLabel(text);
     //WrapAlert();

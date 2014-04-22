@@ -35,7 +35,7 @@ public:
     MyStatusBar(wxWindow * parent, wxWindowID id = wxID_ANY, long style = wxST_SIZEGRIP, const wxString& name = _T("statusBar"));
     ~MyStatusBar() {}
 
-    void SetAlert(const wxString & text, const wxColour & fgColor = *wxBLACK, const wxColour & bgColor = wxNullColour);
+    void SetAlert(const wxString & text, const wxColour & bgColor = wxNullColour);
     void SetStatus(const wxString & text);
 #ifdef XWORD_USE_LUA
     void SetLuaErrors(int num);
