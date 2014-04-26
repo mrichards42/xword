@@ -55,7 +55,7 @@ end
 --- Remove and return the first item from the queue.
 function Queue:pop()
     if self:empty() then return end
-    local value = self:front()
+    local value = self[self._front]
     self[self._front] = nil
     self._front = self._front + 1
     return value
@@ -64,7 +64,7 @@ end
 --- Remove and return the last item from the queue.
 function Queue:popback()
     if self:empty() then return end
-    local value = self:back()
+    local value = self[self._back]
     self[self._back] = nil
     self._back = self._back - 1
     return value
@@ -197,8 +197,9 @@ function UniqueQueue:pop(hash)
     -- If we get a hash, find and remove just that value
     if hash then
         local idx = self._map[hash]
-        local v = idx and self[idx]
-        if (not idx) or (v == nil) then return end
+        if not idx then return end
+        local v = self[idx]
+        if v == nil then return end
         self._map[hash] = nil
         self[idx] = nil
         if idx == self._front then self._front = self._front + 1 end
