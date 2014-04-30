@@ -37,7 +37,8 @@ local _R = string.match(..., "^.+%.") or "" -- relative require
 QueueTask.new{
     obj = M,
     script = _R .. 'stats_task',
-    name = 'Puzzle Stats'
+    name = 'Puzzle Stats',
+    unique = true,
 }
 
 --- @type Stats
@@ -106,11 +107,14 @@ function M:fetch(opts)
     end
 end
 
---- Clear and delete cached stats.
-function M:erase()
-    self:clear()
-    clear(self.map)
-    clear(self.error)
+--- Clear downloads and optionally delete cached stats.
+-- @param[opt] all Delete cached stats.
+function M:clear(all)
+    QueueTask.clear(self)
+    if all then
+        clear(self.map)
+        clear(self.error)
+    end
 end
 
 --- Set stats.
