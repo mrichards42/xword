@@ -68,7 +68,8 @@ local function get_login_form(page, puzzle)
             if not action or action:sub(1,1) == "#" then
                 action = auth.url
             end
-            -- Look for the <input> and keep default values (except username/password)
+            action = action:gsub("&amp;", "&");
+            -- Look for the <inputs> and <selects> and keep default values (except username/password)
             local has_user = false -- Make sure this is the login form
             local has_pw = false
             local postdata = {}
@@ -78,9 +79,24 @@ local function get_login_form(page, puzzle)
                     has_user = true
                 elseif name == auth.password_id then
                     has_pw = true
-                else
+                elseif name then
                     local value = input:match('value%s*=%s*"(.-)"')
-                    table.insert(postdata, {name, value})
+                    if value then
+                        table.insert(postdata, {name, value})
+                    end
+                end
+            end
+            for s in form:gmatch("<select(.-)</select>") do
+                local name = s:match('name%s*=%s*"(.-)"')
+                if name then
+                    for option in s:gmatch("<option([^>]*)>") do
+                        if option:match('selected') then
+                            local value = option:match('value%s*=%s*"(.-)"')
+                            if value then
+                                table.insert(postdata, {name, value})
+                            end
+                        end
+                    end
                 end
             end
             if has_user and has_pw then
