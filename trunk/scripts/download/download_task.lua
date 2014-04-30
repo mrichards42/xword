@@ -66,7 +66,6 @@ local function get_login_form(page, puzzle)
             if not action or action:sub(1,1) == "#" then
                 action = auth.url
             end
-            action = action:gsub("&amp;", "&");
             -- Look for the <inputs> and <selects> and keep default values (except username/password)
             local has_user = false -- Make sure this is the login form
             local has_pw = false
