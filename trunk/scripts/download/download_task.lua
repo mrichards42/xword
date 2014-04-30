@@ -36,11 +36,9 @@ local CURRENT_PUZZLE
 function get_cookie_file(puzzle)
     puzzle = puzzle or CURRENT_PUZZLE
     assert(puzzle.auth and puzzle.auth.url, "Missing authentication url")
-    -- Use authentication url as the cookie file
-    local name = puzzle.auth.url:gsub("[:/]", "-")
-    local cookies = path.join(xword.configdir, 'download', name .. ".txt")
-    -- Strip invalid chars
-    return cookies:gsub('[?<>:*|"%%]\t\r\n\v\f', "")
+    -- Use authentication url as the cookie file, but strip invalid chars
+    local name = puzzle.auth.url:gsub('[?<>:/\\%*|"%%\t\r\n\v\f]+', ".")
+    return path.join(xword.configdir, 'download', name .. ".txt")
 end
 
 --- Does this puzzle have the associated cookie file?
