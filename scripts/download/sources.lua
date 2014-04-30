@@ -21,7 +21,8 @@ local mgr = require(_R .. 'manager')
 
 -- Remove characters that are not allowed in filenames
 local function sanitize_name(text)
-    return text:gsub('[?<>:*|"%%]\t\r\n\v\f', "")
+    local n = text:gsub('[?<>:*|"%%\t\r\n\v\f]', "")
+    return n
 end
 
 -- Metatables
@@ -143,12 +144,11 @@ end
 --- Get the date format for the local filename of a puzzle.
 -- @return A date format string.
 function Source:get_filename_fmt()
-    local p = path.join(
+    return path.join(
         config.puzzle_directory,
-        config.separate_directories and (self.directoryname or self.name) or '',
+        config.separate_directories and sanitize_name(self.directoryname or self.name) or '',
         self.filename
     )
-    return sanitize_name(p)
 end
 
 
