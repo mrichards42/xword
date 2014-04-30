@@ -1,14 +1,8 @@
 -- A Grid of puzzles
 
-local _R = mod_path(...)
-local _RR = mod_path(..., 2)
-
-local tablex = require 'pl.tablex'
-
-local stats = require(_RR .. 'stats')
-local config = require(_RR .. 'config')
-
-local PuzzlePopup = require(_R .. 'puzzle_popup')
+-- ----------------------------------------------------------------------------
+-- TextGrid -- The base for PuzzleGrid
+-- ----------------------------------------------------------------------------
 
 --- A grid of text items.
 local function TextGrid(parent, x_gap, y_gap)
@@ -18,13 +12,17 @@ local function TextGrid(parent, x_gap, y_gap)
     self.item_text = {} -- { {col, row, text, [data]} }
     self.item_width, self.item_height = 0, 0
     x_gap, y_gap = x_gap or 5, y_gap or 5
+    local max_col = 0
+    local max_row = 0
 
     --- Add an item or static text to the panel.
     -- @param text The text to display
     -- @param col the column (0-indexed)
     -- @param row the row (0-indexed)
     -- @param[opt] data Custom item data for hyperlinked text.
-    function self:Add(text, col, row, data)
+    -- @param[opt] is_span If true, don't factor into grid size.  
+    --   This can be used for headers, etc. that cross multiple cells.
+    function self:Add(text, col, row, data, is_span)
         local item = {col, row, text, data}
         table.insert(self.item_text, item)
         if data then
@@ -33,9 +31,14 @@ local function TextGrid(parent, x_gap, y_gap)
             self.data_item[data] = item
         end
         -- Figure out the item size
-        local w, h = self:GetTextExtent(text, self:get_style(data or text))
-        if w > self.item_width then self.item_width = w end
-        if h > self.item_height then self.item_height = h end
+        if not is_span then
+            local w, h = self:GetTextExtent(text, self:get_style(data or text))
+            if w > self.item_width then self.item_width = w end
+            if h > self.item_height then self.item_height = h end
+        end
+        -- Adjust the grid size.
+        if col > max_col then max_col = col end
+        if row > max_row then max_row = row end
     end
 
     --- Get the item rectangle.
@@ -49,14 +52,7 @@ local function TextGrid(parent, x_gap, y_gap)
     
     --- Override wxWindow::Fit to set a better min size
     function self:Fit()
-        -- Find the bottom-right most item
-        local max_col, max_row = 0, 0
-        for _, item in ipairs(self.item_text) do
-            local col, row = unpack(item)
-            if col > max_col then max_col = col end
-            if row > max_row then max_row = row end
-        end
-        -- Calculate its rectangle
+        -- Find the rectangle of the bottom-right most item.
         local x, y, w, h = get_rect(max_col, max_row)
         -- Set our min size
         self:SetMinSize(wx.wxSize(x + w, y + h))
@@ -188,6 +184,17 @@ local function TextGrid(parent, x_gap, y_gap)
     return self
 end -- end function TextGrid
 
+-- ----------------------------------------------------------------------------
+-- PuzzleGrid
+-- ----------------------------------------------------------------------------
+local _R = mod_path(...)
+local _RR = mod_path(..., 2)
+
+local stats = require(_RR .. 'stats')
+local config = require(_RR .. 'config')
+
+local PuzzlePopup = require(_R .. 'puzzle_popup')
+
 --- Return the config style given a stats flag.
 local function get_style(flag)
     if flag == stats.ERROR then
@@ -206,11 +213,11 @@ end
 
 --- Copy text to the clipboard.
 local function copy_text(text)
-    local clipBoard = wx.wxClipboard.Get()
-    if clipBoard and clipBoard:Open() then
-        clipBoard:SetData(wx.wxTextDataObject(tostring(text)))
-        clipBoard:Flush() -- Make this available after we've exited
-        clipBoard:Close()
+    local clipboard = wx.wxClipboard.Get()
+    if clipboard and clipboard:Open() then
+        clipboard:SetData(wx.wxTextDataObject(tostring(text)))
+        clipboard:Flush() -- Make this available after we've exited
+        clipboard:Close()
     end
 end
 
@@ -230,8 +237,8 @@ local function PuzzleGrid(parent, x_gap, y_gap)
 
     -- Save puzzles in the CTRLS table
     local add = self.Add
-    function self:Add(text, col, row, puzzle)
-        add(self, text, col, row, puzzle)
+    function self:Add(text, col, row, puzzle, is_span)
+        add(self, text, col, row, puzzle, is_span)
         if puzzle then
             CTRLS[puzzle.filename] = {self, puzzle}
             table.insert(filenames, puzzle.filename)
@@ -339,4 +346,79 @@ local function PuzzleGrid(parent, x_gap, y_gap)
     return self
 end -- end function PuzzleGrid
 
-return PuzzleGrid
+
+-- ----------------------------------------------------------------------------
+-- Specializations of PuzzleGrid
+-- ----------------------------------------------------------------------------
+
+local date = require 'date'
+
+-- Grid size per month for CalendarGrid, including a gap
+local MONTH_X = 8
+local MONTH_Y = 7
+local DAYS = {"Su", "M", "Tu", "W", "Th", "F", "Sa"}
+
+--- A PuzzleGrid arranged as a calendar
+local function Calendar(parent, source, use_heading)
+    if use_heading == nil then use_heading = true end
+    local self = PuzzleGrid(parent)
+    function self:AddMonth(year, month, x, y)
+        local d = date(year, month, 1) -- First day of the month
+        month = d:getmonth() -- If month was not between 1 and 12
+        x = x * MONTH_X
+        y = y * (MONTH_Y + (use_heading and 1 or 0))
+        -- Add a heading centered on the calendar
+        if use_heading then
+            self:Add(d:fmt("%B %Y"), x + 3, y, nil, true)
+            y = y + 1
+        end
+        -- Add the labels
+        for i, label in pairs(DAYS) do
+            self:Add(label, x + i-1, y)
+        end
+        -- Add the days
+        local today = date()
+        local row = 1
+        local col = d:getweekday() - 1 -- Find the col of the first day
+        while d:getmonth() == month do
+            -- Get the puzzle (or just the day number if no puzzle)
+            local puzzle
+            if d <= today and source:has_puzzle(d) then
+                puzzle = source:get_puzzle(d)
+            end
+            self:Add(d:fmt('%d'), x + col, y + row, puzzle)
+            -- Increment
+            d:adddays(1)
+            col = col + 1
+            if col > 6 then
+                col = 0
+                row = row + 1
+            end
+        end
+    end
+    return self
+end -- end function Calendar
+
+local function Month(parent, source, year, month)
+    local self = Calendar(parent, source, false)
+    self:AddMonth(year, month, 0, 0)
+    self:Fit()
+    return self
+end -- end function Month
+
+local function List(parent, puzzles, fmt)
+    local self = PuzzleGrid(parent)
+    for i, puzzle in ipairs(puzzles) do
+        self:Add(puzzle.date:fmt(fmt or '%m/%d'), i-1, 0, puzzle)
+    end
+    self:Fit()
+    return self
+end -- end function List
+
+-- Expose local functions
+return setmetatable({
+    Calendar = Calendar,
+    Month = Month,
+    List = List,
+    TextGrid = TextGrid,
+}, { __call = PuzzleGrid })
