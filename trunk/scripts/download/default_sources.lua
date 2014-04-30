@@ -35,8 +35,9 @@ local sources = {
 
     {
         name = "LA Times",
-        url = "http://www.cruciverb.com/puzzles/lat/lat%y%m%d.puz",
+        url = "http://www.cruciverb.com/download.php?f=lat%y%m%d.puz",
         filename = "lat%Y%m%d.puz",
+        auth = { url="http://www.cruciverb.com/index.php?action=login", user_id="user", password_id="passwrd"},
         curlopts =
         {
             [curl.OPT_REFERER] = 'http://www.cruciverb.com/',
