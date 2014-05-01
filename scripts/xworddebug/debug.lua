@@ -34,25 +34,9 @@ end
 local dlg
 local function get_dialog()
     if not dlg then
-        dlg = wx.wxFrame(xword.frame, wx.wxID_ANY, 'Lua Debug',
-            wx.wxDefaultPosition, wx.wxDefaultSize,
-            wx.wxFRAME_TOOL_WINDOW + wx.wxFRAME_FLOAT_ON_PARENT +
-            wx.wxDEFAULT_FRAME_STYLE
-        )
-        local panel = wx.wxPanel(dlg, wx.wxID_ANY)
-        local sizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-        local text = wx.wxTextCtrl(panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxTE_MULTILINE)
-        sizer:Add(text, 1, wx.wxEXPAND + wx.wxALL, 10)
-        panel:SetSizer(sizer)
-        local dlgsizer = wx.wxBoxSizer(wx.wxHORIZONTAL)
-        dlgsizer:Add(panel, 1, wx.wxEXPAND)
-        dlg:SetSizer(dlgsizer)
-        -- Just hide on close
-        dlg:Connect(wx.wxEVT_CLOSE_WINDOW, function(evt)
-            dlg:Hide()
-        end)
+        dlg = require'xworddebug.wxFB'.DebugDialog(xword.frame)
         function dlg:add_message(msg)
-            text:AppendText(msg .. '\n')
+            self.text:AppendText(msg .. '\n')
         end
     end
     return dlg
@@ -60,8 +44,21 @@ end
 
 
 -- Replace print with a debug dialog
+local msg = false -- Recursion control
 function xword.debug(...)
+    if msg then
+        table.insert(msg, get_message(...))
+        return
+    else
+        msg = {}
+    end
     local dlg = get_dialog()
+    if msg then
+        if #msg > 0 then
+            dlg:add_message(table.concat(msg, '\n'))
+        end
+        msg = false
+    end
     dlg:add_message(get_message(...))
     dlg:Show()
 end
