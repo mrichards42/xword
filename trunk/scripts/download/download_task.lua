@@ -29,6 +29,21 @@ function prompt(msg, ...)
     return wait_for_message(mgr.PROMPT)
 end
 
+--- Check if this is a valid puzzle.
+-- @param filename
+-- @return true or nil, error
+function check_puzzle(filename)
+    if puz.Puzzle.CanLoad(filename) then
+        local success, result = pcall(puz.Puzzle, filename)
+        if success then
+            result:__gc()
+        else
+            return nil, result
+        end
+    end
+    return true
+end
+
 local CURRENT_PUZZLE
 --- Get the cookie file for this puzzle.
 -- @param[opt] puzzle The puzzle table, or CURRENT_PUZZLE
@@ -103,29 +118,26 @@ local function get_login_form(page, puzzle)
     end
 end
 
---- Login for a subscription crossword.
--- @param[opt] puzzle The puzzle table, or CURRENT_PUZZLE
--- @param[opt] page The login page
--- Uses puzzle.auth fields.
-function login(puzzle, page)
-    puzzle = puzzle or CURRENT_PUZZLE
+-- The actual login function
+-- See function login below for the public memorized version
+local function _login(puzzle, msg)
     local auth = puzzle.auth
     -- Prompt for username and password
-    local authdata = prompt('Login for ' .. puzzle.name, 'Username', 'Password')
-    if not authdata or type(authdata) ~= 'table' or not authdata.Username or not authdata.Password then
-        return nil, "Username or password not specified"
+    local authdata = prompt((msg and ('*** '..msg..' ***\n') or '') .. 'Login for ' .. puzzle.name, 'Username', 'Password')
+    if not authdata or type(authdata) ~= 'table' then
+        return nil, msg or "Username or password not specified"
+    elseif authdata.Username == '' or authdata.Password == '' then
+        return _login(puzzle, "Username or password not specified")
     end
     -- Setup cookie options
     local cookie_file = get_cookie_file(puzzle)
+    --os.remove(cookie_file) -- Start with a clean cookie file
     local opts = puzzle.curlopts or {}
     opts[curl.OPT_COOKIEJAR] = cookie_file -- Save cookies
     opts[curl.OPT_COOKIEFILE] = cookie_file -- Read cookies
     -- Download authentication page
-    if not page then
-        local err
-        page, err = curl.get(auth.url, opts)
-        if not page then return nil, err end
-    end
+    local page, err = curl.get(auth.url, opts)
+    if not page then return nil, err end
     -- Find the login form
     local action, postdata = get_login_form(page, puzzle)
     if not action then
@@ -137,9 +149,9 @@ function login(puzzle, page)
     -- Send the POST request and save the cookie
     local str, err = curl.post(action, postdata, opts)
     if not str then
-        return nil, err
-    elseif not has_cookie(puzzle) then
-        return nil, "Incorrect username or password"
+        return _login(puzzle, "HTTP POST error: " .. err)
+    elseif get_login_form(str) or not has_cookie(puzzle) then
+        return _login(puzzle, "Incorrect username or password")
     end
     -- Read the cookies file and remove expiration times
     local f = io.open(cookie_file, 'rb')
@@ -158,6 +170,41 @@ function login(puzzle, page)
     end
     return true
 end
+
+local LOGIN_RESULT = {} -- puzzle_id = true/false
+
+-- Clear logins on task.CLEAR
+local function on_clear()
+   LOGIN_RESULT = {}
+end
+
+-- Clear specific saved logins
+local function on_relogin(items)
+    for _, id in ipairs(items) do
+        LOGIN_RESULT[id] = nil
+    end
+end
+
+--- Login for a subscription crossword.
+-- @param[opt] puzzle The puzzle table, or CURRENT_PUZZLE
+-- @param[opt] msg A message to show in the dialog
+-- Uses puzzle.auth fields.
+function login(puzzle, msg)
+    -- A wrapper memorization function for _login so the user isn't bugged
+    -- about logging in multiple times.
+    puzzle = puzzle or CURRENT_PUZZLE
+    local result = LOGIN_RESULT[puzzle.id]
+    if result == true then
+        return true
+    elseif result then
+        return nil, result
+    else
+        local success, err = _login(puzzle, msg)
+        LOGIN_RESULT[puzzle.id] = success and true or err
+        return success, err
+    end
+end
+
 
 -- ---------------------------------------------------------------------------
 -- QueueTask Functions
@@ -207,25 +254,41 @@ local function download(puzzle)
             -- Add cookie file to curlopts
             opts[curl.OPT_COOKIEFILE] = cookie_file -- Read
             opts[curl.OPT_COOKIEJAR] = cookie_file -- Write
-            local login_page -- Save the login page if it is returned
             if has_cookie(puzzle) then
                 -- Download the puzle
                 success, err = curl.get(puzzle.url, puzzle.filename, opts)
                 if not success then return err end
                 -- Check the result to make sure it's not an error/login page
-                local f = io.open(puzzle.filename, 'rb')
-                login_page = f:read('*a')
-                f:close()
-                -- If we didn't get a login page, assume this is the right puzzle
-                if not get_login_form(login_page) then
+                if LOGIN_RESULT[puzzle.id] == true then
+                    -- If we have successfuly logged in, don't bother
+                    -- checking this puzzle twice.
                     return
+                elseif not puzzle.not_puzzle then
+                    -- Check that this is a valid puzzle
+                    if check_puzzle(puzzle.filename) then
+                        -- If we have a good cookie and a good puzzle,
+                        -- count this as a successful login.
+                        LOGIN_RESULT[puzzle.id] = true
+                        return
+                    end
+                else
+                    -- If this is supposed to be a non-puzzle (e.g. PDF),
+                    -- check for a login page
+                    local f = io.open(puzzle.filename, 'rb')
+                    local page = f:read('*a')
+                    f:close()
+                    -- If there is no login form, assume this is the correct
+                    -- file type.
+                    if not get_login_form(page) then
+                        return
+                    end
                 end
             end
-            -- If we haven't returned, login failed.
-            -- Try to login (use the existing login page if any)
-            success, err = login(puzzle, login_page)
+            -- If we haven't returned, login failed, so try to login.
+            success, err = login(puzzle)
             if not success then return err end
         end
+        -- Either no auth is necessary, or we have passed authentication.
         success, err = curl.get(puzzle.url, puzzle.filename, opts)
         if not success then return err end
     end
@@ -243,20 +306,15 @@ end
 curl.progress_func = nil -- Turn off for now
 
 -- This function is called for each puzzle in the queue
-return function(puzzle)
+local function func(puzzle)
     -- Download the puzzle
     time = os.clock()
     CURRENT_PUZZLE = puzzle
     local success, err = xpcall(function() return download(puzzle) end, debug.traceback)
     CURRENT_PUZZLE = nil
     -- Try to open to make sure the puzzle was completely downloaded
-    if success and not err and not puzzle.not_puzzle and puz.Puzzle.CanLoad(puzzle.filename) then
-        local success, result = pcall(puz.Puzzle, puzzle.filename)
-        if success then
-            result:__gc()
-        else
-            err = result
-        end
+    if success and not err and not puzzle.not_puzzle then
+        success, err = check_puzzle(puzzle.filename)
     end
     if err then
         -- Remove the puzzle if there was an error
@@ -265,3 +323,10 @@ return function(puzzle)
         return err
     end
 end
+
+-- Return main function and event handlers
+return {
+    func,
+    [mgr.CLEAR]=on_clear,
+    [mgr.LOGIN]=on_relogin
+}

@@ -62,7 +62,7 @@ function Puzzle:open()
     if self:exists() then
         SourceList.open(self.filename)
     else
-        self:download{prepend=true, open=true}
+        self:download{prepend=true, open=true, login=true}
     end
 end
 

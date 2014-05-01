@@ -322,7 +322,7 @@ local function PuzzleGrid(parent, x_gap, y_gap)
     self:Connect(
         menu:Append(wx.wxID_ANY, "Redownload"):GetId(),
         wx.wxEVT_COMMAND_MENU_SELECTED,
-        function () context_puzzle:download() end
+        function () context_puzzle:download{login=true} end
     )
 
     self:Connect(wx.wxEVT_CONTEXT_MENU, function()
