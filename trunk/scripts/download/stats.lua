@@ -21,17 +21,16 @@ local M = {
 }
 
 -- Secondary threads just need these fields
-if not task.is_main then return M end
+if not task.is_main then return QueueTask.new{obj=M} end
 
 local path = require 'pl.path'
+local _R = mod_path(...)
 
 local function clear(t)
     for k,_ in pairs(t) do
         t[k] = nil
     end
 end
-
-local _R = string.match(..., "^.+%.") or "" -- relative require
 
 -- Create the stats thread
 QueueTask.new{
