@@ -24,7 +24,20 @@ local M = {
     EVT_QUEUE_UPDATED = -223
 }
 -- Return the events to secondary tasks
-if not task.is_main then return M end
+if not task.is_main then
+    -- Stub QueueTask.new for secondary tasks to inherit events
+    function M.new(opts)
+        if type(opts) == "table" and opts.obj then
+            for k,v in pairs(M) do
+                if k ~= "new" then
+                    opts.obj[k] = v
+                end
+            end
+            return opts.obj
+        end
+    end
+    return M
+end
 
 local Task = task.Task
 local Queue = require 'task.queue'
