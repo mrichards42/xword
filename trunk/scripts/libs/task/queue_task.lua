@@ -124,11 +124,27 @@ function M:start(...)
     -- Call Task:start with queue_task_create as the _script, and the script
     -- passed in the constructor as the first argument.
     -- The same as it we called task.new('queue_task_create'):start(script, ...)
-    local ret = Task.start(self, self._userscript, self._unique, self._key)
+    if not self:is_running() then
+        local ret = Task.start(self, self._userscript, self._unique, self._key)
+    end
     -- Append the first arguments
     if select('#', ...) > 0 then
         self:append(...)
     end
+    return ret
+end
+
+--- Restart an aborted QueueTask.
+function M:restart()
+    if self:is_running() then return end
+    -- Start the task
+    local ret = Task.start(self, self._userscript, self._unique, self._key)
+    -- Append already queued items to the task
+    local t = {}
+    for item in self.queue:iter() do
+        table.insert(t, item)
+    end
+    self:post(M.APPEND, unpack(t))
     return ret
 end
 
