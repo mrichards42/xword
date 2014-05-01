@@ -29,7 +29,7 @@ local M = {
     PROMPT = 110,
 }
 
-if not task.is_main then return M end
+if not task.is_main then return QueueTask.new{obj=M} end
 
 local tablex = require 'pl.tablex'
 local path = require 'pl.path'
