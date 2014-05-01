@@ -329,4 +329,47 @@ end
 -- curl.post("www.example.com", data)
 -- @function curl.post
 
+
+
+local old_perform = _perform
+--- Enable/disable logging of all c:perform() calls
+-- @param enable True/false
+function curl.enable_logging(enable)
+    if enable == false then
+        _perform = old_perform
+    elseif enable == true then
+        local function opt_name(n)
+            for k,v in pairs(curl) do
+                if v == n and k:sub(1,4) == "OPT_" then
+                    return k:sub(5)
+                end
+            end
+        end
+        _perform = function(url, opts)
+            local log = {}
+            if opts and opts[curl.OPT_POSTFIELDS] then
+                table.insert(log, "cURL POST:")
+            else
+                table.insert(log, "cURL GET:")
+            end
+            table.insert(log, "    URL: " .. url)
+            table.insert(log, "    FOLLOWLOCATION: " .. 1)
+            for k,v in pairs(opts or {}) do
+                local name = opt_name(k)
+                if name and not name:find("PROGRESS") then
+                    table.insert(log, ("    %s: %s"):format(name, tostring(v)))
+                end
+            end
+            print(table.concat(log, "\n"))
+            local success, err, rc = old_perform(url, opts)
+            if success then
+                print("Success!")
+            else
+                print(("Error: %d, %s"):format(rc, err))
+            end
+            return success, err, rc
+        end
+    end
+end
+
 return curl
