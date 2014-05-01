@@ -9,6 +9,7 @@ local msg = require 'task.queue_task'
 -- The message queue
 local Queue = require 'task.queue'
 local queue = Queue{unique=unique, key=key}
+local HANDLERS = {} -- A table of message handlers
 
 --- Process messages received from the calling thread
 -- @param[opt=0] timeout -1 means wait forever
@@ -18,11 +19,19 @@ local function process_messages(timeout, evt)
     while true do
         if task.check_abort() then return 'abort' end
         local task_id, evt_id, data = task.receive(timeout or 0)
+        -- Check for no messages or abort
         if not task_id then
             return -- No messages
         elseif evt_id == task.EVT_ABORT then
             return 'abort'
-        elseif evt_id == evt and evt_id ~= nil then
+        end
+        -- Custom message handling
+        local handler = HANDLERS[evt_id]
+        if handler then
+            handler(unpack(data))
+        end
+        -- Queue message handling
+        if evt_id == evt and evt_id ~= nil then
             return evt_id, data
         elseif evt_id == msg.APPEND then
             for _, item in ipairs(data) do
@@ -92,10 +101,21 @@ local function loop_through_queue(func)
     end
 end
 
--- Load the script, which should return a function for loop_through_queue
-local func, err = task.load(script)
-if func then
-    loop_through_queue(func())
+-- Load the script, which should return a function for loop_through_queue,
+-- or a table { func, msg=handler, ... }
+local result, err = task.load(script)
+if result then
+    result = result()
+    local func
+    if type(result) == 'function' then
+        func = result
+    elseif type(result) == 'table' then
+        func = table.remove(result, 1)
+        HANDLERS = result
+    else
+        task.error("function expected for loop_through_queue")
+    end
+    loop_through_queue(func)
 else
     task.error(err)
 end
