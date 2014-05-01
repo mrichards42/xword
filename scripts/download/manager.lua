@@ -27,6 +27,9 @@ local M = {
 
     -- Internal use
     PROMPT = 110,
+
+    -- Internal use
+    LOGIN = 111,
 }
 
 if not task.is_main then return QueueTask.new{obj=M} end
@@ -131,6 +134,7 @@ M:connect{
 -- @param opts.1 table of `Puzzle` objects.
 -- @param opts.prepend Download these puzzles before others in the queue.
 -- @param opts.open Open the first puzzle in the list when complete.
+-- @param opts.login Clear authentication cookie and relogin.
 -- @usage
 -- local puzzles = {puzzle1, puzzle2, ...}
 -- mgr:add(puzzles)
@@ -143,11 +147,12 @@ M:connect{
 -- mgr:add{puzzle, open=true}
 function M:add(opts)
     -- Get options
-    local prepend, puzzles, open
+    local prepend, puzzles, open, login
     if #opts == 1 then -- More options exist
         puzzles = opts[1]
         prepend = opts.prepend
         open = opts.open
+        login = opts.login
     else
         puzzles = opts
     end
@@ -162,6 +167,14 @@ function M:add(opts)
     -- Post to the task
     local downloads = tablex.map_named_method('get_download_data', puzzles)
     if not self:is_running() then self:start() end
+    if login then
+        -- Reauthenticate sources in downloads
+        local login_ids = {}
+        for _, puzzle in ipairs(downloads) do
+            login_ids[puzzle.id] = true
+        end
+        self:post(self.LOGIN, tablex.keys(login_ids))
+    end
     if prepend then
         self:prepend(unpack(downloads))
     else
