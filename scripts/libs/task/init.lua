@@ -510,6 +510,9 @@ function task.debug(fmt, ...)
     _post(1, task.EVT_DEBUG, format_string(fmt, ...))
 end
 
+-- Override print for secondary threads
+print = task.debug
+
 --- Load a script inside a task.
 -- If the first character of script is "=", use `loadstring`, otherwise
 -- try `package.loaders`.
