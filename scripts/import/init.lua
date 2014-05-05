@@ -43,8 +43,9 @@ function import.uninit()
 end
 
 -- Import the handlers
-pcall(require, 'import.uclick')
-pcall(require, 'import.xwordinfo')
+require 'import.uclick'
+require 'import.xwordinfo'
+require 'import.newsday'
 
 -- ============================================================================
 -- Replace loading functions with import.load
