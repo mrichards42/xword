@@ -21,11 +21,23 @@ local function get_curl_opt(key)
     end
 end
 
+local HTTP_CODES = require 'luacurl.http' -- error codes
+
 --- Parse an HTTP error message.
 -- @param err An error message returned from curl_easy:perform().
--- @return A numeric HTTP error code.
+-- @return An error message with the code description
 local function get_http_error(err)
-    return tonumber(err:match("The requested URL returned error: (%d+)"))
+    local code = tonumber(err:match("The requested URL returned error: (%d+)"))
+    if code then
+        local msg = HTTP_CODES[code]
+        if msg then
+            return ("Error %d: %s"):format(code, msg)
+        else
+            return ("Error %d"):format(code)
+        end
+    else
+        return err
+    end
 end
 
 --- Progress function hook.
@@ -109,13 +121,7 @@ local function _perform(url, opts)
     c:cleanup()
     -- Check the return code
     if rc == curl.HTTP_RETURNED_ERROR then
-        local code = get_http_error(err)
-        if code == 404 or code == 410 then
-            err = "HTTP error " .. code .. " URL not found"
-        else
-            err = "HTTP error " .. code
-        end
-        return nil, err, rc
+        return nil, get_http_error(err), rc
     end
     if rc == curl.OK then
         return true
