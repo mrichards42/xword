@@ -165,18 +165,21 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 
     // Metadata
     xml::node meta = puzzle.child("metadata");
-    puz->SetTitle(GetInnerXML(meta, "title"));
-    puz->SetAuthor(GetInnerXML(meta, "creator"));
-    puz->SetCopyright(GetInnerXML(meta, "copyright"));
-    puz->SetMeta(puzT("editor"), GetInnerXML(meta, "editor"));
-    puz->SetMeta(puzT("publisher"), GetInnerXML(meta, "publisher"));
+    for (meta = meta.first_child(); meta; meta = meta.next_sibling())
+    {
+        if (meta.name() == "creator")
+            puz->SetAuthor(GetInnerXML(meta, "creator"));
+        else
+            puz->SetMeta(decode_utf8(meta.name()), GetInnerXML(meta));
+        // Can be title, creator, copyright, editor, publisher, created,
+        // rights, identifier, description
+    }
+    puz->SetNotes(GetInnerXML(puzzle, "instructions"));
 
     if (puz->GetTitle().empty())
         puz->SetTitle(GetInnerXML(applet, "title"));
     if (puz->GetCopyright().empty())
         puz->SetCopyright(GetInnerXML(applet, "copyright"));
-
-    puz->SetNotes(GetInnerXML(puzzle, "instructions"));
 
     // Grid
     {
