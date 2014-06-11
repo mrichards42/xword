@@ -953,7 +953,9 @@ MyFrame::ShowMetadata()
 }
 
 
-// Does this metadata key have "notes" in it?
+// Should this metadata be displayed as notes?
+// Either has "_notes_" in the name, or is one of
+// "description", or "instructions"
 bool IsNotes(const puz::string_t & str)
 {
     // str == "notes" is the real notepad
@@ -966,6 +968,9 @@ bool IsNotes(const puz::string_t & str)
         return true;
     // Contains "-notes-"
     if (str.find(puzT("_notes_")) != puz::string_t::npos)
+        return true;
+    // description/instructions
+    if (str == puzT("description") || str == puzT("instructions"))
         return true;
     return false;
 }

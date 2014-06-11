@@ -103,16 +103,17 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
         "http://crossword.info/xml/rectangular-puzzle";
     // Metadata
     xml::node metadata = puzzle.append_child("metadata");
-    xml::SetInnerXML(metadata.append_child("title"), puz->GetTitle());
-    xml::SetInnerXML(metadata.append_child("creator"), puz->GetAuthor());
-    xml::SetInnerXML(metadata.append_child("copyright"), puz->GetCopyright());
-    xml::SetInnerXML(metadata.append_child("editor"), puz->GetMeta(puzT("editor")));
-    xml::SetInnerXML(metadata.append_child("publisher"), puz->GetMeta(puzT("publisher")));
-    // Unused metadata
-    metadata.append_child("created");
-    metadata.append_child("rights");
-    metadata.append_child("identifier");
-    metadata.append_child("description");
+    const Puzzle::metamap_t & puz_metadata = puz->GetMetadata();
+    Puzzle::metamap_t::const_iterator it;
+    for (it = puz_metadata.begin(); it != puz_metadata.end(); ++it)
+    {
+        // Author is "creator" in jpz
+        if (it->first == puzT("author"))
+            xml::SetInnerXML(metadata.append_child("creator"), it->second);
+        // Notes are jpz "instructions" and are under the "puzzle" element
+        else if (it->first != puzT("notes"))
+            xml::SetInnerXML(metadata.append_child(puz::encode_utf8(it->first).c_str()), it->second);
+    }
 
     xml::SetInnerXML(puzzle.append_child("instructions"), puz->GetNotes());
 

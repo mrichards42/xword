@@ -62,12 +62,12 @@ project "XWord"
             defines "XWORD_USE_LUA"
     
             includedirs {
-                "../deps/luajit/include",
+                DEPS.lua.include,
                 "../lua",
                 "../lua/wxbind/setup",
             }
 
-            libdirs { "../deps/luajit/lib" }
+            libdirs { DEPS.lua.lib }
     
             links {
                 "lua51",
@@ -102,10 +102,10 @@ project "XWord"
         -- Postbuild: copy lua51.dll to XWord directory
 
         configuration { "windows", "Debug" }
-           postbuildcommands { [[copy "..\..\deps\luajit\lib\lua51.dll" ..\..\bin\Debug /Y]] }
+           postbuildcommands { DEPS.lua.copydebug }
 
         configuration { "windows", "Release" }
-           postbuildcommands { [[copy "..\..\deps\luajit\lib\lua51.dll" ..\..\bin\Release /Y]] }
+           postbuildcommands { DEPS.lua.copyrelease }
 
     else -- disable-lua
         configuration {}
