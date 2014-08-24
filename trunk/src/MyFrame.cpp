@@ -1579,13 +1579,13 @@ MyFrame::LoadConfig()
     // Load the Metadata panels
     ConfigManager::MetadataCtrls_t & metadata = config.MetadataCtrls;
     ConfigManager::MetadataCtrls_t::iterator meta;
-    // If we have no metadata panels, create Title, Author, and Copyright.
-    if (metadata.empty())
-    {
-        metadata.push_back(_T("Title"));
-        metadata.push_back(_T("Author"));
-        metadata.push_back(_T("Copyright"));
-    }
+    // Make sure we have Title, Author, and Copyright
+    if (! metadata.FindChild("Title"))
+        metadata.push_back("Title");
+    if (! metadata.FindChild("Author"))
+        metadata.push_back("Author");
+    if (! metadata.FindChild("Copyright"))
+        metadata.push_back("Copyright");
     // Set default values
     for (meta = metadata.begin(); meta != metadata.end(); ++meta)
     {
@@ -1616,6 +1616,10 @@ MyFrame::LoadConfig()
     // Add the panels to our configuration
     for (meta = metadata.begin(); meta != metadata.end(); ++meta)
     {
+        // Don't add if we already have the pane
+        if (m_mgr.GetPane(meta->m_name).IsOk())
+            continue;
+
         MetadataCtrl * ctrl = new MetadataCtrl(
             this, wxID_ANY, meta->displayFormat(),
             wxDefaultPosition, wxDefaultSize,
@@ -1623,7 +1627,6 @@ MyFrame::LoadConfig()
         // Metadata callbacks
         ctrl->SetConfig(&*meta);
 
-        // Add to AUI
         // Chop the metadata part of the name off
         wxString name;
         if (! meta->m_name.StartsWith(_T("/Metadata/"), &name))
