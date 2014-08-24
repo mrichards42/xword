@@ -167,8 +167,8 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     xml::node meta = puzzle.child("metadata");
     for (meta = meta.first_child(); meta; meta = meta.next_sibling())
     {
-        if (meta.name() == "creator")
-            puz->SetAuthor(GetInnerXML(meta, "creator"));
+        if (strcmp(meta.name(), "creator") == 0)
+            puz->SetAuthor(GetInnerXML(meta));
         else
             puz->SetMeta(decode_utf8(meta.name()), GetInnerXML(meta));
         // Can be title, creator, copyright, editor, publisher, created,
