@@ -22,14 +22,6 @@
 #include "../config.hpp" // For ConfigManager
 #include <wx/propdlg.h>
 
-#ifdef __WXOSX__
-#   define XWORD_PREFERENCES_LIVE_PREVIEW 1
-#   define XWORD_PREFERENCES_SHRINK 1
-#else
-#   define XWORD_PREFERENCES_LIVE_PREVIEW 1
-#   define XWORD_PREFERENCES_SHRINK 0
-#endif
-
 class PreferencesDialog : public wxPropertySheetDialog
 {
 protected:
