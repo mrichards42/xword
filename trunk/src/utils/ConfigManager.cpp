@@ -50,10 +50,11 @@ void ConfigGroup::RemoveCallbacks(wxEvtHandler * h)
 
 ConfigGroup * ConfigGroup::FindChild(const wxString & name)
 {
+    wxString childName = m_name + _T("/") + name;
     std::list<ConfigGroup *>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); ++it)
     {
-        if ((*it)->m_name == name)
+        if ((*it)->m_name == childName)
             return *it;
     }
     return NULL;
