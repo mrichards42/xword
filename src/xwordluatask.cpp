@@ -37,7 +37,8 @@ int task_post(lua_State * L) {
     wxCommandEvent * evt = new wxCommandEvent(EVT_LUATASK);
     evt->SetInt(flags);
     evt->SetString(data.c_str());
-    wxTheApp->QueueEvent(evt);
+    if (wxTheApp)
+        wxTheApp->QueueEvent(evt);
     // Always return 0, as this should never fail
     lua_pushnumber(L, 0);
     return 1;
