@@ -88,7 +88,7 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
         {
             // Call the function with our notebook argument
             if (wxluaT_pushuserdatatype(L, GetBookCtrl(), wxluatype_wxBookCtrlBase))
-                lua_pcall(L, 1, 0, 0);
+                lua.LuaPCall(1, 0);
         }
         lua_pop(L, 1); // remove the xword table from the stack
     }
@@ -153,14 +153,15 @@ void PreferencesDialog::SaveConfig()
     }
 #if XWORD_USE_LUA
     // Save preferences from lua
-    lua_State * L = wxGetApp().GetwxLuaState().GetLuaState();
+    wxLuaState & lua = wxGetApp().GetwxLuaState();
+    lua_State * L = lua.GetLuaState();
     // Find the function xword.OnSavePreferences
     lua_getglobal(L, "xword");
     lua_getfield(L, -1, "OnSavePreferences");
     if (lua_isfunction(L, -1))
     {
         // Call the function with our notebook argument
-        lua_pcall(L, 0, 0, 0);
+        lua.LuaPCall(0, 0);
     }
     lua_pop(L, 1); // remove the xword table from the stack
 #endif
