@@ -221,10 +221,29 @@ local function myassert(v, msg, ...)
     error(msg)
 end
 
+-- Automatically clean up puzzles that are created during downloading
+local mypuz = {}
+local _puzzles = {}
+setmetatable(mypuz, {__index = puz})
+function mypuz.Puzzle(...)
+    local p = puz.Puzzle(...)
+    table.insert(_puzzles, p)
+    return p
+end
+
+-- Garbage collect puzzles
+local function cleanup_puzzles()
+    for k, p in pairs(_puzzles) do
+        _puzzles[k] = nil
+        task.debug('Collecting puzzle:' .. tostring(p))
+        p:__gc()
+    end
+end
+
 -- Download a puzzle, return the error code if any
 local function download(puzzle)
     if puzzle.func then
-        local func, err = loadstring([[return function(puzzle, download, assert) ]]..puzzle.func..[[ end]])
+        local func, err = loadstring([[return function(puzzle, download, assert, puz) ]]..puzzle.func..[[ end]])
         if err then return err end
         -- Compile this function
         func = func()
@@ -234,7 +253,10 @@ local function download(puzzle)
         -- which case we should differentiate between user-called asserts
         -- (using myassert and ASSERT_ERROR), or an actual programming error.
         ASSERT_ERROR = false
-        local success, result, err = xpcall(function() return func(puzzle, curl.get, myassert) end, debug.traceback)
+        local success, result, err = xpcall(function() return func(puzzle, curl.get, myassert, mypuz) end, debug.traceback)
+        -- gc puzles
+        cleanup_puzzles()
+        -- Figure out what to return
         if ASSERT_ERROR then
             -- User called assert
             return ASSERT_ERROR
