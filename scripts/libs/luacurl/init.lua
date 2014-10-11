@@ -6,21 +6,76 @@ local path = require 'pl.path'
 local tablex = require 'pl.tablex'
 local makepath = require 'pl.dir'.makepath
 
--- Get shortcurl names
--- e.g. curl.cookiejar == curl.OPT_COOKIEJAR
+-- cURL options string to int conversion
+
+--- Specially mapped option name
+-- @see curl.get_opt
 local named_opts = {
-    write = curl.OPT_WRITEFUNCTION,
-    progress = curl.OPT_PROGRESSFUNCTION,
-    post = curl.OPT_POSTFIELDS,
+    write = curl.OPT_WRITEFUNCTION, -- OPT_WRITEFUNCTION
+    progress = curl.OPT_PROGRESSFUNCTION,  -- OPT_PROGRESSFUNCTION
+    post = curl.OPT_POSTFIELDS, -- OPT_POSTFIELDS
 }
-local function get_curl_opt(key)
-    if type(key) == 'string' then
+
+--- Get the int value given a string option
+-- @param str The string option. Can be the full name (e.g. "OPT_REFERER"),
+-- a short name ("referer"), or a specially mapped name.
+-- @see named_opts
+-- @return The int value or nil
+function curl.get_opt(str)
+    if type(str) == 'string' then
         -- Look for key in named_opts or as a curl.OPT option
-        local ukey = key:upper()
-        return named_opts[key] or curl[ukey] or curl['OPT_' .. ukey]
+        local up = str:upper()
+        return named_opts[str] or curl[up] or curl['OPT_' .. up]
     end
 end
 
+--- Convert a table with curl options to numeric keys
+-- @param opts A table mapping string cURL options to their values
+-- @return a table mapping int cURL options to their values
+-- @usage config.curlopts_to_string({referer='www.example.com'})
+--     -> {[10016] = 'www.example.com'}
+function curl.string_to_opts(opts)
+    if not opts then return end
+    local ret = {}
+    for str, value in pairs(opts) do
+        ret[curl.get_opt(str) or str] = value
+    end
+    return ret
+end
+
+
+--- Table mapping int options to strings
+curl.opts = {} -- { opt_value (int) = opt_name (string) }
+for k, v in pairs(curl) do
+    if k:sub(1,4) == "OPT_" then
+        k = k:sub(5)
+        curl.opts[v] = k:lower() -- Convert to lowercase strings for readability
+    end
+end
+
+--- Get the string name of the specified curl option
+-- @param curlopt The int option
+-- @return The string name (lower cased) or nil
+function curl.opt_to_string(curlopt)
+    return curl.opts[curlopt]
+end
+
+--- Convert a table with numeric keys to use curl options
+-- @param opts A table mapping int cURL options to their values
+-- @return a table mapping string cURL options to their values
+-- @usage config.curlopts_to_string({[10016] = 'www.example.com'})
+--     -> {referer = 'www.example.com'}
+function curl.opts_to_string(opts)
+    if not opts then return end
+    local ret = {}
+    for opt, value in pairs(opts) do
+        ret[curl.opt_to_string(opt) or opt] = value
+    end
+    return ret
+end
+
+
+-- HTTP error codes
 local HTTP_CODES = require 'luacurl.http' -- error codes
 
 --- Parse an HTTP error message.
@@ -270,7 +325,7 @@ function curl.get(opts, ...)
     local function add_opts(t)
         for k,v in pairs(t or {}) do
             if type(k) == 'string' then
-                local id = get_curl_opt(k)
+                local id = curl.get_opt(k)
                 if id then
                     curlopts[id] = v
                 else -- We don't want to fail silently
