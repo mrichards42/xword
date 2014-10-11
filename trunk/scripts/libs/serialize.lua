@@ -11,11 +11,16 @@
 -- Additions for XWord:
 -- serialize is made into a table where the metamethod __call is the same
 -- as the original serialize function.
+-- Serialize and load dates
 --     serialize.pprint() is used for pretty-printing
 --     serialize.dump() is used for output to a file
 --     serialize.loadfile() safely loads a file
 --     serialize.loadstring() safely loads a string
 --------------------------------------------------------------------------------
+
+-- Date serialization
+local date = require 'date'
+local date_mt = getmetatable(date())
 
 -- Private functions
 
@@ -123,6 +128,10 @@ local function _serialize(x)
       elseif t=="function" then
          return string.format ("loadstring(%q,'@serialized')", string.dump (x))
       elseif t=="table" then
+         -- Special date handling
+         if getmetatable(x) == date_mt then
+            return x:fmt("date(%Y, %m, %d, %H, %M, %S)")
+         end
 
          local acc        = { }
          local idx_dumped = { }
@@ -223,6 +232,10 @@ local function _pprint(t, indent, prev_tables, max_width, fail_on_error)
         return _serialize_value(t)
     end
 
+    if getmetatable(t) == date_mt then
+        return t:fmt("date(%Y, %m, %d, %H, %M, %S)")
+    end
+
     local ret = {}
     -- Write the array part
     local array_part = {}
@@ -313,7 +326,9 @@ end
 -- @param func An untrusted function
 -- @param[opt=empty] env The environment
 local function safe_call(func, env)
-    setfenv(func, env or {})
+    env = env or {}
+    env.date = date
+    setfenv(func, env)
     local success, result = pcall(func)
     if success then
         return result
