@@ -178,47 +178,24 @@ return {
         url = "http://www.brendanemmettquigley.com/%Y/%m/%d",
         filename = "beq%Y%m%d.jpz",
         days = { true, false, false, true, false, false, false },
-        specs = {
-            -- Custom download function
-            {
-                startdate = date('9/29/2014'),
-                func = [[
-                    -- Download the page with the puzzle
-                    local page = assert(curl.get(puzzle.url))
+        -- Custom download function
+        func = [[
+            -- Download the page with the puzzle
+            local page = assert(curl.get(puzzle.url))
 
-                    -- Search for a download link
-                    local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
-                    if not name then return "No puzzle" end
+            -- Search for a download link
+            local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
+            if not name then return "No puzzle" end
 
-                    -- Download the puzzle as an jpz javascript
-                    local js = assert(curl.get("http://www.brendanemmettquigley.com/xpuz/" .. name .. ".js"))
+            -- Download the puzzle as an jpz javascript
+            local js = assert(curl.get("http://www.brendanemmettquigley.com/xpuz/" .. name .. ".js"))
 
-                    -- Extract the string from this js
-                    local jpz = js:match("['\"](.+)['\"]")
-                    local f = io.open(puzzle.filename, 'wb')
-                    f:write(jpz:gsub('\\"', '"')) -- Unescape strings
-                    f:close()
-                ]]
-            },
-            {
-                enddate = date('9/28/2014'),
-                func = [[
-                    -- Download the page with the puzzle
-                    local page = assert(curl.get(puzzle.url))
-
-                    -- Search for a download link
-                    local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
-
-                    -- Download the puzzle
-                    if name then
-                        local url = "http://www.brendanemmettquigley.com/xpuz/" .. name .. ".jpz"
-                        return curl.get(url, puzzle.filename)
-                    else
-                        return "No puzzle"
-                    end 
-                ]]
-            }
-        },
+            -- Extract the string from this js
+            local jpz = js:match("['\"](.+)['\"]")
+            local f = io.open(puzzle.filename, 'wb')
+            f:write(jpz:gsub('\\"', '"')) -- Unescape strings
+            f:close()
+        ]]
     },
 
     {
