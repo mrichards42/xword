@@ -308,6 +308,32 @@ function SourceList.new(sources)
     return obj
 end
 
+--- Create a copy of this SourceList
+function SourceList:copy()
+    return SourceList.new(self)
+end
+
+--- Set sources from a table or SourceList
+-- @param sources a table or other SourceList
+function SourceList:set(sources)
+    -- Clear sources
+    for k, id in pairs(self._order) do
+        self[id] = nil
+        self._order[k] = nil
+    end
+    if getmetatable(sources) == SourceList then
+        -- Copy from a SourceList
+        for k, v in pairs(sources) do
+            self[k] = tablex.deepcopy(v)
+        end
+    else
+        -- Copy from a table
+        for _, p in ipairs(sources) do
+            self:insert(p)
+        end
+    end
+end
+
 --- Iterate enabled sources
 -- @return an iterator yielding: id, source
 function SourceList:iter()
