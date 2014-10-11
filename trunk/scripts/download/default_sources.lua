@@ -1,6 +1,4 @@
--- Default puzzle sources
-
-local sources = {
+return {
     {
         name = "NY Times Premium",
         url = "http://select.nytimes.com/premium/xword/%Y/%m/%d/%b%d%y.puz",
@@ -28,9 +26,16 @@ local sources = {
 
     {
         name = "Newsday",
-        url = "http://picayune.uclick.com/comics/crnet/data/crnet%y%m%d-data.xml",
-        filename = "nd%Y%m%d.xml",
+        url = "http://www.brainsonly.com/servlets-newsday-crossword/newsdaycrossword?date=%y%m%d",
+        filename = "nd%Y%m%d.puz",
         days = { true, true, true, true, true, true, true },
+        func = [[
+    assert(curl.get(puzzle.url, puzzle.filename, puzzle.curlopts))
+    local success, p = pcall(puz.Puzzle, puzzle.filename, import.Newsday)
+    if success then
+        p:Save(puzzle.filename) -- Save this as a puz
+    end
+]]
     },
 
     {
@@ -40,7 +45,7 @@ local sources = {
         auth = { url="http://www.cruciverb.com/index.php?action=login", user_id="user", password_id="passwrd"},
         curlopts =
         {
-            [curl.OPT_REFERER] = 'http://www.cruciverb.com/',
+            referer = 'http://www.cruciverb.com/',
         },
         days = { true, true, true, true, true, true, true },
     },
@@ -56,13 +61,15 @@ local sources = {
         url = "http://herbach.dnsalias.com/Tausig/vv%y%m%d.puz",
         filename = "tausig%Y%m%d.puz",
         days = { false, false, false, false, true, false, false },
+        enddate = date('6/27/2014')
     },
 
     {
-        name = "The Onion AV Club",
+        name = "AV Club",
         url = "http://herbach.dnsalias.com/Tausig/av%y%m%d.puz",
         filename = "av%Y%m%d.puz",
         days = { false, false, true, false, false, false, false },
+        enddate = date('12/5/2012')
     },
 
     {
@@ -84,6 +91,7 @@ local sources = {
         url = "http://home.comcast.net/~nshack/Puzzles/bg%y%m%d.puz",
         filename = "bg%Y%m%d.puz",
         days = { false, false, false, false, false, false, true },
+        enddate = date('1/13/2013')
     },
 
     {
@@ -114,12 +122,18 @@ local sources = {
         url = "http://xwordcontest.com/%Y/%m/%d",
         curlopts =
         {
-            [curl.OPT_REFERER] = 'http://icrossword.com/',
+            referer = 'http://icrossword.com/',
         },
         -- Custom download function
         func = [[
     -- Download the page with this week's puzzle
-    local page = assert(curl.get(puzzle.url))
+    local page, err = curl.get(puzzle.url)
+    -- Try a day before
+    if err and err:find('404') then
+        puzzle.date:adddays(-1)
+        page, err = curl.get(puzzle.date:fmt("http://xwordcontest.com/%Y/%m/%d"))
+    end
+    if err then return err end
 
     -- Find the Across Lite applet
     local id = page:match('"http://icrossword.com/embed/%?id=([^"]*%.puz)"')
@@ -164,22 +178,47 @@ local sources = {
         url = "http://www.brendanemmettquigley.com/%Y/%m/%d",
         filename = "beq%Y%m%d.jpz",
         days = { true, false, false, true, false, false, false },
-        -- Custom download function
-        func = [[
-    -- Download the page with the puzzle
-    local page = assert(curl.get(puzzle.url))
+        specs = {
+            -- Custom download function
+            {
+                startdate = date('9/29/2014'),
+                func = [[
+                    -- Download the page with the puzzle
+                    local page = assert(curl.get(puzzle.url))
 
-    -- Search for a download link
-    local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
+                    -- Search for a download link
+                    local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
+                    if not name then return "No puzzle" end
 
-    -- Download the puzzle
-    if name then
-        local url = "http://www.brendanemmettquigley.com/xpuz/" .. name .. ".jpz"
-        return curl.get(url, puzzle.filename)
-    else
-        return "No puzzle"
-    end 
-]]
+                    -- Download the puzzle as an jpz javascript
+                    local js = assert(curl.get("http://www.brendanemmettquigley.com/xpuz/" .. name .. ".js"))
+
+                    -- Extract the string from this js
+                    local jpz = js:match("['\"](.+)['\"]")
+                    local f = io.open(puzzle.filename, 'wb')
+                    f:write(jpz:gsub('\\"', '"')) -- Unescape strings
+                    f:close()
+                ]]
+            },
+            {
+                enddate = date('9/28/2014'),
+                func = [[
+                    -- Download the page with the puzzle
+                    local page = assert(curl.get(puzzle.url))
+
+                    -- Search for a download link
+                    local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
+
+                    -- Download the puzzle
+                    if name then
+                        local url = "http://www.brendanemmettquigley.com/xpuz/" .. name .. ".jpz"
+                        return curl.get(url, puzzle.filename)
+                    else
+                        return "No puzzle"
+                    end 
+                ]]
+            }
+        },
     },
 
     {
@@ -187,6 +226,7 @@ local sources = {
         url = "http://wij.theworld.com/puzzles/dailyrecord/DR%y%m%d.puz",
         filename = "dr%Y%m%d.puz",
         days = { false, false, false, false, true, false, false },
+        enddate = date('12/31/2013')
     },
 
     {
@@ -194,17 +234,5 @@ local sources = {
         url = "http://cdn.games.arkadiumhosted.com/washingtonpost/puzzler/puzzle_%y%m%d.xml",
         filename = "wp%Y%m%d.jpz",
         days = { false, false, false, false, false, false, true },
-        -- Custom download function
-        func = [[
-    local jpz = assert(curl.get(puzzle.url))
-    local f = assert(io.open(puzzle.filename, 'wb'))
-    f:write(jpz:gsub("crossword-compiler", "crossword-compiler-applet"))
-    f:close()
-]]
-},
+    },
 }
-
--- Copy NY Times custom download function for NY Times PDF
-sources[2].func = sources[1].func
-
-return sources
