@@ -123,10 +123,6 @@ Source.__index = Source
 --- An optional custom download function.
 -- @field Source.func
 
---- A table of download specs separated by dates.  Entries should include
--- startdate or enddate at a minimum.
--- @field Source.specs
-
 --- Is this source disabled?
 -- @field Source.disabled
 
@@ -138,21 +134,6 @@ function Source.new(obj)
     obj.url = obj.url or ''
     obj.days = obj.days or {true, true, true, true, true, true, true}
     obj.filename = obj.filename or ''
-    -- Make download specs inherit from self
-    local prev = nil
-    for _, spec in ipairs(obj.specs or {}) do
-        setmetatable(spec, {__index=obj})
-        -- If this has a startdate or prev has an enddate, make sure they're
-        -- consistent
-        if prev then
-            if prev.enddate and not spec.startdate then
-                spec.startdate = prev.enddate
-            elseif spec.startdate and not prev.enddate then
-                prev.enddate = spec.startdate
-            end
-        end
-        prev = spec
-    end
     return obj
 end
 
@@ -172,42 +153,24 @@ local function is_between(d, d1, d2)
     return is_after(d, d1) and is_before(d2)
 end
 
-
--- Get the table filled with download specs for this date
-function Source:_get_dl_spec(date)
-    if not self.specs then
-        return self
-    else
-        for _, opts in ipairs(self.specs) do
-            if is_between(date, opts.startdate, opts.enddate) then
-                return opts
-            end
-        end
-    end
-    -- If nothing else
-    return self
-end
-
 --- Get the url of a puzzle on this date.
 -- @param date The `date`.
 -- @return A url.
 function Source:get_url(date)
-    local spec = self:_get_dl_spec(date)
-    if type(spec.url) == 'string' then
-        return date:format(spec.url)
+    if type(self.url) == 'string' then
+        return date:format(self.url)
     else
-        return spec.url
+        return self.url
     end
 end
 
 --- Get the date format for the local filename of a puzzle.
 -- @return A date format string.
-function Source:get_filename_fmt(date)
-    local spec = self:_get_dl_spec(date)
+function Source:get_filename_fmt()
     return path.join(
         config.puzzle_directory,
-        config.separate_directories and sanitize_name(spec.directoryname or spec.name) or '',
-        spec.filename
+        config.separate_directories and sanitize_name(self.directoryname or self.name) or '',
+        self.filename
     )
 end
 
@@ -216,14 +179,14 @@ end
 -- @param date The `date`.
 -- @return The filename.
 function Source:get_filename(date)
-    return date:format(self:get_filename_fmt(date))
+    return date:format(self:get_filename_fmt())
 end
 
 --- Get a puzzle for this date.
 -- @param date The `date`.
 -- @return A `Puzzle`.
 function Source:get_puzzle(date)
-    return Puzzle.new(self:_get_dl_spec(date), date)
+    return Puzzle.new(self, date)
 end
 
 --- Get a table of puzzles between two dates.
@@ -272,32 +235,25 @@ end
 -- @param[opt] d2 Second `date`.  Must be on or after d1.
 -- @return true/false
 function Source:has_puzzle(d1, d2)
-    local spec = self:_get_dl_spec(d1)
     if not d2 or d1 == d2 then -- Single date
-        return is_before(d1, spec.enddate) and spec.days[d1:getisoweekday()]
+        return is_before(d1, self.enddate) and self.days[d1:getisoweekday()]
     else -- Multiple dates
         if self.enddate and d2 > self.enddate then
             d2 = self.enddate
         end
         local diff = math.ceil((d2 - d1):spandays())
-        -- A week or more; should always return true as long as the span doesn't
-        -- cross a download spec boundary
-        if diff >= 6 and is_before(d2, spec.enddate) then
-            return tablex.find(spec.days, true) and true or false
+        -- A week or more; should always return true as long as it's before the enddate
+        if diff >= 6 and is_before(d2, self.enddate) then
         else -- Less thank a week; check each day
-            local d = d1:copy()
-            while d <= d2 do
-                -- Check dl params for an end date
-                if spec.enddate and d > spec.enddate then
-                    spec = self:_get_dl_spec(d)
-                end
-                -- Check date
-                if spec.days[d:getisoweekday()] then
+            local day = d1:getisoweekday()
+            while true do
+                if self.days[day] then
                     return true
+                elseif day == d2:getisoweekday() then
+                    return false
                 end
-                d:adddays(1)
+                day = (day % 7) + 1 -- Wrap from 7 (sunday) to 1 (monday)
             end
-            return false
         end
     end
 end
@@ -310,23 +266,23 @@ function Source:puzzle_count(d1, d2)
     if not d2 or d1 == d2 then -- Single date
         if stats.exists(self:get_filename(d1)) then
             return 1,0
-        else
+        elseif self:has_puzzle(d1) then
             return 0,1
+        else
+            return 0,0
         end
     else -- Multiple dates
+        if self.enddate and d2 > self.enddate then
+            d2 = self.enddate
+        end
         local count = 0
         local total = 0
         local d = d1:copy()
         -- NB: get_filename itself is fairly expensive, since get_filename_fmt
         -- is called each time, so just call it once here
-        local spec = self:_get_dl_spec(d)
-        local fmt = self:get_filename_fmt(d)
+        local fmt = self:get_filename_fmt()
         while d <= d2 do
-            -- Check dl params for an end date
-            if spec.enddate and d > spec.enddate then
-                spec = self:_get_dl_spec(d)
-            end
-            if spec.days[d:getisoweekday()] then -- has_puzzle shortcut
+            if self:has_puzzle(d) then
                 total = total + 1
                 if stats.exists(d:format(fmt)) then
                     count = count + 1
