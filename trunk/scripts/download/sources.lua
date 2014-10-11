@@ -43,8 +43,8 @@ end
 function Puzzle.new(source, date)
     local self = {
         date = date:copy(),
-        url = source.url and source:get_url(date),
-        filename = source.filename and source:get_filename(date),
+        url = source:get_url(date),
+        filename = source:get_filename(date),
         _source = source
     }
     setmetatable(self, Puzzle)
@@ -106,6 +106,12 @@ Source.__index = Source
 --- A table of days to expect puzzles. days[1] = Monday.
 -- @field Source.days
 
+--- The start date of this source.  Can be nil.
+-- @field Source.startdate
+
+--- The end date of this source.  Can be nil.
+-- @field Source.enddate
+
 --- The subdirectory to save puzzles.  Defaults to `Source.name`.
 -- @field Source.directoryname
 
@@ -117,9 +123,9 @@ Source.__index = Source
 --- An optional custom download function.
 -- @field Source.func
 
---- A table of optional user-supplied data.
--- Used in conjunction with `Source.func`.
--- @field Source.fields
+--- A table of download specs separated by dates.  Entries should include
+-- startdate or enddate at a minimum.
+-- @field Source.specs
 
 --- Is this source disabled?
 -- @field Source.disabled
@@ -127,27 +133,81 @@ Source.__index = Source
 -- This should only be called from `SourceList:insert`.
 function Source.new(obj)
     setmetatable(obj, Source)
+    -- Defaults
+    obj.name = obj.name or ''
+    obj.url = obj.url or ''
+    obj.days = obj.days or {true, true, true, true, true, true, true}
+    obj.filename = obj.filename or ''
+    -- Make download specs inherit from self
+    local prev = nil
+    for _, spec in ipairs(obj.specs or {}) do
+        setmetatable(spec, {__index=obj})
+        -- If this has a startdate or prev has an enddate, make sure they're
+        -- consistent
+        if prev then
+            if prev.enddate and not spec.startdate then
+                spec.startdate = prev.enddate
+            elseif spec.startdate and not prev.enddate then
+                prev.enddate = spec.startdate
+            end
+        end
+        prev = spec
+    end
     return obj
+end
+
+-- Is this date on or before d1?
+local function is_before(d, d1)
+    return not d1 or d <= d1
+end
+
+-- Is this date on or after d1?
+local function is_after(d, d1)
+    return not d1 or d >= d1
+end
+
+--- Is the date between d1 and d2?
+-- d1 or d2 can be nil
+local function is_between(d, d1, d2)
+    return is_after(d, d1) and is_before(d2)
+end
+
+
+-- Get the table filled with download specs for this date
+function Source:_get_dl_spec(date)
+    if not self.specs then
+        return self
+    else
+        for _, opts in ipairs(self.specs) do
+            if is_between(date, opts.startdate, opts.enddate) then
+                return opts
+            end
+        end
+    end
+    -- If nothing else
+    return self
 end
 
 --- Get the url of a puzzle on this date.
 -- @param date The `date`.
 -- @return A url.
 function Source:get_url(date)
-    if type(self.url) == 'string' then
-        return date:format(self.url)
+    local spec = self:_get_dl_spec(date)
+    if type(spec.url) == 'string' then
+        return date:format(spec.url)
     else
-        return self.url
+        return spec.url
     end
 end
 
 --- Get the date format for the local filename of a puzzle.
 -- @return A date format string.
-function Source:get_filename_fmt()
+function Source:get_filename_fmt(date)
+    local spec = self:_get_dl_spec(date)
     return path.join(
         config.puzzle_directory,
-        config.separate_directories and sanitize_name(self.directoryname or self.name) or '',
-        self.filename
+        config.separate_directories and sanitize_name(spec.directoryname or spec.name) or '',
+        spec.filename
     )
 end
 
@@ -156,14 +216,14 @@ end
 -- @param date The `date`.
 -- @return The filename.
 function Source:get_filename(date)
-    return date:format(self:get_filename_fmt())
+    return date:format(self:get_filename_fmt(date))
 end
 
 --- Get a puzzle for this date.
 -- @param date The `date`.
 -- @return A `Puzzle`.
 function Source:get_puzzle(date)
-    return Puzzle.new(self, date)
+    return Puzzle.new(self:_get_dl_spec(date), date)
 end
 
 --- Get a table of puzzles between two dates.
@@ -174,6 +234,9 @@ end
 -- @return A table of `Puzzle` objects.
 function Source:get_puzzles(start, end_, only_missing, t)
     end_ = end_ or start
+    if not is_before(end_, self.enddate) then
+        end_ = self.enddate
+    end
     local puzzles = t or {}
     local d = start:copy()
     while d <= end_ do
@@ -209,22 +272,32 @@ end
 -- @param[opt] d2 Second `date`.  Must be on or after d1.
 -- @return true/false
 function Source:has_puzzle(d1, d2)
+    local spec = self:_get_dl_spec(d1)
     if not d2 or d1 == d2 then -- Single date
-        return self.days[d1:getisoweekday()]
+        return is_before(d1, spec.enddate) and spec.days[d1:getisoweekday()]
     else -- Multiple dates
+        if self.enddate and d2 > self.enddate then
+            d2 = self.enddate
+        end
         local diff = math.ceil((d2 - d1):spandays())
-        if diff >= 6 then -- A week or more; should always return true
-            return tablex.find(self.days, true) and true or false
+        -- A week or more; should always return true as long as the span doesn't
+        -- cross a download spec boundary
+        if diff >= 6 and is_before(d2, spec.enddate) then
+            return tablex.find(spec.days, true) and true or false
         else -- Less thank a week; check each day
-            local day = d1:getisoweekday()
-            while true do
-                if self.days[day] then
-                    return true
-                elseif day == d2:getisoweekday() then
-                    return false
+            local d = d1:copy()
+            while d <= d2 do
+                -- Check dl params for an end date
+                if spec.enddate and d > spec.enddate then
+                    spec = self:_get_dl_spec(d)
                 end
-                day = (day % 7) + 1 -- Wrap from 7 (sunday) to 1 (monday)
+                -- Check date
+                if spec.days[d:getisoweekday()] then
+                    return true
+                end
+                d:adddays(1)
             end
+            return false
         end
     end
 end
@@ -246,9 +319,14 @@ function Source:puzzle_count(d1, d2)
         local d = d1:copy()
         -- NB: get_filename itself is fairly expensive, since get_filename_fmt
         -- is called each time, so just call it once here
-        local fmt = self:get_filename_fmt()
+        local spec = self:_get_dl_spec(d)
+        local fmt = self:get_filename_fmt(d)
         while d <= d2 do
-            if self:has_puzzle(d) then
+            -- Check dl params for an end date
+            if spec.enddate and d > spec.enddate then
+                spec = self:_get_dl_spec(d)
+            end
+            if spec.days[d:getisoweekday()] then -- has_puzzle shortcut
                 total = total + 1
                 if stats.exists(d:format(fmt)) then
                     count = count + 1
@@ -270,10 +348,7 @@ function SourceList.new(sources)
     local obj = {}
     obj._order = {}
     setmetatable(obj, SourceList)
-    -- Insert sources in order
-    for _, p in ipairs(sources) do
-        obj:insert(p)
-    end
+    obj:set(sources)
     return obj
 end
 
@@ -313,10 +388,10 @@ end
 -- @param key The index of the puzzle, or the internal puzzle id.
 -- @return The `Source`.
 function SourceList:get(key)
-    local p = self[key]
+    local p = rawget(self, key)
     if p then return p end
     local id = self._order[key]
-    if key then return self[id] end
+    if key then return rawget(self, id) end
 end
 
 --- Insert a source and give it the Source metatable.
@@ -413,9 +488,9 @@ function SourceList.get_default_sources()
     local sources = serialize.loadfile(path.join(xword.configdir, 'download', 'sources.lua'))
     -- Fallback on the default sources
     if not sources then
-        sources = dofile(path.join(xword.scriptsdir, unpack(split(_R, '%.')), 'default_sources.lua'))
+        sources = serialize.loadfile(path.join(xword.scriptsdir, unpack(split(_R, '%.')), 'default_sources.lua'))
     end
-    return SourceList.new(sources)
+    return SourceList.new(sources or {})
 end
 
 --- Open a puzzle in XWord.
