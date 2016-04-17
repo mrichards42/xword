@@ -1409,7 +1409,8 @@ XGridCtrl::OnKeyDown(wxKeyEvent & evt)
         break;
     case WXK_INSERT:
     case WXK_NUMPAD_INSERT:
-        OnInsert(mod);
+    case WXK_ESCAPE:
+        OnRebusKey(mod);
         break;
     default:
         evt.Skip();
@@ -1729,7 +1730,7 @@ XGridCtrl::OnTab(int mod)
 
 // Allow entering multiple letters
 void
-XGridCtrl::OnInsert(int WXUNUSED(mod))
+XGridCtrl::OnRebusKey(int WXUNUSED(mod))
 {
     wxASSERT(! IsEmpty());
     if (! m_rebusCtrl)
@@ -1769,6 +1770,7 @@ XGridCtrl::EndRebusEntry(bool success)
         MoveAfterLetter();
     }
     RefreshSquare();
+    wxScrolledCanvas::SetFocus();
 }
 
 void
