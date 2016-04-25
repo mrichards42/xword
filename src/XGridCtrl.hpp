@@ -387,6 +387,7 @@ protected:
     int m_lastBoxSize;          // The last non-fitted box size
     bool m_fit;                 // Fit the grid to the window?
     bool m_isPaused;            // Trigger a "Paused" message?
+    bool m_isPausedRendered;    // Is the "Paused" message currently showing?
 
     // Pointer to puzzle data
     puz::Puzzle * m_puz;
