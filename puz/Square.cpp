@@ -479,11 +479,10 @@ char_t Square::GetSolutionSymbol() const
 bool Square::Check(bool checkBlank, bool strictRebus)  const
 {
     // Black squares should be checked as well (for diagramless)
-
     if (IsBlank() && ! IsSolutionBlank())
         return ! checkBlank;
 
-    if (strictRebus || HasTextRebus())
+    if (strictRebus || (HasTextRebus() && HasSolutionRebus()))
         return m_solution == m_text;
     else
         return GetPlainText() == GetPlainSolution();
