@@ -196,8 +196,8 @@ Scrambler::ScrambleString(const std::string & str)
 // These are almost exactly the scrambling functions run backward
 //-----------------------------------------------------------------------------
 
-bool
-Scrambler::UnscrambleSolution(unsigned short key_int)
+std::string
+Scrambler::GetUnscrambledSolution(unsigned short key_int)
 {
     bool ok = m_grid.GetWidth() > 0 && m_grid.GetHeight() > 0;
     ok = ok && (m_grid.m_flag & FLAG_NO_SOLUTION) == 0;
@@ -206,7 +206,7 @@ Scrambler::UnscrambleSolution(unsigned short key_int)
     assert(m_grid.First() != NULL);
 
     if (! ok)
-        return false;
+        return "";
 
     // Read the key into an array of single digits
     unsigned char key[4];
@@ -221,7 +221,7 @@ Scrambler::UnscrambleSolution(unsigned short key_int)
 
     // Don't unscramble really small puzzles
     if(length < 12)
-        return 0;
+        return "";
 
     // Do the unscrambling
     for (int i = 3; i >= 0; --i)
@@ -254,7 +254,18 @@ Scrambler::UnscrambleSolution(unsigned short key_int)
     unsigned short cksum = Checksummer::cksum_region(solution, 0);
 
     if (cksum != m_grid.m_cksum)
+        return "";
+
+    return solution;
+}
+
+bool
+Scrambler::UnscrambleSolution(unsigned short key_int)
+{
+    std::string solution = GetUnscrambledSolution(key_int);
+    if (solution.empty()) {
         return false;
+    }
 
     // Save the unscrambled solution to the grid
     std::string::iterator it = solution.begin();
