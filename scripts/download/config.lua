@@ -1,7 +1,5 @@
---- Download configuration
-
 -- Save the current directory for relative require
-local _R = mod_path(...)
+local _R = (string.match(..., '^.+%.') or ... .. '.')
 
 local path = require 'pl.path'
 local tablex = require 'pl.tablex'
@@ -12,7 +10,8 @@ local date = require 'date'
 local curl = require 'luacurl'
 
 -- ----------------------------------------------------------------------------
--- Default config
+-- Default configuration
+-- ----------------------------------------------------------------------------
 local config = {}
 config.puzzle_directory = path.join(xword.userdatadir, "puzzles")
 config.separate_directories = true
@@ -45,8 +44,10 @@ local default_disabled = {
 -- Keep a list of original keys to the config table
 local config_keys = tablex.keys(config)
 
+
 -- ----------------------------------------------------------------------------
 -- Helpers
+-- ----------------------------------------------------------------------------
 
 -- Recursively update keys from t1 with values from t2
 local function deep_update(t1, t2)
@@ -179,15 +180,13 @@ end
 
 -- ----------------------------------------------------------------------------
 -- Public functions
+-- ----------------------------------------------------------------------------
 
---- Get the download config filename
--- @return config filename
 function config.get_config_filename()
     return path.join(xword.configdir, 'download', 'config.lua')
 end
 
 local LOAD_ERROR = false
---- Read the configuration file
 function config.load()
     local data, err = serialize.loadfile(config.get_config_filename())
     -- Check for errors
@@ -216,6 +215,12 @@ function config.load()
             end
         end
     end
+    -- Create dates from strings
+    for _, k in ipairs({'start_date', 'end_date'}) do
+        if type(config.previous_view[k]) == 'string' then
+            config.previous_view[k] = date(config.previous_view[k])
+        end
+    end
     -- Create fonts and colors from strings
     for k, style in pairs(data.styles) do
         local config_style = config.styles[k]
@@ -232,7 +237,6 @@ function config.load()
     load_sources_config(data)
 end
 
---- Save the config to file
 function config.save()
     if LOAD_ERROR then
         xword.Message(
@@ -246,6 +250,12 @@ function config.save()
     for _, k in ipairs(config_keys) do
         data[k] = tablex.deepcopy(config[k])
     end
+    -- Turn dates into strings
+    for _, k in ipairs({'start_date', 'end_date'}) do
+        if config.previous_view[k] then
+            data.previous_view[k] = config.previous_view[k]:fmt("%m/%d/%Y")
+        end
+    end
     -- Turn fonts and colors into strings
     for k, style in pairs(config.styles) do
         data.styles[k] = { font = style.font:GetNativeFontInfoDesc(),
@@ -257,7 +267,6 @@ function config.save()
     serialize.dump(data, config.get_config_filename())
 end
 
-config.PreferencesPanel = require(_R .. 'gui.preferences')
 
 if true then
 return config
