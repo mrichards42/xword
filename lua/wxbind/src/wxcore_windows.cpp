@@ -24,6 +24,9 @@
     #undef Below
 #endif
 
+#ifdef __GNUC__
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+#endif // __GNUC__
 
 
 #if wxLUA_USE_wxTooltip && wxUSE_TOOLTIPS
@@ -4882,6 +4885,35 @@ static int LUACALL wxLua_wxControl_Create(lua_State *L)
 
 #endif // (wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxPointSizeRect)
 
+#if (wxLUA_USE_wxDC) && (wxCHECK_VERSION(2,9,0))
+static wxLuaArgType s_wxluatypeArray_wxLua_wxControl_Ellipsize[] = { &wxluatype_TSTRING, &wxluatype_wxDC, &wxluatype_TINTEGER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxControl_Ellipsize(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxControl_Ellipsize[1] = {{ wxLua_wxControl_Ellipsize, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 4, 5, s_wxluatypeArray_wxLua_wxControl_Ellipsize }};
+//     %wxchkver_2_9 static wxString Ellipsize(const wxString& label, const wxDC & dc, wxEllipsizeMode mode, int maxWidth, int flags = wxELLIPSIZE_FLAGS_DEFAULT );
+static int LUACALL wxLua_wxControl_Ellipsize(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int flags = wxELLIPSIZE_FLAGS_DEFAULT
+    int flags = (argCount >= 5 ? (int)wxlua_getnumbertype(L, 5) : wxELLIPSIZE_FLAGS_DEFAULT);
+    // int maxWidth
+    int maxWidth = (int)wxlua_getnumbertype(L, 4);
+    // wxEllipsizeMode mode
+    wxEllipsizeMode mode = (wxEllipsizeMode)wxlua_getenumtype(L, 3);
+    // const wxDC dc
+    const wxDC * dc = (const wxDC *)wxluaT_getuserdatatype(L, 2, wxluatype_wxDC);
+    // const wxString label
+    const wxString label = wxlua_getwxStringtype(L, 1);
+    // call Ellipsize
+    wxString returns = (wxControl::Ellipsize(label, *dc, mode, maxWidth, flags));
+    // push the result string
+    wxlua_pushwxString(L, returns);
+
+    return 1;
+}
+
+#endif // (wxLUA_USE_wxDC) && (wxCHECK_VERSION(2,9,0))
+
 #if wxCHECK_VERSION(2,8,0)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxControl_GetLabelText[] = { &wxluatype_wxControl, NULL };
 static int LUACALL wxLua_wxControl_GetLabelText(lua_State *L);
@@ -4980,6 +5012,10 @@ wxLuaBindMethod wxControl_methods[] = {
 #if (wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxPointSizeRect)
     { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxControl_Create, 1, NULL },
 #endif // (wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxPointSizeRect)
+
+#if (wxLUA_USE_wxDC) && (wxCHECK_VERSION(2,9,0))
+    { "Ellipsize", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxControl_Ellipsize, 1, NULL },
+#endif // (wxLUA_USE_wxDC) && (wxCHECK_VERSION(2,9,0))
 
 #if wxCHECK_VERSION(2,8,0)
     { "GetLabelText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxControl_GetLabelText, 1, NULL },
