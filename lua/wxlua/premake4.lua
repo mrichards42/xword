@@ -7,11 +7,11 @@ project "wxlua"
     files { "*", "debug/*", "debugger/*" }
     includedirs {
         "../wxbind/setup",
-        "../../deps/luajit/include",
+        DEPS.lua.include,
         "..",
         "."
     }
-    libdirs { "../../deps/luajit/lib" }
+    libdirs { DEPS.lua.lib }
     links { "lua51" }
 
     configuration "Debug"   targetdir "../../lib/Debug"

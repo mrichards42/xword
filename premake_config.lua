@@ -242,4 +242,31 @@ function get_configurations()
 	return { "Debug", "Release" }
 end
 
+-- Dependency paths
+
+-- Make paths absolute and adjust dll path
+local function paths(paths)
+    if paths.dll then
+        paths.debugdll = paths.lib .. '/debug/' .. paths.dll
+        paths.dll = paths.lib .. '/' .. paths.dll
+    end
+    for k,v in pairs(paths) do
+        paths[k] = path.getabsolute(v)
+    end
+    if paths.dll then
+        paths.dll = path.getrelative('build/release', paths.dll):gsub('/','\\')
+        paths.debugdll = path.getrelative('build/release', paths.debugdll):gsub('/','\\')
+        paths.copyrelease = [[copy "]] .. paths.dll .. [[" ..\..\bin\Release /Y]]
+        -- Try to copy from lib/debug first, then lib if that fails
+        paths.copydebug = ([[if exist "%s" (copy "%s" ..\..\bin\Debug /Y) else (copy "%s" ..\..\bin\Debug /Y)]]):format(paths.debugdll, paths.debugdll, paths.dll)
+    end
+    return paths
+end
+DEPS = {
+    lua = paths{include="deps/luajit/include", lib="deps/luajit/lib", dll="lua51.dll"},
+    zlib = paths{include="deps/zlib/include", lib="deps/zlib/lib", dll="zlib1.dll"},
+    expat = paths{include="deps/expat/include", lib="deps/expat/lib", dll="libexpat.dll"},
+    curl = paths{include="deps/curl/include", lib="deps/curl/lib", dll="*.dll"},
+}
+
 return true
