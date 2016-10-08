@@ -7,7 +7,7 @@ local BmpToggleButton = require(_R..'toggle_button')
 --- Class ArrowButton
 -- @section class
 
---- A ToggleButton.
+--- A toggling ArrowButton.
 -- @param parent Parent window
 -- @param[opt=wxID_ANY] id Window id
 -- @function ArrowButton
@@ -19,5 +19,4 @@ return function(parent, id)
     bmp:delete()
     -- Return the button
     return BmpToggleButton(parent, id or wx.wxID_ANY, collapsed, expanded)
-
 end
