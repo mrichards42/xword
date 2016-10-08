@@ -33,6 +33,7 @@ local events = {
         'EVT_SCROLL_THUMBRELEASE',
         'EVT_SCROLL_CHANGED',
     },
+    EVT_TEXT = 'EVT_COMMAND_TEXT_UPDATED',
     EVT_CLOSE = 'EVT_CLOSE_WINDOW'
 }
 
@@ -197,6 +198,8 @@ local function convert(filename, writefile, luafile)
     text = text:gsub(' wxfb:', ' wxfb.')
     text = text:gsub('require%("wx%.wx', 'require("wx.')
 
+    -- Static functions
+    text = text:gsub('wx.wxSystemSettings:', 'wx.wxSystemSettings.')
 
     -- Indents to spaces
     text = text:gsub('\t\t', '    ')
