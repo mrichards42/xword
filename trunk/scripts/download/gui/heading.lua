@@ -1,4 +1,4 @@
-local _R = (string.match(..., '^.+%.') or ... .. '.')
+local _R = mod_path(...)
 
 local date = require 'date'
 
