@@ -1,7 +1,7 @@
 --- Download configuration
 
 -- Save the current directory for relative require
-local _R = (string.match(..., '^.+%.') or ... .. '.')
+local _R = mod_path(...)
 
 local path = require 'pl.path'
 local tablex = require 'pl.tablex'
