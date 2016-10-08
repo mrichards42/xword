@@ -215,12 +215,6 @@ function config.load()
             end
         end
     end
-    -- Create dates from strings
-    for _, k in ipairs({'start_date', 'end_date'}) do
-        if type(config.previous_view[k]) == 'string' then
-            config.previous_view[k] = date(config.previous_view[k])
-        end
-    end
     -- Create fonts and colors from strings
     for k, style in pairs(data.styles) do
         local config_style = config.styles[k]
@@ -249,12 +243,6 @@ function config.save()
     local data = {}
     for _, k in ipairs(config_keys) do
         data[k] = tablex.deepcopy(config[k])
-    end
-    -- Turn dates into strings
-    for _, k in ipairs({'start_date', 'end_date'}) do
-        if config.previous_view[k] then
-            data.previous_view[k] = config.previous_view[k]:fmt("%m/%d/%Y")
-        end
     end
     -- Turn fonts and colors into strings
     for k, style in pairs(config.styles) do
