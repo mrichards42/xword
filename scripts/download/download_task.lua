@@ -235,7 +235,6 @@ end
 local function cleanup_puzzles()
     for k, p in pairs(_puzzles) do
         _puzzles[k] = nil
-        task.debug('Collecting puzzle:' .. tostring(p))
         p:__gc()
     end
 end
