@@ -13,6 +13,37 @@
 #include "../../lua/luapuz/bind/luapuz.hpp"
 #include "../../lua/luapuz/bind/luapuz_puz_Puzzle_helpers.hpp"
 #include "../../lua/wxbind/include/wxaui_bind.h"
+#include "../dialogs/PrintDialog.hpp"
+
+
+//----------------------------------------------------------------------------
+// Printing
+//----------------------------------------------------------------------------
+class PrintInfo
+{
+    PrintInfo(int options = 0);
+    
+    bool clues;
+    bool grid;
+    int grid_options;
+    bool two_pages;
+    bool author;
+    bool title;
+    bool notes;
+};
+
+// Printing flags
+#define DRAW_USER_TEXT  0x01
+#define DRAW_SOLUTION   0x02
+#define DRAW_NUMBER     0x04
+#define DRAW_FLAG       0x08
+#define DRAW_X          0x10
+#define DRAW_CIRCLE     0x20
+#define DRAW_OUTLINE    0x40
+#define DRAW_BLANK_DIAGRAMLESS 0x80
+#define DRAW_THEME      0x100
+
+
 
 //----------------------------------------------------------------------------
 // Gui stuff
@@ -83,6 +114,10 @@ class MyFrame : public wxFrame
     // const puz::Clue * MyFrame::GetFocusedClue()
     int GetFocusedClue()
 
+    // %override bool Print(const PrintInfo & info, puz::Puzzle * puz = NULL, bool prompt = true)
+    int Print()
+    // %override void PrintPreview(const PrintInfo & info, puz::Puzzle * puz = NULL)
+    int PrintPreview()
 };
 
 

@@ -2480,35 +2480,43 @@ MyFrame::OnPageSetup(wxCommandEvent & WXUNUSED(evt))
 }
 
 
-void
-MyFrame::DoPrint(const PrintInfo & info)
+bool
+MyFrame::Print(const PrintInfo & info, puz::Puzzle * puz, bool prompt)
 {
+    if (puz == NULL)
+        puz = &m_puz;
+
     wxPrintDialogData printDialogData(*g_printData);
 
     wxPrinter printer(& printDialogData);
-    MyPrintout printout(this, &m_puz, info);
-    if (!printer.Print(this, &printout, true /*prompt*/))
+    MyPrintout printout(this, puz, info);
+    if (!printer.Print(this, &printout, prompt))
     {
-        if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+        if (prompt && wxPrinter::GetLastError() == wxPRINTER_ERROR)
             wxMessageBox(_T("There was a problem printing.\n")
                          _T("Perhaps your current printer is not set correctly?"),
                          _T("Printing"),
                          wxOK);
+        return false;
     }
     else
     {
         *g_printData = printer.GetPrintDialogData().GetPrintData();
+        return true;
     }
 }
 
 void
-MyFrame::DoPrintPreview(const PrintInfo & info)
+MyFrame::PrintPreview(const PrintInfo & info, puz::Puzzle * puz)
 {
+    if (puz == NULL)
+        puz = &m_puz;
+
     // Pass two printout objects: for preview, and possible printing.
     wxPrintDialogData printDialogData(*g_printData);
     wxPrintPreview * preview = new wxPrintPreview(
-        new MyPrintout(this, &m_puz, info),
-        new MyPrintout(this, &m_puz, info),
+        new MyPrintout(this, puz, info),
+        new MyPrintout(this, puz, info),
         &printDialogData
     );
     if (! preview->Ok())
@@ -2533,7 +2541,7 @@ MyFrame::OnPrintBlank(wxCommandEvent & WXUNUSED(evt))
         info.grid_options = XGridDrawer::DRAW_NUMBER;
     else
         info.grid_options = XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
-    DoPrint(info);
+    Print(info);
 }
 
 void
@@ -2545,7 +2553,7 @@ MyFrame::OnPrintTwoPages(wxCommandEvent & WXUNUSED(evt))
         info.grid_options = XGridDrawer::DRAW_NUMBER;
     else
         info.grid_options = XGridDrawer::DRAW_BLANK_DIAGRAMLESS;
-    DoPrint(info);
+    Print(info);
 }
 
 void
@@ -2557,7 +2565,7 @@ MyFrame::OnPrintCurrent(wxCommandEvent & WXUNUSED(evt))
                             | XGridDrawer::DRAW_NUMBER;
     else
         info.grid_options = XGridDrawer::DRAW_USER_TEXT;
-    DoPrint(info);
+    Print(info);
 }
 
 void
@@ -2566,7 +2574,7 @@ MyFrame::OnPrintSolution(wxCommandEvent & WXUNUSED(evt))
     PrintInfo info;
     info.grid_options = XGridDrawer::DRAW_SOLUTION;
     info.clues = false;
-    DoPrint(info);
+    Print(info);
 }
 
 void
@@ -2575,9 +2583,9 @@ MyFrame::OnPrintCustom(wxCommandEvent & WXUNUSED(evt))
     CustomPrintDialog dlg(this);
     int code = dlg.ShowModal();
     if (code == CustomPrintDialog::ID_PRINT)
-        DoPrint(dlg.GetPrintInfo());
+        Print(dlg.GetPrintInfo());
     else if (code == CustomPrintDialog::ID_PREVIEW)
-        DoPrintPreview(dlg.GetPrintInfo());
+        PrintPreview(dlg.GetPrintInfo());
 }
 
 

@@ -289,6 +289,52 @@ static int LUACALL wxLua_MyFrame_GetFocusedClue(lua_State *L)
 
 
 
+%override wxLua_MyFrame_Print
+// bool Print(const PrintInfo & info, puz::Puzzle * puz = NULL, bool prompt = true)
+static int LUACALL wxLua_MyFrame_Print(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // prompt
+    bool prompt = (argCount >= 4 ? wxlua_getbooleantype(L, 4) : true);
+    // Puzzle
+    puz::Puzzle * puz = (argCount >= 3 ? luapuz_checkPuzzle(L, 3) : NULL);
+    // PrintInfo
+    const PrintInfo * info = (PrintInfo *)wxluaT_getuserdatatype(L, 2, wxluatype_PrintInfo);
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // Call
+    bool returns = self->Print(*info, puz, prompt);
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+%end
+
+
+%override wxLua_MyFrame_PrintPreview
+// bool PrintPreview(const PrintInfo & info, puz::Puzzle * puz = NULL)
+static int LUACALL wxLua_MyFrame_PrintPreview(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // Puzzle
+    puz::Puzzle * puz = (argCount >= 3 ? luapuz_checkPuzzle(L, 3) : NULL);
+    // PrintInfo
+    const PrintInfo * info = (PrintInfo *)wxluaT_getuserdatatype(L, 2, wxluatype_PrintInfo);
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // Call
+    bool returns = self->Print(*info, puz);
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+%end
+
+
 
 //-----------------------------------------------------------------------------
 // wxPuzEvent overrides

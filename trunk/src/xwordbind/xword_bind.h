@@ -47,6 +47,7 @@ extern WXLUA_NO_DLLIMPEXP wxLuaBinding* wxLuaBinding_xword_init();
 #include "../App.hpp"
 #include "../MyFrame.hpp"
 #include "../PuzEvent.hpp"
+#include "../dialogs/PrintDialog.hpp"
 #include "../paths.hpp"
 
 // ---------------------------------------------------------------------------
@@ -54,6 +55,7 @@ extern WXLUA_NO_DLLIMPEXP wxLuaBinding* wxLuaBinding_xword_init();
 // ---------------------------------------------------------------------------
 
 extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_MyFrame;
+extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_PrintInfo;
 extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_wxPuzEvent;
 
 

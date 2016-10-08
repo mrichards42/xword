@@ -154,6 +154,10 @@ public:
     void SetFocusedDirection(short direction);
     bool SetSquareText(puz::Square * square, const wxString & text = _T(""));
 
+    // Printing
+    bool Print(const PrintInfo & info, puz::Puzzle * puz = NULL, bool promt=true);
+    void PrintPreview(const PrintInfo & info, puz::Puzzle * puz = NULL);
+
 private:
     // Windows
     //--------
@@ -322,8 +326,6 @@ private:
 
     // Printing
     void OnPageSetup(wxCommandEvent & WXUNUSED(evt));
-    void DoPrint(const PrintInfo & info);
-    void DoPrintPreview(const PrintInfo & info);
     void OnPrintBlank(wxCommandEvent & WXUNUSED(evt));
     void OnPrintSolution(wxCommandEvent & WXUNUSED(evt));
     void OnPrintCurrent(wxCommandEvent & WXUNUSED(evt));

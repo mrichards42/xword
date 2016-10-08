@@ -57,6 +57,11 @@ xword_dataTypeTable =
     Name = "MyFrame",
     ValueType = "class",
   },
+  PrintInfo = {
+    IsNumber = false,
+    Name = "PrintInfo",
+    ValueType = "class",
+  },
   Propagation_state = {
     IsNumber = true,
     Name = "Propagation_state",
