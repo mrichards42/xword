@@ -74,7 +74,7 @@ setmetatable(M, Task)
 -- @return A new QueueTask
 -- @usage
 -- -- Create a task that posts back each item in the queue
--- t = QueueTask.new('=return function(item) task.debug(item) end')
+-- t = QueueTask.new('=return function(item) task.log(item) end')
 -- -- Start the task with two items
 -- t:start('hello', 'world')
 -- -- Add some items to the queue

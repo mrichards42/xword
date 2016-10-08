@@ -40,7 +40,7 @@ local EVENT_TABLE = setmetatable({}, {
 -- -- Connect an event
 -- handler:connect(MY_CUSTOM_EVT, function() print('hello world') end)
 -- -- Connect to events from any handler
--- EvtHandler.connect(wx.wxID_ANY, task.EVT_DEBUG, function(msg) print('debug:', msg) end)
+-- EvtHandler.connect(wx.wxID_ANY, task.EVT_LOG, function(msg) print('debug:', msg) end)
 function M.connect(key, evt_id, callback)
     local events = EVENT_TABLE[key]
     if evt_id and callback then -- Single callback

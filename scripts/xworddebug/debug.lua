@@ -65,6 +65,38 @@ end
 old_print = print
 print = xword.debug
 
--- Set task debug handler
+-- Set task log handler
 local task = require 'task'
-task.debug_handler = xword.debug
+task.log_handler = xword.debug
+
+require 'task.debug'
+local EvtHandler = require 'task.event'
+-- Deal with task debug
+EvtHandler.connect(wx.wxID_ANY, task.EVT_DEBUG_START, function(locals)
+    local t = EvtHandler.evt_handler
+    -- Create the debug command message
+    function t:debug(command)
+        t:post(task.EVT_DEBUG_MSG, command)
+    end
+    -- Set the global task
+    T = t
+    print("======================================================")
+    print(("Task: %q called task.debug()"):format(t.name))
+    print("Global variable 'T' is set to the task")
+    print("Send commands using T:debug(commmand)")
+    print("Variable '_' will be set to the result of any commands")
+    print("Use 'cont' to continue and end debugging")
+    print("======================================================")
+    print("_L contains local variables. _L =")
+    print(locals)
+end)
+
+-- Print debug messages
+EvtHandler.connect(wx.wxID_ANY, task.EVT_DEBUG_MSG, function(...)
+    print(...)
+    if select('#', ...) > 1 then
+        _ = {...}
+    else
+        _ = ({...})[1]
+    end
+end)

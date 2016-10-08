@@ -17,14 +17,14 @@ function download_suggestions(url)
     c:setopt(curl.OPT_WRITEFUNCTION, saveText)
 
     local success, err = c:perform()
-    if not success then task.debug("error: " .. err) return end
+    if not success then task.log("error: " .. err) return end
     text = table.concat(text)
 
     -- Parse
     local ret = {}
     -- Extract the body of the matches table
     text = text:match("<b>Source</b></font></td></tr>(.-)</table>")
-    if not text then task.debug("Could not parse") return {} end
+    if not text then task.log("Could not parse") return {} end
     -- Move through the rows of the table
     for row in text:gmatch("<tr(.-)</tr>") do
         -- Count the number of stars this gets (rank)
@@ -48,5 +48,5 @@ for idx, url in pairs(arg) do
         suggestions = download_suggestions(url)
     end
     task.post(1, {idx, suggestions}, 10)
-    if task.checkAbort() then break end
+    if task.check_abort() then break end
 end
