@@ -183,18 +183,27 @@ return {
             -- Download the page with the puzzle
             local page = assert(curl.get(puzzle.url))
 
-            -- Search for a download link
+            -- Search for a download link (crossword solver app)
             local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
-            if not name then return "No puzzle" end
+            if name then
+                -- Download the puzzle as an jpz javascript
+                local js = assert(curl.get("http://www.brendanemmettquigley.com/xpuz/" .. name .. ".js"))
 
-            -- Download the puzzle as an jpz javascript
-            local js = assert(curl.get("http://www.brendanemmettquigley.com/xpuz/" .. name .. ".js"))
+                -- Extract the string from this js
+                local jpz = js:match("['\"](.+)['\"]")
+                local f = io.open(puzzle.filename, 'wb')
+                f:write(jpz:gsub('\\"', '"')) -- Unescape strings
+                f:close()
+                return
+            end
 
-            -- Extract the string from this js
-            local jpz = js:match("['\"](.+)['\"]")
-            local f = io.open(puzzle.filename, 'wb')
-            f:write(jpz:gsub('\\"', '"')) -- Unescape strings
-            f:close()
+            -- Search for a jpz link
+            local jpz_url = page:match('href="(http://www.brendanemmettquigley.com/files/[^"]+%.jpz)"')
+            if jpz_url then
+                assert(curl.get(jpz_url, puzzle.filename))
+                return
+            end
+            return "No puzzle"
         ]]
     },
 
