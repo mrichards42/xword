@@ -24,6 +24,9 @@
     #undef Below
 #endif
 
+#ifdef __GNUC__
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+#endif // __GNUC__
 
 
 #if wxLUA_USE_wxButton && wxUSE_BUTTON
@@ -3687,18 +3690,22 @@ static int LUACALL wxLua_wxListCtrl_GetItemState(lua_State *L)
     return 1;
 }
 
-static wxLuaArgType s_wxluatypeArray_wxLua_wxListCtrl_GetItemText[] = { &wxluatype_wxListCtrl, &wxluatype_TNUMBER, NULL };
+static wxLuaArgType s_wxluatypeArray_wxLua_wxListCtrl_GetItemText[] = { &wxluatype_wxListCtrl, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxListCtrl_GetItemText(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxListCtrl_GetItemText[1] = {{ wxLua_wxListCtrl_GetItemText, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxListCtrl_GetItemText }};
-//     wxString GetItemText(long item) const;
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxListCtrl_GetItemText[1] = {{ wxLua_wxListCtrl_GetItemText, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxListCtrl_GetItemText }};
+//     wxString GetItemText(long item, int col = 0 ) const;
 static int LUACALL wxLua_wxListCtrl_GetItemText(lua_State *L)
 {
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int col = 0
+    int col = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : 0);
     // long item
     long item = (long)wxlua_getnumbertype(L, 2);
     // get this
     wxListCtrl * self = (wxListCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxListCtrl);
     // call GetItemText
-    wxString returns = (self->GetItemText(item));
+    wxString returns = (self->GetItemText(item, col));
     // push the result string
     wxlua_pushwxString(L, returns);
 
@@ -4636,6 +4643,40 @@ int wxListCtrl_methodCount = sizeof(wxListCtrl_methods)/sizeof(wxLuaBindMethod) 
 // Lua MetaTable Tag for Class 'wxLuaListCtrl'
 int wxluatype_wxLuaListCtrl = WXLUA_TUNKNOWN;
 
+static wxLuaArgType s_wxluatypeArray_wxLua_wxLuaListCtrl_RefreshItem[] = { &wxluatype_wxLuaListCtrl, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxLuaListCtrl_RefreshItem(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxLuaListCtrl_RefreshItem[1] = {{ wxLua_wxLuaListCtrl_RefreshItem, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLuaListCtrl_RefreshItem }};
+//     void RefreshItem(long item );
+static int LUACALL wxLua_wxLuaListCtrl_RefreshItem(lua_State *L)
+{
+    // long item
+    long item = (long)wxlua_getnumbertype(L, 2);
+    // get this
+    wxLuaListCtrl * self = (wxLuaListCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLuaListCtrl);
+    // call RefreshItem
+    self->RefreshItem(item);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxLuaListCtrl_RefreshItems[] = { &wxluatype_wxLuaListCtrl, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxLuaListCtrl_RefreshItems(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxLuaListCtrl_RefreshItems[1] = {{ wxLua_wxLuaListCtrl_RefreshItems, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxLuaListCtrl_RefreshItems }};
+//     void RefreshItems(long itemFrom, long itemTo );
+static int LUACALL wxLua_wxLuaListCtrl_RefreshItems(lua_State *L)
+{
+    // long itemTo
+    long itemTo = (long)wxlua_getnumbertype(L, 3);
+    // long itemFrom
+    long itemFrom = (long)wxlua_getnumbertype(L, 2);
+    // get this
+    wxLuaListCtrl * self = (wxLuaListCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLuaListCtrl);
+    // call RefreshItems
+    self->RefreshItems(itemFrom, itemTo);
+
+    return 0;
+}
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxLuaListCtrl_SetItemCount[] = { &wxluatype_wxLuaListCtrl, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxLuaListCtrl_SetItemCount(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxLuaListCtrl_SetItemCount[1] = {{ wxLua_wxLuaListCtrl_SetItemCount, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLuaListCtrl_SetItemCount }};
@@ -4717,6 +4758,8 @@ void wxLua_wxLuaListCtrl_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxLuaListCtrl_methods[] = {
+    { "RefreshItem", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLuaListCtrl_RefreshItem, 1, NULL },
+    { "RefreshItems", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLuaListCtrl_RefreshItems, 1, NULL },
     { "SetItemCount", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLuaListCtrl_SetItemCount, 1, NULL },
 
 #if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL)) && (wxLUA_USE_wxPointSizeRect)
@@ -8053,6 +8096,28 @@ static int LUACALL wxLua_wxTextCtrl_AppendText(lua_State *L)
     return 0;
 }
 
+
+#if (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && (wxLUA_USE_wxArrayString)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTextCtrl_AutoComplete[] = { &wxluatype_wxTextCtrl, &wxluatype_wxArrayString, NULL };
+static int LUACALL wxLua_wxTextCtrl_AutoComplete(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextCtrl_AutoComplete[1] = {{ wxLua_wxTextCtrl_AutoComplete, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxTextCtrl_AutoComplete }};
+//     bool AutoComplete(const wxArrayString & choices );
+static int LUACALL wxLua_wxTextCtrl_AutoComplete(lua_State *L)
+{
+    // const wxArrayString choices
+    wxLuaSmartwxArrayString choices = wxlua_getwxArrayString(L, 2);
+    // get this
+    wxTextCtrl * self = (wxTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTextCtrl);
+    // call AutoComplete
+    bool returns = (self->AutoComplete(choices));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && (wxLUA_USE_wxArrayString)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTextCtrl_CanCopy[] = { &wxluatype_wxTextCtrl, NULL };
 static int LUACALL wxLua_wxTextCtrl_CanCopy(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextCtrl_CanCopy[1] = {{ wxLua_wxTextCtrl_CanCopy, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxTextCtrl_CanCopy }};
@@ -8774,6 +8839,28 @@ static int LUACALL wxLua_wxTextCtrl_SetInsertionPointEnd(lua_State *L)
     return 0;
 }
 
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTextCtrl_SetMargins[] = { &wxluatype_wxTextCtrl, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxTextCtrl_SetMargins(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextCtrl_SetMargins[1] = {{ wxLua_wxTextCtrl_SetMargins, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxTextCtrl_SetMargins }};
+//     bool SetMargins(wxCoord left, wxCoord top = -1 );
+static int LUACALL wxLua_wxTextCtrl_SetMargins(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // wxCoord top = -1
+    wxCoord top = (argCount >= 3 ? (wxCoord)wxlua_getnumbertype(L, 3) : -1);
+    // wxCoord left
+    wxCoord left = (wxCoord)wxlua_getnumbertype(L, 2);
+    // get this
+    wxTextCtrl * self = (wxTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTextCtrl);
+    // call SetMargins
+    bool returns = (self->SetMargins(left, top));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTextCtrl_SetMaxLength[] = { &wxluatype_wxTextCtrl, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxTextCtrl_SetMaxLength(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextCtrl_SetMaxLength[1] = {{ wxLua_wxTextCtrl_SetMaxLength, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxTextCtrl_SetMaxLength }};
@@ -8991,6 +9078,11 @@ void wxLua_wxTextCtrl_delete_function(void** p)
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxTextCtrl_methods[] = {
     { "AppendText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_AppendText, 1, NULL },
+
+#if (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && (wxLUA_USE_wxArrayString)
+    { "AutoComplete", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_AutoComplete, 1, NULL },
+#endif // (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && (wxLUA_USE_wxArrayString)
+
     { "CanCopy", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_CanCopy, 1, NULL },
     { "CanCut", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_CanCut, 1, NULL },
     { "CanPaste", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_CanPaste, 1, NULL },
@@ -9040,6 +9132,7 @@ wxLuaBindMethod wxTextCtrl_methods[] = {
     { "SetEditable", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_SetEditable, 1, NULL },
     { "SetInsertionPoint", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_SetInsertionPoint, 1, NULL },
     { "SetInsertionPointEnd", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_SetInsertionPointEnd, 1, NULL },
+    { "SetMargins", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_SetMargins, 1, NULL },
     { "SetMaxLength", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_SetMaxLength, 1, NULL },
     { "SetSelection", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_SetSelection, 1, NULL },
     { "SetStyle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextCtrl_SetStyle, 1, NULL },

@@ -24,6 +24,9 @@
     #undef Below
 #endif
 
+#ifdef __GNUC__
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+#endif // __GNUC__
 // wxWidgets >= 2.7 doesn't have static versions of stock GDI objects anymore
 wxColour* wxLua_wxBLACK = NULL;
 wxColour* wxLua_wxWHITE = NULL;
@@ -995,6 +998,17 @@ wxLuaBindNumber* wxLuaGetDefineList_wxcore(size_t &count)
 #endif // wxLUA_USE_wxDragDrop && wxUSE_DRAG_AND_DROP
 
         { "wxEAST", wxEAST },
+
+#if wxCHECK_VERSION(2,9,0)
+        { "wxELLIPSIZE_END", wxELLIPSIZE_END },
+        { "wxELLIPSIZE_FLAGS_DEFAULT", wxELLIPSIZE_FLAGS_DEFAULT },
+        { "wxELLIPSIZE_FLAGS_EXPAND_TABS", wxELLIPSIZE_FLAGS_EXPAND_TABS },
+        { "wxELLIPSIZE_FLAGS_NONE", wxELLIPSIZE_FLAGS_NONE },
+        { "wxELLIPSIZE_FLAGS_PROCESS_MNEMONICS", wxELLIPSIZE_FLAGS_PROCESS_MNEMONICS },
+        { "wxELLIPSIZE_MIDDLE", wxELLIPSIZE_MIDDLE },
+        { "wxELLIPSIZE_NONE", wxELLIPSIZE_NONE },
+        { "wxELLIPSIZE_START", wxELLIPSIZE_START },
+#endif // wxCHECK_VERSION(2,9,0)
 
 #if wxLUA_USE_wxDC
         { "wxEQUIV", wxEQUIV },
