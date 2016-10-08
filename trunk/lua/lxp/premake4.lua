@@ -17,8 +17,8 @@ project "lxp"
     -- Platform-specific
     configuration "windows"
         defines { "_CRT_SECURE_NO_WARNINGS" }
-        includedirs { "../../deps/expat/include" }
-        libdirs { "../../deps/expat/lib" }
+        includedirs { DEPS.expat.include }
+        libdirs { DEPS.expat.lib }
         links { "libexpat" }
 
     configuration "linux or macosx"
@@ -27,7 +27,7 @@ project "lxp"
     -- Postbuild: copy libexpat.dll to XWord directory
 
     configuration { "windows", "Debug" }
-       postbuildcommands { [[copy "..\..\deps\expat\lib\libexpat.dll" ..\..\bin\Debug /Y]] }
+       postbuildcommands { DEPS.expat.copydebug }
 
     configuration { "windows", "Release" }
-       postbuildcommands { [[copy "..\..\deps\expat\lib\libexpat.dll" ..\..\bin\Release /Y]] }
+       postbuildcommands { DEPS.expat.copyrelease }

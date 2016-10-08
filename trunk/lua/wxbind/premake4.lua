@@ -6,7 +6,7 @@ local function wxbindproject(name)
         files { "src/wx"..name.."*", "include/wx"..name.."*" }
 
         defines { "_LIB" }
-        includedirs { "setup", "../lua/include", "..",  }
+        includedirs { "setup", DEPS.lua.include, "..",  }
         files { "src/dummy.cpp" }
 
         configuration "Debug"   targetdir "../../lib/Debug"

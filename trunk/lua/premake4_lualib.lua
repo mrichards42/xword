@@ -8,9 +8,9 @@ configuration {}
 
 
 -- lua
-includedirs { "../deps/luajit/include" }
+includedirs { DEPS.lua.include }
 defines { "LUA_LIB" }
-libdirs { "../deps/luajit/lib" }
+libdirs { DEPS.lua.lib }
 links { "lua51" }
 
 configuration "windows"
