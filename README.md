@@ -2,8 +2,6 @@
 XWord - A cross platform crossword solving program
 ==================================================
 
-https://sourceforge.net/projects/wx-xword/
-
 XWord is a cross-platform crossword puzzle program designed to be highly
 configurable.  It reads multiple puzzle file formats.
 
