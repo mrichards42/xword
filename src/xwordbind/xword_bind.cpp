@@ -21,6 +21,279 @@
 
 
 // ---------------------------------------------------------------------------
+// Bind class PrintInfo
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'PrintInfo'
+int wxluatype_PrintInfo = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Get_author[] = { &wxluatype_PrintInfo, NULL };
+static int LUACALL wxLua_PrintInfo_Get_author(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Get_author[1] = {{ wxLua_PrintInfo_Get_author, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_PrintInfo_Get_author }};
+//     bool author;
+static int LUACALL wxLua_PrintInfo_Get_author(lua_State *L)
+{
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    // push the result flag
+    lua_pushboolean(L, self->author);
+    // return the number of values
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Get_clues[] = { &wxluatype_PrintInfo, NULL };
+static int LUACALL wxLua_PrintInfo_Get_clues(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Get_clues[1] = {{ wxLua_PrintInfo_Get_clues, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_PrintInfo_Get_clues }};
+//     bool clues;
+static int LUACALL wxLua_PrintInfo_Get_clues(lua_State *L)
+{
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    // push the result flag
+    lua_pushboolean(L, self->clues);
+    // return the number of values
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Get_grid[] = { &wxluatype_PrintInfo, NULL };
+static int LUACALL wxLua_PrintInfo_Get_grid(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Get_grid[1] = {{ wxLua_PrintInfo_Get_grid, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_PrintInfo_Get_grid }};
+//     bool grid;
+static int LUACALL wxLua_PrintInfo_Get_grid(lua_State *L)
+{
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    // push the result flag
+    lua_pushboolean(L, self->grid);
+    // return the number of values
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Get_grid_options[] = { &wxluatype_PrintInfo, NULL };
+static int LUACALL wxLua_PrintInfo_Get_grid_options(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Get_grid_options[1] = {{ wxLua_PrintInfo_Get_grid_options, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_PrintInfo_Get_grid_options }};
+//     int grid_options;
+static int LUACALL wxLua_PrintInfo_Get_grid_options(lua_State *L)
+{
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    // push the result number
+    lua_pushnumber(L, self->grid_options);
+    // return the number of values
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Get_notes[] = { &wxluatype_PrintInfo, NULL };
+static int LUACALL wxLua_PrintInfo_Get_notes(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Get_notes[1] = {{ wxLua_PrintInfo_Get_notes, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_PrintInfo_Get_notes }};
+//     bool notes;
+static int LUACALL wxLua_PrintInfo_Get_notes(lua_State *L)
+{
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    // push the result flag
+    lua_pushboolean(L, self->notes);
+    // return the number of values
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Get_title[] = { &wxluatype_PrintInfo, NULL };
+static int LUACALL wxLua_PrintInfo_Get_title(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Get_title[1] = {{ wxLua_PrintInfo_Get_title, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_PrintInfo_Get_title }};
+//     bool title;
+static int LUACALL wxLua_PrintInfo_Get_title(lua_State *L)
+{
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    // push the result flag
+    lua_pushboolean(L, self->title);
+    // return the number of values
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Get_two_pages[] = { &wxluatype_PrintInfo, NULL };
+static int LUACALL wxLua_PrintInfo_Get_two_pages(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Get_two_pages[1] = {{ wxLua_PrintInfo_Get_two_pages, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_PrintInfo_Get_two_pages }};
+//     bool two_pages;
+static int LUACALL wxLua_PrintInfo_Get_two_pages(lua_State *L)
+{
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    // push the result flag
+    lua_pushboolean(L, self->two_pages);
+    // return the number of values
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_constructor[] = { &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_PrintInfo_constructor(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_constructor[1] = {{ wxLua_PrintInfo_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_PrintInfo_constructor }};
+//     PrintInfo(int options = 0);
+static int LUACALL wxLua_PrintInfo_constructor(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int options = 0
+    int options = (argCount >= 1 ? (int)wxlua_getnumbertype(L, 1) : 0);
+    // call constructor
+    PrintInfo* returns = new PrintInfo(options);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_PrintInfo);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Set_author[] = { &wxluatype_PrintInfo, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_PrintInfo_Set_author(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Set_author[1] = {{ wxLua_PrintInfo_Set_author, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_PrintInfo_Set_author }};
+//     bool author;
+static int LUACALL wxLua_PrintInfo_Set_author(lua_State *L)
+{
+    // get the boolean value
+    bool val = wxlua_getbooleantype(L, 2);
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    self->author = val;
+    // return the number of values
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Set_clues[] = { &wxluatype_PrintInfo, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_PrintInfo_Set_clues(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Set_clues[1] = {{ wxLua_PrintInfo_Set_clues, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_PrintInfo_Set_clues }};
+//     bool clues;
+static int LUACALL wxLua_PrintInfo_Set_clues(lua_State *L)
+{
+    // get the boolean value
+    bool val = wxlua_getbooleantype(L, 2);
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    self->clues = val;
+    // return the number of values
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Set_grid[] = { &wxluatype_PrintInfo, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_PrintInfo_Set_grid(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Set_grid[1] = {{ wxLua_PrintInfo_Set_grid, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_PrintInfo_Set_grid }};
+//     bool grid;
+static int LUACALL wxLua_PrintInfo_Set_grid(lua_State *L)
+{
+    // get the boolean value
+    bool val = wxlua_getbooleantype(L, 2);
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    self->grid = val;
+    // return the number of values
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Set_grid_options[] = { &wxluatype_PrintInfo, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_PrintInfo_Set_grid_options(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Set_grid_options[1] = {{ wxLua_PrintInfo_Set_grid_options, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_PrintInfo_Set_grid_options }};
+//     int grid_options;
+static int LUACALL wxLua_PrintInfo_Set_grid_options(lua_State *L)
+{
+    // get the number value
+    int val = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    self->grid_options = val;
+    // return the number of values
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Set_notes[] = { &wxluatype_PrintInfo, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_PrintInfo_Set_notes(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Set_notes[1] = {{ wxLua_PrintInfo_Set_notes, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_PrintInfo_Set_notes }};
+//     bool notes;
+static int LUACALL wxLua_PrintInfo_Set_notes(lua_State *L)
+{
+    // get the boolean value
+    bool val = wxlua_getbooleantype(L, 2);
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    self->notes = val;
+    // return the number of values
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Set_title[] = { &wxluatype_PrintInfo, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_PrintInfo_Set_title(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Set_title[1] = {{ wxLua_PrintInfo_Set_title, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_PrintInfo_Set_title }};
+//     bool title;
+static int LUACALL wxLua_PrintInfo_Set_title(lua_State *L)
+{
+    // get the boolean value
+    bool val = wxlua_getbooleantype(L, 2);
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    self->title = val;
+    // return the number of values
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_PrintInfo_Set_two_pages[] = { &wxluatype_PrintInfo, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_PrintInfo_Set_two_pages(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_PrintInfo_Set_two_pages[1] = {{ wxLua_PrintInfo_Set_two_pages, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_PrintInfo_Set_two_pages }};
+//     bool two_pages;
+static int LUACALL wxLua_PrintInfo_Set_two_pages(lua_State *L)
+{
+    // get the boolean value
+    bool val = wxlua_getbooleantype(L, 2);
+    // get this
+    PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
+    self->two_pages = val;
+    // return the number of values
+    return 0;
+}
+
+
+
+void wxLua_PrintInfo_delete_function(void** p)
+{
+    PrintInfo* o = (PrintInfo*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod PrintInfo_methods[] = {
+    // %member    { "Get_author", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Get_author, 1, NULL },
+    // %member    { "Get_clues", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Get_clues, 1, NULL },
+    // %member    { "Get_grid", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Get_grid, 1, NULL },
+    // %member    { "Get_grid_options", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Get_grid_options, 1, NULL },
+    // %member    { "Get_notes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Get_notes, 1, NULL },
+    // %member    { "Get_title", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Get_title, 1, NULL },
+    // %member    { "Get_two_pages", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Get_two_pages, 1, NULL },
+    { "PrintInfo", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_PrintInfo_constructor, 1, NULL },
+    // %member    { "Set_author", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Set_author, 1, NULL },
+    // %member    { "Set_clues", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Set_clues, 1, NULL },
+    // %member    { "Set_grid", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Set_grid, 1, NULL },
+    // %member    { "Set_grid_options", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Set_grid_options, 1, NULL },
+    // %member    { "Set_notes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Set_notes, 1, NULL },
+    // %member    { "Set_title", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Set_title, 1, NULL },
+    // %member    { "Set_two_pages", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_PrintInfo_Set_two_pages, 1, NULL },
+    { "author", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_PrintInfo_Get_author, 1, NULL },
+    { "author", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_PrintInfo_Set_author, 1, NULL },
+    { "clues", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_PrintInfo_Get_clues, 1, NULL },
+    { "clues", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_PrintInfo_Set_clues, 1, NULL },
+    { "grid", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_PrintInfo_Get_grid, 1, NULL },
+    { "grid", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_PrintInfo_Set_grid, 1, NULL },
+    { "grid_options", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_PrintInfo_Get_grid_options, 1, NULL },
+    { "grid_options", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_PrintInfo_Set_grid_options, 1, NULL },
+    { "notes", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_PrintInfo_Get_notes, 1, NULL },
+    { "notes", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_PrintInfo_Set_notes, 1, NULL },
+    { "title", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_PrintInfo_Get_title, 1, NULL },
+    { "title", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_PrintInfo_Set_title, 1, NULL },
+    { "two_pages", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_PrintInfo_Get_two_pages, 1, NULL },
+    { "two_pages", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_PrintInfo_Set_two_pages, 1, NULL },
+    { 0, 0, 0, 0 },
+};
+
+int PrintInfo_methodCount = sizeof(PrintInfo_methods)/sizeof(wxLuaBindMethod) - 1;
+
+
+// ---------------------------------------------------------------------------
 // Bind class MyFrame
 // ---------------------------------------------------------------------------
 
@@ -279,6 +552,56 @@ static int LUACALL wxLua_MyFrame_LoadPuzzle(lua_State *L)
         lua_pushboolean(L, returns);
         return 1;
     }
+}
+
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_Print[] = { &wxluatype_MyFrame, NULL };
+static int LUACALL wxLua_MyFrame_Print(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_Print[1] = {{ wxLua_MyFrame_Print, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_Print }};
+// %override wxLua_MyFrame_Print
+// bool Print(const PrintInfo & info, puz::Puzzle * puz = NULL, bool prompt = true)
+static int LUACALL wxLua_MyFrame_Print(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // prompt
+    bool prompt = (argCount >= 4 ? wxlua_getbooleantype(L, 4) : true);
+    // Puzzle
+    puz::Puzzle * puz = (argCount >= 3 ? luapuz_checkPuzzle(L, 3) : NULL);
+    // PrintInfo
+    const PrintInfo * info = (PrintInfo *)wxluaT_getuserdatatype(L, 2, wxluatype_PrintInfo);
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // Call
+    bool returns = self->Print(*info, puz, prompt);
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+
+static wxLuaArgType s_wxluatypeArray_wxLua_MyFrame_PrintPreview[] = { &wxluatype_MyFrame, NULL };
+static int LUACALL wxLua_MyFrame_PrintPreview(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_MyFrame_PrintPreview[1] = {{ wxLua_MyFrame_PrintPreview, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_MyFrame_PrintPreview }};
+// %override wxLua_MyFrame_PrintPreview
+// bool PrintPreview(const PrintInfo & info, puz::Puzzle * puz = NULL)
+static int LUACALL wxLua_MyFrame_PrintPreview(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // Puzzle
+    puz::Puzzle * puz = (argCount >= 3 ? luapuz_checkPuzzle(L, 3) : NULL);
+    // PrintInfo
+    const PrintInfo * info = (PrintInfo *)wxluaT_getuserdatatype(L, 2, wxluatype_PrintInfo);
+    // get this
+    MyFrame * self = (MyFrame *)wxluaT_getuserdatatype(L, 1, wxluatype_MyFrame);
+
+    // Call
+    bool returns = self->Print(*info, puz);
+    lua_pushboolean(L, returns);
+
+    return 1;
 }
 
 
@@ -632,6 +955,8 @@ wxLuaBindMethod MyFrame_methods[] = {
     { "HidePane", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_HidePane, 1, NULL },
     { "IsTimerRunning", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_IsTimerRunning, 1, NULL },
     { "LoadPuzzle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_LoadPuzzle, 1, NULL },
+    { "Print", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_Print, 1, NULL },
+    { "PrintPreview", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_PrintPreview, 1, NULL },
     { "ResetTimer", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_ResetTimer, 1, NULL },
     { "SavePuzzle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SavePuzzle, 1, NULL },
     { "SetFilename", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_MyFrame_SetFilename, 1, NULL },
@@ -731,6 +1056,15 @@ wxLuaBindNumber* wxLuaGetDefineList_xword(size_t &count)
 {
     static wxLuaBindNumber numberList[] =
     {
+        { "DRAW_BLANK_DIAGRAMLESS", 0x80 },
+        { "DRAW_CIRCLE", 0x20 },
+        { "DRAW_FLAG", 0x08 },
+        { "DRAW_NUMBER", 0x04 },
+        { "DRAW_OUTLINE", 0x40 },
+        { "DRAW_SOLUTION", 0x02 },
+        { "DRAW_THEME", 0x100 },
+        { "DRAW_USER_TEXT", 0x01 },
+        { "DRAW_X", 0x10 },
 
         { 0, 0 },
     };
@@ -823,6 +1157,7 @@ wxLuaBindMethod* wxLuaGetFunctionList_xword(size_t &count)
 // ---------------------------------------------------------------------------
 
 static const char* wxluaclassname_MyFrame = "MyFrame";
+static const char* wxluaclassname_PrintInfo = "PrintInfo";
 static const char* wxluaclassname_wxCommandEvent = "wxCommandEvent";
 static const char* wxluaclassname_wxFrame = "wxFrame";
 static const char* wxluaclassname_wxPuzEvent = "wxPuzEvent";
@@ -838,6 +1173,9 @@ static wxLuaBindClass* wxluabaseclassbinds_wxPuzEvent[] = { NULL };
 extern wxLuaBindMethod MyFrame_methods[];
 extern int MyFrame_methodCount;
 extern void wxLua_MyFrame_delete_function(void** p);
+extern wxLuaBindMethod PrintInfo_methods[];
+extern int PrintInfo_methodCount;
+extern void wxLua_PrintInfo_delete_function(void** p);
 extern wxLuaBindMethod wxPuzEvent_methods[];
 extern int wxPuzEvent_methodCount;
 extern void wxLua_wxPuzEvent_delete_function(void** p);
@@ -850,6 +1188,7 @@ wxLuaBindClass* wxLuaGetClassList_xword(size_t &count)
     static wxLuaBindClass classList[] =
     {
         { wxluaclassname_MyFrame, MyFrame_methods, MyFrame_methodCount, CLASSINFO(MyFrame), &wxluatype_MyFrame, wxluabaseclassnames_MyFrame, wxluabaseclassbinds_MyFrame, NULL, NULL, NULL, 0, &wxLua_MyFrame_delete_function, }, 
+        { wxluaclassname_PrintInfo, PrintInfo_methods, PrintInfo_methodCount, NULL, &wxluatype_PrintInfo, NULL, NULL, NULL, NULL, NULL, 0, &wxLua_PrintInfo_delete_function, }, 
         { wxluaclassname_wxPuzEvent, wxPuzEvent_methods, wxPuzEvent_methodCount, CLASSINFO(wxPuzEvent), &wxluatype_wxPuzEvent, wxluabaseclassnames_wxPuzEvent, wxluabaseclassbinds_wxPuzEvent, NULL, NULL, NULL, 0, &wxLua_wxPuzEvent_delete_function, }, 
 
         { 0, 0, 0, 0, 0, 0, 0 }, 
