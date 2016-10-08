@@ -257,6 +257,7 @@ function config.save()
     serialize.dump(data, config.get_config_filename())
 end
 
+config.PreferencesPanel = require(_R .. 'gui.preferences')
 
 if true then
 return config
