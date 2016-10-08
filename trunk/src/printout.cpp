@@ -173,6 +173,9 @@ wxString BreakWord(wxDC * dc, const wxString & word, int maxWidth)
 // Add <wbr> wherever it is needed in a line
 wxString BreakLine(wxDC * dc, const wxString & line, int width)
 {
+    // Don't try to break up HTML
+    if (line.find_first_of(_T("<>")) != wxString::npos)
+        return line;
     wxString ret;
     // Break up the line by whitespace
     size_t start = 0;
@@ -240,18 +243,18 @@ MyPrintout::GetHTML()
         // Table for clues
         html << _T("<table cellspacing=0 cellpadding=1 border=0>");
         // Heading
-        html << _T("<tr><th colspan=2 align=\"left\"><b>")
+        html << _T("<tr><th colspan=2 align=\"left\"><font size=\"+1\"><b>")
                     << BreakLine(dc, puz2wx(clues_it->first), m_columnWidth)
-               << _T("</b></th></tr>");
+               << _T("</b></font></th></tr>");
         puz::ClueList::const_iterator it;
         for (it = clues_it->second.begin(); it != clues_it->second.end(); ++it)
         {
             html
                 << _T("<tr>")
                     // Clue number
-                    << _T("<td align=\"right\" valign=\"top\"><b>")
+                    << _T("<td align=\"right\" valign=\"top\"><font size=\"-1\"><b>")
                         << puz2wx(it->GetNumber()) // Don't bother to break the number
-                    << _T(" </b></td>")
+                    << _T(" </b></font></td>")
                     // Clue text
                     << _T("<td>")
                         // Break the clue at .8 column width
@@ -551,21 +554,23 @@ MyPrintout::LayoutPages()
     for (int pt = MAX_FONT_SIZE; pt >= MIN_FONT_SIZE; --pt)
     {
         double textRatio = log((double)pt / (double)GOOD_FONT_SIZE);
-        // Columns that are all text
-        for (double textCols = 1.; textCols < 3; ++textCols)
+        for (int i = 0; i < 4; ++i)
         {
-            for (int i = 0; i < 4; ++i)
+            int nColumns = columns[i];
+            // Columns that are all text
+            for (double textCols = 1.; textCols < (double)nColumns/2; ++textCols)
             {
-                // The grid takes up all but on column.
-                m_gridScale = 1 - (textCols / columns[i]);
-                wxLogDebug(_T("Laying out cols=%d, pt=%d, grid=%g"), columns[i], pt, m_gridScale);
+                // The grid takes up all cols that are not all text
+                m_gridScale = 1 - (textCols / nColumns);
+                wxLogDebug(_T("Laying out cols=%d, textCols=%d, pt=%d, grid=%g"), nColumns, (int)textCols, pt, m_gridScale);
                 if (m_gridScale < .1)
                     continue;
 
                 LayoutGrid(m_gridScale);
+                wxLogDebug(_T("Box Size: %d"), m_drawer.GetBoxSize());
                 if (m_drawer.GetBoxSize() < minBoxSize)
                     continue;
-                if (LayoutText(columns[i], pt))
+                if (LayoutText(nColumns, pt))
                 {
                     double gridRatio = log((double)m_drawer.GetBoxSize() / (double)goodBoxSize);
                     spaceFilled = gridRatio + textRatio;
@@ -584,7 +589,7 @@ MyPrintout::LayoutPages()
                         best.spaceFilled = spaceFilled;
                         best.gridScale = m_gridScale;
                         best.fontSize = pt;
-                        best.columns = columns[i];
+                        best.columns = nColumns;
                     }
                 }
             }
@@ -626,7 +631,7 @@ MyPrintout::DrawHeader()
     // Setup the HTML Renderer
     m_htmlRenderer->SetDC(dc);
     m_htmlRenderer->SetSize(rect.width, rect.height);
-    m_htmlRenderer->SetStandardFonts(12);
+    m_htmlRenderer->SetStandardFonts(12, m_clueFont.GetFaceName());
     dc->SetFont(m_clueFont);
 
     // Get the header Text
@@ -694,7 +699,7 @@ MyPrintout::DrawText(int columns, int fontSize)
     // Setup the HTML Renderer
     m_htmlRenderer->SetDC(dc);
     m_htmlRenderer->SetSize(m_columnWidth, 1000);
-    m_htmlRenderer->SetStandardFonts(fontSize);
+    m_htmlRenderer->SetStandardFonts(fontSize, m_clueFont.GetFaceName());
     dc->SetFont(m_clueFont);
     m_htmlRenderer->SetHtmlText(GetHTML());
 
