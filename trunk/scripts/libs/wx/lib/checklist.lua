@@ -7,6 +7,9 @@ local mixins = require(_R .. 'mixins.listctrl')
 --- Class CheckListCtrl
 -- @section class
 
+local UTF8_CHECK = "\226\156\147"
+local UTF8_HEAVY_CHECK = "\226\156\148"
+
 --- A CheckListCtrl
 -- @param parent Parent window
 -- @param[opt=wx.wxID_ANY] id Window id
@@ -18,13 +21,22 @@ return function(parent, id, col1, col2)
     mixins.CheckListMixin(self)
     mixins.AutoWidthMixin(self)
 
-    col1 = col1 or "Check"
-    col2 = col2 or "Value"
+    col1 = type(col1) == 'string' and col1 or UTF8_HEAVY_CHECK
+    col2 = type(col2) == 'string' and col2 or "Value"
 
     local w = self:GetTextExtent(col1)
-    self:InsertColumn(0, col1, wx.wxLIST_FORMAT_CENTRE, w)
+    self:InsertColumn(0, col1, wx.wxLIST_FORMAT_LEFT, -1)
     self:InsertColumn(1, col2, wx.wxLIST_FORMAT_LEFT, -1)
     self:SetColumnWidth(0, w + 15)
+
+    --- Set the name of a column
+    -- @param col 0-based index
+    -- @param name Name
+    function self:SetColumnName(col, name)
+        local item = wx.wxListItem()
+        item:SetText(name)
+        self:SetColumn(col, item)
+    end
 
     -- wxListBox functions
 
@@ -65,14 +77,6 @@ return function(parent, id, col1, col2)
     --- Delete all items.
     -- @function self:Clear
     self.Clear = self.DeleteAllItems
-
-    --- Insert a new item.
-    -- @param label The item label
-    -- @param index Insert before this index
-    -- @param[opt=false] is_checked Is this item checked?
-    function self:Insert(label, index, is_checked)
-        self:InsertItem(index, label, is_checked)
-    end
 
     --- Set all values at once.
     -- @param items A table of labels, or a table of labels and check values.
