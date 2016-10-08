@@ -1,13 +1,12 @@
 -- See Copyright Notice in license.html
 -- $Id: lom.lua,v 1.6 2005/06/09 19:18:40 tuler Exp $
 
-require "lxp"
+local lxp = require "lxp"
 
 local tinsert, tremove, getn = table.insert, table.remove, table.getn
 local assert, type, print = assert, type, print
-local lxp = lxp
 
-module ("lxp.lom")
+--module ("lxp.lom")
 
 local function starttag (p, tag, attr)
   local stack = p:getcallbacks().stack
@@ -34,7 +33,9 @@ local function text (p, txt)
   end
 end
 
-function  parse (o)
+lxp.lom = {}
+
+function  lxp.lom.parse (o)
   local c = { StartElement = starttag,
               EndElement = endtag,
               CharacterData = text,
@@ -60,7 +61,7 @@ end
 
 
 -- An element iterator: skip over text nodes
-function inodes(node)
+function lxp.lom.inodes(node)
     local i = 0
     local f
     f = function()
@@ -71,3 +72,5 @@ function inodes(node)
     end
     return f
 end
+
+return lxp.lom
