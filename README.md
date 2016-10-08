@@ -6,24 +6,25 @@ XWord is a cross-platform crossword puzzle program designed to be highly
 configurable.  It reads multiple puzzle file formats.
 
 Supported features:
-    - Solving of all American style, cryptic, and diagramless crosswords.
-    - Solving rebus puzzles.
-    - Solving puzzles with a variety of tricks, e.g. diagonal clues, arbitrary
-      numbering schemes, shaded squares.
-    - Support for reading number of puzzle formats:
-        - Across Lite
-        - XPF
-        - jpz
-        - ipuz (partial)
-    - Recovery of corrupted Across Lite .puz files.
-    - A timer.
-    - Checking and revealing letters.
-    - Scrambling and unscrambling puzzle solutions (for Across Lite files).
-    - Viewing puzzle notes.
-    - Zooming the grid in and out.
-    - Rearranging the window layout.
-    - Color, font, and solving behavior configuration.
-    - Printing
+
+* Solving of all American style, cryptic, and diagramless crosswords.
+* Solving rebus puzzles.
+* Solving puzzles with a variety of tricks, e.g. diagonal clues, arbitrary
+  numbering schemes, shaded squares.
+* Support for reading number of puzzle formats:
+    * Across Lite
+    * XPF
+    * jpz
+    * ipuz (partial)
+* Recovery of corrupted Across Lite .puz files.
+* A timer.
+* Checking and revealing letters.
+* Scrambling and unscrambling puzzle solutions (for Across Lite files).
+* Viewing puzzle notes.
+* Zooming the grid in and out.
+* Rearranging the window layout.
+* Color, font, and solving behavior configuration.
+* Printing
 
 XWord is extensible via the lua scripting language.  A number of plugins are
 available.  See Tools > Package Manager.
@@ -74,9 +75,9 @@ probably don't work.
 XWord requires the following libraries in addition to the wxWidgets Base and
 Core libraries:
 
-wxAUI
-wxpng
-wxzlib
+* wxAUI
+* wxpng
+* wxzlib
 
 
 Windows-specific building instructions
