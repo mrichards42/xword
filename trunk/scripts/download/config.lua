@@ -61,6 +61,9 @@ local function deep_update(t1, t2)
     for k, v in pairs(t2) do
         if type(t1[k]) == 'table' then
             deep_update(t1[k], t2[k])
+            if getmetatable(t2[k]) then
+                setmetatable(t1[k], getmetatable(t2[k]))
+            end
         else
             t1[k] = v
         end
