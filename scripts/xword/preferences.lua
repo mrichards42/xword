@@ -3,12 +3,26 @@
 --      This script adds panels to the preferences dialog
 -- ============================================================================
 
--- Use this function to add a panel to the preferences dialog
 xword.preferences_panels = {}
-function xword.AddPreferencesPanel(title, constructor, save_func)
-    assert(title and constructor and save_func)
+
+--- Add a custom preferences panel.
+-- The panel should have a method panel:SaveConfig() that applies changes.
+-- @param title The panel title
+-- @param constructor The constructor.
+function xword.AddPreferencesPanel(title, constructor)
+    assert(title and constructor)
     table.insert(xword.preferences_panels,
-        {title = title, constructor = constructor, save_func = save_func})
+        {title = title, constructor = constructor})
+end
+
+-- Remove a panel from the preferences dialog
+function xword.RemovePreferencesPanel(title)
+    for i, panel in ipairs(xword.preferences_panels) do
+        if panel.title == title then
+            table.remove(xword.preferences_panels, i)
+            return true
+        end
+    end
 end
 
 -- This is called from C++ from PreferencesDialog::OnInit
@@ -22,6 +36,6 @@ end
 -- This is called from C++ from PreferencesDialog::SaveConfig
 function xword.OnSavePreferences()
     for _, info in ipairs(xword.preferences_panels) do
-        info.save_func(info.ctrl)
+        info.ctrl:SaveConfig()
     end
 end
