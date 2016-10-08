@@ -21,4 +21,4 @@
 #define UnparsedEntityDeclKey		"UnparsedEntityDecl"
 #define StartDoctypeDeclKey		"StartDoctypeDecl"
 
-int luaopen_lxp (lua_State *L);
+LUALIB_API int luaopen_lxp (lua_State *L);

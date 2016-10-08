@@ -578,7 +578,7 @@ static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
 #endif
 
 
-int luaopen_lxp (lua_State *L) {
+LUALIB_API int luaopen_lxp (lua_State *L) {
 	luaL_newmetatable(L, ParserType);
 
 	lua_pushliteral(L, "__index");
