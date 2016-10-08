@@ -42,20 +42,12 @@ local function fbCollapsePanel(parent, id)
         -- Find the item after ourself
         local item = find_next(sizer, ctrl)
         if item then
-            -- Save the item info
-            local p, f, b = item:GetProportion(), item:GetFlag(), item:GetBorder()
-            -- Reparent
-            local obj
+            -- Add to ourself
             if item:IsWindow() then
-                obj = item:GetWindow()
-                obj:Reparent(ctrl)
+                ctrl:AddSibling(item:GetWindow())
             else -- Should be a sizer
-                obj = item:GetSizer()
-                reparent_items(obj, ctrl)
+                ctrl:AddSibling(item:GetSizer())
             end
-            -- Detach and add to ourself
-            sizer:Detach(obj)
-            ctrl:Add(obj, p, f, b)
             ctrl:Layout()
         end
         -- Remove this method
