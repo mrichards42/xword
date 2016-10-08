@@ -37,8 +37,8 @@ task.EVT_START = -100
 task.EVT_END   = -101
 --- Error messages
 task.EVT_ERROR = -102
---- Debug messages
-task.EVT_DEBUG = -103
+--- Log messages
+task.EVT_LOG = -103
 --- Posted to abort a task
 task.EVT_ABORT = -104
 
@@ -209,9 +209,9 @@ task.globals = {}
 -- Defaults to `print`.
 task.error_handler = print
 
---- The function called to handle debug messages.
+--- The function called to handle log messages.
 -- Defaults to `print`.
-task.debug_handler = print
+task.log_handler = print
 
 -- The task event loop.
 -- xword creates an event xword.EVT_LUATASK that is used for passing messages
@@ -384,8 +384,8 @@ EvtHandler.connect(wx.wxID_ANY, task.EVT_ERROR, function(msg)
     task.error_handler(('Task Error (%s): %s'):format(EvtHandler.evt_handler.name, msg))
 end)
 
-EvtHandler.connect(wx.wxID_ANY, task.EVT_DEBUG, function(msg)
-    task.debug_handler(('(%s): %s'):format(EvtHandler.evt_handler.name, msg))
+EvtHandler.connect(wx.wxID_ANY, task.EVT_LOG, function(msg)
+    task.log_handler(('(%s): %s'):format(EvtHandler.evt_handler.name, msg))
 end)
 
 -- Cleanup when the task ends:
@@ -481,17 +481,25 @@ function task.check_abort(timeout, cleanup)
     end
 end
 
--- Format a string for task.debug and task.error
+-- Format a string for task.log and task.error
 local function format_string(fmt, ...)
     if type(fmt) == 'string' then
         if select('#', ...) > 0 then
-            return string.format(fmt, ...)
+            local result = string.format(fmt, ...)
+            if result ~= fmt then
+                return result
+            end
+            -- Else this wasn't a format string, so fallthrough to the end
         else
             return fmt
         end
-    else
-        return serialize.pprint(fmt)
     end
+    -- Concat all values with a tab
+    local t = {(type(fmt) == 'string') and fmt or serialize.pprint(fmt)}
+    for _, v in ipairs({...}) do
+        table.insert(t, (type(v) == 'string') and v or serialize.pprint(v))
+    end
+    return table.concat(t, '\t')
 end
 
 --- Report a task error.
@@ -506,12 +514,12 @@ end
 -- Posts to the main task if called from a running task.
 -- @param fmt The message.
 -- @param ... Arguments passed to `string.format`
-function task.debug(fmt, ...)
-    _post(1, task.EVT_DEBUG, format_string(fmt, ...))
+function task.log(fmt, ...)
+    _post(1, task.EVT_LOG, format_string(fmt, ...))
 end
 
 -- Override print for secondary threads
-print = task.debug
+print = task.log
 
 --- Load a script inside a task.
 -- If the first character of script is "=", use `loadstring`, otherwise
