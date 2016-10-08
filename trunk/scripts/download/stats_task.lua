@@ -12,12 +12,31 @@ end
 
 -- Return the stats enum for this puzzle
 local function get_solving_stats(p)
+    local pprint = require 'serialize'.pprint
+    local log = {}
     local is_solving = false
     local square = p.Grid:First()
+    table.insert(log, pprint(p))
+    table.insert(log, pprint(p.Grid))
     while square do
+        if not pcall(function () square:IsWhite() end) then
+            -- TODO:
+            -- This appears to be a bug in luapuz where the square pointer
+            -- is returned with the wrong metadata.  It seems like an old
+            -- pointer (with the same address as the square) is being stored in
+            -- the tracked objects table.
+            table.insert(log, pprint(square) .. " (" .. square:GetText() .. ")")
+            task.log("square:IsWhite() missing?\n" .. table.concat(log, '\n'))
+            require 'task.debug'() -- Try to sort this out next time
+            error("square:IsWhite() missing?\n" .. table.concat(log, '\n'))
+        else
+            table.insert(log, pprint(square) .. " (" .. square:GetSolution() .. ")")
+        end
         if square:IsWhite() then
             if square:IsBlank() then
-                if is_solving or has_entry(square) then
+                if square:IsSolutionBlank() then
+                    -- Nothing
+                elseif is_solving or has_entry(square) then
                     return stats.SOLVING
                 end
             elseif not is_solving then
@@ -49,9 +68,11 @@ return function(filename)
     end
     local success, ret = pcall(get_solving_stats, p)
     if not success then
-        task.error(ret .. '\n' .. require'serialize'.pprint(p))
+        task.error(ret .. '\n' .. filename)
+        return stats.ERROR, ret
+    else
+        -- Don't wait for the garbage collector
+        p:__gc()
+        return ret
     end
-    -- Don't wait for the garbage collector
-    p:__gc()
-    return ret
 end
