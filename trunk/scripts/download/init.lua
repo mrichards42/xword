@@ -33,6 +33,8 @@ local function init()
     xword.frame:AddMenuItem({'Tools'}, 'Download puzzles\tCtrl+D',
         function(evt) show_dialog() end
     )
+    -- Add preferences panel
+    xword.AddPreferencesPanel("Downloader", config.PreferencesPanel)
     -- Check auto_download
     if config.auto_download > 0 then
         local sources = require(_R .. 'sources')
@@ -47,6 +49,7 @@ end
 
 local function uninit()
     xword.frame:RemoveMenuItem('Tools', 'Download puzzles')
+    xword.RemovePreferencesPanel("Downloader")
     require(_R .. 'config').save()
     -- Reset the sources
     package.loaded[_R .. 'sources'] = nil

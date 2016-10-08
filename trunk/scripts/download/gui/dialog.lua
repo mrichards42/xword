@@ -152,6 +152,11 @@ local function DownloadDialog(parent)
         end
     end
 
+    local dlg = self
+    function download_list:OnClose()
+        dlg:ShowQueuePanel(false)
+    end
+
     -- -----------------------------------------------------------------------
     -- Events
 
@@ -185,6 +190,7 @@ local function DownloadDialog(parent)
     self.OnNextWeek = date_evt(1, 'week')
 
     function self:OnClose(evt)
+        stats:clear(true) -- Clear cached stats
         evt:Skip()
     end
 
@@ -223,5 +229,44 @@ local function DownloadDialog(parent)
 
     return self
 end
+
+if true then
+    return DownloadDialog
+end
+
+local function DownloadDialog(parent)
+    local self = wxfb.DownloadDialog2(parent or wx.NULL)
+
+    -- Create the tree ctrl
+    local tree = self.tree
+    tree:SetIndent(1)
+    tree:SetQuickBestSize(false)
+    local root = tree:AddRoot("")
+    local week_id = tree:AppendItem(root, "This Week")
+    local downloads_id = tree:AppendItem(root, "Downloads")
+    local puzzle_id = tree:AppendItem(root, "Puzzles")
+    -- Update tree with enabled puzzles
+    local labels = {} -- id = name
+    function self:UpdatePuzzles()
+        tree:DeleteChildren(puzzle_id)
+        labels = {}
+        for _, source in sources:iter() do
+            local id = tree:AppendItem(puzzle_id, source.name)
+            labels[id.Value] = source.name
+        end
+        tree:InvalidateBestSize()
+    end
+    self:UpdatePuzzles()
+    tree:ExpandAll()
+    tree:GetContainingSizer():Layout()
+
+    function self:OnTreeSelect(evt)
+        print(tree:GetItemText(evt:GetItem()))
+        evt:Skip()
+    end
+
+    return self
+end
+
 
 return DownloadDialog
