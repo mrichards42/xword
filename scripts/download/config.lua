@@ -1,3 +1,5 @@
+--- Download configuration
+
 -- Save the current directory for relative require
 local _R = (string.match(..., '^.+%.') or ... .. '.')
 
@@ -10,8 +12,7 @@ local date = require 'date'
 local curl = require 'luacurl'
 
 -- ----------------------------------------------------------------------------
--- Default configuration
--- ----------------------------------------------------------------------------
+-- Default config
 local config = {}
 config.puzzle_directory = path.join(xword.userdatadir, "puzzles")
 config.separate_directories = true
@@ -44,10 +45,8 @@ local default_disabled = {
 -- Keep a list of original keys to the config table
 local config_keys = tablex.keys(config)
 
-
 -- ----------------------------------------------------------------------------
 -- Helpers
--- ----------------------------------------------------------------------------
 
 -- Recursively update keys from t1 with values from t2
 local function deep_update(t1, t2)
@@ -180,13 +179,15 @@ end
 
 -- ----------------------------------------------------------------------------
 -- Public functions
--- ----------------------------------------------------------------------------
 
+--- Get the download config filename
+-- @return config filename
 function config.get_config_filename()
     return path.join(xword.configdir, 'download', 'config.lua')
 end
 
 local LOAD_ERROR = false
+--- Read the configuration file
 function config.load()
     local data, err = serialize.loadfile(config.get_config_filename())
     -- Check for errors
@@ -231,6 +232,7 @@ function config.load()
     load_sources_config(data)
 end
 
+--- Save the config to file
 function config.save()
     if LOAD_ERROR then
         xword.Message(
