@@ -7,49 +7,7 @@ local stringx = require 'pl.stringx'
 local serialize = require 'serialize'
 local os = require 'os'
 local date = require 'date'
-
--- ----------------------------------------------------------------------------
--- cURL string -> enum conversion
--- ----------------------------------------------------------------------------
 local curl = require 'luacurl'
-local _curl_to_config = {}
-local _curl_from_config = {}
-for k, v in pairs(curl) do
-    if k:sub(1,4) == "OPT_" then
-        k = k:sub(5)
-        _curl_to_config[v] = k
-        _curl_from_config[k] = v
-    end
-end
-
--- Convert a table with numeric keys to use curl options
-local function curl_to_config(opts)
-    if not opts then return end
-    local ret = {}
-    for id, value in pairs(opts) do
-        pcall(function()
-            ret[_curl_to_config[id]] = value
-        end)
-    end
-    return ret
-end
-
--- Convert a table with curl options to numeric keys
-local function curl_from_config(opts)
-    if not opts then return end
-    local ret = {}
-    for id, value in pairs(opts) do
-        if type(id) == 'string' then
-            pcall(function()
-                ret[_curl_from_config[id]] = value
-            end)
-        else
-            ret[id] = value
-        end
-    end
-    return ret
-end
-
 
 -- ----------------------------------------------------------------------------
 -- Default configuration
@@ -114,7 +72,7 @@ local function load_sources_config(data)
     local sources = require(_R .. 'sources')
     -- Added
     for _, src in ipairs(data.added or {}) do
-        src.curlopts = curl_from_config(src.curlopts)
+        src.curlopts = curl.string_to_opts(src.curlopts)
         sources:insert(src)
     end
     -- Disabled
@@ -130,7 +88,7 @@ local function load_sources_config(data)
         if src then
             deep_update(src, changes)
             -- Turn curl strings into numbers
-            src.curlopts = curl_from_config(src.curlopts)
+            src.curlopts = curl.string_to_opts(src.curlopts)
         end
     end
     -- Place sources in the order specified
@@ -202,7 +160,7 @@ local function get_sources_config()
             -- If this source doesn't exist in the defaults, the user
             -- added it
             local p = tablex.deepcopy(src)
-            p.curlopts = curl_to_config(p.curlopts)
+            p.curlopts = curl.opts_to_string(p.curlopts)
             table.insert(data.added, p)
         else
             -- Get changes (ignoring the 'disabled' key)
@@ -210,7 +168,7 @@ local function get_sources_config()
             data.changed[src.id] = changes
             -- Turn curl options into strings
             if changes then
-                changes.curlopts = curl_to_config(changes.curlopts)
+                changes.curlopts = curl.opts_to_string(changes.curlopts)
             end
         end
     end
