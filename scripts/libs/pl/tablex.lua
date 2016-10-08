@@ -728,8 +728,11 @@ end
 -- @param t a table
 -- @param istart optional start position
 function tablex.clear(t,istart)
-    istart = istart or 1
-    for i = istart,#t do remove(t) end
+    if istart then
+        for i = istart,#t do t[i] = nil end
+    else
+        for k, _ in pairs(t) do t[k] = nil end
+    end
 end
 
 --- insert values into a table. <br>
