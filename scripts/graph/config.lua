@@ -24,10 +24,11 @@ function graph.load_config()
         config = {}
     end
     -- Load colors
-    for k, _ in pairs(graph.config.color) do
-        local color = config.color[k]
-        if color then
-            graph.config.color[k]:Set(color)
+    if config.color then
+        for k, _ in pairs(graph.config.color) do
+            if config.color[k] then
+                graph.config.color[k]:Set(config.color[k])
+            end
         end
     end
 end
@@ -40,7 +41,7 @@ function graph.save_config()
     end
     -- Dump
     if not path.isdir(graph.configdir) then
-        makedirs(graph.configdir)
+        makepath(graph.configdir)
     end
     serialize.dump(config, graph.get_config_filename(), true)
 end
