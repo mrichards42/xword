@@ -29,14 +29,6 @@
 #   include "../xwordlua.hpp"
 #endif // XWORD_USE_LUA
 
-#ifdef __WXOSX__
-#   define XWORD_PREFERENCES_LIVE_PREVIEW 1
-#   define XWORD_PREFERENCES_SHRINK 1
-#else
-#   define XWORD_PREFERENCES_LIVE_PREVIEW 1
-#   define XWORD_PREFERENCES_SHRINK 0
-#endif
-
 
 extern int wxluatype_wxBookCtrlBase;
 
@@ -71,6 +63,7 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
     LoadConfig();
 
     // Setup buttons
+    // On OS X, we update the preferences as they change, so we show no buttons.
 #ifndef __WXOSX__
 #   if XWORD_PREFERENCES_LIVE_PREVIEW
     CreateButtons(wxOK | wxCANCEL);

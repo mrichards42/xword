@@ -240,10 +240,9 @@ void SolvePanel::DoSaveConfig()
     long gridStyle = 0;
     if (m_moveAfterLetter->GetValue())
     {
+        gridStyle |= MOVE_AFTER_LETTER;
         if (m_nextBlank->GetValue())
             gridStyle |= MOVE_TO_NEXT_BLANK;
-        else
-            gridStyle |= MOVE_AFTER_LETTER;
     }
     if (m_blankOnDirection->GetValue())
         gridStyle |= BLANK_ON_DIRECTION;
