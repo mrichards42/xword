@@ -314,7 +314,7 @@ public:
 
     // Style
     void SetGridStyle(int style)
-        { SetWindowStyle( GetWindowStyle() & ~ GRID_STYLE_MASK | style ); }
+        { SetWindowStyle( (GetWindowStyle() & ~ GRID_STYLE_MASK) | style ); }
     int  GetGridStyle() const  { return GetWindowStyle() & GRID_STYLE_MASK; }
     bool HasStyle(int style) const { return HasFlag(style); }
 

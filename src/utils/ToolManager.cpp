@@ -158,7 +158,7 @@ ToolManager::DisconnectEvents()
          it != m_toolList.end();
          ++it)
     {
-        if (! it->m_function == NULL)
+        if (! (it->m_function == NULL))
             Disconnect(&*it);
     }
 }
@@ -256,7 +256,7 @@ ToolManager::SetLabel(int id, const wxString & label)
     tool->m_label = label;
 
     // For the toolbars
-    wxString stripped_label = wxMenuItem::GetLabelFromText(label);
+    wxString stripped_label = wxMenuItem::GetLabelText(label);
 
 
     FOR_AUI_TOOL_BARS(tool)

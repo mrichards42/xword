@@ -83,7 +83,6 @@ SizedText::WrapLabel()
     GetTextExtent(label, &textWidth, &textHeight);
 
     // Guess the number of lines we need
-    double scaleX = double(maxWidth)  / textWidth;
     double scaleY = double(maxHeight) / textHeight;
 
     double clientRatio = double(maxHeight)  / maxWidth;

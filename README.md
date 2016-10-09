@@ -93,7 +93,9 @@ following configure options should work as a baseline for release builds:
     $ ./configure --enable-unicode --disable-shared --enable-compat28
 
 For debug builds, add --enable-debug. For Mac OS builds, add --enable-universal-binary=i386
---with-macosx-version-min=10.6.
+--with-macosx-version-min=10.6. You may also want to add -fvisibility-inlines-hidden to CFLAGS, 
+CXXFLAGS, CPPFLAGS, OBJCFLAGS, and OBJCXXFLAGS, as this is the default option used by the Mac 
+toolchain, and this option should be used consistently across an app and all of its dependencies.
 
 ### Lua libraries ###
 

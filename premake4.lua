@@ -28,12 +28,18 @@ solution "XWord"
     configuration "Release"
         defines { "NDEBUG" }
         flags { "Optimize" }
-        libdirs { "bin/Release", "lib/Release" }
+        libdirs { "bin/Release" }
+        if not _OPTIONS["disable-lua"] then
+            libdirs { "lib/Release" }
+        end
 
     configuration "Debug"
         defines { "DEBUG", "_DEBUG" }
         flags { "Symbols" }
-        libdirs { "bin/Debug", "lib/Debug" }
+        libdirs { "bin/Debug" }
+        if not _OPTIONS["disable-lua"] then
+            libdirs { "lib/Debug" }
+        end
 
     -- --------------------------------------------------------------------
     -- Platform-specific

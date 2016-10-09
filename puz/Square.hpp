@@ -225,8 +225,8 @@ public:
     static char ToPlain(const string_t & str);
 
     // Solutions with special meaning
-    static char_t * Blank;
-    static char_t * Black;
+    static const char_t * Blank;
+    static const char_t * Black;
 
     // Number
     //-----

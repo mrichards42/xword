@@ -337,18 +337,18 @@ void HtmlClueListBox::OnSize(wxSizeEvent& event)
     event.Skip();
 }
 
-void HtmlClueListBox::RefreshLine(size_t line)
+void HtmlClueListBox::RefreshRow(size_t row)
 {
-    m_cache->InvalidateRange(line, line);
+    m_cache->InvalidateRange(row, row);
 
-    wxVListBox::RefreshLine(line);
+    wxVListBox::RefreshRow(row);
 }
 
-void HtmlClueListBox::RefreshLines(size_t from, size_t to)
+void HtmlClueListBox::RefreshRows(size_t from, size_t to)
 {
     m_cache->InvalidateRange(from, to);
 
-    wxVListBox::RefreshLines(from, to);
+    wxVListBox::RefreshRows(from, to);
 }
 
 void HtmlClueListBox::RefreshAll()
@@ -404,7 +404,7 @@ void HtmlClueListBox::OnDrawBackground(wxDC & dc,
 {
     if (IsSelected(n))
     {
-        dc.SetBrush(wxBrush(GetSelectionBackground(), wxSOLID));
+        dc.SetBrush(wxBrush(GetSelectionBackground(), wxBRUSHSTYLE_SOLID));
         dc.SetPen(*wxTRANSPARENT_PEN);
         dc.DrawRectangle(rect);
     }

@@ -94,13 +94,13 @@ public:
 
     void SetWrapMode(SizedTextWrapMode mode)
     {
-        SetWindowStyle(GetWindowStyle() & ~ (ST_WRAP | ST_TRUNCATE) | mode);
+        SetWindowStyle((GetWindowStyle() & ~ (ST_WRAP | ST_TRUNCATE)) | mode);
         Refresh();
     }
 
     void SetAlign(long align)
     {
-        SetWindowStyle(GetWindowStyle() & ~ (wxALIGN_MASK) | align);
+        SetWindowStyle((GetWindowStyle() & ~ (wxALIGN_MASK)) | align);
         Refresh();
     }
 

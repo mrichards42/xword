@@ -77,8 +77,8 @@ public:
     virtual ~HtmlClueListBox();
 
     // override some base class virtuals
-    virtual void RefreshLine(size_t line);
-    virtual void RefreshLines(size_t from, size_t to);
+    virtual void RefreshRow(size_t row);
+    virtual void RefreshRows(size_t from, size_t to);
     virtual void RefreshAll();
     virtual void SetItemCount(size_t count);
 

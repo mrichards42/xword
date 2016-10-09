@@ -582,7 +582,7 @@ MyPrintout::LayoutPages()
                     if (best.fontSize == -1
                         || (spaceFilled > best.spaceFilled
                             && spaceFilled - best.spaceFilled >
-                                (abs(gridWeight) - abs(best.gridWeight)) / 2))
+                                (std::abs(gridWeight) - std::abs(best.gridWeight)) / 2))
                     {
                         wxLogDebug(_T("(current best)"));
                         best.gridWeight = gridWeight;

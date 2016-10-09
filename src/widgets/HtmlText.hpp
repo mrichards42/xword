@@ -93,7 +93,7 @@ public:
 
     virtual void SetAlignment(long alignment)
     {
-        SetWindowStyle(GetWindowStyle() & ~ wxALIGN_MASK | alignment);
+        SetWindowStyle((GetWindowStyle() & ~ wxALIGN_MASK) | alignment);
         LayoutCell();
         Refresh();
     }

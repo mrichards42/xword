@@ -20,7 +20,7 @@
 
 void ColorChoice::OSXUpdateAttributedStrings()
 {
-    NSArray *itemArray = [GetPeer()->GetWXWidget() itemArray];
+    NSArray *itemArray = [((NSPopUpButton *) GetPeer()->GetWXWidget()) itemArray];
     // The standard ctrl font size
     NSDictionary *attrs = [NSDictionary dictionaryWithObject:
                                 [NSFont systemFontOfSize: 0.0]

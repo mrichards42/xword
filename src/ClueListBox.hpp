@@ -165,7 +165,7 @@ ClueListBox::SetSelectionBackground(const wxColour & color)
     parent_t::SetSelectionBackground(color);
     const int selection = GetSelection();
     if (selection != wxNOT_FOUND)
-        RefreshLine(selection);
+        RefreshRow(selection);
 }
 
 inline void
@@ -174,7 +174,7 @@ ClueListBox::SetSelectionForeground(const wxColour & color)
     m_selectionForeground = color;
     const int selection = GetSelection();
     if (selection != wxNOT_FOUND)
-        RefreshLine(selection);
+        RefreshRow(selection);
 }
 
 

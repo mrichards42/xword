@@ -1670,7 +1670,6 @@ XGridCtrl::OnTab(int mod)
         return;
     }
     // There is a clue . . . find it and move to the next one.
-    puz::Square * newSquare = NULL;
     puz::Clues & clues = m_puz->GetClues();
     puz::Clues::iterator cluelist_it;
     for (cluelist_it = clues.begin(); cluelist_it != clues.end(); ++cluelist_it)

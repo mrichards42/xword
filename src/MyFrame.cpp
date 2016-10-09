@@ -1554,7 +1554,7 @@ MyFrame::LoadConfig()
     // Printing
     ConfigManager::Printing_t & print = config.Printing;
     g_printData->SetPaperId(static_cast<wxPaperSize>(print.paperID()));
-    g_printData->SetOrientation(print.orientation());
+    g_printData->SetOrientation(static_cast<wxPrintOrientation>(print.orientation()));
     g_pageSetupData->SetPaperId(g_printData->GetPaperId());
 
     ConfigManager::Printing_t::Margins_t & margins = print.Margins;
