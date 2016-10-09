@@ -58,7 +58,7 @@ public:
         wxBoxSizer * top = new wxBoxSizer(wxHORIZONTAL);
         
         m_facename = new FontFaceCtrl(this, wxID_ANY);
-        top->Add(m_facename, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 0);
+        top->Add(m_facename, 0, wxEXPAND, 0);
         
         m_pointsize = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(50, -1), wxSP_ARROW_KEYS, 5, 100, 5);
         top->Add(m_pointsize, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 2);

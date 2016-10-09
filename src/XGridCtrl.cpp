@@ -461,11 +461,11 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
     if (IsEmpty())
         return;
 
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
         int _scrollX, _scrollY;
         GetScrollPixelsPerUnit(&_scrollX, &_scrollY);
         wxASSERT(_scrollX == GetSquareSize() && _scrollY == GetSquareSize());
-#endif
+#endif // _DEBUG
 
     if (m_drawer.GetBoxSize() == 0)
     {

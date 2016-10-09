@@ -29,8 +29,6 @@ solution "XWord"
         defines { "NDEBUG" }
         flags { "Optimize" }
         libdirs { "bin/Release", "lib/Release" }
-    configuration { "macoxs", "Release" }
-    	linkoptions "-S" -- Strip debug symbols
 
     configuration "Debug"
         defines { "DEBUG", "_DEBUG" }
@@ -48,8 +46,10 @@ solution "XWord"
             [[if not exist "..\..\bin\$(ConfigurationName)\images" mklink /j "..\..\bin\$(ConfigurationName)\images" "..\..\images"]],
         }
 
-    configuration "macoxs"
-        platforms { "native", "x32", "x64" }
+    configuration "macosx"
+        platforms { "x32" }
+        buildoptions { "-mmacosx-version-min=10.6" }
+        linkoptions  { "-mmacosx-version-min=10.6" }
 
     -- ------------------------------------------------------------------------
     -- General

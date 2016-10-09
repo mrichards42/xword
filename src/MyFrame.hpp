@@ -360,14 +360,14 @@ private:
     // Debugging
     //----------
 
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
 
     void ShowDebugDialog(const wxString & title, const wxString & str);
     void OnDumpLayout (wxCommandEvent & WXUNUSED(evt));
     void OnDumpStatus (wxCommandEvent & WXUNUSED(evt));
     void OnBruteForceUnscramble (wxCommandEvent & WXUNUSED(evt));
 
-#endif // __WXDEBUG__
+#endif // _DEBUG
 
     DECLARE_EVENT_TABLE()
 };

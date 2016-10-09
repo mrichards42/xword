@@ -47,9 +47,7 @@ follows the normal rules of numbering a grid.
 # Building XWord #
 
 XWord uses the [wxWidgets](http://www.wxwidgets.org) cross-platform toolkit
-(statically linked). The wxpatches directory contains slightly altered versions
-of aui/framemanager. If you would like to use these patches, copy them to the
-wxWidgets directory and overwrite the corresponding files.
+(statically linked).
 
 XWord uses [premake](http://industriousone.com/premake/download) to generate
 project files.  Version 4 has been used successfully, but the 5 beta may also work.
@@ -82,12 +80,20 @@ I'm sure the simpler libraries could be updated.
 
 Windows builds include dlls for everything except wxWidgets.
 
-* wxWidgets (3.0)
+* wxWidgets (3.0; 3.1 is required for Mac OS 10.10+)
 * lua (5.1, but actually using LuaJIT 2.0.3)
 * expat
 * curl (7.24.0)
 * yajl (2.0.2 -- source included)
 * zlib (1.2.5)
+
+A debug build of wxWidgets is needed for debug builds of XWord, and likewise for release builds. The
+following configure options should work as a baseline for release builds:
+
+    $ ./configure --enable-unicode --disable-shared --enable-compat28
+
+For debug builds, add --enable-debug. For Mac OS builds, add --enable-universal-binary=i386
+--with-macosx-version-min=10.6.
 
 ### Lua libraries ###
 

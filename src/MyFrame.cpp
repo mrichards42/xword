@@ -132,12 +132,12 @@ enum toolIds
     //wxID_ABOUT,
     ID_LICENSE,
 
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
 
     ID_DUMP_STATUS,
     ID_DUMP_LAYOUT,
     ID_FORCE_UNSCRAMBLE,
-#endif // __WXDEBUG__
+#endif // _DEBUG
 
     // Timers
     ID_CLOCK_TIMER,
@@ -318,7 +318,7 @@ MyFrame::ManageTools()
         { ID_LICENSE, wxITEM_NORMAL, _T("&License..."), NULL, NULL,
                    _handler(MyFrame::OnLicense) },
 
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
         { ID_DUMP_STATUS,   wxITEM_NORMAL, _T("Dump status"), NULL, NULL,
                    _handler(MyFrame::OnDumpStatus) },
 
@@ -329,7 +329,7 @@ MyFrame::ManageTools()
                    _handler(MyFrame::OnBruteForceUnscramble) },
 
 
-#endif // __WXDEBUG__
+#endif // _DEBUG
 
         { TOOL_NONE }
     };
@@ -385,7 +385,7 @@ MyFrame::MyFrame()
       m_fileHistory(10, ID_FILE_HISTORY_1)
 { 
 #if 0
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
     // Debug window
     wxTextCtrl * logctrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString,
                                           wxDefaultPosition, wxDefaultSize,
@@ -400,7 +400,7 @@ MyFrame::MyFrame()
                   .Left()
                   .Caption(_T("Logger"))
                   .Name(_T("Logger")) );
-#endif // __WXDEBUG__
+#endif // _DEBUG
 #endif // 0
     // Set the initial timer amount
     m_timer.Start(1000);
@@ -1283,7 +1283,7 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, ID_LICENSE);
     mb->Append(menu, _T("&Help"));
 
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
 
     // Debug menu
     menu = new wxMenu();
@@ -1292,7 +1292,7 @@ MyFrame::CreateMenuBar()
         m_toolMgr.Add(menu, ID_FORCE_UNSCRAMBLE);
     mb->Append(menu, _T("&Debug"));
 
-#endif // __WXDEBUG__
+#endif // _DEBUG
 
     return mb;
 }
@@ -2803,8 +2803,10 @@ MyFrame::OnClose(wxCloseEvent & evt)
         for (it = begin; it != end; ++it)
             (*it)->Hide();
 
+#if XWORD_USE_LUA
         // cleanup xword package
         wxGetApp().GetwxLuaState().RunFile(GetScriptsDir() + "/xword/cleanup.lua");
+#endif
 
         // Close the clipboard
         if (wxTheClipboard->Open())
@@ -2833,7 +2835,7 @@ MyFrame::OnLinkClicked(wxHtmlLinkEvent & evt)
 // Debug stuff
 //------------------------------------------------------------------------------
 
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
 
 void
 MyFrame::ShowDebugDialog(const wxString & title, const wxString & str)
@@ -3109,4 +3111,4 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
 }
 
 
-#endif // __WXDEBUG__
+#endif // _DEBUG

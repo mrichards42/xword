@@ -42,8 +42,8 @@ project "XWord"
     
     configuration "macosx"
         defines {
-            [[PUZ_API=\"\"]],
-            [[LUAPUZ_API=\"\"]],
+            [[PUZ_API=""]],
+            [[LUAPUZ_API=""]],
             "USE_FILE32API" -- for minizip
         }
 
@@ -109,7 +109,10 @@ project "XWord"
 
     else -- disable-lua
         configuration {}
-            excludes { "xwordbind/*" }
+            excludes {
+                "xwordbind/*",
+                "xwordlua*",
+            }
     end
 
     -- --------------------------------------------------------------------
@@ -130,10 +133,13 @@ project "XWord"
             -- Copy Info.plist and xword.icns
             "cp ../../src/Info.plist $INFOPLIST_PATH",
             "cp ../../images/xword.icns $UNLOCALIZED_RESOURCES_FOLDER_PATH",
-            -- Build the rest of the projects
-            "cd ../../build/" .. _ACTION,
-            'xcodebuild -project lfs.xcodeproj -configuration "$CONFIGURATION"',
-            'xcodebuild -project luacurl.xcodeproj -configuration "$CONFIGURATION"',
-            'xcodebuild -project luatask.xcodeproj -configuration "$CONFIGURATION"',
         }
-
+        if not _OPTIONS["disable-lua"] then
+            postbuildcommands {
+                -- Build the rest of the projects
+                "cd ../../build/" .. _ACTION,
+                'xcodebuild -project lfs.xcodeproj -configuration "$CONFIGURATION"',
+                'xcodebuild -project luacurl.xcodeproj -configuration "$CONFIGURATION"',
+                'xcodebuild -project luatask.xcodeproj -configuration "$CONFIGURATION"',
+            }
+        end
