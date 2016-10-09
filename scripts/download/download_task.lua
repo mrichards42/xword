@@ -3,6 +3,7 @@ local os = require 'os'
 local date = require 'date'
 local curl = require 'luacurl'
 local puz = require 'luapuz'
+local makepath = require 'pl.dir'.makepath
 require 'import' -- Additional puzzle file types
 
 -- Messages
@@ -241,6 +242,7 @@ end
 
 -- Download a puzzle, return the error code if any
 local function download(puzzle)
+    makepath(path.dirname(puzzle.filename))
     if puzzle.func then
         local func, err = loadstring([[return function(puzzle, download, assert, puz) ]]..puzzle.func..[[ end]])
         if err then return err end
