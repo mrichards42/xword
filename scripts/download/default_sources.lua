@@ -191,7 +191,7 @@ return {
 
                 -- Extract the string from this js
                 local jpz = js:match("['\"](.+)['\"]")
-                local f = io.open(puzzle.filename, 'wb')
+                local f = assert(io.open(puzzle.filename, 'wb'))
                 f:write(jpz:gsub('\\"', '"')) -- Unescape strings
                 f:close()
                 return
