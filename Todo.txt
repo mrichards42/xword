@@ -1,7 +1,5 @@
-Todo:
+Finishing migration from sourceforge to github:
 
-Stripping the (c) symbol when saving as text format doesn't work under Ubuntu.
-
-Finish Printing
-
-Save tool and menu layout in config file (separate XML file?)
+* Move help from http://wx-xword.sourceforge.net/index.html
+* Point update urls somewhere else (like github releases)
+* Upload release binaries
