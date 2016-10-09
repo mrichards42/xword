@@ -1,11 +1,10 @@
 
-XWord - A cross platform crossword solving program
-==================================================
+# XWord - A cross platform crossword solving program #
 
 XWord is a cross-platform crossword puzzle program designed to be highly
 configurable.  It reads multiple puzzle file formats.
 
-Supported features:
+## Features ##
 
 * Solving of all American style, cryptic, and diagramless crosswords.
 * Solving rebus puzzles.
@@ -30,8 +29,8 @@ XWord is extensible via the lua scripting language.  A number of plugins are
 available.  See Tools > Package Manager.
 
 
-Diagramless Puzzles
-===================
+### Diagramless Puzzles ###
+
 XWord allows the user to solve diagramless puzzles similarly to normal puzzles
 with the exception that black squares are allowed to be selected. When
 selected, black squares are outlined in the focused square color.
@@ -45,49 +44,73 @@ Naturally, this automatic calculation of grid numbers only works if the puzzle
 follows the normal rules of numbering a grid.
 
 
-Building XWord
-==============
+# Building XWord #
 
-XWord uses the wxWidgets cross-platform toolkit (version 2.8.10 as of this
-writing).  The distributed builds are statically linked and use unicode.  If you
-want to build a non-unicode version of XWord, you will get a couple of errors,
-because of a few unicode-specific functions and parameters.  These should be
-easy to fix.
+XWord uses the [wxWidgets](http://www.wxwidgets.org) cross-platform toolkit
+(statically linked).  On windows, it is easiest to set a `WXWIN` environmental
+variable.  On other platforms, use wx-config.
 
-http://www.wxwidgets.org
+The wxpatches directory contains slightly altered versions of aui/framemanager.
+If you would like to use these patches, copy them to the wxWidgets directory
+and overwrite the corresponding files.
 
-XWord uses a number of other statically or dynamically linked libraries. Most
-of these are supplied in the source distribution.  The external libraries
-you'll want are wxLua (required for buildling XWord with lua support) and
-cURL (if you want to build luacurl, which is needed for many of the lua
-scripts).
+XWord uses [premake](http://industriousone.com/premake/download) to generate
+project files.  Version 4 has been used successfully, but the 5 beta may also work.
 
-XWord uses lua as a scripting extension language.  If you don't want to include
-lua, undefine XWORD_USE_LUA.  Odds are that there are a few modifications that
-will be needed for this option, though regenerating the makefiles using premake
-might be enough.
+To see all options:
+
+    $ cd xword
+    $ premake4 --help
+
+To build project files:
+
+    $ premake [target]
+
+    # Examples:
+    $ premake4 vs2008
+    $ premake4 xcode4
+
+XWord-specific premake options:
+
+    --disable-lua
+    --wx-prefix="wxWidgets directory"
+
+## Dependencies ##
+
+Versions listed are the most recent that I have build XWord against.
+I'm sure the simpler libraries could be updated.
+
+Windows builds include dlls for everything except wxWidgets.
+
+* wxWidgets (3.0)
+* lua (5.1, but actually using LuaJIT 2.0.3)
+* expat
+* curl (7.24.0)
+* yajl (2.0.2 -- source included)
+* zlib (1.2.5)
+
+### Lua libraries ###
+
+Source included in lua directory
+
+* luacurl (rename library to c-luacurl -- there is an additional lua module for this library)
+* luatask (rename library to c-task -- there is an additional lua module for this library)
+* luayajl
+* lxp
+* lfs
+* wxLua (2.8.12.3 -- with bindings built against wxWidgets 3.0)
 
 
-Visual C++ project files and gnu makefules are supplied in the source
-distribution.  I haven't built XWord on linux in a while, so the makefiles
-probably don't work.
+## Windows notes ##
 
-XWord requires the following libraries in addition to the wxWidgets Base and
-Core libraries:
+The images and scripts directories need to be in the same directory as XWord.exe.
+It is easiest to craete symlinks so that changes are shared -- this requires
+administrator privileges.
 
-* wxAUI
-* wxpng
-* wxzlib
-
-
-Windows-specific building instructions
-======================================
-
-The VC project file is set up to link to the MSVC runtime library dynamically.
-You will either need to build the wxWidgets libraries so that they also link to
-the MSVC runtimes dynamically (the default), or change the setting
-(Properties >> C/C++ >> Code Generation >> Runtime Library).
-
-The VC project file assumes that you have an environmental variable $(WXWIN)
-that points to the wxWidgets folder (with compiled Unicode and Unicode Debug
-libraries).
+    cd xword
+    mkdir bin\Debug
+    mklink /d bin\Debug\images images
+    mklink /d bin\Debug\scripts scripts
+    mkdir bin\Release
+    mklink /d bin\Release\images images
+    mklink /d bin\Release\scripts scripts

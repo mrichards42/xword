@@ -1,3 +1,6 @@
+Notes from the first time I tried to compile on a Mac.  These are pretty old at this point.
+
+
 Compiling XWord with XCode3 on a Mac
 
 ----------------------------------------
@@ -31,21 +34,3 @@ Build the debug release too (the XWord configure script needs both builds for no
     $ cd build-debug
     $ ../configure --enable-unicode --disable-shared --enable-debug CFLAGS="$arch_flags" CXXFLAGS="$arch_flags" CPPFLAGS="$arch_flags" LDFLAGS="$arch_flags" OBJCFLAGS="$arch_flags" OBJCXXFLAGS="$arch_flags"
     $ make
-
-
-
-----------------------------------------
-Build XWord
-----------------------------------------
-XWord uses premake to generate project files.  Premake for mac is already included in the distribution.  You can also download the most recent beta here:
-
-http://industriousone.com/premake/download
-
-Unzip premake4 to xword/trunk
-
-    $ cd xword/trunk
-    $ ./premake4 --wx-prefix="/Developer/wxMac-2.8.12" xcode3
-
-(If you actually unzipped wxMac there, the configure script will find it without having to add --wx-prefix)
-
-(Previously there were images, etc. to copy, and also some magic that needed to happen to get XWord to know where to find the dylibs.  That's all automated now!)
