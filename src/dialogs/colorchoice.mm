@@ -23,7 +23,7 @@ void ColorChoice::OSXUpdateAttributedStrings()
     NSArray *itemArray = [GetPeer()->GetWXWidget() itemArray];
     // The standard ctrl font size
     NSDictionary *attrs = [NSDictionary dictionaryWithObject:
-                                [NSFont controlContentFontOfSize: 0.0]
+                                [NSFont systemFontOfSize: 0.0]
                             forKey:NSFontAttributeName];
     for (int i = 1; i < [itemArray count]; i++) {
         NSMenuItem *item = [itemArray objectAtIndex:i];
