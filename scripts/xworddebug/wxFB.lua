@@ -1,6 +1,6 @@
 -- Converted from python by py2lua
 -- python file: wxFB.py
--- modtime: 1398906624
+-- modtime: 1475969738
 -- ----------------------------------
 
 local wxfb = {} -- Table to hold classes
