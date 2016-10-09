@@ -172,7 +172,12 @@ local function gen_packages(outdir)
     end
     -- Write packages_windows.lua
     serialize.dump(packages, join(outdir, 'packages_windows.lua'), true) -- pretty print
+    -- Write readme.md
     local f = io.open(join(outdir, 'readme.md'), 'w')
+    f:write(table.concat(readme, '\n'))
+    f:close()
+    -- Write scripts/readme.md
+    local f = io.open(join(scriptsdir, 'readme.md'), 'w')
     f:write(table.concat(readme, '\n'))
     f:close()
     print("Packages written to "..join(outdir, 'packages_windows.lua'))
