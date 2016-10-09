@@ -342,6 +342,7 @@ end
 -- @param[opt=empty] env The environment to use
 -- @return same as `loadstring`
 function M.loadstring(str, env)
+    if not str then return nil, "empty string" end
     local func, err = loadstring(str)
     if not func then return nil, err end
     return safe_call(func, env)
