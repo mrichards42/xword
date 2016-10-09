@@ -69,7 +69,7 @@ local function gen_packages(outdir)
             return info
         end
     end
-    local readme = {}
+    local readme = {"# XWord Packages #\n\n"}
     lfs.mkdir(join(outdir, "_temp_packages"))
     -- Current packages
     for name in lfs.dir(scriptsdir) do
@@ -82,7 +82,10 @@ local function gen_packages(outdir)
             if info then
                 if info.name and info.requires and info.version and info.packagename then
                     -- Add info to readme.md
-                    table.insert(readme, string.format("%s (%s)\n====\n%s\n\n----\n\n", info.name, info.version, info.description))
+                    -- Add a space before the start of * lists for markdown
+                    local md_description = info.description:gsub('(\n[^*][^\n]+)\n%*', "%1\n\n*")
+                    md_description = md_description:gsub('^([^*][^\n]+)\n%*', "%1\n\n*")
+                    table.insert(readme, string.format("## %s (%s) ##\n%s\n\n----\n\n", info.name, info.version, md_description))
                     -- Copy the files to a temp directory so that we can
                     -- create the scripts/packagename directory structure.
                     os.execute(string.format(
