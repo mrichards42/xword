@@ -104,7 +104,7 @@ Source included in lua directory
 ## Windows notes ##
 
 The images and scripts directories need to be in the same directory as XWord.exe.
-It is easiest to craete symlinks so that changes are shared -- this requires
+It is easiest to create symlinks so that changes are shared -- this requires
 administrator privileges.
 
     cd xword
