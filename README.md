@@ -47,20 +47,12 @@ follows the normal rules of numbering a grid.
 # Building XWord #
 
 XWord uses the [wxWidgets](http://www.wxwidgets.org) cross-platform toolkit
-(statically linked).  On windows, it is easiest to set a `WXWIN` environmental
-variable.  On other platforms, use wx-config.
-
-The wxpatches directory contains slightly altered versions of aui/framemanager.
-If you would like to use these patches, copy them to the wxWidgets directory
-and overwrite the corresponding files.
+(statically linked). The wxpatches directory contains slightly altered versions
+of aui/framemanager. If you would like to use these patches, copy them to the
+wxWidgets directory and overwrite the corresponding files.
 
 XWord uses [premake](http://industriousone.com/premake/download) to generate
 project files.  Version 4 has been used successfully, but the 5 beta may also work.
-
-To see all options:
-
-    $ cd xword
-    $ premake4 --help
 
 To build project files:
 
@@ -70,10 +62,18 @@ To build project files:
     $ premake4 vs2008
     $ premake4 xcode4
 
+On windows, the %WXWIN% environmental variable will be used to find the wxWidgets
+directory.  On other platforms, wx-config is used.  You can override either
+%WXIN% or the default wx-config (see options below).
+
 XWord-specific premake options:
 
     --disable-lua
     --wx-prefix="wxWidgets directory"
+    --wx-config="wx-config path" # mac/linux
+
+    # List all options
+    $ premake4 --help
 
 ## Dependencies ##
 
@@ -99,18 +99,3 @@ Source included in lua directory
 * lxp
 * lfs
 * wxLua (2.8.12.3 -- with bindings built against wxWidgets 3.0)
-
-
-## Windows notes ##
-
-The images and scripts directories need to be in the same directory as XWord.exe.
-It is easiest to create symlinks so that changes are shared -- this requires
-administrator privileges.
-
-    cd xword
-    mkdir bin\Debug
-    mklink /d bin\Debug\images images
-    mklink /d bin\Debug\scripts scripts
-    mkdir bin\Release
-    mklink /d bin\Release\images images
-    mklink /d bin\Release\scripts scripts
