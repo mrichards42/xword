@@ -69,6 +69,12 @@
   #include "compat-5.1.h"
 #endif
 
+#if LUA_VERSION_NUM == 502
+#define luaL_reg			luaL_Reg
+#define luaL_register(L,name,tbl)	luaL_setfuncs(L,tbl,0)
+#define lua_strlen(L,i)			lua_rawlen((L),(i))
+#endif
+
 #define CURL_EASY_META_NAME "curleasy.type"
 
 /* think more if this means unicity... maybe store in the bag some pointers */
@@ -92,9 +98,6 @@
 #endif
 #ifndef CURLOPT_READDATA
 	#define CURLOPT_READDATA  CURLOPT_INFILE 
-#endif
-#ifndef CURLOPT_HEADERDATA
-	#define CURLOPT_HEADERDATA CURLOPT_WRITEHEADER
 #endif
 
 /* XWORD START */

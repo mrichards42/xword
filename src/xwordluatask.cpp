@@ -20,7 +20,7 @@
 extern "C" {
 #include <lauxlib.h>
 }
-#include <wxlua\wxllua.h> // lua2wx()
+#include "wxlua/wxllua.h" // lua2wx()
 #include <wx/app.h> // wxTheApp
 
 // Thread event
