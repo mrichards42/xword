@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Oct 10 2016)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -23,7 +23,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText911;
 	m_staticText911 = new wxStaticText( this, wxID_ANY, wxT("Timer"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText911->Wrap( -1 );
-	m_staticText911->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_staticText911->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer411->Add( m_staticText911, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
@@ -45,7 +45,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText91;
 	m_staticText91 = new wxStaticText( this, wxID_ANY, wxT("Solution"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText91->Wrap( -1 );
-	m_staticText91->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_staticText91->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer41->Add( m_staticText91, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
@@ -72,7 +72,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText9;
 	m_staticText9 = new wxStaticText( this, wxID_ANY, wxT("Cursor Movement"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText9->Wrap( -1 );
-	m_staticText9->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_staticText9->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer4->Add( m_staticText9, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
@@ -122,7 +122,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText92;
 	m_staticText92 = new wxStaticText( this, wxID_ANY, wxT("Auto Saving"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText92->Wrap( -1 );
-	m_staticText92->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_staticText92->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer42->Add( m_staticText92, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
@@ -162,7 +162,7 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText921;
 	m_staticText921 = new wxStaticText( this, wxID_ANY, wxT("File History"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText921->Wrap( -1 );
-	m_staticText921->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_staticText921->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer421->Add( m_staticText921, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
@@ -260,7 +260,7 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText911;
 	m_staticText911 = new wxStaticText( this, wxID_ANY, wxT("Fonts"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText911->Wrap( -1 );
-	m_staticText911->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_staticText911->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer411->Add( m_staticText911, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
@@ -314,7 +314,7 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText9111;
 	m_staticText9111 = new wxStaticText( this, wxID_ANY, wxT("Grid Alignment"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText9111->Wrap( -1 );
-	m_staticText9111->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_staticText9111->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer4111->Add( m_staticText9111, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
@@ -346,7 +346,7 @@ wxFB_PrintPanel::wxFB_PrintPanel( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText91111;
 	m_staticText91111 = new wxStaticText( this, wxID_ANY, wxT("Black Square Color"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText91111->Wrap( -1 );
-	m_staticText91111->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_staticText91111->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer41111->Add( m_staticText91111, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	

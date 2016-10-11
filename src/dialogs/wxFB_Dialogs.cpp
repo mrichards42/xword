@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Nov  6 2013)
+// C++ code generated with wxFormBuilder (version Oct 10 2016)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -17,7 +17,6 @@ LicenseDialog::LicenseDialog( wxWindow* parent, wxWindowID id, const wxString& t
 	bSizer22 = new wxBoxSizer( wxVERTICAL );
 	
 	m_textCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrl->SetMaxLength( 0 ); 
 	bSizer22->Add( m_textCtrl, 1, wxALL|wxEXPAND, 10 );
 	
 	m_sdbSizer2 = new wxStdDialogButtonSizer();
@@ -65,22 +64,22 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	wxStaticBoxSizer* sbSizer13;
 	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Puzzle") ), wxVERTICAL );
 	
-	m_grid = new wxCheckBox( this, wxID_ANY, wxT("Grid"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_grid = new wxCheckBox( sbSizer13->GetStaticBox(), wxID_ANY, wxT("Grid"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer13->Add( m_grid, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer21;
 	bSizer21 = new wxBoxSizer( wxVERTICAL );
 	
-	m_numbers = new wxCheckBox( this, wxID_ANY, wxT("Numbers"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_numbers = new wxCheckBox( sbSizer13->GetStaticBox(), wxID_ANY, wxT("Numbers"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer21->Add( m_numbers, 1, wxALL|wxEXPAND, 5 );
 	
-	m_text = new wxCheckBox( this, wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_text = new wxCheckBox( sbSizer13->GetStaticBox(), wxID_ANY, wxT("Text"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer21->Add( m_text, 1, wxALL|wxEXPAND, 5 );
 	
-	m_solution = new wxCheckBox( this, wxID_ANY, wxT("Solution"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_solution = new wxCheckBox( sbSizer13->GetStaticBox(), wxID_ANY, wxT("Solution"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer21->Add( m_solution, 1, wxALL|wxEXPAND, 5 );
 	
-	m_theme = new wxCheckBox( this, wxID_ANY, wxT("Highlight Theme"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_theme = new wxCheckBox( sbSizer13->GetStaticBox(), wxID_ANY, wxT("Highlight Theme"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_theme->Hide();
 	
 	bSizer21->Add( m_theme, 0, wxALL, 5 );
@@ -88,7 +87,7 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	sbSizer13->Add( bSizer21, 3, wxLEFT|wxEXPAND, 25 );
 	
-	m_clues = new wxCheckBox( this, wxID_ANY, wxT("Clues"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_clues = new wxCheckBox( sbSizer13->GetStaticBox(), wxID_ANY, wxT("Clues"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer13->Add( m_clues, 1, wxALL|wxEXPAND, 5 );
 	
 	
@@ -100,13 +99,13 @@ CustomPrintDialogBase::CustomPrintDialogBase( wxWindow* parent, wxWindowID id, c
 	wxStaticBoxSizer* sbSizer12;
 	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Header") ), wxVERTICAL );
 	
-	m_title = new wxCheckBox( this, wxID_ANY, wxT("Title"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_title = new wxCheckBox( sbSizer12->GetStaticBox(), wxID_ANY, wxT("Title"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer12->Add( m_title, 0, wxALL|wxEXPAND, 5 );
 	
-	m_author = new wxCheckBox( this, wxID_ANY, wxT("Author"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_author = new wxCheckBox( sbSizer12->GetStaticBox(), wxID_ANY, wxT("Author"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer12->Add( m_author, 0, wxALL|wxEXPAND, 5 );
 	
-	m_notes = new wxCheckBox( this, wxID_ANY, wxT("Notes"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_notes = new wxCheckBox( sbSizer12->GetStaticBox(), wxID_ANY, wxT("Notes"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer12->Add( m_notes, 0, wxALL, 5 );
 	
 	
