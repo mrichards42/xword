@@ -177,6 +177,7 @@ void XGridCtrl::Init()
     m_isSelecting = false;
 
     m_isPaused = false;
+    m_isPausedRendered = false;
     m_fit = true;
 
     m_lastBoxSize = UNDEFINED_BOX_SIZE;
@@ -413,12 +414,14 @@ XGridCtrl::OnPaint(wxPaintEvent & WXUNUSED(evt))
         if (m_rebusCtrl && ! m_rebusCtrl->IsShown())
             m_rebusCtrl->Show();
         DrawGrid(dc, GetUpdateRegion());
+        m_isPausedRendered = false;
     }
     else
     {
         if (m_rebusCtrl && m_rebusCtrl->IsShown())
             m_rebusCtrl->Hide();
         DrawPauseMessage(dc);
+        m_isPausedRendered = true;
     }
 
     //wxScrolledWindow::SetFocus();
@@ -1286,7 +1289,8 @@ XGridCtrl::OnLeftDown(wxMouseEvent & evt)
 
     wxPoint pt = evt.GetPosition();
     puz::Square * square = HitTest(pt.x, pt.y);
-    if (square != NULL && (square->IsWhite() || GetGrid()->IsDiagramless()))
+    if (square != NULL && !m_isPausedRendered
+            && (square->IsWhite() || GetGrid()->IsDiagramless()))
         SetFocusedSquare(square);
 
     // Make sure to skip this event or we don't get keyboard focus!
