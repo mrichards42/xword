@@ -413,12 +413,14 @@ XGridCtrl::OnPaint(wxPaintEvent & WXUNUSED(evt))
         if (m_rebusCtrl && ! m_rebusCtrl->IsShown())
             m_rebusCtrl->Show();
         DrawGrid(dc, GetUpdateRegion());
+        ConnectEvents();
     }
     else
     {
         if (m_rebusCtrl && m_rebusCtrl->IsShown())
             m_rebusCtrl->Hide();
         DrawPauseMessage(dc);
+        DisconnectEvents();
     }
 
     //wxScrolledWindow::SetFocus();
