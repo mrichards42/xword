@@ -304,13 +304,20 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     // Clues
     {
         xml::node clues = crossword.child("clues");
+        bool hasClueList = false;
         for (; clues; clues = clues.next_sibling("clues"))
         {
             string_t key = GetText(clues, "title");
             if (key.empty())
                 throw LoadError("Each clue list must have a title");
             ClueList list(GetInnerXML(RequireChild(clues, "title")));
-            xml::node clue = RequireChild(clues, "clue");
+            xml::node clue = GetChild(clues, "clue");
+            if (!clue) {
+                // Skip over empty cluelists. Note that some puzzles specify a second, empty list
+                // to work around apps which require exactly two lists, but we handle one list just
+                // fine. If *all* clue lists are empty, this will be caught below.
+                continue;
+            }
             for (; clue; clue = clue.next_sibling("clue"))
             {
                 std::map<string_t, Word>::iterator it;
@@ -326,6 +333,11 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 list.push_back(Clue(number, text, it->second));
             }
             puz->SetClueList(key, list);
+            hasClueList = true;
+        }
+
+        if (!hasClueList) {
+            throw LoadError("Must have at least one clue list");
         }
     }
 
