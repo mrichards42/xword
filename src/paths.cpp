@@ -67,7 +67,7 @@ wxString GetConfigFile()
 //     wxStandardPaths::GetAppDir
 // Fortunately these should always return the exe directory.
 // TODO: Investigate using wxStandardPaths::DontIgnoreAppSubDir with wxWidgets 2.9.1+
-#if defined(__WXDEBUG__) && defined(__WXMSW__)
+#if defined(_DEBUG) && defined(__WXMSW__)
 
 wxString GetImagesDir()
 {
