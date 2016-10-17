@@ -103,7 +103,7 @@ wxString GetScriptsDir()
 
 #define GetPluginsDir() wxStandardPaths::Get().GetPluginsDir()
 
-#endif // __WXDEBUG__ && __WXMSW__
+#endif // _DEBUG && __WXMSW__
 
 
 wxImage LoadXWordImage(const wxString & name, int size)
