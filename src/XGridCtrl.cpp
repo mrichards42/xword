@@ -413,7 +413,9 @@ XGridCtrl::OnPaint(wxPaintEvent & WXUNUSED(evt))
         if (m_rebusCtrl && ! m_rebusCtrl->IsShown())
             m_rebusCtrl->Show();
         DrawGrid(dc, GetUpdateRegion());
-        ConnectEvents();
+        if (!IsEmpty()) {
+            ConnectEvents();
+        }
     }
     else
     {
