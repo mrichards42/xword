@@ -141,5 +141,7 @@ project "XWord"
                 'xcodebuild -project lfs.xcodeproj -configuration "$CONFIGURATION"',
                 'xcodebuild -project luacurl.xcodeproj -configuration "$CONFIGURATION"',
                 'xcodebuild -project luatask.xcodeproj -configuration "$CONFIGURATION"',
+                'xcodebuild -project lxp.xcodeproj -configuration "$CONFIGURATION"',
+                'xcodebuild -project luayajl.xcodeproj -configuration "$CONFIGURATION"',
             }
         end
