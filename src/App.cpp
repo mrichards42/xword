@@ -230,7 +230,7 @@ int MyApp::OnExit()
         if (m_luaMessages) {
             XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %s"), (const wxChar *)GetLuaLogFilename().c_str());
         #ifdef __WXDEBUG__
-            wxShell(wxString::Format(_T("\"%s\""), (const wxChar *)GetLuaLogFilename().c_str()));
+            wxLaunchDefaultApplication(GetLuaLogFilename());
         #endif // __WXDEBUG__
         }
         delete m_luaLog;
