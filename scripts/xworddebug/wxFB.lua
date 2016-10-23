@@ -1,12 +1,12 @@
 -- Converted from python by py2lua
 -- python file: wxFB.py
--- modtime: 1475969738
+-- modtime: 1477182147
 -- ----------------------------------
 
 local wxfb = {} -- Table to hold classes
 
 ---------------------------------------------------------------------------
--- Python code generated with wxFormBuilder (version Nov  6 2013)
+-- Python code generated with wxFormBuilder (version Oct 10 2016)
 -- http://www.wxformbuilder.org/
 --
 -- PLEASE DO "NOT" EDIT THIS FILE!
@@ -28,7 +28,7 @@ function wxfb.DebugDialog(parent)
     local bSizer2 = wx.wxBoxSizer( wx.wxVERTICAL )
     
     self.text = wx.wxTextCtrl( self.panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxHSCROLL+wx.wxTE_MULTILINE )
-    self.text:SetFont( wx.wxFont( 8, 75, 90, 90, false, "Consolas" ) )
+    self.text:SetFont( wx.wxFont( 8, wx.wxFONTFAMILY_MODERN, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_NORMAL, false, "Consolas" ) )
     
     bSizer2:Add( self.text, 1, wx.wxALL+wx.wxEXPAND, 5 )
     
