@@ -879,6 +879,11 @@ MyFrame::ShowClues()
     if (no_clues)
         m_puz.GetClues().clear();
 
+#if USE_MY_AUI_MANAGER
+    // Since the set of panes / pane captions may have changed, update the menu.
+    m_mgr.UpdateMenu();
+#endif // USE_MY_AUI_MANAGER
+
     // Update the UI
     wxGetApp().GetConfigManager().Clue.Update();
 }
