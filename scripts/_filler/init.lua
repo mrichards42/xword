@@ -3,6 +3,9 @@
 
 require 'luacurl'
 
+local _R = mod_path(...)
+local split = require 'pl.stringx'.split
+
 local dlg
 
 -- Words and URLS
@@ -29,6 +32,8 @@ end
 
 local function get_word(number, direction)
     number = tostring(number)
+    local p = xword.frame.Puzzle
+    local g = p.Grid
     local s = g:FindSquare(function (s) return s.Number == number end)
     if not s then return end
     local word = {}
@@ -249,8 +254,9 @@ local function makeDialog()
         end
         print("Downloading word suggestions . . . ")
         dlg.update_list()
-        dlg.task_id = task.create('filler.task', args)
-        local e = task.handleEvents(dlg.task_id, dlg.callbacks, dlg)
+        local t = task.new(unpack(split(_R, '.'))..'.task')
+        t:connect(dlg.callbacks)
+        t:start(unpack(args))
     end
 
     dlg.button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED,
@@ -271,7 +277,7 @@ local function makeDialog()
         end,
 
         -- Place the words
-        [task.END] = function()
+        [task.EVT_END] = function()
             print "Download complete"
             print "Scoring words"
             score_words(dlg.words)

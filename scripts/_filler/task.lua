@@ -47,6 +47,6 @@ for idx, url in pairs(arg) do
         if suggestions and #suggestions > 0 then break end
         suggestions = download_suggestions(url)
     end
-    task.post(1, {idx, suggestions}, 10)
+    task.post(10, {idx, suggestions})
     if task.check_abort() then break end
 end
