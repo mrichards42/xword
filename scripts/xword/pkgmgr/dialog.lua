@@ -596,7 +596,7 @@ function P.PackageDialog(opts)
     end
 
     dlg:Connect(wx.wxEVT_CLOSE_WINDOW, function(evt)
-        evt:Skip()
+        dlg:EndModal(wx.wxID_OK)
         dlg:Destroy()
         P.dlg = nil
     end)
