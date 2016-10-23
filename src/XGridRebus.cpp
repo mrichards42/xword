@@ -42,6 +42,7 @@ protected:
     wxTextCtrl * m_text;
 
     void OnChar(wxKeyEvent & evt);
+    void OnKeyDown(wxKeyEvent & evt);
     void OnPaste(wxClipboardTextEvent & evt);
     void OnSelectAll(wxCommandEvent & evt);
     void OnInsert(wxCommandEvent & evt);
@@ -65,6 +66,8 @@ RebusTextCtrl::RebusTextCtrl(wxWindow * parent, XGridCtrl * grid)
 
     m_text->Connect(wxEVT_CHAR,
         wxKeyEventHandler(RebusTextCtrl::OnChar), NULL, this);
+    m_text->Connect(wxEVT_KEY_DOWN,
+        wxKeyEventHandler(RebusTextCtrl::OnKeyDown), NULL, this);
 
     // Accelerators
     wxAcceleratorEntry entries[1];
@@ -118,8 +121,6 @@ void RebusTextCtrl::OnChar(wxKeyEvent & evt)
     // Don't filter special keys
     if (code == WXK_RETURN || code == WXK_INSERT)
         m_grid->EndRebusEntry(); // end the rebus entry
-    else if (code == WXK_ESCAPE)
-        m_grid->EndRebusEntry(false); // user canceled
     else if (code < WXK_SPACE || code == WXK_DELETE || code > WXK_START)
         evt.Skip();
     else if (XGridCtrl::IsValidChar(code))
@@ -128,6 +129,14 @@ void RebusTextCtrl::OnChar(wxKeyEvent & evt)
         wxBell();
 }
 
+void RebusTextCtrl::OnKeyDown(wxKeyEvent & evt)
+{
+    int code = evt.GetKeyCode();
+    if (code == WXK_ESCAPE)
+        m_grid->EndRebusEntry(false); // user canceled
+    else
+        evt.Skip();
+}
 
 void RebusTextCtrl::OnPaste(wxClipboardTextEvent & evt)
 {

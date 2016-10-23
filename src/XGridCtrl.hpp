@@ -434,7 +434,7 @@ private:
     void OnEnd          (int mod);
     void OnBackspace    (int mod);
     void OnDelete       (int mod);
-    void OnInsert       (int mod);
+    void OnRebusKey     (int mod);
 
     DECLARE_EVENT_TABLE()
     DECLARE_NO_COPY_CLASS(XGridCtrl)
