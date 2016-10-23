@@ -470,7 +470,7 @@ function SourceList.get_default_sources()
     local sources = serialize.loadfile(path.join(xword.configdir, 'download', 'sources.lua'))
     -- Fallback on the default sources
     if not sources then
-        sources = serialize.loadfile(path.join(xword.scriptsdir, unpack(split(_R, '%.')), 'default_sources.lua'))
+        sources = serialize.loadfile(path.join(xword.scriptsdir, unpack(split(_R, '.')), 'default_sources.lua'))
     end
     return SourceList.new(sources or {})
 end
