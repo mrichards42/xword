@@ -1,0 +1,167 @@
+diff -Naur a/include/wx/aui/framemanager.h b/include/wx/aui/framemanager.h
+--- a/include/wx/aui/framemanager.h	2016-10-15 21:28:26.000000000 -0700
++++ b/include/wx/aui/framemanager.h	2016-10-15 21:21:02.000000000 -0700
+@@ -231,7 +231,7 @@
+     }
+ 
+     bool IsOk() const { return window != NULL; }
+-    bool IsFixed() const { return !HasFlag(optionResizable); }
++    bool IsFixed() const { return HasFlag(optionFixed); }
+     bool IsResizable() const { return HasFlag(optionResizable); }
+     bool IsShown() const { return !HasFlag(optionHidden); }
+     bool IsFloating() const { return HasFlag(optionFloating); }
+@@ -294,7 +294,7 @@
+     wxAuiPaneInfo& FloatingPosition(int x, int y) { floating_pos.x = x; floating_pos.y = y; return *this; }
+     wxAuiPaneInfo& FloatingSize(const wxSize& size) { floating_size = size; return *this; }
+     wxAuiPaneInfo& FloatingSize(int x, int y) { floating_size.Set(x,y); return *this; }
+-    wxAuiPaneInfo& Fixed() { return SetFlag(optionResizable, false); }
++    wxAuiPaneInfo& Fixed(bool fixed = true) { return SetFlag(optionFixed, fixed); }
+     wxAuiPaneInfo& Resizable(bool resizable = true) { return SetFlag(optionResizable, resizable); }
+     wxAuiPaneInfo& Dock() { return SetFlag(optionFloating, false); }
+     wxAuiPaneInfo& Float() { return SetFlag(optionFloating, true); }
+@@ -331,6 +331,7 @@
+                  optionLeftDockable | optionRightDockable |
+                  optionFloatable | optionMovable | optionResizable |
+                  optionCaption | optionPaneBorder | buttonClose;
++        state &= (~optionFixed);
+         wxCHECK_MSG(test.IsValid(), *this,
+                     "window settings and pane settings are incompatible");
+         *this = test;
+@@ -341,13 +342,13 @@
+     wxAuiPaneInfo& CenterPane()
+     {
+         state = 0;
+-        return Center().PaneBorder().Resizable();
++        return Center().PaneBorder().Resizable().Fixed(false);
+     }
+ 
+     wxAuiPaneInfo& ToolbarPane()
+     {
+         DefaultPane();
+-        state |= (optionToolbar | optionGripper);
++        state |= (optionToolbar | optionGripper | optionFixed);
+         state &= ~(optionResizable | optionCaption);
+         if (dock_layer == 0)
+             dock_layer = 10;
+@@ -404,6 +405,7 @@
+         optionGripperTop      = 1 << 15,
+         optionMaximized       = 1 << 16,
+         optionDockFixed       = 1 << 17,
++        optionFixed           = 1 << 18,
+ 
+         buttonClose           = 1 << 21,
+         buttonMaximize        = 1 << 22,
+@@ -478,7 +480,7 @@
+     wxAuiPaneInfo& GetPane(const wxString& name);
+     wxAuiPaneInfoArray& GetAllPanes();
+ 
+-    bool AddPane(wxWindow* window,
++    virtual bool AddPane(wxWindow* window,
+                  const wxAuiPaneInfo& paneInfo);
+ 
+     bool AddPane(wxWindow* window,
+@@ -493,14 +495,14 @@
+                  const wxAuiPaneInfo& insertLocation,
+                  int insertLevel = wxAUI_INSERT_PANE);
+ 
+-    bool DetachPane(wxWindow* window);
++    virtual bool DetachPane(wxWindow* window);
+ 
+-    void Update();
++    virtual void Update();
+ 
+     wxString SavePaneInfo(wxAuiPaneInfo& pane);
+     void LoadPaneInfo(wxString panePart, wxAuiPaneInfo &pane);
+-    wxString SavePerspective();
+-    bool LoadPerspective(const wxString& perspective, bool update = true);
++    virtual wxString SavePerspective();
++    virtual bool LoadPerspective(const wxString& perspective, bool update = true);
+ 
+     void SetDockSizeConstraint(double widthPct, double heightPct);
+     void GetDockSizeConstraint(double* widthPct, double* heightPct) const;
+diff -Naur a/src/aui/framemanager.cpp b/src/aui/framemanager.cpp
+--- a/src/aui/framemanager.cpp	2016-10-15 21:35:43.000000000 -0700
++++ b/src/aui/framemanager.cpp	2016-10-15 21:33:15.000000000 -0700
+@@ -1939,7 +1939,7 @@
+     int orientation = dock.IsHorizontal() ? wxHORIZONTAL : wxVERTICAL;
+ 
+     // resizable bottom and right docks have a sash before them
+-    if (!m_hasMaximized && !dock.fixed && (dock.dock_direction == wxAUI_DOCK_BOTTOM ||
++    if (!m_hasMaximized && !dock.fixed && dock.resizable && (dock.dock_direction == wxAUI_DOCK_BOTTOM ||
+                         dock.dock_direction == wxAUI_DOCK_RIGHT))
+     {
+         sizer_item = cont->Add(sashSize, sashSize, 0, wxEXPAND);
+@@ -2027,7 +2027,7 @@
+ 
+             // if this is not the first pane being added,
+             // we need to add a pane sizer
+-            if (!m_hasMaximized && pane_i > 0)
++            if (!m_hasMaximized && pane_i > 0 && dock.resizable)
+             {
+                 sizer_item = dock_sizer->Add(sashSize, sashSize, 0, wxEXPAND);
+ 
+@@ -2066,7 +2066,7 @@
+ 
+     //  top and left docks have a sash after them
+     if (!m_hasMaximized &&
+-        !dock.fixed &&
++        !dock.fixed && dock.resizable &&
+           (dock.dock_direction == wxAUI_DOCK_TOP ||
+            dock.dock_direction == wxAUI_DOCK_LEFT))
+     {
+@@ -2287,6 +2287,7 @@
+         // determine whether the dock has only toolbars
+         bool action_pane_marked = false;
+         dock.fixed = true;
++        dock.resizable = false;
+         dock.toolbar = true;
+         for (j = 0; j < dock_pane_count; ++j)
+         {
+@@ -2299,6 +2300,8 @@
+                 dock.fixed = true;
+             if (pane.HasFlag(wxAuiPaneInfo::actionPane))
+                 action_pane_marked = true;
++            if (pane.IsResizable())
++                dock.resizable = true;
+         }
+ 
+ 
+@@ -4009,11 +4012,12 @@
+             // pane which is not resizable
+             if (part->type == wxAuiDockUIPart::typeDockSizer && part->dock &&
+                 part->dock->panes.GetCount() == 1 &&
+-                part->dock->panes.Item(0)->IsFixed())
++                (! part->dock->panes.Item(0)->IsResizable() ||
++                part->dock->panes.Item(0)->IsFixed()))
+                     return;
+ 
+             // panes that may not be resized do not get a sizing cursor
+-            if (part->pane && part->pane->IsFixed())
++            if (part->pane && (part->pane->IsFixed() || ! part->pane->IsResizable()))
+                 return;
+ 
+             if (part->orientation == wxVERTICAL)
+@@ -4091,11 +4095,12 @@
+             // pane which is not resizable
+             if (part->type == wxAuiDockUIPart::typeDockSizer && part->dock &&
+                 part->dock->panes.GetCount() == 1 &&
+-                part->dock->panes.Item(0)->IsFixed())
++                (! part->dock->panes.Item(0)->IsResizable() ||
++                 part->dock->panes.Item(0)->IsFixed()))
+                     return;
+ 
+             // panes that may not be resized should be ignored here
+-            if (part->pane && part->pane->IsFixed())
++            if (part->pane && (part->pane->IsFixed() || ! part->pane->IsResizable()))
+                 return;
+ 
+             m_action = actionResize;
+@@ -4311,7 +4316,7 @@
+             // while we're at it, subtract the pane sash
+             // width from the dock width, because this would
+             // skew our proportion calculations
+-            if (i > 0)
++            if (i > 0 && dock.resizable)
+                 dock_pixels -= sashSize;
+ 
+             // also, the whole size (including decorations) of

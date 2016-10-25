@@ -39,10 +39,12 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     istream_wrapper f(stream);
 
     const unsigned short c_primary = f.ReadShort();
+    (void) c_primary; // unused
     if (strcmp(f.ReadString(12).c_str(), "ACROSS&DOWN") != 0)
         throw FileTypeError("puz");
 
     const unsigned short c_cib = f.ReadShort();
+    (void) c_cib; // unused
     unsigned char c_masked[8];
     f.ReadCharArray(c_masked, 8);
 
@@ -53,6 +55,7 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
         throw LoadError("Unknown puz version.");
 
     const unsigned short version = 10 + versionstr[2] - 0x30;
+    (void) version; // unused
 
     f.Skip(2); // 1 unknown short
     const unsigned short c_grid = f.ReadShort();
@@ -82,7 +85,7 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
          square = square->Next())
     {
         // Solution
-        if (*sol_it == '.' || *sol_it == ':' && puz->IsDiagramless())
+        if (*sol_it == '.' || (*sol_it == ':' && puz->IsDiagramless()))
             square->SetSolution(puz::Square::Black);
         else if (*sol_it == '-')
             square->SetSolution(puz::Square::Blank);
@@ -261,7 +264,6 @@ bool LoadGEXT(Puzzle * puz, const std::string & data)
     std::istringstream stream(data);
     istream_wrapper f(stream);
 
-    std::string::const_iterator it = data.begin();
     for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
@@ -314,7 +316,6 @@ bool LoadCHKD(Puzzle * puz, const std::string & data)
     std::istringstream stream(data);
     istream_wrapper f(stream);
 
-    std::string::const_iterator it = data.begin();
     for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())

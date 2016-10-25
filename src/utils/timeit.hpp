@@ -17,7 +17,7 @@
 
 // Time a function (or more literally, a scope)
 // Time is logged in the destructor
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
 #include <wx/stopwatch.h>
 #include <wx/log.h>
 
@@ -41,6 +41,6 @@ public:
 // For debugging purposes
 #define TimeIt(name) _TimeIt ___the_timer(name)
 
-#else
-#define TimeIt
-#endif
+#else // ! _DEBUG
+#define TimeIt(name)
+#endif // _DEBUG

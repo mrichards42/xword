@@ -94,7 +94,6 @@ wxString MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame,
     if (! frame || ! frame->GetPuzzle().IsOk())
         return wxEmptyString;
     wxString result;
-    const puz::Puzzle & puz = frame->GetPuzzle();
     wxStringTokenizer tok(format, _T("%"), wxTOKEN_RET_EMPTY_ALL);
     bool ismeta = false; // Is the current token a metadata value?
     while (tok.HasMoreTokens())

@@ -87,7 +87,7 @@ void HCLColor::ToRGB(unsigned char * red, unsigned char * green, unsigned char *
     }
     double r, g, b;
     double h1 = h / 60.;
-    double x = c * (1 - abs(fmod(h1, 2) - 1));
+    double x = c * (1 - std::abs(fmod(h1, 2) - 1));
     switch (int(h1))
     {
         case 0: r = c; g = x; b = 0; break;

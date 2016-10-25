@@ -44,12 +44,12 @@
 
 // All other characters are invalid
 
-char_t * Square::Blank   = puzT(" ");
-char_t * Square::Black   = puzT(".");
+const char_t * Square::Blank   = puzT(" ");
+const char_t * Square::Black   = puzT(".");
 
 // Across Lite representation
 static unsigned char ascii [] = {
-/*         0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f 
+/*         0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f */
 /* 0 */    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 /* 1 */    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 /* 2 */  ' ',    0,    0,  'H',  'D',  'P',  'A',    0,    0,    0,    0,  'P',    0,  ' ',  '.',    0,

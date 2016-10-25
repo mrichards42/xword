@@ -25,6 +25,6 @@ project "luatask"
     configuration "linux or macosx"
         defines {
             "LUATASK_PTHREAD_STACK_SIZE=2097152/16",
-            [[LUATASK_API=\"\"]]
+            [[LUATASK_API=""]]
         }
         links { "pthread" }

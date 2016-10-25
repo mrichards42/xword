@@ -52,5 +52,7 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>

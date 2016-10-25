@@ -1,4 +1,4 @@
-// This file is part of XWord    
+// This file is part of XWord
 // Copyright (C) 2011 Mike Richards ( mrichards42@gmx.com )
 //
 // This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
 
 // Define macro XWORD_CHECK_CLUE to check the clue prompt size
 // in debug mode and print a message when it changes.
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
 int __CLUE_SIZE = 0;
 #define XWORD_CHECK_CLUE()                                        \
     int __NEW_SIZE = GetPaneByCaption("Clue Prompt").rect.height; \
@@ -34,9 +34,9 @@ int __CLUE_SIZE = 0;
         __CLUE_SIZE = __NEW_SIZE;                                 \
         wxLogDebug("New Clue Size: %d", __NEW_SIZE);              \
     }
-#else // ! __WXDEBUG__
-#define XWORD_CHECK_CLUE
-#endif // __WXDEBUG__
+#else // ! _DEBUG
+#define XWORD_CHECK_CLUE()
+#endif // _DEBUG
 
 
 // ----------------------------------------------------------------
@@ -373,7 +373,6 @@ void MyAuiManager::ResizeDocks(bool is_frame_resize)
     // Expand the grid to fill the resizable area.
 
     // Calculate the new grid size
-    wxAuiPaneInfo & grid = GetPane("Grid");
     wxSize grid_size = resizable - dock_min_size;
     // Make the grid square
     int grid_square = std::min(grid_size.x, grid_size.y);

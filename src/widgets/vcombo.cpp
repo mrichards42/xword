@@ -78,9 +78,9 @@ public:
         int idx = combo->FindItem(combo->GetValue());
         SetSelection(idx);
         if (idx == wxNOT_FOUND)
-            wxVListBox::ScrollToLine(0);
+            wxVListBox::ScrollToRow(0);
         else
-            wxVListBox::ScrollToLine(static_cast<size_t>(idx));
+            wxVListBox::ScrollToRow(static_cast<size_t>(idx));
     }
 
     wxSize GetAdjustedSize(int minWidth, int prefHeight, int maxHeight);
@@ -144,7 +144,7 @@ protected:
             bg = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
         else
             bg = GetBackgroundColour();
-        dc.SetBrush(wxBrush(bg, wxSOLID));
+        dc.SetBrush(wxBrush(bg, wxBRUSHSTYLE_SOLID));
         dc.SetPen(*wxTRANSPARENT_PEN);
         GetCombo()->OnDrawBackground(dc, rect, n);
     }
@@ -251,6 +251,6 @@ void VirtualComboBox::OnDrawItem(wxDC& dc, const wxRect& rect, size_t n) const
 void VirtualComboBox::OnDrawCtrl(wxDC & dc, const wxRect & rect)
 {
     wxRect text(rect);
-    text.Offset(GetTextIndent(), 0);
+    text.Offset(GetMargins());
     dc.DrawLabel(GetValue(), text, wxALIGN_CENTER_VERTICAL);
 }

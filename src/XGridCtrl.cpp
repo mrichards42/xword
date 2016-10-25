@@ -461,11 +461,11 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
     if (IsEmpty())
         return;
 
-#ifdef __WXDEBUG__
+#ifdef _DEBUG
         int _scrollX, _scrollY;
         GetScrollPixelsPerUnit(&_scrollX, &_scrollY);
         wxASSERT(_scrollX == GetSquareSize() && _scrollY == GetSquareSize());
-#endif
+#endif // _DEBUG
 
     if (m_drawer.GetBoxSize() == 0)
     {
@@ -1670,7 +1670,6 @@ XGridCtrl::OnTab(int mod)
         return;
     }
     // There is a clue . . . find it and move to the next one.
-    puz::Square * newSquare = NULL;
     puz::Clues & clues = m_puz->GetClues();
     puz::Clues::iterator cluelist_it;
     for (cluelist_it = clues.begin(); cluelist_it != clues.end(); ++cluelist_it)

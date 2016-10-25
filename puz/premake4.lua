@@ -41,8 +41,8 @@ project "puz"
 
     configuration "macosx"
         defines {
-            [[PUZ_API=\"\"]],
-            [[LUAPUZ_API=\"\"]],
+            [[PUZ_API=""]],
+            [[LUAPUZ_API=""]],
             "USE_FILE32API" -- for minizip
         }
         links { "z" }

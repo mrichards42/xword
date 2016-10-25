@@ -10,6 +10,8 @@ project "luayajl"
         "lua_yajl.c",
     }
 
+    includedirs { "../../yajl/build/yajl-2.0.2/include" }
+
     links { "yajl" }
 
     -- Common lua stuff
@@ -18,4 +20,3 @@ project "luayajl"
     -- Platform-specific
     configuration "windows"
         defines { "_CRT_SECURE_NO_WARNINGS" }
-        includedirs { "../../yajl/build/yajl-2.0.2/include" }
