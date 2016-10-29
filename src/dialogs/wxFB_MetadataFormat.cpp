@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Oct 10 2016)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -24,19 +24,18 @@ wxFB_MetadataFormatDialog::wxFB_MetadataFormatDialog( wxWindow* parent, wxWindow
 	
 	m_functionStart = new wxStaticText( m_panel5, wxID_ANY, wxT("function(puzzle)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_functionStart->Wrap( -1 );
-	m_functionStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
+	m_functionStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas") ) );
 	
 	m_sizer->Add( m_functionStart, 0, wxBOTTOM, 5 );
 	
 	m_format = new wxTextCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_DONTWRAP|wxTE_MULTILINE );
-	m_format->SetMaxLength( 0 ); 
-	m_format->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
+	m_format->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas") ) );
 	
 	m_sizer->Add( m_format, 1, wxEXPAND|wxLEFT, 15 );
 	
 	m_functionEnd = new wxStaticText( m_panel5, wxID_ANY, wxT("end"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_functionEnd->Wrap( -1 );
-	m_functionEnd->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 75, 90, 90, false, wxT("Consolas") ) );
+	m_functionEnd->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas") ) );
 	
 	m_sizer->Add( m_functionEnd, 0, wxTOP, 5 );
 	
@@ -46,7 +45,7 @@ wxFB_MetadataFormatDialog::wxFB_MetadataFormatDialog( wxWindow* parent, wxWindow
 	wxStaticBoxSizer* sbSizer12;
 	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( m_panel5, wxID_ANY, wxT("Result") ), wxVERTICAL );
 	
-	m_result = new wxStaticText( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_result = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_result->Wrap( -1 );
 	sbSizer12->Add( m_result, 0, wxALL, 5 );
 	
@@ -100,7 +99,7 @@ wxFB_MetadataFormatHelpPanel::wxFB_MetadataFormatHelpPanel( wxWindow* parent, wx
 	
 	m_text1 = new wxStaticText( this, wxID_ANY, wxT("Format Help"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_text1->Wrap( -1 );
-	m_text1->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_text1->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	
 	bSizer14->Add( m_text1, 0, wxALL, 5 );
 	

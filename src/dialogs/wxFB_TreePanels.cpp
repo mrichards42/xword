@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Oct 10 2016)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -35,14 +35,14 @@ wxFB_GridTweaks::wxFB_GridTweaks( wxWindow* parent, wxWindowID id, const wxPoint
 	wxStaticText* m_staticText341;
 	m_staticText341 = new wxStaticText( this, wxID_ANY, wxT("Percent of the square taken up by text and number:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText341->Wrap( -1 );
-	m_staticText341->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
+	m_staticText341->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
 	
 	gbSizer1->Add( m_staticText341, wxGBPosition( 2, 0 ), wxGBSpan( 1, 3 ), wxALIGN_CENTER_VERTICAL, 10 );
 	
 	wxStaticText* m_staticText3411;
 	m_staticText3411 = new wxStaticText( this, wxID_ANY, wxT("Does not have to add up to 100."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText3411->Wrap( -1 );
-	m_staticText3411->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 90, false, wxEmptyString ) );
+	m_staticText3411->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
 	
 	gbSizer1->Add( m_staticText3411, wxGBPosition( 3, 0 ), wxGBSpan( 1, 3 ), wxBOTTOM, 5 );
 	
