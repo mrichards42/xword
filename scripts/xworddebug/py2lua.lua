@@ -64,6 +64,9 @@ local function convert(filename, writefile, luafile)
     local f = assert(io.open(filename, 'r'))
     local text = f:read('*a')
     f:close()
+    
+    -- Use unix newlines
+    text = text:gsub('\r\n', '\n')
 
     -- Remove coding
     text = text:gsub('#.-coding:.-\n', '\n')
@@ -213,7 +216,7 @@ local function convert(filename, writefile, luafile)
         if not luafile then
             luafile = filename:gsub('%.py', '%.lua')
         end
-        f = io.open(luafile, 'w')
+        f = io.open(luafile, 'wb')
         -- Keep track of filename and modification time
         f:write(([[
 -- Converted from python by py2lua
@@ -315,8 +318,8 @@ local function is_modified(luafile)
     local f = io.open(luafile, 'r')
     if f then
         f:read("*line") -- py2lua line
-        local pyfile = f:read("*line"):match("--.*:%s+(.*)") -- python file
-        local mtime = tonumber(f:read("*line"):match("--.*:%s+(.*)")) -- modified time
+        local pyfile = f:read("*line"):match("--.*:%s+(.*%.py)") -- python file
+        local mtime = tonumber(f:read("*line"):match("--.*:%s+(%d*)")) -- modified time
         f:close()
         if pyfile and mtime then
             -- Get the full path of the python file

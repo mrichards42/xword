@@ -112,7 +112,7 @@ M:connect{
                 wx.wxDefaultPosition, wx.wxDefaultSize, flags)
             values[label] = ctrl
             ctrl:SetMinSize(wx.wxSize(200, -1))
-            sizer:Add(ctrl, 1, wx.wxALIGN_CENTER_VERTICAL + wx.wxEXPAND)
+            sizer:Add(ctrl, 1, wx.wxEXPAND)
         end
         -- Prompt
         dlg:Fit()

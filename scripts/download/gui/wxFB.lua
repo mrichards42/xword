@@ -1,6 +1,6 @@
 -- Converted from python by py2lua
 -- python file: wxFB.py
--- modtime: 1475969737
+-- modtime: 1477178435
 -- ----------------------------------
 
 local wxfb = {} -- Table to hold classes
@@ -8,7 +8,7 @@ local wxfb = {} -- Table to hold classes
 local require_bmp = require("wx.lib.bmp") -- require function for images
 
 ---------------------------------------------------------------------------
--- Python code generated with wxFormBuilder (version Nov  6 2013)
+-- Python code generated with wxFormBuilder (version Oct 10 2016)
 -- http://www.wxformbuilder.org/
 --
 -- PLEASE DO "NOT" EDIT THIS FILE!
@@ -55,7 +55,7 @@ function wxfb.DownloadDialog(parent)
     bSizer2:Add( self.prev, 0, wx.wxALIGN_CENTER_VERTICAL, 5 )
     
     self.label = TextButton( self.panel, wx.wxID_ANY, "Label", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-    self.label:SetFont( wx.wxFont( 12, 70, 90, 92, false, "" ) )
+    self.label:SetFont( wx.wxFont( 12, wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     self.label:SetForegroundColour( wx.wxColour( 0, 0, 255 ) )
     self.label:SetToolTip( "Download missing puzzles" )
     
@@ -87,7 +87,7 @@ function wxfb.DownloadDialog(parent)
     local queueCountSizer = wx.wxBoxSizer( wx.wxHORIZONTAL )
     
     self.queue_count = TextButton( self.panel, wx.wxID_ANY, "0", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-    self.queue_count:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 92, false, "" ) )
+    self.queue_count:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     self.queue_count:SetForegroundColour( wx.wxColour( 0, 0, 255 ) )
     self.queue_count:SetToolTip( "Download queue" )
     
@@ -97,12 +97,12 @@ function wxfb.DownloadDialog(parent)
     queueCountSizer:Add( self.queueBmp, 0, wx.wxALIGN_CENTER_VERTICAL, 5 )
     
     
-    bSizer3:Add( queueCountSizer, 0, wx.wxEXPAND+wx.wxALIGN_CENTER_VERTICAL+wx.wxRIGHT+wx.wxLEFT, 5 )
+    bSizer3:Add( queueCountSizer, 0, wx.wxEXPAND+wx.wxRIGHT+wx.wxLEFT, 5 )
     
     local errorCountSizer = wx.wxBoxSizer( wx.wxHORIZONTAL )
     
     self.error_count = TextButton( self.panel, wx.wxID_ANY, "0", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-    self.error_count:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 92, false, "" ) )
+    self.error_count:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     self.error_count:SetForegroundColour( wx.wxColour( 0, 0, 255 ) )
     self.error_count:SetToolTip( "Download missing puzzles" )
     
@@ -186,7 +186,7 @@ function wxfb.DownloadHeading(parent)
     bSizer8:Add( self.expand_button, 0, wx.wxALIGN_CENTER_VERTICAL+wx.wxRIGHT, 5 )
     
     self.label = TextButton( self.m_panel4, wx.wxID_ANY, "Source", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-    self.label:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 92, false, "" ) )
+    self.label:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     
     bSizer8:Add( self.label, 1, wx.wxALIGN_CENTER_VERTICAL+wx.wxRIGHT, 5 )
     
@@ -243,19 +243,19 @@ function wxfb.DownloadList(parent)
     bSizer13:Add(0, 0, 1)
     
     self.erase_history = TextButton( self, wx.wxID_ANY, "Clear History", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-    self.erase_history:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 92, false, "" ) )
+    self.erase_history:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     self.erase_history:SetForegroundColour( wx.wxColour( 0, 0, 255 ) )
     
     bSizer13:Add( self.erase_history, 0, wx.wxALL, 5 )
     
     self.cancel_downloads = TextButton( self, wx.wxID_ANY, "Cancel Downloads", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-    self.cancel_downloads:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 92, false, "" ) )
+    self.cancel_downloads:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     self.cancel_downloads:SetForegroundColour( wx.wxColour( 0, 0, 255 ) )
     
     bSizer13:Add( self.cancel_downloads, 0, wx.wxALL, 5 )
     
     self.close = TextButton( self, wx.wxID_ANY, "X", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-    self.close:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 92, false, "" ) )
+    self.close:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     self.close:SetForegroundColour( wx.wxColour( 0, 0, 255 ) )
     self.close:SetToolTip( "Close" )
     
@@ -520,25 +520,25 @@ function wxfb.PuzzleSourceDialog(parent)
     
     local sbSizer1 = wx.wxStaticBoxSizer( wx.wxStaticBox( self.m_panel3, wx.wxID_ANY, "Days available" ), wx.wxHORIZONTAL )
     
-    self.day1 = wx.wxCheckBox( self.m_panel3, wx.wxID_ANY, "Mon", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+    self.day1 = wx.wxCheckBox( sbSizer1:GetStaticBox(), wx.wxID_ANY, "Mon", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     sbSizer1:Add( self.day1, 0, wx.wxALL, 5 )
     
-    self.day2 = wx.wxCheckBox( self.m_panel3, wx.wxID_ANY, "Tue", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+    self.day2 = wx.wxCheckBox( sbSizer1:GetStaticBox(), wx.wxID_ANY, "Tue", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     sbSizer1:Add( self.day2, 0, wx.wxALL, 5 )
     
-    self.day3 = wx.wxCheckBox( self.m_panel3, wx.wxID_ANY, "Wed", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+    self.day3 = wx.wxCheckBox( sbSizer1:GetStaticBox(), wx.wxID_ANY, "Wed", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     sbSizer1:Add( self.day3, 0, wx.wxALL, 5 )
     
-    self.day4 = wx.wxCheckBox( self.m_panel3, wx.wxID_ANY, "Thu", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+    self.day4 = wx.wxCheckBox( sbSizer1:GetStaticBox(), wx.wxID_ANY, "Thu", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     sbSizer1:Add( self.day4, 0, wx.wxALL, 5 )
     
-    self.day5 = wx.wxCheckBox( self.m_panel3, wx.wxID_ANY, "Fri", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+    self.day5 = wx.wxCheckBox( sbSizer1:GetStaticBox(), wx.wxID_ANY, "Fri", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     sbSizer1:Add( self.day5, 0, wx.wxALL, 5 )
     
-    self.day6 = wx.wxCheckBox( self.m_panel3, wx.wxID_ANY, "Sat", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+    self.day6 = wx.wxCheckBox( sbSizer1:GetStaticBox(), wx.wxID_ANY, "Sat", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     sbSizer1:Add( self.day6, 0, wx.wxALL, 5 )
     
-    self.day7 = wx.wxCheckBox( self.m_panel3, wx.wxID_ANY, "Sun", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+    self.day7 = wx.wxCheckBox( sbSizer1:GetStaticBox(), wx.wxID_ANY, "Sun", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     sbSizer1:Add( self.day7, 0, wx.wxALL, 5 )
     
     
@@ -546,7 +546,7 @@ function wxfb.PuzzleSourceDialog(parent)
     
     self.m_staticText122 = wx.wxStaticText( self.m_panel3, wx.wxID_ANY, "Date format codes for puzzle URL and filename:", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     self.m_staticText122:Wrap( -1 )
-    self.m_staticText122:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 90, false, "" ) )
+    self.m_staticText122:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_NORMAL, false, "" ) )
     
     bSizer26:Add( self.m_staticText122, 0, wx.wxTOP+wx.wxRIGHT+wx.wxLEFT, 5 )
     
@@ -624,7 +624,7 @@ function wxfb.PuzzleSourceDialog(parent)
     
     self.m_staticText37 = wx.wxStaticText( self.m_panel4, wx.wxID_ANY, "Note: Authentication may not work for every source.  Login is attempted via an HTML form.  Any cookies set after a successful login are saved and used to download puzzles.", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     self.m_staticText37:Wrap( 325 )
-    self.m_staticText37:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 93, 90, false, "" ) )
+    self.m_staticText37:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_ITALIC, wx.wxFONTWEIGHT_NORMAL, false, "" ) )
     
     bSizer29:Add( self.m_staticText37, 0, wx.wxALL+wx.wxALIGN_CENTER_HORIZONTAL, 5 )
     
@@ -641,7 +641,7 @@ function wxfb.PuzzleSourceDialog(parent)
     
     self.custom_func_message = wx.wxStaticText( self.m_panel6, wx.wxID_ANY, "This source uses a custom download function!  Not all changes you make in this dialog may have the desired effect.  Click to view the function.", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxALIGN_CENTRE )
     self.custom_func_message:Wrap( 250 )
-    self.custom_func_message:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 92, false, "" ) )
+    self.custom_func_message:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     self.custom_func_message:SetBackgroundColour( wx.wxColour( 255, 255, 0 ) )
     self.custom_func_message:Hide()
     
@@ -669,7 +669,7 @@ function wxfb.PuzzleSourceDialog(parent)
     
     self.m_staticText21 = wx.wxStaticText( self.custom_func_panel, wx.wxID_ANY, "Don't edit this function unless you know what you're doing.", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     self.m_staticText21:Wrap( -1 )
-    self.m_staticText21:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 70, 90, 92, false, "" ) )
+    self.m_staticText21:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_BOLD, false, "" ) )
     
     bSizer34:Add( self.m_staticText21, 0, wx.wxALL, 5 )
     
@@ -678,13 +678,13 @@ function wxfb.PuzzleSourceDialog(parent)
     
     self.m_staticText40 = wx.wxStaticText( self.m_panel8, wx.wxID_ANY, "function(puzzle)", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
     self.m_staticText40:Wrap( -1 )
-    self.m_staticText40:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 76, 90, 90, false, "" ) )
+    self.m_staticText40:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_TELETYPE, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_NORMAL, false, "" ) )
     self.m_staticText40:SetForegroundColour( wx.wxSystemSettings.GetColour( wx.wxSYS_COLOUR_GRAYTEXT ) )
     
     bSizer32:Add( self.m_staticText40, 0, wx.wxEXPAND, 5 )
     
     self.func = wx.wxTextCtrl( self.m_panel8, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxTE_DONTWRAP+wx.wxTE_MULTILINE+wx.wxNO_BORDER )
-    self.func:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), 76, 90, 90, false, "" ) )
+    self.func:SetFont( wx.wxFont( wx.wxNORMAL_FONT:GetPointSize(), wx.wxFONTFAMILY_TELETYPE, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_NORMAL, false, "" ) )
     
     bSizer32:Add( self.func, 1, wx.wxEXPAND, 5 )
     
