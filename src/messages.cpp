@@ -65,14 +65,14 @@ const MessageDesc messageTable [] = {
 
     // MSG_PUZ_ERROR
     {
-        _T("%s"),
+        _T("%hs"),
         errorTitle,
         errorFlags
     },
 
     // MSG_STD_EXCEPTION
     {
-        _T("%s"),
+        _T("%hs"),
         errorTitle,
         errorFlags
     },

@@ -648,11 +648,13 @@ MyFrame::HandlePuzException()
     }
     catch (puz::Exception & err)
     {
-        XWordMessage(this, MSG_PUZ_ERROR, puz2wx(puz::decode_utf8(err.what())).c_str().AsChar());
+        XWordMessage(this, MSG_PUZ_ERROR,
+                     (const char *) puz2wx(puz::decode_utf8(err.what())).mb_str());
     }
     catch (std::exception & err)
     {
-        XWordMessage(this, MSG_STD_EXCEPTION, puz2wx(puz::decode_utf8(err.what())).c_str().AsChar());
+        XWordMessage(this, MSG_STD_EXCEPTION,
+                     (const char *) puz2wx(puz::decode_utf8(err.what())).mb_str());
     }
     catch (...)
     {
@@ -1412,7 +1414,8 @@ MyFrame::SetupToolManager()
     }
     else
     {
-        XWordErrorMessage(this, _T("Cannot find images directory:\n%s"), imagesdir.c_str().AsChar());
+        XWordErrorMessage(this, _T("Cannot find images directory:\n%hs"),
+                          (const char *) imagesdir.mb_str());
         m_toolMgr.SetIconLocation(_T(""));
     }
 }
