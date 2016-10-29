@@ -59,10 +59,6 @@ if not xword.frame then
     local config = require(_R .. 'config')
     config.load()
     local dlg = show_dialog()
-    dlg:Connect(wx.wxEVT_CLOSE_WINDOW, function (evt)
-        dlg:Destroy()
-        evt:Skip()
-    end)
 end
 
 return { init, uninit }

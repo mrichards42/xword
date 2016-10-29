@@ -86,11 +86,6 @@ local function ShowDialog(points)
     dlg:Fit()
     dlg:SetMinSize(dlg:GetSize())
 
-    dlg:Connect(wx.wxEVT_CLOSE_WINDOW, function(evt)
-        dlg:Destroy()
-        evt:Skip()
-    end)
-
     dlg:Fit()
     dlg:Center()
     dlg:ShowModal()
