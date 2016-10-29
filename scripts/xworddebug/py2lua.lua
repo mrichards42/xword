@@ -216,7 +216,7 @@ local function convert(filename, writefile, luafile)
         if not luafile then
             luafile = filename:gsub('%.py', '%.lua')
         end
-        f = io.open(luafile, 'w')
+        f = io.open(luafile, 'wb')
         -- Keep track of filename and modification time
         f:write(([[
 -- Converted from python by py2lua
