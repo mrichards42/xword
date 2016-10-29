@@ -3051,6 +3051,10 @@ private:
     }
 };
 
+bool isVowel(char x) {
+    return x == 'A' || x == 'E' || x == 'I' || x == 'O' || x == 'U';
+}
+
 void
 MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
 {
@@ -3066,16 +3070,28 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
     dlg->Show();
     puz::Scrambler scrambler(m_puz.GetGrid());
     unsigned short key = 0;
+    int maxCandidateVowels = 0;
     wxStopWatch sw;
     dlg->StartTimer();
     for (unsigned short i = 1000; i <= 9999; ++i)
     {
         wxTheApp->Yield(); // Don't block the GUI.
-        dlg->SetKey(i);
-        if (scrambler.UnscrambleSolution(i))
+        // Only update every 100 keys so rendering doesn't slow down the unscramble process.
+        if (i % 100 == 0) {
+            dlg->SetKey(i);
+        }
+        std::string solution = scrambler.GetUnscrambledSolution(i);
+        if (!solution.empty())
         {
-            key = i;
-            break;
+            // Some puzzles have more than one key which "unlocks" the puzzle, but only one key is
+            // valid, whereas the rest produce gibberish. As a rough heuristic, take the key whose
+            // resulting solution has the highest number of vowels.
+            int candidateVowels = std::count_if(solution.begin(), solution.end(), isVowel);
+            wxLogDebug(_T("Candidate key %d has %d vowels"), i, candidateVowels);
+            if (candidateVowels >= maxCandidateVowels) {
+                maxCandidateVowels = candidateVowels;
+                key = i;
+            }
         }
     }
     // If we don't stop the timer, it might try to send another event, which would
@@ -3094,6 +3110,7 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
     }
     else
     {
+        assert(scrambler.UnscrambleSolution(key));
         wxMessageBox(wxString::Format(
                         _T("Unscrambling succeeded!\n")
                         _T("Key: %d\n")

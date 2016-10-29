@@ -36,6 +36,9 @@ public:
     // If key != 0, use the provided key, otherwise create one
     bool ScrambleSolution(unsigned short key_int = 0);
     bool UnscrambleSolution(unsigned short key_int);
+    // Return the unscrambled solution for the given key if it
+    // is valid, or else the empty string.
+    std::string GetUnscrambledSolution(unsigned short key_int);
 
     // Check a scrambled grid to see if it is correct
     static bool CheckUserGrid(const Grid & grid);
