@@ -248,6 +248,8 @@ int MyApp::OnExit()
     wxFileOutputStream fileStream(configFile.GetFullPath());
     config->Save(fileStream);
 
+    delete m_frame;
+
     delete m_config;
 
     // Clean up printing stuff.
