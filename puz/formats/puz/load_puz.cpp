@@ -80,6 +80,10 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     // Set the grid's solution and text
     std::string::iterator sol_it  = solution.begin();
     std::string::iterator text_it = text.begin();
+    // Guard against malformatted diagramless puzzles where the text grid is marked using '.' for
+    // black squares instead of ':'. We can detect this if the text grid equals a perfectly blank
+    // solution grid but with '.' for all the black squares.
+    bool is_malformatted_diagramless = true;
     for (Square * square = puz->GetGrid().First();
          square != NULL;
          square = square->Next())
@@ -97,20 +101,37 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
         if (square->IsBlack() && ! puz->IsDiagramless())
             square->SetText(puz::Square::Black);
         else if (*text_it == '-' || *text_it == 0)
+        {
             square->SetText(puz::Square::Blank);
+            if (puz->IsDiagramless() && square->IsSolutionBlack())
+                // Solution is black but text has a blank; not malformatted.
+                is_malformatted_diagramless = false;
+        }
         else if (puz->IsDiagramless() && (*text_it == '.' || *text_it == ':'))
         {
             // Black squares in a diagramless puzzle.
             if (*text_it == '.')
+            {
                 square->SetText(puz::Square::Black);
+                if (!square->IsSolutionBlack())
+                    // Solution is not black but text is; not malformatted.
+                    is_malformatted_diagramless = false;
+            }
             else if (*text_it == ':')
+            {
                 square->SetText(puz::Square::Blank);
+                // Solution specifies a proper blank for a black square; not malformatted.
+                is_malformatted_diagramless = false;
+            }
         }
         else
         {
             square->SetText(decode_puz(std::string(1, *text_it)));
             if (islower(*text_it))
                 square->AddFlag(FLAG_PENCIL);
+            if (puz->IsDiagramless())
+                // Text contains an actual letter; not malformatted.
+                is_malformatted_diagramless = false;
         }
         ++text_it;
     }
@@ -150,6 +171,21 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
         // EOF here doesn't matter.
     }
 
+    if (puz->IsDiagramless() && puz->GetTime() == 0 && is_malformatted_diagramless)
+    {
+        // The timer was never started on this diagramless puzzle, yet the text grid has all the
+        // black squares perfectly filled in without any actual answers. Assume this is just a
+        // malformatted puzzle and replace all the text grid blacks with blanks.
+        for (Square * square = puz->GetGrid().First();
+             square != NULL;
+             square = square->Next())
+        {
+            if (square->IsBlack())
+            {
+                square->SetText(puz::Square::Blank);
+            }
+        }
+    }
 
     // Don't even bother with the checksums, since we check the validity
     // of the puzzle anyways
