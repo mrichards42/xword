@@ -37,13 +37,13 @@ namespace messagesPrivate
 void DoXWordMessage(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    wxMessageBox(message, XWORD_APP_NAME " Message", wxOK | wxICON_INFORMATION, parent);
+    wxMessageBox(message, XWORD_APP_NAME _T(" Message"), wxOK | wxICON_INFORMATION, parent);
 }
 
 bool DoXWordPrompt(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    const int ret = wxMessageBox(message, XWORD_APP_NAME " Message", wxYES_NO | wxICON_QUESTION,
+    const int ret = wxMessageBox(message, XWORD_APP_NAME _T(" Message"), wxYES_NO | wxICON_QUESTION,
                                  parent);
     return ret == wxYES || ret == wxOK;
 }
@@ -51,14 +51,14 @@ bool DoXWordPrompt(wxWindow * parent, const wxChar * fmt, ...)
 int DoXWordCancelablePrompt(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    return wxMessageBox(message, XWORD_APP_NAME " Message", wxYES_NO | wxICON_QUESTION | wxCANCEL,
+    return wxMessageBox(message, XWORD_APP_NAME _T(" Message"), wxYES_NO | wxICON_QUESTION | wxCANCEL,
                         parent);
 }
 
 void DoXWordErrorMessage(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    wxMessageBox(message, XWORD_APP_NAME " Error", wxOK | wxICON_ERROR, parent);
+    wxMessageBox(message, XWORD_APP_NAME _T(" Error"), wxOK | wxICON_ERROR, parent);
 }
 
 } // namespace messagesPrivate
