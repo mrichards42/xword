@@ -228,8 +228,7 @@ int MyApp::OnExit()
         m_luaLog->Close();
         // Check to see if we have lua messages
         if (m_luaMessages) {
-            XWordErrorMessage(NULL, _T("Errors occurred.  See log file: %hs"),
-                              (const char *) GetLuaLogFilename().mb_str());
+            XWordErrorMessage(NULL, "Errors occurred.  See log file: %s", GetLuaLogFilename());
         #ifdef _DEBUG
             wxLaunchDefaultApplication(GetLuaLogFilename());
         #endif // _DEBUG

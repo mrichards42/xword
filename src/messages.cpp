@@ -19,125 +19,6 @@
 #include "messages.hpp"
 #include <wx/msgdlg.h>
 
-//-----------------------------------------------------------------------------
-// Message definition
-//-----------------------------------------------------------------------------
-
-// Data for each message
-struct MessageDesc
-{
-    const wxChar * message;
-    const wxChar * title;
-    int flags;
-};
-
-// A generic error
-const wxString errorTitle = XWORD_APP_NAME _T(" Error");
-const int errorFlags = wxOK | wxICON_ERROR;
-
-// A generic message
-const wxString messageTitle = XWORD_APP_NAME _T(" Message");
-const int messageFlags = wxOK | wxICON_INFORMATION;
-
-// A generic question
-const wxString questionTitle = XWORD_APP_NAME _T(" Message");
-const int questionFlags = wxYES_NO | wxICON_QUESTION;
-
-
-// Messages *must* be in the same order they are defined in messages.hpp
-const MessageDesc messageTable [] = {
-
-    // MSG_CORRUPT_PUZ
-    {
-        _T("This puzzle seems to be corrupt.\n")
-        _T("Load it anyway?"),
-        errorTitle,
-        wxYES_NO | wxICON_ERROR
-    },
-
-    // MSG_CORRUPT_SECTION
-    {
-        _T("Some parts of this puzzle are corrupt, but the basic puzzle information is intact.\n")
-        _T("Load it anyway?"),
-        errorTitle,
-        wxYES_NO | wxICON_ERROR
-    },
-
-    // MSG_PUZ_ERROR
-    {
-        _T("%hs"),
-        errorTitle,
-        errorFlags
-    },
-
-    // MSG_STD_EXCEPTION
-    {
-        _T("%hs"),
-        errorTitle,
-        errorFlags
-    },
-
-    // MSG_UNKNOWN_ERROR
-    {
-        _T("Unknown error."),
-        errorTitle,
-        errorFlags
-    },
-
-    // MSG_SAVE_PUZ
-    {
-        _T("Current Puzzle not saved.  Save before closing?"),
-        questionTitle,
-        wxYES_NO | wxCANCEL | wxICON_QUESTION
-    },
-
-    // MSG_DELETE_PUZ
-    {
-        _T("Delete this file?"),
-        questionTitle,
-        wxYES_NO | wxICON_QUESTION
-    },
-
-    // MSG_REVEAL_ALL
-    {
-        _T("This will reveal the entire grid.  Continue?"),
-        questionTitle,
-        questionFlags
-    },
-
-    // MSG_NO_INCORRECT,
-    {
-        
-        _T("No Incorrect Letters!"),
-        messageTitle,
-        messageFlags
-    },
-
-    // MSG_UNSCRAMBLE
-    {
-        _T("Solution unscrambled!"),
-        messageTitle,
-        messageFlags
-    },
-
-    // MSG_SCRAMBLE
-    {
-        _T("Solution scrambled.  Key is %d"),
-        messageTitle,
-        messageFlags
-    },
-
-    // MSG_WRONG_KEY
-    {
-        _T("Wrong Key!"),
-        messageTitle,
-        messageFlags
-    }
-};
-
-wxCOMPILE_TIME_ASSERT(sizeof(messageTable) / sizeof(MessageDesc) == MSG_TOTAL_MESSAGES,
-                      Bad_messageTable);
-
 
 //-----------------------------------------------------------------------------
 // Message / Prompt / Error functions
@@ -150,40 +31,36 @@ wxCOMPILE_TIME_ASSERT(sizeof(messageTable) / sizeof(MessageDesc) == MSG_TOTAL_ME
         const wxString strname = wxString::FormatV(format, argptr);  \
         va_end(argptr);
 
-int XWordMessage(wxWindow * parent, XWordMessageId id, ...)
+namespace messagesPrivate
 {
-    const MessageDesc & desc = messageTable[id];
-    _FORMAT_MESSAGE(id, desc.message, message);
-    return wxMessageBox(message, desc.title, desc.flags, parent);
-}
 
-int XWordMessage(wxWindow * parent, const wxChar * fmt, ...)
+void DoXWordMessage(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    return wxMessageBox(message, messageTitle, messageFlags, parent);
+    wxMessageBox(message, XWORD_APP_NAME " Message", wxOK | wxICON_INFORMATION, parent);
 }
 
-
-bool XWordPrompt(wxWindow * parent, XWordMessageId id, ...)
-{
-    const MessageDesc & desc = messageTable[id];
-    _FORMAT_MESSAGE(id, desc.message, message);
-    const int ret = wxMessageBox(message, desc.title, desc.flags, parent);
-    return (ret == wxYES || ret == wxOK);
-}
-
-bool XWordPrompt(wxWindow * parent, const wxChar * fmt, ...)
+bool DoXWordPrompt(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    const int ret = wxMessageBox(message, questionTitle, questionFlags, parent);
-    return (ret == wxYES || ret == wxOK);
+    const int ret = wxMessageBox(message, XWORD_APP_NAME " Message", wxYES_NO | wxICON_QUESTION,
+                                 parent);
+    return ret == wxYES || ret == wxOK;
 }
 
-
-int XWordErrorMessage(wxWindow * parent, const wxChar * fmt, ...)
+int DoXWordCancelablePrompt(wxWindow * parent, const wxChar * fmt, ...)
 {
     _FORMAT_MESSAGE(fmt, fmt, message);
-    return wxMessageBox(message, errorTitle, errorFlags, parent);
+    return wxMessageBox(message, XWORD_APP_NAME " Message", wxYES_NO | wxICON_QUESTION | wxCANCEL,
+                        parent);
 }
+
+void DoXWordErrorMessage(wxWindow * parent, const wxChar * fmt, ...)
+{
+    _FORMAT_MESSAGE(fmt, fmt, message);
+    wxMessageBox(message, XWORD_APP_NAME " Error", wxOK | wxICON_ERROR, parent);
+}
+
+} // namespace messagesPrivate
 
 #undef _FORMAT_MESSAGE

@@ -141,6 +141,8 @@ IMPLEMENT_DYNAMIC_CLASS(XGridCtrl, wxScrolledCanvas)
 
 const int UNDEFINED_BOX_SIZE = -1;
 
+const char * MSG_NO_INCORRECT = "No Incorrect Letters!";
+
 // Helper functions for all of the "lookup" functions that return NULL
 inline void
 SetIfExists(puz::Square * &current, puz::Square * test)

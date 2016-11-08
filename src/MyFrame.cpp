@@ -648,17 +648,15 @@ MyFrame::HandlePuzException()
     }
     catch (puz::Exception & err)
     {
-        XWordMessage(this, MSG_PUZ_ERROR,
-                     (const char *) puz2wx(puz::decode_utf8(err.what())).mb_str());
+        XWordErrorMessage(this, puz2wx(puz::decode_utf8(err.what())));
     }
     catch (std::exception & err)
     {
-        XWordMessage(this, MSG_STD_EXCEPTION,
-                     (const char *) puz2wx(puz::decode_utf8(err.what())).mb_str());
+        XWordErrorMessage(this, err.what());
     }
     catch (...)
     {
-        XWordMessage(this, MSG_UNKNOWN_ERROR);
+        XWordErrorMessage(this, "Unknown error.");
     }
 }
 
@@ -672,7 +670,7 @@ MyFrame::ClosePuzzle(bool prompt, bool update)
 
     if (prompt && m_isModified)
     {
-        int ret = XWordMessage(this, MSG_SAVE_PUZ);
+        int ret = XWordCancelablePrompt(this, "Current Puzzle not saved.  Save before closing?");
         if (ret == wxCANCEL)
             return false;
         if (ret == wxYES)
@@ -1414,8 +1412,7 @@ MyFrame::SetupToolManager()
     }
     else
     {
-        XWordErrorMessage(this, _T("Cannot find images directory:\n%hs"),
-                          (const char *) imagesdir.mb_str());
+        XWordErrorMessage(this, "Cannot find images directory:\n%s", imagesdir);
         m_toolMgr.SetIconLocation(_T(""));
     }
 }
@@ -1866,7 +1863,7 @@ MyFrame::OnSavePuzzle(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnDeletePuzzle(wxCommandEvent & WXUNUSED(evt))
 {
-    if (XWordPrompt(this, MSG_DELETE_PUZ) && ClosePuzzle(false))
+    if (XWordPrompt(this, "Delete this file?") && ClosePuzzle(false))
         wxRemoveFile(m_filename);
 }
 
@@ -1993,7 +1990,7 @@ MyFrame::OnCheckLetter(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnRevealGrid(wxCommandEvent & WXUNUSED(evt))
 {
-    if (XWordPrompt(this, MSG_REVEAL_ALL))
+    if (XWordPrompt(this, "This will reveal the entire grid.  Continue?"))
         m_XGridCtrl->CheckGrid(REVEAL_ANSWER | CHECK_ALL);
 }
 
@@ -2030,8 +2027,8 @@ MyFrame::OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
 void
 MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
 {
-    if (! XWordPrompt(this, _T("This will erase all letters in the grid ")
-                            _T("and reset the timer.  Continue?")))
+    if (! XWordPrompt(this, "This will erase all letters in the grid "
+                            "and reset the timer.  Continue?"))
         return;
 
     const bool is_diagramless = m_puz.IsDiagramless();
@@ -2164,7 +2161,7 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 
     if (m_XGridCtrl->GetGrid()->ScrambleSolution(key))
     {
-        XWordMessage(this, MSG_SCRAMBLE, m_XGridCtrl->GetGrid()->GetKey());
+        XWordMessage(this, "Solution scrambled.  Key is %d", m_XGridCtrl->GetGrid()->GetKey());
 
         CheckPuzzle();
 
@@ -2205,7 +2202,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
 
     if (m_XGridCtrl->UnscrambleSolution(key))
     {
-        XWordMessage(this, MSG_UNSCRAMBLE);
+        XWordMessage(this, "Solution unscrambled!");
 
         CheckPuzzle();
 
@@ -2217,7 +2214,7 @@ MyFrame::OnUnscramble(wxCommandEvent & WXUNUSED(evt))
     }
     else
     {
-        XWordMessage(this, MSG_WRONG_KEY);
+        XWordMessage(this, "Wrong Key!");
     }
 }
 
