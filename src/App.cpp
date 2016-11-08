@@ -248,15 +248,21 @@ int MyApp::OnExit()
     wxFileOutputStream fileStream(configFile.GetFullPath());
     config->Save(fileStream);
 
-    delete m_frame;
-
-    delete m_config;
-
     // Clean up printing stuff.
     delete g_printData;
     delete g_pageSetupData;
 
     return wxApp::OnExit();
+}
+
+void MyApp::CleanUp() {
+    wxApp::CleanUp();
+
+    // We can't safely delete the ConfigManager in OnExit because it has a correctness check
+    // ensuring that all registered callbacks are unregistered, but OnExit is called prior to
+    // wxWidgets cleanup (which means, in particular, that MyFrame may not yet be destroyed). So we
+    // delete it after the cleanup instead.
+    delete m_config;
 }
 
 //------------------------------------------------------------------------------

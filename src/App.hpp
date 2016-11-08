@@ -59,6 +59,7 @@ class MyApp : public wxApp
 public:
     bool OnInit();
     int OnExit();
+    void CleanUp();
 
     ConfigManager & GetConfigManager() { return *m_config; }
     bool IsPortable() { return m_isPortable; }
