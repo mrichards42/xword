@@ -618,6 +618,8 @@ Puzzle::ConvertDiagramlessToNormal()
     {
         if (square->IsSolutionBlack())
             square->SetText(puz::Square::Black);
+        else if (square->IsBlack())
+            square->SetText(puz::Square::Blank);
     }
     m_grid.SetType(TYPE_NORMAL);
     NumberGrid();
