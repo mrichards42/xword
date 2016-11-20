@@ -56,34 +56,6 @@ wxString GetConfigFile()
     return GetConfigDir() + sep() + configFileName;
 }
 
-// If wxWidgets is compiled in debug mode under windows, *and* the exe is located
-// in a folder that begins with "debug" certain wxStandardPaths functions return
-// the parent directory instead of the exe directory.  This is clearly intended
-// as a feature, but I find it to be a pain.
-// The following are affected:
-//     wxStandardPaths::GetDataDir
-//     wxStandardPaths::GetPluginsDir
-//     wxStandardPaths::GetResourcesDir
-//     wxStandardPaths::GetAppDir
-// Fortunately these should always return the exe directory.
-// TODO: Investigate using wxStandardPaths::DontIgnoreAppSubDir with wxWidgets 2.9.1+
-#if defined(_DEBUG) && defined(__WXMSW__)
-
-wxString GetImagesDir()
-{
-    return exedir() + sep() + _T("images");
-}
-
-
-wxString GetScriptsDir()
-{
-    return exedir() + sep() + _T("scripts");
-}
-
-#define GetPluginsDir() exedir()
-
-#else
-
 wxString GetImagesDir()
 {
     if (wxGetApp().IsPortable())
@@ -102,9 +74,6 @@ wxString GetScriptsDir()
 }
 
 #define GetPluginsDir() wxStandardPaths::Get().GetPluginsDir()
-
-#endif // _DEBUG && __WXMSW__
-
 
 wxImage LoadXWordImage(const wxString & name, int size)
 {

@@ -22,6 +22,15 @@
 #include <wx/image.h>
 #include <wx/bitmap.h>
 
+// On Windows, turn off the wxWidgets default behavior of returning the parent directory instead of
+// the exe directory when we're compiled in debug mode and the exe is located in a folder that
+// begins with "debug".
+#ifdef __WXMSW__
+#define InitPaths() wxStandardPaths::Get().DontIgnoreAppSubDir();
+#else // ! __WXMSW__
+#define InitPaths()
+#endif // __WXMSW__ / ! __WXMSW__
+
 // Locations where the application expects to find its files.
 // It is up to the caller to determine whether or not the path exists.
 wxString GetUserDataDir(); // Directory for user data
