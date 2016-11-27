@@ -201,11 +201,12 @@ bool XPFParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             Square * square = GetSquare(puz, clue);
             string_t dir = GetAttribute(clue, "Dir");
             string_t num = GetAttribute(clue, "Num");
-            if (! square || dir.empty() || num.empty())
+            if (dir.empty() || num.empty())
                 clueAlgorithm = true;
             else
             {
-                square->SetNumber(num);
+                if (square)
+                    square->SetNumber(num);
                 clues[dir].push_back(Clue(num, clue_text));
             }
         }
