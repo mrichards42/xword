@@ -176,8 +176,9 @@ public:
     //--------------------
     // These are defined in terms of text, not solution.
     // This makes certain things easier for diagramless puzzles.
-    // If the puzzle is not diagramless, SetSolution(Square::Black)
-    // also calls SetText(Square::Black) for consistency.
+    // SetSolution(Square::Black) also calls SetText(Square::Black) for
+    // consistency, so if your puzzle is diagramless, you will have to
+    // explicitly call SetText("") on black squares to make them empty.
     bool IsWhite()         const { return ! IsBlack() && ! IsMissing(); }
     bool IsBlack()         const { return m_text == Black; }
     bool IsBlank()         const { return m_text == Blank; }
