@@ -53,11 +53,26 @@ function import.xwordinfoJSON(p, filename)
     end
 
     -- Metadata
-    -- Sunday puzzles have a real title without the date, so add the date
-    if doc.dow == "Sunday" then
-        p.Title = date(doc.date):fmt("NY Times, %a, %b %d, %Y ") .. doc.title
+    if ornil(doc.type) then
+        -- Add the variety type to the title
+        local variety_type
+        if doc.type == "panda" then
+            variety_type = "PUNS AND ANAGRAMS"
+        else
+            variety_type = doc.type:upper()
+        end
+        if doc.title:find(variety_type) then
+            p.Title = doc.title
+        else
+            p.Title = doc.title .. " " .. variety_type
+        end
     else
-        p.Title = doc.title
+        -- Sunday puzzles have a real title without the date, so add the date
+        if doc.dow == "Sunday" then
+            p.Title = date(doc.date):fmt("NY Times, %a, %b %d, %Y ") .. doc.title
+        else
+            p.Title = doc.title
+        end
     end
     p.Author = doc.author
     p.Copyright = doc.copyright
@@ -73,10 +88,18 @@ function import.xwordinfoJSON(p, filename)
     local g = p.Grid
     g:SetSize(doc.size.cols, doc.size.rows)
 
+    -- Set diagramless
+    if doc.type == "diagramless" then
+        g.Type = puz.TYPE_DIAGRAMLESS
+    end
+
     local s = g:First()
     local shade = ornil(doc.shadecircles) or false
     for _, letter, number, circle in izip(doc.grid, doc.gridnums, ornil(doc.circles)) do
         s.Solution = letter
+        if letter == "." and doc.type == "diagramless" then
+            s.Text = ""
+        end
         if circle == 1 then
             if shade then
                 s:SetHighlight(true)
