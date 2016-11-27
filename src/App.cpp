@@ -81,6 +81,8 @@ bool MyApp::OnInit()
     wxCmdLineParser cmd(cmdLineDesc, argc, argv);
     cmd.Parse(false); // don't show usage
 
+    InitPaths();
+
     // Portable mode is enabled if there is a file named
     // "portable_mode_enabled" in the executable directory or with the
     // command line switch -p
