@@ -24,43 +24,29 @@
 // Message / Prompt / Error functions
 //-----------------------------------------------------------------------------
 
-// Make message formatting a little cleaner
-#define _FORMAT_MESSAGE(lastparam, format, strname)                  \
-        va_list argptr;                                              \
-        va_start(argptr, lastparam);                                 \
-        const wxString strname = wxString::FormatV(format, argptr);  \
-        va_end(argptr);
-
-namespace messagesPrivate
+void XWordMessage(wxWindow * parent, const wxString & message)
 {
-
-void DoXWordMessage(wxWindow * parent, const wxChar * fmt, ...)
-{
-    _FORMAT_MESSAGE(fmt, fmt, message);
     wxMessageBox(message, XWORD_APP_NAME _T(" Message"), wxOK | wxICON_INFORMATION, parent);
 }
 
-bool DoXWordPrompt(wxWindow * parent, const wxChar * fmt, ...)
+bool XWordPrompt(wxWindow * parent, const wxString & message)
 {
-    _FORMAT_MESSAGE(fmt, fmt, message);
-    const int ret = wxMessageBox(message, XWORD_APP_NAME _T(" Message"), wxYES_NO | wxICON_QUESTION,
+    const int ret = wxMessageBox(message,
+                                 XWORD_APP_NAME _T(" Message"),
+                                 wxYES_NO | wxICON_QUESTION,
                                  parent);
     return ret == wxYES || ret == wxOK;
 }
 
-int DoXWordCancelablePrompt(wxWindow * parent, const wxChar * fmt, ...)
+int XWordCancelablePrompt(wxWindow * parent, const wxString & message)
 {
-    _FORMAT_MESSAGE(fmt, fmt, message);
-    return wxMessageBox(message, XWORD_APP_NAME _T(" Message"), wxYES_NO | wxICON_QUESTION | wxCANCEL,
+    return wxMessageBox(message,
+                        XWORD_APP_NAME _T(" Message"),
+                        wxYES_NO | wxICON_QUESTION | wxCANCEL,
                         parent);
 }
 
-void DoXWordErrorMessage(wxWindow * parent, const wxChar * fmt, ...)
+void XWordErrorMessage(wxWindow * parent, const wxString & message)
 {
-    _FORMAT_MESSAGE(fmt, fmt, message);
     wxMessageBox(message, XWORD_APP_NAME _T(" Error"), wxOK | wxICON_ERROR, parent);
 }
-
-} // namespace messagesPrivate
-
-#undef _FORMAT_MESSAGE

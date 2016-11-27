@@ -23,40 +23,22 @@
 #    include <wx/frame.h>
 #endif
 
-// Internal helper methods for WX_DEFINE_VARARG_FUNC declarations.
-namespace messagesPrivate {
-    void DoXWordMessage(wxWindow * parent, const wxChar * fmt, ...);
-    bool DoXWordPrompt(wxWindow * parent, const wxChar * fmt, ...);
-    int DoXWordCancelablePrompt(wxWindow * parent, const wxChar * fmt, ...);
-    void DoXWordErrorMessage(wxWindow * parent, const wxChar * fmt, ...);
-}
-
-// NOTE: WX_DEFINE_VARARG_FUNC takes two method implementations; the one we provide, which is used
-// when wxWidgets uses the native wchar_t, and an alternative used if wxUSE_UNICODE_UTF8 == 1. Since
-// wxWidgets 3.0+ uses the native representation by default on all platforms, we leave out the
-// implementation for UTF-8, so this code will fail to compile if wxWidgets is compiled with
-// wxUSE_UNICODE_UTF8 == 1.
-
-// XWordMessage(parent, format, ...):
+// XWordMessage(parent, message):
 // Show a wxMessageBox with the given informational message.
-WX_DEFINE_VARARG_FUNC_VOID(XWordMessage, 2, (wxWindow*, const wxFormatString&),
-                           messagesPrivate::DoXWordMessage, UnusedUtf8Implementation);
+void XWordMessage(wxWindow * parent, const wxString & message);
 
-// XWordPrompt(parent, format, ...):
+// XWordPrompt(parent, message):
 // Show a wxMessageBox prompting the user with the given question.
 // Returns whether the user said yes.
-WX_DEFINE_VARARG_FUNC(bool, XWordPrompt, 2, (wxWindow*, const wxFormatString&),
-                      messagesPrivate::DoXWordPrompt, UnusedUtf8Implementation);
+bool XWordPrompt(wxWindow * parent, const wxString & message);
 
-// XWordCancelablePrompt(parent, format, ...):
+// XWordCancelablePrompt(parent, message):
 // Show a wxMessageBox prompting the user with the given question for a cancelable action.
 // Return the raw return value of the wxMessageBox (wxYES / wxNO / wxCANCEL).
-WX_DEFINE_VARARG_FUNC(int, XWordCancelablePrompt, 2, (wxWindow*, const wxFormatString&),
-                      messagesPrivate::DoXWordCancelablePrompt, UnusedUtf8Implementation);
+int XWordCancelablePrompt(wxWindow * parent, const wxString & message);
 
-// XWordErrorMessage(parent, format, ...):
+// XWordErrorMessage(parent, message):
 // Show a wxMessageBox with the given error message.
-WX_DEFINE_VARARG_FUNC_VOID(XWordErrorMessage, 2, (wxWindow*, const wxFormatString&),
-                           messagesPrivate::DoXWordErrorMessage, UnusedUtf8Implementation);
+void XWordErrorMessage(wxWindow * parent, const wxString & message);
 
 #endif // MY_MESSAGES_H

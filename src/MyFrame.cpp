@@ -1412,7 +1412,7 @@ MyFrame::SetupToolManager()
     }
     else
     {
-        XWordErrorMessage(this, "Cannot find images directory:\n%s", imagesdir);
+        XWordErrorMessage(this, wxString::Format("Cannot find images directory:\n%s", imagesdir));
         m_toolMgr.SetIconLocation(_T(""));
     }
 }
@@ -2161,7 +2161,8 @@ MyFrame::OnScramble(wxCommandEvent & WXUNUSED(evt))
 
     if (m_XGridCtrl->GetGrid()->ScrambleSolution(key))
     {
-        XWordMessage(this, "Solution scrambled.  Key is %d", m_XGridCtrl->GetGrid()->GetKey());
+        XWordMessage(this, wxString::Format("Solution scrambled.  Key is %d",
+                                            m_XGridCtrl->GetGrid()->GetKey()));
 
         CheckPuzzle();
 
