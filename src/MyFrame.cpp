@@ -2052,18 +2052,18 @@ MyFrame::OnConvertToNormal(wxCommandEvent & WXUNUSED(evt))
     // Turn off the diagramless menu items
     EnableDiagramless(false);
 
-    // Ensure focus moves to a different word as it may be on a black square. We move twice to
-    // ensure that the old word is cleared, as it may not have the correct boundaries.
-    m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->LastWhite(), puz::ACROSS);
-    m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite(), puz::ACROSS);
+    // Restore focus to the current square. If the current square is black or no square is selected,
+    // move to the first square instead.
+    puz::Square * square = m_XGridCtrl->GetFocusedSquare();
+    if (square == NULL || square->IsBlack())
+        square = m_XGridCtrl->FirstWhite();
+    m_XGridCtrl->SetFocusedSquare(square, m_puz.FindWord(square));
 
     // Refresh the grid UI
     m_XGridCtrl->Refresh();
 
     // Send puzzle updated event
-    wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
-    evt.SetSquare(m_XGridCtrl->GetFocusedSquare());
-    GetEventHandler()->ProcessEvent(evt);
+    m_XGridCtrl->SendEvent(wxEVT_PUZ_LETTER);
 }
 
 void
@@ -2092,9 +2092,7 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
     m_XGridCtrl->Refresh();
     SetTime(0);
     // Send puzzle updated event
-	wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
-    evt.SetSquare(m_XGridCtrl->GetFocusedSquare());
-    GetEventHandler()->ProcessEvent(evt);
+    m_XGridCtrl->SendEvent(wxEVT_PUZ_LETTER);
 }
 
 
