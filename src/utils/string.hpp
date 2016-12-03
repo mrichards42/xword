@@ -38,7 +38,7 @@ inline puz::string_t wx2puz(const wxString & str)
 
 inline wxString puz2wx(const puz::string_t & str)
 {
-    return str.c_str();
+    return str;
 }
 
 #else

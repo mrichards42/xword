@@ -23,43 +23,22 @@
 #    include <wx/frame.h>
 #endif
 
-enum XWordMessageId
-{
-    // Loading / saving messages
-    MSG_CORRUPT_PUZ,
-    MSG_CORRUPT_SECTION,
-    MSG_PUZ_ERROR,
-    MSG_STD_EXCEPTION,
-    MSG_UNKNOWN_ERROR,
-    MSG_SAVE_PUZ,
-    MSG_DELETE_PUZ,
+// XWordMessage(parent, message):
+// Show a wxMessageBox with the given informational message.
+void XWordMessage(wxWindow * parent, const wxString & message);
 
-    // Check / reveal messages
-    MSG_REVEAL_ALL,
-    MSG_NO_INCORRECT,
+// XWordPrompt(parent, message):
+// Show a wxMessageBox prompting the user with the given question.
+// Returns whether the user said yes.
+bool XWordPrompt(wxWindow * parent, const wxString & message);
 
-    // Scrambling / unscrambling messages
-    MSG_UNSCRAMBLE,
-    MSG_SCRAMBLE,
-    MSG_WRONG_KEY,
+// XWordCancelablePrompt(parent, message):
+// Show a wxMessageBox prompting the user with the given question for a cancelable action.
+// Return the raw return value of the wxMessageBox (wxYES / wxNO / wxCANCEL).
+int XWordCancelablePrompt(wxWindow * parent, const wxString & message);
 
-    // Internal use: the total number of messages
-    MSG_TOTAL_MESSAGES
-};
-
-
-// Return the raw return value of the wxMessagebox
-// (wxYES / wxNO / wxCANCEL / wxOK)
-int XWordMessage(wxWindow * parent, XWordMessageId id, ...);
-int XWordMessage(wxWindow * parent, const wxChar * fmt, ...);
-
-// Return true if the wxMessageBox returns either wxYES or wxOK
-bool XWordPrompt(wxWindow * parent, XWordMessageId id, ...);
-bool XWordPrompt(wxWindow * parent, const wxChar * fmt, ...);
-
-// Return the raw return value of the wxMessagebox
-// The return value is pretty much meaningless, since an error dialog
-// should only have an OK button anyways.
-int XWordErrorMessage(wxWindow * parent, const wxChar * fmt, ...);
+// XWordErrorMessage(parent, message):
+// Show a wxMessageBox with the given error message.
+void XWordErrorMessage(wxWindow * parent, const wxString & message);
 
 #endif // MY_MESSAGES_H
