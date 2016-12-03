@@ -219,6 +219,7 @@ private:
     void EnableUnscramble(bool enable = true);
     void EnableCheck (bool enable = true);
     void EnableReveal(bool enable = true);
+    void EnableDiagramless(bool enable = true);
 
     void SetHasNotes(bool show = true);
 
@@ -293,6 +294,7 @@ private:
     void OnRevealIncorrect(wxCommandEvent & WXUNUSED(evt));
     void OnRevealWord     (wxCommandEvent & WXUNUSED(evt));
     void OnRevealLetter   (wxCommandEvent & WXUNUSED(evt));
+    void OnConvertToNormal(wxCommandEvent & WXUNUSED(evt));
 
     void OnEraseGrid      (wxCommandEvent & WXUNUSED(evt));
     void OnEraseUncrossed (wxCommandEvent & WXUNUSED(evt));

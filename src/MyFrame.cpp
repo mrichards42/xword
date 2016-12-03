@@ -100,6 +100,7 @@ enum toolIds
     ID_REVEAL_INCORRECT_SELECTION,
     ID_REVEAL_SELECTION,
     ID_REVEAL_GRID,
+    ID_CONVERT_TO_NORMAL,
 
     ID_ERASE_GRID,
     ID_ERASE_UNCROSSED,
@@ -279,6 +280,9 @@ MyFrame::ManageTools()
 
         { ID_REVEAL_GRID,      wxITEM_NORMAL, _T("Reveal &Grid"), NULL, NULL,
                    _handler(MyFrame::OnRevealGrid) },
+
+        { ID_CONVERT_TO_NORMAL, wxITEM_NORMAL, _T("Convert to &Normal Puzzle"), NULL, NULL,
+                   _handler(MyFrame::OnConvertToNormal) },
 
         { ID_ERASE_GRID,       wxITEM_NORMAL, _T("Erase &Grid"), NULL, NULL,
                    _handler(MyFrame::OnEraseGrid) },
@@ -1272,6 +1276,9 @@ MyFrame::CreateMenuBar()
             m_toolMgr.Add(submenu, ID_TIMER);
             m_toolMgr.Add(submenu, ID_RESET_TIMER);
         menu->AppendSubMenu(submenu, _T("&Timer"));
+        submenu = new wxMenu();
+            m_toolMgr.Add(submenu, ID_CONVERT_TO_NORMAL);
+        menu->AppendSubMenu(submenu, _T("&Diagramless"));
     mb->Append(menu, _T("&Tools"));
 
     // Help Menu
@@ -1425,6 +1432,7 @@ MyFrame::EnableTools(bool enable)
     EnableGridSize(enable);
     EnableCheck(enable);
     EnableReveal(enable);
+    EnableDiagramless(enable && m_puz.IsOk() && m_puz.IsDiagramless());
 
     // Tools that are only enabled or disabled when a puzzle
     // is shown or closed.  These don't have any special logic.
@@ -1524,7 +1532,12 @@ MyFrame::EnableReveal(bool enable)
                       enable);
 }
 
-
+void
+MyFrame::EnableDiagramless(bool enable)
+{
+    m_toolMgr.Enable(ID_CONVERT_TO_NORMAL, enable);
+    m_menubar->Enable(m_menubar->FindMenuItem("Tools", "Diagramless"), enable);
+}
 
 //------------------------------------------------------------------------------
 // Config
@@ -2025,6 +2038,35 @@ MyFrame::OnRevealLetter(wxCommandEvent & WXUNUSED(evt))
 }
 
 void
+MyFrame::OnConvertToNormal(wxCommandEvent & WXUNUSED(evt))
+{
+    wxASSERT(m_puz.IsDiagramless());
+
+    if (! XWordPrompt(this, _T("This will convert this diagramless puzzle to a normal puzzle, ")
+                            _T("revealing all black squares and overwriting any letters entered ")
+                            _T("where black squares should be.  Continue?")))
+        return;
+
+    m_puz.ConvertDiagramlessToNormal();
+
+    // Turn off the diagramless menu items
+    EnableDiagramless(false);
+
+    // Restore focus to the current square. If the current square is black or no square is selected,
+    // move to the first square instead.
+    puz::Square * square = m_XGridCtrl->GetFocusedSquare();
+    if (square == NULL || square->IsBlack())
+        square = m_XGridCtrl->FirstWhite();
+    m_XGridCtrl->SetFocusedSquare(square, m_puz.FindWord(square));
+
+    // Refresh the grid UI
+    m_XGridCtrl->Refresh();
+
+    // Send puzzle updated event
+    m_XGridCtrl->SendEvent(wxEVT_PUZ_LETTER);
+}
+
+void
 MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
 {
     if (! XWordPrompt(this, _T("This will erase all letters in the grid ")
@@ -2050,9 +2092,7 @@ MyFrame::OnEraseGrid(wxCommandEvent & WXUNUSED(evt))
     m_XGridCtrl->Refresh();
     SetTime(0);
     // Send puzzle updated event
-	wxPuzEvent evt(wxEVT_PUZ_LETTER, GetId());
-    evt.SetSquare(m_XGridCtrl->GetFocusedSquare());
-    GetEventHandler()->ProcessEvent(evt);
+    m_XGridCtrl->SendEvent(wxEVT_PUZ_LETTER);
 }
 
 

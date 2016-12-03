@@ -148,6 +148,7 @@ public:
           Grid & GetGrid()       { return m_grid; }
     void SetGrid(const Grid & grid) { m_grid = grid; }
     bool IsDiagramless() const { return m_grid.IsDiagramless(); }
+    void ConvertDiagramlessToNormal();
 
     // Grid / clue / word numbering algorithms
     //----------------------------------------
@@ -166,6 +167,10 @@ public:
 
     // Find theme squares and mark them as such.
     void MarkThemeSquares();
+
+    // Fix a malformatted diagramless puzzle where blank squares have been
+    // entered as black squares by mistake.
+    void FixMalformattedDiagramless();
 
     // -------------------------------------------------------------------
     // Load / Save

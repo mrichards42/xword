@@ -41,6 +41,7 @@ Puzzle::DoLoad(const std::string & filename, const FileHandlerDesc * desc)
         if (! m_clues.HasWords())
             GenerateWords();
         MarkThemeSquares();
+        FixMalformattedDiagramless();
         TestOk();
     }
     catch (std::ios::failure &) {
@@ -567,5 +568,61 @@ const Puzzle::FileHandlerDesc Puzzle::sm_saveHandlers[] = {
     { SaveJpz, "jpz", puzT("jpuz"), NULL },
     { NULL, NULL, NULL }
 };
+
+// -----------------------------------------------------------------------
+// Diagramless
+// -----------------------------------------------------------------------
+
+void
+Puzzle::FixMalformattedDiagramless()
+{
+    if (!IsDiagramless()) return;
+
+    // If the timer was started on this puzzle, do nothing.
+    if (GetTime() != 0) return;
+
+    // Check if the grid has perfect black squares; that is, the "user" has entered precisely the
+    // correct set of black squares, but the grid is otherwise blank.
+    bool grid_has_perfect_blacks = true;
+    for (Square * square = GetGrid().First();
+         square != NULL;
+         square = square->Next())
+    {
+        if ((square->IsSolutionBlack() != square->IsBlack())
+            || (!square->IsBlack() && !square->IsBlank())) {
+            grid_has_perfect_blacks = false;
+            break;
+        }
+    }
+
+    if (grid_has_perfect_blacks)
+    {
+        for (Square * square = GetGrid().First();
+             square != NULL;
+             square = square->Next())
+        {
+            if (square->IsBlack())
+                square->SetText(puz::Square::Blank);
+        }
+    }
+}
+
+void
+Puzzle::ConvertDiagramlessToNormal()
+{
+    if (!IsDiagramless()) return;
+
+    for (Square * square = m_grid.First();
+         square != NULL;
+         square = square->Next())
+    {
+        if (square->IsSolutionBlack())
+            square->SetText(puz::Square::Black);
+        else if (square->IsBlack())
+            square->SetText(puz::Square::Blank);
+    }
+    m_grid.SetType(TYPE_NORMAL);
+    NumberGrid();
+}
 
 } // namespace puz
