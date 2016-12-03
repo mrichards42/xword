@@ -1,0 +1,41 @@
+version: '{build}'
+test: off
+
+configuration:
+  - Debug
+  - Release
+
+# Build and install wxWidgets, with our custom tweaks patch
+install:
+  - call "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
+  - bash build-wxwidgets.sh %CONFIGURATION%
+
+# Cache the compiled wxWidgets so it can be in with future builds
+cache:
+  - '%USERPROFILE%\wxWidgets'
+
+# Run premake4 to create the Visual Studio project
+before_build:
+  - premake4.exe --wx-prefix="%USERPROFILE%/wxWidgets" vs2010
+
+# Build XWord
+build_script:
+  - msbuild build/vs2010/XWord.sln /p:Configuration=%CONFIGURATION%
+
+# For deployed builds, zip the build folder
+after_build:
+  - 7z a bin\%CONFIGURATION%\XWord-Windows.zip "%APPVEYOR_BUILD_FOLDER%\bin\%CONFIGURATION%\*" -r -x!*.exp -x!*.lib -x!*.pdb -x!*.idb -x!*.ilk -x!*.fbp
+
+artifacts:
+  path: bin\%CONFIGURATION%\XWord-Windows.zip
+  name: XWord-Windows.zip
+
+# Deploy tagged release builds to GitHub Releases
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: di7vtZSm1K8JwmYD0z+PVfcDGav/KwuK4CeBdp4oKoT7ImfJ7ksFSV6zcLcW6qui
+  artifact: XWord-Windows.zip
+  on:
+    appveyor_repo_tag: true
+    configuration: Release
