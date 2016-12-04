@@ -67,9 +67,12 @@ MyStatusBar::MyStatusBar(wxWindow * parent,
                  wxMouseEventHandler(MyStatusBar::OnAlertClick),
                  NULL, this);
 
-    m_timer = new SizedText(this, wxID_ANY);
-    m_timer->SetAlign(wxALIGN_RIGHT);
-    m_timer->SetWrapMode(ST_TRUNCATE);
+    m_timer = new wxStaticText(this,
+                               wxID_ANY,
+                               wxEmptyString,
+                               wxDefaultPosition,
+                               wxDefaultSize,
+                               wxST_NO_AUTORESIZE | wxALIGN_RIGHT);
     m_timer->SetFont(GetFont());
     m_timer->SetToolTip("");
 }
