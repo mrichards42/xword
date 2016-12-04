@@ -47,8 +47,10 @@ follows the normal rules of numbering a grid.
 # Building XWord #
 
 XWord uses the [wxWidgets](http://www.wxwidgets.org) cross-platform toolkit
-(statically linked). wxaui-tweaks.patch slightly alters aui/framemanager. If
-you would like to use this patch, apply it to the wxWidgets directory.
+(statically linked). wxaui-tweaks.patch slightly alters aui/framemanager.
+wxwidgets-smooth-scroll-modals.patch fixes two-finger scrolling in modal
+dialogs on macOS. If you would like to use these patches, apply them to the
+wxWidgets directory.
 
 XWord uses [premake](http://industriousone.com/premake/download) to generate
 project files.  Version 4 has been used successfully, but the 5 beta may also work.
