@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Script to build and install wxWidgets, with our custom tweaks patch.
 
 set -e
@@ -20,10 +20,10 @@ WX_CONFIGURE_FLAGS="\
   OBJCXXFLAGS=-fvisibility-inlines-hidden"
 WX_MAKE_FLAGS="SHARED=0"
 
-if [ "$CONFIGURATION" = "Debug" ]; then
+if [[ "$CONFIGURATION" == "Debug" ]]; then
   WX_CONFIGURE_FLAGS="$WX_CONFIGURE_FLAGS --enable-debug"
   WX_MAKE_FLAGS="$WX_MAKE_FLAGS BUILD=debug"
-elif [ "$CONFIGURATION" = "Release" ]; then
+elif [[ "$CONFIGURATION" == "Release" ]]; then
   WX_MAKE_FLAGS="$WX_MAKE_FLAGS BUILD=release"
 else
   echo "Unsupported configuration: $CONFIGURATION"
@@ -32,7 +32,7 @@ else
 fi
 echo "Building wxWidgets for configuration: $CONFIGURATION"
 
-if [ "$OSTYPE" = "darwin"* ]; then
+if [[ "$OSTYPE" == "darwin"* ]]; then
   # Mac OS X
   BUILD_COMMAND="./configure --prefix=$INSTALL_PATH $WX_CONFIGURE_FLAGS && make && make install"
 else
