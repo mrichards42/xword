@@ -15,6 +15,8 @@ local oldprint = print
 require 'wx'
 print = oldprint
 local path = require 'pl.path'
+local lfs = require 'lfs'
+local md5 = require 'md5'
 
 -- Events we know how to handle
 -- { wxPythonEventBinder = wxWidgetsEventId }
@@ -64,7 +66,10 @@ local function convert(filename, writefile, luafile)
     local f = assert(io.open(filename, 'r'))
     local text = f:read('*a')
     f:close()
-    
+
+    -- Calculate the checksum of the original text
+    local md5sum = md5.sumhexa(text)
+
     -- Use unix newlines
     text = text:gsub('\r\n', '\n')
 
@@ -222,9 +227,10 @@ local function convert(filename, writefile, luafile)
 -- Converted from python by py2lua
 -- python file: %s
 -- modtime: %s
+-- md5sum: %s
 -- ----------------------------------
 
-]]):format(path.basename(filename), path.getmtime(filename)))
+]]):format(path.basename(filename), path.getmtime(filename), md5sum))
         -- Write converted text
         f:write(text)
         f:close()
@@ -320,13 +326,25 @@ local function is_modified(luafile)
         f:read("*line") -- py2lua line
         local pyfile = f:read("*line"):match("--.*:%s+(.*%.py)") -- python file
         local mtime = tonumber(f:read("*line"):match("--.*:%s+(%d*)")) -- modified time
+        local md5sum = f:read("*line"):match("--.*:%s+(%x*)") -- md5sum
         f:close()
-        if pyfile and mtime then
+        if pyfile and mtime and md5sum then
             -- Get the full path of the python file
             pyfile = path.join(path.dirname(luafile), pyfile)
             -- Compare modification times
             if path.getmtime(pyfile) > mtime then
-                return true, pyfile
+                -- Compare md5sums (in case the mtime changed but the file is the same)
+                local pyf = assert(io.open(pyfile, 'r'))
+                local text = pyf:read('*a')
+                pyf:close()
+                local pymd5sum = md5.sumhexa(text)
+                if md5sum ~= pymd5sum then
+                    return true, pyfile
+                else
+                    -- Touch the py file to skip future md5 checks until the file changes
+                    lfs.touch(pyfile)
+                    return false
+                end
             else
                 return false
             end
