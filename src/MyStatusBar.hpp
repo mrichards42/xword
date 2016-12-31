@@ -46,6 +46,7 @@ private:
     void OnSize(wxSizeEvent & WXUNUSED(evt));
 
     SizedText * m_alert;
+    wxStaticText * m_timer;
     void OnAlertClick(wxMouseEvent & evt);
     void WrapAlert(int width = -1);
 

@@ -66,6 +66,15 @@ MyStatusBar::MyStatusBar(wxWindow * parent,
     m_alert->Connect(wxEVT_LEFT_DCLICK,
                  wxMouseEventHandler(MyStatusBar::OnAlertClick),
                  NULL, this);
+
+    m_timer = new wxStaticText(this,
+                               wxID_ANY,
+                               wxEmptyString,
+                               wxDefaultPosition,
+                               wxDefaultSize,
+                               wxST_NO_AUTORESIZE | wxALIGN_RIGHT);
+    m_timer->SetFont(GetFont());
+    m_timer->SetToolTip("");
 }
 
 void MyStatusBar::SetStatus(const wxString & text)
@@ -102,7 +111,7 @@ void MyStatusBar::SetAlert(const wxString & text, const wxColour & bgColor)
 
 void MyStatusBar::SetTime(int time, const wxString & msg)
 {
-    SetStatusText( wxTimeSpan::Seconds(time).Format() + msg, STATUS_TIME);
+    m_timer->SetLabel(wxTimeSpan::Seconds(time).Format() + msg);
 }
 
 
@@ -115,6 +124,9 @@ MyStatusBar::OnSize(wxSizeEvent & WXUNUSED(evt))
     if (GetFieldRect(STATUS_ALERT, rect)) {
         m_alert->SetSize(rect);
         //WrapAlert(rect.width);
+    }
+    if (GetFieldRect(STATUS_TIME, rect)) {
+        m_timer->SetSize(rect);
     }
 }
 
