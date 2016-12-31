@@ -167,9 +167,8 @@ void LoadTxt(Puzzle * puz, const std::string & filename, void * /* dummy */)
     for (line = f.ReadLine(); line != "<NOTEPAD>" && ! line.empty(); line = f.ReadLine())
         down.push_back(Clue(puzT(""), TrimWhitespace(decode_utf8(line))));
 
-    puz->NumberGrid();
     puz->NumberClues();
-    puz->GenerateWords();
+    puz->NumberGrid();
 
     // The rest of the puzzle is notepad
     if (line == "<NOTEPAD>")
