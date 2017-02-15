@@ -525,7 +525,10 @@ MyFrame::LoadPuzzle(const wxString & filename, const puz::Puzzle::FileHandlerDes
 {
     Freeze();
     if (! ClosePuzzle(true, false)) // Prompt for save, don't update
+    {
+        Thaw();
         return false;
+    }
 
     wxStopWatch sw;
 
