@@ -4,6 +4,16 @@
 XWord is a cross-platform crossword puzzle program designed to be highly
 configurable.  It reads multiple puzzle file formats.
 
+## See it in action ##
+
+In 2013 [Alex Boisvert](http://www.alexboisvert.com/) and
+[Tyler Hinman](http://www.tylerhinman.com/) made a series of videos called
+["Crossword Race"](https://www.youtube.com/watch?v=3kz5z7mobBM&list=PLkuKuYfrweip0hxFZr4gQ7Fk_eLrfbo2Z)
+where they race to solve puzzles using XWord, with Tyler having different
+handicaps each time.  Some of the handicaps showcase features of XWord and the
+puzzle formats it supports, including [non-standard word directions](https://www.youtube.com/watch?v=3kz5z7mobBM&list=PLkuKuYfrweip0hxFZr4gQ7Fk_eLrfbo2Z)
+and [diagramless solving](https://www.youtube.com/watch?v=7P1EeDniH5c&index=2&list=PLkuKuYfrweip0hxFZr4gQ7Fk_eLrfbo2Z).
+
 ## Features ##
 
 * Solving of all American style, cryptic, and diagramless crosswords.
