@@ -7,21 +7,22 @@ configuration:
 
 environment:
   PYTHON: "C:\\Python38"
+  WX_VERSION: 3.1.3
 
 # Build and install markdown and wxWidgets, with our custom tweaks patch
 install:
   - SET PATH=%PYTHON%;%PATH%
   - IF %CONFIGURATION%==Release python -m pip install markdown
   - call "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
-  - bash build-wxwidgets.sh %CONFIGURATION%
+  - bash build-wxwidgets.sh %WX_VERSION% %CONFIGURATION%
 
 # Cache the compiled wxWidgets so it can be in with future builds
 cache:
-  - '%USERPROFILE%\wxWidgets-3.1.0'
+  - '%USERPROFILE%\wxWidgets-%WX_VERSION%'
 
 # Run premake4 to create the Visual Studio project
 before_build:
-  - premake4.exe --platform=x32 --wx-prefix="%USERPROFILE%/wxWidgets-3.1.0" vs2010
+  - premake4.exe --platform=x32 --wx-prefix="%USERPROFILE%/wxWidgets-%WX_VERSION%" vs2010
 
 # Build XWord
 build_script:

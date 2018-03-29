@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 #include "TreePanels.hpp"
 #include <wx/treebook.h>
+#include <wx/treectrl.h>
 
 // A treebook that hacks up the constructor to allow a style for the wxTreeCtrl
 class MyTreebook : public wxTreebook

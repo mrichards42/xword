@@ -47,14 +47,8 @@ public:
     // If dont_render is TRUE then nothing is rendered into DC and it only counts
     // pixels and return y coord of the next page
     //
-    // known_pagebreaks and number_of_pages are used only when counting pages;
-    // otherwise, their default values should be used. Their purpose is to
-    // support pagebreaks using a subset of CSS2's <DIV>. The <DIV> handler
-    // needs to know what pagebreaks have already been set so that it doesn't
-    // set the same pagebreak twice.
-    //
     // CAUTION! Render() changes DC's user scale and does NOT restore it!
-    int Render(int x, int y, wxArrayInt& known_pagebreaks, int from = 0,
+    int Render(int x, int y, int from = 0,
                int dont_render = FALSE, int to = INT_MAX);
 
     // returns total height of the html document

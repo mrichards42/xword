@@ -108,6 +108,14 @@ void ColorChoice::ClearColors()
 // Sort roughly by hue
 bool color_sort(ColorChoice::colorlabel_t a, ColorChoice::colorlabel_t b)
 {
+    // wxNullColour should be last.
+    if (!a.color.IsOk()) {
+        return false;
+    }
+    if (!b.color.IsOk()) {
+        return true;
+    }
+
     return HCLColor(a.color) < HCLColor(b.color);
 }
 

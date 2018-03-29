@@ -351,9 +351,6 @@ private:
 
     // Frame events
     //-------------
-    void OnActivate    (wxActivateEvent & evt);
-    void SetFocusOnIdle(wxIdleEvent & evt);
-    bool m_isIdleConnected;
     void OnClose       (wxCloseEvent & evt);
     void OnLinkClicked (wxHtmlLinkEvent & evt);
     void OnSize        (wxSizeEvent & evt);
