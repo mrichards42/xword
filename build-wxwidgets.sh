@@ -11,8 +11,7 @@ mkdir -p $INSTALL_PATH
 WX_CONFIGURE_FLAGS="\
   --disable-shared \
   --enable-compat28 \
-  --enable-universal-binary=i386 \
-  --with-macosx-version-min=10.6 \
+  --with-macosx-version-min=10.7 \
   CFLAGS=-fvisibility-inlines-hidden \
   CXXFLAGS=-fvisibility-inlines-hidden \
   CPPFLAGS=-fvisibility-inlines-hidden \

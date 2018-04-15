@@ -16,7 +16,7 @@ cache:
 
 # Run premake4 to create the Visual Studio project
 before_build:
-  - premake4.exe --wx-prefix="%USERPROFILE%/wxWidgets" vs2010
+  - premake4.exe --platform=x32 --wx-prefix="%USERPROFILE%/wxWidgets" vs2010
 
 # Build XWord
 build_script:
