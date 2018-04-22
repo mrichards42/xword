@@ -53,9 +53,8 @@ solution "XWord"
         }
 
     configuration "macosx"
-        platforms { "x32" }
-        buildoptions { "-mmacosx-version-min=10.6" }
-        linkoptions  { "-mmacosx-version-min=10.6" }
+        buildoptions { "-mmacosx-version-min=10.7" }
+        linkoptions  { "-mmacosx-version-min=10.7 -L/usr/local/lib" }
 
     -- ------------------------------------------------------------------------
     -- General
@@ -95,6 +94,15 @@ if os.is("macosx") then
                 configuration { "macosx" }
                 -- Set the install name
                 linkoptions{ "-install_name @executable_path/../Frameworks/lib"..(get_key(p, "targetname") or p.name)..".dylib" }
+        elseif get_key(p, "kind") == "WindowedApp" then
+            project(p.name)
+                if not _OPTIONS["disable-lua"] then
+                    -- Requirement for 64-bit OS X applications linking against LuaJIT.
+                    -- See http://luajit.org/install.html
+                    configuration { "macosx" }
+                        linkoptions { "-pagezero_size 10000 -image_base 100000000" }
+                end
         end
     end
 end
+

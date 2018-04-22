@@ -18,7 +18,7 @@ cache:
 
 # Run premake4 to create the Xcode project
 before_script:
-  - ./premake4 --wx-config-debug=$HOME/wxWidgets/bin/wx-config --wx-config-release=$HOME/wxWidgets/bin/wx-config xcode4
+  - ./premake4 --platform=x64 --wx-config-debug=$HOME/wxWidgets/bin/wx-config --wx-config-release=$HOME/wxWidgets/bin/wx-config xcode4
 
 # Build XWord
 script:
