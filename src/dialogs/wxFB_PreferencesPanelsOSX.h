@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct 10 2016)
+// C++ code generated with wxFormBuilder (version May 29 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __WXFB_PREFERENCESPANELSOSX_H__
@@ -39,6 +39,7 @@ class wxFB_SolvePanel : public wxPanel
 		wxCheckBox* m_startTimer;
 		wxCheckBox* m_checkWhileTyping;
 		wxCheckBox* m_strictRebus;
+		wxCheckBox* m_showCompletionStatus;
 		wxCheckBox* m_moveAfterLetter;
 		wxRadioButton* m_nextSquare;
 		wxRadioButton* m_nextBlank;

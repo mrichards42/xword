@@ -139,7 +139,8 @@ ConfigManager::Status_t::Status_t(ConfigManager * cfg)
       completeColor(this, _T("completeColor"), *wxGREEN),
       incorrectColor(this, _T("incorrectColor"), *wxRED),
       uncheckableColor(this, _T("uncheckableColor"), *wxCYAN),
-      brightnessCutoff(this, _T("brightnessCutoff"), 200)
+      brightnessCutoff(this, _T("brightnessCutoff"), 200),
+      showCompletionStatus(this, _T("showCompletionStatus"), true)
 {}
 
 // Printing

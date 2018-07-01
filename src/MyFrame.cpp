@@ -384,6 +384,7 @@ MyFrame::MyFrame()
       m_autoStartTimer(false),
       m_autoSaveTimer(this, ID_AUTOSAVE_TIMER),
       m_autoSaveInterval(0),
+      m_showCompletionStatus(true),
       m_mgr(),
       m_isIdleConnected(false),
       m_fileHistory(10, ID_FILE_HISTORY_1)
@@ -1058,6 +1059,10 @@ MyFrame::ShowNotes()
 void
 MyFrame::CheckPuzzle()
 {
+    if (!m_showCompletionStatus) {
+        m_status->SetAlert("");
+        return;
+    }
     GridStats stats;
     m_XGridCtrl->GetStats(&stats);
     switch (stats.correct)
@@ -1581,6 +1586,7 @@ MyFrame::LoadConfig()
     // Misc
     config.Timer.autoStart.AddCallback(this, &MyFrame::SetAutoStartTimer);
     config.autoSaveInterval.AddCallback(this, &MyFrame::SetAutoSaveInterval);
+    config.Status.showCompletionStatus.AddCallback(this, &MyFrame::SetShowCompletionStatus);
 
     // File History
     config.FileHistory.saveFileHistory.AddCallback(
@@ -2425,6 +2431,18 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
     else
     {
         m_XGridCtrl->SetPaused(true);
+    }
+}
+
+// Status bar
+//-----------
+void
+MyFrame::SetShowCompletionStatus(bool show)
+{
+    m_showCompletionStatus = show;
+    if (m_puz.IsOk())
+    {
+        CheckPuzzle();
     }
 }
 
