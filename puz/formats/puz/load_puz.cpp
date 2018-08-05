@@ -85,7 +85,7 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
          square = square->Next())
     {
         // Solution
-        if (*sol_it == '.' || (*sol_it == ':' && puz->IsDiagramless()))
+        if (*sol_it == '.' || *sol_it == ':')
             square->SetSolution(puz::Square::Black);
         else if (*sol_it == '-')
             square->SetSolution(puz::Square::Blank);
