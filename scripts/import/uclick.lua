@@ -15,13 +15,13 @@ end
 local function unescape(str)
     -- Replace all %xx escapes with their value in hex
     local result, replacements = str:gsub('%%..', function(escape)
-        local high = assert(hex_codes[escape:sub(2,2):lower()],
-                            'Bad hex character: '..escape:sub(2,2))
-
-        local low  = assert(hex_codes[escape:sub(3,3):lower()],
-                            'Bad hex character: '..escape:sub(3,3))
-
-        return string.char(high * 16 + low)
+        local high = hex_codes[escape:sub(2,2):lower()]
+        local low  = hex_codes[escape:sub(3,3):lower()]
+        if high and low then
+            return string.char(high * 16 + low)
+        else
+            return escape
+        end
     end)
     return result
 end
