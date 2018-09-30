@@ -22,7 +22,7 @@ before_script:
 
 # Build XWord
 script:
-  - xcodebuild -project build/xcode4/XWord.xcodeproj -configuration $CONFIGURATION build
+  - xcodebuild -project build/xcode4/XWord.xcodeproj -configuration "$CONFIGURATION Native" build
 
 # For deployed builds, zip the .app folder
 before_deploy:
