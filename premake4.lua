@@ -53,8 +53,8 @@ solution "XWord"
         }
 
     configuration "macosx"
-        buildoptions { "-mmacosx-version-min=10.7" }
-        linkoptions  { "-mmacosx-version-min=10.7 -L/usr/local/lib" }
+        buildoptions { "-mmacosx-version-min=10.7", "-stdlib=libc++" }
+        linkoptions  { "-mmacosx-version-min=10.7", "-stdlib=libc++", "-L/usr/local/lib" }
 
     -- ------------------------------------------------------------------------
     -- General

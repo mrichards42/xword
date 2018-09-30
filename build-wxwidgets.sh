@@ -13,10 +13,11 @@ WX_CONFIGURE_FLAGS="\
   --enable-compat28 \
   --with-macosx-version-min=10.7 \
   CFLAGS=-fvisibility-inlines-hidden \
-  CXXFLAGS=-fvisibility-inlines-hidden \
-  CPPFLAGS=-fvisibility-inlines-hidden \
+  CXXFLAGS='-fvisibility-inlines-hidden -stdlib=libc++' \
+  CPPFLAGS='-fvisibility-inlines-hidden -stdlib=libc++' \
   OBJCFLAGS=-fvisibility-inlines-hidden \
-  OBJCXXFLAGS=-fvisibility-inlines-hidden"
+  OBJCXXFLAGS='-fvisibility-inlines-hidden -stdlib=libc++' \
+  LDFLAGS=-stdlib=libc++"
 WX_MAKE_FLAGS="SHARED=0"
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
