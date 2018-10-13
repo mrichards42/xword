@@ -127,6 +127,17 @@ void ipuzParser::SetStyle(Square & square, json::Value * style_value)
         square.SetCircle();
     if (style->GetBool(puzT("highlight"), false))
         square.SetHighlight();
+
+    string_t barred = style->GetString(puzT("barred"), puzT(""));
+    if (barred.find(puzT("T")) != string_t::npos)
+        square.m_bars[BAR_TOP] = true;
+    if (barred.find(puzT("L")) != string_t::npos)
+        square.m_bars[BAR_LEFT] = true;
+    if (barred.find(puzT("R")) != string_t::npos)
+        square.m_bars[BAR_RIGHT] = true;
+    if (barred.find(puzT("B")) != string_t::npos)
+        square.m_bars[BAR_BOTTOM] = true;
+
     // TODO: colors
 }
 

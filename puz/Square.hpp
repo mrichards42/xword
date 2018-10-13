@@ -138,6 +138,14 @@ enum CornerMark
     MARK_BR
 };
 
+// Bars
+enum Bar
+{
+    BAR_TOP = 0,
+    BAR_LEFT,
+    BAR_RIGHT,
+    BAR_BOTTOM
+};
 
 // Used with Check()
 enum CheckTest
@@ -238,6 +246,9 @@ public:
 
     // Corner marks
     string_t m_mark[4];
+
+    // Bars
+    bool m_bars[4];
 
     // Clue
     //-----

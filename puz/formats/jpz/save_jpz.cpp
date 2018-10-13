@@ -198,6 +198,14 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 cell.append_attribute("top-right-number") =
                     encode_utf8(square->m_mark[MARK_TL]).c_str();
             }
+            if (square->m_bars[BAR_TOP])
+                cell.append_attribute("top-bar") = "true";
+            if (square->m_bars[BAR_LEFT])
+                cell.append_attribute("left-bar") = "true";
+            if (square->m_bars[BAR_RIGHT])
+                cell.append_attribute("right-bar") = "true";
+            if (square->m_bars[BAR_BOTTOM])
+                cell.append_attribute("bottom-bar") = "true";
         }
     }
 

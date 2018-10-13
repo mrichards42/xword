@@ -19,6 +19,8 @@
 #include "Square.hpp"
 #include "Grid.hpp"
 
+#include <cstring>
+
 //#define PUZ_CHECK_STRINGS
 
 namespace puz {
@@ -36,7 +38,8 @@ Square::Square()
       m_number(),
       m_red(255),
       m_green(255),
-      m_blue(255)
+      m_blue(255),
+      m_bars()
 {
     SetText(puzT(""));
     SetSolution(puzT(""));
@@ -63,6 +66,7 @@ Square::Square(const Square & other)
       m_blue(other.m_blue)
 {
     m_next = SquareDirectionMap(m_next);
+    std::memcpy(m_bars, other.m_bars, 4 * sizeof(bool));
 }
 
 // Since all constructors are private, only a grid can create squares.

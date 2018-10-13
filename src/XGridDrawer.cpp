@@ -425,8 +425,9 @@ XGridDrawer::DrawSquare(wxDC & adc,
     // 3. A correct indicator (green check in the corner)
     // 4. A circle
     // 5. The number (with an opaque background so it draws over the circle)
-    // 6. The text
-    // 7. An X over everything
+    // 6. Thicker inner borders when specified
+    // 7. The text
+    // 8. An X over everything
 
     // If we are supposed to draw the outline, we'll draw the square with
     // the default square background, and then draw the outline using the
@@ -614,6 +615,33 @@ XGridDrawer::DrawSquare(wxDC & adc,
 
         dc.SetBackgroundMode(wxTRANSPARENT);
     }
+
+    // Draw bars
+    const int barSize = m_borderSize * 3;
+    const int barOffset = barSize / 2;
+    wxPen barPen(GetBlackSquareColor(), barSize);
+    barPen.SetCap(wxCAP_BUTT);
+    dc.SetPen(barPen);
+    if (square.m_bars[puz::BAR_TOP])
+        dc.DrawLine(x - 1,
+                    y + barOffset,
+                    x + m_boxSize,
+                    y + barOffset);
+    if (square.m_bars[puz::BAR_LEFT])
+        dc.DrawLine(x + barOffset,
+                    y - 1,
+                    x + barOffset,
+                    y + m_boxSize);
+    if (square.m_bars[puz::BAR_BOTTOM])
+        dc.DrawLine(x - 1,
+                    y + m_boxSize - barSize + barOffset,
+                    x + m_boxSize,
+                    y + m_boxSize - barSize + barOffset);
+    if (square.m_bars[puz::BAR_RIGHT])
+        dc.DrawLine(x + m_boxSize - barSize + barOffset,
+                    y - 1,
+                    x + m_boxSize - barSize + barOffset,
+                    y + m_boxSize);
 
     // Draw square's text (bottom and center to avoid conflicts with numbers)
     if ((HasFlag(DRAW_USER_TEXT) && ! square.IsBlank()) ||
