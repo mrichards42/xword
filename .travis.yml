@@ -14,11 +14,11 @@ install:
 # Cache the compiled wxWidgets so it can be in with future builds
 cache:
   directories:
-    - $HOME/wxWidgets
+    - $HOME/wxWidgets-3.1.0
 
 # Run premake4 to create the Xcode project
 before_script:
-  - ./premake4 --platform=x64 --wx-config-debug=$HOME/wxWidgets/bin/wx-config --wx-config-release=$HOME/wxWidgets/bin/wx-config xcode4
+  - ./premake4 --platform=x64 --wx-config-debug=$HOME/wxWidgets-3.1.0/bin/wx-config --wx-config-release=$HOME/wxWidgets-3.1.0/bin/wx-config xcode4
 
 # Build XWord
 script:
