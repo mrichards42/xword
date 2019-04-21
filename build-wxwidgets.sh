@@ -5,7 +5,7 @@ set -e
 
 CONFIGURATION=$1
 
-INSTALL_PATH="$HOME/wxWidgets"
+INSTALL_PATH="$HOME/wxWidgets-3.1.0"
 mkdir -p $INSTALL_PATH
 
 WX_CONFIGURE_FLAGS="\
@@ -48,6 +48,7 @@ if [ ! -d "$INSTALL_PATH/lib" ]; then
   cd wxWidgets-3.1.0
   patch -p1 -i ../wxaui-tweaks.patch
   patch -p1 -i ../wxwidgets-smooth-scroll-modals.patch
+  patch -p1 -i ../wxwidgets-mojave-open-file-delay.patch
   eval $BUILD_COMMAND
 else
   echo "Using cached directory."

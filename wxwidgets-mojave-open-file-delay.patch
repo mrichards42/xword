@@ -1,0 +1,57 @@
+diff -Naur wxWidgets-3.1.0-old/src/osx/cocoa/utils.mm wxWidgets-3.1.0/src/osx/cocoa/utils.mm
+--- wxWidgets-3.1.0-old/src/osx/cocoa/utils.mm	2016-02-28 13:33:37.000000000 -0800
++++ wxWidgets-3.1.0/src/osx/cocoa/utils.mm	2019-04-21 13:26:16.000000000 -0700
+@@ -68,6 +68,7 @@
+ 
+ - (void)applicationDidFinishLaunching:(NSNotification *)notification
+ {
++    [NSApp stop:nil];
+     wxTheApp->OSXOnDidFinishLaunching();
+ }
+ 
+@@ -323,7 +324,6 @@
+ // here we subclass NSApplication, for the purpose of being able to override sendEvent.
+ @interface wxNSApplication : NSApplication
+ {
+-    BOOL firstPass;
+ }
+ 
+ - (id)init;
+@@ -337,7 +337,7 @@
+ - (id)init
+ {
+     self = [super init];
+-    firstPass = YES;
++    // further init
+     return self;
+ }
+ 
+@@ -366,14 +366,7 @@
+     if ([anEvent type] == NSKeyUp && ([anEvent modifierFlags] & NSCommandKeyMask))
+         [[self keyWindow] sendEvent:anEvent];
+     else
+-        [super sendEvent:anEvent];
+-    
+-    if ( firstPass )
+-    {
+-        [NSApp stop:nil];
+-        firstPass = NO;
+-        return;
+-    }
++        [super sendEvent:anEvent];    
+ }
+ 
+ @end
+@@ -412,12 +405,6 @@
+         appcontroller = OSXCreateAppController();
+         [[NSApplication sharedApplication] setDelegate:(id <NSApplicationDelegate>)appcontroller];
+         [NSColor setIgnoresAlpha:NO];
+-
+-        // calling finishLaunching so early before running the loop seems to trigger some 'MenuManager compatibility' which leads
+-        // to the duplication of menus under 10.5 and a warning under 10.6
+-#if 0
+-        [NSApp finishLaunching];
+-#endif
+     }
+     gNSLayoutManager = [[NSLayoutManager alloc] init];
+     

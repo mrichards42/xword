@@ -12,11 +12,11 @@ install:
 
 # Cache the compiled wxWidgets so it can be in with future builds
 cache:
-  - '%USERPROFILE%\wxWidgets'
+  - '%USERPROFILE%\wxWidgets-3.1.0'
 
 # Run premake4 to create the Visual Studio project
 before_build:
-  - premake4.exe --platform=x32 --wx-prefix="%USERPROFILE%/wxWidgets" vs2010
+  - premake4.exe --platform=x32 --wx-prefix="%USERPROFILE%/wxWidgets-3.1.0" vs2010
 
 # Build XWord
 build_script:
