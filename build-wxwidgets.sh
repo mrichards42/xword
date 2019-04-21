@@ -48,7 +48,7 @@ if [ ! -d "$INSTALL_PATH/lib" ]; then
   tar -xjf wxWidgets-3.1.0.tar.bz2
   cd wxWidgets-3.1.0
   patch -p1 -i ../wxaui-tweaks.patch
-  patch -p1 -i ../wxwidgets-smooth-scroll-modals.patch
+  patch -p1 -i ../wxwidgets-mojave-open-file-delay.patch
   eval $BUILD_COMMAND
 else
   echo "Using cached directory."
