@@ -331,6 +331,11 @@ public:
         // a long string
         m_format->SetInitialSize(wxSize(250, m_format->GetCharHeight() * 7));
 
+#ifdef __WXOSX__
+        // Since this might be a script, don't let OS X substitute fancy quotes.
+        m_format->OSXEnableAutomaticQuoteSubstitution(false);
+#endif
+
         // Use Lua checkbox
         m_useLua = AddConfigControl(new ConfigControl<bool>(meta.useLua));
         m_useLua->SetLabel("Script");
