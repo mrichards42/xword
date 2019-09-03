@@ -357,6 +357,7 @@ private:
     void OnClose       (wxCloseEvent & evt);
     void OnLinkClicked (wxHtmlLinkEvent & evt);
     void OnSize        (wxSizeEvent & evt);
+    void OnIconize     (wxIconizeEvent & evt);
 
 private:
     // Debugging
