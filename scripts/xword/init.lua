@@ -54,6 +54,17 @@ function mod_path(path, level)
     return path .. '.'
 end
 
+-- Setup curl
+-- luacurl initialization will call curl_global_init; per
+-- https://curl.haxx.se/libcurl/c/threadsafe.html, we must do this before
+-- starting any other threads (as is done by the task library) to ensure it
+-- completes before anything else attempts to use curl. This isn't 100%
+-- sufficient - curl_global_init may call other thread-unsafe methods (e.g.
+-- SSL init methods), leading to issues if anything else is using those methods.
+-- But it's the best we can do here, and nothing else should be making network
+-- requests except for lua plugins.
+require 'luacurl'
+
 -- Setup task library
 local task = require 'task'
 task.error_handler = xword.logerror
