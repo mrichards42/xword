@@ -7,9 +7,9 @@ local function PopupWindow(parent)
     -- A borderless dialog
     local self = wx.wxDialog(
         parent, wx.wxID_ANY, '', wx.wxDefaultPosition, wx.wxDefaultSize,
-        wx.wxFRAME_NO_TASKBAR + wx.wxFRAME_FLOAT_ON_PARENT + wx.wxWS_EX_TRANSIENT 
+        wx.wxFRAME_NO_TASKBAR + wx.wxFRAME_FLOAT_ON_PARENT + wx.wxWS_EX_TRANSIENT
     )
-    
+
     -- wxWindow:Fit is simply SetSize(GetBestSize()), but we need to adjust
     -- both position and size
     function self:Fit()
@@ -48,10 +48,13 @@ local function PopupWindow(parent)
     function self:Popup(effect, timeout)
         -- Move to the best position based on the current mouse pointer
         self:Fit()
-        if effect then
+        if effect and effect ~= wx.wxSHOW_EFFECT_NONE then
             self:ShowWithEffect(effect, timeout or 0)
         else
-            self:Show()
+            -- On Mac, Show() causes focus to move to the popup.
+            -- Unclear why this is inconsistent between platforms, but since the
+            -- effect isn't supported anyway, this works fine.
+            self:ShowWithoutActivating()
         end
 
         -- Destroy the popup when the mouse leaves the parent window.
