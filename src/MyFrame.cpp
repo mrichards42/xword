@@ -1710,8 +1710,11 @@ MyFrame::SaveWindowConfig()
             // Make sure the sizes are within acceptable bounds
             if (w < 200) w = 500;
             if (h < 200) h = 500;
-            if (x < 0 || x >= wxSystemSettings::GetMetric(wxSYS_SCREEN_X)) x = 20;
-            if (y < 0 || y >= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)) y = 20;
+            // For some reason on Windows with wxWidgets 3.1.2, xleft alignment of the window
+            // results in slightly negative coordinates. So only snap the window back to the
+            // screen if it is significantly off screen.
+            if (x < -200 || x >= wxSystemSettings::GetMetric(wxSYS_SCREEN_X)) x = 20;
+            if (y < -200 || y >= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)) y = 20;
             config.Window.width = w;
             config.Window.height = h;
             config.Window.top = y;
