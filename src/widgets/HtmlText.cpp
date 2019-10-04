@@ -209,22 +209,23 @@ void HtmlText::LayoutCell()
         }
         else // ! HT_NOWRAP
         {
-            // Increase cell size
-            while (pointSize < m_maxFontSize
-                   && (m_cell->GetHeight() < height
-                       || m_cell->GetWidth() < width))
-            {
-                Parse(label, ++pointSize, faceName);
+            // Binary search to find the highest point size where the text still fits.
+            int lowerBound = m_minFontSize;
+            int upperBound = m_maxFontSize;
+            while (lowerBound != upperBound) {
+                pointSize = (lowerBound + upperBound + 1) / 2;
+                Parse(label, pointSize, faceName);
                 m_cell->Layout(width);
+                if (m_cell->GetHeight() < height) {
+                    lowerBound = pointSize;
+                }
+                else {
+                    upperBound = pointSize - 1;
+                }
             }
-            // Decrease cell size
-            while (pointSize > m_minFontSize
-                   && (m_cell->GetHeight() > height
-                       || m_cell->GetWidth() > width))
-            {
-                Parse(label, --pointSize, faceName);
-                m_cell->Layout(width);
-            }
+            pointSize = lowerBound;
+            Parse(label, pointSize, faceName);
+            m_cell->Layout(width);
         }
     }
     // Set m_layoutWidth
