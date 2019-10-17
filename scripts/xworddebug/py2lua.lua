@@ -59,6 +59,8 @@ local replace = {
     {'wx.ST_ELLIPSIZE_START', 4},
     {'wx.ST_ELLIPSIZE_MIDDLE', 8},
     {'wx.ST_ELLIPSIZE_END',   16},
+    -- Density scaling
+    {'wx.Size%(([^%)]+)%)', 'parent:FromDIP( wx.Size(%1) )'},
 }
 
 -- Convert the wxFormBuilder python code to lua code

@@ -203,7 +203,7 @@ local function ScriptItem(parent, pkg)
             win:UpdateSettings()
             return
         end
-       
+
         -- If this is pending installation, undo that
         if win.pkg.installed then
             local filename = join(xword.userdatadir, 'pending_install.lua')
@@ -419,8 +419,10 @@ function P.PackageDialog(opts)
     if opts.check == nil then
         opts.check = true
     end
+    local dialogSize = wx.wxSize(450,350)
     if opts.parent == nil then
         opts.parent = xword.frame or wx.NULL
+        dialogSize = opts.parent:FromDIP(dialogSize)
     end
     if opts.buttons == nil or opts.buttons == true then
         opts.buttons = { close = true, check = true }
@@ -428,7 +430,7 @@ function P.PackageDialog(opts)
 
     local dlg = wx.wxDialog(opts.parent, wx.wxID_ANY,
                             "Package Manager",
-                            wx.wxDefaultPosition, wx.wxSize(450,350),
+                            wx.wxDefaultPosition, dialogSize,
                             wx.wxDEFAULT_DIALOG_STYLE + wx.wxRESIZE_BORDER)
     P.dlg = dlg
 

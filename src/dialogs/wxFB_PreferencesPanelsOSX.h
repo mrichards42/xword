@@ -1,15 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version May 29 2018)
+// C++ code generated with wxFormBuilder (version Oct 26 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __WXFB_PREFERENCESPANELSOSX_H__
-#define __WXFB_PREFERENCESPANELSOSX_H__
+#pragma once
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
+#include "../widgets/ScaledSpinCtrl.h"
 #include <wx/string.h>
 #include <wx/stattext.h>
 #include <wx/gdicmn.h>
@@ -22,6 +22,9 @@
 #include <wx/spinctrl.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
 #include <wx/button.h>
 #include "fontpicker.hpp"
 #include <wx/slider.h>
@@ -31,10 +34,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxFB_SolvePanel
 ///////////////////////////////////////////////////////////////////////////////
-class wxFB_SolvePanel : public wxPanel 
+class wxFB_SolvePanel : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxCheckBox* m_startTimer;
 		wxCheckBox* m_checkWhileTyping;
@@ -49,54 +52,54 @@ class wxFB_SolvePanel : public wxPanel
 		wxCheckBox* m_moveOnRightClick;
 		wxCheckBox* m_useAutoSave;
 		wxStaticText* m_stAfter;
-		wxSpinCtrl* m_autoSave;
+		ScaledSpinCtrl* m_autoSave;
 		wxStaticText* m_stSeconds;
 		wxCheckBox* m_saveFileHistory;
 		wxCheckBox* m_reopenLastPuzzle;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnMoveAfterLetter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUseAutoSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveFileHistory( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
-		wxFB_SolvePanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+
+		wxFB_SolvePanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString );
 		~wxFB_SolvePanel();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxFB_AppearancePanel
 ///////////////////////////////////////////////////////////////////////////////
-class wxFB_AppearancePanel : public wxPanel 
+class wxFB_AppearancePanel : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxChoice* m_advancedChoice;
 		wxButton* m_defaultsBtn;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnAdvancedChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnResetDefaults( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
-		wxFB_AppearancePanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+
+		wxFB_AppearancePanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString );
 		~wxFB_AppearancePanel();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxFB_PrintPanel
 ///////////////////////////////////////////////////////////////////////////////
-class wxFB_PrintPanel : public wxPanel 
+class wxFB_PrintPanel : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxCheckBox* m_printCustomFonts;
 		FontPickerPanel * m_printGridLetterFont;
@@ -111,17 +114,16 @@ class wxFB_PrintPanel : public wxPanel
 		wxStaticText* m_staticText14;
 		wxPanel* m_panel8;
 		wxPanel* m_printBlackSquarePreview;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnPrintCustomFonts( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBlackSquareBrightness( wxScrollEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
-		wxFB_PrintPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+
+		wxFB_PrintPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString );
 		~wxFB_PrintPanel();
-	
+
 };
 
-#endif //__WXFB_PREFERENCESPANELSOSX_H__

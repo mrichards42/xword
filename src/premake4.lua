@@ -7,6 +7,8 @@ project "XWord"
 
     files { "**.hpp", "**.cpp", "**.h" }
 
+    dpiawareness "HighPerMonitor"
+
     local xword_version = os.getenv("XWORD_VERSION")
     if xword_version == nil or xword_version == "" then
         local version_file = assert(io.open("../VERSION", "r"))

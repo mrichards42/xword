@@ -176,8 +176,10 @@ ToolManager::GetImage(const ToolInfo * tool, int iconSize) const
     if (! tool->HasIcon())
         return wxNullImage;
 
+    // TODO: Create higher-resolution assets of toolbar icon images so we can show better-quality
+    // icons on hidpi displays, instead of having to hard-code to 24px images.
     const wxString icon =
-        wxString::Format(_T("%s_%d.png"), (const wxChar *)tool->GetIconName().c_str(), iconSize);
+        wxString::Format(_T("%s_%d.png"), (const wxChar*)tool->GetIconName().c_str(), 24);
 
     wxFileName iconPath(icon);
     iconPath.MakeAbsolute(m_iconLocation);

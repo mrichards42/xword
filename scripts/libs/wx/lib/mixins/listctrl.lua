@@ -23,9 +23,12 @@ end
 -- @param self An existing wxListCtrl
 function M.CheckListMixin(self)
     -- Check icons
-    self.images = wx.wxImageList(16, 16, 2)
-    self.images:Add(create_check_bitmap(self, 0, 16, 16))
-    self.images:Add(create_check_bitmap(self, wx.wxCONTROL_CHECKED, 16, 16))
+    -- TODO: This should use wxRendererNative::GetCheckBoxSize, but this isn't
+    -- currently available through wxLua.
+    local size = self:FromDIP(16)
+    self.images = wx.wxImageList(size, size, 2)
+    self.images:Add(create_check_bitmap(self, 0, size, size))
+    self.images:Add(create_check_bitmap(self, wx.wxCONTROL_CHECKED, size, size))
     self:SetImageList(self.images, wx.wxIMAGE_LIST_SMALL)
 
     local insert_item = self.InsertItem
@@ -265,7 +268,7 @@ function M.DragAndDropMixin(self)
         scroll_timer:Stop()
         scroll_direction = nil
     end
-    
+
     -- Set the scroll direction for the next timer
     local function check_scroll(pos)
         local rect = get_list_rect()
@@ -297,7 +300,7 @@ function M.DragAndDropMixin(self)
     -- -------------
     local drag_idx
     local last_hint
-    
+
     -- Return the position that an item should be inserted, and the
     -- item under the cursor.
     -- If the cursor is in the top half of the item, return the item
@@ -338,7 +341,7 @@ function M.DragAndDropMixin(self)
         last_hint = nil
         evt:Skip()
     end)
-    
+
     -- Draw a hint as the cursor moves
     self:Connect(wx.wxEVT_MOTION, function(evt)
         evt:Skip()

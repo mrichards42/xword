@@ -1,6 +1,6 @@
 -- Converted from python by py2lua
 -- python file: wxFB.py
--- modtime: 1571291120
+-- modtime: 1583996157
 -- md5sum: 467718ba3df3de0bdb451da715fe925e
 -- ----------------------------------
 
@@ -19,7 +19,7 @@ local wxfb = {} -- Table to hold classes
 
 function wxfb.DebugDialog(parent)
 
-    local self = wx.wxFrame ( parent, wx.wxID_ANY, "Lua Debug", wx.wxDefaultPosition, wx.wxSize( 400,600 ), wx.wxDEFAULT_FRAME_STYLE+wx.wxFRAME_FLOAT_ON_PARENT+wx.wxFRAME_TOOL_WINDOW+wx.wxTAB_TRAVERSAL )
+    local self = wx.wxFrame ( parent, wx.wxID_ANY, "Lua Debug", wx.wxDefaultPosition, parent:FromDIP( wx.wxSize( 400,600 ) ), wx.wxDEFAULT_FRAME_STYLE+wx.wxFRAME_FLOAT_ON_PARENT+wx.wxFRAME_TOOL_WINDOW+wx.wxTAB_TRAVERSAL )
     
     self:SetSizeHints( wx.wxDefaultSize, wx.wxDefaultSize )
     
