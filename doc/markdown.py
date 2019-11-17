@@ -68,16 +68,17 @@ def html_escape(text):
     return "".join(html_escape_table.get(c,c) for c in text)
 
 def convert(t):
-    return markdown.markdown(t, ['footnotes', 'tables'])
+    return markdown.markdown(t, extensions=['footnotes', 'tables'])
 
 import sys, os, re, shutil
 
+filepath = sys.path[0]
 if sys.platform == 'win32':
         # We have to remove the Scripts dir from path on windows.
         # If we don't, it will try to import itself rather than markdown lib.
         # This appears to *not* be a problem on *nix systems, only Windows.
         try:
-            sys.path.remove(os.path.dirname(__file__))
+            sys.path.remove(sys.path[0])
         except (ValueError, NameError):
             pass
 
@@ -108,7 +109,7 @@ class ContentsItem:
 contents = {}
 files = []
 
-os.chdir(os.path.dirname(__file__))
+os.chdir(filepath)
 
 # Clear the chm directory and re-make it
 if os.path.exists('chm'):
@@ -122,7 +123,7 @@ for mdfile in os.listdir(os.getcwd()):
     filename = os.path.splitext(mdfile)[0]
     htmlfile = filename + '.html'
     files.append(htmlfile)
-    print 'converting', mdfile
+    print('converting', mdfile)
     with open(mdfile, 'r') as input:
         # Read the first line and make it the title
         title = input.readline().strip()
@@ -138,7 +139,7 @@ for mdfile in os.listdir(os.getcwd()):
         # Search the text for table of contents headings
         contents[filename] = ContentsItem(title, htmlfile)
         if filename not in contents_order:
-            print '"%s" not in contents' % filename
+            print('"%s" not in contents' % filename)
         if filename not in no_ids:
             c = contents[filename]
             level = -1
@@ -214,7 +215,7 @@ with open(os.path.join('chm', 'contents.hhc'), 'w') as f:
 
     def write_item(item):
         f.write("<LI>")
-        f.write('<OBJECT type="text/sitemap">\n' + 
+        f.write('<OBJECT type="text/sitemap">\n' +
                 '    <param name="Name" value="%s">\n'
                 '    <param name="Local" value="%s">\n'
                 '</OBJECT>\n' % (item.name, item.link))
