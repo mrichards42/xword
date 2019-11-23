@@ -1,7 +1,7 @@
 import os
 import re
 
-print "Checking links . . ."
+print("Checking links . . .")
 
 links = {}
 ids = set()
@@ -27,8 +27,8 @@ for htmlfile in os.listdir('html'):
 # Check broken links
 missing = set(links.keys()) - ids
 if len(missing) > 0:
-    print "Broken links:"
+    print("Broken links:")
     for m in missing:
-        print m, links[m]
+        print(m, links[m])
 else:
-    print "No broken links"
+    print("No broken links")

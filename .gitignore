@@ -2,3 +2,7 @@
 /bin
 /build
 /lib
+/dist/XWord-Windows.exe
+/dist/packages
+/doc/chm
+/doc/html

@@ -9,7 +9,7 @@
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
-!define XWORD_TRUNK "D:\C++\XWord\trunk"
+!define XWORD_TRUNK "..\"
 !define XWORD_BIN "${XWORD_TRUNK}\bin\Release"
 !define VC_REDIST "vc_redist"
 
@@ -144,7 +144,7 @@ FunctionEnd
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "Setup.exe"
+OutFile "XWord-Windows.exe"
 InstallDir "$PROGRAMFILES\XWord" ; This will be overwritten by the portable page
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
@@ -166,7 +166,7 @@ Section "MainSection" SEC01
         File "${XWORD_BIN}\puz.dll"
         File "${XWORD_TRUNK}\doc\chm\xword.chm"
         ; LUA
-        File "${XWORD_BIN}\lua5.1.dll"
+        File "${XWORD_BIN}\lua51.dll"
         File "${XWORD_BIN}\luapuz.dll"
         ; Parsers / Misc
         File "${XWORD_BIN}\libexpat.dll"
@@ -176,7 +176,7 @@ Section "MainSection" SEC01
         File "${XWORD_BIN}\libeay32.dll"
         File "${XWORD_BIN}\libssl32.dll"
         ; Info
-        File "${XWORD_TRUNK}\README"
+        File "${XWORD_TRUNK}\README.md"
         File "${XWORD_TRUNK}\AUTHORS"
         File "${XWORD_TRUNK}\COPYING"
         File "${XWORD_TRUNK}\CHANGELOG"
@@ -225,6 +225,7 @@ Section "MainSection" SEC01
         File "${VC_REDIST}\dummy_manifest\Microsoft.VC90.CRT.manifest"
 
         File "${XWORD_TRUNK}\scripts\libs\date.lua"
+        File "${XWORD_TRUNK}\scripts\libs\md5.lua"
         File "${XWORD_TRUNK}\scripts\libs\serialize.lua"
 
         File "${XWORD_TRUNK}\scripts\libs\c-luacurl.dll"
@@ -431,13 +432,13 @@ Section Uninstall
         Delete "$INSTDIR\xword.chm"
         Delete "$INSTDIR\puz.dll"
         Delete "$INSTDIR\luapuz.dll"
-        Delete "$INSTDIR\lua5.1.dll"
+        Delete "$INSTDIR\lua51.dll"
         Delete "$INSTDIR\libcurl.dll"
         Delete "$INSTDIR\libeay32.dll"
         Delete "$INSTDIR\libssl32.dll"
         Delete "$INSTDIR\libexpat.dll"
 
-        Delete "$INSTDIR\README"
+        Delete "$INSTDIR\README.md"
         Delete "$INSTDIR\AUTHORS"
         Delete "$INSTDIR\COPYING"
         Delete "$INSTDIR\CHANGELOG"
