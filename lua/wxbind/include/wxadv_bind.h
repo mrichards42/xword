@@ -19,9 +19,9 @@
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 30
+#if WXLUA_BINDING_VERSION > 35
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 30
+#endif //WXLUA_BINDING_VERSION > 35
 // ---------------------------------------------------------------------------
 
 // binding class
@@ -43,13 +43,13 @@ extern WXDLLIMPEXP_BINDWXADV wxLuaBinding* wxLuaBinding_wxadv_init();
 // Includes
 // ---------------------------------------------------------------------------
 
-#if (wxLUA_USE_wxWave) && (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE)
+#if (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE) && (wxLUA_USE_wxWave)
     #include "wx/wave.h"
-#endif // (wxLUA_USE_wxWave) && (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE)
+#endif // (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE) && (wxLUA_USE_wxWave)
 
-#if (wxLUA_USE_wxWave) && (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND)
+#if (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND) && (wxLUA_USE_wxWave)
     #include "wx/sound.h"
-#endif // (wxLUA_USE_wxWave) && (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND)
+#endif // (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND) && (wxLUA_USE_wxWave)
 
 #if wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxAnimation && wxUSE_ANIMATIONCTRL
     #include "wx/animate.h"
@@ -106,13 +106,13 @@ extern WXDLLIMPEXP_BINDWXADV wxLuaBinding* wxLuaBinding_wxadv_init();
 // Lua Tag Method Values and Tables for each Class
 // ---------------------------------------------------------------------------
 
-#if (wxLUA_USE_wxWave) && (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE)
+#if (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE) && (wxLUA_USE_wxWave)
     extern WXDLLIMPEXP_DATA_BINDWXADV(int) wxluatype_wxWave;
-#endif // (wxLUA_USE_wxWave) && (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE)
+#endif // (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE) && (wxLUA_USE_wxWave)
 
-#if (wxLUA_USE_wxWave) && (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND)
+#if (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND) && (wxLUA_USE_wxWave)
     extern WXDLLIMPEXP_DATA_BINDWXADV(int) wxluatype_wxSound;
-#endif // (wxLUA_USE_wxWave) && (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND)
+#endif // (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND) && (wxLUA_USE_wxWave)
 
 #if wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxAnimation && wxUSE_ANIMATIONCTRL
     extern WXDLLIMPEXP_DATA_BINDWXADV(int) wxluatype_wxAnimation;

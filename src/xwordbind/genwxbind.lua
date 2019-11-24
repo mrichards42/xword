@@ -17,7 +17,7 @@
 -- Globals
 -- ---------------------------------------------------------------------------
 
-WXLUA_BINDING_VERSION = 30 -- Used to verify that the bindings are updated
+WXLUA_BINDING_VERSION = 35 -- Used to verify that the bindings are updated
                            -- This must match modules/wxlua/wxldefs.h
                            -- otherwise a compile time error will be generated.
 
@@ -226,7 +226,6 @@ function InitDataTypes()
     AllocDataType("long",               "number", true)
     AllocDataType("short",              "number", true)
     AllocDataType("size_t",             "number", true)
-    AllocDataType("ptrdiff_t",          "number", true)
     AllocDataType("time_t",             "number", true)
     AllocDataType("unsigned char",      "number", true)
     AllocDataType("unsigned short",     "number", true)
@@ -253,6 +252,8 @@ function InitDataTypes()
     AllocDataType("wxUint32",           "number", true)
     AllocDataType("wxInt64",            "number", true)
     AllocDataType("wxUint64",           "number", true)
+    AllocDataType("wxIntPtr",           "number", true)
+    AllocDataType("wxUIntPtr",          "number", true)
     AllocDataType("wxFloat32",          "number", true)
     AllocDataType("wxFloat64",          "number", true)
     AllocDataType("wxDouble",           "number", true)
@@ -714,22 +715,14 @@ end
 -- Build condition string using condition stack (number indexed Lua table)
 -- ---------------------------------------------------------------------------
 function BuildCondition(conditionStack)
-    local condition = nil
-
-    if HasCondition(conditionStack[1]) then
-        if not HasCondition(conditionStack[2]) then -- only one item
-            condition = conditionStack[1]
-        else
-            condition = "("..conditionStack[1]..")"
-            for i = 2, #conditionStack do
-                if HasCondition(conditionStack[i]) then
-                    condition = condition.." && ("..conditionStack[i]..")"
-                end
-            end
-        end
+    local conditions = {}
+    for i = 1, #conditionStack do
+        if HasCondition(conditionStack[i]) then table.insert(conditions, conditionStack[i]) end
     end
-
-    return condition
+    table.sort(conditions)
+    return #conditions > 1 and "("..table.concat(conditions, ") && (")..")"
+        or #conditions == 1 and conditions[1]
+        or nil
 end
 
 -- ---------------------------------------------------------------------------
@@ -739,7 +732,9 @@ function AddCondition(condition1, condition2)
     local condition = nil
 
     if HasCondition(condition1) and HasCondition(condition2) then
-        condition = "("..condition1..") && ("..condition2..")"
+        condition = condition1 <= condition2
+          and "("..condition1..") && ("..condition2..")"
+          or "("..condition2..") && ("..condition1..")"
     elseif HasCondition(condition1) then
         condition = condition1
     elseif HasCondition(condition2) then
@@ -856,6 +851,7 @@ function InitKeywords()
     preprocConditionTable["wxUSE_CONTROLS"]                = "wxUSE_CONTROLS"
     preprocConditionTable["wxUSE_DATAOBJ"]                 = "wxUSE_DATAOBJ"
     preprocConditionTable["wxUSE_DATEPICKCTRL"]            = "wxUSE_DATEPICKCTRL"
+    preprocConditionTable["wxUSE_TIMEPICKCTRL"]            = "wxUSE_TIMEPICKCTRL"
     preprocConditionTable["wxUSE_DATETIME"]                = "wxUSE_DATETIME"
     preprocConditionTable["wxUSE_DEBUG_CONTEXT"]           = "wxUSE_DEBUG_CONTEXT"
     preprocConditionTable["wxUSE_DEBUG_NEW_ALWAYS"]        = "wxUSE_DEBUG_NEW_ALWAYS"
@@ -947,6 +943,7 @@ function InitKeywords()
     preprocConditionTable["wxUSE_POPUPWIN"]                = "wxUSE_POPUPWIN"
     preprocConditionTable["wxUSE_POSTSCRIPT"]              = "wxUSE_POSTSCRIPT"
     preprocConditionTable["wxUSE_PRINTING_ARCHITECTURE"]   = "wxUSE_PRINTING_ARCHITECTURE"
+    preprocConditionTable["wxUSE_PRIVATE_FONTS"]           = "wxUSE_PRIVATE_FONTS"
     preprocConditionTable["wxUSE_PROGRESSDLG"]             = "wxUSE_PROGRESSDLG"
     preprocConditionTable["wxUSE_PROLOGIO"]                = "wxUSE_PROLOGIO"
     preprocConditionTable["wxUSE_PROPSHEET"]               = "wxUSE_PROPSHEET"
@@ -1000,6 +997,7 @@ function InitKeywords()
     preprocConditionTable["wxUSE_TOOLTIPS"]                = "wxUSE_TOOLTIPS"
     preprocConditionTable["wxUSE_TREEBOOK"]                = "wxUSE_TREEBOOK"
     preprocConditionTable["wxUSE_TREECTRL"]                = "wxUSE_TREECTRL"
+    preprocConditionTable["wxUSE_TREELISTCTRL"]            = "wxUSE_TREELISTCTRL"
     preprocConditionTable["wxUSE_TREELAYOUT"]              = "wxUSE_TREELAYOUT"
     preprocConditionTable["wxUSE_UNICODE"]                 = "wxUSE_UNICODE"
     preprocConditionTable["wxUSE_UNICODE_MSLU"]            = "wxUSE_UNICODE_MSLU"
@@ -1060,6 +1058,7 @@ function InitKeywords()
     preprocConditionTable["wxLUA_USE_wxCriticalSectionLocker"] = "wxLUA_USE_wxCriticalSectionLocker"
     preprocConditionTable["wxLUA_USE_wxDataObject"]            = "wxLUA_USE_wxDataObject"
     preprocConditionTable["wxLUA_USE_wxDatePickerCtrl"]        = "wxLUA_USE_wxDatePickerCtrl"
+    preprocConditionTable["wxLUA_USE_wxTimePickerCtrl"]        = "wxLUA_USE_wxTimePickerCtrl"
     preprocConditionTable["wxLUA_USE_wxDateSpan"]              = "wxLUA_USE_wxDateSpan"
     preprocConditionTable["wxLUA_USE_wxDateTime"]              = "wxLUA_USE_wxDateTime"
     preprocConditionTable["wxLUA_USE_wxDateTimeHolidayAuthority"] = "wxLUA_USE_wxDateTimeHolidayAuthority"
@@ -1140,6 +1139,7 @@ function InitKeywords()
     preprocConditionTable["wxLUA_USE_wxSocket"]                = "wxLUA_USE_wxSocket"
     preprocConditionTable["wxLUA_USE_wxSpinButton"]            = "wxLUA_USE_wxSpinButton"
     preprocConditionTable["wxLUA_USE_wxSpinCtrl"]              = "wxLUA_USE_wxSpinCtrl"
+    preprocConditionTable["wxLUA_USE_wxSpinCtrlDouble"]        = "wxLUA_USE_wxSpinCtrlDouble"
     preprocConditionTable["wxLUA_USE_wxSplashScreen"]          = "wxLUA_USE_wxSplashScreen"
     preprocConditionTable["wxLUA_USE_wxSplitterWindow"]        = "wxLUA_USE_wxSplitterWindow"
     preprocConditionTable["wxLUA_USE_wxStandardPaths"]         = "wxLUA_USE_wxStandardPaths"
@@ -1165,6 +1165,7 @@ function InitKeywords()
     preprocConditionTable["wxLUA_USE_wxTooltip"]               = "wxLUA_USE_wxTooltip"
     preprocConditionTable["wxLUA_USE_wxTreebook"]              = "wxLUA_USE_wxTreebook"
     preprocConditionTable["wxLUA_USE_wxTreeCtrl"]              = "wxLUA_USE_wxTreeCtrl"
+    preprocConditionTable["wxLUA_USE_wxTreeListCtrl"]          = "wxLUA_USE_wxTreeListCtrl"
     preprocConditionTable["wxLUA_USE_wxValidator"]             = "wxLUA_USE_wxValidator"
     preprocConditionTable["wxLUA_USE_wxWave"]                  = "wxLUA_USE_wxWave"
     preprocConditionTable["wxLUA_USE_wxWindowList"]            = "wxLUA_USE_wxWindowList"
@@ -1749,7 +1750,7 @@ end
 -- ---------------------------------------------------------------------------
 function BuildDataTypeTable(interfaceData)
     local in_block_comment = 0
-    local namespaceStack = {} -- todo, use this 
+    local namespaceStack = {} -- todo, use this
     local enumType = ""
 
     for l = 1, #interfaceData do
@@ -1789,7 +1790,7 @@ function BuildDataTypeTable(interfaceData)
                     elseif (tag == "class"  ) then action = "find_classname"
                     elseif (tag == "struct" ) then action = "find_structname"
                     elseif (tag == "enum"   ) then action = "find_enumname"
-                    elseif (tag == "typedef") then action = "find_typedef"                
+                    elseif (tag == "typedef") then action = "find_typedef"
                     elseif (tag == "}"      ) then
                       enumType = string.sub(enumType, 1, math.max(0, #enumType - #(namespaceStack[#namespaceStack] or {})))
                       namespaceStack[#namespaceStack] = nil
@@ -1897,7 +1898,7 @@ function ParseData(interfaceData)
     local function EndObjectStack(objectList, parseState, lineState)
         table.insert(objectList, parseState.ObjectStack[1])
         table.remove(parseState.ObjectStack, 1)
-        
+
         --TableDump(parseState.ObjectStack, "EndObjectStack-parseState.ObjectStack ")
         --TableDump(lineState,              "EndObjectStack-lineState ")
         --TableDump(objectList,             "EndObjectStack-objectList ")
@@ -1965,10 +1966,10 @@ function ParseData(interfaceData)
                 tag = nil
                 return
             end
-            
+
             lineTable = interfaceData[l]
             lineTags  = interfaceData[l].Tags
-        
+
             if (lineState ~= nil) then
                 lineState.FileName   = lineTable.FileName
                 lineState.LineNumber = lineTable.LineNumber
@@ -1979,10 +1980,10 @@ function ParseData(interfaceData)
         if (lineState == nil) then
             lineState = AllocLineState(lineTable)
         end
-        
+
         t = t + 1
         tag = lineTags[t]
-        
+
         if tag == "//" then
             -- skip to next line
             tag = nil
@@ -1992,7 +1993,7 @@ function ParseData(interfaceData)
     end
 
     while interfaceData[l+1] do -- not for loop so we can adjust l
-    
+
         GetNextToken()
 
         local run_once = 1
@@ -2162,7 +2163,7 @@ function ParseData(interfaceData)
                     elseif tag == "%delete" then -- tag for class
                         parseState.ObjectStack[1]["%delete"] = true
 
-                        if (parseState.ObjectStack[1].ObjType ~= "objtype_class") and 
+                        if (parseState.ObjectStack[1].ObjType ~= "objtype_class") and
                            (parseState.ObjectStack[1].ObjType ~= "objtype_struct") then
                             print("ERROR: %delete is not used for a class. "..LineTableErrString(lineTable))
                         end
@@ -2177,14 +2178,14 @@ function ParseData(interfaceData)
                     -- -------------------------------------------------------
                     elseif tag == "public" then
                         if (lineTags[t+1] == ":") then
-                            if (parseState.ObjectStack[1].ObjType ~= "objtype_class") and 
+                            if (parseState.ObjectStack[1].ObjType ~= "objtype_class") and
                                (parseState.ObjectStack[1].ObjType ~= "objtype_struct") then
                                 print("ERROR: 'public:' is not used in a class or struct. "..LineTableErrString(lineTable))
                             end
 
                             t = t + 1
                             tag = lineTags[t]
-                            
+
                             parseState.ObjectStack[1].Access = "public"
                         end
 
@@ -2192,29 +2193,29 @@ function ParseData(interfaceData)
                         lineState.Skip = true
 
                         if (lineTags[t+1] == ":") then
-                            if (parseState.ObjectStack[1].ObjType ~= "objtype_class") and 
+                            if (parseState.ObjectStack[1].ObjType ~= "objtype_class") and
                                (parseState.ObjectStack[1].ObjType ~= "objtype_struct") then
                                 print("ERROR: 'public:' is not used in a class or struct. "..LineTableErrString(lineTable))
                             end
 
                             t = t + 1
                             tag = lineTags[t]
-                            
+
                             parseState.ObjectStack[1].Access = "protected"
                         end
 
                     elseif tag == "private" then -- skip private functions
                         lineState.Skip = true
-                        
+
                         if (lineTags[t+1] == ":") then
-                            if (parseState.ObjectStack[1].ObjType ~= "objtype_class") and 
+                            if (parseState.ObjectStack[1].ObjType ~= "objtype_class") and
                                (parseState.ObjectStack[1].ObjType ~= "objtype_struct") then
                                 print("ERROR: 'public:' is not used in a class or struct. "..LineTableErrString(lineTable))
                             end
 
                             t = t + 1
                             tag = lineTags[t]
-                            
+
                             parseState.ObjectStack[1].Access = "private"
                         end
 
@@ -2445,7 +2446,7 @@ function ParseData(interfaceData)
                         end
 
                         lineState.Condition = lineState.Condition..tag
-                        
+
                         if lineTags[t+1] == nil then
                             statement_end = true
                         end
@@ -2489,7 +2490,7 @@ function ParseData(interfaceData)
                             elseif (parseState.ObjectStack[1].ObjType == "objtype_class") or
                                    (parseState.ObjectStack[1].ObjType == "objtype_struct") or
                                    (parseState.ObjectStack[1].ObjType == "objtype_globals") then
-                                   
+
                                 if (parseState.ObjectStack[1].Access == "protected") or
                                    (parseState.ObjectStack[1].Access == "private") then
                                    -- do nothing
@@ -2542,7 +2543,7 @@ function ParseData(interfaceData)
                             parseState.ObjectStack[1].Name = tag
                             lineState.Action = "action_baseclasscolon"
                             lineState.ActionMandatory = false
-                            
+
                             enumType = enumType..tag.."::"
 
                         elseif lineState.Action == "action_baseclasscolon" then
@@ -2572,7 +2573,7 @@ function ParseData(interfaceData)
                             if class_access == "public" then
                                 table.insert(parseState.ObjectStack[1].BaseClasses, tag)
                             end
-                            
+
                             lineState.Action = "action_baseclasscomma"
                             lineState.ActionMandatory = false
                         elseif lineState.Action == "action_structname" then
@@ -2580,9 +2581,9 @@ function ParseData(interfaceData)
 
                             lineState.Action = nil
                             lineState.ActionMandatory = false
-                            
+
                             enumType = enumType..tag.."::"
-                            
+
                         elseif lineState.Action == "action_enumname" then
                             enumType = enumType..tag
                             parseState.ObjectStack[1].Name = enumType
@@ -2894,9 +2895,9 @@ function ParseData(interfaceData)
 
                                 lineState.Action = "action_method_body"
                                 lineState.ActionMandatory = false
-                            elseif --IsDataType(tag) or 
-                                   dataTypeAttribTable[tag] or functionAttribTable[tag] or 
-                                   (tag == "*") or (tag == "&") or (tag == "[]") or 
+                            elseif --IsDataType(tag) or
+                                   dataTypeAttribTable[tag] or functionAttribTable[tag] or
+                                   (tag == "*") or (tag == "&") or (tag == "[]") or
                                    IsDelimiter(tag) and (tag ~= "|") and (tag ~= "&") then
                                 print("ERROR: Expected Parameter Default Value, got Tag='"..tag.."'. "..LineTableErrString(lineTable))
                             else
@@ -3050,8 +3051,8 @@ function ParseData(interfaceData)
 
         -- pop parseObject off objectStack
         if lineState.PopParseObject then
-            EndObjectStack(objectList, parseState, lineState)            
-            
+            EndObjectStack(objectList, parseState, lineState)
+
             --TableDump(parseState.ObjectStack, "PPO-parseState.ObjectStack")
             --TableDump(lineState,              "PPO-lineState")
             --TableDump(objectList,             "PPO-objectList")
@@ -3060,9 +3061,9 @@ function ParseData(interfaceData)
                 print("ERROR: parseState.ObjectStack is unexpectedly empty. "..LineTableErrString(lineTable))
             end
         end
-        
+
         lineState = nil --AllocLineState(lineTable) -- reset to new
-        
+
         end -- if statement_end then
 
         end -- while lineTags[t+1] do
@@ -3218,7 +3219,7 @@ function GenerateLuaLanguageBinding(interface)
 
                 -- build member condition
                 local membercondition = nil
-                for idx, condition in pairs(dependConditions) do
+                for idx, condition in pairs_sort(dependConditions) do
                     membercondition = AddCondition(membercondition, condition)
                 end
                 membercondition = FixCondition(membercondition)
@@ -3664,11 +3665,10 @@ function GenerateLuaLanguageBinding(interface)
                         isTranslated = true
                     end
 
-
                     -- the function takes (void*), but we just pass a long
                     if argType == "voidptr_long" then
-                        argType = "long"
-                        argTypeWithAttrib = "long"
+                        argType = "wxUIntPtr"
+                        argTypeWithAttrib = "wxUIntPtr"
                         argCast = "void*"
                     end
 
@@ -3783,7 +3783,7 @@ function GenerateLuaLanguageBinding(interface)
                             if (origArgTypeWithAttrib ~= "const char") then
                                 argCast = "("..origArgTypeWithAttrib.."*)(const char*)"
                             else
-                                argCast = origArgTypeWithAttrib.."*" 
+                                argCast = origArgTypeWithAttrib.."*"
                             end
                         else
                             if isTranslated and (origIndirectionCount == 0) then
@@ -4064,8 +4064,8 @@ function GenerateLuaLanguageBinding(interface)
                         memberTypeWithAttrib = string.sub(memberTypeWithAttrib, 7)
                     end
 
-                    if string.find("voidptr_long", memberTypeWithAttrib, 1, 1) then
-                        memberTypeWithAttrib = "long "
+                    if string.find(memberTypeWithAttrib, "voidptr_long", 1, 1) then
+                        memberTypeWithAttrib = "wxUIntPtr"
                     end
                 end
 
@@ -4308,7 +4308,7 @@ function GenerateLuaLanguageBinding(interface)
 
                 -- build method condition
                 local methodcondition = nil
-                for idx, condition in pairs(dependConditions) do
+                for idx, condition in pairs_sort(dependConditions) do
                     methodcondition = AddCondition(methodcondition, condition)
                 end
 
@@ -4357,10 +4357,10 @@ function GenerateLuaLanguageBinding(interface)
 
         if (parseObject.ObjType == "objtype_class") or (parseObject.ObjType == "objtype_struct") then
             -- Class Includes
-            for condition, includeBindingList in pairs(interface.includeBindingTable) do
+            for condition, includeBindingList in pairs_sort(interface.includeBindingTable) do
                 if not classIncludeBindingTable[condition] then classIncludeBindingTable[condition] = {} end
 
-                for idx, includeBinding in pairs(includeBindingList) do
+                for idx, includeBinding in pairs_sort(includeBindingList) do
                     classIncludeBindingTable[condition][idx] = includeBinding
                 end
             end
@@ -4419,7 +4419,7 @@ function GenerateLuaLanguageBinding(interface)
 
                             -- only store the ptr_diffs to higher base classes, the 1st level is always 0
                             if level > 1 then
-                                local ptr_diff = "((long int)("..dataTypeTable[name].BaseClasses[i].."*)("..parseObject.Name.."*)&wxluatype_TNONE) - ((long int)("..parseObject.Name.."*)&wxluatype_TNONE)"
+                                local ptr_diff = "wxIntPtr(((wxIntPtr)("..dataTypeTable[name].BaseClasses[i].."*)("..parseObject.Name.."*)&wxluatype_TNONE) - ((wxIntPtr)("..parseObject.Name.."*)&wxluatype_TNONE))"
                                 base_diff_table[#base_diff_table+1] = ptr_diff
                                 base_type_table[#base_type_table+1] = "&wxluatype_"..dataTypeTable[name].BaseClasses[i]
                             end
@@ -4779,6 +4779,11 @@ function GenerateHookCppFileHeader(fileData, fileName, add_includes)
         table.insert(fileData, "#include \""..hook_cpp_header_filename.."\"\n")
         table.insert(fileData, hook_cpp_binding_post_includes or "")
         table.insert(fileData, "\n")
+
+        -- It would be awkward to #ifdef the static string names of the classes
+        table.insert(fileData, "#ifdef __GNUC__\n")
+        table.insert(fileData, "    #pragma GCC diagnostic ignored \"-Wunused-variable\"\n")
+        table.insert(fileData, "#endif // __GNUC__\n")
     end
 
     return fileData
@@ -4818,7 +4823,7 @@ function GenerateHookClassFileTable(fileData)
 
     classNames = TableSort(classNames)
 
-    for _, c in pairs(classNames) do
+    for _, c in pairs_sort(classNames) do
         table.insert(fileData, "static const char* wxluaclassname_"..c.." = \""..c.."\";\n")
     end
 
@@ -4868,7 +4873,7 @@ function GenerateHookClassFileTable(fileData)
 
             if classTypeBinding.BaseClassVtableOffsets then
                 table.insert(fileData, indent.."static wxLuaArgType wxluabaseclass_wxluatypes_"..classTypeBinding.LuaName.."[] = "..classTypeBinding.BaseClassTypes.."\n")
-                table.insert(fileData, indent.."static int wxluabaseclass_vtable_offsets_"..classTypeBinding.LuaName.."[] = "..classTypeBinding.BaseClassVtableOffsets.."\n")
+                table.insert(fileData, indent.."static wxIntPtr wxluabaseclass_vtable_offsets_"..classTypeBinding.LuaName.."[] = "..classTypeBinding.BaseClassVtableOffsets.."\n")
             end
 
             table.insert(fileData, indent..classTypeBinding.ExternDeleteFunction)
@@ -5382,7 +5387,7 @@ function RemoveExtra_wxLuaBindCFunc(fileData)
 
             cfuncTable[s] = n
         elseif string.find(fileData[n], "s_wxluafunc", 1, 1) then
-            for k, v in pairs(cfuncTable) do
+            for k, v in pairs_sort(cfuncTable) do
                 if string.find(fileData[n], k..",", 1, 1) or string.find(fileData[n], k.." ", 1, 1) then
                     cfuncTable[k] = -1 -- found
                 end
@@ -5390,7 +5395,7 @@ function RemoveExtra_wxLuaBindCFunc(fileData)
         end
     end
 
-    for k, v in pairs(cfuncTable) do
+    for k, v in pairs_sort(cfuncTable) do
         if v > 0 then
             fileData[v] = "// "..fileData[v]
         end
@@ -5529,7 +5534,7 @@ function main()
 
     -- load any cached settings from other wrappers
     if datatype_cache_input_fileTable then
-        for key, filename in pairs(datatype_cache_input_fileTable) do
+        for key, filename in pairs_sort(datatype_cache_input_fileTable) do
             if FileExists(filename) then
                 local cache = loadfile(filename)
                 cache() -- run loaded file

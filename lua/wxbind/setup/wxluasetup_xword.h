@@ -54,6 +54,7 @@
 #define wxLUA_USE_wxCriticalSectionLocker       0
 #define wxLUA_USE_wxDataObject                  0
 #define wxLUA_USE_wxDatePickerCtrl              0
+#define wxLUA_USE_wxTimePickerCtrl              0
 #define wxLUA_USE_wxDateSpan                    0
 #define wxLUA_USE_wxDateTime                    1
 #define wxLUA_USE_wxDateTimeHolidayAuthority    0
@@ -132,6 +133,7 @@
 #define wxLUA_USE_wxSocket                      0
 #define wxLUA_USE_wxSpinButton                  1
 #define wxLUA_USE_wxSpinCtrl                    1
+#define wxLUA_USE_wxSpinCtrlDouble              1
 #define wxLUA_USE_wxSplashScreen                0
 #define wxLUA_USE_wxSplitterWindow              0
 #define wxLUA_USE_wxStandardPaths               0
@@ -157,6 +159,7 @@
 #define wxLUA_USE_wxTooltip                     0
 #define wxLUA_USE_wxTreebook                    0
 #define wxLUA_USE_wxTreeCtrl                    1
+#define wxLUA_USE_wxTreeListCtrl                1
 #define wxLUA_USE_wxValidator                   0
 #define wxLUA_USE_wxWave                        0
 #define wxLUA_USE_wxWindowList                  1

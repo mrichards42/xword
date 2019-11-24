@@ -29,6 +29,7 @@
 #define wxLUA_USEBINDING_WXRICHTEXT 0
 #define wxLUA_USEBINDING_WXSTC 0
 #define wxLUA_USEBINDING_WXLUADEBUGGER 0
+#define wxLUA_USEBINDING_WXWEBVIEW 0
 
 #include "wxlua/wxlua.h"
 #include "wxbind/include/wxbinddefs.h"

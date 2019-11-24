@@ -34,9 +34,9 @@ extern WXDLLIMPEXP_BINDWXBASE wxDateTime::TimeZone wxLua_wxDateTime_TimeZone_Loc
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 30
+#if WXLUA_BINDING_VERSION > 35
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 30
+#endif //WXLUA_BINDING_VERSION > 35
 // ---------------------------------------------------------------------------
 
 // binding class
@@ -59,15 +59,15 @@ extern WXDLLIMPEXP_BINDWXBASE wxLuaBinding* wxLuaBinding_wxbase_init();
 // Includes
 // ---------------------------------------------------------------------------
 
-#if (wxUSE_STREAMS) && (wxUSE_FILESYSTEM)
+#if (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS) && (wxUSE_STREAMS)
+    #include "wx/fs_inet.h"
+#endif // (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS) && (wxUSE_STREAMS)
+
+#if (wxUSE_FILESYSTEM) && (wxUSE_STREAMS)
     #include "wx/filesys.h"
     #include "wx/fs_arc.h"
     #include "wx/fs_filter.h"
-#endif // (wxUSE_STREAMS) && (wxUSE_FILESYSTEM)
-
-#if (wxUSE_STREAMS) && (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS)
-    #include "wx/fs_inet.h"
-#endif // (wxUSE_STREAMS) && (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS)
+#endif // (wxUSE_FILESYSTEM) && (wxUSE_STREAMS)
 
 #include "sys/stat.h"
 #include "wx/dynlib.h"
@@ -183,18 +183,18 @@ extern WXDLLIMPEXP_BINDWXBASE wxLuaBinding* wxLuaBinding_wxbase_init();
 // Lua Tag Method Values and Tables for each Class
 // ---------------------------------------------------------------------------
 
-#if (wxUSE_STREAMS) && (wxUSE_FILESYSTEM)
+#if (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS) && (wxUSE_STREAMS)
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxInternetFSHandler;
+#endif // (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS) && (wxUSE_STREAMS)
+
+#if (wxUSE_FILESYSTEM) && (wxUSE_STREAMS)
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxArchiveFSHandler;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxFSFile;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxFileSystem;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxFileSystemHandler;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxFilterFSHandler;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxLocalFSHandler;
-#endif // (wxUSE_STREAMS) && (wxUSE_FILESYSTEM)
-
-#if (wxUSE_STREAMS) && (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS)
-    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxInternetFSHandler;
-#endif // (wxUSE_STREAMS) && (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS)
+#endif // (wxUSE_FILESYSTEM) && (wxUSE_STREAMS)
 
 extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxClientData;
 extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxClientDataContainer;
@@ -202,6 +202,8 @@ extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxDynamicLibrary;
 extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxDynamicLibraryDetails;
 extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxDynamicLibraryDetailsArray;
 extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxEvent;
+extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxEventFilter;
+extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxEventLoopBase;
 extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxEvtHandler;
 extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxFileType;
 extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxFileType_MessageParameters;
@@ -222,6 +224,10 @@ extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxStringTokenizer;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxString_const_iterator;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxString_iterator;
 #endif // wxCHECK_VERSION(2,9,0)
+
+#if wxCHECK_VERSION(2,9,2)
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxVersionInfo;
+#endif // wxCHECK_VERSION(2,9,2)
 
 #if wxLUA_USE_wxArrayInt
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxArrayInt;
@@ -342,6 +348,8 @@ extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxStringTokenizer;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxMemoryInputStream;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxOutputStream;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxStreamBase;
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxTextInputStream;
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxTextOutputStream;
 #endif // wxUSE_STREAMS
 
 

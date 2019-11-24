@@ -27,10 +27,11 @@
 
 wxLuaState wxNullLuaState(false);
 
-int LUACALL luaopen_bit(lua_State *L); // implemented at bottom of file
-
 extern "C"
 {
+    // provided by bit.c (Lua BitOp)
+    int luaopen_bit(lua_State *L);
+
     // provided by lbitlib.c for 5.1 or we use the one in 5.2 or LuaJIT.
     int luaopen_bit32 (lua_State *L);
 }
@@ -132,7 +133,7 @@ void LUACALL wxlua_debugHookFunction(lua_State *L, lua_Debug *LDebug)
 
         // restore hook to previous state
         wxlState.ClearDebugHookBreak();
-        wxlua_error(L, wxlStateData->m_debug_hook_break_msg);
+        wxlua_error(L, wxlStateData->m_debug_hook_break_msg.c_str());
         return;
     }
 
@@ -337,11 +338,24 @@ bool wxLuaCleanupWindows(lua_State* L, bool only_check)
 }
 
 //----------------------------------------------------------------------------
+// wxLuaStateRunLocker
+//----------------------------------------------------------------------------
+
+class wxLuaStateRunLocker
+{
+public:
+    wxLuaStateRunLocker(int &is_running) : m_is_running(++is_running) {}
+    ~wxLuaStateRunLocker() { m_is_running = wxMax(0, m_is_running-1); } // DebugHookBreak sets to 0.
+
+    int &m_is_running;
+};
+
+//----------------------------------------------------------------------------
 // wxLuaStateData
 //----------------------------------------------------------------------------
 
 wxLuaStateData::wxLuaStateData()
-               :m_is_running(false),
+               :m_is_running(0),
                 m_is_closing(false),
                 m_lua_debug_hook_count(100), m_lua_debug_hook_yield(50),
                 m_lua_debug_hook(0), m_lua_debug_hook_send_evt(false),
@@ -381,7 +395,11 @@ wxLuaStateRefData::~wxLuaStateRefData()
     wxCHECK_RET((m_lua_State_static == true) || (m_lua_State == NULL),
                 wxT("You must ALWAYS call wxLuaState::Destroy and not wxObject::UnRef"));
 
-    CloseLuaState(true);
+    // only close the state if it's not static,
+    // as when it's static (wx is loaded as a library), it will be closed somewhere else
+    if (!m_lua_State_static)
+        CloseLuaState(true);
+
     if (m_own_stateData)
         delete m_wxlStateData;
 }
@@ -389,6 +407,9 @@ wxLuaStateRefData::~wxLuaStateRefData()
 bool wxLuaStateRefData::CloseLuaState(bool force)
 {
     if ((m_lua_State == NULL) || m_wxlStateData->m_is_closing || m_lua_State_coroutine)
+        return true;
+
+    if (lua_status(m_lua_State) != 0) // lua state is not LUA_OK
         return true;
 
     m_wxlStateData->m_is_closing = true;
@@ -688,11 +709,11 @@ bool wxLuaState::Create(lua_State* L, int state_type)
             lua_pushcfunction(L, luaopen_bit);
             lua_pushstring(L, "bit");
             lua_call(L, 1, 0);
-    #ifndef LUA_JITLIBNAME
+
             lua_pushcfunction(L, luaopen_bit32);
             lua_pushstring(L, "bit32");
             lua_call(L, 1, 0);
-    #endif // LUA_JITLIBNAME
+
             RegisterBindings();
         }
     }
@@ -713,7 +734,7 @@ bool wxLuaState::IsOk() const
 
 void wxLuaState::Destroy()
 {
-    if (m_refData == NULL) return;
+    if (m_refData == NULL || M_WXLSTATEDATA->m_lua_State_static) return;
 
     // we don't want recursion in UnRef and wxlua_garbageCollect
     if (GetRefData()->GetRefCount() == 1)
@@ -725,6 +746,8 @@ void wxLuaState::Destroy()
 bool wxLuaState::CloseLuaState(bool force)
 {
     wxCHECK_MSG(Ok(), false, wxT("Invalid wxLuaState"));
+    if (M_WXLSTATEDATA->m_lua_State_static) return true;
+
     return M_WXLSTATEDATA->CloseLuaState(force);
 }
 
@@ -840,10 +863,10 @@ bool wxLuaState::SendEvent( wxLuaEvent &event ) const
 int wxLuaState::RunFile(const wxString &filename, int nresults)
 {
     wxCHECK_MSG(Ok(), LUA_ERRRUN, wxT("Lua interpreter not created"));
-    wxCHECK_MSG(!M_WXLSTATEDATA->m_wxlStateData->m_is_running, LUA_ERRRUN, wxT("Lua interpreter is already running"));
+    //wxCHECK_MSG(!M_WXLSTATEDATA->m_wxlStateData->m_is_running, LUA_ERRRUN, wxT("Lua interpreter is already running"));
 
     M_WXLSTATEDATA->m_wxlStateData->m_debug_hook_break = false;
-    M_WXLSTATEDATA->m_wxlStateData->m_is_running = true;
+    wxLuaStateRunLocker runLocker(M_WXLSTATEDATA->m_wxlStateData->m_is_running);
 
     int top = lua_GetTop();
     int status = luaL_LoadFile(wx2lua(filename));
@@ -856,7 +879,6 @@ int wxLuaState::RunFile(const wxString &filename, int nresults)
         lua_SetTop(top); // restore original top (removes err msg)
 
     M_WXLSTATEDATA->m_wxlStateData->m_debug_hook_break = false;
-    M_WXLSTATEDATA->m_wxlStateData->m_is_running = false;
 
     return status;
 }
@@ -870,10 +892,10 @@ int wxLuaState::RunString(const wxString &script, const wxString& name, int nres
 int wxLuaState::RunBuffer(const char buf[], size_t size, const wxString &name, int nresults)
 {
     wxCHECK_MSG(Ok(), LUA_ERRRUN, wxT("Invalid wxLuaState"));
-    wxCHECK_MSG(!M_WXLSTATEDATA->m_wxlStateData->m_is_running, LUA_ERRRUN, wxT("Lua interpreter is already running"));
+    //wxCHECK_MSG(!M_WXLSTATEDATA->m_wxlStateData->m_is_running, LUA_ERRRUN, wxT("Lua interpreter is already running"));
 
     M_WXLSTATEDATA->m_wxlStateData->m_debug_hook_break = false;
-    M_WXLSTATEDATA->m_wxlStateData->m_is_running = true;
+    wxLuaStateRunLocker runLocker(M_WXLSTATEDATA->m_wxlStateData->m_is_running);
 
     int top = lua_GetTop();
     int status = luaL_LoadBuffer(buf, size, wx2lua(name));
@@ -886,7 +908,6 @@ int wxLuaState::RunBuffer(const char buf[], size_t size, const wxString &name, i
         lua_SetTop(top); // restore original top (removes err msg)
 
     M_WXLSTATEDATA->m_wxlStateData->m_debug_hook_break = false;
-    M_WXLSTATEDATA->m_wxlStateData->m_is_running = false;
 
     return status;
 }
@@ -894,7 +915,7 @@ int wxLuaState::RunBuffer(const char buf[], size_t size, const wxString &name, i
 bool wxLuaState::IsRunning() const
 {
     wxCHECK_MSG(Ok(), false, wxT("Invalid wxLuaState"));
-    return M_WXLSTATEDATA->m_wxlStateData->m_is_running;
+    return M_WXLSTATEDATA->m_wxlStateData->m_is_running > 0;
 }
 
 // this function taken from lua.c, the lua executable
@@ -986,7 +1007,7 @@ int wxLuaState::CompileBuffer(const char buf[], size_t size, const wxString &nam
 void wxLuaState::DebugHookBreak(const wxString &msg)
 {
     wxCHECK_RET(Ok(), wxT("Invalid wxLuaState"));
-    wxCHECK_RET(M_WXLSTATEDATA->m_wxlStateData->m_is_running, wxT("Lua interpreter not running"));
+    //wxCHECK_RET(M_WXLSTATEDATA->m_wxlStateData->m_is_running, wxT("Lua interpreter not running"));
 
     // Lua likes to be stopped within the debug hook, you get funny wxYield
     //  recursion asserts if you call wxlua_Error() within another wxYield, i.e. from a gui button
@@ -994,7 +1015,7 @@ void wxLuaState::DebugHookBreak(const wxString &msg)
     M_WXLSTATEDATA->m_wxlStateData->m_debug_hook_break_msg = msg;
     M_WXLSTATEDATA->m_wxlStateData->m_debug_hook_break = true;
     lua_sethook(GetLuaState(), wxlua_debugHookFunction, LUA_MASKCALL|LUA_MASKRET|LUA_MASKLINE|LUA_MASKCOUNT, 1);
-    M_WXLSTATEDATA->m_wxlStateData->m_is_running = false;
+    M_WXLSTATEDATA->m_wxlStateData->m_is_running = 0;
 }
 
 void wxLuaState::ClearDebugHookBreak()
@@ -1861,7 +1882,12 @@ int  wxLuaState::lua_Load(lua_Reader reader, void *dt, const char* chunkname, co
 int wxLuaState::lua_Dump(lua_Writer writer, void *data)
 {
     wxCHECK_MSG(Ok(), 0, wxT("Invalid wxLuaState"));
-    return lua_dump(M_WXLSTATEDATA->m_lua_State, writer, data);
+    return lua_dump(M_WXLSTATEDATA->m_lua_State, writer, data
+    // Lua 5.3+ requires additional parameter `int strip`
+#if LUA_VERSION_NUM >= 503
+      , 0
+#endif
+    );
 }
 
 // ----------------------------------------------------------------------------
@@ -2019,11 +2045,14 @@ const char* wxLuaState::lua_SetUpvalue(int funcindex, int n)
     return lua_setupvalue(M_WXLSTATEDATA->m_lua_State, funcindex, n);
 }
 
-int wxLuaState::lua_SetHook(lua_Hook func, int mask, int count)
+void wxLuaState::lua_SetHook(lua_Hook func, int mask, int count)
 {
-    wxCHECK_MSG(Ok(), 0, wxT("Invalid wxLuaState"));
-    return lua_sethook(M_WXLSTATEDATA->m_lua_State, func, mask, count);
+    wxCHECK_RET(Ok(), wxT("Invalid wxLuaState"));
+    lua_sethook(M_WXLSTATEDATA->m_lua_State, func, mask, count);
+    // lua_sethook returns 1 for lua 5.1 & 5.2
+    // lua_sethook is void in 5.3+
 }
+
 lua_Hook wxLuaState::lua_GetHook()
 {
     wxCHECK_MSG(Ok(), 0, wxT("Invalid wxLuaState"));
@@ -2043,10 +2072,31 @@ int wxLuaState::lua_GetHookCount()
 // ----------------------------------------------------------------------------
 // Raw Lua auxlib functions, lauxlib.h
 
+#if LUA_VERSION_NUM >= 503
+extern "C" {
+    static int create_table(lua_State *L) {
+        lua_newtable(L);
+        return 1;    
+    }
+}
+#endif
+void wxLuaState::luaL_Register(lua_State *L, const char *libname, const luaL_Reg *l)
+{
+#if LUA_VERSION_NUM >= 503
+    // Do NOT use luaL_requiref with lua5.2, because with lua5.2 luaL_requiref always creates new module!
+    // lua5.3 luaL_requiref creates new modul only if modname is not already present in package.loaded
+    // call luaL_requiref with glb=true -> stores the module into global modname for backwards compatibility.
+    luaL_requiref(L, libname, create_table, 1);
+    luaL_setfuncs(L, l, 0);
+#else
+    luaL_register(L, libname, l);
+#endif
+}
 void wxLuaState::luaL_Register(const char *libname, const luaL_Reg *l)
 {
     wxCHECK_RET(Ok(), wxT("Invalid wxLuaState"));
-    luaL_register(M_WXLSTATEDATA->m_lua_State, libname, l);
+
+    wxLuaState::luaL_Register(M_WXLSTATEDATA->m_lua_State, libname, l);
 }
 int wxLuaState::luaL_GetMetafield(int obj, const char *e)
 {
@@ -2195,22 +2245,38 @@ const char* wxLuaState::luaL_OptString(int numArg, const char* def)
 int wxLuaState::luaL_CheckInt(int numArg)
 {
     wxCHECK_MSG(Ok(), 0, wxT("Invalid wxLuaState"));
+#if LUA_VERSION_NUM >= 502
+    return (int)luaL_checkinteger(M_WXLSTATEDATA->m_lua_State, numArg);
+#else
     return (int)luaL_checkint(M_WXLSTATEDATA->m_lua_State, numArg);
+#endif
 }
 int wxLuaState::luaL_OptInt(int numArg, int def)
 {
     wxCHECK_MSG(Ok(), 0, wxT("Invalid wxLuaState"));
+#if LUA_VERSION_NUM >= 502
+    return (int)luaL_optinteger(M_WXLSTATEDATA->m_lua_State, numArg, def);
+#else
     return (int)luaL_optint(M_WXLSTATEDATA->m_lua_State, numArg, def);
+#endif
 }
 long wxLuaState::luaL_CheckLong(int numArg)
 {
     wxCHECK_MSG(Ok(), 0, wxT("Invalid wxLuaState"));
+#if LUA_VERSION_NUM >= 502
+    return (long)luaL_checkinteger(M_WXLSTATEDATA->m_lua_State, numArg);
+#else
     return (long)luaL_checklong(M_WXLSTATEDATA->m_lua_State, numArg);
+#endif
 }
 long wxLuaState::luaL_OptLong(int numArg, int def)
 {
     wxCHECK_MSG(Ok(), 0, wxT("Invalid wxLuaState"));
+#if LUA_VERSION_NUM >= 502
+    return (long)luaL_optinteger(M_WXLSTATEDATA->m_lua_State, numArg, def);
+#else
     return (long)luaL_optlong(M_WXLSTATEDATA->m_lua_State, numArg, def);
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -2273,7 +2339,7 @@ void wxLuaState::AddLuaPath(const wxFileName& filename)
     // append path
     luapath += path + wxT(';');
 
-    lua_PushString(luapath);
+    lua_PushString(luapath.c_str());
     lua_SetGlobal(LUA_PATH);
 }
 
@@ -2301,165 +2367,3 @@ wxLuaEvent::wxLuaEvent( const wxLuaEvent &event )
             m_lua_Debug(event.m_lua_Debug)
 {
 }
-
-#ifndef LUA_JITLIBNAME
-
-//-----------------------------------------------------------------------------
-// bitlib release 25 - Bitwise operations library
-// by Reuben Thomas <rrt@sc3d.org>
-// http://luaforge.net/projects/bitlib
-// copyright Reuben Thomas 2000-2008, and is released under the MIT license
-//-----------------------------------------------------------------------------
-
-// This is the code copied directly from lbitlib.c and ever so slightly modified
-// to allow it to work here.
-
-/* Bitwise operations library */
-/* (c) Reuben Thomas 2000-2008 */
-/* See README for license */
-
-//#include "config.h"
-
-//#include <lua.h>
-//#include <lauxlib.h>
-#include <limits.h>
-
-//#include "bit_limits.h"
-#define BITLIB_FLOAT_BITS 53
-#define BITLIB_FLOAT_MAX  0xfffffffffffffL
-#define BITLIB_FLOAT_MIN  (-0x10000000000000L)
-#if defined(__VISUALC__)
-    #define BITLIB_FLOAT_UMAX 0x1fffffffffffffUL
-#else
-    #define BITLIB_FLOAT_UMAX 0x1fffffffffffffULL
-#endif
-
-/* FIXME: Assume lua_Integer is ptrdiff_t */
-#define LUA_INTEGER_MAX PTRDIFF_MAX
-#define LUA_INTEGER_MIN PTRDIFF_MIN
-
-#ifndef SIZE_MAX
-#define SIZE_MAX ((size_t)-1)
-#endif
-
-/* FIXME: Assume size_t is an unsigned lua_Integer */
-typedef size_t lua_UInteger;
-#define LUA_UINTEGER_MAX SIZE_MAX
-
-
-/* Bit type size and limits */
-
-#define BIT_BITS                                                        \
-  (CHAR_BIT * sizeof(lua_Integer) > BITLIB_FLOAT_BITS ?                 \
-   BITLIB_FLOAT_BITS : (CHAR_BIT * sizeof(lua_Integer)))
-
-/* This code may give warnings if BITLIB_FLOAT_* are too big to fit in
-   long, but that doesn't matter since in that case they won't be
-   used. */
-#define BIT_MAX                                                         \
-  (CHAR_BIT * sizeof(lua_Integer) > BITLIB_FLOAT_BITS ? BITLIB_FLOAT_MAX : LUA_INTEGER_MAX)
-
-#define BIT_MIN                                                         \
-  (CHAR_BIT * sizeof(lua_Integer) > BITLIB_FLOAT_BITS ? BITLIB_FLOAT_MIN : LUA_INTEGER_MIN)
-
-#define BIT_UMAX                                                        \
-  (CHAR_BIT * sizeof(lua_Integer) > BITLIB_FLOAT_BITS ? BITLIB_FLOAT_UMAX : LUA_UINTEGER_MAX)
-
-
-#define BUILTIN_CAST
-
-/* Define TOBIT to get a bit value */
-#ifdef BUILTIN_CAST
-#define TOBIT(L, n, res)                    \
-  ((void)(res), luaL_checkinteger((L), (n)))
-#else
-#include <stdint.h>
-#include <math.h>
-
-/* FIXME: Assume lua_Number fits in a double (use of fmod). */
-#define TOBIT(L, n, res)                                            \
-  ((lua_Integer)(((res) = fmod(luaL_checknumber(L, (n)), (double)BIT_UMAX + 1.0)), \
-                 (res) > BIT_MAX ? ((res) -= (double)BIT_UMAX, (res) -= 1) : \
-                 ((res) < BIT_MIN ? ((res) += (double)BIT_UMAX, (res) += 1) : (res))))
-#endif
-
-
-#define BIT_TRUNCATE(i)                         \
-  ((i) & BIT_UMAX)
-
-/* Operations
-
-   The macros MONADIC and VARIADIC only deal with bitwise operations.
-
-   LOGICAL_SHIFT truncates its left-hand operand before shifting so
-   that any extra bits at the most-significant end are not shifted
-   into the result.
-
-   ARITHMETIC_SHIFT does not truncate its left-hand operand, so that
-   the sign bits are not removed and right shift work properly.
-   */
-
-#define MONADIC(name, op)                                       \
-  static int bit_ ## name(lua_State *L) {                       \
-    lua_Number f;                                               \
-    lua_pushinteger(L, BIT_TRUNCATE(op TOBIT(L, 1, f)));        \
-    return 1;                                                   \
-  }
-
-#define VARIADIC(name, op)                      \
-  static int bit_ ## name(lua_State *L) {       \
-    lua_Number f;                               \
-    int n = lua_gettop(L), i;                   \
-    lua_Integer w = TOBIT(L, 1, f);             \
-    for (i = 2; i <= n; i++)                    \
-      w op TOBIT(L, i, f);                      \
-    lua_pushinteger(L, BIT_TRUNCATE(w));        \
-    return 1;                                   \
-  }
-
-#define LOGICAL_SHIFT(name, op)                                         \
-  static int bit_ ## name(lua_State *L) {                               \
-    lua_Number f;                                                       \
-    lua_pushinteger(L, BIT_TRUNCATE(BIT_TRUNCATE((lua_UInteger)TOBIT(L, 1, f)) op \
-                                    (unsigned)luaL_checknumber(L, 2))); \
-    return 1;                                                           \
-  }
-
-#define ARITHMETIC_SHIFT(name, op)                                      \
-  static int bit_ ## name(lua_State *L) {                               \
-    lua_Number f;                                                       \
-    lua_pushinteger(L, BIT_TRUNCATE((lua_Integer)TOBIT(L, 1, f) op      \
-                                    (unsigned)luaL_checknumber(L, 2))); \
-    return 1;                                                           \
-  }
-
-MONADIC(cast,  +)
-MONADIC(bnot,  ~)
-VARIADIC(band, &=)
-VARIADIC(bor,  |=)
-VARIADIC(bxor, ^=)
-ARITHMETIC_SHIFT(lshift,  <<)
-LOGICAL_SHIFT(rshift,     >>)
-//ARITHMETIC_SHIFT(arshift, >>) // broken in 64 bit
-
-static const struct luaL_Reg bitlib[] = {
-  {"cast",    bit_cast},
-  {"bnot",    bit_bnot},
-  {"band",    bit_band},
-  {"bor",     bit_bor},
-  {"bxor",    bit_bxor},
-  {"lshift",  bit_lshift},
-  {"rshift",  bit_rshift},
-  //{"arshift", bit_arshift},
-
-  {NULL, NULL}
-};
-
-int LUACALL luaopen_bit (lua_State *L) {
-  luaL_register(L, "bit", bitlib);
-  lua_pushnumber(L, BIT_BITS);
-  lua_setfield(L, -2, "bits");
-  return 1;
-}
-
-#endif // LUA_JITLIBNAME

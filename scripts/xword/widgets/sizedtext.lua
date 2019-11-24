@@ -159,7 +159,7 @@ local function SizedTextCtrl(parent, id, text, pos, size, style)
     end)
 
     -- Draw the text and arrow
-    ctrl:SetBackgroundStyle(wx.wxBG_STYLE_CUSTOM)
+    ctrl:SetBackgroundStyle(wx.wxBG_STYLE_PAINT)
     ctrl:Connect(wx.wxEVT_ERASE_BACKGROUND, function (evt) end)
     ctrl:Connect(wx.wxEVT_PAINT, function (evt)
         local dc = wx.wxAutoBufferedPaintDC(ctrl)

@@ -19,9 +19,9 @@
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 30
+#if WXLUA_BINDING_VERSION > 35
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 30
+#endif //WXLUA_BINDING_VERSION > 35
 // ---------------------------------------------------------------------------
 
 // binding class
@@ -59,6 +59,7 @@ extern WXDLLIMPEXP_BINDWXAUI wxLuaBinding* wxLuaBinding_wxaui_init();
     extern WXDLLIMPEXP_DATA_BINDWXAUI(int) wxluatype_wxAuiDockInfo;
     extern WXDLLIMPEXP_DATA_BINDWXAUI(int) wxluatype_wxAuiDockUIPart;
     extern WXDLLIMPEXP_DATA_BINDWXAUI(int) wxluatype_wxAuiFloatingFrame;
+    extern WXDLLIMPEXP_DATA_BINDWXAUI(int) wxluatype_wxAuiGenericTabArt;
     extern WXDLLIMPEXP_DATA_BINDWXAUI(int) wxluatype_wxAuiMDIChildFrame;
     extern WXDLLIMPEXP_DATA_BINDWXAUI(int) wxluatype_wxAuiMDIClientWindow;
     extern WXDLLIMPEXP_DATA_BINDWXAUI(int) wxluatype_wxAuiMDIParentFrame;

@@ -19,9 +19,9 @@
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 30
+#if WXLUA_BINDING_VERSION > 35
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 30
+#endif //WXLUA_BINDING_VERSION > 35
 // ---------------------------------------------------------------------------
 
 // binding class
@@ -51,10 +51,18 @@ extern WXDLLIMPEXP_BINDWXXML wxLuaBinding* wxLuaBinding_wxxml_init();
 // Lua Tag Method Values and Tables for each Class
 // ---------------------------------------------------------------------------
 
+#if (!wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxXML && wxUSE_XML)
+    extern WXDLLIMPEXP_DATA_BINDWXXML(int) wxluatype_wxXmlProperty;
+#endif // (!wxCHECK_VERSION(2,9,0)) && (wxLUA_USE_wxXML && wxUSE_XML)
+
+#if (wxCHECK_VERSION(3,1,0)) && (wxLUA_USE_wxXML && wxUSE_XML)
+    extern WXDLLIMPEXP_DATA_BINDWXXML(int) wxluatype_wxXmlDoctype;
+#endif // (wxCHECK_VERSION(3,1,0)) && (wxLUA_USE_wxXML && wxUSE_XML)
+
 #if wxLUA_USE_wxXML && wxUSE_XML
+    extern WXDLLIMPEXP_DATA_BINDWXXML(int) wxluatype_wxXmlAttribute;
     extern WXDLLIMPEXP_DATA_BINDWXXML(int) wxluatype_wxXmlDocument;
     extern WXDLLIMPEXP_DATA_BINDWXXML(int) wxluatype_wxXmlNode;
-    extern WXDLLIMPEXP_DATA_BINDWXXML(int) wxluatype_wxXmlProperty;
 #endif // wxLUA_USE_wxXML && wxUSE_XML
 
 

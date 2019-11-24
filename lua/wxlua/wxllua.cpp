@@ -199,7 +199,7 @@ void LUACALL wxlua_argerrormsg(lua_State *L, const wxString& msg_)
 
     wxString msg;
     msg.Printf(wxT("%s\nFunction called: '%s'%s"), msg_.c_str(), argMsg.c_str(), funcArgs.c_str());
-    wxlua_error(L, msg);
+    wxlua_error(L, msg.c_str());
 }
 
 void* LUACALL wxlua_touserdata(lua_State *L, int stack_idx, bool null_ptr /*= false*/)
@@ -389,7 +389,7 @@ bool LUACALL wxluaO_deletegcobject(lua_State *L, int stack_idx, int flags)
     void* udata   = lua_touserdata(L, stack_idx);
     void* obj_ptr = wxlua_touserdata(L, stack_idx, true); // clear lua userdata's ptr
 
-    //if (obj_ptr == NULL) return false; // can happen
+    if (obj_ptr == NULL) return false; // can happen
 
     bool delete_all = WXLUA_HASBIT(flags, WXLUA_DELETE_OBJECT_ALL);
 
@@ -1068,7 +1068,8 @@ void* LUACALL wxluaT_getuserdatatype(lua_State* L, int stack_idx, int wxl_type)
         // pointer to the class object on the stack. We need to shift the
         // pointer by the number of bytes in wxLuaBindClass::baseclass_vtable_offsets
         // so that when it is casted to the base class we don't segfault.
-        long int o = (long int)wxlua_touserdata(L, stack_idx, false);
+        // Using 'long long' for 32 and 64 bit and compatibility with older compilers that don't have uintptr_t.
+        unsigned long long o = (unsigned long long)wxlua_touserdata(L, stack_idx, false);
 
         if (wxlClass->baseclass_wxluatypes)
         {

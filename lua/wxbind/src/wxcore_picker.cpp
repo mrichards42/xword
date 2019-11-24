@@ -56,7 +56,7 @@ static int LUACALL wxLua_wxPickerBase_GetInternalMargin(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_GetPickerCtrl[] = { &wxluatype_wxPickerBase, NULL };
 static int LUACALL wxLua_wxPickerBase_GetPickerCtrl(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_GetPickerCtrl[1] = {{ wxLua_wxPickerBase_GetPickerCtrl, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxPickerBase_GetPickerCtrl }};
-//     wxControl *GetPickerCtrl( );
+//     wxControl *GetPickerCtrl();
 static int LUACALL wxLua_wxPickerBase_GetPickerCtrl(lua_State *L)
 {
     // get this
@@ -86,11 +86,11 @@ static int LUACALL wxLua_wxPickerBase_GetPickerCtrlProportion(lua_State *L)
 }
 
 
-#if (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)
+#if (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_GetTextCtrl[] = { &wxluatype_wxPickerBase, NULL };
 static int LUACALL wxLua_wxPickerBase_GetTextCtrl(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_GetTextCtrl[1] = {{ wxLua_wxPickerBase_GetTextCtrl, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxPickerBase_GetTextCtrl }};
-//     wxTextCtrl *GetTextCtrl( );
+//     wxTextCtrl *GetTextCtrl();
 static int LUACALL wxLua_wxPickerBase_GetTextCtrl(lua_State *L)
 {
     // get this
@@ -103,7 +103,7 @@ static int LUACALL wxLua_wxPickerBase_GetTextCtrl(lua_State *L)
     return 1;
 }
 
-#endif // (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)
+#endif // (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_GetTextCtrlProportion[] = { &wxluatype_wxPickerBase, NULL };
 static int LUACALL wxLua_wxPickerBase_GetTextCtrlProportion(lua_State *L);
@@ -172,7 +172,7 @@ static int LUACALL wxLua_wxPickerBase_IsTextCtrlGrowable(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_SetInternalMargin[] = { &wxluatype_wxPickerBase, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxPickerBase_SetInternalMargin(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_SetInternalMargin[1] = {{ wxLua_wxPickerBase_SetInternalMargin, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxPickerBase_SetInternalMargin }};
-//     void SetInternalMargin(int newmargin );
+//     void SetInternalMargin(int newmargin);
 static int LUACALL wxLua_wxPickerBase_SetInternalMargin(lua_State *L)
 {
     // int newmargin
@@ -188,7 +188,7 @@ static int LUACALL wxLua_wxPickerBase_SetInternalMargin(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_SetPickerCtrlGrowable[] = { &wxluatype_wxPickerBase, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxPickerBase_SetPickerCtrlGrowable(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_SetPickerCtrlGrowable[1] = {{ wxLua_wxPickerBase_SetPickerCtrlGrowable, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxPickerBase_SetPickerCtrlGrowable }};
-//     void SetPickerCtrlGrowable(bool grow = true );
+//     void SetPickerCtrlGrowable(bool grow = true);
 static int LUACALL wxLua_wxPickerBase_SetPickerCtrlGrowable(lua_State *L)
 {
     // get number of arguments
@@ -206,7 +206,7 @@ static int LUACALL wxLua_wxPickerBase_SetPickerCtrlGrowable(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_SetPickerCtrlProportion[] = { &wxluatype_wxPickerBase, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxPickerBase_SetPickerCtrlProportion(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_SetPickerCtrlProportion[1] = {{ wxLua_wxPickerBase_SetPickerCtrlProportion, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxPickerBase_SetPickerCtrlProportion }};
-//     void SetPickerCtrlProportion(int prop );
+//     void SetPickerCtrlProportion(int prop);
 static int LUACALL wxLua_wxPickerBase_SetPickerCtrlProportion(lua_State *L)
 {
     // int prop
@@ -222,7 +222,7 @@ static int LUACALL wxLua_wxPickerBase_SetPickerCtrlProportion(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_SetTextCtrlGrowable[] = { &wxluatype_wxPickerBase, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxPickerBase_SetTextCtrlGrowable(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_SetTextCtrlGrowable[1] = {{ wxLua_wxPickerBase_SetTextCtrlGrowable, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxPickerBase_SetTextCtrlGrowable }};
-//     void SetTextCtrlGrowable(bool grow = true );
+//     void SetTextCtrlGrowable(bool grow = true);
 static int LUACALL wxLua_wxPickerBase_SetTextCtrlGrowable(lua_State *L)
 {
     // get number of arguments
@@ -240,7 +240,7 @@ static int LUACALL wxLua_wxPickerBase_SetTextCtrlGrowable(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_SetTextCtrlProportion[] = { &wxluatype_wxPickerBase, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxPickerBase_SetTextCtrlProportion(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_SetTextCtrlProportion[1] = {{ wxLua_wxPickerBase_SetTextCtrlProportion, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxPickerBase_SetTextCtrlProportion }};
-//     void SetTextCtrlProportion(int prop );
+//     void SetTextCtrlProportion(int prop);
 static int LUACALL wxLua_wxPickerBase_SetTextCtrlProportion(lua_State *L)
 {
     // int prop
@@ -256,7 +256,7 @@ static int LUACALL wxLua_wxPickerBase_SetTextCtrlProportion(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_UpdatePickerFromTextCtrl[] = { &wxluatype_wxPickerBase, NULL };
 static int LUACALL wxLua_wxPickerBase_UpdatePickerFromTextCtrl(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_UpdatePickerFromTextCtrl[1] = {{ wxLua_wxPickerBase_UpdatePickerFromTextCtrl, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxPickerBase_UpdatePickerFromTextCtrl }};
-//     virtual void UpdatePickerFromTextCtrl( );
+//     virtual void UpdatePickerFromTextCtrl();
 static int LUACALL wxLua_wxPickerBase_UpdatePickerFromTextCtrl(lua_State *L)
 {
     // get this
@@ -270,7 +270,7 @@ static int LUACALL wxLua_wxPickerBase_UpdatePickerFromTextCtrl(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPickerBase_UpdateTextCtrlFromPicker[] = { &wxluatype_wxPickerBase, NULL };
 static int LUACALL wxLua_wxPickerBase_UpdateTextCtrlFromPicker(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPickerBase_UpdateTextCtrlFromPicker[1] = {{ wxLua_wxPickerBase_UpdateTextCtrlFromPicker, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxPickerBase_UpdateTextCtrlFromPicker }};
-//     virtual void UpdateTextCtrlFromPicker( );
+//     virtual void UpdateTextCtrlFromPicker();
 static int LUACALL wxLua_wxPickerBase_UpdateTextCtrlFromPicker(lua_State *L)
 {
     // get this
@@ -296,9 +296,9 @@ wxLuaBindMethod wxPickerBase_methods[] = {
     { "GetPickerCtrl", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxPickerBase_GetPickerCtrl, 1, NULL },
     { "GetPickerCtrlProportion", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxPickerBase_GetPickerCtrlProportion, 1, NULL },
 
-#if (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)
+#if (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)
     { "GetTextCtrl", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxPickerBase_GetTextCtrl, 1, NULL },
-#endif // (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)
+#endif // (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)
 
     { "GetTextCtrlProportion", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxPickerBase_GetTextCtrlProportion, 1, NULL },
     { "HasTextCtrl", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxPickerBase_HasTextCtrl, 1, NULL },
@@ -328,11 +328,11 @@ int wxPickerBase_methodCount = sizeof(wxPickerBase_methods)/sizeof(wxLuaBindMeth
 // Lua MetaTable Tag for Class 'wxColourPickerCtrl'
 int wxluatype_wxColourPickerCtrl = WXLUA_TUNKNOWN;
 
-#if (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxColourPickerCtrl_Create[] = { &wxluatype_wxColourPickerCtrl, &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxColour, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxColourPickerCtrl_Create(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerCtrl_Create[1] = {{ wxLua_wxColourPickerCtrl_Create, WXLUAMETHOD_METHOD, 4, 9, s_wxluatypeArray_wxLua_wxColourPickerCtrl_Create }};
-//     bool Create(wxWindow *parent, wxWindowID id, const wxColour& col, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLRP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxColourPickerCtrl" );
+//     bool Create(wxWindow *parent, wxWindowID id, const wxColour& col, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLRP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxColourPickerCtrl");
 static int LUACALL wxLua_wxColourPickerCtrl_Create(lua_State *L)
 {
     // get number of arguments
@@ -363,7 +363,7 @@ static int LUACALL wxLua_wxColourPickerCtrl_Create(lua_State *L)
     return 1;
 }
 
-#endif // (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 #if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxColourPickerCtrl_GetColour[] = { &wxluatype_wxColourPickerCtrl, NULL };
@@ -390,7 +390,7 @@ static int LUACALL wxLua_wxColourPickerCtrl_GetColour(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxColourPickerCtrl_SetColour1[] = { &wxluatype_wxColourPickerCtrl, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxColourPickerCtrl_SetColour1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerCtrl_SetColour1[1] = {{ wxLua_wxColourPickerCtrl_SetColour1, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxColourPickerCtrl_SetColour1 }};
-//     bool SetColour(const wxString& text );
+//     bool SetColour(const wxString& text);
 static int LUACALL wxLua_wxColourPickerCtrl_SetColour1(lua_State *L)
 {
     // const wxString text
@@ -410,7 +410,7 @@ static int LUACALL wxLua_wxColourPickerCtrl_SetColour1(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxColourPickerCtrl_SetColour[] = { &wxluatype_wxColourPickerCtrl, &wxluatype_wxColour, NULL };
 static int LUACALL wxLua_wxColourPickerCtrl_SetColour(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerCtrl_SetColour[1] = {{ wxLua_wxColourPickerCtrl_SetColour, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxColourPickerCtrl_SetColour }};
-//     void SetColour(const wxColour& col );
+//     void SetColour(const wxColour& col);
 static int LUACALL wxLua_wxColourPickerCtrl_SetColour(lua_State *L)
 {
     // const wxColour col
@@ -425,11 +425,11 @@ static int LUACALL wxLua_wxColourPickerCtrl_SetColour(lua_State *L)
 
 #endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)
 
-#if (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxColourPickerCtrl_constructor1[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxColour, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxColourPickerCtrl_constructor1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerCtrl_constructor1[1] = {{ wxLua_wxColourPickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 3, 8, s_wxluatypeArray_wxLua_wxColourPickerCtrl_constructor1 }};
-//     wxColourPickerCtrl(wxWindow *parent, wxWindowID id, const wxColour& col, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLRP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxColourPickerCtrl" );
+//     wxColourPickerCtrl(wxWindow *parent, wxWindowID id, const wxColour& col, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLRP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxColourPickerCtrl");
 static int LUACALL wxLua_wxColourPickerCtrl_constructor1(lua_State *L)
 {
     // get number of arguments
@@ -460,11 +460,11 @@ static int LUACALL wxLua_wxColourPickerCtrl_constructor1(lua_State *L)
     return 1;
 }
 
-#endif // (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 static int LUACALL wxLua_wxColourPickerCtrl_constructor(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerCtrl_constructor[1] = {{ wxLua_wxColourPickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxColourPickerCtrl( );
+//     wxColourPickerCtrl();
 static int LUACALL wxLua_wxColourPickerCtrl_constructor(lua_State *L)
 {
     // call constructor
@@ -494,19 +494,19 @@ static int s_wxluafunc_wxLua_wxColourPickerCtrl_SetColour_overload_count = sizeo
 
 #endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))||(((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush))
 
-#if ((((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerCtrl_constructor_overload[] =
 {
 
-#if (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxColourPickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 3, 8, s_wxluatypeArray_wxLua_wxColourPickerCtrl_constructor1 },
-#endif // (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxColourPickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
 };
 static int s_wxluafunc_wxLua_wxColourPickerCtrl_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxColourPickerCtrl_constructor_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // ((((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
 
 void wxLua_wxColourPickerCtrl_delete_function(void** p)
 {
@@ -516,9 +516,9 @@ void wxLua_wxColourPickerCtrl_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxColourPickerCtrl_methods[] = {
-#if (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxColourPickerCtrl_Create, 1, NULL },
-#endif // (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 #if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)
     { "GetColour", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxColourPickerCtrl_GetColour, 1, NULL },
@@ -528,9 +528,9 @@ wxLuaBindMethod wxColourPickerCtrl_methods[] = {
     { "SetColour", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxColourPickerCtrl_SetColour_overload, s_wxluafunc_wxLua_wxColourPickerCtrl_SetColour_overload_count, 0 },
 #endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))||(((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush))
 
-#if ((((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
     { "wxColourPickerCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxColourPickerCtrl_constructor_overload, s_wxluafunc_wxLua_wxColourPickerCtrl_constructor_overload_count, 0 },
-#endif // ((((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
 
     { 0, 0, 0, 0 },
 };
@@ -571,7 +571,7 @@ static int LUACALL wxLua_wxColourPickerEvent_GetColour(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxColourPickerEvent_SetColour[] = { &wxluatype_wxColourPickerEvent, &wxluatype_wxColour, NULL };
 static int LUACALL wxLua_wxColourPickerEvent_SetColour(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerEvent_SetColour[1] = {{ wxLua_wxColourPickerEvent_SetColour, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxColourPickerEvent_SetColour }};
-//     void SetColour(const wxColour &c );
+//     void SetColour(const wxColour &c);
 static int LUACALL wxLua_wxColourPickerEvent_SetColour(lua_State *L)
 {
     // const wxColour c
@@ -590,11 +590,11 @@ static wxLuaArgType s_wxluatypeArray_wxLua_wxColourPickerEvent_delete[] = { &wxl
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerEvent_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxColourPickerEvent_delete }};
 
 
-#if ((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxObject)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#if (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxObject)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxColourPickerEvent_constructor1[] = { &wxluatype_wxObject, &wxluatype_TNUMBER, &wxluatype_wxColour, NULL };
 static int LUACALL wxLua_wxColourPickerEvent_constructor1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerEvent_constructor1[1] = {{ wxLua_wxColourPickerEvent_constructor1, WXLUAMETHOD_CONSTRUCTOR, 3, 3, s_wxluatypeArray_wxLua_wxColourPickerEvent_constructor1 }};
-//     wxColourPickerEvent(wxObject *generator, int id, const wxColour &col );
+//     wxColourPickerEvent(wxObject *generator, int id, const wxColour &col);
 static int LUACALL wxLua_wxColourPickerEvent_constructor1(lua_State *L)
 {
     // const wxColour col
@@ -613,11 +613,11 @@ static int LUACALL wxLua_wxColourPickerEvent_constructor1(lua_State *L)
     return 1;
 }
 
-#endif // ((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxObject)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#endif // (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxObject)
 
 static int LUACALL wxLua_wxColourPickerEvent_constructor(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerEvent_constructor[1] = {{ wxLua_wxColourPickerEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxColourPickerEvent( );
+//     wxColourPickerEvent();
 static int LUACALL wxLua_wxColourPickerEvent_constructor(lua_State *L)
 {
     // call constructor
@@ -633,19 +633,19 @@ static int LUACALL wxLua_wxColourPickerEvent_constructor(lua_State *L)
 
 
 
-#if (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxObject)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxObject))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxColourPickerEvent_constructor_overload[] =
 {
 
-#if ((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxObject)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#if (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxObject)
     { wxLua_wxColourPickerEvent_constructor1, WXLUAMETHOD_CONSTRUCTOR, 3, 3, s_wxluatypeArray_wxLua_wxColourPickerEvent_constructor1 },
-#endif // ((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxObject)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#endif // (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxObject)
     { wxLua_wxColourPickerEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
 };
 static int s_wxluafunc_wxLua_wxColourPickerEvent_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxColourPickerEvent_constructor_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxObject)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxObject))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
 
 void wxLua_wxColourPickerEvent_delete_function(void** p)
 {
@@ -662,9 +662,9 @@ wxLuaBindMethod wxColourPickerEvent_methods[] = {
 
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxColourPickerEvent_delete, 1, NULL },
 
-#if (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxObject)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxObject))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
     { "wxColourPickerEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxColourPickerEvent_constructor_overload, s_wxluafunc_wxLua_wxColourPickerEvent_constructor_overload_count, 0 },
-#endif // (((wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxObject)) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxObject))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL))
 
     { 0, 0, 0, 0 },
 };
@@ -682,11 +682,11 @@ int wxColourPickerEvent_methodCount = sizeof(wxColourPickerEvent_methods)/sizeof
 // Lua MetaTable Tag for Class 'wxDatePickerCtrl'
 int wxluatype_wxDatePickerCtrl = WXLUA_TUNKNOWN;
 
-#if (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDatePickerCtrl_Create[] = { &wxluatype_wxDatePickerCtrl, &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxDateTime, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxDatePickerCtrl_Create(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDatePickerCtrl_Create[1] = {{ wxLua_wxDatePickerCtrl_Create, WXLUAMETHOD_METHOD, 3, 9, s_wxluatypeArray_wxLua_wxDatePickerCtrl_Create }};
-//     bool Create(wxWindow *parent, wxWindowID id, const wxDateTime& dt = wxDefaultDateTime, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDP_DEFAULT | wxDP_SHOWCENTURY, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxDatePickerCtrl" );
+//     bool Create(wxWindow *parent, wxWindowID id, const wxDateTime& dt = wxDefaultDateTime, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDP_DEFAULT | wxDP_SHOWCENTURY, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxDatePickerCtrl");
 static int LUACALL wxLua_wxDatePickerCtrl_Create(lua_State *L)
 {
     // get number of arguments
@@ -717,7 +717,7 @@ static int LUACALL wxLua_wxDatePickerCtrl_Create(lua_State *L)
     return 1;
 }
 
-#endif // (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDatePickerCtrl_GetRange[] = { &wxluatype_wxDatePickerCtrl, NULL };
 static int LUACALL wxLua_wxDatePickerCtrl_GetRange(lua_State *L);
@@ -765,7 +765,7 @@ static int LUACALL wxLua_wxDatePickerCtrl_GetValue(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDatePickerCtrl_SetRange[] = { &wxluatype_wxDatePickerCtrl, &wxluatype_wxDateTime, &wxluatype_wxDateTime, NULL };
 static int LUACALL wxLua_wxDatePickerCtrl_SetRange(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDatePickerCtrl_SetRange[1] = {{ wxLua_wxDatePickerCtrl_SetRange, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxDatePickerCtrl_SetRange }};
-//     void SetRange(const wxDateTime& dt1, const wxDateTime& dt2 );
+//     void SetRange(const wxDateTime& dt1, const wxDateTime& dt2);
 static int LUACALL wxLua_wxDatePickerCtrl_SetRange(lua_State *L)
 {
     // const wxDateTime dt2
@@ -783,7 +783,7 @@ static int LUACALL wxLua_wxDatePickerCtrl_SetRange(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDatePickerCtrl_SetValue[] = { &wxluatype_wxDatePickerCtrl, &wxluatype_wxDateTime, NULL };
 static int LUACALL wxLua_wxDatePickerCtrl_SetValue(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDatePickerCtrl_SetValue[1] = {{ wxLua_wxDatePickerCtrl_SetValue, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxDatePickerCtrl_SetValue }};
-//     void SetValue(const wxDateTime& dt );
+//     void SetValue(const wxDateTime& dt);
 static int LUACALL wxLua_wxDatePickerCtrl_SetValue(lua_State *L)
 {
     // const wxDateTime dt
@@ -798,11 +798,11 @@ static int LUACALL wxLua_wxDatePickerCtrl_SetValue(lua_State *L)
 
 #endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
 
-#if (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDatePickerCtrl_constructor1[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxDateTime, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxDatePickerCtrl_constructor1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxDatePickerCtrl_constructor1[1] = {{ wxLua_wxDatePickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 8, s_wxluatypeArray_wxLua_wxDatePickerCtrl_constructor1 }};
-//     wxDatePickerCtrl(wxWindow *parent, wxWindowID id, const wxDateTime& dt = wxDefaultDateTime, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDP_DEFAULT | wxDP_SHOWCENTURY, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxDatePickerCtrl" );
+//     wxDatePickerCtrl(wxWindow *parent, wxWindowID id, const wxDateTime& dt = wxDefaultDateTime, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDP_DEFAULT | wxDP_SHOWCENTURY, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxDatePickerCtrl");
 static int LUACALL wxLua_wxDatePickerCtrl_constructor1(lua_State *L)
 {
     // get number of arguments
@@ -833,11 +833,11 @@ static int LUACALL wxLua_wxDatePickerCtrl_constructor1(lua_State *L)
     return 1;
 }
 
-#endif // (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 static int LUACALL wxLua_wxDatePickerCtrl_constructor(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxDatePickerCtrl_constructor[1] = {{ wxLua_wxDatePickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxDatePickerCtrl( );
+//     wxDatePickerCtrl();
 static int LUACALL wxLua_wxDatePickerCtrl_constructor(lua_State *L)
 {
     // call constructor
@@ -853,19 +853,19 @@ static int LUACALL wxLua_wxDatePickerCtrl_constructor(lua_State *L)
 
 
 
-#if ((((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))
+#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDatePickerCtrl_constructor_overload[] =
 {
 
-#if (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxDatePickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 8, s_wxluatypeArray_wxLua_wxDatePickerCtrl_constructor1 },
-#endif // (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxDatePickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
 };
 static int s_wxluafunc_wxLua_wxDatePickerCtrl_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxDatePickerCtrl_constructor_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // ((((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))
+#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))
 
 void wxLua_wxDatePickerCtrl_delete_function(void** p)
 {
@@ -875,9 +875,9 @@ void wxLua_wxDatePickerCtrl_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxDatePickerCtrl_methods[] = {
-#if (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDatePickerCtrl_Create, 1, NULL },
-#endif // (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
     { "GetRange", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDatePickerCtrl_GetRange, 1, NULL },
 
@@ -887,9 +887,9 @@ wxLuaBindMethod wxDatePickerCtrl_methods[] = {
     { "SetValue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDatePickerCtrl_SetValue, 1, NULL },
 #endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
 
-#if ((((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))
+#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))
     { "wxDatePickerCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxDatePickerCtrl_constructor_overload, s_wxluafunc_wxLua_wxDatePickerCtrl_constructor_overload_count, 0 },
-#endif // ((((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))
+#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL))
 
     { 0, 0, 0, 0 },
 };
@@ -899,7 +899,252 @@ int wxDatePickerCtrl_methodCount = sizeof(wxDatePickerCtrl_methods)/sizeof(wxLua
 #endif  // (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)
 
 
-#if (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))
+#if (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))
+// ---------------------------------------------------------------------------
+// Bind class wxTimePickerCtrl
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxTimePickerCtrl'
+int wxluatype_wxTimePickerCtrl = WXLUA_TUNKNOWN;
+
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTimePickerCtrl_Create[] = { &wxluatype_wxTimePickerCtrl, &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxDateTime, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxTimePickerCtrl_Create(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTimePickerCtrl_Create[1] = {{ wxLua_wxTimePickerCtrl_Create, WXLUAMETHOD_METHOD, 3, 9, s_wxluatypeArray_wxLua_wxTimePickerCtrl_Create }};
+//                 const wxString& name = wxTimePickerCtrlNameStr);
+static int LUACALL wxLua_wxTimePickerCtrl_Create(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // const wxString name = wxTimePickerCtrlNameStr
+    const wxString name = (argCount >= 9 ? wxlua_getwxStringtype(L, 9) : wxString(wxTimePickerCtrlNameStr));
+    // const wxValidator validator = wxDefaultValidator
+    const wxValidator * validator = (argCount >= 8 ? (const wxValidator *)wxluaT_getuserdatatype(L, 8, wxluatype_wxValidator) : &wxDefaultValidator);
+    // long style = wxTP_DEFAULT
+    long style = (argCount >= 7 ? (long)wxlua_getnumbertype(L, 7) : wxTP_DEFAULT);
+    // const wxSize size = wxDefaultSize
+    const wxSize * size = (argCount >= 6 ? (const wxSize *)wxluaT_getuserdatatype(L, 6, wxluatype_wxSize) : &wxDefaultSize);
+    // const wxPoint pos = wxDefaultPosition
+    const wxPoint * pos = (argCount >= 5 ? (const wxPoint *)wxluaT_getuserdatatype(L, 5, wxluatype_wxPoint) : &wxDefaultPosition);
+    // const wxDateTime dt = wxDefaultDateTime
+    const wxDateTime * dt = (argCount >= 4 ? (const wxDateTime *)wxluaT_getuserdatatype(L, 4, wxluatype_wxDateTime) : &wxDefaultDateTime);
+    // wxWindowID id
+    wxWindowID id = (wxWindowID)wxlua_getnumbertype(L, 3);
+    // wxWindow parent
+    wxWindow * parent = (wxWindow *)wxluaT_getuserdatatype(L, 2, wxluatype_wxWindow);
+    // get this
+    wxTimePickerCtrl * self = (wxTimePickerCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTimePickerCtrl);
+    // call Create
+    bool returns = (self->Create(parent, id, *dt, *pos, *size, style, *validator, name));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+
+#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxCHECK_VERSION(2,9,4))
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTimePickerCtrl_GetTime[] = { &wxluatype_wxTimePickerCtrl, &wxluatype_TLIGHTUSERDATA, &wxluatype_TLIGHTUSERDATA, &wxluatype_TLIGHTUSERDATA, NULL };
+static int LUACALL wxLua_wxTimePickerCtrl_GetTime(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTimePickerCtrl_GetTime[1] = {{ wxLua_wxTimePickerCtrl_GetTime, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxTimePickerCtrl_GetTime }};
+//     %wxchkver_2_9_4 bool GetTime(int* hour, int* min, int* sec) const;
+static int LUACALL wxLua_wxTimePickerCtrl_GetTime(lua_State *L)
+{
+    // int sec
+    int * sec = (int *)wxlua_touserdata(L, 4);
+    // int min
+    int * min = (int *)wxlua_touserdata(L, 3);
+    // int hour
+    int * hour = (int *)wxlua_touserdata(L, 2);
+    // get this
+    wxTimePickerCtrl * self = (wxTimePickerCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTimePickerCtrl);
+    // call GetTime
+    bool returns = (self->GetTime(hour, min, sec));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxCHECK_VERSION(2,9,4))
+
+#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTimePickerCtrl_GetValue[] = { &wxluatype_wxTimePickerCtrl, NULL };
+static int LUACALL wxLua_wxTimePickerCtrl_GetValue(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTimePickerCtrl_GetValue[1] = {{ wxLua_wxTimePickerCtrl_GetValue, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxTimePickerCtrl_GetValue }};
+//     virtual wxDateTime GetValue() const;
+static int LUACALL wxLua_wxTimePickerCtrl_GetValue(lua_State *L)
+{
+    // get this
+    wxTimePickerCtrl * self = (wxTimePickerCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTimePickerCtrl);
+    // call GetValue
+    // allocate a new object using the copy constructor
+    wxDateTime* returns = new wxDateTime(self->GetValue());
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxDateTime);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxDateTime);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
+
+#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxCHECK_VERSION(2,9,4))
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTimePickerCtrl_SetTime[] = { &wxluatype_wxTimePickerCtrl, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxTimePickerCtrl_SetTime(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTimePickerCtrl_SetTime[1] = {{ wxLua_wxTimePickerCtrl_SetTime, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxTimePickerCtrl_SetTime }};
+//     %wxchkver_2_9_4 bool SetTime(int hour, int min, int sec);
+static int LUACALL wxLua_wxTimePickerCtrl_SetTime(lua_State *L)
+{
+    // int sec
+    int sec = (int)wxlua_getnumbertype(L, 4);
+    // int min
+    int min = (int)wxlua_getnumbertype(L, 3);
+    // int hour
+    int hour = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    wxTimePickerCtrl * self = (wxTimePickerCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTimePickerCtrl);
+    // call SetTime
+    bool returns = (self->SetTime(hour, min, sec));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxCHECK_VERSION(2,9,4))
+
+#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTimePickerCtrl_SetValue[] = { &wxluatype_wxTimePickerCtrl, &wxluatype_wxDateTime, NULL };
+static int LUACALL wxLua_wxTimePickerCtrl_SetValue(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTimePickerCtrl_SetValue[1] = {{ wxLua_wxTimePickerCtrl_SetValue, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxTimePickerCtrl_SetValue }};
+//     virtual void SetValue(const wxDateTime& dt);
+static int LUACALL wxLua_wxTimePickerCtrl_SetValue(lua_State *L)
+{
+    // const wxDateTime dt
+    const wxDateTime * dt = (const wxDateTime *)wxluaT_getuserdatatype(L, 2, wxluatype_wxDateTime);
+    // get this
+    wxTimePickerCtrl * self = (wxTimePickerCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTimePickerCtrl);
+    // call SetValue
+    self->SetValue(*dt);
+
+    return 0;
+}
+
+#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
+
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTimePickerCtrl_constructor1[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxDateTime, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxTimePickerCtrl_constructor1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxTimePickerCtrl_constructor1[1] = {{ wxLua_wxTimePickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 8, s_wxluatypeArray_wxLua_wxTimePickerCtrl_constructor1 }};
+//                      const wxString& name = wxTimePickerCtrlNameStr);
+static int LUACALL wxLua_wxTimePickerCtrl_constructor1(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // const wxString name = wxTimePickerCtrlNameStr
+    const wxString name = (argCount >= 8 ? wxlua_getwxStringtype(L, 8) : wxString(wxTimePickerCtrlNameStr));
+    // const wxValidator validator = wxDefaultValidator
+    const wxValidator * validator = (argCount >= 7 ? (const wxValidator *)wxluaT_getuserdatatype(L, 7, wxluatype_wxValidator) : &wxDefaultValidator);
+    // long style = wxTP_DEFAULT
+    long style = (argCount >= 6 ? (long)wxlua_getnumbertype(L, 6) : wxTP_DEFAULT);
+    // const wxSize size = wxDefaultSize
+    const wxSize * size = (argCount >= 5 ? (const wxSize *)wxluaT_getuserdatatype(L, 5, wxluatype_wxSize) : &wxDefaultSize);
+    // const wxPoint pos = wxDefaultPosition
+    const wxPoint * pos = (argCount >= 4 ? (const wxPoint *)wxluaT_getuserdatatype(L, 4, wxluatype_wxPoint) : &wxDefaultPosition);
+    // const wxDateTime dt = wxDefaultDateTime
+    const wxDateTime * dt = (argCount >= 3 ? (const wxDateTime *)wxluaT_getuserdatatype(L, 3, wxluatype_wxDateTime) : &wxDefaultDateTime);
+    // wxWindowID id
+    wxWindowID id = (wxWindowID)wxlua_getnumbertype(L, 2);
+    // wxWindow parent
+    wxWindow * parent = (wxWindow *)wxluaT_getuserdatatype(L, 1, wxluatype_wxWindow);
+    // call constructor
+    wxTimePickerCtrl* returns = new wxTimePickerCtrl(parent, id, *dt, *pos, *size, style, *validator, name);
+    // add to tracked window list, it will check validity
+    wxluaW_addtrackedwindow(L, returns);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxTimePickerCtrl);
+
+    return 1;
+}
+
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+
+static int LUACALL wxLua_wxTimePickerCtrl_constructor(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxTimePickerCtrl_constructor[1] = {{ wxLua_wxTimePickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
+//     wxTimePickerCtrl();
+static int LUACALL wxLua_wxTimePickerCtrl_constructor(lua_State *L)
+{
+    // call constructor
+    wxTimePickerCtrl* returns = new wxTimePickerCtrl();
+    // add to tracked window list, it will check validity
+    wxluaW_addtrackedwindow(L, returns);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxTimePickerCtrl);
+
+    return 1;
+}
+
+
+
+
+#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3)))
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTimePickerCtrl_constructor_overload[] =
+{
+
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+    { wxLua_wxTimePickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 8, s_wxluatypeArray_wxLua_wxTimePickerCtrl_constructor1 },
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+    { wxLua_wxTimePickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
+};
+static int s_wxluafunc_wxLua_wxTimePickerCtrl_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxTimePickerCtrl_constructor_overload)/sizeof(wxLuaBindCFunc);
+
+#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3)))
+
+void wxLua_wxTimePickerCtrl_delete_function(void** p)
+{
+    wxTimePickerCtrl* o = (wxTimePickerCtrl*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxTimePickerCtrl_methods[] = {
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+    { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTimePickerCtrl_Create, 1, NULL },
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+
+#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxCHECK_VERSION(2,9,4))
+    { "GetTime", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTimePickerCtrl_GetTime, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxCHECK_VERSION(2,9,4))
+
+#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
+    { "GetValue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTimePickerCtrl_GetValue, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
+
+#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxCHECK_VERSION(2,9,4))
+    { "SetTime", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTimePickerCtrl_SetTime, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxCHECK_VERSION(2,9,4))
+
+#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
+    { "SetValue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTimePickerCtrl_SetValue, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)
+
+#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3)))
+    { "wxTimePickerCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxTimePickerCtrl_constructor_overload, s_wxluafunc_wxLua_wxTimePickerCtrl_constructor_overload_count, 0 },
+#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))) && (wxLUA_USE_wxDateTime && wxUSE_DATETIME)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3)))
+
+    { 0, 0, 0, 0 },
+};
+
+int wxTimePickerCtrl_methodCount = sizeof(wxTimePickerCtrl_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxTimePickerCtrl && wxUSE_TIMEPICKCTRL && wxCHECK_VERSION(2,9,3))
+
+
+#if ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)
 // ---------------------------------------------------------------------------
 // Bind class wxFileDirPickerCtrlBase
 // ---------------------------------------------------------------------------
@@ -942,7 +1187,7 @@ static int LUACALL wxLua_wxFileDirPickerCtrlBase_GetTextCtrlValue(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileDirPickerCtrlBase_SetPath[] = { &wxluatype_wxFileDirPickerCtrlBase, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxFileDirPickerCtrlBase_SetPath(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileDirPickerCtrlBase_SetPath[1] = {{ wxLua_wxFileDirPickerCtrlBase_SetPath, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxFileDirPickerCtrlBase_SetPath }};
-//     void SetPath(const wxString &str );
+//     void SetPath(const wxString &str);
 static int LUACALL wxLua_wxFileDirPickerCtrlBase_SetPath(lua_State *L)
 {
     // const wxString str
@@ -975,10 +1220,10 @@ wxLuaBindMethod wxFileDirPickerCtrlBase_methods[] = {
 
 int wxFileDirPickerCtrlBase_methodCount = sizeof(wxFileDirPickerCtrlBase_methods)/sizeof(wxLuaBindMethod) - 1;
 
-#endif  // (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))
+#endif  // ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)
 
 
-#if (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))
+#if ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)
 // ---------------------------------------------------------------------------
 // Bind class wxFileDirPickerEvent
 // ---------------------------------------------------------------------------
@@ -1005,7 +1250,7 @@ static int LUACALL wxLua_wxFileDirPickerEvent_GetPath(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileDirPickerEvent_SetPath[] = { &wxluatype_wxFileDirPickerEvent, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxFileDirPickerEvent_SetPath(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileDirPickerEvent_SetPath[1] = {{ wxLua_wxFileDirPickerEvent_SetPath, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxFileDirPickerEvent_SetPath }};
-//     void SetPath(const wxString &p );
+//     void SetPath(const wxString &p);
 static int LUACALL wxLua_wxFileDirPickerEvent_SetPath(lua_State *L)
 {
     // const wxString p
@@ -1022,11 +1267,11 @@ static wxLuaArgType s_wxluatypeArray_wxLua_wxFileDirPickerEvent_delete[] = { &wx
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileDirPickerEvent_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxFileDirPickerEvent_delete }};
 
 
-#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxObject)
+#if (((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)) && (wxLUA_USE_wxObject)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileDirPickerEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_wxObject, &wxluatype_TNUMBER, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxFileDirPickerEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileDirPickerEvent_constructor[1] = {{ wxLua_wxFileDirPickerEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 4, 4, s_wxluatypeArray_wxLua_wxFileDirPickerEvent_constructor }};
-//     wxFileDirPickerEvent(wxEventType type, wxObject *generator, int id, const wxString &path );
+//     wxFileDirPickerEvent(wxEventType type, wxObject *generator, int id, const wxString &path);
 static int LUACALL wxLua_wxFileDirPickerEvent_constructor(lua_State *L)
 {
     // const wxString path
@@ -1047,7 +1292,7 @@ static int LUACALL wxLua_wxFileDirPickerEvent_constructor(lua_State *L)
     return 1;
 }
 
-#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxObject)
+#endif // (((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)) && (wxLUA_USE_wxObject)
 
 
 
@@ -1063,16 +1308,16 @@ wxLuaBindMethod wxFileDirPickerEvent_methods[] = {
     { "SetPath", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFileDirPickerEvent_SetPath, 1, NULL },
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxFileDirPickerEvent_delete, 1, NULL },
 
-#if ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxObject)
+#if (((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)) && (wxLUA_USE_wxObject)
     { "wxFileDirPickerEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxFileDirPickerEvent_constructor, 1, NULL },
-#endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxObject)
+#endif // (((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)) && (wxLUA_USE_wxObject)
 
     { 0, 0, 0, 0 },
 };
 
 int wxFileDirPickerEvent_methodCount = sizeof(wxFileDirPickerEvent_methods)/sizeof(wxLuaBindMethod) - 1;
 
-#endif  // (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))
+#endif  // ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )) && (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker)
 
 
 #if (wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))
@@ -1083,11 +1328,11 @@ int wxFileDirPickerEvent_methodCount = sizeof(wxFileDirPickerEvent_methods)/size
 // Lua MetaTable Tag for Class 'wxDirPickerCtrl'
 int wxluatype_wxDirPickerCtrl = WXLUA_TUNKNOWN;
 
-#if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#if (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDirPickerCtrl_Create[] = { &wxluatype_wxDirPickerCtrl, &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxDirPickerCtrl_Create(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDirPickerCtrl_Create[1] = {{ wxLua_wxDirPickerCtrl_Create, WXLUAMETHOD_METHOD, 3, 10, s_wxluatypeArray_wxLua_wxDirPickerCtrl_Create }};
-//     bool Create(wxWindow *parent, wxWindowID id, const wxString& path = "", const wxString& message = wxDirSelectorPromptStr, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDIRP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxDirPickerCtrl" );
+//     bool Create(wxWindow *parent, wxWindowID id, const wxString& path = "", const wxString& message = wxDirSelectorPromptStr, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDIRP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxDirPickerCtrl");
 static int LUACALL wxLua_wxDirPickerCtrl_Create(lua_State *L)
 {
     // get number of arguments
@@ -1123,7 +1368,7 @@ static int LUACALL wxLua_wxDirPickerCtrl_Create(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDirPickerCtrl_constructor1[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxDirPickerCtrl_constructor1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxDirPickerCtrl_constructor1[1] = {{ wxLua_wxDirPickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 9, s_wxluatypeArray_wxLua_wxDirPickerCtrl_constructor1 }};
-//     wxDirPickerCtrl(wxWindow *parent, wxWindowID id, const wxString& path = "", const wxString& message = wxDirSelectorPromptStr, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDIRP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxDirPickerCtrl" );
+//     wxDirPickerCtrl(wxWindow *parent, wxWindowID id, const wxString& path = "", const wxString& message = wxDirSelectorPromptStr, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDIRP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxDirPickerCtrl");
 static int LUACALL wxLua_wxDirPickerCtrl_constructor1(lua_State *L)
 {
     // get number of arguments
@@ -1156,11 +1401,11 @@ static int LUACALL wxLua_wxDirPickerCtrl_constructor1(lua_State *L)
     return 1;
 }
 
-#endif // ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#endif // (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 static int LUACALL wxLua_wxDirPickerCtrl_constructor(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxDirPickerCtrl_constructor[1] = {{ wxLua_wxDirPickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxDirPickerCtrl( );
+//     wxDirPickerCtrl();
 static int LUACALL wxLua_wxDirPickerCtrl_constructor(lua_State *L)
 {
     // call constructor
@@ -1176,19 +1421,19 @@ static int LUACALL wxLua_wxDirPickerCtrl_constructor(lua_State *L)
 
 
 
-#if (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDirPickerCtrl_constructor_overload[] =
 {
 
-#if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#if (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxDirPickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 9, s_wxluatypeArray_wxLua_wxDirPickerCtrl_constructor1 },
-#endif // ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#endif // (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxDirPickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
 };
 static int s_wxluafunc_wxLua_wxDirPickerCtrl_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxDirPickerCtrl_constructor_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
 
 void wxLua_wxDirPickerCtrl_delete_function(void** p)
 {
@@ -1198,13 +1443,13 @@ void wxLua_wxDirPickerCtrl_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxDirPickerCtrl_methods[] = {
-#if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#if (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDirPickerCtrl_Create, 1, NULL },
-#endif // ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#endif // (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
-#if (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
     { "wxDirPickerCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxDirPickerCtrl_constructor_overload, s_wxluafunc_wxLua_wxDirPickerCtrl_constructor_overload_count, 0 },
-#endif // (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
 
     { 0, 0, 0, 0 },
 };
@@ -1222,11 +1467,11 @@ int wxDirPickerCtrl_methodCount = sizeof(wxDirPickerCtrl_methods)/sizeof(wxLuaBi
 // Lua MetaTable Tag for Class 'wxFilePickerCtrl'
 int wxluatype_wxFilePickerCtrl = WXLUA_TUNKNOWN;
 
-#if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#if (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFilePickerCtrl_Create[] = { &wxluatype_wxFilePickerCtrl, &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxFilePickerCtrl_Create(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFilePickerCtrl_Create[1] = {{ wxLua_wxFilePickerCtrl_Create, WXLUAMETHOD_METHOD, 3, 11, s_wxluatypeArray_wxLua_wxFilePickerCtrl_Create }};
-//     bool Create(wxWindow *parent, wxWindowID id, const wxString& path = "", const wxString& message = wxFileSelectorPromptStr, const wxString& wildcard = wxFileSelectorDefaultWildcardStr, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxFLP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxFilePickerCtrl" );
+//     bool Create(wxWindow *parent, wxWindowID id, const wxString& path = "", const wxString& message = wxFileSelectorPromptStr, const wxString& wildcard = wxFileSelectorDefaultWildcardStr, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxFLP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxFilePickerCtrl");
 static int LUACALL wxLua_wxFilePickerCtrl_Create(lua_State *L)
 {
     // get number of arguments
@@ -1264,7 +1509,7 @@ static int LUACALL wxLua_wxFilePickerCtrl_Create(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFilePickerCtrl_constructor1[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxFilePickerCtrl_constructor1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxFilePickerCtrl_constructor1[1] = {{ wxLua_wxFilePickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 10, s_wxluatypeArray_wxLua_wxFilePickerCtrl_constructor1 }};
-//     wxFilePickerCtrl(wxWindow *parent, wxWindowID id, const wxString& path = "", const wxString& message = wxFileSelectorPromptStr, const wxString& wildcard = wxFileSelectorDefaultWildcardStr, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxFLP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxFilePickerCtrl" );
+//     wxFilePickerCtrl(wxWindow *parent, wxWindowID id, const wxString& path = "", const wxString& message = wxFileSelectorPromptStr, const wxString& wildcard = wxFileSelectorDefaultWildcardStr, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxFLP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxFilePickerCtrl");
 static int LUACALL wxLua_wxFilePickerCtrl_constructor1(lua_State *L)
 {
     // get number of arguments
@@ -1299,11 +1544,11 @@ static int LUACALL wxLua_wxFilePickerCtrl_constructor1(lua_State *L)
     return 1;
 }
 
-#endif // ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#endif // (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 static int LUACALL wxLua_wxFilePickerCtrl_constructor(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxFilePickerCtrl_constructor[1] = {{ wxLua_wxFilePickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxFilePickerCtrl( );
+//     wxFilePickerCtrl();
 static int LUACALL wxLua_wxFilePickerCtrl_constructor(lua_State *L)
 {
     // call constructor
@@ -1319,19 +1564,19 @@ static int LUACALL wxLua_wxFilePickerCtrl_constructor(lua_State *L)
 
 
 
-#if (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFilePickerCtrl_constructor_overload[] =
 {
 
-#if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#if (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxFilePickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 10, s_wxluatypeArray_wxLua_wxFilePickerCtrl_constructor1 },
-#endif // ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#endif // (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxFilePickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
 };
 static int s_wxluafunc_wxLua_wxFilePickerCtrl_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxFilePickerCtrl_constructor_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
 
 void wxLua_wxFilePickerCtrl_delete_function(void** p)
 {
@@ -1341,13 +1586,13 @@ void wxLua_wxFilePickerCtrl_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFilePickerCtrl_methods[] = {
-#if ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#if (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFilePickerCtrl_Create, 1, NULL },
-#endif // ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect)
+#endif // (((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
-#if (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
     { "wxFilePickerCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxFilePickerCtrl_constructor_overload, s_wxluafunc_wxLua_wxFilePickerCtrl_constructor_overload_count, 0 },
-#endif // (((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL )))
 
     { 0, 0, 0, 0 },
 };
@@ -1365,11 +1610,11 @@ int wxFilePickerCtrl_methodCount = sizeof(wxFilePickerCtrl_methods)/sizeof(wxLua
 // Lua MetaTable Tag for Class 'wxFontPickerCtrl'
 int wxluatype_wxFontPickerCtrl = WXLUA_TUNKNOWN;
 
-#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFontPickerCtrl_Create[] = { &wxluatype_wxFontPickerCtrl, &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxFont, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxFontPickerCtrl_Create(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerCtrl_Create[1] = {{ wxLua_wxFontPickerCtrl_Create, WXLUAMETHOD_METHOD, 3, 9, s_wxluatypeArray_wxLua_wxFontPickerCtrl_Create }};
-//     bool Create(wxWindow *parent, wxWindowID id, const wxFont& initial = wxNullFont, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxFNTP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxFontPickerCtrl" );
+//     bool Create(wxWindow *parent, wxWindowID id, const wxFont& initial = wxNullFont, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxFNTP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxFontPickerCtrl");
 static int LUACALL wxLua_wxFontPickerCtrl_Create(lua_State *L)
 {
     // get number of arguments
@@ -1400,7 +1645,7 @@ static int LUACALL wxLua_wxFontPickerCtrl_Create(lua_State *L)
     return 1;
 }
 
-#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFontPickerCtrl_GetMaxPointSize[] = { &wxluatype_wxFontPickerCtrl, NULL };
 static int LUACALL wxLua_wxFontPickerCtrl_GetMaxPointSize(lua_State *L);
@@ -1444,7 +1689,7 @@ static int LUACALL wxLua_wxFontPickerCtrl_GetSelectedFont(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFontPickerCtrl_SetMaxPointSize[] = { &wxluatype_wxFontPickerCtrl, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxFontPickerCtrl_SetMaxPointSize(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerCtrl_SetMaxPointSize[1] = {{ wxLua_wxFontPickerCtrl_SetMaxPointSize, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxFontPickerCtrl_SetMaxPointSize }};
-//     void SetMaxPointSize(unsigned int max );
+//     void SetMaxPointSize(unsigned int max);
 static int LUACALL wxLua_wxFontPickerCtrl_SetMaxPointSize(lua_State *L)
 {
     // unsigned int max
@@ -1462,7 +1707,7 @@ static int LUACALL wxLua_wxFontPickerCtrl_SetMaxPointSize(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFontPickerCtrl_SetSelectedFont[] = { &wxluatype_wxFontPickerCtrl, &wxluatype_wxFont, NULL };
 static int LUACALL wxLua_wxFontPickerCtrl_SetSelectedFont(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerCtrl_SetSelectedFont[1] = {{ wxLua_wxFontPickerCtrl_SetSelectedFont, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxFontPickerCtrl_SetSelectedFont }};
-//     virtual void SetSelectedFont(const wxFont &f );
+//     virtual void SetSelectedFont(const wxFont &f);
 static int LUACALL wxLua_wxFontPickerCtrl_SetSelectedFont(lua_State *L)
 {
     // const wxFont f
@@ -1477,11 +1722,11 @@ static int LUACALL wxLua_wxFontPickerCtrl_SetSelectedFont(lua_State *L)
 
 #endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)
 
-#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFontPickerCtrl_constructor1[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxFont, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxFontPickerCtrl_constructor1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerCtrl_constructor1[1] = {{ wxLua_wxFontPickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 8, s_wxluatypeArray_wxLua_wxFontPickerCtrl_constructor1 }};
-//     wxFontPickerCtrl(wxWindow *parent, wxWindowID id, const wxFont& initial = wxNullFont, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxFNTP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxFontPickerCtrl" );
+//     wxFontPickerCtrl(wxWindow *parent, wxWindowID id, const wxFont& initial = wxNullFont, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxFNTP_DEFAULT_STYLE, const wxValidator& validator = wxDefaultValidator, const wxString& name = "wxFontPickerCtrl");
 static int LUACALL wxLua_wxFontPickerCtrl_constructor1(lua_State *L)
 {
     // get number of arguments
@@ -1512,11 +1757,11 @@ static int LUACALL wxLua_wxFontPickerCtrl_constructor1(lua_State *L)
     return 1;
 }
 
-#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 static int LUACALL wxLua_wxFontPickerCtrl_constructor(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerCtrl_constructor[1] = {{ wxLua_wxFontPickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxFontPickerCtrl( );
+//     wxFontPickerCtrl();
 static int LUACALL wxLua_wxFontPickerCtrl_constructor(lua_State *L)
 {
     // call constructor
@@ -1532,19 +1777,19 @@ static int LUACALL wxLua_wxFontPickerCtrl_constructor(lua_State *L)
 
 
 
-#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL))
+#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerCtrl_constructor_overload[] =
 {
 
-#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxFontPickerCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 8, s_wxluatypeArray_wxLua_wxFontPickerCtrl_constructor1 },
-#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { wxLua_wxFontPickerCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
 };
 static int s_wxluafunc_wxLua_wxFontPickerCtrl_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxFontPickerCtrl_constructor_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL))
+#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL))
 
 void wxLua_wxFontPickerCtrl_delete_function(void** p)
 {
@@ -1554,9 +1799,9 @@ void wxLua_wxFontPickerCtrl_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFontPickerCtrl_methods[] = {
-#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect)
+#if ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFontPickerCtrl_Create, 1, NULL },
-#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect)
+#endif // ((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
     { "GetMaxPointSize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFontPickerCtrl_GetMaxPointSize, 1, NULL },
 
@@ -1570,9 +1815,9 @@ wxLuaBindMethod wxFontPickerCtrl_methods[] = {
     { "SetSelectedFont", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFontPickerCtrl_SetSelectedFont, 1, NULL },
 #endif // ((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)
 
-#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL))
+#if (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL))
     { "wxFontPickerCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxFontPickerCtrl_constructor_overload, s_wxluafunc_wxLua_wxFontPickerCtrl_constructor_overload_count, 0 },
-#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxLUA_USE_wxPointSizeRect))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL))
+#endif // (((((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)) && (wxLUA_USE_wxFont)) && (wxLUA_USE_wxPointSizeRect)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS))||((wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL))
 
     { 0, 0, 0, 0 },
 };
@@ -1613,7 +1858,7 @@ static int LUACALL wxLua_wxFontPickerEvent_GetFont(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFontPickerEvent_SetFont[] = { &wxluatype_wxFontPickerEvent, &wxluatype_wxFont, NULL };
 static int LUACALL wxLua_wxFontPickerEvent_SetFont(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerEvent_SetFont[1] = {{ wxLua_wxFontPickerEvent_SetFont, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxFontPickerEvent_SetFont }};
-//     void SetFont(const wxFont &c );
+//     void SetFont(const wxFont &c);
 static int LUACALL wxLua_wxFontPickerEvent_SetFont(lua_State *L)
 {
     // const wxFont c
@@ -1636,7 +1881,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerEvent_delete[1] = {{ wxlua_u
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFontPickerEvent_constructor[] = { &wxluatype_wxObject, &wxluatype_TNUMBER, &wxluatype_wxFont, NULL };
 static int LUACALL wxLua_wxFontPickerEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFontPickerEvent_constructor[1] = {{ wxLua_wxFontPickerEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 3, 3, s_wxluatypeArray_wxLua_wxFontPickerEvent_constructor }};
-//     wxFontPickerEvent(wxObject *generator, int id, const wxFont &f );
+//     wxFontPickerEvent(wxObject *generator, int id, const wxFont &f);
 static int LUACALL wxLua_wxFontPickerEvent_constructor(lua_State *L)
 {
     // const wxFont f
