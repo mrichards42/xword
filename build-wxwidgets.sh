@@ -5,7 +5,7 @@ set -e
 
 CONFIGURATION=$1
 
-INSTALL_PATH="$HOME/wxWidgets"
+INSTALL_PATH="$HOME/wxWidgets-3.1.0"
 mkdir -p $INSTALL_PATH
 
 WX_CONFIGURE_FLAGS="\
