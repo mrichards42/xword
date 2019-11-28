@@ -20,19 +20,12 @@
 #include "paths.hpp"
 
 // Initialize xword lua stuff:
-// Require the luapuz library.
 // Set package.path and package.cpath.
+// Require the luapuz library.
 // Create an xword table with standard paths.
 // Set TASK_INIT global function to initialize secondary threads.
 void lua_openxword(lua_State * L)
 {
-    // Open the luapuz library
-    // NB: We have to use require instead of directly calling luaopen_luapuz
-    // since luapuz is loaded as a dll
-    lua_getglobal(L, "require");
-    lua_pushstring(L, "luapuz");
-    lua_pcall(L, 1, 0, 0);
-
     // Set package.path and package.cpath
     lua_getglobal(L, "package");
 
@@ -44,6 +37,18 @@ void lua_openxword(lua_State * L)
 
     lua_pop(L, 1);
 
+    // Open the luapuz library
+    // NB: We have to use require instead of directly calling luaopen_luapuz
+    // since luapuz is loaded as a shared library.
+    lua_getglobal(L, "require");
+    lua_pushstring(L, "luapuz");
+    if (lua_pcall(L, 1, 0, 0) != 0) {
+        if (lua_isstring(L, -1))
+            wxLogDebug("Error loading luapuz library: %s", lua_tostring(L, -1));
+        else
+            wxLogDebug("Unknown error loading luapuz library");
+        lua_pop(L, 1);
+    }
 
     // Set values in xword table:
     //    configdir
