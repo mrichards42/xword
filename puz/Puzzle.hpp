@@ -82,8 +82,8 @@ public:
         metamap_t::const_iterator it = m_metadata.find(name);
         if (it == m_metadata.end())
         {
-            // Return an empty string (created on demand).
-            return (const_cast<Puzzle *>(this)->m_metadata)[puzT("")];
+            const static string_t empty_string = puzT("");
+            return empty_string;
         }
         return it->second;
     }
