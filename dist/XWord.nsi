@@ -318,6 +318,7 @@ Section "MainSection" SEC01
 
     ; XWord main script
     SetOutPath "$SCRIPTSDIR\xword"
+        File "${XWORD_TRUNK}\scripts\xword\archives.lua"
         File "${XWORD_TRUNK}\scripts\xword\cleanup.lua"
         File "${XWORD_TRUNK}\scripts\xword\init.lua"
         File "${XWORD_TRUNK}\scripts\xword\menu.lua"
