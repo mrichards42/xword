@@ -11,7 +11,7 @@ project "yajl"
         "src/api/*.c"
     }
 
-    includedirs { "build/yajl-2.0.2/include" }
+    sysincludedirs { "build/yajl-2.0.2/include" }
 
     targetname "yajl"
 

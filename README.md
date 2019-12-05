@@ -63,15 +63,15 @@ which fixes Mac builds. If you would like to use these patches, apply them to
 the wxWidgets directory.
 
 XWord uses [premake](http://industriousone.com/premake/download) to generate
-project files.  Version 4 has been used successfully, but the 5 beta may also work.
+project files.  Version 5 is required.
 
 To build project files:
 
-    $ premake [target]
+    $ premake5 [target]
 
     # Examples:
-    $ premake4 vs2008
-    $ premake4 xcode4
+    $ premake5 vs2008
+    $ premake5 xcode4
 
 On windows, the %WXWIN% environmental variable will be used to find the wxWidgets
 directory.  On other platforms, wx-config is used.  You can override either
@@ -84,7 +84,7 @@ XWord-specific premake options:
     --wx-config="wx-config path" # mac/linux
 
     # List all options
-    $ premake4 --help
+    $ premake5 --help
 
 ## Dependencies ##
 

@@ -10,7 +10,7 @@ project "luayajl"
         "lua_yajl.c",
     }
 
-    includedirs { "../../yajl/build/yajl-2.0.2/include" }
+    sysincludedirs { "../../yajl/build/yajl-2.0.2/include" }
 
     links { "yajl" }
 

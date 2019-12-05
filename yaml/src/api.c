@@ -8,10 +8,7 @@
 YAML_DECLARE(const char *)
 yaml_get_version_string(void)
 {
-    // XWORD EDIT
-    // premake4 doesn't properly escape quotes in preprocessor
-    // definitions, so add them here instead of the macro.
-    return "YAML_VERSION_STRING";
+    return YAML_VERSION_STRING;
 }
 
 /*

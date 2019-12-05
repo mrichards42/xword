@@ -1,5 +1,5 @@
 -- wxWidgets links
-if os.is("windows") then
+if os.istarget("windows") then
 
 configuration "windows"
     libdirs { _OPTIONS["wx-prefix"].."/lib/vc_lib" }
@@ -72,7 +72,7 @@ configuration "windows"
             "wxexpatd",
         }
 
-elseif os.is("linux") then
+elseif os.istarget("linux") then
 
 configuration { "linux", "Debug" }
     linkoptions(string.format("`%s --debug --unicode --static --libs`",
@@ -82,7 +82,7 @@ configuration { "linux", "Release" }
     linkoptions(string.format("`%s --release --unicode --static --libs`",
                                 _OPTIONS["wx-config-release"]))
 
-elseif os.is("macosx") then
+elseif os.istarget("macosx") then
 
 configuration { "macosx", "Debug" }
     linkoptions(wx_config("--debug --unicode --static --libs std aui"))

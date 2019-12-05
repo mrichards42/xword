@@ -19,8 +19,9 @@ project "puz"
         -- This allows #include "Puzzle.hpp" from the formats subdirs.
         -- The alternative would be #include "../../Puzzle.hpp", which is a pain
         ".",
-        "../yajl/build/yajl-2.0.2/include"
     }
+
+    sysincludedirs { "../yajl/build/yajl-2.0.2/include" }
 
     links { "yajl" }
 
@@ -41,8 +42,8 @@ project "puz"
 
     configuration "macosx"
         defines {
-            [[PUZ_API=""]],
-            [[LUAPUZ_API=""]],
+            "PUZ_API=",
+            "LUAPUZ_API=",
             "USE_FILE32API" -- for minizip
         }
         links { "z" }
