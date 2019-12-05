@@ -171,6 +171,7 @@ Section "MainSection" SEC01
         ; Parsers / Misc
         File "${XWORD_BIN}\libexpat.dll"
         File "${XWORD_BIN}\yajl.dll"
+        File "${XWORD_BIN}\yaml.dll"
         File "${XWORD_BIN}\zlib1.dll"
         File "${XWORD_BIN}\libcurl.dll"
         File "${XWORD_BIN}\libeay32.dll"
@@ -230,6 +231,7 @@ Section "MainSection" SEC01
 
         File "${XWORD_TRUNK}\scripts\libs\c-luacurl.dll"
         File "${XWORD_TRUNK}\scripts\libs\c-task.dll"
+        File "${XWORD_TRUNK}\scripts\libs\c-yaml.dll"
         File "${XWORD_TRUNK}\scripts\libs\lfs.dll"
         File "${XWORD_TRUNK}\scripts\libs\luayajl.dll"
         File "${XWORD_TRUNK}\scripts\libs\lxp.dll"
@@ -240,6 +242,12 @@ Section "MainSection" SEC01
 
     SetOutPath "$SCRIPTSDIR\libs\lxp"
         File "${XWORD_TRUNK}\scripts\libs\lxp\lom.lua"
+
+    SetOutPath "$SCRIPTSDIR\libs\lyaml"
+        File "${XWORD_TRUNK}\scripts\libs\lyaml\explicit.lua"
+        File "${XWORD_TRUNK}\scripts\libs\lyaml\functional.lua"
+        File "${XWORD_TRUNK}\scripts\libs\lyaml\implicit.lua"
+        File "${XWORD_TRUNK}\scripts\libs\lyaml\init.lua"
 
     SetOutPath "$SCRIPTSDIR\libs\pl"
         File "${XWORD_TRUNK}\scripts\libs\pl\app.lua"

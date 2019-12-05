@@ -60,7 +60,7 @@ project "XWord"
     if not _OPTIONS["disable-lua"] then
         configuration {}
             defines "XWORD_USE_LUA"
-    
+
             includedirs {
                 DEPS.lua.include,
                 "../lua",
@@ -68,7 +68,7 @@ project "XWord"
             }
 
             libdirs { DEPS.lua.lib }
-    
+
             links {
                 "lua51",
                 "wxlua",
@@ -143,5 +143,6 @@ project "XWord"
                 'xcodebuild -project luatask.xcodeproj -configuration "$CONFIGURATION"',
                 'xcodebuild -project lxp.xcodeproj -configuration "$CONFIGURATION"',
                 'xcodebuild -project luayajl.xcodeproj -configuration "$CONFIGURATION"',
+                'xcodebuild -project lyaml.xcodeproj -configuration "$CONFIGURATION"',
             }
         end
