@@ -157,8 +157,11 @@ void SetInnerXML(node n, const string_t & innerxml)
     pugi::xml_parse_result result = doc.load(temp.c_str());
     if (! result)
         SetText(n, innerxml);
-    else
-        n.append_copy(doc.first_child().first_child());
+    else {
+        for (node child = doc.first_child().first_child(); child; child = child.next_sibling()) {
+            n.append_copy(child);
+        }
+    }
 }
 
 } // namespace xml
