@@ -346,6 +346,7 @@ Section "MainSection" SEC01
         File "${XWORD_TRUNK}\scripts\import\info.lua"
         File "${XWORD_TRUNK}\scripts\import\init.lua"
         File "${XWORD_TRUNK}\scripts\import\newsday.lua"
+        File "${XWORD_TRUNK}\scripts\import\rowsgarden.lua"
         File "${XWORD_TRUNK}\scripts\import\theme.lua"
         File "${XWORD_TRUNK}\scripts\import\uclick.lua"
         File "${XWORD_TRUNK}\scripts\import\xwordinfo.lua"
