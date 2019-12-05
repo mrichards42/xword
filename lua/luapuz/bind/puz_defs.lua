@@ -191,6 +191,7 @@ typedef{"ClueList", luatype="LUA_TTABLE",
 class()
 typedef{"Word", luatype="LUA_TTABLE",
         headers={"puz/Word.hpp"},
+        check_func=overrides.checkWord,
         push_func=overrides.pushWord}
 
 class{"Clue", header="puz/Clue.hpp"}

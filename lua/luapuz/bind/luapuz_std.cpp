@@ -28,9 +28,11 @@ void luapuz_checkSquareVector(lua_State * L, int index, std::vector<puz::Square*
 {
     luaL_checktype(L, index, LUA_TTABLE);
 
+    lua_pushvalue(L, index);
+
     // Iterate the table
     lua_pushnil(L);  /* first key */
-    while (lua_next(L, index) != 0)
+    while (lua_next(L, -2) != 0)
     {
         // key is index -2
         // value is index -1
@@ -41,6 +43,8 @@ void luapuz_checkSquareVector(lua_State * L, int index, std::vector<puz::Square*
         /* removes 'value'; keeps 'key' for next iteration */
         lua_pop(L, 1);
     }
+
+    lua_pop(L, 1);
 }
 
 int luapuz_pushSquareVector(lua_State * L, std::vector<puz::Square*> * squares)

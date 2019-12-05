@@ -13,8 +13,8 @@ extern "C" {
 #include "../luapuz_functions.hpp"
 #include "../luapuz_tracking.hpp"
 
-#include "luapuz_puz.hpp"
 #include "luapuz_puz_Clue.hpp"
+#include "luapuz_puz.hpp"
 // ---------------------------------------------------------------------------
 // class Clue
 // ---------------------------------------------------------------------------
