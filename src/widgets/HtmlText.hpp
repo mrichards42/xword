@@ -84,6 +84,11 @@ public:
 
     virtual void SetLabel(const wxString & label)
     {
+        wxString currentLabel = wxControl::GetLabel();
+        if (currentLabel == label) {
+            // Avoid flicker if the label hasn't changed.
+            return;
+        }
         wxControl::SetLabel(label);
         LayoutCell();
         Refresh();
