@@ -178,12 +178,10 @@ bool MyApp::OnInit()
     for (size_t i = 0; i < cmd.GetParamCount(); ++i)
     {
         wxFileName fn(cmd.GetParam(i));
-        if (fn.FileExists() && puz::Puzzle::CanLoad(wx2file(fn.GetFullPath())))
-            if (m_frame->LoadPuzzle(fn.GetFullPath()))
-            {
-                has_puzzle = true;
-                break;
-            }
+        if (fn.FileExists() && m_frame->LoadPuzzle(fn.GetFullPath())) {
+            has_puzzle = true;
+            break;
+        }
     }
     // Open the last puzzle in the history
     ConfigManager::FileHistory_t & history = GetConfigManager().FileHistory;
