@@ -462,17 +462,91 @@ MyFrame::~MyFrame()
 wxString
 MyFrame::GetLoadTypeString()
 {
-    return _T("Supported Types (*.puz;*.xml;*.ipuz;*.jpz)|*.puz;*.xml;*.ipuz;*.jpz")
-           _T("|")
-           _T("Across Lite Format (*.puz)|*.puz")
-           _T("|")
-           _T("XPF (*.xml)|*.xml")
-           _T("|")
-           _T("JPZ (*.jpz)|*.jpz")
-           _T("|")
-           _T("ipuz (*.ipuz)|*.ipuz")
-           _T("|")
-           _T("All Files (*.*)|*.*");
+    // Multimap from file type description to file extensions for that type
+    std::multimap<wxString, wxString> types;
+    // Set of all supported extensions across all file types
+    // Note that some extensions may be common across multiple file types (e.g. .xml).
+    std::set<wxString> extensions;
+
+    // Native formats.
+    types.insert(std::pair<wxString, wxString>("Across Lite Format", "puz"));
+    extensions.insert("puz");
+    types.insert(std::pair<wxString, wxString>("XPF", "xml"));
+    extensions.insert("xml");
+    types.insert(std::pair<wxString, wxString>("JPZ", "jpz"));
+    extensions.insert("jpz");
+    types.insert(std::pair<wxString, wxString>("ipuz", "ipuz"));
+    extensions.insert("ipuz");
+
+#if XWORD_USE_LUA
+    // Also include formats supported by the import plugin by reading them from the imports.handler
+    // table.
+    wxLuaState& wxL = wxGetApp().GetwxLuaState();
+    lua_State* L = wxL.GetLuaState();
+    lua_getglobal(L, "import");
+    if (lua_istable(L, -1)) {
+        lua_getfield(L, -1, "handlers");
+        if (lua_istable(L, -1)) {
+            // Loop over the table; each entry should have a "desc" description and "ext" extension
+            lua_pushnil(L);
+            while (lua_next(L, -2) != 0) {
+                if (lua_istable(L, -1)) {
+                    std::string desc;
+                    std::string ext;
+                    lua_getfield(L, -1, "desc");
+                    if (!lua_isnil(L, -1))
+                        desc = luaL_checkstring(L, -1);
+                    lua_pop(L, 1);
+                    lua_getfield(L, -1, "ext");
+                    if (!lua_isnil(L, -1))
+                        ext = luaL_checkstring(L, -1);
+                    lua_pop(L, 1);
+                    if (!desc.empty() && !ext.empty()) {
+                        types.insert(std::pair<wxString, wxString>(desc, ext));
+                        extensions.insert(ext);
+                    }
+                }
+                lua_pop(L, 1);
+            }
+        }
+        lua_pop(L, 1); // Pop the handlers table
+    }
+    lua_pop(L, 1); // Pop the import table
+#endif
+
+    // Generate the list of all supported extensions and add that entry as the first/default.
+    wxString allExtensions = "";
+    for (std::set<wxString>::iterator it = extensions.begin(); it != extensions.end(); ++it) {
+        allExtensions += "*." + *it;
+        if (std::next(it) != extensions.end())
+            allExtensions += ";";
+    }
+    wxString loadTypeString =
+            wxString::Format("Supported Types (%s)|%s|", allExtensions, allExtensions);
+
+    // Add an entry for each format, including all extensions in that format.
+    std::pair<std::multimap<wxString, wxString>::iterator,
+            std::multimap<wxString, wxString>::iterator> range;
+    for (std::multimap<wxString, wxString>::iterator it = types.begin();
+            it != types.end();
+            it = range.second) {
+        range = types.equal_range(it->first);
+        wxString typeExtensions = "";
+        for (std::multimap<wxString, wxString>::iterator typeIt = range.first;
+                typeIt != range.second;
+                ++typeIt) {
+            typeExtensions += "*." + typeIt->second;
+            if (std::next(typeIt) != range.second)
+                typeExtensions += ";";
+        }
+        loadTypeString +=
+                wxString::Format("%s (%s)|%s|", it->first, typeExtensions, typeExtensions);
+    }
+
+    // Add an entry for all file types, in case a supported file has an unexpected extension.
+    loadTypeString += "All Files (*.*)|*.*";
+
+    return loadTypeString;
 }
 
 wxString
