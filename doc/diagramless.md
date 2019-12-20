@@ -22,5 +22,4 @@ In the picture, based on the black squares entered, there should be an 8-down
 list (in fact, they are across clues), so they are drawn in red.  The grid
 needs to have more black squares added to satisfy the constraints of the clues.
 
-![Image of solving a diagramless puzzle]
-(images/diagramless.png "Solving a diagramless puzzle")
+![Image of solving a diagramless puzzle](images/diagramless.png "Solving a diagramless puzzle")

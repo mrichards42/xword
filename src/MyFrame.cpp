@@ -292,7 +292,7 @@ MyFrame::ManageTools()
 
         { ID_REBUS_ENTRY,  wxITEM_CHECK, _T("Enter Multiple Letters\tCtrl+R"), _T("rebus"), NULL,
                    _handler(MyFrame::OnRebusEntry) },
-                   
+
         { ID_EDIT_LAYOUT, wxITEM_CHECK,  _T("&Edit Layout"), _T("layout"), NULL,
                    _handler(MyFrame::OnEditLayout) },
 
@@ -387,7 +387,7 @@ MyFrame::MyFrame()
       m_mgr(),
       m_isIdleConnected(false),
       m_fileHistory(10, ID_FILE_HISTORY_1)
-{ 
+{
 #if 0
 #ifdef _DEBUG
     // Debug window
@@ -2553,7 +2553,7 @@ MyFrame::OnAbout(wxCommandEvent & WXUNUSED(evt))
 
     info.SetCopyright(XWORD_COPYRIGHT_STRING);
 
-    info.SetDescription(_T("http://sourceforge.net/projects/wx-xword/"));
+    info.SetDescription(_T("https://github.com/mrichards42/xword"));
     wxAboutBox(info);
 }
 

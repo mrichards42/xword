@@ -330,7 +330,7 @@ void MyApp::ShowHelp()
 #ifdef __WXMSW__
     if (! m_help.DisplayContents())
 #endif // __WXMSW__
-        wxLaunchDefaultBrowser(_T("http://wx-xword.sourceforge.net/index.html"));
+        wxLaunchDefaultBrowser(_T("https://mrichards42.github.io/xword"));
 }
 
 //------------------------------------------------------------------------------
