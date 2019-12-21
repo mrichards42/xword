@@ -65,6 +65,7 @@ solution "XWord"
     include "src" -- the XWord premake file
     include "puz" -- the puzzle library
     include "yajl"
+    include "yaml"
     if not _OPTIONS["disable-lua"] then
         include "lua" -- lua libraries
     end

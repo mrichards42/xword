@@ -20,8 +20,8 @@ extern "C" {
 // namespace std
 // ---------------------------------------------------------------------------
 
-#include "puz/Square.hpp"
 #include <vector>
+#include "puz/Square.hpp"
 
 // typedef vector<puz::Square*>
 //-------------

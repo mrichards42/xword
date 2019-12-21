@@ -526,6 +526,7 @@ void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * clues)
             // value is index -1
             puz::string_t number = luapuz_checkstring_t(L, -2);
             puz::string_t text;
+            puz::Word word;
             if (lua_istable(L, -1))
             {
                 // Look for data:
@@ -541,6 +542,12 @@ void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * clues)
                 if (! lua_isnil(L, -1))
                     text = luapuz_checkstring_t(L, -1);
                 lua_pop(L, 1);
+
+                // word
+                lua_getfield(L, -1, "word");
+                if (! lua_isnil(L, -1))
+                    luapuz_checkWord(L, -1, &word);
+                lua_pop(L, 1);
             }
             else if (lua_isstring(L, -1))
             {
@@ -551,7 +558,7 @@ void luapuz_checkClueList(lua_State * L, int index, puz::ClueList * clues)
                 luaL_error(L, "puz::Clue, table, or string expected for clue; got %s", luaL_typename(L, -1));
             }
 
-            clues->push_back(puz::Clue(number, text));
+            clues->push_back(puz::Clue(number, text, word));
         }
 
         /* removes 'value'; keeps 'key' for next iteration */
@@ -589,7 +596,32 @@ int luapuz_pushWord(lua_State * L, puz::Word * word)
 }
 ]],
 
+checkWord = [[
+#include "luapuz_puz_Square.hpp"
 
+void luapuz_checkWord(lua_State * L, int index, puz::Word * word)
+{
+    luaL_checktype(L, index, LUA_TTABLE);
+
+    lua_pushvalue(L, index);
+
+    // Iterate the table
+    lua_pushnil(L);  /* first key */
+    while (lua_next(L, -2) != 0)
+    {
+        // key is index -2
+        // value is index -1
+        int number = luapuz_checkuint(L, -2);
+        puz::Square * square = luapuz_checkSquare(L, -1);
+        word->push_back(square);
+
+        /* removes 'value'; keeps 'key' for next iteration */
+        lua_pop(L, 1);
+    }
+
+    lua_pop(L, 1);
+}
+]],
 
 -- ===================================================================
 -- Typedef std::vector<Square*>
@@ -622,9 +654,11 @@ void luapuz_checkSquareVector(lua_State * L, int index, std::vector<puz::Square*
 {
     luaL_checktype(L, index, LUA_TTABLE);
 
+    lua_pushvalue(L, index);
+
     // Iterate the table
     lua_pushnil(L);  /* first key */
-    while (lua_next(L, index) != 0)
+    while (lua_next(L, -2) != 0)
     {
         // key is index -2
         // value is index -1
@@ -635,6 +669,8 @@ void luapuz_checkSquareVector(lua_State * L, int index, std::vector<puz::Square*
         /* removes 'value'; keeps 'key' for next iteration */
         lua_pop(L, 1);
     }
+
+    lua_pop(L, 1);
 }
 ]],
 

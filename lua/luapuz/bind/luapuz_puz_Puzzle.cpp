@@ -13,10 +13,10 @@ extern "C" {
 #include "../luapuz_functions.hpp"
 #include "../luapuz_tracking.hpp"
 
-#include "luapuz_puz_Puzzle_helpers.hpp"
-#include "luapuz_puz_Puzzle.hpp"
 #include "luapuz_puz_Grid.hpp"
+#include "luapuz_puz_Puzzle_helpers.hpp"
 #include "luapuz_puz.hpp"
+#include "luapuz_puz_Puzzle.hpp"
 // ---------------------------------------------------------------------------
 // class Puzzle
 // ---------------------------------------------------------------------------

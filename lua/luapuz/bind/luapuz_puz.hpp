@@ -20,12 +20,12 @@ extern "C" {
 // namespace puz
 // ---------------------------------------------------------------------------
 
-#include "puz/Grid.hpp"
+#include "puz/Puzzle.hpp"
+#include "puz/Square.hpp"
 #include "puz/Word.hpp"
+#include "puz/Grid.hpp"
 #include <algorithm>
 #include "puz/Clue.hpp"
-#include "puz/Square.hpp"
-#include "puz/Puzzle.hpp"
 
 // enum GridDirection
 //------------
@@ -190,6 +190,8 @@ LUAPUZ_API int luapuz_pushClueList(lua_State * L, puz::ClueList * cluelist);
 
 // typedef Word
 //-------------
+
+LUAPUZ_API void luapuz_checkWord(lua_State * L, int index, puz::Word * word);
 
 LUAPUZ_API int luapuz_pushWord(lua_State * L, puz::Word * word);
 

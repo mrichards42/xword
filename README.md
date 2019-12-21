@@ -99,6 +99,7 @@ Windows builds include dlls for everything except wxWidgets.
 * curl (7.24.0)
 * yajl (2.0.2 -- source included)
 * zlib (1.2.5)
+* libyaml (0.2.2 -- source included)
 
 A debug build of wxWidgets is needed for debug builds of XWord, and likewise for release builds. The
 following configure options should work as a baseline for release builds:
@@ -116,6 +117,7 @@ Source included in lua directory
 
 * luacurl (rename library to c-luacurl -- there is an additional lua module for this library)
 * luatask (rename library to c-task -- there is an additional lua module for this library)
+* lyaml (rename library to c-yaml -- there is an additional lua module for this library)
 * luayajl
 * lxp
 * lfs

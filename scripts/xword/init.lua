@@ -78,6 +78,7 @@ end)
 
 
 -- Require the xword packages
+require 'xword.archives'
 require 'xword.preferences'
 require 'xword.menu'
 require 'xword.messages'
