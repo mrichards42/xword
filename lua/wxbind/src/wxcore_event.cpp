@@ -41,7 +41,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxPropagationDisabler_delete[1] = {{ wxl
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPropagationDisabler_constructor[] = { &wxluatype_wxEvent, NULL };
 static int LUACALL wxLua_wxPropagationDisabler_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPropagationDisabler_constructor[1] = {{ wxLua_wxPropagationDisabler_constructor, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxPropagationDisabler_constructor }};
-//     wxPropagationDisabler(wxEvent& event );
+//     wxPropagationDisabler(wxEvent& event);
 static int LUACALL wxLua_wxPropagationDisabler_constructor(lua_State *L)
 {
     // wxEvent event
@@ -87,7 +87,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxPropagateOnce_delete[1] = {{ wxlua_use
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPropagateOnce_constructor[] = { &wxluatype_wxEvent, NULL };
 static int LUACALL wxLua_wxPropagateOnce_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPropagateOnce_constructor[1] = {{ wxLua_wxPropagateOnce_constructor, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxPropagateOnce_constructor }};
-//     wxPropagateOnce(wxEvent& event );
+//     wxPropagateOnce(wxEvent& event);
 static int LUACALL wxLua_wxPropagateOnce_constructor(lua_State *L)
 {
     // wxEvent event
@@ -136,7 +136,7 @@ static int LUACALL wxLua_wxCommandEvent_GetClientData(lua_State *L)
     // get this
     wxCommandEvent * self = (wxCommandEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxCommandEvent);
     // call GetClientData
-    long  returns = (long )self->GetClientData();
+    wxUIntPtr returns = (wxUIntPtr)self->GetClientData();
     // push the result number
     lua_pushnumber(L, returns);
 
@@ -146,7 +146,7 @@ static int LUACALL wxLua_wxCommandEvent_GetClientData(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_GetClientObject[] = { &wxluatype_wxCommandEvent, NULL };
 static int LUACALL wxLua_wxCommandEvent_GetClientObject(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_GetClientObject[1] = {{ wxLua_wxCommandEvent_GetClientObject, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxCommandEvent_GetClientObject }};
-//     wxClientData* GetClientObject( );
+//     wxClientData* GetClientObject();
 static int LUACALL wxLua_wxCommandEvent_GetClientObject(lua_State *L)
 {
     // get this
@@ -162,13 +162,13 @@ static int LUACALL wxLua_wxCommandEvent_GetClientObject(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_GetExtraLong[] = { &wxluatype_wxCommandEvent, NULL };
 static int LUACALL wxLua_wxCommandEvent_GetExtraLong(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_GetExtraLong[1] = {{ wxLua_wxCommandEvent_GetExtraLong, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxCommandEvent_GetExtraLong }};
-//     long GetExtraLong( );
+//     long GetExtraLong();
 static int LUACALL wxLua_wxCommandEvent_GetExtraLong(lua_State *L)
 {
     // get this
     wxCommandEvent * self = (wxCommandEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxCommandEvent);
     // call GetExtraLong
-    long  returns = (self->GetExtraLong());
+    long returns = (self->GetExtraLong());
     // push the result number
     lua_pushnumber(L, returns);
 
@@ -178,7 +178,7 @@ static int LUACALL wxLua_wxCommandEvent_GetExtraLong(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_GetInt[] = { &wxluatype_wxCommandEvent, NULL };
 static int LUACALL wxLua_wxCommandEvent_GetInt(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_GetInt[1] = {{ wxLua_wxCommandEvent_GetInt, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxCommandEvent_GetInt }};
-//     int GetInt( );
+//     int GetInt();
 static int LUACALL wxLua_wxCommandEvent_GetInt(lua_State *L)
 {
     // get this
@@ -194,7 +194,7 @@ static int LUACALL wxLua_wxCommandEvent_GetInt(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_GetSelection[] = { &wxluatype_wxCommandEvent, NULL };
 static int LUACALL wxLua_wxCommandEvent_GetSelection(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_GetSelection[1] = {{ wxLua_wxCommandEvent_GetSelection, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxCommandEvent_GetSelection }};
-//     int GetSelection( );
+//     int GetSelection();
 static int LUACALL wxLua_wxCommandEvent_GetSelection(lua_State *L)
 {
     // get this
@@ -210,7 +210,7 @@ static int LUACALL wxLua_wxCommandEvent_GetSelection(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_GetString[] = { &wxluatype_wxCommandEvent, NULL };
 static int LUACALL wxLua_wxCommandEvent_GetString(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_GetString[1] = {{ wxLua_wxCommandEvent_GetString, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxCommandEvent_GetString }};
-//     wxString GetString( );
+//     wxString GetString();
 static int LUACALL wxLua_wxCommandEvent_GetString(lua_State *L)
 {
     // get this
@@ -226,7 +226,7 @@ static int LUACALL wxLua_wxCommandEvent_GetString(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_GetStringClientObject[] = { &wxluatype_wxCommandEvent, NULL };
 static int LUACALL wxLua_wxCommandEvent_GetStringClientObject(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_GetStringClientObject[1] = {{ wxLua_wxCommandEvent_GetStringClientObject, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxCommandEvent_GetStringClientObject }};
-//     %rename GetStringClientObject wxStringClientData* GetClientObject( );
+//     %rename GetStringClientObject wxStringClientData* GetClientObject();
 static int LUACALL wxLua_wxCommandEvent_GetStringClientObject(lua_State *L)
 {
     // get this
@@ -258,7 +258,7 @@ static int LUACALL wxLua_wxCommandEvent_IsChecked(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_IsSelection[] = { &wxluatype_wxCommandEvent, NULL };
 static int LUACALL wxLua_wxCommandEvent_IsSelection(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_IsSelection[1] = {{ wxLua_wxCommandEvent_IsSelection, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxCommandEvent_IsSelection }};
-//     bool IsSelection( );
+//     bool IsSelection();
 static int LUACALL wxLua_wxCommandEvent_IsSelection(lua_State *L)
 {
     // get this
@@ -278,7 +278,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_SetClientData[1] = {{ wxL
 static int LUACALL wxLua_wxCommandEvent_SetClientData(lua_State *L)
 {
     // voidptr_long number
-    long number = (long)wxlua_getnumbertype(L, 2);
+    wxUIntPtr number = (wxUIntPtr)wxlua_getnumbertype(L, 2);
     // get this
     wxCommandEvent * self = (wxCommandEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxCommandEvent);
     // call SetClientData
@@ -306,7 +306,7 @@ static int LUACALL wxLua_wxCommandEvent_SetClientObject(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_SetExtraLong[] = { &wxluatype_wxCommandEvent, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxCommandEvent_SetExtraLong(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_SetExtraLong[1] = {{ wxLua_wxCommandEvent_SetExtraLong, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxCommandEvent_SetExtraLong }};
-//     void SetExtraLong(int extraLong );
+//     void SetExtraLong(int extraLong);
 static int LUACALL wxLua_wxCommandEvent_SetExtraLong(lua_State *L)
 {
     // int extraLong
@@ -322,7 +322,7 @@ static int LUACALL wxLua_wxCommandEvent_SetExtraLong(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_SetInt[] = { &wxluatype_wxCommandEvent, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxCommandEvent_SetInt(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_SetInt[1] = {{ wxLua_wxCommandEvent_SetInt, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxCommandEvent_SetInt }};
-//     void SetInt(int intCommand );
+//     void SetInt(int intCommand);
 static int LUACALL wxLua_wxCommandEvent_SetInt(lua_State *L)
 {
     // int intCommand
@@ -338,7 +338,7 @@ static int LUACALL wxLua_wxCommandEvent_SetInt(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_SetString[] = { &wxluatype_wxCommandEvent, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxCommandEvent_SetString(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_SetString[1] = {{ wxLua_wxCommandEvent_SetString, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxCommandEvent_SetString }};
-//     void SetString(const wxString &string );
+//     void SetString(const wxString &string);
 static int LUACALL wxLua_wxCommandEvent_SetString(lua_State *L)
 {
     // const wxString string
@@ -357,7 +357,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_delete[1] = {{ wxlua_user
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCommandEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxCommandEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCommandEvent_constructor[1] = {{ wxLua_wxCommandEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxCommandEvent_constructor }};
-//     wxCommandEvent(wxEventType commandEventType = wxEVT_NULL, int id = 0 );
+//     wxCommandEvent(wxEventType commandEventType = wxEVT_NULL, int id = 0);
 static int LUACALL wxLua_wxCommandEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -418,7 +418,7 @@ int wxluatype_wxNotifyEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxNotifyEvent_Allow[] = { &wxluatype_wxNotifyEvent, NULL };
 static int LUACALL wxLua_wxNotifyEvent_Allow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNotifyEvent_Allow[1] = {{ wxLua_wxNotifyEvent_Allow, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxNotifyEvent_Allow }};
-//     void Allow( );
+//     void Allow();
 static int LUACALL wxLua_wxNotifyEvent_Allow(lua_State *L)
 {
     // get this
@@ -448,7 +448,7 @@ static int LUACALL wxLua_wxNotifyEvent_IsAllowed(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxNotifyEvent_Veto[] = { &wxluatype_wxNotifyEvent, NULL };
 static int LUACALL wxLua_wxNotifyEvent_Veto(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNotifyEvent_Veto[1] = {{ wxLua_wxNotifyEvent_Veto, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxNotifyEvent_Veto }};
-//     void Veto( );
+//     void Veto();
 static int LUACALL wxLua_wxNotifyEvent_Veto(lua_State *L)
 {
     // get this
@@ -465,7 +465,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxNotifyEvent_delete[1] = {{ wxlua_userd
 static wxLuaArgType s_wxluatypeArray_wxLua_wxNotifyEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxNotifyEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNotifyEvent_constructor[1] = {{ wxLua_wxNotifyEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxNotifyEvent_constructor }};
-//     wxNotifyEvent(wxEventType eventType = wxEVT_NULL, int id = 0 );
+//     wxNotifyEvent(wxEventType eventType = wxEVT_NULL, int id = 0);
 static int LUACALL wxLua_wxNotifyEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -534,7 +534,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxActivateEvent_delete[1] = {{ wxlua_use
 static wxLuaArgType s_wxluatypeArray_wxLua_wxActivateEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TBOOLEAN, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxActivateEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxActivateEvent_constructor[1] = {{ wxLua_wxActivateEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 3, s_wxluatypeArray_wxLua_wxActivateEvent_constructor }};
-//     wxActivateEvent(wxEventType eventType = wxEVT_NULL, bool active = true, int id = 0 );
+//     wxActivateEvent(wxEventType eventType = wxEVT_NULL, bool active = true, int id = 0);
 static int LUACALL wxLua_wxActivateEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -584,7 +584,7 @@ int wxluatype_wxCloseEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCloseEvent_CanVeto[] = { &wxluatype_wxCloseEvent, NULL };
 static int LUACALL wxLua_wxCloseEvent_CanVeto(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCloseEvent_CanVeto[1] = {{ wxLua_wxCloseEvent_CanVeto, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxCloseEvent_CanVeto }};
-//     bool CanVeto( );
+//     bool CanVeto();
 static int LUACALL wxLua_wxCloseEvent_CanVeto(lua_State *L)
 {
     // get this
@@ -616,7 +616,7 @@ static int LUACALL wxLua_wxCloseEvent_GetLoggingOff(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCloseEvent_SetCanVeto[] = { &wxluatype_wxCloseEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxCloseEvent_SetCanVeto(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCloseEvent_SetCanVeto[1] = {{ wxLua_wxCloseEvent_SetCanVeto, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxCloseEvent_SetCanVeto }};
-//     void SetCanVeto(bool canVeto );
+//     void SetCanVeto(bool canVeto);
 static int LUACALL wxLua_wxCloseEvent_SetCanVeto(lua_State *L)
 {
     // bool canVeto
@@ -648,7 +648,7 @@ static int LUACALL wxLua_wxCloseEvent_SetLoggingOff(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCloseEvent_Veto[] = { &wxluatype_wxCloseEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxCloseEvent_Veto(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCloseEvent_Veto[1] = {{ wxLua_wxCloseEvent_Veto, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxCloseEvent_Veto }};
-//     void Veto(bool veto = true );
+//     void Veto(bool veto = true);
 static int LUACALL wxLua_wxCloseEvent_Veto(lua_State *L)
 {
     // get number of arguments
@@ -669,7 +669,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxCloseEvent_delete[1] = {{ wxlua_userda
 static wxLuaArgType s_wxluatypeArray_wxLua_wxCloseEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxCloseEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxCloseEvent_constructor[1] = {{ wxLua_wxCloseEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxCloseEvent_constructor }};
-//     wxCloseEvent(wxEventType commandEventType = wxEVT_NULL, int id = 0 );
+//     wxCloseEvent(wxEventType commandEventType = wxEVT_NULL, int id = 0);
 static int LUACALL wxLua_wxCloseEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -745,7 +745,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxEraseEvent_delete[1] = {{ wxlua_userda
 static wxLuaArgType s_wxluatypeArray_wxLua_wxEraseEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_wxDC, NULL };
 static int LUACALL wxLua_wxEraseEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxEraseEvent_constructor[1] = {{ wxLua_wxEraseEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxEraseEvent_constructor }};
-//     wxEraseEvent(int id = 0, wxDC* dc = NULL );
+//     wxEraseEvent(int id = 0, wxDC* dc = NULL);
 static int LUACALL wxLua_wxEraseEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -802,7 +802,7 @@ int wxluatype_wxFocusEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFocusEvent_GetWindow[] = { &wxluatype_wxFocusEvent, NULL };
 static int LUACALL wxLua_wxFocusEvent_GetWindow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFocusEvent_GetWindow[1] = {{ wxLua_wxFocusEvent_GetWindow, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxFocusEvent_GetWindow }};
-//     wxWindow* GetWindow( );
+//     wxWindow* GetWindow();
 static int LUACALL wxLua_wxFocusEvent_GetWindow(lua_State *L)
 {
     // get this
@@ -818,7 +818,7 @@ static int LUACALL wxLua_wxFocusEvent_GetWindow(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFocusEvent_SetWindow[] = { &wxluatype_wxFocusEvent, &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxFocusEvent_SetWindow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFocusEvent_SetWindow[1] = {{ wxLua_wxFocusEvent_SetWindow, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxFocusEvent_SetWindow }};
-//     void SetWindow(wxWindow *win );
+//     void SetWindow(wxWindow *win);
 static int LUACALL wxLua_wxFocusEvent_SetWindow(lua_State *L)
 {
     // wxWindow win
@@ -837,7 +837,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxFocusEvent_delete[1] = {{ wxlua_userda
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFocusEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxFocusEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFocusEvent_constructor[1] = {{ wxLua_wxFocusEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxFocusEvent_constructor }};
-//     wxFocusEvent(wxEventType eventType = wxEVT_NULL, int id = 0 );
+//     wxFocusEvent(wxEventType eventType = wxEVT_NULL, int id = 0);
 static int LUACALL wxLua_wxFocusEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -905,7 +905,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxChildFocusEvent_delete[1] = {{ wxlua_u
 static wxLuaArgType s_wxluatypeArray_wxLua_wxChildFocusEvent_constructor[] = { &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxChildFocusEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxChildFocusEvent_constructor[1] = {{ wxLua_wxChildFocusEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxChildFocusEvent_constructor }};
-//     wxChildFocusEvent(wxWindow *win = NULL );
+//     wxChildFocusEvent(wxWindow *win = NULL);
 static int LUACALL wxLua_wxChildFocusEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -967,7 +967,7 @@ static int LUACALL wxLua_wxQueryNewPaletteEvent_GetPaletteRealized(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxQueryNewPaletteEvent_SetPaletteRealized[] = { &wxluatype_wxQueryNewPaletteEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxQueryNewPaletteEvent_SetPaletteRealized(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxQueryNewPaletteEvent_SetPaletteRealized[1] = {{ wxLua_wxQueryNewPaletteEvent_SetPaletteRealized, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxQueryNewPaletteEvent_SetPaletteRealized }};
-//     void SetPaletteRealized(bool realized );
+//     void SetPaletteRealized(bool realized);
 static int LUACALL wxLua_wxQueryNewPaletteEvent_SetPaletteRealized(lua_State *L)
 {
     // bool realized
@@ -986,7 +986,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxQueryNewPaletteEvent_delete[1] = {{ wx
 static wxLuaArgType s_wxluatypeArray_wxLua_wxQueryNewPaletteEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxQueryNewPaletteEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxQueryNewPaletteEvent_constructor[1] = {{ wxLua_wxQueryNewPaletteEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxQueryNewPaletteEvent_constructor }};
-//     wxQueryNewPaletteEvent(wxWindowID winid = 0 );
+//     wxQueryNewPaletteEvent(wxWindowID winid = 0);
 static int LUACALL wxLua_wxQueryNewPaletteEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -1049,7 +1049,7 @@ static int LUACALL wxLua_wxPaletteChangedEvent_GetChangedWindow(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPaletteChangedEvent_SetChangedWindow[] = { &wxluatype_wxPaletteChangedEvent, &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxPaletteChangedEvent_SetChangedWindow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPaletteChangedEvent_SetChangedWindow[1] = {{ wxLua_wxPaletteChangedEvent_SetChangedWindow, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxPaletteChangedEvent_SetChangedWindow }};
-//     void SetChangedWindow(wxWindow* win );
+//     void SetChangedWindow(wxWindow* win);
 static int LUACALL wxLua_wxPaletteChangedEvent_SetChangedWindow(lua_State *L)
 {
     // wxWindow win
@@ -1068,7 +1068,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxPaletteChangedEvent_delete[1] = {{ wxl
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPaletteChangedEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxPaletteChangedEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPaletteChangedEvent_constructor[1] = {{ wxLua_wxPaletteChangedEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxPaletteChangedEvent_constructor }};
-//     wxPaletteChangedEvent(wxWindowID winid = 0 );
+//     wxPaletteChangedEvent(wxWindowID winid = 0);
 static int LUACALL wxLua_wxPaletteChangedEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -1238,16 +1238,64 @@ static int LUACALL wxLua_wxKeyEvent_GetPositionXY(lua_State *L)
 }
 
 
+static wxLuaArgType s_wxluatypeArray_wxLua_wxKeyEvent_GetRawKeyCode[] = { &wxluatype_wxKeyEvent, NULL };
+static int LUACALL wxLua_wxKeyEvent_GetRawKeyCode(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxKeyEvent_GetRawKeyCode[1] = {{ wxLua_wxKeyEvent_GetRawKeyCode, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxKeyEvent_GetRawKeyCode }};
+//     wxUint32 GetRawKeyCode() const;
+static int LUACALL wxLua_wxKeyEvent_GetRawKeyCode(lua_State *L)
+{
+    // get this
+    wxKeyEvent * self = (wxKeyEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxKeyEvent);
+    // call GetRawKeyCode
+    wxUint32 returns = (self->GetRawKeyCode());
+    // push the result number
+    lua_pushnumber(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxKeyEvent_GetRawKeyFlags[] = { &wxluatype_wxKeyEvent, NULL };
+static int LUACALL wxLua_wxKeyEvent_GetRawKeyFlags(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxKeyEvent_GetRawKeyFlags[1] = {{ wxLua_wxKeyEvent_GetRawKeyFlags, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxKeyEvent_GetRawKeyFlags }};
+//     wxUint32 GetRawKeyFlags() const;
+static int LUACALL wxLua_wxKeyEvent_GetRawKeyFlags(lua_State *L)
+{
+    // get this
+    wxKeyEvent * self = (wxKeyEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxKeyEvent);
+    // call GetRawKeyFlags
+    wxUint32 returns = (self->GetRawKeyFlags());
+    // push the result number
+    lua_pushnumber(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxKeyEvent_GetUnicodeKey[] = { &wxluatype_wxKeyEvent, NULL };
+static int LUACALL wxLua_wxKeyEvent_GetUnicodeKey(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxKeyEvent_GetUnicodeKey[1] = {{ wxLua_wxKeyEvent_GetUnicodeKey, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxKeyEvent_GetUnicodeKey }};
+//     wxChar GetUnicodeKey() const;
+static int LUACALL wxLua_wxKeyEvent_GetUnicodeKey(lua_State *L)
+{
+    // get this
+    wxKeyEvent * self = (wxKeyEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxKeyEvent);
+    // call GetUnicodeKey
+    wxChar returns = (self->GetUnicodeKey());
+    // push the result number
+    lua_pushnumber(L, returns);
+
+    return 1;
+}
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxKeyEvent_GetX[] = { &wxluatype_wxKeyEvent, NULL };
 static int LUACALL wxLua_wxKeyEvent_GetX(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxKeyEvent_GetX[1] = {{ wxLua_wxKeyEvent_GetX, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxKeyEvent_GetX }};
-//     long GetX( );
+//     long GetX();
 static int LUACALL wxLua_wxKeyEvent_GetX(lua_State *L)
 {
     // get this
     wxKeyEvent * self = (wxKeyEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxKeyEvent);
     // call GetX
-    long  returns = (self->GetX());
+    long returns = (self->GetX());
     // push the result number
     lua_pushnumber(L, returns);
 
@@ -1263,7 +1311,7 @@ static int LUACALL wxLua_wxKeyEvent_GetY(lua_State *L)
     // get this
     wxKeyEvent * self = (wxKeyEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxKeyEvent);
     // call GetY
-    long  returns = (self->GetY());
+    long returns = (self->GetY());
     // push the result number
     lua_pushnumber(L, returns);
 
@@ -1324,7 +1372,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxKeyEvent_delete[1] = {{ wxlua_userdata
 static wxLuaArgType s_wxluatypeArray_wxLua_wxKeyEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxKeyEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxKeyEvent_constructor[1] = {{ wxLua_wxKeyEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxKeyEvent_constructor }};
-//     wxKeyEvent(wxEventType keyEventType );
+//     wxKeyEvent(wxEventType keyEventType);
 static int LUACALL wxLua_wxKeyEvent_constructor(lua_State *L)
 {
     // wxEventType keyEventType
@@ -1363,6 +1411,9 @@ wxLuaBindMethod wxKeyEvent_methods[] = {
 #endif // wxLUA_USE_wxPointSizeRect
 
     { "GetPositionXY", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxKeyEvent_GetPositionXY, 1, NULL },
+    { "GetRawKeyCode", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxKeyEvent_GetRawKeyCode, 1, NULL },
+    { "GetRawKeyFlags", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxKeyEvent_GetRawKeyFlags, 1, NULL },
+    { "GetUnicodeKey", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxKeyEvent_GetUnicodeKey, 1, NULL },
     { "GetX", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxKeyEvent_GetX, 1, NULL },
     { "GetY", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxKeyEvent_GetY, 1, NULL },
     { "HasModifiers", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxKeyEvent_HasModifiers, 1, NULL },
@@ -1450,7 +1501,7 @@ static int LUACALL wxLua_wxNavigationKeyEvent_IsWindowChange(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetCurrentFocus[] = { &wxluatype_wxNavigationKeyEvent, &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxNavigationKeyEvent_SetCurrentFocus(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNavigationKeyEvent_SetCurrentFocus[1] = {{ wxLua_wxNavigationKeyEvent_SetCurrentFocus, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetCurrentFocus }};
-//     void SetCurrentFocus(wxWindow *win );
+//     void SetCurrentFocus(wxWindow *win);
 static int LUACALL wxLua_wxNavigationKeyEvent_SetCurrentFocus(lua_State *L)
 {
     // wxWindow win
@@ -1466,7 +1517,7 @@ static int LUACALL wxLua_wxNavigationKeyEvent_SetCurrentFocus(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetDirection[] = { &wxluatype_wxNavigationKeyEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxNavigationKeyEvent_SetDirection(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNavigationKeyEvent_SetDirection[1] = {{ wxLua_wxNavigationKeyEvent_SetDirection, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetDirection }};
-//     void SetDirection(bool bForward );
+//     void SetDirection(bool bForward);
 static int LUACALL wxLua_wxNavigationKeyEvent_SetDirection(lua_State *L)
 {
     // bool bForward
@@ -1482,7 +1533,7 @@ static int LUACALL wxLua_wxNavigationKeyEvent_SetDirection(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetFlags[] = { &wxluatype_wxNavigationKeyEvent, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxNavigationKeyEvent_SetFlags(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNavigationKeyEvent_SetFlags[1] = {{ wxLua_wxNavigationKeyEvent_SetFlags, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetFlags }};
-//     void SetFlags(long flags );
+//     void SetFlags(long flags);
 static int LUACALL wxLua_wxNavigationKeyEvent_SetFlags(lua_State *L)
 {
     // long flags
@@ -1498,7 +1549,7 @@ static int LUACALL wxLua_wxNavigationKeyEvent_SetFlags(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetFromTab[] = { &wxluatype_wxNavigationKeyEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxNavigationKeyEvent_SetFromTab(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNavigationKeyEvent_SetFromTab[1] = {{ wxLua_wxNavigationKeyEvent_SetFromTab, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetFromTab }};
-//     void SetFromTab(bool bIs );
+//     void SetFromTab(bool bIs);
 static int LUACALL wxLua_wxNavigationKeyEvent_SetFromTab(lua_State *L)
 {
     // bool bIs
@@ -1514,7 +1565,7 @@ static int LUACALL wxLua_wxNavigationKeyEvent_SetFromTab(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetWindowChange[] = { &wxluatype_wxNavigationKeyEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxNavigationKeyEvent_SetWindowChange(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNavigationKeyEvent_SetWindowChange[1] = {{ wxLua_wxNavigationKeyEvent_SetWindowChange, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxNavigationKeyEvent_SetWindowChange }};
-//     void SetWindowChange(bool bIs );
+//     void SetWindowChange(bool bIs);
 static int LUACALL wxLua_wxNavigationKeyEvent_SetWindowChange(lua_State *L)
 {
     // bool bIs
@@ -1532,7 +1583,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxNavigationKeyEvent_delete[1] = {{ wxlu
 
 static int LUACALL wxLua_wxNavigationKeyEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxNavigationKeyEvent_constructor[1] = {{ wxLua_wxNavigationKeyEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxNavigationKeyEvent( );
+//     wxNavigationKeyEvent();
 static int LUACALL wxLua_wxNavigationKeyEvent_constructor(lua_State *L)
 {
     // call constructor
@@ -1591,7 +1642,7 @@ int wxluatype_wxIdleEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxIdleEvent_CanSend[] = { &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxIdleEvent_CanSend(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxIdleEvent_CanSend[1] = {{ wxLua_wxIdleEvent_CanSend, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxIdleEvent_CanSend }};
-//     !%wxchkver_2_9_2 static bool CanSend(wxWindow* window );
+//     !%wxchkver_2_9_2 static bool CanSend(wxWindow* window);
 static int LUACALL wxLua_wxIdleEvent_CanSend(lua_State *L)
 {
     // wxWindow window
@@ -1608,7 +1659,7 @@ static int LUACALL wxLua_wxIdleEvent_CanSend(lua_State *L)
 
 static int LUACALL wxLua_wxIdleEvent_GetMode(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxIdleEvent_GetMode[1] = {{ wxLua_wxIdleEvent_GetMode, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static wxIdleMode GetMode( );
+//     static wxIdleMode GetMode();
 static int LUACALL wxLua_wxIdleEvent_GetMode(lua_State *L)
 {
     // call GetMode
@@ -1638,7 +1689,7 @@ static int LUACALL wxLua_wxIdleEvent_MoreRequested(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxIdleEvent_RequestMore[] = { &wxluatype_wxIdleEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxIdleEvent_RequestMore(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxIdleEvent_RequestMore[1] = {{ wxLua_wxIdleEvent_RequestMore, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxIdleEvent_RequestMore }};
-//     void RequestMore(bool needMore = true );
+//     void RequestMore(bool needMore = true);
 static int LUACALL wxLua_wxIdleEvent_RequestMore(lua_State *L)
 {
     // get number of arguments
@@ -1656,7 +1707,7 @@ static int LUACALL wxLua_wxIdleEvent_RequestMore(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxIdleEvent_SetMode[] = { &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxIdleEvent_SetMode(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxIdleEvent_SetMode[1] = {{ wxLua_wxIdleEvent_SetMode, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxIdleEvent_SetMode }};
-//     static void SetMode(wxIdleMode mode );
+//     static void SetMode(wxIdleMode mode);
 static int LUACALL wxLua_wxIdleEvent_SetMode(lua_State *L)
 {
     // wxIdleMode mode
@@ -1672,7 +1723,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxIdleEvent_delete[1] = {{ wxlua_userdat
 
 static int LUACALL wxLua_wxIdleEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxIdleEvent_constructor[1] = {{ wxLua_wxIdleEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxIdleEvent( );
+//     wxIdleEvent();
 static int LUACALL wxLua_wxIdleEvent_constructor(lua_State *L)
 {
     // call constructor
@@ -1724,7 +1775,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxInitDialogEvent_delete[1] = {{ wxlua_u
 static wxLuaArgType s_wxluatypeArray_wxLua_wxInitDialogEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxInitDialogEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxInitDialogEvent_constructor[1] = {{ wxLua_wxInitDialogEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxInitDialogEvent_constructor }};
-//     wxInitDialogEvent(int id = 0 );
+//     wxInitDialogEvent(int id = 0);
 static int LUACALL wxLua_wxInitDialogEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -1789,7 +1840,7 @@ static int LUACALL wxLua_wxContextMenuEvent_GetPosition(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxContextMenuEvent_SetPosition[] = { &wxluatype_wxContextMenuEvent, &wxluatype_wxPoint, NULL };
 static int LUACALL wxLua_wxContextMenuEvent_SetPosition(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxContextMenuEvent_SetPosition[1] = {{ wxLua_wxContextMenuEvent_SetPosition, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxContextMenuEvent_SetPosition }};
-//     void SetPosition(const wxPoint& pos );
+//     void SetPosition(const wxPoint& pos);
 static int LUACALL wxLua_wxContextMenuEvent_SetPosition(lua_State *L)
 {
     // const wxPoint pos
@@ -1812,7 +1863,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxContextMenuEvent_delete[1] = {{ wxlua_
 static wxLuaArgType s_wxluatypeArray_wxLua_wxContextMenuEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_wxPoint, NULL };
 static int LUACALL wxLua_wxContextMenuEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxContextMenuEvent_constructor[1] = {{ wxLua_wxContextMenuEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 3, s_wxluatypeArray_wxLua_wxContextMenuEvent_constructor }};
-//     wxContextMenuEvent(wxEventType type = wxEVT_NULL, wxWindowID winid = 0, const wxPoint& pt = wxDefaultPosition );
+//     wxContextMenuEvent(wxEventType type = wxEVT_NULL, wxWindowID winid = 0, const wxPoint& pt = wxDefaultPosition);
 static int LUACALL wxLua_wxContextMenuEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -1872,7 +1923,7 @@ int wxluatype_wxMouseEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_AltDown[] = { &wxluatype_wxMouseEvent, NULL };
 static int LUACALL wxLua_wxMouseEvent_AltDown(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_AltDown[1] = {{ wxLua_wxMouseEvent_AltDown, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMouseEvent_AltDown }};
-//     bool AltDown( );
+//     bool AltDown();
 static int LUACALL wxLua_wxMouseEvent_AltDown(lua_State *L)
 {
     // get this
@@ -1888,7 +1939,7 @@ static int LUACALL wxLua_wxMouseEvent_AltDown(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_Button[] = { &wxluatype_wxMouseEvent, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMouseEvent_Button(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_Button[1] = {{ wxLua_wxMouseEvent_Button, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMouseEvent_Button }};
-//     bool Button(int button );
+//     bool Button(int button);
 static int LUACALL wxLua_wxMouseEvent_Button(lua_State *L)
 {
     // int button
@@ -1906,7 +1957,7 @@ static int LUACALL wxLua_wxMouseEvent_Button(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_ButtonDClick[] = { &wxluatype_wxMouseEvent, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMouseEvent_ButtonDClick(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_ButtonDClick[1] = {{ wxLua_wxMouseEvent_ButtonDClick, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxMouseEvent_ButtonDClick }};
-//     bool ButtonDClick(int but = wxMOUSE_BTN_ANY );
+//     bool ButtonDClick(int but = wxMOUSE_BTN_ANY);
 static int LUACALL wxLua_wxMouseEvent_ButtonDClick(lua_State *L)
 {
     // get number of arguments
@@ -1926,7 +1977,7 @@ static int LUACALL wxLua_wxMouseEvent_ButtonDClick(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_ButtonDown[] = { &wxluatype_wxMouseEvent, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMouseEvent_ButtonDown(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_ButtonDown[1] = {{ wxLua_wxMouseEvent_ButtonDown, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxMouseEvent_ButtonDown }};
-//     bool ButtonDown(int but = wxMOUSE_BTN_ANY );
+//     bool ButtonDown(int but = wxMOUSE_BTN_ANY);
 static int LUACALL wxLua_wxMouseEvent_ButtonDown(lua_State *L)
 {
     // get number of arguments
@@ -1946,7 +1997,7 @@ static int LUACALL wxLua_wxMouseEvent_ButtonDown(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_ButtonUp[] = { &wxluatype_wxMouseEvent, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMouseEvent_ButtonUp(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_ButtonUp[1] = {{ wxLua_wxMouseEvent_ButtonUp, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxMouseEvent_ButtonUp }};
-//     bool ButtonUp(int but = wxMOUSE_BTN_ANY );
+//     bool ButtonUp(int but = wxMOUSE_BTN_ANY);
 static int LUACALL wxLua_wxMouseEvent_ButtonUp(lua_State *L)
 {
     // get number of arguments
@@ -1982,7 +2033,7 @@ static int LUACALL wxLua_wxMouseEvent_CmdDown(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_ControlDown[] = { &wxluatype_wxMouseEvent, NULL };
 static int LUACALL wxLua_wxMouseEvent_ControlDown(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_ControlDown[1] = {{ wxLua_wxMouseEvent_ControlDown, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMouseEvent_ControlDown }};
-//     bool ControlDown( );
+//     bool ControlDown();
 static int LUACALL wxLua_wxMouseEvent_ControlDown(lua_State *L)
 {
     // get this
@@ -1998,7 +2049,7 @@ static int LUACALL wxLua_wxMouseEvent_ControlDown(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_Dragging[] = { &wxluatype_wxMouseEvent, NULL };
 static int LUACALL wxLua_wxMouseEvent_Dragging(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_Dragging[1] = {{ wxLua_wxMouseEvent_Dragging, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMouseEvent_Dragging }};
-//     bool Dragging( );
+//     bool Dragging();
 static int LUACALL wxLua_wxMouseEvent_Dragging(lua_State *L)
 {
     // get this
@@ -2014,7 +2065,7 @@ static int LUACALL wxLua_wxMouseEvent_Dragging(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_Entering[] = { &wxluatype_wxMouseEvent, NULL };
 static int LUACALL wxLua_wxMouseEvent_Entering(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_Entering[1] = {{ wxLua_wxMouseEvent_Entering, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMouseEvent_Entering }};
-//     bool Entering( );
+//     bool Entering();
 static int LUACALL wxLua_wxMouseEvent_Entering(lua_State *L)
 {
     // get this
@@ -2152,7 +2203,7 @@ static int LUACALL wxLua_wxMouseEvent_GetX(lua_State *L)
     // get this
     wxMouseEvent * self = (wxMouseEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMouseEvent);
     // call GetX
-    long  returns = (self->GetX());
+    long returns = (self->GetX());
     // push the result number
     lua_pushnumber(L, returns);
 
@@ -2162,13 +2213,13 @@ static int LUACALL wxLua_wxMouseEvent_GetX(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_GetY[] = { &wxluatype_wxMouseEvent, NULL };
 static int LUACALL wxLua_wxMouseEvent_GetY(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_GetY[1] = {{ wxLua_wxMouseEvent_GetY, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMouseEvent_GetY }};
-//     long GetY( );
+//     long GetY();
 static int LUACALL wxLua_wxMouseEvent_GetY(lua_State *L)
 {
     // get this
     wxMouseEvent * self = (wxMouseEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMouseEvent);
     // call GetY
-    long  returns = (self->GetY());
+    long returns = (self->GetY());
     // push the result number
     lua_pushnumber(L, returns);
 
@@ -2453,7 +2504,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_delete[1] = {{ wxlua_userda
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMouseEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseEvent_constructor[1] = {{ wxLua_wxMouseEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxMouseEvent_constructor }};
-//     wxMouseEvent(wxEventType mouseEventType = wxEVT_NULL );
+//     wxMouseEvent(wxEventType mouseEventType = wxEVT_NULL);
 static int LUACALL wxLua_wxMouseEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -2558,7 +2609,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseCaptureChangedEvent_delete[1] = {
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseCaptureChangedEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxMouseCaptureChangedEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseCaptureChangedEvent_constructor[1] = {{ wxLua_wxMouseCaptureChangedEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxMouseCaptureChangedEvent_constructor }};
-//     wxMouseCaptureChangedEvent(wxWindowID winid = 0, wxWindow* gainedCapture = NULL );
+//     wxMouseCaptureChangedEvent(wxWindowID winid = 0, wxWindow* gainedCapture = NULL);
 static int LUACALL wxLua_wxMouseCaptureChangedEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -2611,7 +2662,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseCaptureLostEvent_delete[1] = {{ w
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMouseCaptureLostEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMouseCaptureLostEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMouseCaptureLostEvent_constructor[1] = {{ wxLua_wxMouseCaptureLostEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxMouseCaptureLostEvent_constructor }};
-//     wxMouseCaptureLostEvent(wxWindowID winid = 0 );
+//     wxMouseCaptureLostEvent(wxWindowID winid = 0);
 static int LUACALL wxLua_wxMouseCaptureLostEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -2686,7 +2737,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxMoveEvent_delete[1] = {{ wxlua_userdat
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMoveEvent_constructor[] = { &wxluatype_wxPoint, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMoveEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMoveEvent_constructor[1] = {{ wxLua_wxMoveEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 1, 2, s_wxluatypeArray_wxLua_wxMoveEvent_constructor }};
-//     wxMoveEvent(const wxPoint& pt, int id = 0 );
+//     wxMoveEvent(const wxPoint& pt, int id = 0);
 static int LUACALL wxLua_wxMoveEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -2746,7 +2797,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxPaintEvent_delete[1] = {{ wxlua_userda
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPaintEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxPaintEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPaintEvent_constructor[1] = {{ wxLua_wxPaintEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxPaintEvent_constructor }};
-//     wxPaintEvent(int id = 0 );
+//     wxPaintEvent(int id = 0);
 static int LUACALL wxLua_wxPaintEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -2792,7 +2843,7 @@ int wxluatype_wxProcessEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxProcessEvent_GetExitCode[] = { &wxluatype_wxProcessEvent, NULL };
 static int LUACALL wxLua_wxProcessEvent_GetExitCode(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxProcessEvent_GetExitCode[1] = {{ wxLua_wxProcessEvent_GetExitCode, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxProcessEvent_GetExitCode }};
-//     %wxchkver_2_6 int GetExitCode( );
+//     %wxchkver_2_6 int GetExitCode();
 static int LUACALL wxLua_wxProcessEvent_GetExitCode(lua_State *L)
 {
     // get this
@@ -2831,7 +2882,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxProcessEvent_delete[1] = {{ wxlua_user
 static wxLuaArgType s_wxluatypeArray_wxLua_wxProcessEvent_constructor1[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxProcessEvent_constructor1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxProcessEvent_constructor1[1] = {{ wxLua_wxProcessEvent_constructor1, WXLUAMETHOD_CONSTRUCTOR, 0, 3, s_wxluatypeArray_wxLua_wxProcessEvent_constructor1 }};
-//     %wxchkver_2_6 wxProcessEvent(int nId = 0, int pid = 0, int exitcode = 0 );
+//     %wxchkver_2_6 wxProcessEvent(int nId = 0, int pid = 0, int exitcode = 0);
 static int LUACALL wxLua_wxProcessEvent_constructor1(lua_State *L)
 {
     // get number of arguments
@@ -2858,7 +2909,7 @@ static int LUACALL wxLua_wxProcessEvent_constructor1(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxProcessEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxProcessEvent_constructor(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxProcessEvent_constructor[1] = {{ wxLua_wxProcessEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxProcessEvent_constructor }};
-//     !%wxchkver_2_6 wxProcessEvent(int id = 0, int pid = 0 );
+//     !%wxchkver_2_6 wxProcessEvent(int id = 0, int pid = 0);
 static int LUACALL wxLua_wxProcessEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -2968,7 +3019,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxScrollEvent_delete[1] = {{ wxlua_userd
 static wxLuaArgType s_wxluatypeArray_wxLua_wxScrollEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxScrollEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxScrollEvent_constructor[1] = {{ wxLua_wxScrollEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 4, s_wxluatypeArray_wxLua_wxScrollEvent_constructor }};
-//     wxScrollEvent(wxEventType commandType = wxEVT_NULL, int id = 0, int pos = 0, int orientation = 0 );
+//     wxScrollEvent(wxEventType commandType = wxEVT_NULL, int id = 0, int pos = 0, int orientation = 0);
 static int LUACALL wxLua_wxScrollEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3056,7 +3107,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxScrollWinEvent_delete[1] = {{ wxlua_us
 static wxLuaArgType s_wxluatypeArray_wxLua_wxScrollWinEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxScrollWinEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxScrollWinEvent_constructor[1] = {{ wxLua_wxScrollWinEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 3, s_wxluatypeArray_wxLua_wxScrollWinEvent_constructor }};
-//     wxScrollWinEvent(wxEventType commandType = wxEVT_NULL, int pos = 0, int orientation = 0 );
+//     wxScrollWinEvent(wxEventType commandType = wxEVT_NULL, int pos = 0, int orientation = 0);
 static int LUACALL wxLua_wxScrollWinEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3134,7 +3185,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxSizeEvent_delete[1] = {{ wxlua_userdat
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSizeEvent_constructor[] = { &wxluatype_wxSize, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxSizeEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSizeEvent_constructor[1] = {{ wxLua_wxSizeEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 1, 2, s_wxluatypeArray_wxLua_wxSizeEvent_constructor }};
-//     wxSizeEvent(const wxSize& sz, int id = 0 );
+//     wxSizeEvent(const wxSize& sz, int id = 0);
 static int LUACALL wxLua_wxSizeEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3188,10 +3239,11 @@ int wxSizeEvent_methodCount = sizeof(wxSizeEvent_methods)/sizeof(wxLuaBindMethod
 // Lua MetaTable Tag for Class 'wxShowEvent'
 int wxluatype_wxShowEvent = WXLUA_TUNKNOWN;
 
+#if !wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxShowEvent_GetShow[] = { &wxluatype_wxShowEvent, NULL };
 static int LUACALL wxLua_wxShowEvent_GetShow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxShowEvent_GetShow[1] = {{ wxLua_wxShowEvent_GetShow, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxShowEvent_GetShow }};
-//     bool GetShow() const;
+//     !%wxchkver_2_9 || %wxcompat_2_8 bool GetShow() const;
 static int LUACALL wxLua_wxShowEvent_GetShow(lua_State *L)
 {
     // get this
@@ -3204,10 +3256,31 @@ static int LUACALL wxLua_wxShowEvent_GetShow(lua_State *L)
     return 1;
 }
 
+#endif // !wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)
+
+#if wxCHECK_VERSION(2,8,0)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxShowEvent_IsShown[] = { &wxluatype_wxShowEvent, NULL };
+static int LUACALL wxLua_wxShowEvent_IsShown(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxShowEvent_IsShown[1] = {{ wxLua_wxShowEvent_IsShown, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxShowEvent_IsShown }};
+//     %wxchkver_2_8 bool IsShown() const
+static int LUACALL wxLua_wxShowEvent_IsShown(lua_State *L)
+{
+    // get this
+    wxShowEvent * self = (wxShowEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxShowEvent);
+    // call IsShown
+    bool returns = (self->IsShown());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // wxCHECK_VERSION(2,8,0)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxShowEvent_SetShow[] = { &wxluatype_wxShowEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxShowEvent_SetShow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxShowEvent_SetShow[1] = {{ wxLua_wxShowEvent_SetShow, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxShowEvent_SetShow }};
-//     void SetShow(bool show );
+//     void SetShow(bool show);
 static int LUACALL wxLua_wxShowEvent_SetShow(lua_State *L)
 {
     // bool show
@@ -3226,7 +3299,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxShowEvent_delete[1] = {{ wxlua_userdat
 static wxLuaArgType s_wxluatypeArray_wxLua_wxShowEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxShowEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxShowEvent_constructor[1] = {{ wxLua_wxShowEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxShowEvent_constructor }};
-//     wxShowEvent(int winid = 0, bool show = false );
+//     wxShowEvent(int winid = 0, bool show = false);
 static int LUACALL wxLua_wxShowEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3255,7 +3328,14 @@ void wxLua_wxShowEvent_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxShowEvent_methods[] = {
+#if !wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)
     { "GetShow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxShowEvent_GetShow, 1, NULL },
+#endif // !wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)
+
+#if wxCHECK_VERSION(2,8,0)
+    { "IsShown", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxShowEvent_IsShown, 1, NULL },
+#endif // wxCHECK_VERSION(2,8,0)
+
     { "SetShow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxShowEvent_SetShow, 1, NULL },
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxShowEvent_delete, 1, NULL },
     { "wxShowEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxShowEvent_constructor, 1, NULL },
@@ -3272,10 +3352,11 @@ int wxShowEvent_methodCount = sizeof(wxShowEvent_methods)/sizeof(wxLuaBindMethod
 // Lua MetaTable Tag for Class 'wxIconizeEvent'
 int wxluatype_wxIconizeEvent = WXLUA_TUNKNOWN;
 
+#if !wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxIconizeEvent_Iconized[] = { &wxluatype_wxIconizeEvent, NULL };
 static int LUACALL wxLua_wxIconizeEvent_Iconized(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxIconizeEvent_Iconized[1] = {{ wxLua_wxIconizeEvent_Iconized, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxIconizeEvent_Iconized }};
-//     bool Iconized() const;
+//     !%wxchkver_2_9 || %wxcompat_2_8 bool Iconized() const;
 static int LUACALL wxLua_wxIconizeEvent_Iconized(lua_State *L)
 {
     // get this
@@ -3288,13 +3369,34 @@ static int LUACALL wxLua_wxIconizeEvent_Iconized(lua_State *L)
     return 1;
 }
 
+#endif // !wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)
+
+#if wxCHECK_VERSION(2,8,0)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxIconizeEvent_IsIconized[] = { &wxluatype_wxIconizeEvent, NULL };
+static int LUACALL wxLua_wxIconizeEvent_IsIconized(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxIconizeEvent_IsIconized[1] = {{ wxLua_wxIconizeEvent_IsIconized, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxIconizeEvent_IsIconized }};
+//     %wxchkver_2_8 bool IsIconized() const;
+static int LUACALL wxLua_wxIconizeEvent_IsIconized(lua_State *L)
+{
+    // get this
+    wxIconizeEvent * self = (wxIconizeEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxIconizeEvent);
+    // call IsIconized
+    bool returns = (self->IsIconized());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // wxCHECK_VERSION(2,8,0)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxIconizeEvent_delete[] = { &wxluatype_wxIconizeEvent, NULL };
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxIconizeEvent_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxIconizeEvent_delete }};
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxIconizeEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxIconizeEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxIconizeEvent_constructor[1] = {{ wxLua_wxIconizeEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxIconizeEvent_constructor }};
-//     wxIconizeEvent(int winid = 0, bool iconized = true );
+//     wxIconizeEvent(int winid = 0, bool iconized = true);
 static int LUACALL wxLua_wxIconizeEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3323,7 +3425,14 @@ void wxLua_wxIconizeEvent_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxIconizeEvent_methods[] = {
+#if !wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)
     { "Iconized", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxIconizeEvent_Iconized, 1, NULL },
+#endif // !wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)
+
+#if wxCHECK_VERSION(2,8,0)
+    { "IsIconized", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxIconizeEvent_IsIconized, 1, NULL },
+#endif // wxCHECK_VERSION(2,8,0)
+
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxIconizeEvent_delete, 1, NULL },
     { "wxIconizeEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxIconizeEvent_constructor, 1, NULL },
     { 0, 0, 0, 0 },
@@ -3345,7 +3454,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxMaximizeEvent_delete[1] = {{ wxlua_use
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMaximizeEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxMaximizeEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMaximizeEvent_constructor[1] = {{ wxLua_wxMaximizeEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxMaximizeEvent_constructor }};
-//     wxMaximizeEvent(int winid = 0 );
+//     wxMaximizeEvent(int winid = 0);
 static int LUACALL wxLua_wxMaximizeEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3409,7 +3518,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxWindowCreateEvent_delete[1] = {{ wxlua
 static wxLuaArgType s_wxluatypeArray_wxLua_wxWindowCreateEvent_constructor[] = { &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxWindowCreateEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxWindowCreateEvent_constructor[1] = {{ wxLua_wxWindowCreateEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxWindowCreateEvent_constructor }};
-//     wxWindowCreateEvent(wxWindow *win = NULL );
+//     wxWindowCreateEvent(wxWindow *win = NULL);
 static int LUACALL wxLua_wxWindowCreateEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3474,7 +3583,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxWindowDestroyEvent_delete[1] = {{ wxlu
 static wxLuaArgType s_wxluatypeArray_wxLua_wxWindowDestroyEvent_constructor[] = { &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxWindowDestroyEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxWindowDestroyEvent_constructor[1] = {{ wxLua_wxWindowDestroyEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxWindowDestroyEvent_constructor }};
-//     wxWindowDestroyEvent(wxWindow *win = NULL );
+//     wxWindowDestroyEvent(wxWindow *win = NULL);
 static int LUACALL wxLua_wxWindowDestroyEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3522,7 +3631,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxSysColourChangedEvent_delete[1] = {{ w
 
 static int LUACALL wxLua_wxSysColourChangedEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSysColourChangedEvent_constructor[1] = {{ wxLua_wxSysColourChangedEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxSysColourChangedEvent( );
+//     wxSysColourChangedEvent();
 static int LUACALL wxLua_wxSysColourChangedEvent_constructor(lua_State *L)
 {
     // call constructor
@@ -3565,7 +3674,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxDisplayChangedEvent_delete[1] = {{ wxl
 
 static int LUACALL wxLua_wxDisplayChangedEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDisplayChangedEvent_constructor[1] = {{ wxLua_wxDisplayChangedEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxDisplayChangedEvent( );
+//     wxDisplayChangedEvent();
 static int LUACALL wxLua_wxDisplayChangedEvent_constructor(lua_State *L)
 {
     // call constructor
@@ -3597,7 +3706,7 @@ int wxDisplayChangedEvent_methodCount = sizeof(wxDisplayChangedEvent_methods)/si
 
 
 
-#if (wxCHECK_VERSION(2,8,0)) && (defined(wxHAS_POWER_EVENTS))
+#if (defined(wxHAS_POWER_EVENTS)) && (wxCHECK_VERSION(2,8,0))
 // ---------------------------------------------------------------------------
 // Bind class wxPowerEvent
 // ---------------------------------------------------------------------------
@@ -3624,7 +3733,7 @@ static int LUACALL wxLua_wxPowerEvent_IsVetoed(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPowerEvent_Veto[] = { &wxluatype_wxPowerEvent, NULL };
 static int LUACALL wxLua_wxPowerEvent_Veto(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPowerEvent_Veto[1] = {{ wxLua_wxPowerEvent_Veto, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxPowerEvent_Veto }};
-//     void Veto( );
+//     void Veto();
 static int LUACALL wxLua_wxPowerEvent_Veto(lua_State *L)
 {
     // get this
@@ -3641,7 +3750,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxPowerEvent_delete[1] = {{ wxlua_userda
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPowerEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxPowerEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPowerEvent_constructor[1] = {{ wxLua_wxPowerEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxPowerEvent_constructor }};
-//     wxPowerEvent(wxEventType evtType );
+//     wxPowerEvent(wxEventType evtType);
 static int LUACALL wxLua_wxPowerEvent_constructor(lua_State *L)
 {
     // wxEventType evtType
@@ -3677,7 +3786,7 @@ wxLuaBindMethod wxPowerEvent_methods[] = {
 
 int wxPowerEvent_methodCount = sizeof(wxPowerEvent_methods)/sizeof(wxLuaBindMethod) - 1;
 
-#endif  // (wxCHECK_VERSION(2,8,0)) && (defined(wxHAS_POWER_EVENTS))
+#endif  // (defined(wxHAS_POWER_EVENTS)) && (wxCHECK_VERSION(2,8,0))
 
 // ---------------------------------------------------------------------------
 // Bind class wxSetCursorEvent
@@ -3761,7 +3870,7 @@ static int LUACALL wxLua_wxSetCursorEvent_HasCursor(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSetCursorEvent_SetCursor[] = { &wxluatype_wxSetCursorEvent, &wxluatype_wxCursor, NULL };
 static int LUACALL wxLua_wxSetCursorEvent_SetCursor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSetCursorEvent_SetCursor[1] = {{ wxLua_wxSetCursorEvent_SetCursor, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxSetCursorEvent_SetCursor }};
-//     void SetCursor(const wxCursor& cursor );
+//     void SetCursor(const wxCursor& cursor);
 static int LUACALL wxLua_wxSetCursorEvent_SetCursor(lua_State *L)
 {
     // const wxCursor cursor
@@ -3782,7 +3891,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxSetCursorEvent_delete[1] = {{ wxlua_us
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSetCursorEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxSetCursorEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSetCursorEvent_constructor[1] = {{ wxLua_wxSetCursorEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxSetCursorEvent_constructor }};
-//     wxSetCursorEvent(wxCoord x = 0, wxCoord y = 0 );
+//     wxSetCursorEvent(wxCoord x = 0, wxCoord y = 0);
 static int LUACALL wxLua_wxSetCursorEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -3841,7 +3950,7 @@ int wxluatype_wxUpdateUIEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxUpdateUIEvent_CanUpdate[] = { &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxUpdateUIEvent_CanUpdate(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_CanUpdate[1] = {{ wxLua_wxUpdateUIEvent_CanUpdate, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxUpdateUIEvent_CanUpdate }};
-//     static bool CanUpdate(wxWindow* window );
+//     static bool CanUpdate(wxWindow* window);
 static int LUACALL wxLua_wxUpdateUIEvent_CanUpdate(lua_State *L)
 {
     // wxWindow window
@@ -3857,7 +3966,7 @@ static int LUACALL wxLua_wxUpdateUIEvent_CanUpdate(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxUpdateUIEvent_Check[] = { &wxluatype_wxUpdateUIEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxUpdateUIEvent_Check(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_Check[1] = {{ wxLua_wxUpdateUIEvent_Check, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxUpdateUIEvent_Check }};
-//     void Check(bool check );
+//     void Check(bool check);
 static int LUACALL wxLua_wxUpdateUIEvent_Check(lua_State *L)
 {
     // bool check
@@ -3873,7 +3982,7 @@ static int LUACALL wxLua_wxUpdateUIEvent_Check(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxUpdateUIEvent_Enable[] = { &wxluatype_wxUpdateUIEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxUpdateUIEvent_Enable(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_Enable[1] = {{ wxLua_wxUpdateUIEvent_Enable, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxUpdateUIEvent_Enable }};
-//     void Enable(bool enable );
+//     void Enable(bool enable);
 static int LUACALL wxLua_wxUpdateUIEvent_Enable(lua_State *L)
 {
     // bool enable
@@ -3920,7 +4029,7 @@ static int LUACALL wxLua_wxUpdateUIEvent_GetEnabled(lua_State *L)
 
 static int LUACALL wxLua_wxUpdateUIEvent_GetMode(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_GetMode[1] = {{ wxLua_wxUpdateUIEvent_GetMode, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static wxUpdateUIMode GetMode( );
+//     static wxUpdateUIMode GetMode();
 static int LUACALL wxLua_wxUpdateUIEvent_GetMode(lua_State *L)
 {
     // call GetMode
@@ -4037,11 +4146,11 @@ static int LUACALL wxLua_wxUpdateUIEvent_GetText(lua_State *L)
 
 static int LUACALL wxLua_wxUpdateUIEvent_GetUpdateInterval(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_GetUpdateInterval[1] = {{ wxLua_wxUpdateUIEvent_GetUpdateInterval, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static long GetUpdateInterval( );
+//     static long GetUpdateInterval();
 static int LUACALL wxLua_wxUpdateUIEvent_GetUpdateInterval(lua_State *L)
 {
     // call GetUpdateInterval
-    long  returns = (wxUpdateUIEvent::GetUpdateInterval());
+    long returns = (wxUpdateUIEvent::GetUpdateInterval());
     // push the result number
     lua_pushnumber(L, returns);
 
@@ -4050,7 +4159,7 @@ static int LUACALL wxLua_wxUpdateUIEvent_GetUpdateInterval(lua_State *L)
 
 static int LUACALL wxLua_wxUpdateUIEvent_ResetUpdateTime(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_ResetUpdateTime[1] = {{ wxLua_wxUpdateUIEvent_ResetUpdateTime, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static void ResetUpdateTime( );
+//     static void ResetUpdateTime();
 static int LUACALL wxLua_wxUpdateUIEvent_ResetUpdateTime(lua_State *L)
 {
     // call ResetUpdateTime
@@ -4062,7 +4171,7 @@ static int LUACALL wxLua_wxUpdateUIEvent_ResetUpdateTime(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxUpdateUIEvent_SetMode[] = { &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxUpdateUIEvent_SetMode(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_SetMode[1] = {{ wxLua_wxUpdateUIEvent_SetMode, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxUpdateUIEvent_SetMode }};
-//     static void SetMode(wxUpdateUIMode mode );
+//     static void SetMode(wxUpdateUIMode mode);
 static int LUACALL wxLua_wxUpdateUIEvent_SetMode(lua_State *L)
 {
     // wxUpdateUIMode mode
@@ -4076,7 +4185,7 @@ static int LUACALL wxLua_wxUpdateUIEvent_SetMode(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxUpdateUIEvent_SetText[] = { &wxluatype_wxUpdateUIEvent, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxUpdateUIEvent_SetText(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_SetText[1] = {{ wxLua_wxUpdateUIEvent_SetText, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxUpdateUIEvent_SetText }};
-//     void SetText(const wxString& text );
+//     void SetText(const wxString& text);
 static int LUACALL wxLua_wxUpdateUIEvent_SetText(lua_State *L)
 {
     // const wxString text
@@ -4092,7 +4201,7 @@ static int LUACALL wxLua_wxUpdateUIEvent_SetText(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxUpdateUIEvent_SetUpdateInterval[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxUpdateUIEvent_SetUpdateInterval(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_SetUpdateInterval[1] = {{ wxLua_wxUpdateUIEvent_SetUpdateInterval, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxUpdateUIEvent_SetUpdateInterval }};
-//     static void SetUpdateInterval(long updateInterval );
+//     static void SetUpdateInterval(long updateInterval);
 static int LUACALL wxLua_wxUpdateUIEvent_SetUpdateInterval(lua_State *L)
 {
     // long updateInterval
@@ -4108,7 +4217,7 @@ static int LUACALL wxLua_wxUpdateUIEvent_SetUpdateInterval(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxUpdateUIEvent_Show[] = { &wxluatype_wxUpdateUIEvent, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxUpdateUIEvent_Show(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_Show[1] = {{ wxLua_wxUpdateUIEvent_Show, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxUpdateUIEvent_Show }};
-//     %wxchkver_2_8 void Show(bool show );
+//     %wxchkver_2_8 void Show(bool show);
 static int LUACALL wxLua_wxUpdateUIEvent_Show(lua_State *L)
 {
     // bool show
@@ -4129,7 +4238,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_delete[1] = {{ wxlua_use
 static wxLuaArgType s_wxluatypeArray_wxLua_wxUpdateUIEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxUpdateUIEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxUpdateUIEvent_constructor[1] = {{ wxLua_wxUpdateUIEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxUpdateUIEvent_constructor }};
-//     wxUpdateUIEvent(wxWindowID commandId = wxID_ANY );
+//     wxUpdateUIEvent(wxWindowID commandId = wxID_ANY);
 static int LUACALL wxLua_wxUpdateUIEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -4204,7 +4313,7 @@ int wxluatype_wxHelpEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_GetLink[] = { &wxluatype_wxHelpEvent, NULL };
 static int LUACALL wxLua_wxHelpEvent_GetLink(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_GetLink[1] = {{ wxLua_wxHelpEvent_GetLink, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHelpEvent_GetLink }};
-//     wxString GetLink( );
+//     wxString GetLink();
 static int LUACALL wxLua_wxHelpEvent_GetLink(lua_State *L)
 {
     // get this
@@ -4241,7 +4350,7 @@ static int LUACALL wxLua_wxHelpEvent_GetOrigin(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_GetPosition[] = { &wxluatype_wxHelpEvent, NULL };
 static int LUACALL wxLua_wxHelpEvent_GetPosition(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_GetPosition[1] = {{ wxLua_wxHelpEvent_GetPosition, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHelpEvent_GetPosition }};
-//     wxPoint  GetPosition( );
+//     wxPoint  GetPosition();
 static int LUACALL wxLua_wxHelpEvent_GetPosition(lua_State *L)
 {
     // get this
@@ -4262,7 +4371,7 @@ static int LUACALL wxLua_wxHelpEvent_GetPosition(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_GetTarget[] = { &wxluatype_wxHelpEvent, NULL };
 static int LUACALL wxLua_wxHelpEvent_GetTarget(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_GetTarget[1] = {{ wxLua_wxHelpEvent_GetTarget, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHelpEvent_GetTarget }};
-//     wxString GetTarget( );
+//     wxString GetTarget();
 static int LUACALL wxLua_wxHelpEvent_GetTarget(lua_State *L)
 {
     // get this
@@ -4278,7 +4387,7 @@ static int LUACALL wxLua_wxHelpEvent_GetTarget(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_SetLink[] = { &wxluatype_wxHelpEvent, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxHelpEvent_SetLink(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_SetLink[1] = {{ wxLua_wxHelpEvent_SetLink, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHelpEvent_SetLink }};
-//     void SetLink(const wxString& link );
+//     void SetLink(const wxString& link);
 static int LUACALL wxLua_wxHelpEvent_SetLink(lua_State *L)
 {
     // const wxString link
@@ -4296,7 +4405,7 @@ static int LUACALL wxLua_wxHelpEvent_SetLink(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_SetOrigin[] = { &wxluatype_wxHelpEvent, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxHelpEvent_SetOrigin(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_SetOrigin[1] = {{ wxLua_wxHelpEvent_SetOrigin, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHelpEvent_SetOrigin }};
-//     %wxchkver_2_8 void SetOrigin(wxHelpEvent::Origin origin );
+//     %wxchkver_2_8 void SetOrigin(wxHelpEvent::Origin origin);
 static int LUACALL wxLua_wxHelpEvent_SetOrigin(lua_State *L)
 {
     // wxHelpEvent::Origin origin
@@ -4315,7 +4424,7 @@ static int LUACALL wxLua_wxHelpEvent_SetOrigin(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_SetPosition[] = { &wxluatype_wxHelpEvent, &wxluatype_wxPoint, NULL };
 static int LUACALL wxLua_wxHelpEvent_SetPosition(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_SetPosition[1] = {{ wxLua_wxHelpEvent_SetPosition, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHelpEvent_SetPosition }};
-//     void SetPosition(const wxPoint& pos );
+//     void SetPosition(const wxPoint& pos);
 static int LUACALL wxLua_wxHelpEvent_SetPosition(lua_State *L)
 {
     // const wxPoint pos
@@ -4333,7 +4442,7 @@ static int LUACALL wxLua_wxHelpEvent_SetPosition(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_SetTarget[] = { &wxluatype_wxHelpEvent, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxHelpEvent_SetTarget(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_SetTarget[1] = {{ wxLua_wxHelpEvent_SetTarget, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHelpEvent_SetTarget }};
-//     void SetTarget(const wxString& target );
+//     void SetTarget(const wxString& target);
 static int LUACALL wxLua_wxHelpEvent_SetTarget(lua_State *L)
 {
     // const wxString target
@@ -4350,11 +4459,11 @@ static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_delete[] = { &wxluatype_w
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxHelpEvent_delete }};
 
 
-#if (wxLUA_USE_wxPointSizeRect) && (wxCHECK_VERSION(2,8,0))
+#if (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_constructor1[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_wxPoint, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxHelpEvent_constructor1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_constructor1[1] = {{ wxLua_wxHelpEvent_constructor1, WXLUAMETHOD_CONSTRUCTOR, 0, 4, s_wxluatypeArray_wxLua_wxHelpEvent_constructor1 }};
-//     %wxchkver_2_8 wxHelpEvent(wxEventType type = wxEVT_NULL, wxWindowID id = 0, const wxPoint& pt = wxDefaultPosition, wxHelpEvent::Origin origin = wxHelpEvent::Origin_Unknown );
+//     %wxchkver_2_8 wxHelpEvent(wxEventType type = wxEVT_NULL, wxWindowID id = 0, const wxPoint& pt = wxDefaultPosition, wxHelpEvent::Origin origin = wxHelpEvent::Origin_Unknown);
 static int LUACALL wxLua_wxHelpEvent_constructor1(lua_State *L)
 {
     // get number of arguments
@@ -4377,13 +4486,13 @@ static int LUACALL wxLua_wxHelpEvent_constructor1(lua_State *L)
     return 1;
 }
 
-#endif // (wxLUA_USE_wxPointSizeRect) && (wxCHECK_VERSION(2,8,0))
+#endif // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect)
 
 #if (!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxHelpEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_wxPoint, NULL };
 static int LUACALL wxLua_wxHelpEvent_constructor(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_constructor[1] = {{ wxLua_wxHelpEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 3, s_wxluatypeArray_wxLua_wxHelpEvent_constructor }};
-//     !%wxchkver_2_8 wxHelpEvent(wxEventType type = wxEVT_NULL, wxWindowID id = 0, const wxPoint& pt = wxDefaultPosition );
+//     !%wxchkver_2_8 wxHelpEvent(wxEventType type = wxEVT_NULL, wxWindowID id = 0, const wxPoint& pt = wxDefaultPosition);
 static int LUACALL wxLua_wxHelpEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -4408,14 +4517,14 @@ static int LUACALL wxLua_wxHelpEvent_constructor(lua_State *L)
 
 
 
-#if ((wxLUA_USE_wxPointSizeRect) && (wxCHECK_VERSION(2,8,0)))||((!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))
+#if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))||((!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_constructor_overload[] =
 {
 
-#if (wxLUA_USE_wxPointSizeRect) && (wxCHECK_VERSION(2,8,0))
+#if (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect)
     { wxLua_wxHelpEvent_constructor1, WXLUAMETHOD_CONSTRUCTOR, 0, 4, s_wxluatypeArray_wxLua_wxHelpEvent_constructor1 },
-#endif // (wxLUA_USE_wxPointSizeRect) && (wxCHECK_VERSION(2,8,0))
+#endif // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect)
 
 #if (!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect)
     { wxLua_wxHelpEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 3, s_wxluatypeArray_wxLua_wxHelpEvent_constructor },
@@ -4423,7 +4532,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxHelpEvent_constructor_overload[] =
 };
 static int s_wxluafunc_wxLua_wxHelpEvent_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxHelpEvent_constructor_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // ((wxLUA_USE_wxPointSizeRect) && (wxCHECK_VERSION(2,8,0)))||((!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))
+#endif // ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))||((!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))
 
 void wxLua_wxHelpEvent_delete_function(void** p)
 {
@@ -4457,9 +4566,9 @@ wxLuaBindMethod wxHelpEvent_methods[] = {
     { "SetTarget", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHelpEvent_SetTarget, 1, NULL },
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxHelpEvent_delete, 1, NULL },
 
-#if ((wxLUA_USE_wxPointSizeRect) && (wxCHECK_VERSION(2,8,0)))||((!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))
+#if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))||((!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))
     { "wxHelpEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxHelpEvent_constructor_overload, s_wxluafunc_wxLua_wxHelpEvent_constructor_overload_count, 0 },
-#endif // ((wxLUA_USE_wxPointSizeRect) && (wxCHECK_VERSION(2,8,0)))||((!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))
+#endif // ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))||((!wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxPointSizeRect))
 
     { 0, 0, 0, 0 },
 };

@@ -19,6 +19,9 @@
 #include "xword_bind.h"
 #include "xword_bind_helpers.hpp"
 
+#ifdef __GNUC__
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+#endif // __GNUC__
 
 // ---------------------------------------------------------------------------
 // Bind class PrintInfo

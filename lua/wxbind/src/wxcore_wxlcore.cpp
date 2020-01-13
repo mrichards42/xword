@@ -254,6 +254,83 @@ wxDragResult wxLuaTextDropTarget::OnData(wxCoord x, wxCoord y, wxDragResult def)
     return result;
 }
 
+wxDragResult wxLuaTextDropTarget::OnEnter(wxCoord x, wxCoord y, wxDragResult def)
+{
+    wxDragResult result = wxDragNone;
+
+    if (m_wxlState.Ok() && !m_wxlState.GetCallBaseClassFunction() &&
+        m_wxlState.HasDerivedMethod(this, "OnEnter", true))
+    {
+        int nOldTop = m_wxlState.lua_GetTop();
+        m_wxlState.wxluaT_PushUserDataType(this, wxluatype_wxLuaTextDropTarget, true);
+        m_wxlState.lua_PushInteger(x);
+        m_wxlState.lua_PushInteger(y);
+        m_wxlState.lua_PushInteger(def);
+
+        if (m_wxlState.LuaPCall(4, 1) == 0)
+            result = (wxDragResult)m_wxlState.GetIntegerType(-1);
+
+        m_wxlState.lua_SetTop(nOldTop-1); // -1 to remove pushed derived method func too
+    }
+    else
+    {
+        // do nothing if function is not set in Lua
+    }
+
+    m_wxlState.SetCallBaseClassFunction(false); // clear flag always
+
+    return result;
+}
+
+void wxLuaTextDropTarget::OnLeave()
+{
+    if (m_wxlState.Ok() && !m_wxlState.GetCallBaseClassFunction() &&
+        m_wxlState.HasDerivedMethod(this, "OnLeave", true))
+    {
+        int nOldTop = m_wxlState.lua_GetTop();
+        m_wxlState.wxluaT_PushUserDataType(this, wxluatype_wxLuaTextDropTarget, true);
+
+        if (m_wxlState.LuaPCall(1, 0) == 0)
+        {
+            // All is OK, do nothing
+        }
+
+        m_wxlState.lua_SetTop(nOldTop-1); // -1 to remove pushed derived method func too
+    }
+    else
+    {
+        // do nothing if function is not set in Lua
+    }
+
+    m_wxlState.SetCallBaseClassFunction(false); // clear flag always
+}
+
+wxDragResult wxLuaTextDropTarget::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
+{
+    wxDragResult result = wxDragNone;
+
+    if (m_wxlState.Ok() && !m_wxlState.GetCallBaseClassFunction() &&
+        m_wxlState.HasDerivedMethod(this, "OnDragOver", true))
+    {
+        int nOldTop = m_wxlState.lua_GetTop();
+        m_wxlState.wxluaT_PushUserDataType(this, wxluatype_wxLuaTextDropTarget, true);
+        m_wxlState.lua_PushInteger(x);
+        m_wxlState.lua_PushInteger(y);
+        m_wxlState.lua_PushInteger(def);
+
+        if (m_wxlState.LuaPCall(4, 1) == 0)
+            result = (wxDragResult)m_wxlState.GetIntegerType(-1);
+
+        m_wxlState.lua_SetTop(nOldTop-1); // -1 to remove pushed derived method func too
+    }
+    else
+        result = wxTextDropTarget::OnDragOver(x, y, def);
+
+    m_wxlState.SetCallBaseClassFunction(false); // clear flag always
+
+    return result;
+}
+
 #endif //wxLUA_USE_wxDataObject && wxUSE_DRAG_AND_DROP
 
 
@@ -812,3 +889,30 @@ wxString wxLuaListCtrl::OnGetItemText(long item, long column) const
 }
 
 #endif //wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL
+
+// ----------------------------------------------------------------------------
+// wxLuaProcess - Allows overriding onTerminate event
+// ----------------------------------------------------------------------------
+#if wxLUA_USE_wxProcess
+
+IMPLEMENT_ABSTRACT_CLASS(wxLuaProcess, wxProcess)
+
+extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxLuaProcess;
+
+wxLuaProcess::wxLuaProcess(int flags)
+    : wxProcess(flags)
+{
+}
+
+wxLuaProcess::wxLuaProcess(wxEvtHandler *parent, int nId)
+    : wxProcess(parent, nId)
+{
+}
+
+void wxLuaProcess::OnTerminate(int pid, int status)
+{
+    wxProcessEvent event(m_id, pid, status);
+    ProcessEvent(event);
+}
+
+#endif //WX_LUA_WXLCORE_H

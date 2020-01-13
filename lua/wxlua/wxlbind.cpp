@@ -60,11 +60,13 @@ int* p_wxluatype_wxPoint             = &wxluatype_TUNKNOWN;
 // wxlua_tableErrorHandler
 // ----------------------------------------------------------------------------
 
+/*
 static int LUACALL wxlua_tableErrorHandler(lua_State *L)
 {
     wxlua_error(L, "Cannot modify read-only wxLua table");
     return 0;
 }
+*/
 
 // ----------------------------------------------------------------------------
 // Generic delete function for bindings
@@ -138,7 +140,7 @@ int LUACALL wxlua_wxLuaBindClass__index(lua_State *L)
     {
         // name is NULL if it's not a string
         wxlua_error(L, wxString::Format(_("wxLua: Attempt to call a class method using '%s' on a '%s' wxLua type."),
-            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()));
+            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()).c_str());
     }
     else if (wxluaT_type(L, 1) == *wxlClass->wxluatype)
     {
@@ -225,12 +227,6 @@ int LUACALL wxlua_wxLuaBindClass__index(lua_State *L)
         }
     }
 
-    if (!found)
-    {
-        wxlua_error(L, wxString::Format(_("wxLua: Unable to call an unknown method '%s' on a '%s' type."),
-            lua2wx(name).c_str(), lua2wx(wxlClass ? wxlClass->name : "").c_str()));
-    }
-
     return result;
 }
 
@@ -252,7 +248,7 @@ int LUACALL wxlua_wxLuaBindClass__newindex(lua_State *L)
     {
         // name is NULL if it's not a string
         wxlua_error(L, wxString::Format(_("wxLua: Attempt to call or add a class method using '%s' on a '%s' type."),
-            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()));
+            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()).c_str());
     }
     else if (wxluaT_type(L, 1) == *wxlClass->wxluatype)
     {
@@ -303,7 +299,7 @@ int LUACALL wxlua_wxLuaBindClass__newindex(lua_State *L)
     if (!found)
     {
         wxlua_error(L, wxString::Format(_("wxLua: Unable to call or add an unknown method '%s' on a '%s' type."),
-            lua2wx(name).c_str(), lua2wx(wxlClass ? wxlClass->name : "").c_str()));
+            lua2wx(name).c_str(), lua2wx(wxlClass ? wxlClass->name : "").c_str()).c_str());
     }
 
     return 0;
@@ -364,7 +360,7 @@ int LUACALL wxlua_wxLuaBindMethod_table__index(lua_State *L)
     {
         // name is NULL if it's not a string
         wxlua_error(L, wxString::Format(_("wxLua: Attempt to call a static class method using '%s' on a '%s' type."),
-            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()));
+            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()).c_str());
         return 0;
     }
 
@@ -397,7 +393,7 @@ int LUACALL wxlua_wxLuaBindMethod_table__newindex(lua_State *L)
     {
         // name is NULL if it's not a string
         wxlua_error(L, wxString::Format(_("wxLua: Attempt to call a static class method using '%s' on a '%s' type."),
-            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()));
+            wxlua_luaL_typename(L, 2).c_str(), lua2wx(wxlClass->name).c_str()).c_str());
         return 0;
     }
 
@@ -562,7 +558,7 @@ int LUACALL wxlua_callOverloadedFunction(lua_State* L, struct wxLuaBindMethod* w
 
     errmsg += wxT("\n") + fnOverloadList;
 
-    wxlua_error(L, errmsg);
+    wxlua_error(L, errmsg.c_str());
 
     return 0;
 }
@@ -826,7 +822,8 @@ bool wxLuaBinding::RegisterBinding(const wxLuaState& wxlState)
     //    LUA_GLOBALSINDEX[m_nameSpace] = table
     //    LUA_GLOBALSINDEX["package"]["loaded"][m_nameSpace] = table
     static const luaL_Reg wxlualib[] = { {NULL, NULL} };
-    luaL_register(L, wx2lua(m_nameSpace), wxlualib);
+
+    wxLuaState::luaL_Register(L, wx2lua(m_nameSpace), wxlualib);
 
     // luaL_register should have given an error message about why it couldn't
     // create the table for us
@@ -1081,29 +1078,29 @@ bool wxLuaBinding::InstallClass(lua_State* L, const wxLuaBindClass* wxlClass)
             else
                 lua_getfield(L, -2, wxlMethod->name);
 
-                // add the items to the table as t[first pushed] = second pushed
-                lua_pushlstring(L, "new", 3);
+            // add the items to the table as t[first pushed] = second pushed
+            lua_pushlstring(L, "new", 3);
+            lua_pushlightuserdata(L, wxlMethod);
+            lua_pushcclosure(L, wxlua_callOverloadedFunction, 1);
+            lua_rawset(L, -3);
+
+            // Add __call to the metatable for this table
+            bool has_meta = (lua_getmetatable(L, -1) != 0);
+            if (!has_meta) lua_newtable(L);
+
+                lua_pushlstring(L, "__call", 6);
                 lua_pushlightuserdata(L, wxlMethod);
-                lua_pushcclosure(L, wxlua_callOverloadedFunction, 1);
+                lua_pushcclosure(L, wxlua_wxLuaBindMethod_table__call, 1);
                 lua_rawset(L, -3);
 
-                // Add __call to the metatable for this table
-                bool has_meta = (lua_getmetatable(L, -1) != 0);
-                if (!has_meta) lua_newtable(L);
+                //lua_pushstring(L, "__metatable");
+                //lua_pushstring(L, "Metatable is not accessible");
+                //lua_rawset(L, -3);
 
-                    lua_pushlstring(L, "__call", 6);
-                    lua_pushlightuserdata(L, wxlMethod);
-                    lua_pushcclosure(L, wxlua_wxLuaBindMethod_table__call, 1);
-                    lua_rawset(L, -3);
-
-                    //lua_pushstring(L, "__metatable");
-                    //lua_pushstring(L, "Metatable is not accessible");
-                    //lua_rawset(L, -3);
-
-                if (!has_meta)
-                    lua_setmetatable(L, -2);
-                else
-                    lua_pop(L, 1);
+            if (!has_meta)
+                lua_setmetatable(L, -2);
+            else
+                lua_pop(L, 1);
 
             // add table to the binding table t[wxlMethod->name] = { this table }
             lua_rawset(L, -3); // set t[key] = value, pops key and value

@@ -42,7 +42,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxLogGui_delete[1] = {{ wxlua_userdata_d
 
 static int LUACALL wxLua_wxLogGui_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxLogGui_constructor[1] = {{ wxLua_wxLogGui_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxLogGui( );
+//     wxLogGui();
 static int LUACALL wxLua_wxLogGui_constructor(lua_State *L)
 {
     // call constructor
@@ -89,7 +89,7 @@ static wxLuaArgType s_wxluatypeArray_wxLua_wxLogTextCtrl_delete[] = { &wxluatype
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxLogTextCtrl_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxLogTextCtrl_delete }};
 
 
-#if (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL))
+#if ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxLogTextCtrl_constructor[] = { &wxluatype_wxTextCtrl, NULL };
 static int LUACALL wxLua_wxLogTextCtrl_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxLogTextCtrl_constructor[1] = {{ wxLua_wxLogTextCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxLogTextCtrl_constructor }};
@@ -108,7 +108,7 @@ static int LUACALL wxLua_wxLogTextCtrl_constructor(lua_State *L)
     return 1;
 }
 
-#endif // (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL))
+#endif // ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)
 
 
 
@@ -122,9 +122,9 @@ void wxLua_wxLogTextCtrl_delete_function(void** p)
 wxLuaBindMethod wxLogTextCtrl_methods[] = {
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxLogTextCtrl_delete, 1, NULL },
 
-#if (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL))
+#if ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)
     { "wxLogTextCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxLogTextCtrl_constructor, 1, NULL },
-#endif // (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL) && ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL))
+#endif // ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)
 
     { 0, 0, 0, 0 },
 };
@@ -142,7 +142,7 @@ int wxLogTextCtrl_methodCount = sizeof(wxLogTextCtrl_methods)/sizeof(wxLuaBindMe
 // Lua MetaTable Tag for Class 'wxLogWindow'
 int wxluatype_wxLogWindow = WXLUA_TUNKNOWN;
 
-#if (wxLUA_USE_wxFrame) && ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW))
+#if ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW)) && (wxLUA_USE_wxFrame)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxLogWindow_GetFrame[] = { &wxluatype_wxLogWindow, NULL };
 static int LUACALL wxLua_wxLogWindow_GetFrame(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxLogWindow_GetFrame[1] = {{ wxLua_wxLogWindow_GetFrame, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLogWindow_GetFrame }};
@@ -159,12 +159,12 @@ static int LUACALL wxLua_wxLogWindow_GetFrame(lua_State *L)
     return 1;
 }
 
-#endif // (wxLUA_USE_wxFrame) && ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW))
+#endif // ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW)) && (wxLUA_USE_wxFrame)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxLogWindow_Show[] = { &wxluatype_wxLogWindow, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxLogWindow_Show(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxLogWindow_Show[1] = {{ wxLua_wxLogWindow_Show, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxLogWindow_Show }};
-//     void Show(bool show = true );
+//     void Show(bool show = true);
 static int LUACALL wxLua_wxLogWindow_Show(lua_State *L)
 {
     // get number of arguments
@@ -219,9 +219,9 @@ void wxLua_wxLogWindow_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxLogWindow_methods[] = {
-#if (wxLUA_USE_wxFrame) && ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW))
+#if ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW)) && (wxLUA_USE_wxFrame)
     { "GetFrame", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLogWindow_GetFrame, 1, NULL },
-#endif // (wxLUA_USE_wxFrame) && ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW))
+#endif // ((wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW)) && (wxLUA_USE_wxFrame)
 
     { "Show", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLogWindow_Show, 1, NULL },
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxLogWindow_delete, 1, NULL },
@@ -247,7 +247,7 @@ int wxluatype_wxSystemSettings = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemSettings_GetColour[] = { &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxSystemSettings_GetColour(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemSettings_GetColour[1] = {{ wxLua_wxSystemSettings_GetColour, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxSystemSettings_GetColour }};
-//     static wxColour GetColour(wxSystemColour index );
+//     static wxColour GetColour(wxSystemColour index);
 static int LUACALL wxLua_wxSystemSettings_GetColour(lua_State *L)
 {
     // wxSystemColour index
@@ -269,7 +269,7 @@ static int LUACALL wxLua_wxSystemSettings_GetColour(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemSettings_GetFont[] = { &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxSystemSettings_GetFont(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemSettings_GetFont[1] = {{ wxLua_wxSystemSettings_GetFont, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxSystemSettings_GetFont }};
-//     static wxFont   GetFont(wxSystemFont index );
+//     static wxFont   GetFont(wxSystemFont index);
 static int LUACALL wxLua_wxSystemSettings_GetFont(lua_State *L)
 {
     // wxSystemFont index
@@ -290,7 +290,7 @@ static int LUACALL wxLua_wxSystemSettings_GetFont(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemSettings_GetMetric[] = { &wxluatype_TINTEGER, &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxSystemSettings_GetMetric(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemSettings_GetMetric[1] = {{ wxLua_wxSystemSettings_GetMetric, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 2, s_wxluatypeArray_wxLua_wxSystemSettings_GetMetric }};
-//     static int      GetMetric(wxSystemMetric index, wxWindow* win = NULL );
+//     static int      GetMetric(wxSystemMetric index, wxWindow* win = NULL);
 static int LUACALL wxLua_wxSystemSettings_GetMetric(lua_State *L)
 {
     // get number of arguments
@@ -309,7 +309,7 @@ static int LUACALL wxLua_wxSystemSettings_GetMetric(lua_State *L)
 
 static int LUACALL wxLua_wxSystemSettings_GetScreenType(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemSettings_GetScreenType[1] = {{ wxLua_wxSystemSettings_GetScreenType, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static wxSystemScreenType GetScreenType( );
+//     static wxSystemScreenType GetScreenType();
 static int LUACALL wxLua_wxSystemSettings_GetScreenType(lua_State *L)
 {
     // call GetScreenType
@@ -323,7 +323,7 @@ static int LUACALL wxLua_wxSystemSettings_GetScreenType(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemSettings_HasFeature[] = { &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxSystemSettings_HasFeature(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemSettings_HasFeature[1] = {{ wxLua_wxSystemSettings_HasFeature, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxSystemSettings_HasFeature }};
-//     static bool     HasFeature(wxSystemFeature index );
+//     static bool     HasFeature(wxSystemFeature index);
 static int LUACALL wxLua_wxSystemSettings_HasFeature(lua_State *L)
 {
     // wxSystemFeature index
@@ -339,7 +339,7 @@ static int LUACALL wxLua_wxSystemSettings_HasFeature(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemSettings_SetScreenType[] = { &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxSystemSettings_SetScreenType(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemSettings_SetScreenType[1] = {{ wxLua_wxSystemSettings_SetScreenType, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxSystemSettings_SetScreenType }};
-//     static void     SetScreenType( wxSystemScreenType screen );
+//     static void     SetScreenType(wxSystemScreenType screen);
 static int LUACALL wxLua_wxSystemSettings_SetScreenType(lua_State *L)
 {
     // wxSystemScreenType screen
@@ -408,7 +408,7 @@ static int LUACALL wxLua_wxValidator_GetWindow(lua_State *L)
 
 static int LUACALL wxLua_wxValidator_IsSilent(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxValidator_IsSilent[1] = {{ wxLua_wxValidator_IsSilent, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static bool IsSilent( );
+//     static bool IsSilent();
 static int LUACALL wxLua_wxValidator_IsSilent(lua_State *L)
 {
     // call IsSilent
@@ -419,10 +419,12 @@ static int LUACALL wxLua_wxValidator_IsSilent(lua_State *L)
     return 1;
 }
 
+
+#if (!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxValidator_SetBellOnError[] = { &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxValidator_SetBellOnError(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxValidator_SetBellOnError[1] = {{ wxLua_wxValidator_SetBellOnError, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 1, s_wxluatypeArray_wxLua_wxValidator_SetBellOnError }};
-//     static void SetBellOnError(bool doIt = true );
+//     !%wxchkver_2_9 || %wxcompat_2_8 static void SetBellOnError(bool doIt = true);
 static int LUACALL wxLua_wxValidator_SetBellOnError(lua_State *L)
 {
     // get number of arguments
@@ -435,10 +437,12 @@ static int LUACALL wxLua_wxValidator_SetBellOnError(lua_State *L)
     return 0;
 }
 
+#endif // (!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxValidator_SetWindow[] = { &wxluatype_wxValidator, &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxValidator_SetWindow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxValidator_SetWindow[1] = {{ wxLua_wxValidator_SetWindow, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxValidator_SetWindow }};
-//     void SetWindow(wxWindow* window );
+//     void SetWindow(wxWindow* window);
 static int LUACALL wxLua_wxValidator_SetWindow(lua_State *L)
 {
     // wxWindow window
@@ -454,7 +458,7 @@ static int LUACALL wxLua_wxValidator_SetWindow(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxValidator_TransferFromWindow[] = { &wxluatype_wxValidator, NULL };
 static int LUACALL wxLua_wxValidator_TransferFromWindow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxValidator_TransferFromWindow[1] = {{ wxLua_wxValidator_TransferFromWindow, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxValidator_TransferFromWindow }};
-//     virtual bool TransferFromWindow( );
+//     virtual bool TransferFromWindow();
 static int LUACALL wxLua_wxValidator_TransferFromWindow(lua_State *L)
 {
     // get this
@@ -470,7 +474,7 @@ static int LUACALL wxLua_wxValidator_TransferFromWindow(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxValidator_TransferToWindow[] = { &wxluatype_wxValidator, NULL };
 static int LUACALL wxLua_wxValidator_TransferToWindow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxValidator_TransferToWindow[1] = {{ wxLua_wxValidator_TransferToWindow, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxValidator_TransferToWindow }};
-//     virtual bool TransferToWindow( );
+//     virtual bool TransferToWindow();
 static int LUACALL wxLua_wxValidator_TransferToWindow(lua_State *L)
 {
     // get this
@@ -486,7 +490,7 @@ static int LUACALL wxLua_wxValidator_TransferToWindow(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxValidator_Validate[] = { &wxluatype_wxValidator, &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxValidator_Validate(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxValidator_Validate[1] = {{ wxLua_wxValidator_Validate, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxValidator_Validate }};
-//     virtual bool Validate(wxWindow* parent );
+//     virtual bool Validate(wxWindow* parent);
 static int LUACALL wxLua_wxValidator_Validate(lua_State *L)
 {
     // wxWindow parent
@@ -514,7 +518,11 @@ void wxLua_wxValidator_delete_function(void** p)
 wxLuaBindMethod wxValidator_methods[] = {
     { "GetWindow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxValidator_GetWindow, 1, NULL },
     { "IsSilent", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxValidator_IsSilent, 1, NULL },
+
+#if (!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
     { "SetBellOnError", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxValidator_SetBellOnError, 1, NULL },
+#endif // (!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
+
     { "SetWindow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxValidator_SetWindow, 1, NULL },
     { "TransferFromWindow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxValidator_TransferFromWindow, 1, NULL },
     { "TransferToWindow", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxValidator_TransferToWindow, 1, NULL },
@@ -528,7 +536,7 @@ int wxValidator_methodCount = sizeof(wxValidator_methods)/sizeof(wxLuaBindMethod
 #endif  // wxLUA_USE_wxValidator && wxUSE_VALIDATORS
 
 
-#if (wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator)
+#if (wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 // ---------------------------------------------------------------------------
 // Bind class wxTextValidator
 // ---------------------------------------------------------------------------
@@ -536,11 +544,11 @@ int wxValidator_methodCount = sizeof(wxValidator_methods)/sizeof(wxLuaBindMethod
 // Lua MetaTable Tag for Class 'wxTextValidator'
 int wxluatype_wxTextValidator = WXLUA_TUNKNOWN;
 
-#if ((wxCHECK_VERSION(2,6,0)) && ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator))) && (wxLUA_USE_wxArrayString)
+#if (((wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxCHECK_VERSION(2,6,0))) && (wxLUA_USE_wxArrayString)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTextValidator_GetExcludes[] = { &wxluatype_wxTextValidator, NULL };
 static int LUACALL wxLua_wxTextValidator_GetExcludes(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextValidator_GetExcludes[1] = {{ wxLua_wxTextValidator_GetExcludes, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxTextValidator_GetExcludes }};
-//     %wxchkver_2_6 wxArrayString& GetExcludes( );
+//     %wxchkver_2_6 wxArrayString& GetExcludes();
 static int LUACALL wxLua_wxTextValidator_GetExcludes(lua_State *L)
 {
     // get this
@@ -556,7 +564,7 @@ static int LUACALL wxLua_wxTextValidator_GetExcludes(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTextValidator_GetIncludes[] = { &wxluatype_wxTextValidator, NULL };
 static int LUACALL wxLua_wxTextValidator_GetIncludes(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextValidator_GetIncludes[1] = {{ wxLua_wxTextValidator_GetIncludes, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxTextValidator_GetIncludes }};
-//     %wxchkver_2_6 wxArrayString& GetIncludes( );
+//     %wxchkver_2_6 wxArrayString& GetIncludes();
 static int LUACALL wxLua_wxTextValidator_GetIncludes(lua_State *L)
 {
     // get this
@@ -569,7 +577,7 @@ static int LUACALL wxLua_wxTextValidator_GetIncludes(lua_State *L)
     return 1;
 }
 
-#endif // ((wxCHECK_VERSION(2,6,0)) && ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator))) && (wxLUA_USE_wxArrayString)
+#endif // (((wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxCHECK_VERSION(2,6,0))) && (wxLUA_USE_wxArrayString)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTextValidator_GetStyle[] = { &wxluatype_wxTextValidator, NULL };
 static int LUACALL wxLua_wxTextValidator_GetStyle(lua_State *L);
@@ -580,7 +588,7 @@ static int LUACALL wxLua_wxTextValidator_GetStyle(lua_State *L)
     // get this
     wxTextValidator * self = (wxTextValidator *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTextValidator);
     // call GetStyle
-    long  returns = (self->GetStyle());
+    long returns = (self->GetStyle());
     // push the result number
     lua_pushnumber(L, returns);
 
@@ -588,11 +596,11 @@ static int LUACALL wxLua_wxTextValidator_GetStyle(lua_State *L)
 }
 
 
-#if ((wxCHECK_VERSION(2,6,0)) && ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator))) && (wxLUA_USE_wxArrayString)
+#if (((wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxCHECK_VERSION(2,6,0))) && (wxLUA_USE_wxArrayString)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTextValidator_SetExcludes[] = { &wxluatype_wxTextValidator, &wxluatype_wxArrayString, NULL };
 static int LUACALL wxLua_wxTextValidator_SetExcludes(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextValidator_SetExcludes[1] = {{ wxLua_wxTextValidator_SetExcludes, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxTextValidator_SetExcludes }};
-//     %wxchkver_2_6 void SetExcludes(const wxArrayString& excludes );
+//     %wxchkver_2_6 void SetExcludes(const wxArrayString& excludes);
 static int LUACALL wxLua_wxTextValidator_SetExcludes(lua_State *L)
 {
     // const wxArrayString excludes
@@ -608,7 +616,7 @@ static int LUACALL wxLua_wxTextValidator_SetExcludes(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTextValidator_SetIncludes[] = { &wxluatype_wxTextValidator, &wxluatype_wxArrayString, NULL };
 static int LUACALL wxLua_wxTextValidator_SetIncludes(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextValidator_SetIncludes[1] = {{ wxLua_wxTextValidator_SetIncludes, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxTextValidator_SetIncludes }};
-//     %wxchkver_2_6 void SetIncludes(const wxArrayString& includes );
+//     %wxchkver_2_6 void SetIncludes(const wxArrayString& includes);
 static int LUACALL wxLua_wxTextValidator_SetIncludes(lua_State *L)
 {
     // const wxArrayString includes
@@ -621,12 +629,12 @@ static int LUACALL wxLua_wxTextValidator_SetIncludes(lua_State *L)
     return 0;
 }
 
-#endif // ((wxCHECK_VERSION(2,6,0)) && ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator))) && (wxLUA_USE_wxArrayString)
+#endif // (((wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxCHECK_VERSION(2,6,0))) && (wxLUA_USE_wxArrayString)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTextValidator_SetStyle[] = { &wxluatype_wxTextValidator, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxTextValidator_SetStyle(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxTextValidator_SetStyle[1] = {{ wxLua_wxTextValidator_SetStyle, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxTextValidator_SetStyle }};
-//     void SetStyle(long style );
+//     void SetStyle(long style);
 static int LUACALL wxLua_wxTextValidator_SetStyle(lua_State *L)
 {
     // long style
@@ -682,17 +690,17 @@ void wxLua_wxTextValidator_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxTextValidator_methods[] = {
-#if ((wxCHECK_VERSION(2,6,0)) && ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator))) && (wxLUA_USE_wxArrayString)
+#if (((wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxCHECK_VERSION(2,6,0))) && (wxLUA_USE_wxArrayString)
     { "GetExcludes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextValidator_GetExcludes, 1, NULL },
     { "GetIncludes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextValidator_GetIncludes, 1, NULL },
-#endif // ((wxCHECK_VERSION(2,6,0)) && ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator))) && (wxLUA_USE_wxArrayString)
+#endif // (((wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxCHECK_VERSION(2,6,0))) && (wxLUA_USE_wxArrayString)
 
     { "GetStyle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextValidator_GetStyle, 1, NULL },
 
-#if ((wxCHECK_VERSION(2,6,0)) && ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator))) && (wxLUA_USE_wxArrayString)
+#if (((wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxCHECK_VERSION(2,6,0))) && (wxLUA_USE_wxArrayString)
     { "SetExcludes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextValidator_SetExcludes, 1, NULL },
     { "SetIncludes", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextValidator_SetIncludes, 1, NULL },
-#endif // ((wxCHECK_VERSION(2,6,0)) && ((wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator))) && (wxLUA_USE_wxArrayString)
+#endif // (((wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxCHECK_VERSION(2,6,0))) && (wxLUA_USE_wxArrayString)
 
     { "SetStyle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTextValidator_SetStyle, 1, NULL },
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxTextValidator_delete, 1, NULL },
@@ -703,10 +711,10 @@ wxLuaBindMethod wxTextValidator_methods[] = {
 
 int wxTextValidator_methodCount = sizeof(wxTextValidator_methods)/sizeof(wxLuaBindMethod) - 1;
 
-#endif  // (wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator)
+#endif  // (wxLUA_USE_wxTextValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 
-#if (wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxGenericValidator)
+#if (wxLUA_USE_wxGenericValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 // ---------------------------------------------------------------------------
 // Bind class wxGenericValidator
 // ---------------------------------------------------------------------------
@@ -819,7 +827,7 @@ wxLuaBindMethod wxGenericValidator_methods[] = {
 
 int wxGenericValidator_methodCount = sizeof(wxGenericValidator_methods)/sizeof(wxLuaBindMethod) - 1;
 
-#endif  // (wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxGenericValidator)
+#endif  // (wxLUA_USE_wxGenericValidator) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)
 
 
 #if wxUSE_STREAMS && wxUSE_FILESYSTEM
@@ -830,7 +838,7 @@ int wxGenericValidator_methodCount = sizeof(wxGenericValidator_methods)/sizeof(w
 // Lua MetaTable Tag for Class 'wxMemoryFSHandler'
 int wxluatype_wxMemoryFSHandler = WXLUA_TUNKNOWN;
 
-#if (wxLUA_USE_wxBitmap) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE))
+#if ((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxBitmap)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFile2[] = { &wxluatype_TSTRING, &wxluatype_wxBitmap, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxMemoryFSHandler_AddFile2(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryFSHandler_AddFile2[1] = {{ wxLua_wxMemoryFSHandler_AddFile2, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 3, 3, s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFile2 }};
@@ -849,9 +857,9 @@ static int LUACALL wxLua_wxMemoryFSHandler_AddFile2(lua_State *L)
     return 0;
 }
 
-#endif // (wxLUA_USE_wxBitmap) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE))
+#endif // ((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxBitmap)
 
-#if (wxLUA_USE_wxImage && wxUSE_IMAGE) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE))
+#if ((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxImage && wxUSE_IMAGE)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFile1[] = { &wxluatype_TSTRING, &wxluatype_wxImage, &wxluatype_TINTEGER, NULL };
 static int LUACALL wxLua_wxMemoryFSHandler_AddFile1(lua_State *L);
 // static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryFSHandler_AddFile1[1] = {{ wxLua_wxMemoryFSHandler_AddFile1, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 3, 3, s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFile1 }};
@@ -870,7 +878,7 @@ static int LUACALL wxLua_wxMemoryFSHandler_AddFile1(lua_State *L)
     return 0;
 }
 
-#endif // (wxLUA_USE_wxImage && wxUSE_IMAGE) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE))
+#endif // ((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxImage && wxUSE_IMAGE)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFile[] = { &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMemoryFSHandler_AddFile(lua_State *L);
@@ -889,7 +897,7 @@ static int LUACALL wxLua_wxMemoryFSHandler_AddFile(lua_State *L)
 }
 
 
-#if (wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxCHECK_VERSION(2,8,5))
+#if (wxCHECK_VERSION(2,8,5)) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFileWithMimeType[] = { &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMemoryFSHandler_AddFileWithMimeType(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryFSHandler_AddFileWithMimeType[1] = {{ wxLua_wxMemoryFSHandler_AddFileWithMimeType, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 3, 3, s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFileWithMimeType }};
@@ -908,7 +916,7 @@ static int LUACALL wxLua_wxMemoryFSHandler_AddFileWithMimeType(lua_State *L)
     return 0;
 }
 
-#endif // (wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxCHECK_VERSION(2,8,5))
+#endif // (wxCHECK_VERSION(2,8,5)) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryFSHandler_RemoveFile[] = { &wxluatype_TSTRING, NULL };
 static int LUACALL wxLua_wxMemoryFSHandler_RemoveFile(lua_State *L);
@@ -929,7 +937,7 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryFSHandler_delete[1] = {{ wxlua_u
 
 static int LUACALL wxLua_wxMemoryFSHandler_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryFSHandler_constructor[1] = {{ wxLua_wxMemoryFSHandler_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxMemoryFSHandler( );
+//     wxMemoryFSHandler();
 static int LUACALL wxLua_wxMemoryFSHandler_constructor(lua_State *L)
 {
     // call constructor
@@ -945,23 +953,23 @@ static int LUACALL wxLua_wxMemoryFSHandler_constructor(lua_State *L)
 
 
 
-#if ((wxLUA_USE_wxBitmap) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE)))||((wxLUA_USE_wxImage && wxUSE_IMAGE) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE)))||(wxUSE_STREAMS && wxUSE_FILESYSTEM)
+#if (((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxBitmap))||(((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxImage && wxUSE_IMAGE))||(wxUSE_STREAMS && wxUSE_FILESYSTEM)
 // function overload table
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryFSHandler_AddFile_overload[] =
 {
 
-#if (wxLUA_USE_wxBitmap) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE))
+#if ((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxBitmap)
     { wxLua_wxMemoryFSHandler_AddFile2, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 3, 3, s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFile2 },
-#endif // (wxLUA_USE_wxBitmap) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE))
+#endif // ((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxBitmap)
 
-#if (wxLUA_USE_wxImage && wxUSE_IMAGE) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE))
+#if ((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxImage && wxUSE_IMAGE)
     { wxLua_wxMemoryFSHandler_AddFile1, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 3, 3, s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFile1 },
-#endif // (wxLUA_USE_wxImage && wxUSE_IMAGE) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE))
+#endif // ((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxImage && wxUSE_IMAGE)
     { wxLua_wxMemoryFSHandler_AddFile, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 2, 2, s_wxluatypeArray_wxLua_wxMemoryFSHandler_AddFile },
 };
 static int s_wxluafunc_wxLua_wxMemoryFSHandler_AddFile_overload_count = sizeof(s_wxluafunc_wxLua_wxMemoryFSHandler_AddFile_overload)/sizeof(wxLuaBindCFunc);
 
-#endif // ((wxLUA_USE_wxBitmap) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE)))||((wxLUA_USE_wxImage && wxUSE_IMAGE) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE)))||(wxUSE_STREAMS && wxUSE_FILESYSTEM)
+#endif // (((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxBitmap))||(((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxImage && wxUSE_IMAGE))||(wxUSE_STREAMS && wxUSE_FILESYSTEM)
 
 void wxLua_wxMemoryFSHandler_delete_function(void** p)
 {
@@ -971,13 +979,13 @@ void wxLua_wxMemoryFSHandler_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxMemoryFSHandler_methods[] = {
-#if ((wxLUA_USE_wxBitmap) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE)))||((wxLUA_USE_wxImage && wxUSE_IMAGE) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE)))||(wxUSE_STREAMS && wxUSE_FILESYSTEM)
+#if (((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxBitmap))||(((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxImage && wxUSE_IMAGE))||(wxUSE_STREAMS && wxUSE_FILESYSTEM)
     { "AddFile", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxMemoryFSHandler_AddFile_overload, s_wxluafunc_wxLua_wxMemoryFSHandler_AddFile_overload_count, 0 },
-#endif // ((wxLUA_USE_wxBitmap) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE)))||((wxLUA_USE_wxImage && wxUSE_IMAGE) && ((wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxUSE_IMAGE)))||(wxUSE_STREAMS && wxUSE_FILESYSTEM)
+#endif // (((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxBitmap))||(((wxUSE_IMAGE) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)) && (wxLUA_USE_wxImage && wxUSE_IMAGE))||(wxUSE_STREAMS && wxUSE_FILESYSTEM)
 
-#if (wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxCHECK_VERSION(2,8,5))
+#if (wxCHECK_VERSION(2,8,5)) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)
     { "AddFileWithMimeType", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxMemoryFSHandler_AddFileWithMimeType, 1, NULL },
-#endif // (wxUSE_STREAMS && wxUSE_FILESYSTEM) && (wxCHECK_VERSION(2,8,5))
+#endif // (wxCHECK_VERSION(2,8,5)) && (wxUSE_STREAMS && wxUSE_FILESYSTEM)
 
     { "RemoveFile", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxMemoryFSHandler_RemoveFile, 1, NULL },
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxMemoryFSHandler_delete, 1, NULL },
