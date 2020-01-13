@@ -20,7 +20,7 @@ local function TextGrid(parent, x_gap, y_gap)
     -- @param col the column (0-indexed)
     -- @param row the row (0-indexed)
     -- @param[opt] data Custom item data for hyperlinked text.
-    -- @param[opt] is_span If true, don't factor into grid size.  
+    -- @param[opt] is_span If true, don't factor into grid size.
     --   This can be used for headers, etc. that cross multiple cells.
     function self:Add(text, col, row, data, is_span)
         local item = {col, row, text, data}
@@ -49,7 +49,7 @@ local function TextGrid(parent, x_gap, y_gap)
                self.item_width,
                self.item_height
     end
-    
+
     --- Override wxWindow::Fit to set a better min size
     function self:Fit()
         -- Find the rectangle of the bottom-right most item.
@@ -276,6 +276,14 @@ local function PuzzleGrid(parent, x_gap, y_gap)
     local popup
     --- Show a popup and underline on hover
     function self:OnHover(puzzle)
+        -- Effects cause crashes on Mac when rapidly showing/hiding popups.
+        local effect
+        if wx.__WXMAC__ then
+            effect = wx.wxSHOW_EFFECT_NONE
+        else
+            effect = wx.wxSHOW_EFFECT_BLEND
+        end
+
         -- Destroy popup
         if puzzle then
             if not popup then
@@ -288,9 +296,9 @@ local function PuzzleGrid(parent, x_gap, y_gap)
             end
             -- Show it
             popup:set_puzzle(puzzle)
-            popup:Popup(wx.wxSHOW_EFFECT_BLEND, 100)
+            popup:Popup(effect, 100)
         elseif popup then
-            popup:HideWithEffect(wx.wxSHOW_EFFECT_BLEND, 100)
+            popup:HideWithEffect(effect, 100)
             popup:Destroy()
         end
     end
@@ -331,7 +339,7 @@ local function PuzzleGrid(parent, x_gap, y_gap)
             self:PopupMenu(menu)
         end
     end)
-    
+
     -- Cleanup when we are destroyed
     self:Connect(self:GetId(), wx.wxEVT_DESTROY, function(evt)
         for _, filename in ipairs(filenames) do
