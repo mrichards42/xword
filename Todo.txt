@@ -1,5 +1,4 @@
 Finishing migration from sourceforge to github:
 
-* Move help from http://wx-xword.sourceforge.net/index.html
 * Point update urls somewhere else (like github releases)
 * Upload release binaries

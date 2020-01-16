@@ -1,0 +1,536 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="styles.css" />
+<title>The Main Window</title>
+<script type="text/javascript" src="functions.js"></script>
+</head>
+<body>
+<div id="nav"><ul>
+<li id="nav_index_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="index.html" onclick="location='index.html'; updateHash();">XWord Overview</a>
+<ul style="display:none;">
+<li id="nav_index_html_crossword_features">
+<div></div>
+<a href="index.html#crossword_features" onclick="location='index.html#crossword_features'; updateHash();">Crossword Features</a>
+</li>
+<li id="nav_index_html_program_features">
+<div></div>
+<a href="index.html#program_features" onclick="location='index.html#program_features'; updateHash();">Program Features</a>
+</li>
+</ul>
+</li>
+<li id="nav_window_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="window.html" onclick="location='window.html'; updateHash();">The Main Window</a>
+<ul style="display:none;">
+<li id="nav_window_html_panes">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="window.html#panes" onclick="location='window.html#panes'; updateHash();">Panes</a>
+<ul style="display:none;">
+<li id="nav_window_html_clue_prompt">
+<div></div>
+<a href="window.html#clue_prompt" onclick="location='window.html#clue_prompt'; updateHash();">Clue Prompt</a>
+</li>
+<li id="nav_window_html_clue_lists">
+<div></div>
+<a href="window.html#clue_lists" onclick="location='window.html#clue_lists'; updateHash();">Clue Lists</a>
+</li>
+<li id="nav_window_html_metadata">
+<div></div>
+<a href="window.html#metadata" onclick="location='window.html#metadata'; updateHash();">Metadata</a>
+</li>
+<li id="nav_window_html_notes">
+<div></div>
+<a href="window.html#notes" onclick="location='window.html#notes'; updateHash();">Notes</a>
+</li>
+</ul>
+</li>
+<li id="nav_window_html_file_menu">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="window.html#file_menu" onclick="location='window.html#file_menu'; updateHash();">File Menu</a>
+<ul style="display:none;">
+<li id="nav_window_html_opening_puzzles">
+<div></div>
+<a href="window.html#opening_puzzles" onclick="location='window.html#opening_puzzles'; updateHash();">Opening Puzzles</a>
+</li>
+<li id="nav_window_html_saving_puzzles">
+<div></div>
+<a href="window.html#saving_puzzles" onclick="location='window.html#saving_puzzles'; updateHash();">Saving Puzzles</a>
+</li>
+<li id="nav_window_html_printing_puzzles">
+<div></div>
+<a href="window.html#printing_puzzles" onclick="location='window.html#printing_puzzles'; updateHash();">Printing Puzzles</a>
+</li>
+</ul>
+</li>
+<li id="nav_window_html_edit_menu">
+<div></div>
+<a href="window.html#edit_menu" onclick="location='window.html#edit_menu'; updateHash();">Edit Menu</a>
+</li>
+<li id="nav_window_html_view_menu">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="window.html#view_menu" onclick="location='window.html#view_menu'; updateHash();">View Menu</a>
+<ul style="display:none;">
+<li id="nav_window_html_grid_size">
+<div></div>
+<a href="window.html#grid_size" onclick="location='window.html#grid_size'; updateHash();">Grid Size</a>
+</li>
+</ul>
+</li>
+<li id="nav_window_html_solution_menu">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="window.html#solution_menu" onclick="location='window.html#solution_menu'; updateHash();">Solution Menu</a>
+<ul style="display:none;">
+<li id="nav_window_html_unscrambling">
+<div></div>
+<a href="window.html#unscrambling" onclick="location='window.html#unscrambling'; updateHash();">Unscrambling</a>
+</li>
+</ul>
+</li>
+<li id="nav_window_html_tools_menu">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="window.html#tools_menu" onclick="location='window.html#tools_menu'; updateHash();">Tools Menu</a>
+<ul style="display:none;">
+<li id="nav_window_html_timer">
+<div></div>
+<a href="window.html#timer" onclick="location='window.html#timer'; updateHash();">Timer</a>
+</li>
+</ul>
+</li>
+<li id="nav_window_html_help_menu">
+<div></div>
+<a href="window.html#help_menu" onclick="location='window.html#help_menu'; updateHash();">Help Menu</a>
+</li>
+<li id="nav_window_html_status_bar">
+<div></div>
+<a href="window.html#status_bar" onclick="location='window.html#status_bar'; updateHash();">Status Bar</a>
+</li>
+</ul>
+</li>
+<li id="nav_solving_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="solving.html" onclick="location='solving.html'; updateHash();">Entering Letters in the Grid</a>
+<ul style="display:none;">
+<li id="nav_solving_html_erasing_letters">
+<div></div>
+<a href="solving.html#erasing_letters" onclick="location='solving.html#erasing_letters'; updateHash();">Erasing Letters</a>
+</li>
+<li id="nav_solving_html_rebus_entries">
+<div></div>
+<a href="solving.html#rebus_entries" onclick="location='solving.html#rebus_entries'; updateHash();">Rebus Entries</a>
+</li>
+<li id="nav_solving_html_webdings_symbols">
+<div></div>
+<a href="solving.html#webdings_symbols" onclick="location='solving.html#webdings_symbols'; updateHash();">Webdings Symbols</a>
+</li>
+<li id="nav_solving_html_circles">
+<div></div>
+<a href="solving.html#circles" onclick="location='solving.html#circles'; updateHash();">Circles</a>
+</li>
+</ul>
+</li>
+<li id="nav_navigation_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="navigation.html" onclick="location='navigation.html'; updateHash();">Navigating Around the Grid</a>
+<ul style="display:none;">
+<li id="nav_navigation_html_mouse_navigation">
+<div></div>
+<a href="navigation.html#mouse_navigation" onclick="location='navigation.html#mouse_navigation'; updateHash();">Mouse Navigation</a>
+</li>
+<li id="nav_navigation_html_keyboard_navigation">
+<div></div>
+<a href="navigation.html#keyboard_navigation" onclick="location='navigation.html#keyboard_navigation'; updateHash();">Keyboard Navigation</a>
+</li>
+</ul>
+</li>
+<li id="nav_check_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="check.html" onclick="location='check.html'; updateHash();">Checking and Revealing the Solution</a>
+<ul style="display:none;">
+<li id="nav_check_html_checking_the_solution_as_you_type">
+<div></div>
+<a href="check.html#checking_the_solution_as_you_type" onclick="location='check.html#checking_the_solution_as_you_type'; updateHash();">Checking the solution as you type</a>
+</li>
+<li id="nav_check_html_checking_or_revealing_a_selection">
+<div></div>
+<a href="check.html#checking_or_revealing_a_selection" onclick="location='check.html#checking_or_revealing_a_selection'; updateHash();">Checking or revealing a selection</a>
+</li>
+<li id="nav_check_html_uncheckable_puzzles">
+<div></div>
+<a href="check.html#uncheckable_puzzles" onclick="location='check.html#uncheckable_puzzles'; updateHash();">Uncheckable puzzles</a>
+</li>
+</ul>
+</li>
+<li id="nav_diagramless_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="diagramless.html" onclick="location='diagramless.html'; updateHash();">Diagramless Puzzles</a>
+<ul style="display:none;">
+<li id="nav_diagramless_html_to_toggle_a_square_between_black_and_white">
+<div></div>
+<a href="diagramless.html#to_toggle_a_square_between_black_and_white" onclick="location='diagramless.html#to_toggle_a_square_between_black_and_white'; updateHash();">To toggle a square between black and white</a>
+</li>
+</ul>
+</li>
+<li id="nav_layout_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="layout.html" onclick="location='layout.html'; updateHash();">Window Layout</a>
+<ul style="display:none;">
+<li id="nav_layout_html_rearranging_panes">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="layout.html#rearranging_panes" onclick="location='layout.html#rearranging_panes'; updateHash();">Rearranging Panes</a>
+<ul style="display:none;">
+<li id="nav_layout_html_context_menu">
+<div></div>
+<a href="layout.html#context_menu" onclick="location='layout.html#context_menu'; updateHash();">Context Menu</a>
+</li>
+<li id="nav_layout_html_panes_menu">
+<div></div>
+<a href="layout.html#panes_menu" onclick="location='layout.html#panes_menu'; updateHash();">Panes Menu</a>
+</li>
+</ul>
+</li>
+<li id="nav_layout_html_saved_layouts">
+<div></div>
+<a href="layout.html#saved_layouts" onclick="location='layout.html#saved_layouts'; updateHash();">Saved Layouts</a>
+</li>
+</ul>
+</li>
+<li id="nav_preferences_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="preferences.html" onclick="location='preferences.html'; updateHash();">Preferences</a>
+<ul style="display:none;">
+<li id="nav_preferences_html_solving_preferences">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="preferences.html#solving_preferences" onclick="location='preferences.html#solving_preferences'; updateHash();">Solving Preferences</a>
+<ul style="display:none;">
+<li id="nav_preferences_html_strict_rebus_checking">
+<div></div>
+<a href="preferences.html#strict_rebus_checking" onclick="location='preferences.html#strict_rebus_checking'; updateHash();">Strict rebus checking</a>
+</li>
+</ul>
+</li>
+<li id="nav_preferences_html_styles">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="preferences.html#styles" onclick="location='preferences.html#styles'; updateHash();">Styles</a>
+<ul style="display:none;">
+<li id="nav_preferences_html_simple_styles">
+<div></div>
+<a href="preferences.html#simple_styles" onclick="location='preferences.html#simple_styles'; updateHash();">Simple Styles</a>
+</li>
+<li id="nav_preferences_html_advanced_styles">
+<div></div>
+<a href="preferences.html#advanced_styles" onclick="location='preferences.html#advanced_styles'; updateHash();">Advanced Styles</a>
+</li>
+</ul>
+</li>
+<li id="nav_preferences_html_miscellaneous_preferences">
+<div></div>
+<a href="preferences.html#miscellaneous_preferences" onclick="location='preferences.html#miscellaneous_preferences'; updateHash();">Miscellaneous Preferences</a>
+</li>
+<li id="nav_preferences_html_printing_preferences">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="preferences.html#printing_preferences" onclick="location='preferences.html#printing_preferences'; updateHash();">Printing Preferences</a>
+<ul style="display:none;">
+<li id="nav_preferences_html_fonts">
+<div></div>
+<a href="preferences.html#fonts" onclick="location='preferences.html#fonts'; updateHash();">Fonts</a>
+</li>
+<li id="nav_preferences_html_black_square_brightness">
+<div></div>
+<a href="preferences.html#black_square_brightness" onclick="location='preferences.html#black_square_brightness'; updateHash();">Black square brightness</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li id="nav_packages_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="packages.html" onclick="location='packages.html'; updateHash();">Packages and Updates</a>
+<ul style="display:none;">
+<li id="nav_packages_html_packages">
+<div></div>
+<a href="packages.html#packages" onclick="location='packages.html#packages'; updateHash();">Packages</a>
+</li>
+<li id="nav_packages_html_updates">
+<div></div>
+<a href="packages.html#updates" onclick="location='packages.html#updates'; updateHash();">Updates</a>
+</li>
+<li id="nav_packages_html_for_developers">
+<div></div>
+<a href="packages.html#for_developers" onclick="location='packages.html#for_developers'; updateHash();">For Developers</a>
+</li>
+</ul>
+</li>
+<li id="nav_features_html">
+<div></div>
+<a href="features.html" onclick="location='features.html'; updateHash();">XWord Support for Puzzle Features</a>
+</li>
+<li id="nav_acrosslite_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="acrosslite.html" onclick="location='acrosslite.html'; updateHash();">XWord for Across Lite Users</a>
+<ul style="display:none;">
+<li id="nav_acrosslite_html_long_clues">
+<div></div>
+<a href="acrosslite.html#long_clues" onclick="location='acrosslite.html#long_clues'; updateHash();">Long clues</a>
+</li>
+<li id="nav_acrosslite_html_scrambled_puzzles">
+<div></div>
+<a href="acrosslite.html#scrambled_puzzles" onclick="location='acrosslite.html#scrambled_puzzles'; updateHash();">Scrambled puzzles</a>
+</li>
+<li id="nav_acrosslite_html_layout">
+<div></div>
+<a href="acrosslite.html#layout" onclick="location='acrosslite.html#layout'; updateHash();">Layout</a>
+</li>
+<li id="nav_acrosslite_html_diagramless_puzzles">
+<div></div>
+<a href="acrosslite.html#diagramless_puzzles" onclick="location='acrosslite.html#diagramless_puzzles'; updateHash();">Diagramless puzzles</a>
+</li>
+<li id="nav_acrosslite_html_check_and_reveal">
+<div></div>
+<a href="acrosslite.html#check_and_reveal" onclick="location='acrosslite.html#check_and_reveal'; updateHash();">Check and reveal</a>
+</li>
+<li id="nav_acrosslite_html_grid_navigation">
+<div></div>
+<a href="acrosslite.html#grid_navigation" onclick="location='acrosslite.html#grid_navigation'; updateHash();">Grid navigation</a>
+</li>
+<li id="nav_acrosslite_html_pencil">
+<div></div>
+<a href="acrosslite.html#pencil" onclick="location='acrosslite.html#pencil'; updateHash();">Pencil</a>
+</li>
+<li id="nav_acrosslite_html_webdings_symbols">
+<div></div>
+<a href="acrosslite.html#webdings_symbols" onclick="location='acrosslite.html#webdings_symbols'; updateHash();">Webdings symbols</a>
+</li>
+<li id="nav_acrosslite_html_notepad">
+<div></div>
+<a href="acrosslite.html#notepad" onclick="location='acrosslite.html#notepad'; updateHash();">Notepad</a>
+</li>
+<li id="nav_acrosslite_html_corrupt_puzzles">
+<div></div>
+<a href="acrosslite.html#corrupt_puzzles" onclick="location='acrosslite.html#corrupt_puzzles'; updateHash();">&quot;Corrupt&quot; puzzles</a>
+</li>
+</ul>
+</li>
+<li id="nav_crosswordsolver_html">
+<div class="collapsed" onclick="toggleMenu(this.parentNode);"><span style="visibility:hidden;">+</span></div>
+<a href="crosswordsolver.html" onclick="location='crosswordsolver.html'; updateHash();">XWord for Crossword Solver Users</a>
+<ul style="display:none;">
+<li id="nav_crosswordsolver_html_grid_navigation">
+<div></div>
+<a href="crosswordsolver.html#grid_navigation" onclick="location='crosswordsolver.html#grid_navigation'; updateHash();">Grid navigation</a>
+</li>
+<li id="nav_crosswordsolver_html_diagramless_puzzles">
+<div></div>
+<a href="crosswordsolver.html#diagramless_puzzles" onclick="location='crosswordsolver.html#diagramless_puzzles'; updateHash();">Diagramless puzzles</a>
+</li>
+<li id="nav_crosswordsolver_html_layout">
+<div></div>
+<a href="crosswordsolver.html#layout" onclick="location='crosswordsolver.html#layout'; updateHash();">Layout</a>
+</li>
+<li id="nav_crosswordsolver_html_check_and_reveal">
+<div></div>
+<a href="crosswordsolver.html#check_and_reveal" onclick="location='crosswordsolver.html#check_and_reveal'; updateHash();">Check and reveal</a>
+</li>
+<li id="nav_crosswordsolver_html_pencil">
+<div></div>
+<a href="crosswordsolver.html#pencil" onclick="location='crosswordsolver.html#pencil'; updateHash();">Pencil</a>
+</li>
+</ul>
+</li>
+<li id="nav_license_html">
+<div></div>
+<a href="license.html" onclick="location='license.html'; updateHash();">GNU GENERAL PUBLIC LICENSE</a>
+</li>
+</ul></div>
+<div id="content"
+
+<p><a href="index.html">Overview</a> |
+<a href="https://github.com/mrichards42/xword" class="external">GitHub</a> |
+<a href="https://github.com/mrichards42/xword/releases" class="external">Download</a></p><hr />
+<h2>The Main Window</h2>
+<!-- Fancy image map -->
+
+<div class="image-map"
+     onmouseover="this.className='image-map focused'"
+     onmouseout="this.className='image-map'"
+     style="width: 587px;">
+
+<div style="position: relative;">
+<img src="images/window.png"/>
+
+<!-- The rectangles -->
+<div style="position:absolute; left:8px; top:31px; width:31px; height:17px;">
+    <a href="#file_menu" onclick="location='#file_menu'; updateHash();" title="File Menu"></a>
+</div>
+<div style="position:absolute; left:42px; top:31px; width:31px; height:17px;">
+    <a href="#edit_menu" onclick="location='#edit_menu'; updateHash();" title="Edit Menu"></a>
+</div>
+<div style="position:absolute; left:76px; top:31px; width:34px; height:17px;">
+    <a href="#view_menu" onclick="location='#view_menu'; updateHash();" title="View Menu"></a>
+</div>
+<div style="position:absolute; left:114px; top:31px; width:54px; height:17px;">
+    <a href="#solution_menu" onclick="location='#solution_menu'; updateHash();" title="Solution Menu"></a>
+</div>
+<div style="position:absolute; left:173px; top:31px; width:39px; height:17px;">
+    <a href="#tools_menu" onclick="location='#tools_menu'; updateHash();" title="Tools Menu"></a>
+</div>
+<div style="position:absolute; left:215px; top:31px; width:34px; height:17px;">
+    <a href="#help_menu" onclick="location='#help_menu'; updateHash();" title="Help Menu"></a>
+</div>
+<div style="position:absolute; left:9px; top:52px; width:27px; height:29px;">
+    <a href="#opening_puzzles" onclick="location='#opening_puzzles'; updateHash();" title="Open Puzzle"></a>
+</div>
+<div style="position:absolute; left:38px; top:52px; width:30px; height:29px;">
+    <a href="#saving_puzzles" onclick="location='#saving_puzzles'; updateHash();" title="Save Puzzle"></a>
+</div>
+<div style="position:absolute; left:105px; top:52px; width:97px; height:29px;">
+    <a href="#grid_size" onclick="location='#grid_size'; updateHash();" title="Grid Size"></a>
+</div>
+<div style="position:absolute; left:206px; top:52px; width:97px; height:29px;">
+    <a href="check.html" title="Check Solution"></a>
+</div>
+<div style="position:absolute; left:307px; top:52px; width:32px; height:29px;">
+    <a href="layout.html" title="Edit Layout"></a>
+</div>
+<div style="position:absolute; left:341px; top:52px; width:32px; height:29px;">
+    <a href="#notes" onclick="location='#notes'; updateHash();" title="Notes"></a>
+</div>
+<div style="position:absolute; left:378px; top:52px; width:32px; height:29px;">
+    <a href="solving.html#rebus_entries" title="Rebus Entries"></a>
+</div>
+<div style="position:absolute; left:418px; top:52px; width:32px; height:29px;">
+    <a href="#timer" onclick="location='#timer'; updateHash();" title="Timer"></a>
+</div>
+<div style="position:absolute; left:9px; top:83px; width:207px; height:458px;">
+    <a href="#clue_lists" onclick="location='#clue_lists'; updateHash();" title="Clue Lists"></a>
+</div>
+<div style="position:absolute; left:221px; top:126px; width:358px; height:49px;">
+    <a href="#clue_prompt" onclick="location='#clue_prompt'; updateHash();" title="Clue Prompt"></a>
+</div>
+<div style="position:absolute; left:221px; top:83px; width:358px; height:38px;">
+    <a href="#metadata" onclick="location='#metadata'; updateHash();" title="Metadata"></a>
+</div>
+<div style="position:absolute; left:248px; top:325px; width:48px; height:25px;">
+    <a href="check.html" title="Incorrect Letters"></a>
+</div>
+<div style="position:absolute; left:225px; top:440px; width:71px; height:25px;">
+    <a href="check.html" title="Revealed Letters"></a>
+</div>
+<div style="position:absolute; left:478px; top:256px; width:25px; height:25px;">
+    <a href="check.html" title="Checked Letters"></a>
+</div>
+<div style="position:absolute; left:294px; top:350px; width:25px; height:184px;">
+    <a href="navigation.html" title="Grid Navigation"></a>
+</div>
+<div style="position:absolute; left:480px; top:544px; width:97px; height:19px;">
+    <a href="#timer" onclick="location='#timer'; updateHash();" title="Timer"></a>
+</div>
+<div style="position:absolute; left:8px; top:544px; width:468px; height:19px;">
+    <a href="#status_bar" onclick="location='#status_bar'; updateHash();" title="Status Bar"></a>
+</div>
+</div>
+
+</div>
+
+<!-- Information -->
+
+<h3 id="panes">Panes</h3>
+<h4 id="clue_prompt">Clue Prompt</h4>
+<p>The clue prompt displays the currently focused clue in large text.  Clues with
+text that exceeds the boundary of the clue prompt will be shrunken and wrapped
+to fit.  If the text cannot be shrunken and wrapped sufficiently to read it,
+the clue prompt will have a tooltip with the current clue.</p>
+<h4 id="clue_lists">Clue Lists</h4>
+<p>XWord supports unlimited clue lists, though the vast majority of puzzles will
+have just Across and Down clues.  Clues with text that exceeds the boundary
+of the clue list is wrapped.  The currently focused clue is highlighted,
+and the clue that crosses the focused letter is highlighted in a different
+color.  Clicking on a clue in a clue list will make that clue the focused word.</p>
+<h4 id="metadata">Metadata</h4>
+<p>Information about the puzzle is displayed in user-configurable metadata panels.
+XWord ships with panels to display title, author, and copyright.  The actual
+information that is displayed in these panels can be configured using the
+<a href="preferences.html#advanced_styles">advanced styles</a> preferences page.</p>
+<h4 id="notes">Notes</h4>
+<p>Notes are read-only and can contain simple XHTML formatting.  Show and hide the
+notes window using the <a href="#view_menu" onclick="location='#view_menu'; updateHash();"><code>View</code></a> menu, the toolbar buttons, or the
+<a href="layout.html#context_menu">context menu</a>.  If a puzzle has notes, the toolbar
+icon turns yellow.</p>
+<h3 id="file_menu">File Menu</h3>
+<p>The file menu contains menu items for opening, saving, and deleting puzzles,
+printing, and the <a href="preferences.html">preferences</a> dialog.</p>
+<h4 id="opening_puzzles">Opening Puzzles</h4>
+<p>Puzzles can be opened by selecting <code>Open</code> from the <code>File</code> menu, by clicking
+on the <code>Open Puzzle</code> toolbar button, by drag-and-drop, or by a puzzle
+downloader <a href="packages.html">package</a>.</p>
+<h4 id="saving_puzzles">Saving Puzzles</h4>
+<p>Puzzles can be saved by selecting <code>Save</code> or <code>Save As</code> from the <code>File</code> menu,
+or by clicking on the <code>Save Puzzle</code> toolbar button.  If no modifications have
+been made to the puzzle, the <code>Save Puzzle</code> toolbar button will be disabled.
+XWord can also be set to <a href="preferences.html#miscellaneous_preferences">auto save</a>
+puzzles after a certain amount of time.</p>
+<h4 id="printing_puzzles">Printing Puzzles</h4>
+<p>XWord prints puzzles on a single page, attempting to achieve the correct
+balance between readable clues and a large grid.  Puzzles can be printed with
+a blank grid, as currently solved, or with the solution.</p>
+<h3 id="edit_menu">Edit Menu</h3>
+<p>The edit menu contains menu items for copying and pasting words and squares.</p>
+<h3 id="view_menu">View Menu</h3>
+<p>The view menu contains grid sizing options and menu items related to adjusting
+the <a href="layout.html">window layout</a></p>
+<h4 id="grid_size">Grid Size</h4>
+<p>The grid can be zoomed in and out, or sized to fit the window.  If the grid
+is zoomed in, scrollbars appear in the grid.  As the cursor is
+<a href="navigation.html">moved</a> around the grid, the currently focused area
+automatically scrolls into view.</p>
+<h3 id="solution_menu">Solution Menu</h3>
+<p>The solution menu allows the user to <a href="check.html">check, reveal</a>,
+<a href="solving.html#erasing_letters">erase</a>, or <a href="#unscrambling" onclick="location='#unscrambling'; updateHash();">unscramble</a> the grid,
+and enter <a href="solving.html#rebus_entries">multiple letters</a> in a square.</p>
+<h4 id="unscrambling">Unscrambling</h4>
+<p>Some .puz files come with a scrambled solution.  To unscramble the solution,
+you need a 4-digit code.  Puzzles with scrambled solutions will have the
+check and reveal solution menus and buttons disabled.  If a scrambled puzzle
+has been filled in, XWord <em>will</em> alert the user if the puzzle is filled
+correctly or incorrectly.</p>
+<h3 id="tools_menu">Tools Menu</h3>
+<p>The tools menu allows the user to toggle the <a href="#timer" onclick="location='#timer'; updateHash();">timer</a> and install or
+uninstall <a href="packages.html">packages</a>.  Packages typically add menu items to the
+tools menu.</p>
+<h4 id="timer">Timer</h4>
+<p>XWord includes a timer so you can keep track of how long it takes you to solve
+puzzles.  The solving time is displayed in the bottom right corner in the
+<a href="#status_bar" onclick="location='#status_bar'; updateHash();">status bar</a>.  The timer can optionally be made to start when
+a puzzle is opened (see <a href="preferences.html#solving_preferences">preferences</a>).</p>
+<h3 id="help_menu">Help Menu</h3>
+<p>The help menu contains an about dialog, the <a href="license.html">license</a>, and links
+to these help files.</p>
+<h3 id="status_bar">Status Bar</h3>
+<p>The status bar displays various information about the current puzzle, including
+the following:</p>
+<ul>
+<li>The filename</li>
+<li>Solving <a href="#timer" onclick="location='#timer'; updateHash();">time</a></li>
+<li>Solving status: when the puzzle is filled in, this section of the status bar
+  will display a message and change color depending on whether the puzzle is
+  correct or not.  While solving it displays percent completion.</li>
+<li>Errors encountered in <a href="packages.html">packages</a></li>
+</ul>
+<hr /><p><a href="index.html">Overview</a> |
+<a href="https://github.com/mrichards42/xword" class="external">GitHub</a> |
+<a href="https://github.com/mrichards42/xword/releases" class="external">Download</a></p>
+
+</div>
+<script type="text/javascript">
+//<![CDATA[
+
+updateHash();
+
+//]]>
+</script>
+</body>
+</html>

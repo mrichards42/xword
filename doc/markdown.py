@@ -29,8 +29,8 @@ updateHash();
 """
 
 links = """[Overview](index.html) |
-[Sourceforge](https://sourceforge.net/projects/wx-xword/) |
-[Download](http://sourceforge.net/projects/wx-xword/files/Binary/)"""
+[GitHub](https://github.com/mrichards42/xword) |
+[Download](https://github.com/mrichards42/xword/releases)"""
 
 no_ids = set(['license'])
 

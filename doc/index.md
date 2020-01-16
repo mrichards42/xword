@@ -3,7 +3,7 @@ XWord Overview
 
 ![](images/xword.png "XWord")
 
-[XWord](https://sourceforge.net/projects/wx-xword/) is an interactive crossword solving program with support for all major puzzle formats.
+[XWord](https://mrichards42.github.io/xword) is an interactive crossword solving program with support for all major puzzle formats.
 
 
 ### Crossword [Features](features.html) ###
