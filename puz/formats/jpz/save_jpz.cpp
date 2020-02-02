@@ -42,6 +42,16 @@ protected:
     zip::File & m_file;
 };
 
+void AppendChildWithSpanWrapping(xml::node parent, int child_count, xml::node child) {
+    if (child_count > 1 && child.type() == pugi::xml_node_type::node_pcdata) {
+        // When writing mixed content, plain text must be wrapped in <span> tags.
+        xml::node span = parent.append_child("span");
+        span.append_copy(child);
+    } else {
+        parent.append_copy(child);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // SaveJpz
 //-----------------------------------------------------------------------------
@@ -236,7 +246,7 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 clue.append_attribute("number") =
                     encode_utf8(it->GetNumber()).c_str();
                 clue.append_attribute("word") = wordMap[&it->GetWord()];
-                xml::SetInnerXML(clue, it->GetText());
+                xml::SetInnerXML(clue, it->GetText(), &AppendChildWithSpanWrapping);
             }
         }
     }

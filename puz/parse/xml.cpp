@@ -146,7 +146,16 @@ string_t Parser::GetInnerXML(node n)
     return decode_utf8(stream.str());
 }
 
-void SetInnerXML(node n, const string_t & innerxml)
+static void AppendChild(node parent, int child_count, node child)
+{
+    parent.append_copy(child);
+}
+
+void SetInnerXML(node node, const string_t& innerxml) {
+    SetInnerXML(node, innerxml, &AppendChild);
+}
+
+void SetInnerXML(node n, const string_t & innerxml, void (*append_fn)(xml::node, int, xml::node))
 {
     // Parse the XML, and add it as a child.
     // We need to add a dummy xml wrapper element so that plain text still
@@ -157,8 +166,12 @@ void SetInnerXML(node n, const string_t & innerxml)
     pugi::xml_parse_result result = doc.load(temp.c_str());
     if (! result)
         SetText(n, innerxml);
-    else
-        n.append_copy(doc.first_child().first_child());
+    else {
+        int child_count = std::distance(doc.first_child().begin(), doc.first_child().end());
+        for (node child = doc.first_child().first_child(); child; child = child.next_sibling()) {
+            append_fn(n, child_count, child);
+        }
+    }
 }
 
 } // namespace xml

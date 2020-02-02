@@ -108,8 +108,13 @@ inline void SetText(node node, const string_t & text)
 {
     SetText(node, encode_utf8(text).c_str());
 }
+void SetInnerXML(node node, const string_t& innerxml);
 
-void SetInnerXML(node node, const string_t & innerxml);
+// Version of SetInnerXML with a custom function to append each parsed node of innerxml.
+// append_fn takes the parent node, the total child count, and the child node.
+void SetInnerXML(node node,
+                 const string_t & innerxml,
+                 void (*append_fn)(xml::node, int, xml::node));
 
 inline void Append(node node, const char * name, const char * value)
 {
