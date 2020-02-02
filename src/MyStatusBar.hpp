@@ -47,6 +47,10 @@ private:
 
     SizedText * m_alert;
     wxStaticText * m_timer;
+    wxStaticText * m_status;
+#ifdef XWORD_USE_LUA
+    wxStaticText * m_luaErrors;
+#endif
     void OnAlertClick(wxMouseEvent & evt);
     void WrapAlert(int width = -1);
 

@@ -3,22 +3,24 @@ os: osx
 osx_image: xcode7.3
 
 env:
+  global:
+    - WX_VERSION="3.1.3"
   matrix:
     - CONFIGURATION="Debug"
     - CONFIGURATION="Release"
 
 # Build and install wxWidgets, with our custom tweaks patch
 install:
-  - ./build-wxwidgets.sh $CONFIGURATION
+  - ./build-wxwidgets.sh $WX_VERSION $CONFIGURATION
 
 # Cache the compiled wxWidgets so it can be in with future builds
 cache:
   directories:
-    - $HOME/wxWidgets-3.1.0
+    - $HOME/wxWidgets-$WX_VERSION
 
 # Run premake4 to create the Xcode project
 before_script:
-  - ./premake4 --platform=x64 --wx-config-debug=$HOME/wxWidgets-3.1.0/bin/wx-config --wx-config-release=$HOME/wxWidgets-3.1.0/bin/wx-config xcode4
+  - ./premake4 --platform=x64 --wx-config-debug=$HOME/wxWidgets-$WX_VERSION/bin/wx-config --wx-config-release=$HOME/wxWidgets-$WX_VERSION/bin/wx-config xcode4
 
 # Build XWord
 script:

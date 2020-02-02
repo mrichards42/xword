@@ -57,6 +57,19 @@ MyStatusBar::MyStatusBar(wxWindow * parent,
 
     SetFieldsCount(STATUS_TOTAL, widths);
 
+    // We use wxStaticText for status and Lua errors even though we could just use SetStatusText in
+    // order to ensure a consistent look with m_timer, which needs wxStaticText to be right-aligned.
+    // The default text may have additional styling (e.g. a different color when inactive) which is
+    // hard to emulate here without brittly copying per-platform private logic.
+    m_status = new wxStaticText(this,
+                                wxID_ANY,
+                                wxEmptyString,
+                                wxDefaultPosition,
+                                wxDefaultSize,
+                                wxST_NO_AUTORESIZE);
+    m_status->SetFont(GetFont());
+    m_status->SetToolTip("");
+
     m_alert = new SizedText(this, wxID_ANY);
     m_alert->SetAlign(wxALIGN_CENTER);
     m_alert->SetWrapMode(ST_TRUNCATE);
@@ -66,6 +79,17 @@ MyStatusBar::MyStatusBar(wxWindow * parent,
     m_alert->Connect(wxEVT_LEFT_DCLICK,
                  wxMouseEventHandler(MyStatusBar::OnAlertClick),
                  NULL, this);
+
+#ifdef XWORD_USE_LUA
+    m_luaErrors = new wxStaticText(this,
+                                   wxID_ANY,
+                                   wxEmptyString,
+                                   wxDefaultPosition,
+                                   wxDefaultSize,
+                                   wxST_NO_AUTORESIZE);
+    m_luaErrors->SetFont(GetFont());
+    m_luaErrors->SetToolTip("");
+#endif
 
     m_timer = new wxStaticText(this,
                                wxID_ANY,
@@ -79,18 +103,18 @@ MyStatusBar::MyStatusBar(wxWindow * parent,
 
 void MyStatusBar::SetStatus(const wxString & text)
 {
-    SetStatusText(text, STATUS_GENERAL);
+    m_status->SetLabel(text);
 }
 
 #ifdef XWORD_USE_LUA
 void MyStatusBar::SetLuaErrors(int num)
 {
     if (num < 1)
-        SetStatusText(_T(""), STATUS_LUA);
+        m_luaErrors->SetLabel("");
     else if (num == 1)
-        SetStatusText(_T("1 Error"), STATUS_LUA);
+        m_luaErrors->SetLabel("1 Error");
     else
-        SetStatusText(wxString::Format(_T("%d Errors"), num), STATUS_LUA);
+        m_luaErrors->SetLabel(wxString::Format(("%d Errors"), num));
 }
 #endif // XWORD_USE_LUA
 
@@ -125,7 +149,20 @@ MyStatusBar::OnSize(wxSizeEvent & WXUNUSED(evt))
         m_alert->SetSize(rect);
         //WrapAlert(rect.width);
     }
+    // Center wxStaticTexts vertically within the field rectangle, since wxStaticText doesn't
+    // support vertical alignment and the status bar might be taller (e.g. on Mac).
+    if (GetFieldRect(STATUS_GENERAL, rect)) {
+        rect.Offset(0, (rect.height - m_status->GetBestHeight(rect.width)) / 2);
+        m_status->SetSize(rect);
+    }
+#ifdef XWORD_USE_LUA
+    if (GetFieldRect(STATUS_LUA, rect)) {
+        rect.Offset(0, (rect.height - m_luaErrors->GetBestHeight(rect.width)) / 2);
+        m_luaErrors->SetSize(rect);
+    }
+#endif
     if (GetFieldRect(STATUS_TIME, rect)) {
+        rect.Offset(0, (rect.height - m_timer->GetBestHeight(rect.width)) / 2);
         m_timer->SetSize(rect);
     }
 }

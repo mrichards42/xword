@@ -666,8 +666,7 @@ MyPrintout::DrawHeader()
 
     m_htmlRenderer->SetHtmlText(html);
 
-    wxArrayInt breaks;
-    m_headerHeight = m_htmlRenderer->Render(rect.x, rect.y, breaks, 0, ! m_isDrawing);
+    m_headerHeight = m_htmlRenderer->Render(rect.x, rect.y, 0, ! m_isDrawing);
     double x, y;
     dc->GetUserScale(&x, &y);
     m_headerHeight *= y;
@@ -707,7 +706,6 @@ MyPrintout::DrawText(int columns, int fontSize)
         return false;
 
     // Layout the text into columns
-    wxArrayInt breaks;
     int x = m_pageRect.x;
     int html_y = 0;
     int html_height = m_htmlRenderer->GetTotalHeight();
@@ -735,11 +733,8 @@ MyPrintout::DrawText(int columns, int fontSize)
         }
 
         // Draw the column
-        // wxWidgets docs haven't been updated.  This function is actually
-        // Render(int x, int y, wxArrayInt & pagebreaks,
-        //        int from = 0, bool dont_render = false, int to = INT_MAX)
         m_htmlRenderer->SetSize(m_columnWidth, colRect.height);
-        html_y = m_htmlRenderer->Render(colRect.x, colRect.y, breaks, html_y, ! m_isDrawing);
+        html_y = m_htmlRenderer->Render(colRect.x, colRect.y, html_y, ! m_isDrawing);
         // Move to the next column
         x += m_columnWidth + COLUMN_PADDING;
     }

@@ -58,9 +58,9 @@ follows the normal rules of numbering a grid.
 
 XWord uses the [wxWidgets](http://www.wxwidgets.org) cross-platform toolkit
 (statically linked). wxaui-tweaks.patch slightly alters aui/framemanager.
-wxwidgets-smooth-scroll-modals.patch fixes two-finger scrolling in modal
-dialogs on macOS. If you would like to use these patches, apply them to the
-wxWidgets directory.
+wxWidgets-osx-private-build-fix.patch is an upstream patch to wxWidgets 3.1.3
+which fixes Mac builds. If you would like to use these patches, apply them to
+the wxWidgets directory.
 
 XWord uses [premake](http://industriousone.com/premake/download) to generate
 project files.  Version 4 has been used successfully, but the 5 beta may also work.
@@ -93,7 +93,7 @@ I'm sure the simpler libraries could be updated.
 
 Windows builds include dlls for everything except wxWidgets.
 
-* wxWidgets (3.0; 3.1 is required for Mac OS 10.10+)
+* wxWidgets (3.0; 3.1.2 is required for Mac OS 10.12+)
 * lua (5.1, but actually using LuaJIT 2.0.3)
 * expat
 * curl (7.24.0)

@@ -262,7 +262,6 @@ SizedText::OnPaint(wxPaintEvent & WXUNUSED(evt))
     dc.SetFont(m_displayFont);
     dc.SetBackground(wxBrush(GetBackgroundColour()));
     dc.SetTextForeground(GetForegroundColour());
-    dc.Clear();
     dc.DrawLabel(GetLabel(),
                  rect,
                  GetWindowStyle() & wxALIGN_MASK);

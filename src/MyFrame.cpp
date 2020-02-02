@@ -159,7 +159,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_PUZ_CLUE_FOCUS (                      MyFrame::OnClueFocus)
     EVT_PUZ_LETTER     (                      MyFrame::OnGridLetter)
 
-    EVT_ACTIVATE       (                      MyFrame::OnActivate)
     EVT_CLOSE          (                      MyFrame::OnClose)
 
     EVT_HTML_LINK_CLICKED(wxID_ANY,           MyFrame::OnLinkClicked)
@@ -385,7 +384,6 @@ MyFrame::MyFrame()
       m_autoSaveTimer(this, ID_AUTOSAVE_TIMER),
       m_autoSaveInterval(0),
       m_mgr(),
-      m_isIdleConnected(false),
       m_fileHistory(10, ID_FILE_HISTORY_1)
 {
 #if 0
@@ -2852,42 +2850,6 @@ MyFrame::OnGridLetter(wxPuzEvent & evt)
 //------------------------------------------------------------------------------
 // Frame events
 //------------------------------------------------------------------------------
-
-// wxTLW::OnActivate tries to restore focus to the previously focused window.
-// This usually fails (especially under wxMSW).  It seems that EVT_ACTIVATE
-// is sent while IsIconized() still returns true.  Perhaps MSW does not
-// allow the focus to be on a window that is not shown (sensibly so).
-// Our OnActivate handler connects an idle event that trys to SetFocus()
-// until it actually works.  At this point, it disconnects itself.
-// Brute force.
-// Unfortunately, I can't get EVT_ICONIZE to be reliable.
-
-void
-MyFrame::OnActivate(wxActivateEvent & evt)
-{
-    if (evt.GetActive() && ! m_isIdleConnected)
-    {
-        m_isIdleConnected = true;
-        Connect(wxEVT_IDLE, wxIdleEventHandler(MyFrame::SetFocusOnIdle));
-    }
-    evt.Skip();
-}
-
-void
-MyFrame::SetFocusOnIdle(wxIdleEvent & evt)
-{
-    if (m_winLastFocused && m_winLastFocused != wxWindow::FindFocus())
-        m_winLastFocused->SetFocus();
-    // We need to check again because the previous call to SetFocus()
-    // isn't guaranteed to work.
-    if (! m_winLastFocused || m_winLastFocused == wxWindow::FindFocus())
-    {
-        m_isIdleConnected = false;
-        Disconnect(wxEVT_IDLE, wxIdleEventHandler(MyFrame::SetFocusOnIdle));
-    }
-    evt.Skip();
-}
-
 
 // This used to be where the timer would be started and stopped.
 // Now this is handled in OnTimerNotify.

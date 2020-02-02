@@ -30,9 +30,11 @@ void ColorChoice::OSXUpdateAttributedStrings()
         // Make a few spaces, and set the background color
         NSMutableAttributedString * as = [[NSMutableAttributedString alloc]
                                           initWithString:@"      "];
-        [as addAttribute:NSBackgroundColorAttributeName
-            value:s_colors[i].color.OSXGetNSColor()
-            range:NSMakeRange(0,5)];
+        if (s_colors[i].color.IsOk()) {
+            [as addAttribute:NSBackgroundColorAttributeName
+                value:s_colors[i].color.OSXGetNSColor()
+                range:NSMakeRange(0,5)];
+        }
         // Add the text description with the standard font size
         [as appendAttributedString:[[NSMutableAttributedString alloc] initWithString:[item title] attributes:attrs]];
         // Set the new label

@@ -3,9 +3,15 @@
 
 set -e
 
-CONFIGURATION=$1
+WX_VERSION=$1
+CONFIGURATION=$2
 
-INSTALL_PATH="$HOME/wxWidgets-3.1.0"
+if [[ -z "$WX_VERSION" ]]; then
+  echo "First argument must be set to the wxWindows version"
+  exit 1
+fi
+
+INSTALL_PATH="$HOME/wxWidgets-$WX_VERSION"
 mkdir -p $INSTALL_PATH
 
 WX_CONFIGURE_FLAGS="\
@@ -30,7 +36,8 @@ else
   echo "Please use one of Debug or Release"
   exit 1
 fi
-echo "Building wxWidgets for configuration: $CONFIGURATION"
+echo "Building wxWidgets version $WX_VERSION for configuration: $CONFIGURATION"
+mkdir -p $INSTALL_PATH
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # Mac OS X
@@ -44,11 +51,11 @@ fi
 
 # Check to see if the cache directory is empty
 if [ ! -d "$INSTALL_PATH/lib" ]; then
-  curl -fsSL -o wxWidgets-3.1.0.tar.bz2 https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.0/wxWidgets-3.1.0.tar.bz2
-  tar -xjf wxWidgets-3.1.0.tar.bz2
-  cd wxWidgets-3.1.0
+  curl -fsSL -o wxWidgets-$WX_VERSION.tar.bz2 https://github.com/wxWidgets/wxWidgets/releases/download/v$WX_VERSION/wxWidgets-$WX_VERSION.tar.bz2
+  tar -xjf wxWidgets-$WX_VERSION.tar.bz2
+  cd wxWidgets-$WX_VERSION
   patch -p1 -i ../wxaui-tweaks.patch
-  patch -p1 -i ../wxwidgets-smooth-scroll-modals.patch
+  patch -p1 -i ../wxWidgets-osx-private-build-fix.patch
   eval $BUILD_COMMAND
 else
   echo "Using cached directory."
