@@ -11,7 +11,7 @@ project "lyaml"
         "ext/yaml/*.h",
     }
 
-    includedirs { "../../yaml/include" }
+    sysincludedirs { "../../yaml/include" }
 
     links { "yaml" }
 

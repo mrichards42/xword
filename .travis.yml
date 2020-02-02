@@ -18,13 +18,13 @@ cache:
   directories:
     - $HOME/wxWidgets-$WX_VERSION
 
-# Run premake4 to create the Xcode project
+# Run premake to create the Xcode project
 before_script:
-  - ./premake4 --platform=x64 --wx-config-debug=$HOME/wxWidgets-$WX_VERSION/bin/wx-config --wx-config-release=$HOME/wxWidgets-$WX_VERSION/bin/wx-config xcode4
+  - ./premake5 --wx-config-debug=$HOME/wxWidgets-$WX_VERSION/bin/wx-config --wx-config-release=$HOME/wxWidgets-$WX_VERSION/bin/wx-config xcode4
 
 # Build XWord
 script:
-  - xcodebuild -project build/xcode4/XWord.xcodeproj -configuration "$CONFIGURATION Native" build
+  - xcodebuild -project build/xcode4/XWord.xcodeproj -configuration "$CONFIGURATION" build
 
 # For deployed builds, zip the .app folder
 before_deploy:

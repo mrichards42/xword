@@ -9,7 +9,7 @@ project "XWord"
 
     configuration "windows"
         -- Use WinMain() instead of main() for windows apps
-        flags { "WinMain" }
+        entrypoint "WinMainCRTStartup"
 
     configuration "macosx"
         files { "**.mm" }
@@ -39,11 +39,11 @@ project "XWord"
     configuration "linux"
         defines { [[PUZ_API=""]] }
         links { "dl" }
-    
+
     configuration "macosx"
         defines {
-            [[PUZ_API=""]],
-            [[LUAPUZ_API=""]],
+            "PUZ_API=",
+            "LUAPUZ_API=",
             "USE_FILE32API" -- for minizip
         }
 
@@ -61,7 +61,7 @@ project "XWord"
         configuration {}
             defines "XWORD_USE_LUA"
 
-            includedirs {
+            sysincludedirs {
                 DEPS.lua.include,
                 "../lua",
                 "../lua/wxbind/setup",

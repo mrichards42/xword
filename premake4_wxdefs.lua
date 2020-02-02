@@ -5,7 +5,7 @@ configuration {}
 configuration "Debug"
     defines { "__WXDEBUG__" }
 
-if os.is("windows") then
+if os.istarget("windows") then
 
 configuration "windows"
     defines { "__WXMSW__", "_CRT_SECURE_NO_WARNINGS" }
@@ -17,7 +17,7 @@ configuration "windows"
     configuration { "windows", "Debug" }
         includedirs { _OPTIONS["wx-prefix"].."/lib/vc_lib/mswud" }
 
-elseif os.is("linux") then
+elseif os.istarget("linux") then
 
 configuration { "linux", "Debug" }
     buildoptions(string.format("`%s --debug --unicode --static --cxxflags`",
@@ -27,7 +27,7 @@ configuration { "linux", "Release" }
     buildoptions(string.format("`%s --release --unicode --static --cxxflags`",
     							_OPTIONS["wx-config-release"]))
 
-elseif os.is("macosx") then
+elseif os.istarget("macosx") then
 
 configuration { "macosx", "Debug" }
     buildoptions(wx_config("--debug --unicode --static --cxxflags"))

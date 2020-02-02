@@ -20,9 +20,9 @@ install:
 cache:
   - '%USERPROFILE%\wxWidgets-%WX_VERSION%'
 
-# Run premake4 to create the Visual Studio project
+# Run premake to create the Visual Studio project
 before_build:
-  - premake4.exe --platform=x32 --wx-prefix="%USERPROFILE%/wxWidgets-%WX_VERSION%" vs2010
+  - premake5.exe --wx-prefix="%USERPROFILE%/wxWidgets-%WX_VERSION%" vs2010
 
 # Build XWord
 build_script:

@@ -39,6 +39,6 @@ project "luapuz"
 
     configuration "macosx"
         defines {
-            [[PUZ_API=""]],
-            [[LUAPUZ_API=""]]
+            "PUZ_API=",
+            "LUAPUZ_API=",
         }

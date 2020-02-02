@@ -12,7 +12,7 @@ newoption {
     description = "Custom wxWidgets directory"
 }
 
-if not os.is("windows") then
+if not os.istarget("windows") then
 newoption {
 	trigger = "wx-config",
 	value = "path",
@@ -124,7 +124,7 @@ end
 
 
 -- Check _OPTIONS to see if we have a wx-config; if we don't, search for it.
-if os.is("windows") then
+if os.istarget("windows") then
 	if not _OPTIONS["wx-prefix"] then
 		local wxwin = os.getenv("WXWIN")
 		_OPTIONS["wx-prefix"] = "$(WXWIN)"
@@ -216,7 +216,7 @@ end
 
 -- Return a list of valid configurations (based on which wx-configs we found)
 function get_configurations()
-	if not os.is("windows") then
+	if not os.istarget("windows") then
 		-- Check wx-config
 		if not (_OPTIONS["wx-config-debug"] or _OPTIONS["wx-config-release"]) then
 			print("Unable to find wx-config on this system.")

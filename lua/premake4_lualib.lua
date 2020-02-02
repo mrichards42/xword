@@ -8,7 +8,7 @@ configuration {}
 
 
 -- lua
-includedirs { DEPS.lua.include }
+sysincludedirs { DEPS.lua.include }
 defines { "LUA_LIB" }
 libdirs { DEPS.lua.lib }
 links { "lua51" }

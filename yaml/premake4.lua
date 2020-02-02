@@ -9,7 +9,7 @@ project "yaml"
         "src/*.c",
     }
 
-    includedirs { "include" }
+    sysincludedirs { "include" }
 
     targetname "yaml"
 
@@ -19,5 +19,5 @@ project "yaml"
         "YAML_VERSION_MAJOR=0",
         "YAML_VERSION_MINOR=2",
         "YAML_VERSION_PATCH=2",
-        "YAML_VERSION_STRING=0.2.2",
+        [[YAML_VERSION_STRING="0.2.2"]],
     }
