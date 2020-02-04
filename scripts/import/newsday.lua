@@ -71,8 +71,8 @@ local function parse(p, f)
     -- Set the clues
     p:SetClueList("Across", across)
     p:SetClueList("Down", down)
-    p:NumberGrid()
     p:NumberClues()
+    p:NumberGrid()
 end
 
 function import.Newsday(p, filename)
