@@ -130,9 +130,10 @@ project "XWord"
             "ln -sFh ../../../../../scripts $PLUGINS_FOLDER_PATH/scripts",
             "mkdir -p $UNLOCALIZED_RESOURCES_FOLDER_PATH",
             "ln -sFh ../../../../../images $UNLOCALIZED_RESOURCES_FOLDER_PATH/images",
-            -- Copy Info.plist and xword.icns
+            -- Copy Info.plist, xword.icns, and default_config.ini
             "cp ../../src/Info.plist $INFOPLIST_PATH",
             "cp ../../images/xword.icns $UNLOCALIZED_RESOURCES_FOLDER_PATH",
+            "cp ../../default_config.ini $UNLOCALIZED_RESOURCES_FOLDER_PATH",
         }
         if not _OPTIONS["disable-lua"] then
             postbuildcommands {

@@ -1,6 +1,3 @@
-; NB: This must be compiled with Unicode NSIS so that the extra long strings
-; in the config section don't get truncated.
-
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "XWord"
 !define PRODUCT_VERSION "0.6.1"
@@ -163,6 +160,7 @@ Section "MainSection" SEC01
     SetOutPath "$INSTDIR"
         ; Program
         File "${XWORD_BIN}\XWord.exe"
+        File "${XWORD_BIN}\default_config.ini"
         File "${XWORD_BIN}\puz.dll"
         File "${XWORD_TRUNK}\doc\chm\xword.chm"
         ; LUA
@@ -207,150 +205,12 @@ Section "MainSection" SEC01
         File "${XWORD_TRUNK}\images\zoom_in_24.png"
         File "${XWORD_TRUNK}\images\zoom_out_24.png"
 
-    SetOutPath "$CONFIGDIR"
-        ; Default layouts
-        WriteINIStr "$CONFIGDIR\config.ini" "Layouts" "Full\ View"  "layout2|name=Logger;caption=Logger;state=18875390;dir=1;layer=0;row=6;pos=0;prop=100000;bestw=350;besth=540;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=105;floaty=177;floatw=350;floath=540|name=Grid;caption=Grid;state=0;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=638;besth=619;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=647|name=Clue;caption=Clue Prompt;state=18874620;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=638;besth=75;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=75|name=Notes;caption=Notes;state=18876415;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=365;besth=288;minw=15;minh=15;maxw=-1;maxh=-1;floatx=331;floaty=206;floatw=365;floath=288|name=/Metadata/Author;caption=Author;state=18874620;dir=1;layer=3;row=0;pos=1;prop=99614;bestw=251;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=87;floath=20|name=/Metadata/Copyright;caption=Copyright;state=18874620;dir=3;layer=0;row=1;pos=0;prop=83228;bestw=638;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=13;floaty=801;floatw=87;floath=49|name=/Metadata/Title;caption=Title;state=18874620;dir=1;layer=3;row=0;pos=0;prop=153658;bestw=387;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=86;floath=20|name=ClueList1;caption=Across;state=18875388;dir=4;layer=5;row=0;pos=0;prop=100000;bestw=395;besth=760;minw=15;minh=15;maxw=-1;maxh=-1;floatx=280;floaty=194;floatw=300;floath=322|name=ClueList2;caption=Down;state=18875388;dir=4;layer=4;row=0;pos=0;prop=100000;bestw=395;besth=760;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-12;floaty=517;floatw=300;floath=323|name=00520f304e5da8570000014700000007;caption=Notes;state=18876414;dir=4;layer=0;row=0;pos=1;prop=100000;bestw=-1;besth=-1;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=250;floath=250|dock_size(5,0,0)=22|dock_size(1,3,0)=34|dock_size(1,2,0)=75|dock_size(4,4,0)=223|dock_size(4,5,0)=223|dock_size(3,0,1)=34|frame_size=808,543|"
-        WriteINIStr "$CONFIGDIR\config.ini" "Layouts" "Floating\ Clues" "layout2|name=Logger;caption=Logger;state=18875390;dir=1;layer=0;row=6;pos=0;prop=100000;bestw=350;besth=540;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=105;floaty=177;floatw=350;floath=540|name=Grid;caption=Grid;state=0;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=1440;besth=619;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=647|name=Clue;caption=Clue Prompt;state=18874620;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=1440;besth=75;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=75|name=Notes;caption=Notes;state=18876415;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=365;besth=288;minw=15;minh=15;maxw=-1;maxh=-1;floatx=331;floaty=206;floatw=365;floath=288|name=/Metadata/Author;caption=Author;state=18874620;dir=1;layer=3;row=0;pos=1;prop=99614;bestw=567;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=87;floath=20|name=/Metadata/Copyright;caption=Copyright;state=18874620;dir=3;layer=0;row=1;pos=0;prop=83228;bestw=1440;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=13;floaty=801;floatw=87;floath=49|name=/Metadata/Title;caption=Title;state=18874620;dir=1;layer=3;row=0;pos=0;prop=153658;bestw=873;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=86;floath=20|name=ClueList1;caption=Across;state=18875389;dir=4;layer=5;row=0;pos=0;prop=100000;bestw=409;besth=760;minw=15;minh=15;maxw=-1;maxh=-1;floatx=163;floaty=187;floatw=300;floath=322|name=ClueList2;caption=Down;state=18875389;dir=4;layer=4;row=0;pos=0;prop=100000;bestw=409;besth=760;minw=15;minh=15;maxw=-1;maxh=-1;floatx=422;floaty=470;floatw=300;floath=323|name=00520f304e5da8570000014700000007;caption=Notes;state=18876414;dir=4;layer=0;row=0;pos=1;prop=100000;bestw=-1;besth=-1;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=250;floath=250|dock_size(5,0,0)=22|dock_size(1,3,0)=34|dock_size(1,2,0)=75|dock_size(3,0,1)=34|frame_size=1440,762|"
-        WriteINIStr "$CONFIGDIR\config.ini" "Layouts" "Side\ Clues" "layout2|name=Logger;caption=Logger;state=18875390;dir=1;layer=0;row=6;pos=0;prop=100000;bestw=350;besth=540;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=105;floaty=177;floatw=350;floath=540|name=Grid;caption=Grid;state=0;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=420;besth=401;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=647|name=Clue;caption=Clue Prompt;state=18874620;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=420;besth=75;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=75|name=Notes;caption=Notes;state=18876415;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=365;besth=288;minw=15;minh=15;maxw=-1;maxh=-1;floatx=331;floaty=206;floatw=365;floath=288|name=/Metadata/Author;caption=Author;state=18874620;dir=1;layer=3;row=0;pos=1;prop=99614;bestw=166;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=87;floath=20|name=/Metadata/Copyright;caption=Copyright;state=18874620;dir=3;layer=0;row=1;pos=0;prop=83228;bestw=420;besth=28;minw=15;minh=15;maxw=-1;maxh=-1;floatx=13;floaty=801;floatw=87;floath=49|name=/Metadata/Title;caption=Title;state=18874620;dir=1;layer=3;row=0;pos=0;prop=153658;bestw=254;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=86;floath=20|name=ClueList1;caption=Across;state=18875388;dir=4;layer=4;row=0;pos=0;prop=100000;bestw=188;besth=536;minw=15;minh=15;maxw=-1;maxh=-1;floatx=237;floaty=770;floatw=300;floath=322|name=ClueList2;caption=Down;state=18875388;dir=2;layer=4;row=0;pos=0;prop=100000;bestw=188;besth=536;minw=15;minh=15;maxw=-1;maxh=-1;floatx=501;floaty=773;floatw=300;floath=323|name=00520f304e5da8570000014700000007;caption=Notes;state=18876414;dir=4;layer=0;row=0;pos=1;prop=100000;bestw=-1;besth=-1;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=250;floath=250|dock_size(5,0,0)=22|dock_size(1,3,0)=34|dock_size(1,2,0)=75|dock_size(3,0,1)=28|dock_size(4,4,0)=190|dock_size(2,4,0)=190|frame_size=808,543|"
-        WriteINIStr "$CONFIGDIR\config.ini" "Layouts" "Stacked\ Clues\ \(Left\)" "layout2|name=Logger;caption=Logger;state=18875390;dir=1;layer=0;row=6;pos=0;prop=100000;bestw=350;besth=540;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=105;floaty=177;floatw=350;floath=540|name=Grid;caption=Grid;state=0;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=457;besth=458;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=647|name=Clue;caption=Clue Prompt;state=18874620;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=457;besth=75;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=75|name=Notes;caption=Notes;state=18876415;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=365;besth=288;minw=15;minh=15;maxw=-1;maxh=-1;floatx=331;floaty=206;floatw=365;floath=288|name=/Metadata/Author;caption=Author;state=18874620;dir=1;layer=3;row=0;pos=1;prop=99614;bestw=180;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=87;floath=20|name=/Metadata/Copyright;caption=Copyright;state=18874620;dir=3;layer=0;row=1;pos=0;prop=83228;bestw=457;besth=29;minw=15;minh=15;maxw=-1;maxh=-1;floatx=13;floaty=801;floatw=87;floath=49|name=/Metadata/Title;caption=Title;state=18874620;dir=1;layer=3;row=0;pos=0;prop=153658;bestw=277;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=86;floath=20|name=ClueList1;caption=Across;state=18875388;dir=4;layer=5;row=0;pos=0;prop=100000;bestw=345;besth=294;minw=15;minh=15;maxw=-1;maxh=-1;floatx=280;floaty=194;floatw=300;floath=322|name=ClueList2;caption=Down;state=18875388;dir=4;layer=5;row=0;pos=1;prop=100000;bestw=345;besth=294;minw=15;minh=15;maxw=-1;maxh=-1;floatx=414;floaty=81;floatw=300;floath=323|name=00520f304e5da8570000014700000007;caption=Notes;state=18876414;dir=4;layer=0;row=0;pos=1;prop=100000;bestw=-1;besth=-1;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=250;floath=250|dock_size(5,0,0)=22|dock_size(1,3,0)=34|dock_size(1,2,0)=75|dock_size(4,5,0)=336|dock_size(3,0,1)=29|frame_size=808,596|"
-        WriteINIStr "$CONFIGDIR\config.ini" "Layouts" "Stacked\ Clues\ \(Right\)" "layout2|name=Logger;caption=Logger;state=18875390;dir=1;layer=0;row=6;pos=0;prop=100000;bestw=350;besth=540;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=105;floaty=177;floatw=350;floath=540|name=Grid;caption=Grid;state=0;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=490;besth=458;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=647|name=Clue;caption=Clue Prompt;state=18874620;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=490;besth=75;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=75|name=Notes;caption=Notes;state=18876415;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=365;besth=288;minw=15;minh=15;maxw=-1;maxh=-1;floatx=331;floaty=206;floatw=365;floath=288|name=/Metadata/Author;caption=Author;state=18874620;dir=1;layer=3;row=0;pos=1;prop=99614;bestw=193;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=87;floath=20|name=/Metadata/Copyright;caption=Copyright;state=18874620;dir=3;layer=0;row=1;pos=0;prop=83228;bestw=490;besth=29;minw=15;minh=15;maxw=-1;maxh=-1;floatx=13;floaty=801;floatw=87;floath=49|name=/Metadata/Title;caption=Title;state=18874620;dir=1;layer=3;row=0;pos=0;prop=153658;bestw=297;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=86;floath=20|name=ClueList1;caption=Across;state=18875388;dir=2;layer=4;row=0;pos=0;prop=100000;bestw=312;besth=294;minw=15;minh=15;maxw=-1;maxh=-1;floatx=253;floaty=209;floatw=300;floath=322|name=ClueList2;caption=Down;state=18875388;dir=2;layer=4;row=0;pos=1;prop=100000;bestw=312;besth=294;minw=15;minh=15;maxw=-1;maxh=-1;floatx=250;floaty=509;floatw=300;floath=323|name=00520f304e5da8570000014700000007;caption=Notes;state=18876414;dir=4;layer=0;row=0;pos=1;prop=100000;bestw=-1;besth=-1;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=250;floath=250|dock_size(5,0,0)=22|dock_size(1,3,0)=34|dock_size(1,2,0)=75|dock_size(3,0,1)=29|dock_size(2,4,0)=323|frame_size=808,596|"
-        WriteINIStr "$CONFIGDIR\config.ini" "Layouts" "Clues\ Below" "layout2|name=Logger;caption=Logger;state=18875390;dir=1;layer=0;row=6;pos=0;prop=100000;bestw=350;besth=540;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=105;floaty=177;floatw=350;floath=540|name=Grid;caption=Grid;state=0;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=1438;besth=572;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=647|name=Clue;caption=Clue Prompt;state=18874620;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=1438;besth=73;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=75|name=Notes;caption=Notes;state=18876415;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=365;besth=288;minw=15;minh=15;maxw=-1;maxh=-1;floatx=331;floaty=206;floatw=365;floath=288|name=/Metadata/Author;caption=Author;state=18874620;dir=1;layer=3;row=0;pos=1;prop=99614;bestw=563;besth=32;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=87;floath=20|name=/Metadata/Copyright;caption=Copyright;state=18874620;dir=3;layer=0;row=1;pos=0;prop=83228;bestw=1438;besth=26;minw=15;minh=15;maxw=-1;maxh=-1;floatx=13;floaty=801;floatw=87;floath=49|name=/Metadata/Title;caption=Title;state=18874620;dir=1;layer=3;row=0;pos=0;prop=153658;bestw=869;besth=32;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=86;floath=20|name=ClueList1;caption=Across;state=18875388;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=716;besth=33;minw=15;minh=15;maxw=-1;maxh=-1;floatx=163;floaty=187;floatw=300;floath=322|name=ClueList2;caption=Down;state=18875388;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=716;besth=33;minw=15;minh=15;maxw=-1;maxh=-1;floatx=422;floaty=470;floatw=300;floath=323|name=00520f304e5da8570000014700000007;caption=Notes;state=18876414;dir=4;layer=0;row=0;pos=1;prop=100000;bestw=-1;besth=-1;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=250;floath=250|dock_size(5,0,0)=22|dock_size(1,3,0)=34|dock_size(1,2,0)=75|dock_size(3,0,1)=28|dock_size(3,1,0)=35|frame_size=1440,762|"
-        WriteINIStr "$CONFIGDIR\config.ini" "Layouts" "Clues\ Above" "layout2|name=Logger;caption=Logger;state=18875390;dir=1;layer=0;row=6;pos=0;prop=100000;bestw=350;besth=540;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=105;floaty=177;floatw=350;floath=540|name=Grid;caption=Grid;state=0;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=1440;besth=585;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=647|name=Clue;caption=Clue Prompt;state=18874620;dir=1;layer=2;row=0;pos=0;prop=100000;bestw=1440;besth=75;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=272;floath=75|name=Notes;caption=Notes;state=18876415;dir=4;layer=0;row=0;pos=0;prop=100000;bestw=365;besth=288;minw=15;minh=15;maxw=-1;maxh=-1;floatx=331;floaty=206;floatw=365;floath=288|name=/Metadata/Author;caption=Author;state=18874620;dir=1;layer=3;row=0;pos=1;prop=99614;bestw=567;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=87;floath=20|name=/Metadata/Copyright;caption=Copyright;state=18874620;dir=3;layer=0;row=1;pos=0;prop=83228;bestw=1440;besth=28;minw=15;minh=15;maxw=-1;maxh=-1;floatx=13;floaty=801;floatw=87;floath=49|name=/Metadata/Title;caption=Title;state=18874620;dir=1;layer=3;row=0;pos=0;prop=153658;bestw=873;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=86;floath=20|name=ClueList1;caption=Across;state=18875388;dir=1;layer=4;row=0;pos=0;prop=100000;bestw=716;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-2;floaty=86;floatw=300;floath=322|name=ClueList2;caption=Down;state=18875388;dir=1;layer=4;row=0;pos=1;prop=100000;bestw=716;besth=34;minw=15;minh=15;maxw=-1;maxh=-1;floatx=7;floaty=798;floatw=300;floath=323|name=00520f304e5da8570000014700000007;caption=Notes;state=18876414;dir=4;layer=0;row=0;pos=1;prop=100000;bestw=-1;besth=-1;minw=15;minh=15;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=250;floath=250|dock_size(5,0,0)=22|dock_size(1,3,0)=34|dock_size(1,2,0)=75|dock_size(3,0,1)=28|dock_size(1,4,0)=32|frame_size=1440,762|"
-
-    SetOutPath "$SCRIPTSDIR"
-
-    ; Script libraries
+    ; Scripts - generated by gen_nsis.py
+    !include scripts.nsi
 
     SetOutPath "$SCRIPTSDIR\libs"
         ; Anywhere we have dlls that link to msvcrt, we need a manifest file
         File "${VC_REDIST}\dummy_manifest\Microsoft.VC90.CRT.manifest"
-
-        File "${XWORD_TRUNK}\scripts\libs\date.lua"
-        File "${XWORD_TRUNK}\scripts\libs\md5.lua"
-        File "${XWORD_TRUNK}\scripts\libs\serialize.lua"
-
-        File "${XWORD_TRUNK}\scripts\libs\c-luacurl.dll"
-        File "${XWORD_TRUNK}\scripts\libs\c-task.dll"
-        File "${XWORD_TRUNK}\scripts\libs\c-yaml.dll"
-        File "${XWORD_TRUNK}\scripts\libs\lfs.dll"
-        File "${XWORD_TRUNK}\scripts\libs\luayajl.dll"
-        File "${XWORD_TRUNK}\scripts\libs\lxp.dll"
-
-    SetOutPath "$SCRIPTSDIR\libs\luacurl"
-        File "${XWORD_TRUNK}\scripts\libs\luacurl\http.lua"
-        File "${XWORD_TRUNK}\scripts\libs\luacurl\init.lua"
-
-    SetOutPath "$SCRIPTSDIR\libs\lxp"
-        File "${XWORD_TRUNK}\scripts\libs\lxp\lom.lua"
-
-    SetOutPath "$SCRIPTSDIR\libs\lyaml"
-        File "${XWORD_TRUNK}\scripts\libs\lyaml\explicit.lua"
-        File "${XWORD_TRUNK}\scripts\libs\lyaml\functional.lua"
-        File "${XWORD_TRUNK}\scripts\libs\lyaml\implicit.lua"
-        File "${XWORD_TRUNK}\scripts\libs\lyaml\init.lua"
-
-    SetOutPath "$SCRIPTSDIR\libs\pl"
-        File "${XWORD_TRUNK}\scripts\libs\pl\app.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\array2d.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\class.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\compat.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\comprehension.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\config.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\data.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\Date.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\dir.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\file.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\func.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\import_into.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\init.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\input.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\lapp.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\lexer.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\list.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\luabalanced.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\Map.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\MultiMap.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\operator.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\OrderedMap.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\path.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\permute.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\pretty.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\seq.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\Set.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\sip.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\strict.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\stringio.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\stringx.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\tablex.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\template.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\test.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\text.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\types.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\utils.lua"
-        File "${XWORD_TRUNK}\scripts\libs\pl\xml.lua"
-
-    SetOutPath "$SCRIPTSDIR\libs\task"
-        File "${XWORD_TRUNK}\scripts\libs\task\debug.lua"
-        File "${XWORD_TRUNK}\scripts\libs\task\event.lua"
-        File "${XWORD_TRUNK}\scripts\libs\task\init.lua"
-        File "${XWORD_TRUNK}\scripts\libs\task\queue.lua"
-        File "${XWORD_TRUNK}\scripts\libs\task\queue_task.lua"
-        File "${XWORD_TRUNK}\scripts\libs\task\queue_task_create.lua"
-        File "${XWORD_TRUNK}\scripts\libs\task\task_create.lua"
-
-    SetOutPath "$SCRIPTSDIR\libs\wx\lib"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\animate.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\arrows.png"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\arrow_button.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\bmp.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\bmp_button.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\checklist.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\collapse.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\collapse_fb.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\ctrlgrid.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\textcombo.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\text_button.lua"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\toggle_button.lua"
-
-    SetOutPath "$SCRIPTSDIR\libs\wx\lib\mixins"
-        File "${XWORD_TRUNK}\scripts\libs\wx\lib\mixins\listctrl.lua"
-
-
-    ; XWord main script
-    SetOutPath "$SCRIPTSDIR\xword"
-        File "${XWORD_TRUNK}\scripts\xword\archives.lua"
-        File "${XWORD_TRUNK}\scripts\xword\cleanup.lua"
-        File "${XWORD_TRUNK}\scripts\xword\init.lua"
-        File "${XWORD_TRUNK}\scripts\xword\menu.lua"
-        File "${XWORD_TRUNK}\scripts\xword\messages.lua"
-        File "${XWORD_TRUNK}\scripts\xword\preferences.lua"
-    SetOutPath "$SCRIPTSDIR\xword\pkgmgr"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\dialog.lua"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\init.lua"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\install.lua"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\join.lua"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\load.lua"
-    SetOutPath "$SCRIPTSDIR\xword\pkgmgr\updater"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\updater\check_task.lua"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\updater\dialog.lua"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\updater\download_task.lua"
-        File "${XWORD_TRUNK}\scripts\xword\pkgmgr\updater\init.lua"
-    SetOutPath "$SCRIPTSDIR\xword\widgets"
-        File "${XWORD_TRUNK}\scripts\xword\widgets\arrows.png"
-        File "${XWORD_TRUNK}\scripts\xword\widgets\button.lua"
-        File "${XWORD_TRUNK}\scripts\xword\widgets\customlist.lua"
-        File "${XWORD_TRUNK}\scripts\xword\widgets\sizedtext.lua"
-
-    ; import script
-    SetOutPath "$SCRIPTSDIR\import"
-        File "${XWORD_TRUNK}\scripts\import\info.lua"
-        File "${XWORD_TRUNK}\scripts\import\init.lua"
-        File "${XWORD_TRUNK}\scripts\import\newsday.lua"
-        File "${XWORD_TRUNK}\scripts\import\rowsgarden.lua"
-        File "${XWORD_TRUNK}\scripts\import\theme.lua"
-        File "${XWORD_TRUNK}\scripts\import\uclick.lua"
-        File "${XWORD_TRUNK}\scripts\import\xwordinfo.lua"
-
 
     ; If it's portable, make a portable_mode_enabled file.
     ${If} $isPortable == "true"

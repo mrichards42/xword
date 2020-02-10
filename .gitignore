@@ -2,6 +2,7 @@
 /bin
 /build
 /lib
+/dist/scripts.nsi
 /dist/XWord-Windows.exe
 /dist/packages
 /doc/chm

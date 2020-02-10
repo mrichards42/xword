@@ -36,6 +36,7 @@
 wxString GetUserDataDir(); // Directory for user data
 wxString GetConfigDir();   // Directory for config files (DataDir/config)
 wxString GetConfigFile();  // The main XWord config file (DataDir/config/config.ini)
+wxString GetDefaultConfigFile(); // Default config file to use if no config exists
 wxString GetImagesDir();   // Images
 wxString GetScriptsDir();  // Scripts
 wxString exedir();

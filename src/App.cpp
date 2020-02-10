@@ -280,6 +280,9 @@ void MyApp::SetupConfig()
     if (! configFile.FileExists())
         configFile.Assign(GetConfigFile_XWord_3());
 
+    // Try to load the default configuration.
+    if (! configFile.FileExists())
+        configFile.Assign(GetDefaultConfigFile());
 
     // Setup wxFileConfig
     if (configFile.FileExists())

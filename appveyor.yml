@@ -29,7 +29,7 @@ build_script:
   - msbuild build/vs2010/XWord.sln /p:Configuration=%CONFIGURATION%
   # For release builds, also build docs and run dist steps.
   - IF %CONFIGURATION%==Release pushd doc & make_help.cmd & popd
-  - IF %CONFIGURATION%==Release pushd dist & "%ProgramFiles(x86)%\NSIS\makensis.exe" /V4 XWord.nsi & popd
+  - IF %CONFIGURATION%==Release pushd dist & python gen_nsis.py > scripts.nsi & "%ProgramFiles(x86)%\NSIS\makensis.exe" /V4 XWord.nsi & popd
 
 # Zip the full build folder and make it available as an artifact.
 after_build:

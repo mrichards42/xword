@@ -29,7 +29,7 @@ script:
 # For deployed builds, zip the .app folder
 before_deploy:
   - pushd bin/$CONFIGURATION
-  - zip -r XWord-macOS.zip XWord.app/ -x *.fbp
+  - zip -r XWord-macOS.zip XWord.app/ -x *.fbp -x "*/scripts/_*" -x "*/scripts/*debug*"
   - popd
 
 # Deploy tagged release builds to GitHub Releases
