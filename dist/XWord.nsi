@@ -174,8 +174,6 @@ Section "MainSection" SEC01
         File "${XWORD_BIN}\yaml.dll"
         File "${XWORD_BIN}\zlib1.dll"
         File "${XWORD_BIN}\libcurl.dll"
-        File "${XWORD_BIN}\libeay32.dll"
-        File "${XWORD_BIN}\libssl32.dll"
         ; Info
         File "${XWORD_TRUNK}\README.md"
         File "${XWORD_TRUNK}\AUTHORS"
@@ -444,8 +442,6 @@ Section Uninstall
         Delete "$INSTDIR\luapuz.dll"
         Delete "$INSTDIR\lua51.dll"
         Delete "$INSTDIR\libcurl.dll"
-        Delete "$INSTDIR\libeay32.dll"
-        Delete "$INSTDIR\libssl32.dll"
         Delete "$INSTDIR\libexpat.dll"
 
         Delete "$INSTDIR\README.md"
