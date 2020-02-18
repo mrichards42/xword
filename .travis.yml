@@ -34,13 +34,16 @@ before_deploy:
   - pushd bin/$CONFIGURATION
   - zip -r XWord-macOS.zip XWord.app/ -x *.fbp -x "*/scripts/_*" -x "*/scripts/*debug*"
   - popd
+  - sed -e "s/{VERSION}/${XWORD_VERSION}/" -e "s/{OS_FILE}/XWord-macOS.zip/" dist/packages_template.lua > dist/packages_mac.lua
 
 # Deploy tagged release builds to GitHub Releases
 deploy:
   provider: releases
   api_key:
     secure: dT5W1MsTMFYjN6mDnSqpL7QjHkL/R6When5elNX9dwGLafCyRN2ohAUa6lpt17v8NG3//qF9BZLZOymA7D9kNqILGbt8mjCu053WBknekI9BTG593HQhsV2y0nA8p2J3y95/Qdty/t0jg/QdWqV60O0w6VQFGoHOb9EUVKCu9cR+WX4kVz2uadB8ms8r2YDeC0fUnrA/w1XnopohJw3P/hiV6S2+u1eeWFFyjOTuTJcyg6cHkxMysj/4N4llxOU/to0/nQYKg+sc9B7hHLFmwHxLbq1prn9LG9kRwDmCnzNlV0OgPOT2vP+LSwyfvp4zuHNC61sIH8OSVKCmn3keM/ZDahKB37Zd0eQKBxLNm9iu/UibBN7R+4QtVXgPkfqZb9bFhpy9fi+MxiYXUzbl3q3p7werLooI42KFzkJ2KxSkP3ZEQko3XsdAdgeBZVXzD/Ze0IMnaTQSeCPQbzbMjXA0mIwOkWCIj77dqOnQOdjAURA+U5tUt1Q2TUa9yJHXT5O6J2XNXdCbM5JlzBNoo9orcTjuwnsyplvMovKw1Qx0DGVG0hNakp2tNszsH4LeJKrAdWr1KXGu392Shq3XCya3X76jhQBO9zMDAe0txdFpnmx6Pi8GYlFabU2OWoWmNsnJVxOsMGKL8wz1vRx4uakFY4WzgDO/SI/6zkQ43W8=
-  file: bin/$CONFIGURATION/XWord-macOS.zip
+  file:
+    - bin/$CONFIGURATION/XWord-macOS.zip
+    - dist/packages_mac.lua
   skip_cleanup: true
   on:
     tags: true
