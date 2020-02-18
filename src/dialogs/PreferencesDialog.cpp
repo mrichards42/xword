@@ -60,8 +60,6 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
     book->AddPage(new AppearancePanel(book, *m_config), "Appearance");
     book->AddPage(new PrintPanel(book, *m_config), "Printing");
 
-    LoadConfig();
-
     // Setup buttons
     // On OS X, we update the preferences as they change, so we show no buttons.
 #ifndef __WXOSX__
@@ -125,14 +123,17 @@ void PreferencesDialog::ShowDialog(wxWindow * parent)
 {
     if (! s_dialog)
         s_dialog = new PreferencesDialog(parent);
+    s_dialog->LoadConfig();
     s_dialog->Raise();
     s_dialog->Show();
 }
 
 void PreferencesDialog::LoadConfig()
 {
+    ConfigManager& appConfig = wxGetApp().GetConfigManager();
+    m_oldConfig.Copy(appConfig);
 #if ! XWORD_PREFERENCES_LIVE_PREVIEW
-    m_config->Copy(wxGetApp().GetConfigManager());
+    m_config->Copy(appConfig);
 #endif
     wxBookCtrlBase * book = GetBookCtrl();
     for (size_t i = 0; i < book->GetPageCount(); ++i)
