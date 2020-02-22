@@ -2552,7 +2552,7 @@ MyFrame::OnAbout(wxCommandEvent & WXUNUSED(evt))
     wxAboutDialogInfo info;
     info.SetName(XWORD_APP_NAME);
 
-    info.SetVersion(XWORD_VERSION_STRING _T(" (") __TDATE__ _T(")"));
+    info.SetVersion(_T(XWORD_VERSION_STRING) _T(" (") __TDATE__ _T(")"));
 
     info.SetCopyright(XWORD_COPYRIGHT_STRING);
 
@@ -2564,7 +2564,7 @@ void
 MyFrame::OnLicense(wxCommandEvent & WXUNUSED(evt))
 {
     const wxString licenseText(
-        XWORD_APP_NAME _T(" ") XWORD_VERSION_STRING _T("\n")
+        XWORD_APP_NAME _T(" ") _T(XWORD_VERSION_STRING) _T("\n")
         _T("Copyright ") XWORD_COPYRIGHT_STRING _T("\n")
         _T("\n")
         _T("This program is free software; you can redistribute it and/or ")

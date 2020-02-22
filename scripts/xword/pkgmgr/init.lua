@@ -137,9 +137,14 @@ end
 
 function P.is_newer(v1, v2)
     local split = require 'pl.stringx'.split
+    -- Split by '-' to determine if either version is a SNAPSHOT build.
+    local v1 = split(tostring(v1) or '', '-')
+    local v1_is_snapshot = v1[#v1] == 'SNAPSHOT'
+    local v2 = split(tostring(v2) or '', '-')
+    local v2_is_snapshot = v2[#v2] == 'SNAPSHOT'
     -- Split by '.'
-    local v1 = split(tostring(v1) or '', '%.')
-    local v2 = split(tostring(v2) or '', '%.')
+    local v1 = split(v1[1], '.')
+    local v2 = split(v2[1], '.')
     -- Compare successive revision numbers
     for i = 1, #v1 do
         local cmp = (tonumber(v1[i]) or 0) - (tonumber(v2[i]) or 0)
@@ -149,7 +154,15 @@ function P.is_newer(v1, v2)
             return false
         end
     end
-    return #v1 > #v2
+    if #v1 ~= #v2 then
+        return #v1 > #v2
+    end
+    -- Versions are equal, except potentially for a -SNAPSHOT at the end of
+    -- one of them. SNAPSHOT builds should be considered older.
+    if v1_is_snapshot ~= v2_is_snapshot then
+        return v2_is_snapshot
+    end
+    return false
 end
 
 function P.get_all_scripts()
