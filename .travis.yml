@@ -9,8 +9,11 @@ env:
     - CONFIGURATION="Debug"
     - CONFIGURATION="Release"
 
-# Build and install wxWidgets, with our custom tweaks patch
 install:
+  # For tagged builds, use the tag name as the version.
+  # Otherwise, read the version from the VERSION file.
+  - if [ "$TRAVIS_TAG" != "" ]; then export XWORD_VERSION=$TRAVIS_TAG; else export XWORD_VERSION=$(cat VERSION); fi
+  # Build and install wxWidgets, with our custom tweaks patch
   - ./build-wxwidgets.sh $WX_VERSION $CONFIGURATION
 
 # Cache the compiled wxWidgets so it can be in with future builds

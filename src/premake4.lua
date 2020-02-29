@@ -7,6 +7,17 @@ project "XWord"
 
     files { "**.hpp", "**.cpp", "**.h" }
 
+    local xword_version = os.getenv("XWORD_VERSION")
+    if xword_version == nil or xword_version == "" then
+        local version_file = assert(io.open("../VERSION", "r"))
+        local version = version_file:read("*all")
+        version_file:close()
+        xword_version = string.gsub(version, '%s+', '')
+    end
+
+    configuration {}
+        defines { [[XWORD_VERSION_STRING="]]..xword_version..[["]] }
+
     configuration "windows"
         -- Use WinMain() instead of main() for windows apps
         entrypoint "WinMainCRTStartup"
@@ -131,7 +142,7 @@ project "XWord"
             "mkdir -p $UNLOCALIZED_RESOURCES_FOLDER_PATH",
             "ln -sFh ../../../../../images $UNLOCALIZED_RESOURCES_FOLDER_PATH/images",
             -- Copy Info.plist, xword.icns, and default_config.ini
-            "cp ../../src/Info.plist $INFOPLIST_PATH",
+            "sed 's/{XWORD_VERSION}/"..xword_version.."/' ../../src/Info.plist > $INFOPLIST_PATH",
             "cp ../../images/xword.icns $UNLOCALIZED_RESOURCES_FOLDER_PATH",
             "cp ../../default_config.ini $UNLOCALIZED_RESOURCES_FOLDER_PATH",
         }

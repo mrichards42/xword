@@ -1,6 +1,6 @@
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "XWord"
-!define PRODUCT_VERSION "0.6.1"
+!define PRODUCT_VERSION "$%XWORD_VERSION%"
 !define PRODUCT_WEB_SITE "http://sourceforge.net/projects/wx-xword/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\XWord.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"

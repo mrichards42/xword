@@ -9,8 +9,11 @@ environment:
   PYTHON: "C:\\Python38"
   WX_VERSION: 3.1.3
 
-# Build and install markdown and wxWidgets, with our custom tweaks patch
 install:
+  # For tagged builds, use the tag name as the version.
+  # Otherwise, read the version from the VERSION file.
+  - IF "%APPVEYOR_REPO_TAG%"=="true" (SET XWORD_VERSION=%APPVEYOR_REPO_TAG_NAME%) ELSE (SET /P XWORD_VERSION=< VERSION)
+  # Build and install markdown and wxWidgets, with our custom tweaks patch
   - SET PATH=%PYTHON%;%PATH%
   - IF %CONFIGURATION%==Release python -m pip install markdown
   - call "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
