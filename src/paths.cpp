@@ -56,6 +56,14 @@ wxString GetConfigFile()
     return GetConfigDir() + sep() + configFileName;
 }
 
+wxString GetDefaultConfigFile()
+{
+    if (wxGetApp().IsPortable())
+        return exedir() + sep() + "default_config.ini";
+    else
+        return wxStandardPaths::Get().GetResourcesDir() + sep() + "default_config.ini";
+}
+
 wxString GetImagesDir()
 {
     if (wxGetApp().IsPortable())

@@ -51,6 +51,7 @@ solution "XWord"
             [[if not exist "..\..\bin\$(ConfigurationName)" mkdir "..\..\bin\$(ConfigurationName)"]],
             [[if not exist "..\..\bin\$(ConfigurationName)\scripts" mklink /j "..\..\bin\$(ConfigurationName)\scripts" "..\..\scripts"]],
             [[if not exist "..\..\bin\$(ConfigurationName)\images" mklink /j "..\..\bin\$(ConfigurationName)\images" "..\..\images"]],
+	    [[if not exist "..\..\bin\$(ConfigurationName)\default_config.ini" copy "..\..\default_config.ini" "..\..\bin\$(ConfigurationName)\" ]],
         }
 
     configuration "macosx"
