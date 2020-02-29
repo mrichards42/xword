@@ -255,6 +255,15 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                     square->AddFlag(FLAG_CORRECT);
                 // Top right number
                 square->m_mark[MARK_TR] = GetAttribute(cell, "top-right-number");
+                // Bars
+                if (GetAttribute(cell, "top-bar") == puzT("true"))
+                    square->m_bars[BAR_TOP] = true;
+                if (GetAttribute(cell, "left-bar") == puzT("true"))
+                    square->m_bars[BAR_LEFT] = true;
+                if (GetAttribute(cell, "right-bar") == puzT("true"))
+                    square->m_bars[BAR_RIGHT] = true;
+                if (GetAttribute(cell, "bottom-bar") == puzT("true"))
+                    square->m_bars[BAR_BOTTOM] = true;
             }
             // Image
             xml::node image = cell.child("background-picture");
