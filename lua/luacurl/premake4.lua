@@ -14,9 +14,9 @@ project "luacurl"
     -- Platform-specific
     configuration "windows"
         includedirs { DEPS.curl.include }
-        links { "wldap32", "winmm", "ws2_32" } -- For curl
+        links { "wldap32", "ws2_32", "crypt32", "normaliz" } -- For curl
         libdirs { DEPS.curl.lib }
-        links { "libcurl_imp" } -- for luacurl
+        links { "libcurl" } -- for luacurl
 
     configuration "linux or macosx"
         links { "curl" }

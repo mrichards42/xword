@@ -2,6 +2,8 @@
 /bin
 /build
 /lib
+/deps/curl
+/deps/luajit/lib
 /dist/scripts.nsi
 /dist/XWord-Windows.exe
 /dist/packages

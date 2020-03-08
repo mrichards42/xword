@@ -263,7 +263,7 @@ local function paths(paths)
     return paths
 end
 DEPS = {
-    lua = paths{include="deps/luajit/include", lib="deps/luajit/lib", dll="lua51.dll"},
+    lua = paths{include="deps/luajit/include", lib="deps/luajit/lib/" .. os.get(), dll="lua51.dll"},
     zlib = paths{include="deps/zlib/include", lib="deps/zlib/lib", dll="zlib1.dll"},
     expat = paths{include="deps/expat/include", lib="deps/expat/lib", dll="libexpat.dll"},
     curl = paths{include="deps/curl/include", lib="deps/curl/lib", dll="*.dll"},
