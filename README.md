@@ -91,15 +91,18 @@ XWord-specific premake options:
 Versions listed are the most recent that I have build XWord against.
 I'm sure the simpler libraries could be updated.
 
-Windows builds include dlls for everything except wxWidgets.
+Windows builds include dlls for everything except curl, lua, and wxWidgets.
 
 * wxWidgets (3.0; 3.1.2 is required for Mac OS 10.12+)
-* lua (5.1, but actually using LuaJIT 2.0.3)
+* lua (5.1, but actually using LuaJIT 2.0.5)
 * expat
-* curl (7.24.0)
+* curl (7.69.0)
 * yajl (2.0.2 -- source included)
 * zlib (1.2.5)
 * libyaml (0.2.2 -- source included)
+
+Curl (for Windows) can be built with build-curl.sh; LuaJIT can be built with
+build-luajit.sh.
 
 A debug build of wxWidgets is needed for debug builds of XWord, and likewise for release builds. The
 following configure options should work as a baseline for release builds:

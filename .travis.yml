@@ -5,6 +5,7 @@ osx_image: xcode7.3
 env:
   global:
     - WX_VERSION="3.1.3"
+    - LUAJIT_VERSION="2.0.5"
   matrix:
     - CONFIGURATION="Debug"
     - CONFIGURATION="Release"
@@ -13,6 +14,8 @@ install:
   # For tagged builds, use the tag name as the version.
   # Otherwise, read the version from the VERSION file.
   - if [ "$TRAVIS_TAG" != "" ]; then export XWORD_VERSION=$TRAVIS_TAG; else export XWORD_VERSION=$(cat VERSION); fi
+  # Build LuaJIT
+  - bash build-luajit.sh $LUAJIT_VERSION
   # Build and install wxWidgets, with our custom tweaks patch
   - ./build-wxwidgets.sh $WX_VERSION $CONFIGURATION
 
@@ -20,6 +23,7 @@ install:
 cache:
   directories:
     - $HOME/wxWidgets-$WX_VERSION
+    - $HOME/LuaJIT-$LUAJIT_VERSION
 
 # Run premake to create the Xcode project
 before_script:
