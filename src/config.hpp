@@ -156,6 +156,7 @@ public:
         ConfigColor incorrectColor;
         ConfigColor uncheckableColor;
         ConfigLong brightnessCutoff;
+        ConfigBool showCompletionStatus;
     } Status;
 
     // Printing

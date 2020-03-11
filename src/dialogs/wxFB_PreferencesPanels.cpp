@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct 10 2016)
+// C++ code generated with wxFormBuilder (version May 29 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #include "wxFB_PreferencesPanels.h"
@@ -89,6 +89,16 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	m_strictRebus->SetToolTip( wxT("Require rebus entries to exactly match the solution") );
 	
 	sbSizer41->Add( m_strictRebus, 0, wxALL, 5 );
+	
+	m_showCompletionStatus
+	= new wxCheckBox( sbSizer41->GetStaticBox(), wxID_ANY, wxT("Show completion status"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_showCompletionStatus
+	->SetValue(true);
+	m_showCompletionStatus
+	->SetToolTip( wxT("Show percentage completion while solving and whether a completed puzzle is correct or incorrect, and stop the timer when the puzzle is completed correctly.") );
+	
+	sbSizer41->Add( m_showCompletionStatus
+	, 0, wxALL, 5 );
 	
 	
 	bSizer5->Add( sbSizer41, 0, wxALL|wxEXPAND, 5 );

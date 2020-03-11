@@ -114,7 +114,7 @@ public:
     // Status bar
     //-----------
     void SetStatus(const wxString & text) { m_status->SetStatus(text); }
-
+    void SetShowCompletionStatus(bool show);
 
     // Timer
     //-----------
@@ -236,6 +236,9 @@ private:
     // AutoSave
     int m_autoSaveInterval;
     wxTimer m_autoSaveTimer;
+
+    // Status
+    bool m_showCompletionStatus;
 
     // The XWord puzzle
     //-----------------

@@ -223,6 +223,9 @@ void SolvePanel::DoLoadConfig()
     // Timer
     m_startTimer->SetValue(m_config.Timer.autoStart());
 
+    // Status
+    m_showCompletionStatus->SetValue(m_config.Status.showCompletionStatus());
+
     // Autosave
     m_useAutoSave->SetValue(m_config.autoSaveInterval() > 0);
     m_autoSave->SetValue(m_config.autoSaveInterval());
@@ -262,6 +265,8 @@ void SolvePanel::DoSaveConfig()
 
     m_config.Timer.autoStart = m_startTimer->GetValue();
 
+    m_config.Status.showCompletionStatus = m_showCompletionStatus->GetValue();
+
     m_config.autoSaveInterval =
         m_useAutoSave->IsChecked() ? m_autoSave->GetValue() : 0;
 
@@ -281,6 +286,7 @@ void SolvePanel::ConnectChangedEvents()
     BindChangedEvent(m_checkWhileTyping);
     BindChangedEvent(m_strictRebus);
     BindChangedEvent(m_startTimer);
+    BindChangedEvent(m_showCompletionStatus);
     BindChangedEvent(m_useAutoSave);
     BindChangedEvent(m_autoSave);
     BindChangedEvent(m_saveFileHistory);
