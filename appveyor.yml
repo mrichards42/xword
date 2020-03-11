@@ -42,6 +42,7 @@ build_script:
   # For release builds, also build docs and run dist steps.
   - IF %CONFIGURATION%==Release pushd doc & make_help.cmd & popd
   - IF %CONFIGURATION%==Release pushd dist & python gen_nsis.py > scripts.nsi & "%ProgramFiles(x86)%\NSIS\makensis.exe" /V4 XWord.nsi & popd
+  - IF %CONFIGURATION%==Release sed -e "s/{VERSION}/%XWORD_VERSION%/" -e "s/{OS_FILE}/XWord-Windows.exe/" dist/packages_template.lua > dist/packages_windows.lua
 
 # Zip the full build folder and make it available as an artifact.
 after_build:
@@ -54,12 +55,15 @@ artifacts:
   - path: dist\XWord-Windows.exe
     name: XWord-Windows.exe
 
+  - path: dist\packages_windows.lua
+    name: packages_windows.lua
+
 # Deploy tagged release builds to GitHub Releases
 deploy:
   provider: GitHub
   auth_token:
     secure: di7vtZSm1K8JwmYD0z+PVfcDGav/KwuK4CeBdp4oKoT7ImfJ7ksFSV6zcLcW6qui
-  artifact: XWord-Windows.exe
+  artifact: XWord-Windows.exe,packages_windows.lua
   on:
     appveyor_repo_tag: true
     configuration: Release

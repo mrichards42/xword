@@ -26,7 +26,7 @@ if not task.is_main then return P end
 
 -- Check for an update.  Callback is called after the task executes
 local osname = wx.__WXMSW__ and 'windows' or wx.__WXMAC__ and 'mac' or 'linux'
-P.packages_url = "http://sourceforge.net/projects/wx-xword/files/scripts/packages_"..osname..".lua"
+P.packages_url = "https://mrichards42.github.io/xword/packages_"..osname..".lua"
 
 function P.CheckForUpdates(callback)
     -- Make sure we have a directory for the updates file
