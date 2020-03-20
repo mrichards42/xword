@@ -1,6 +1,6 @@
 -- Converted from python by py2lua
 -- python file: wxFB.py
--- modtime: 1571291120
+-- modtime: 1583995186
 -- md5sum: ecc728a0399aad746ee6608735de0837
 -- ----------------------------------
 
@@ -78,7 +78,7 @@ function wxfb.DownloadDialog(parent)
     local bSizer3 = wx.wxBoxSizer( wx.wxHORIZONTAL )
     
     local kindChoices = { "Day", "Week", "Month" }
-    self.kind = wx.wxChoice( self.panel, wx.wxID_ANY, wx.wxDefaultPosition, wx.wxSize( 80,-1 ), kindChoices, 0 )
+    self.kind = wx.wxChoice( self.panel, wx.wxID_ANY, wx.wxDefaultPosition, parent:FromDIP( wx.wxSize( 80,-1 ) ), kindChoices, 0 )
     self.kind:SetSelection( 0 )
     bSizer3:Add( self.kind, 0, 0, 5 )
     
@@ -118,7 +118,7 @@ function wxfb.DownloadDialog(parent)
     
     bSizer3:Add(0, 0, 1)
     
-    self.date = wx.wxDatePickerCtrl( self.panel, wx.wxID_ANY, wx.wxDefaultDateTime, wx.wxDefaultPosition, wx.wxSize( 80,-1 ), wx.wxDP_DROPDOWN+wx.wxDP_SHOWCENTURY )
+    self.date = wx.wxDatePickerCtrl( self.panel, wx.wxID_ANY, wx.wxDefaultDateTime, wx.wxDefaultPosition, parent:FromDIP( wx.wxSize( 80,-1 ) ), wx.wxDP_DROPDOWN+wx.wxDP_SHOWCENTURY )
     bSizer3:Add( self.date, 0, 0, 5 )
     
     
@@ -172,7 +172,7 @@ end
 
 function wxfb.DownloadHeading(parent)
 
-    local self = wx.wxPanel ( parent, wx.wxID_ANY, wx.wxDefaultPosition, wx.wxSize( -1,-1 ), wx.wxTAB_TRAVERSAL )
+    local self = wx.wxPanel ( parent, wx.wxID_ANY, wx.wxDefaultPosition, parent:FromDIP( wx.wxSize( -1,-1 ) ), wx.wxTAB_TRAVERSAL )
     
     local bSizer7 = wx.wxBoxSizer( wx.wxVERTICAL )
     
@@ -230,7 +230,7 @@ end
 
 function wxfb.DownloadList(parent)
 
-    local self = wx.wxPanel ( parent, wx.wxID_ANY, wx.wxDefaultPosition, wx.wxSize( -1,-1 ), wx.wxTAB_TRAVERSAL )
+    local self = wx.wxPanel ( parent, wx.wxID_ANY, wx.wxDefaultPosition, parent:FromDIP( wx.wxSize( -1,-1 ) ), wx.wxTAB_TRAVERSAL )
     
     local bSizer10 = wx.wxBoxSizer( wx.wxVERTICAL )
     
@@ -381,7 +381,7 @@ end
 
 function wxfb.PreferencesPanel(parent)
 
-    local self = wx.wxPanel ( parent, wx.wxID_ANY, wx.wxDefaultPosition, wx.wxSize( 500,300 ), wx.wxTAB_TRAVERSAL )
+    local self = wx.wxPanel ( parent, wx.wxID_ANY, wx.wxDefaultPosition, parent:FromDIP( wx.wxSize( 500,300 ) ), wx.wxTAB_TRAVERSAL )
     
     local bSizer19 = wx.wxBoxSizer( wx.wxVERTICAL )
     
@@ -434,7 +434,7 @@ function wxfb.PreferencesPanel(parent)
     self.m_staticText4:Wrap( -1 )
     bSizer23:Add( self.m_staticText4, 0, wx.wxALIGN_CENTER_VERTICAL, 5 )
     
-    self.auto_download = wx.wxSpinCtrl( self, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize( 50,-1 ), wx.wxSP_ARROW_KEYS, 0, 10, 0 )
+    self.auto_download = wx.wxSpinCtrl( self, wx.wxID_ANY, "", wx.wxDefaultPosition, parent:FromDIP( wx.wxSize( 50,-1 ) ), wx.wxSP_ARROW_KEYS, 0, 10, 0 )
     bSizer23:Add( self.auto_download, 0, wx.wxALIGN_CENTER_VERTICAL+wx.wxRIGHT+wx.wxLEFT, 5 )
     
     self.m_staticText6 = wx.wxStaticText( self, wx.wxID_ANY, "days of puzzles", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )

@@ -1492,8 +1492,8 @@ MyFrame::ManageWindows()
 void
 MyFrame::SetupToolManager()
 {
-    m_toolMgr.SetIconSize_AuiToolBar(24);
-    m_toolMgr.SetIconSize_ToolBar(24);
+    m_toolMgr.SetIconSize_AuiToolBar(FromDIP(24));
+    m_toolMgr.SetIconSize_ToolBar(FromDIP(24));
     m_toolMgr.SetIconSize_Menu(16);
     wxString imagesdir = GetImagesDir();
     if (wxDirExists(imagesdir))
@@ -2601,6 +2601,8 @@ MyFrame::OnLicense(wxCommandEvent & WXUNUSED(evt))
     );
 
     LicenseDialog dlg(this);
+    // Until wxFormBuilder supports hidpi, we need to scale the dialog size ourselves.
+    dlg.SetSize(FromDIP(dlg.GetSize()));
     dlg.m_textCtrl->SetValue(licenseText);
     dlg.CenterOnParent();
     dlg.ShowModal();
@@ -2675,6 +2677,8 @@ MyFrame::PrintPreview(const PrintInfo & info, puz::Puzzle * puz)
                                                _T("Print Preview"));
     frame->Centre();
     frame->Initialize();
+    // Default size is not density-scaled, so scale it ourselves.
+    frame->SetSize(FromDIP(frame->GetSize()));
     frame->Show();
 }
 

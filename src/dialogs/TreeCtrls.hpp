@@ -28,6 +28,7 @@
 #endif
 
 #include "../config.hpp"
+#include "../widgets/ScaledSpinCtrl.h"
 #include "colorchoice.hpp"
 #include "fontpicker.hpp"
 #include <wx/odcombo.h>
@@ -61,6 +62,7 @@ DEFINE_CONTROL_EVENT_TRAITS(wxCheckBox, wxEVT_CHECKBOX);
 DEFINE_CONTROL_EVENT_TRAITS(wxRadioBox, wxEVT_RADIOBOX);
 DEFINE_CONTROL_EVENT_TRAITS(wxRadioButton, wxEVT_RADIOBUTTON);
 DEFINE_CONTROL_EVENT_TRAITS(wxSpinCtrl, wxEVT_SPINCTRL);
+DEFINE_CONTROL_EVENT_TRAITS(ScaledSpinCtrl, wxEVT_SPINCTRL);
 DEFINE_CONTROL_EVENT_TRAITS(FontPickerPanel,  wxEVT_FONTPICKER_CHANGED);
 DEFINE_CONTROL_EVENT_TRAITS(wxOwnerDrawnComboBox, wxEVT_COMBOBOX);
 DEFINE_CONTROL_EVENT_TRAITS(ColorChoice, wxEVT_COLOURPICKER_CHANGED);
@@ -125,7 +127,7 @@ struct VAlignDesc : public ControlDesc<wxChoice, long>
     virtual wxChoice * NewCtrl(wxWindow * parent)
     {
         wxString choices[] = {"Top", "Middle", "Bottom"};
-        return new wxChoice(parent, wxID_ANY, wxDefaultPosition, wxSize(100, -1),
+        return new wxChoice(parent, wxID_ANY, wxDefaultPosition, wxSize(parent->FromDIP(100), -1),
                             sizeof(choices) / sizeof(wxString), choices);
     }
 
@@ -162,7 +164,7 @@ struct HAlignDesc : public ControlDesc<wxChoice, long>
     virtual wxChoice * NewCtrl(wxWindow * parent)
     {
         wxString choices[] = {"Left", "Center", "Right"};
-        return new wxChoice(parent, wxID_ANY, wxDefaultPosition, wxSize(100, -1),
+        return new wxChoice(parent, wxID_ANY, wxDefaultPosition, wxSize(parent->FromDIP(100), -1),
                             sizeof(choices) / sizeof(wxString), choices);
     }
 

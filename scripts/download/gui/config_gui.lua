@@ -405,7 +405,7 @@ function config_panel(parent)
     local autosizer = wx.wxStaticBoxSizer(wx.wxHORIZONTAL, panel, "Automatically download")
     autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "Last"), 0, wx.wxALIGN_CENTER_VERTICAL)
     local auto_download = wx.wxSpinCtrl(
-        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(50, -1),
+        panel, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxSize(panel:FromDIP(50), -1),
         wx.wxSP_ARROW_KEYS, 0, 30, 0)
     autosizer:Add(auto_download, 0, wx.wxALIGN_CENTER_VERTICAL + wx.wxLEFT + wx.wxRIGHT, 5)
     autosizer:Add(wx.wxStaticText(panel, wx.wxID_ANY, "day(s) [0 = disabled]"), 0, wx.wxALIGN_CENTER_VERTICAL)

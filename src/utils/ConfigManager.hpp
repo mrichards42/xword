@@ -532,11 +532,8 @@ struct ConfigManagerBase::Convert<wxFont>
     static wxFont FromConfig(const wxString & str)
     {
         wxFont font;
-        // We used to used NativeFontInfoUserDesc instead of NativeFontInfoDesc,
-        // so try both here for backwards compatability
         if (! font.SetNativeFontInfo(str))
-            if (! font.SetNativeFontInfoUserDesc(str))
-                throw ConfigManagerBase::ConversionError();
+            throw ConfigManagerBase::ConversionError();
         return font;
     }
     static wxString ToConfig(const wxFont & font)

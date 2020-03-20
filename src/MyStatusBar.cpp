@@ -50,9 +50,9 @@ MyStatusBar::MyStatusBar(wxWindow * parent,
     : wxStatusBar(parent, id, style, name)
 {
 #ifdef XWORD_USE_LUA
-    int widths[] = {-2, 150, 200, 110};
+    int widths[] = {-2, FromDIP(150), FromDIP(200), FromDIP(100)};
 #else
-    int widths[] = {-2, 200, 110};
+    int widths[] = {-2, FromDIP(200), FromDIP(100)};
 #endif // XWORD_USE_LUA
 
     SetFieldsCount(STATUS_TOTAL, widths);

@@ -23,8 +23,9 @@
 #include <wx/panel.h>
 #include "fontface.hpp"
 #include <wx/tglbtn.h>
-#include <wx/spinctrl.h>
 #include <wx/fontpicker.h> // wxFontPickerEvent
+
+#include "../widgets/ScaledSpinCtrl.h"
 
 //------------------------------------------------------------------------------
 // Font Panels
@@ -60,7 +61,7 @@ public:
         m_facename = new FontFaceCtrl(this, wxID_ANY);
         top->Add(m_facename, 0, wxEXPAND, 0);
         
-        m_pointsize = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(50, -1), wxSP_ARROW_KEYS, 5, 100, 5);
+        m_pointsize = new ScaledSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(50, -1), wxSP_ARROW_KEYS, 5, 100, 5);
         top->Add(m_pointsize, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 2);
         
         sizer->Add(top, 0, wxEXPAND | wxRIGHT, 2);
