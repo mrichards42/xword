@@ -62,7 +62,7 @@ artifacts:
 deploy:
   provider: GitHub
   auth_token:
-    secure: di7vtZSm1K8JwmYD0z+PVfcDGav/KwuK4CeBdp4oKoT7ImfJ7ksFSV6zcLcW6qui
+    secure: hBIo/NQvoOmolwsGAJfq3znQKnQixzyAr6nxBLic6MGRBWLwbBLA+17glcoXO44V
   artifact: XWord-Windows.exe,packages_windows.lua
   on:
     appveyor_repo_tag: true
