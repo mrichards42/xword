@@ -49,6 +49,7 @@ deploy:
     - bin/$CONFIGURATION/XWord-macOS.zip
     - dist/packages_mac.lua
   skip_cleanup: true
+  draft: true
   on:
     tags: true
     condition: $CONFIGURATION = "Release"

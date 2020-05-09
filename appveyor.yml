@@ -64,6 +64,7 @@ deploy:
   auth_token:
     secure: hBIo/NQvoOmolwsGAJfq3znQKnQixzyAr6nxBLic6MGRBWLwbBLA+17glcoXO44V
   artifact: XWord-Windows.exe,packages_windows.lua
+  draft: true
   on:
     appveyor_repo_tag: true
     configuration: Release
