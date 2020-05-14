@@ -51,6 +51,7 @@ enum{ "GextFlag", header="puz/Square.hpp",
     "FLAG_MISSING",
     "FLAG_CORRECT",
     "FLAG_THEME",
+    "FLAG_CLUE",
 
     "FLAG_CHECK_MASK",
 }
@@ -69,6 +70,7 @@ enum { "GridFlag", header="puz/Grid.hpp",
 enum { "GridType", header="puz/Grid.hpp",
     "TYPE_NORMAL",
     "TYPE_DIAGRAMLESS",
+    "TYPE_ACROSTIC",
 }
 
 enum { "FindOptions", header="puz/Grid.hpp",
@@ -138,6 +140,9 @@ class{"Square", header="puz/Square.hpp"}
 
     func{"IsTheme", returns="bool"}
     func{"SetTheme", arg("bool", "doit", "true")}
+
+    func{"IsClue", returns="bool"}
+    func{"SetClue", arg("bool", "doit", "true")}
 
     func{"HasColor", returns="bool"}
     func{"SetColor", arg("unsigned char", "red"),
@@ -225,6 +230,7 @@ class{"Grid", header="puz/Grid.hpp"}
     property{"unsigned short", "Flag"}
 
     func{"IsDiagramless", returns="bool"}
+    func{"IsAcrostic", returns="bool"}
     property{"unsigned short", "Type"}
 
     func{"ScrambleSolution", returns="bool", arg("unsigned short", "key", "0")}

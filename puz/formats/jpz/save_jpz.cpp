@@ -127,7 +127,12 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
     xml::SetInnerXML(puzzle.append_child("instructions"), puz->GetNotes());
 
-    xml::node crossword = puzzle.append_child("crossword");
+    const char* puzzle_root_tag;
+    if (grid.IsAcrostic())
+        puzzle_root_tag = "acrostic";
+    else
+        puzzle_root_tag = "crossword";
+    xml::node crossword = puzzle.append_child(puzzle_root_tag);
 
     // Grid
     xml::node xmlgrid = crossword.append_child("grid");
@@ -151,10 +156,12 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
             cell.append_attribute("y") = square->GetRow() + 1;
             if (square->IsMissing())
                 cell.append_attribute("type") = "void";
-            else if (square->IsBlack())
+            else if (square->IsBlack() && !square->IsClue())
                 cell.append_attribute("type") = "block";
             else
             {
+                if (square->IsClue())
+                    cell.append_attribute("type") = "clue";
                 cell.append_attribute("solution") =
                     encode_utf8(square->GetSolution()).c_str();
                 if (square->HasNumber())

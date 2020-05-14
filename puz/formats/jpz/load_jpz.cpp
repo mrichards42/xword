@@ -161,7 +161,14 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             throw FileTypeError("jpz");
     }
     xml::node puzzle = RequireChild(applet, "rectangular-puzzle");
-    xml::node crossword = RequireChild(puzzle, "crossword");
+    xml::node crossword = puzzle.child("crossword");
+    if (! crossword)
+    {
+        crossword = puzzle.child("acrostic");
+        if (!crossword)
+            throw FileTypeError("jpz must have either <crossword> or <acrostic> tag");
+        grid.SetType(TYPE_ACROSTIC);
+    }
 
     // Metadata
     xml::node meta = puzzle.child("metadata");
@@ -215,15 +222,13 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 square->SetMissing(false);
                 square->SetBlack();
             }
-            else if (type == puzT("clue"))
-            {
-                throw LoadError("Clues inside squares are not supported.");
-            }
-            else // type == puzT("letter")
+            else // type == puzT("letter") || type == puzT("clue")
             {
                 square->SetMissing(false);
                 square->SetSolution(GetAttribute(cell, "solution"));
                 square->SetText(GetAttribute(cell, "solve-state"));
+                if (type == puzT("clue"))
+                    square->SetClue(true);
                 square->SetNumber(GetAttribute(cell, "number"));
                 if (GetAttribute(cell, "background-shape") == puzT("circle"))
                     square->SetCircle();

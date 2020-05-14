@@ -38,8 +38,11 @@ enum GridFlag
 
 enum GridType
 {
+    // Across Lite flags
     TYPE_NORMAL      = 0x0001,
-    TYPE_DIAGRAMLESS = 0x0401
+    TYPE_DIAGRAMLESS = 0x0401,
+    // Additional flags
+    TYPE_ACROSTIC    = 0x1000,
 };
 
 // Parameters for FindSquare
@@ -186,6 +189,7 @@ public:
 
     // Type
     bool IsDiagramless() const { return m_type == TYPE_DIAGRAMLESS; }
+    bool IsAcrostic() const { return m_type == TYPE_ACROSTIC; }
     unsigned short GetType() const { return m_type; }
     void SetType(unsigned short type) { m_type = type; }
 

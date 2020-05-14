@@ -51,6 +51,7 @@ enum GextFlag
     FLAG_MISSING   = 0x200, // No square
     FLAG_CORRECT   = 0x400, // Checked/correct
     FLAG_THEME     = 0x800, // A theme square
+    FLAG_CLUE      = 0x1000, // A clue square
 
     // Check square options
     FLAG_CHECK_MASK = FLAG_X |
@@ -187,12 +188,12 @@ public:
     // SetSolution(Square::Black) also calls SetText(Square::Black) for
     // consistency, so if your puzzle is diagramless, you will have to
     // explicitly call SetText("") on black squares to make them empty.
-    bool IsWhite()         const { return ! IsBlack() && ! IsMissing(); }
-    bool IsBlack()         const { return m_text == Black; }
+    bool IsWhite()         const { return !IsBlack() && !IsMissing(); }
+    bool IsBlack()         const { return m_text == Black || IsClue(); }
     bool IsBlank()         const { return m_text == Blank; }
     // Corresponding functions for the solution
-    bool IsSolutionWhite() const { return ! IsSolutionBlack() &&! IsMissing(); }
-    bool IsSolutionBlack() const { return m_solution == Black; }
+    bool IsSolutionWhite() const { return !IsSolutionBlack() && !IsMissing(); }
+    bool IsSolutionBlack() const { return m_solution == Black || IsClue(); }
     bool IsSolutionBlank() const { return m_solution == Blank; }
 
     // Text
@@ -284,6 +285,9 @@ public:
 
     bool IsTheme() const { return HasFlag(FLAG_THEME); }
     void SetTheme(bool doit = true) { AddFlag(FLAG_THEME, doit); }
+
+    bool IsClue() const { return HasFlag(FLAG_CLUE); }
+    void SetClue(bool doit = true) { AddFlag(FLAG_CLUE, doit); }
 
     bool HasColor() const { return HasFlag(FLAG_COLOR); }
     void SetColor(unsigned char red, unsigned char green, unsigned char blue);

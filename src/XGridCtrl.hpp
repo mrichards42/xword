@@ -194,7 +194,15 @@ public:
         { SetFocusedSquare(NULL, direction); }
 
     // Drawing functions
-    void RefreshSquare(wxDC & dc, const puz::Square & square)  { DrawSquare(dc, square); }
+    void RefreshSquare(wxDC & dc, const puz::Square & square)  { 
+        DrawSquare(dc, square); 
+        if (GetGrid()->IsAcrostic()) {
+            puz::Square* partnerSquare = GetPartnerSquare(square);
+            if (partnerSquare) {
+                DrawSquare(dc, *partnerSquare);
+            }
+        }
+    }
     void RefreshSquare(const puz::Square & square)
         { wxClientDC dc(this); DoPrepareDC(dc); RefreshSquare(dc, square); }
 
@@ -209,7 +217,7 @@ public:
             DrawSquare(dc, *it);
     }
 
-    bool SetSquareText(puz::Square & square, const wxString & text = _T(""));
+    bool SetSquareText(puz::Square & square, const wxString & text = _T(""), bool propagate = true);
 
     const puz::Square * GetFocusedSquare() const { return m_focusedSquare; }
           puz::Square * GetFocusedSquare()       { return m_focusedSquare; }
@@ -416,6 +424,14 @@ protected:
     XGridRebusCtrl * m_rebusCtrl;
 
 private:
+    void AddSquareFlag(puz::Square& square, unsigned int flag, bool propagate = true);
+    void RemoveSquareFlag(puz::Square& square, unsigned int flag, bool propagate = true);
+
+    // For Acrostic puzzles, return the partner square for the given square.
+    // This is the square with the same number - from the quote if the given square
+    // is from a clue, or vice versa.
+    puz::Square* GetPartnerSquare(const puz::Square& square);
+
     // Events
     bool m_areEventsConnected;
 

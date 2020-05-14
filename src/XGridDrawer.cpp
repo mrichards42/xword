@@ -518,7 +518,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
         dc.DrawRectangle(x, y, m_boxSize, m_boxSize);
     }
 
-    if (HasFlag(DRAW_SOLUTION) ? square.IsSolutionBlack() : square.IsBlack())
+    if ((HasFlag(DRAW_SOLUTION) ? square.IsSolutionBlack() : square.IsBlack()) && !square.IsClue())
         return; // Nothing else to do if it's a black square.
 
     // Draw square's flag (top right)
@@ -561,7 +561,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
         dc.SetTextForeground(textColor);
 
         // Draw corner marks
-        wxRect markRect(x+1, y+1, m_boxSize - 2, m_boxSize - 2);
+        wxRect markRect(x+1, y, m_boxSize - 2, m_boxSize - 2);
         if (! square.m_mark[puz::MARK_TL].empty())
             dc.DrawLabel(puz2wx(square.m_mark[puz::MARK_TL]), markRect,
                          wxALIGN_TOP | wxALIGN_LEFT);

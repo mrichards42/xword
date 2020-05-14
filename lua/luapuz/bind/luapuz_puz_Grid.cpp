@@ -288,6 +288,14 @@ static int Grid_IsDiagramless(lua_State * L)
     lua_pushboolean(L, returns);
     return 1;
 }
+// bool IsAcrostic()
+static int Grid_IsAcrostic(lua_State * L)
+{
+    puz::Grid * grid = luapuz_checkGrid(L, 1);
+    bool returns = grid->IsAcrostic();
+    lua_pushboolean(L, returns);
+    return 1;
+}
 // unsigned short GetType()
 static int Grid_GetType(lua_State * L)
 {
@@ -475,6 +483,7 @@ static const luaL_reg Gridlib[] = {
     {"GetFlag", Grid_GetFlag},
     {"SetFlag", Grid_SetFlag},
     {"IsDiagramless", Grid_IsDiagramless},
+    {"IsAcrostic", Grid_IsAcrostic},
     {"GetType", Grid_GetType},
     {"SetType", Grid_SetType},
     {"ScrambleSolution", Grid_ScrambleSolution},

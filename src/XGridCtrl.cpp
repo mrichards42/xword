@@ -912,7 +912,7 @@ XGridCtrl::MakeVisible(const puz::Square & square)
 
 
 bool
-XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
+XGridCtrl::SetSquareText(puz::Square & square, const wxString & text, bool propagate)
 {
     // Are we allowed to enter this text?
     if (text == _T("."))
@@ -930,6 +930,14 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
     // Not allowed to overwrite revealed letters or checked letters
     if (square.HasFlag(puz::FLAG_REVEALED | puz::FLAG_CORRECT))
         return false;
+
+    if (GetGrid()->IsAcrostic() && propagate) {
+        // Propagate the text to the partner square in the Acrostic.
+        puz::Square* partnerSquare = GetPartnerSquare(square);
+        if (partnerSquare) {
+            SetSquareText(*partnerSquare, text, /* propagate= */ false);
+        }
+    }
 
     // renumber the grid if the square is changing from black to white or vice-versa
     const bool numberGrid = GetGrid()->IsDiagramless() &&
@@ -958,11 +966,30 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
         GetGrid()->NumberGrid();
         Refresh();
     }
+    else {
+        RefreshSquare(square);
+    }
 
     return true;
 }
 
-
+puz::Square*
+XGridCtrl::GetPartnerSquare(const puz::Square& square) {
+    wxASSERT(GetGrid()->IsAcrostic());
+    // TODO: Should we precalculate the partner squares to make this a faster lookup?
+    for (size_t y = 0; y < GetGrid()->GetHeight(); y++) {
+        for (size_t x = 0; x < GetGrid()->GetWidth(); x++) {
+            if (x != square.GetCol() || y != square.GetRow()) {
+                puz::Square* sq = GetGrid()->AtNULL(x, y);
+                if (sq->IsWhite() && square.GetNumber() == sq->GetNumber()) {
+                    return sq;
+                }
+            }
+        }
+    }
+    wxFAIL;
+    return NULL;
+}
 
 void
 XGridCtrl::StartSelection(wxObjectEventFunction func, wxEvtHandler * evtSink)
@@ -1142,30 +1169,52 @@ XGridCtrl::CheckSquare(puz::Square * square, int options, wxDC & dc)
 {
     if (! square->IsWhite() && ! m_puz->IsDiagramless())
         return true;
-    square->RemoveFlag(puz::FLAG_CORRECT);
+    RemoveSquareFlag(*square, puz::FLAG_CORRECT);
     if (! square->Check((options & CHECK_ALL) != 0, HasStyle(STRICT_REBUS)))
     {
         if ( (options & REVEAL_ANSWER) != 0)
         {
             SetSquareText(*square, puz2wx(square->GetSolution()));
-            square->RemoveFlag(puz::FLAG_BLACK | puz::FLAG_X);
-            square->AddFlag(puz::FLAG_REVEALED);
+            RemoveSquareFlag(*square, puz::FLAG_BLACK | puz::FLAG_X);
+            AddSquareFlag(*square, puz::FLAG_REVEALED);
         }
         else
         {
-            square->RemoveFlag(puz::FLAG_BLACK);
-            square->AddFlag(puz::FLAG_X);
+            RemoveSquareFlag(*square, puz::FLAG_BLACK);
+            AddSquareFlag(*square, puz::FLAG_X);
         }
         RefreshSquare(dc, *square);
         return false;
     }
     else if (! square->IsBlank() && ! square->HasFlag(puz::FLAG_REVEALED))
     {
-        square->AddFlag(puz::FLAG_CORRECT);
+        AddSquareFlag(*square, puz::FLAG_CORRECT);
         RefreshSquare(dc, *square);
         return true;
     }
     return true;
+}
+
+void
+XGridCtrl::AddSquareFlag(puz::Square& square, unsigned int flag, bool propagate) {
+    square.AddFlag(flag);
+    if (GetGrid()->IsAcrostic() && propagate) {
+        puz::Square* partnerSquare = GetPartnerSquare(square);
+        if (partnerSquare) {
+            AddSquareFlag(*partnerSquare, flag, /* propagate= */ false);
+        }
+    }
+}
+
+void
+XGridCtrl::RemoveSquareFlag(puz::Square& square, unsigned int flag, bool propagate) {
+    square.RemoveFlag(flag);
+    if (GetGrid()->IsAcrostic() && propagate) {
+        puz::Square* partnerSquare = GetPartnerSquare(square);
+        if (partnerSquare) {
+            RemoveSquareFlag(*partnerSquare, flag, /* propagate= */ false);
+        }
+    }
 }
 
 
