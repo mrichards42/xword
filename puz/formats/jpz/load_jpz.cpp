@@ -188,6 +188,11 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     if (puz->GetCopyright().empty())
         puz->SetCopyright(GetInnerXML(applet, "copyright"));
 
+    xml::node completion = applet.child("applet-settings").child("completion");
+    if (completion) {
+        puz->SetMeta(puzT("completion"), GetInnerXML(completion));
+    }
+
     // Grid
     {
         xml::node grid_node = RequireChild(crossword, "grid");
@@ -219,8 +224,23 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             }
             else if (type == puzT("block"))
             {
-                square->SetMissing(false);
-                square->SetBlack();
+                // Quick check to see if the background color is white as a special case for Acrostic spacers.
+                puz::string_t background_color = GetAttribute(cell, "background-color");
+                bool is_white = background_color.size() > 0;
+                for (puz::string_t::iterator it = background_color.begin(); it != background_color.end(); ++it) {
+                    if (*it != '#' && *it != 'f' && *it != 'F') {
+                        is_white = false;
+                        break;
+                    }
+                }
+
+                if (is_white) {
+                    square->SetMissing(true);
+                }
+                else {
+                    square->SetMissing(false);
+                    square->SetBlack();
+                }
             }
             else // type == puzT("letter") || type == puzT("clue")
             {
@@ -228,7 +248,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 square->SetSolution(GetAttribute(cell, "solution"));
                 square->SetText(GetAttribute(cell, "solve-state"));
                 if (type == puzT("clue"))
-                    square->SetClue(true);
+                    square->SetAnnotation(true);
                 square->SetNumber(GetAttribute(cell, "number"));
                 if (GetAttribute(cell, "background-shape") == puzT("circle"))
                     square->SetCircle();

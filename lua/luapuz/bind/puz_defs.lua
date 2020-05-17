@@ -51,7 +51,7 @@ enum{ "GextFlag", header="puz/Square.hpp",
     "FLAG_MISSING",
     "FLAG_CORRECT",
     "FLAG_THEME",
-    "FLAG_CLUE",
+    "FLAG_ANNOTATION",
 
     "FLAG_CHECK_MASK",
 }
@@ -141,8 +141,8 @@ class{"Square", header="puz/Square.hpp"}
     func{"IsTheme", returns="bool"}
     func{"SetTheme", arg("bool", "doit", "true")}
 
-    func{"IsClue", returns="bool"}
-    func{"SetClue", arg("bool", "doit", "true")}
+    func{"IsAnnotation", returns="bool"}
+    func{"SetAnnotation", arg("bool", "doit", "true")}
 
     func{"HasColor", returns="bool"}
     func{"SetColor", arg("unsigned char", "red"),

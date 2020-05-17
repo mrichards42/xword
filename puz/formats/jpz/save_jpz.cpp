@@ -156,11 +156,11 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
             cell.append_attribute("y") = square->GetRow() + 1;
             if (square->IsMissing())
                 cell.append_attribute("type") = "void";
-            else if (square->IsBlack() && !square->IsClue())
+            else if (square->IsBlack() && !square->IsAnnotation())
                 cell.append_attribute("type") = "block";
             else
             {
-                if (square->IsClue())
+                if (square->IsAnnotation())
                     cell.append_attribute("type") = "clue";
                 cell.append_attribute("solution") =
                     encode_utf8(square->GetSolution()).c_str();

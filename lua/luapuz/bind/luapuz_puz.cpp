@@ -144,7 +144,7 @@ const luapuz_enumReg GextFlag_reg[] = {
     {"FLAG_MISSING", puz::FLAG_MISSING},
     {"FLAG_CORRECT", puz::FLAG_CORRECT},
     {"FLAG_THEME", puz::FLAG_THEME},
-    {"FLAG_CLUE", puz::FLAG_CLUE},
+    {"FLAG_ANNOTATION", puz::FLAG_ANNOTATION},
     {"FLAG_CHECK_MASK", puz::FLAG_CHECK_MASK},
     {NULL, NULL}
 };

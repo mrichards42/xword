@@ -602,15 +602,22 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
         else if (! square->HasWord(static_cast<puz::GridDirection>(direction))
             && ! m_puz->FindWord(square, direction))
         {
-            puz::GridDirection newdir
-                = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
-            if (square->HasWord(newdir))
-                direction = newdir;
+            if (GetGrid()->IsAcrostic())
+            {
+                direction = puz::ACROSS;
+            }
             else
             {
-                word = m_puz->FindWord(square, newdir);
-                if (word)
+                puz::GridDirection newdir
+                    = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
+                if (square->HasWord(newdir))
                     direction = newdir;
+                else
+                {
+                    word = m_puz->FindWord(square, newdir);
+                    if (word)
+                        direction = newdir;
+                }
             }
         }
     }
@@ -1600,7 +1607,8 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
             // Check to see if there *should be* a (non-diagonal) word
             // in arrowDirection.
             if (! IsDiagonal(arrowDirection)
-                && m_focusedSquare->HasWord(arrowDirection))
+                && m_focusedSquare->HasWord(arrowDirection)
+                && !GetGrid()->IsAcrostic())
             {
                 SetFocusedSquare(m_focusedSquare, NULL, arrowDirection);
                 return;
@@ -1610,12 +1618,17 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
         if (! GetGrid()->IsDiagramless())
         {
             // Find the next white square in the arrow direction
+            puz::GridDirection newDirection;
+            if (GetGrid()->IsAcrostic())
+                newDirection = puz::ACROSS;
+            else
+                newDirection = arrowDirection;
             SetFocusedSquare(
                 m_grid->FindNextSquare(
                     m_focusedSquare, FIND_WHITE_SQUARE,
                     arrowDirection, puz::NO_WRAP
                 ),
-                NULL, arrowDirection
+                NULL, newDirection
             );
         }
         else // Diagramless

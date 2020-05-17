@@ -518,7 +518,7 @@ XGridDrawer::DrawSquare(wxDC & adc,
         dc.DrawRectangle(x, y, m_boxSize, m_boxSize);
     }
 
-    if ((HasFlag(DRAW_SOLUTION) ? square.IsSolutionBlack() : square.IsBlack()) && !square.IsClue())
+    if ((HasFlag(DRAW_SOLUTION) ? square.IsSolutionBlack() : square.IsBlack()) && !square.IsAnnotation())
         return; // Nothing else to do if it's a black square.
 
     // Draw square's flag (top right)
