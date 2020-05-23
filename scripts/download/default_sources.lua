@@ -77,7 +77,7 @@ return {
             local page = assert(curl.get(puzzle.url))
 
             -- Search for a download link (crossword solver app)
-            local name = page:match('src="http://www.brendanemmettquigley.com/javaapp/([^"]-).html"')
+            local name = page:match('www.brendanemmettquigley.com/javaapp/([^"]-).html"')
             if name then
                 -- Download the puzzle as an jpz javascript
                 local js = assert(curl.get("http://www.brendanemmettquigley.com/xpuz/" .. name .. ".js"))
@@ -91,9 +91,9 @@ return {
             end
 
             -- Search for a jpz link
-            local jpz_url = page:match('href="(http://www.brendanemmettquigley.com/files/[^"]+%.jpz)"')
+            local jpz_url = page:match('www.brendanemmettquigley.com/files/[^"]+%.jpz')
             if jpz_url then
-                assert(curl.get(jpz_url, puzzle.filename))
+                assert(curl.get('http://' .. jpz_url, puzzle.filename))
                 return
             end
             return "No puzzle"
