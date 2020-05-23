@@ -47,6 +47,7 @@ require 'import.uclick'
 require 'import.xwordinfo'
 require 'import.newsday'
 require 'import.rowsgarden'
+require 'import.amuselabs'
 
 -- ============================================================================
 -- Replace loading functions with import.load
