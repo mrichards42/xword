@@ -113,4 +113,32 @@ return {
         filename = "wp%Y%m%d.puz",
         days = { false, false, false, false, false, false, true },
     },
+
+    {
+      name = "The New Yorker",
+      url = "https://www.newyorker.com/crossword/puzzles-dept/%Y/%m/%d",
+      filename = "nyer%Y%m%d.jpz",
+      days = { true, false, false, false, true, false, false },
+      func = [[
+          -- Download the page with the puzzle
+          local page = assert(curl.get(puzzle.url))
+
+          -- Search for the app code
+          local amuse_url = page:match('http[^ ]*amuselabs.com/[^ ]+embed=1')
+          if not amuse_url then
+              return "No puzzle"
+          end
+          local page2 = assert(curl.get(amuse_url))
+
+          -- Get the crossword data
+          local data = page2:match("rawc%s*=%s*'([^']+)'")
+          if data then
+            -- Using the data _as_ the filename is kind of a hack, but it works
+            local success, p = pcall(puz.Puzzle, data, import.amuselabsBase64)
+            if success then
+                p:Save(puzzle.filename) -- Save this as a jpz
+            end
+          end
+      ]]
+    },
 }
