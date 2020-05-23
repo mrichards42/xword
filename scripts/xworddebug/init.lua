@@ -95,6 +95,7 @@ local function init()
 
     -- This is always last
     require 'xworddebug.interp'
+    require('xworddebug.socket_repl').init()
 end
 
 return init
