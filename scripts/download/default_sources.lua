@@ -40,13 +40,8 @@ return {
 
     {
         name = "LA Times",
-        url = "http://www.cruciverb.com/download.php?f=lat%y%m%d.puz",
-        filename = "lat%Y%m%d.puz",
-        auth = { url="http://www.cruciverb.com/index.php?action=login", user_id="user", password_id="passwrd"},
-        curlopts =
-        {
-            referer = 'http://www.cruciverb.com/',
-        },
+        url = "http://cdn.games.arkadiumhosted.com/latimes/assets/DailyCrossword/la%y%m%d.xml",
+        filename = "lat%Y%m%d.jpz",
         days = { true, true, true, true, true, true, true },
     },
 
