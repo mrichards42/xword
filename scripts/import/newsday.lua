@@ -1,7 +1,7 @@
 -- Newsday files are not utf-8, but wx expects utf-8
 -- They're either windows encoding or latin-1
 local function do_read_line(f)
-    local line = f:read('*l')
+    local line = f:read('*l'):gsub("[\n\r]$", '')
     return line:gsub("[\128-\255]", function(c)
         local n = string.byte(c)
         if n < 0xa0 then
