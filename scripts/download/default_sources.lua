@@ -60,10 +60,17 @@ return {
     },
 
     {
-        name = "Universal",
+        name = "Universal Daily",
         url = "http://picayune.uclick.com/comics/fcx/data/fcx%y%m%d-data.xml",
         filename = "univ%Y%m%d.xml",
         days = { true, true, true, true, true, true, true },
+    },
+
+    {
+          name = "Universal Sunday",
+          url = "http://herbach.dnsalias.com/uc/ucs%y%m%d.puz",
+          filename = "ucs%Y%m%d.puz",
+          days = { false, false, false, false, false, false, true },
     },
 
     {
