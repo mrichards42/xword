@@ -199,3 +199,14 @@ void PreferencesDialog::OnCancel(wxCommandEvent & evt)
     ResetConfig();
     evt.Skip();
 }
+
+void PreferencesDialog::OnClose(wxCloseEvent & evt) {
+    // Lua preferences aren't required to implement live previews.  If we're
+    // using live preview, the C++ preferences save automatically, so we don't
+    // need to call SaveConfig().  So we need to explicitly call it here to
+    // make sure the lua preferences are saved.
+#if XWORD_PREFERENCES_LIVE_PREVIEW && XWORD_USE_LUA
+    SaveConfig();
+#endif
+    Destroy();
+}

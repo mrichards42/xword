@@ -55,7 +55,7 @@ protected:
     void OnOK(wxCommandEvent & evt);
     void OnApply(wxCommandEvent & evt);
     void OnCancel(wxCommandEvent & evt);
-    void OnClose(wxCloseEvent & evt) { Destroy(); }
+    void OnClose(wxCloseEvent & evt);
 
     ConfigManager * m_config;
     ConfigManager m_oldConfig;
