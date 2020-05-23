@@ -101,9 +101,9 @@ return {
     },
 
     {
-        name = "Washington Post Puzzler",
-        url = "http://cdn.games.arkadiumhosted.com/washingtonpost/puzzler/puzzle_%y%m%d.xml",
-        filename = "wp%Y%m%d.jpz",
+        name = "Washington Post Sunday",
+        url = "http://herbach.dnsalias.com/WaPo/wp%y%m%d.puz",
+        filename = "wp%Y%m%d.puz",
         days = { false, false, false, false, false, false, true },
     },
 }
