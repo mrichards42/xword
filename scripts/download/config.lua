@@ -38,8 +38,7 @@ local default_disabled = {
     "Matt Gaffney's Weekly Crossword Contest",
     "Matt Gaffney's Daily Crossword",
     "Brendan Emmett Quigley",
-    "I Swear",
-    "Washington Post Puzzler"
+    "Washington Post Puzzler",
 }
 
 -- Keep a list of original keys to the config table
