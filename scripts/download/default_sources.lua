@@ -76,9 +76,9 @@ return {
 
     {
         name = "Wall Street Journal",
-        url = "http://mazerlm.home.comcast.net/wsj%y%m%d.puz",
+        url = "http://herbach.dnsalias.com/wsj/wsj%y%m%d.puz",
         filename = "wsj%Y%m%d.puz",
-        days = { false, false, false, false, true, false, false },
+        days = { true, true, true, true, true, true, false },
     },
 
     {
