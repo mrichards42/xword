@@ -49,7 +49,7 @@ return {
         name = "USA Today",
         url = "http://picayune.uclick.com/comics/usaon/data/usaon%y%m%d-data.xml",
         filename = "usa%Y%m%d.xml",
-        days = { true, true, true, true, true, false, false },
+        days = { true, true, true, true, true, true, true },
     },
     {
         name = "Ink Well",
