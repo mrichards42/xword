@@ -161,4 +161,40 @@ return {
           end
       ]]
     },
+
+    {
+      name = "New York Magazine",
+      url = "https://cdn3.amuselabs.com/nymag/date-picker?set=nymag&theme=nymag&embed=1&limit=100",
+      filename = "nym%Y%m%d.jpz",
+      days = { false, false, false, false, false, false, true },
+      func = [[
+          -- Download the puzzle list
+          local page = assert(curl.get(puzzle.url))
+          local puz_datestr = puzzle.date:fmt('%d %B %Y'):gsub('^0', '')
+
+          -- Find the url for this date
+          local amuse_url
+          for id, datestr in page:gmatch('data%-id="(.-)".-<strong>(.-)</strong>') do
+            if datestr == puz_datestr then
+              amuse_url = "https://cdn3.amuselabs.com/nymag/crossword?id=" .. id .. "&set=nymag&embed=1"
+              break
+            end
+          end
+          if not amuse_url then
+            return "No Puzzle"
+          end
+
+          -- Download the puzzle page
+          local page2 = assert(curl.get(amuse_url))
+
+          -- Get the crossword data
+          local data = page2:match("rawc%s*=%s*'([^']+)'")
+          if data then
+            local success, p = pcall(puz.Puzzle, data, import.amuselabsBase64)
+            if success then
+                p:Save(puzzle.filename)
+            end
+          end
+      ]]
+    },
 }
