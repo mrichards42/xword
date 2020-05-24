@@ -141,4 +141,24 @@ return {
           end
       ]]
     },
+
+    {
+      name = "The Atlantic",
+      url = "https://cdn3.amuselabs.com/atlantic/crossword?id=atlantic_%Y%m%d&set=atlantic&embed=1",
+      filename = "atlantic%Y%m%d.jpz",
+      days = { true, true, true, true, true, false, true },
+      func = [[
+          -- Download the page with the puzzle
+          local page = assert(curl.get(puzzle.url))
+
+          -- Get the crossword data
+          local data = page:match("rawc%s*=%s*'([^']+)'")
+          if data then
+            local success, p = pcall(puz.Puzzle, data, import.amuselabsBase64)
+            if success then
+                p:Save(puzzle.filename)
+            end
+          end
+      ]]
+    },
 }
