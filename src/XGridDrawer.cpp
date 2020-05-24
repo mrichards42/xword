@@ -767,7 +767,10 @@ XGridDrawer::GetSquareColor(const puz::Square & square) const
         }
         else if (square.IsBlack())
         {
-            return GetBlackSquareColor();
+            if (square.HasColor())
+                return wxColor(square.m_red, square.m_green, square.m_blue);
+            else
+                return GetBlackSquareColor();
         }
     }
     else
