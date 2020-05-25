@@ -190,7 +190,7 @@ local LOAD_ERROR = false
 function config.load()
     local data, err = serialize.loadfile(config.get_config_filename())
     -- Check for errors
-    if not data and path.isfile(config.get_config_filename()) then
+    if type(data) ~= 'table' and path.isfile(config.get_config_filename()) then
         local msg =
             "Error while loading Puzzle Downloader configuration file.\n" ..
             "Would you like to reset Puzzle Downloader settings?"
@@ -204,31 +204,32 @@ function config.load()
             LOAD_ERROR = true
         end
     end
-    if type(data) ~= 'table' then return end
-    -- Update the configuration values
-    for _, k in ipairs(config_keys) do
-        if k ~= 'styles' then -- we need special processing for colors/fonts
-            if type(config[k]) == 'table' then
-                deep_update(config[k], data[k])
-            else
-                config[k] = data[k]
-            end
-        end
-    end
-    -- Create fonts and colors from strings
-    for k, style in pairs(data.styles) do
-        local config_style = config.styles[k]
-        if config_style then
-            if type(style.font) == 'string' then
-                config_style.font:SetNativeFontInfo(style.font)
-            end
-            if type(style.color) == 'string' then
-                config_style.color:Set(style.color)
-            end
-        end
+    if data then
+      -- Update the configuration values
+      for _, k in ipairs(config_keys) do
+          if k ~= 'styles' then -- we need special processing for colors/fonts
+              if type(config[k]) == 'table' then
+                  deep_update(config[k], data[k])
+              else
+                  config[k] = data[k]
+              end
+          end
+      end
+      -- Create fonts and colors from strings
+      for k, style in pairs(data.styles or {}) do
+          local config_style = config.styles[k]
+          if config_style then
+              if type(style.font) == 'string' then
+                  config_style.font:SetNativeFontInfo(style.font)
+              end
+              if type(style.color) == 'string' then
+                  config_style.color:Set(style.color)
+              end
+          end
+      end
     end
     -- Update sources config
-    load_sources_config(data)
+    load_sources_config(data or {})
 end
 
 --- Save the config to file
