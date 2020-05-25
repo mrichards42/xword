@@ -10,7 +10,11 @@
 -- @param expanded The expanded bitmap
 -- @function BmpToggleButton
 return function(parent, id, collapsed, expanded)
-    local self = wx.wxStaticBitmap(parent, id, collapsed)
+    local self = wx.wxButton(
+      parent, id, "",
+      wx.wxDefaultPosition, collapsed.Size,
+      wx.wxBORDER_NONE)
+    self:SetBitmap(collapsed)
 
     local cursor = wx.wxCursor(wx.wxCURSOR_HAND)
     self:SetCursor(cursor)
@@ -59,9 +63,6 @@ return function(parent, id, collapsed, expanded)
         )
         evt:Skip()
     end)
-
-    -- Stop flickering
-    self:Connect(wx.wxEVT_ERASE_BACKGROUND, function() end)
 
     -- Delete bitmaps on destroy
     self:Connect(self:GetId(), wx.wxEVT_DESTROY, function(evt)

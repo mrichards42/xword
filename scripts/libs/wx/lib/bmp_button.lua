@@ -12,7 +12,11 @@
 -- @return a wxStaticBitmap formatted to use as a button
 -- @function BmpButton
 return function(parent, id, bmp)
-    local self = wx.wxStaticBitmap(parent, id or wx.wxID_ANY, bmp)
+    local self = wx.wxButton(
+      parent, id, "",
+      wx.wxDefaultPosition, bmp.Size,
+      wx.wxBORDER_NONE)
+    self:SetBitmap(bmp)
 
     self.bmp = bmp
     self.disabled = false
@@ -48,16 +52,6 @@ return function(parent, id, bmp)
     function self:Disable()
         self:Enable(false)
     end
-
-    -- Send BUTTON_CLICKED event on click
-    self:Connect(wx.wxEVT_LEFT_UP, function()
-        self:GetEventHandler():ProcessEvent(
-            wx.wxCommandEvent(wx.wxEVT_COMMAND_BUTTON_CLICKED, self:GetId())
-        )
-    end)
-
-    -- Stop flickering
-    self:Connect(wx.wxEVT_ERASE_BACKGROUND, function() end)
 
     -- Delete bitmaps on destroy
     self:Connect(self:GetId(), wx.wxEVT_DESTROY, function(evt)
