@@ -72,6 +72,7 @@ PreferencesDialog::PreferencesDialog(wxWindow * parent)
     Bind(wxEVT_BUTTON, &PreferencesDialog::OnOK, this, wxID_OK);
     Bind(wxEVT_BUTTON, &PreferencesDialog::OnCancel, this, wxID_CANCEL);
 #endif // __WXOSX__
+    Bind(wxEVT_CLOSE_WINDOW, &PreferencesDialog::OnClose, this);
 
 #if XWORD_USE_LUA
     // Add preferences pages from lua
