@@ -117,6 +117,7 @@ protected:
     // Proportional resizing
     wxSize m_frameSize;
     void OnFrameSize(wxSizeEvent & evt);
+    void ConstrainClueDocks();
 
     // Edit Mode
     void OnLeftDown(wxMouseEvent & evt);

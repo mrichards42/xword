@@ -139,8 +139,44 @@ void MyAuiManager::OnFrameSize(wxSizeEvent & evt)
 }
 
 
+// Force ClueList docks in the same direction to be the same size
+void MyAuiManager::ConstrainClueDocks()
+{
+    std::map<int, dock_list_t> clue_docks;
+    for (int i = m_docks.Count()-1; i >= 0; --i)
+    {
+        wxAuiDockInfo & dock = m_docks.Item(i);
+        if (IsClueListDock(dock))
+            clue_docks[dock.dock_direction].push_back(&dock);
+    }
+    std::map<int, dock_list_t>::iterator it;
+    for (it = clue_docks.begin(); it != clue_docks.end(); ++it)
+    {
+        dock_list_t & docks = it->second;
+
+        // Sum the total dock size
+        dock_list_t::iterator dock_it;
+        int dock_size = 0;
+        for (dock_it = docks.begin(); dock_it != docks.end(); ++dock_it)
+        {
+            dock_size += (**dock_it).size;
+        }
+
+        // Set each dock size to the average
+        int dock_count = docks.size();
+        int avg_dock_size = dock_size / dock_count;
+
+        for (dock_it = docks.begin(); dock_it != docks.end(); ++dock_it)
+        {
+            (**dock_it).size = avg_dock_size;
+        }
+    }
+}
+
+
 void MyAuiManager::Update()
 {
+    ConstrainClueDocks();
     wxAuiManager::Update();
 }
 
