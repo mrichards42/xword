@@ -24,6 +24,29 @@
 
 
 // ----------------------------------------------------------------
+// MyAuiDockArt
+// ----------------------------------------------------------------
+
+class MyAuiDockArt : public wxAuiDefaultDockArt
+{
+public:
+    MyAuiDockArt() : wxAuiDefaultDockArt() {}
+
+    void DrawSash(wxDC& dc,
+                  wxWindow* window,
+                  int orientation,
+                  const wxRect& rect)
+    {
+        // wxMac tries to get too fancy w/ sashes and they end up looking like
+        // a mess. Instead we'll use the default plain sash everywhere.
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(m_sashBrush);
+        dc.DrawRectangle(rect.x, rect.y, rect.width, rect.height);
+    }
+};
+
+
+// ----------------------------------------------------------------
 // MyAuiManager
 // ----------------------------------------------------------------
 
@@ -42,6 +65,7 @@ MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
           m_isEditing(false),
           m_frameSize(-1,-1)
 {
+    SetArtProvider(new MyAuiDockArt());
 }
 
 bool
