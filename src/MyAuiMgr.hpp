@@ -118,6 +118,7 @@ protected:
     wxSize m_frameSize;
     void OnFrameSize(wxSizeEvent & evt);
     void ConstrainClueDocks();
+    void ScaleDocks(double scale_x, double scale_y);
 
     // Edit Mode
     void OnLeftDown(wxMouseEvent & evt);

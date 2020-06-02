@@ -133,6 +133,8 @@ void MyAuiManager::OnFrameSize(wxSizeEvent & evt)
         m_frameSize = newSize;
     else if (newSize != m_frameSize)
     {
+        ScaleDocks((double)newSize.x / m_frameSize.x,
+                   (double)newSize.y / m_frameSize.y);
         m_frameSize = newSize;
         wxAuiManager::Update();
     }
@@ -169,6 +171,20 @@ void MyAuiManager::ConstrainClueDocks()
         for (dock_it = docks.begin(); dock_it != docks.end(); ++dock_it)
         {
             (**dock_it).size = avg_dock_size;
+        }
+    }
+}
+
+
+// Resize docks proportionally
+void MyAuiManager::ScaleDocks(double scale_x, double scale_y)
+{
+    for (int i = m_docks.Count()-1; i >= 0; --i)
+    {
+        wxAuiDockInfo & dock = m_docks.Item(i);
+        if (dock.resizable) {
+            // +0.5 for rounding
+            dock.size = 0.5 + dock.size * (dock.IsHorizontal() ? scale_y : scale_x);
         }
     }
 }
