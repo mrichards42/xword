@@ -332,6 +332,12 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
     if (! wxAuiManager::LoadPerspective(processed_layout, false))
         return false;
 
+    // Old layouts had non-resizable clue prompts. For backwards compatibility,
+    // force clue prompts to always be resizable
+    wxAuiPaneInfo & clue_prompt = GetPaneByCaption("Clue Prompt");
+    if (clue_prompt.IsOk())
+        clue_prompt.Resizable();
+
     // Cache panes that are not currently present for later, and process frame_size
     m_paneCache.clear();
     wxStringTokenizer tok(escaped_layout, _T("|"), wxTOKEN_STRTOK);

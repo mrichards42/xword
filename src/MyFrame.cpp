@@ -1466,6 +1466,7 @@ MyFrame::ManageWindows()
                   .MinSize(50, 50)
                   .Layer(2)
                   .Top()
+                  .Resizable()
                   .Caption(_T("Clue Prompt"))
                   .Name(_T("Clue")) );
 
