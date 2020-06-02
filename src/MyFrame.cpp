@@ -763,11 +763,6 @@ MyFrame::ClosePuzzle(bool prompt, bool update)
     SetStatus(_T("No file loaded"));
     m_puz.Clear();
 
-    // As hard as we try to save wxAUI pane info for clue lists, we can't
-    // save dock info, so we'll just save the current perspective here and
-    // then load the current perspective when we load a new puzzle.
-    SaveLayout(_T("(Current)"));
-
     ShowPuzzle(update);
 
     return true;
