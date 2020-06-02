@@ -274,7 +274,12 @@ MyAuiManager::SavePerspective()
                 pane.PaneBorder(oldPane.HasBorder());
             }
         }
+        // Save the pane's actual size instead of best size. It seems that
+        // after loading a perspective, the best size is restored.
+        wxSize old_best_size = pane.best_size;
+        pane.best_size = pane.rect.GetSize();
         result += SavePaneInfo(pane)+wxT("|");
+        pane.best_size = old_best_size;
     }
 
     // Save the cached panes
