@@ -433,7 +433,9 @@ MyFrame::MyFrame()
     SetIcon(wxIcon(xword_xpm));
 #endif // __WXMSW__ && ! __WXPM__
 
-    LoadLayout("(Previous)");
+    // Try loading the previously saved layout, otherwise default to Full View
+    if (! LoadLayout("(Previous)"))
+        LoadLayout("Full View");
 
     // Show a blank puzzle
     ShowPuzzle();
