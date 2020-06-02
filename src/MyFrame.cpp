@@ -981,7 +981,6 @@ MyFrame::ShowMetadata()
     else
         SetTitle(puz2wx(m_puz.GetTitle()) + _T(" - ") XWORD_APP_NAME);
 
-
     // Update the metadata panels
     typedef std::vector<wxAuiPaneInfo *> pane_vector_t;
     std::map<wxAuiDockInfo *, pane_vector_t> metadata_map;
@@ -994,7 +993,7 @@ MyFrame::ShowMetadata()
         if (meta)
         {
             meta->UpdateLabel();
-            if (! meta->GetPlainLabel().IsEmpty()) {
+            if (! meta->GetPlainLabel().IsEmpty() && ! m_mgr.IsUserHidden(pane)) {
                 pane.Show();
 #if USE_MY_AUI_MANAGER
                 wxAuiDockInfo & dock = m_mgr.FindDock(pane);

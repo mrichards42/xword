@@ -55,6 +55,7 @@ typedef std::list<wxAuiDockInfo *> dock_list_t;
 
 BEGIN_EVENT_TABLE(MyAuiManager, wxAuiManager)
     EVT_AUI_PANE_BUTTON    (MyAuiManager::OnPaneButton)
+    EVT_AUI_PANE_CLOSE     (MyAuiManager::OnPaneClose)
     EVT_SIZE               (MyAuiManager::OnFrameSize)
     EVT_MOUSE_CAPTURE_LOST (MyAuiManager::OnCaptureLost)
 END_EVENT_TABLE()
@@ -76,6 +77,22 @@ MyAuiManager::FireCloseEvent(wxAuiPaneInfo & pane)
     evt.SetPane(&pane);
     ProcessMgrEvent(evt);
     return ! evt.GetVeto();
+}
+
+// We show and hide metadata panes based on the presence or absence of data,
+// but also allow the user to show or hide panes manually. This flag indicates
+// that the user intentionally hid a pane.
+const unsigned int userHidden = 1 << 20; // Unused by wxAUI
+
+void MyAuiManager::OnPaneClose(wxAuiManagerEvent & evt)
+{
+    wxAuiPaneInfo & pane = *evt.GetPane();
+    pane.SetFlag(userHidden, true);
+}
+
+bool MyAuiManager::IsUserHidden(wxAuiPaneInfo & pane)
+{
+    return pane.HasFlag(userHidden);
 }
 
 // ----------------------------------------------------------------------------
@@ -529,6 +546,7 @@ MyAuiManager::OnMenu(wxCommandEvent & evt)
     wxCHECK_RET(pane.IsOk(), _T("Missing wxAuiPaneInfo"));
 
     pane.Show(evt.IsChecked());
+    pane.SetFlag(userHidden, ! evt.IsChecked());
     Update();
 }
 

@@ -56,6 +56,7 @@ public:
     }
 
     void UpdateMenu();
+    bool IsUserHidden(wxAuiPaneInfo & pane);
 
     // Pane Cache
     //-----------
@@ -102,6 +103,7 @@ protected:
     // Close Event
     bool FireCloseEvent(wxAuiPaneInfo & pane);
     void OnPaneButton(wxAuiManagerEvent & evt);
+    void OnPaneClose(wxAuiManagerEvent & evt);
 
     // Menu
     wxMenu * m_menu;
