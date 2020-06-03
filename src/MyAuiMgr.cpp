@@ -22,21 +22,28 @@
 #    include <wx/wx.h>
 #endif
 
-// Define macro XWORD_CHECK_CLUE to check the clue prompt size
-// in debug mode and print a message when it changes.
-#ifdef _DEBUG
-int __CLUE_SIZE = 0;
-#define XWORD_CHECK_CLUE()                                        \
-    int __NEW_SIZE = GetPaneByCaption("Clue Prompt").rect.height; \
-    if (__CLUE_SIZE == 0)                                         \
-        __CLUE_SIZE = __NEW_SIZE;                                 \
-    else if (__CLUE_SIZE != __NEW_SIZE) {                         \
-        __CLUE_SIZE = __NEW_SIZE;                                 \
-        wxLogDebug("New Clue Size: %d", __NEW_SIZE);              \
+
+// ----------------------------------------------------------------
+// MyAuiDockArt
+// ----------------------------------------------------------------
+
+class MyAuiDockArt : public wxAuiDefaultDockArt
+{
+public:
+    MyAuiDockArt() : wxAuiDefaultDockArt() {}
+
+    void DrawSash(wxDC& dc,
+                  wxWindow* window,
+                  int orientation,
+                  const wxRect& rect)
+    {
+        // wxMac tries to get too fancy w/ sashes and they end up looking like
+        // a mess. Instead we'll use the default plain sash everywhere.
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(m_sashBrush);
+        dc.DrawRectangle(rect.x, rect.y, rect.width, rect.height);
     }
-#else // ! _DEBUG
-#define XWORD_CHECK_CLUE()
-#endif // _DEBUG
+};
 
 
 // ----------------------------------------------------------------
@@ -48,6 +55,7 @@ typedef std::list<wxAuiDockInfo *> dock_list_t;
 
 BEGIN_EVENT_TABLE(MyAuiManager, wxAuiManager)
     EVT_AUI_PANE_BUTTON    (MyAuiManager::OnPaneButton)
+    EVT_AUI_PANE_CLOSE     (MyAuiManager::OnPaneClose)
     EVT_SIZE               (MyAuiManager::OnFrameSize)
     EVT_MOUSE_CAPTURE_LOST (MyAuiManager::OnCaptureLost)
 END_EVENT_TABLE()
@@ -58,6 +66,7 @@ MyAuiManager::MyAuiManager(wxWindow* managed_wnd, unsigned int flags)
           m_isEditing(false),
           m_frameSize(-1,-1)
 {
+    SetArtProvider(new MyAuiDockArt());
 }
 
 bool
@@ -68,6 +77,22 @@ MyAuiManager::FireCloseEvent(wxAuiPaneInfo & pane)
     evt.SetPane(&pane);
     ProcessMgrEvent(evt);
     return ! evt.GetVeto();
+}
+
+// We show and hide metadata panes based on the presence or absence of data,
+// but also allow the user to show or hide panes manually. This flag indicates
+// that the user intentionally hid a pane.
+const unsigned int userHidden = 1 << 20; // Unused by wxAUI
+
+void MyAuiManager::OnPaneClose(wxAuiManagerEvent & evt)
+{
+    wxAuiPaneInfo & pane = *evt.GetPane();
+    pane.SetFlag(userHidden, true);
+}
+
+bool MyAuiManager::IsUserHidden(wxAuiPaneInfo & pane)
+{
+    return pane.HasFlag(userHidden);
 }
 
 // ----------------------------------------------------------------------------
@@ -149,288 +174,67 @@ void MyAuiManager::OnFrameSize(wxSizeEvent & evt)
         m_frameSize = newSize;
     else if (newSize != m_frameSize)
     {
-        ResizeDocks(true);
+        ScaleDocks((double)newSize.x / m_frameSize.x,
+                   (double)newSize.y / m_frameSize.y);
         m_frameSize = newSize;
         wxAuiManager::Update();
-        XWORD_CHECK_CLUE();
     }
 }
 
-// this function is used to sort panes by dock position
-static int PaneSortFunc(wxAuiPaneInfo** p1, wxAuiPaneInfo** p2)
+
+// Force ClueList docks in the same direction to be the same size
+void MyAuiManager::ConstrainClueDocks()
 {
-    return ((*p1)->dock_pos < (*p2)->dock_pos) ? -1 : 1;
-}
-
-
-// Make the grid as large as possible, then fill in the space with other panes.
-// If we are resizing the frame, all resizable docks are scaled.
-// If we are updating the position of some panes, only clue lists are resized.
-void MyAuiManager::ResizeDocks(bool is_frame_resize)
-{
-    int sash_size = m_art->GetMetric(wxAUI_DOCKART_SASH_SIZE);
-    int border_size = m_art->GetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE);
-
-    // Recalc all dock sizes.
-    // This happems in LayoutAll, but we can't control dock size from there
-
-    // Remove panes from all docks
-    for (size_t i = 0; i < m_docks.Count(); ++i)
-        m_docks.Item(i).panes.Empty();
-    // Add panes to docks; create docks as needed
-    for (size_t i = 0; i < m_panes.Count(); ++i)
-    {
-        wxAuiPaneInfo & pane = m_panes.Item(i);
-        // Add panes to the dock
-        wxAuiDockInfo * dock = &FindDock(pane);
-        if (pane.IsShown() && pane.IsDocked())
-        {
-            if (! dock->IsOk())
-            {
-                // Create the dock
-                wxAuiDockInfo d;
-                d.dock_direction = pane.dock_direction;
-                d.dock_layer = pane.dock_layer;
-                d.dock_row = pane.dock_row;
-                m_docks.Add(d);
-                dock = &m_docks.Last();
-            }
-            dock->panes.Add(&pane);
-        }
-        else if (! pane.IsFixed() && pane.window->IsShown() && ! pane.frame)
-        {
-            // If the pane is about to be hidden or floated, save the
-            // pane size
-            wxSize pane_size = pane.rect.GetSize();
-            if (pane.HasBorder()) // Add the border
-                pane_size += wxSize(2*border_size, 2*border_size);
-            // Change best size in the resizable direction
-            if (pane.dock_direction == wxAUI_DOCK_BOTTOM || pane.dock_direction == wxAUI_DOCK_TOP)
-                pane.best_size.y = pane_size.y;
-            else
-                pane.best_size.x = pane_size.x;
-        }
-    }
-    // Calc sizes and remove empty docks
-    wxSize dock_min_size(0,0); // min size of all docks
-    wxSize old_dock_size(0,0); // current size of all docks
-    dock_list_t vertical; // Docks to resize
-    dock_list_t horizontal;
+    std::map<int, dock_list_t> clue_docks;
     for (int i = m_docks.Count()-1; i >= 0; --i)
     {
         wxAuiDockInfo & dock = m_docks.Item(i);
-        if (dock.dock_direction == wxAUI_DOCK_CENTER)
-            continue;
-        bool is_shown = false; // Does this dock have panes that are on screen?
-        for (size_t j = 0; j < dock.panes.Count(); ++j)
-        {
-            if (dock.panes.Item(j)->IsShown())
-            {
-                is_shown = true;
-                break;
-            }
-        }
-        if (! is_shown)
-        {
-            // Remove empty docks
-            m_docks.RemoveAt(i);
-            continue;
-        }
-        // Recalc dock size
-        // Adapted from LayoutAll
-        int size = 0;
-        int min_size = 0;
-        dock.fixed = true;
-        for (size_t j = 0; j < dock.panes.Count(); ++j)
-        {
-            wxAuiPaneInfo& pane = *dock.panes.Item(j);
-            wxSize pane_size = pane.best_size;
-            if (pane_size == wxDefaultSize)
-                pane_size = pane.min_size;
-            if (pane_size == wxDefaultSize)
-                pane_size = pane.window->GetSize();
-
-            wxSize pane_min_size = pane.min_size;
-            // Use the window's best size as another min_size.
-            // NB: This only works after Update(), since window sizes
-            // won't get changed until the end of Update().
-            // See MyAuiMgr::Update for the workaround.
-            wxSize window_best_size = pane.IsFixed() ? pane.window->GetBestSize() : wxDefaultSize;
-
-            if (dock.IsHorizontal())
-            {
-                size = std::max(pane_size.y, size);
-                min_size = std::max(std::max(pane_min_size.y, window_best_size.y), min_size);
-            }
-            else
-            {
-                size = std::max(pane_size.x, size);
-                min_size = std::max(std::max(pane_min_size.x, window_best_size.x), min_size);
-            }
-            // Check if this is a fixed dock
-            if (! pane.IsFixed())
-                dock.fixed = false;
-        }
-        // Update size of new or fixed docks
-        if (dock.size == 0 || dock.fixed)
-            dock.size = size;
-        dock.min_size = min_size;
-        if (dock.size < dock.min_size)
-            dock.size = dock.min_size;
-        // Adjust pane positions and sizes to fill fixed docks
-        if (dock.fixed)
-        {
-            dock.panes.Sort(PaneSortFunc);
-            // Find the total pane proportion and the dock size.
-            // NB: wherease usually "size" means the resizable direction,
-            // here it means the opposite.
-            int pane_count = dock.panes.Count();
-            int total_proportion = 0;
-            for (int j = 0; j < pane_count; ++j)
-                total_proportion += dock.panes.Item(j)->dock_proportion;
-            int dock_size = dock.IsHorizontal() ? dock.rect.x : dock.rect.y;
-            // Adjust pane positions and size proportionate to the dock size
-            int pos = 0;
-            if (dock_size > 0 && total_proportion > 0)
-            {
-                for (int j = 0; j < pane_count; ++j)
-                {
-                    wxAuiPaneInfo& pane = *(dock.panes.Item(j));
-                    int pane_size = 0.5 + (double)dock_size * pane.dock_proportion / total_proportion;
-                    if (j == pane_count - 1) // Last pane gets the rest
-                        pane_size = dock_size - pos;
-                    if (dock.IsHorizontal())
-                        pane.best_size.x = pane_size;
-                    else
-                        pane.best_size.y = pane_size;
-                    pane.dock_pos = pos;
-                    pos += pane_size;
-                }
-            }
-            // Fixed docks sizes get reset during wxAuiManager::LayoutAll,
-            // but we can trick LayoutAll() by setting dock.fixed = false here.
-            // This will not affect any layout operations, since LayoutAll()
-            // recalculates dock.fixed.
-            dock.fixed = false;
-        }
-    }
-
-    // Calculate the resizable area.
-
-    wxSize resizable = m_frame->GetClientSize(); // Resizable area
-    double frame_proportion_x, frame_proportion_y; // % change in frame size
-    if (is_frame_resize)
-    {
-        wxSize new_size = m_frame->GetClientSize();
-        frame_proportion_x = (double)new_size.x / m_frameSize.x;
-        frame_proportion_y = (double)new_size.y / m_frameSize.y;
-    }
-    for (int i = m_docks.Count()-1; i >= 0; --i)
-    {
-        wxAuiDockInfo & dock = m_docks.Item(i);
-        if (dock.dock_direction == wxAUI_DOCK_CENTER)
-            continue;
-        // Remove sashes from the resizable area.
-        if (! dock.fixed)
-        {
-            if (dock.IsHorizontal())
-                resizable.y -= sash_size;
-            else
-                resizable.x -= sash_size;
-        }
-        // Only docks with a ClueList are truly resizable.
         if (IsClueListDock(dock))
+            clue_docks[dock.dock_direction].push_back(&dock);
+    }
+    std::map<int, dock_list_t>::iterator it;
+    for (it = clue_docks.begin(); it != clue_docks.end(); ++it)
+    {
+        dock_list_t & docks = it->second;
+
+        // Sum the total dock size
+        dock_list_t::iterator dock_it;
+        int dock_size = 0;
+        for (dock_it = docks.begin(); dock_it != docks.end(); ++dock_it)
         {
-            if (dock.IsHorizontal())
-            {
-                old_dock_size.y += dock.size;
-                dock_min_size.y += dock.min_size;
-                horizontal.push_back(&dock);
-            }
-            else
-            {
-                old_dock_size.x += dock.size;
-                dock_min_size.x += dock.min_size;
-                resizable.x -= sash_size;
-                vertical.push_back(&dock);
-            }
+            dock_size += (**dock_it).size;
         }
-        else
+
+        // Set each dock size to the average
+        int dock_count = docks.size();
+        int avg_dock_size = dock_size / dock_count;
+
+        for (dock_it = docks.begin(); dock_it != docks.end(); ++dock_it)
         {
-            // If the frame is being resized, resize docks proportionate to
-            // the new frame size.  Since we're dealing with integer values
-            // add 0.5 for rounding.
-            if (is_frame_resize)
-                dock.size = 0.5 + dock.size * (dock.IsHorizontal() ? frame_proportion_y : frame_proportion_x);
-            // Subtract from the resizable area
-            if (dock.IsHorizontal())
-                resizable.y -= dock.size;
-            else
-                resizable.x -= dock.size;
+            (**dock_it).size = avg_dock_size;
         }
     }
+}
 
-    // Expand the grid to fill the resizable area.
 
-    // Calculate the new grid size
-    wxSize grid_size = resizable - dock_min_size;
-    // Make the grid square
-    int grid_square = std::min(grid_size.x, grid_size.y);
-    grid_size.x = grid_square;
-    grid_size.y = grid_square;
-
-    // Resize the ClueList docks to take up remaining space.
-
-    wxSize new_dock_size = resizable - grid_size;
-    dock_list_t::iterator it;;
-    for (it = vertical.begin(); it != vertical.end(); ++it)
+// Resize docks proportionally
+void MyAuiManager::ScaleDocks(double scale_x, double scale_y)
+{
+    for (int i = m_docks.Count()-1; i >= 0; --i)
     {
-        wxAuiDockInfo & dock = **it;
-        dock.size = new_dock_size.x / vertical.size();
-    }
-    for (it = horizontal.begin(); it != horizontal.end(); ++it)
-    {
-        wxAuiDockInfo & dock = **it;
-        dock.size = new_dock_size.y / horizontal.size();
+        wxAuiDockInfo & dock = m_docks.Item(i);
+        if (dock.resizable) {
+            // +0.5 for rounding
+            dock.size = 0.5 + dock.size * (dock.IsHorizontal() ? scale_y : scale_x);
+        }
     }
 }
 
 
 void MyAuiManager::Update()
 {
-    // Save fixed pane sizes
-    std::map<wxAuiPaneInfo *, int> sizes;
-    for (size_t i = 0; i < m_panes.Count(); ++i)
-    {
-        wxAuiPaneInfo & pane = m_panes.Item(i);
-        if (pane.IsFixed())
-        {
-            wxSize best_size = pane.window->GetBestSize();
-            bool is_horizontal = pane.dock_direction == wxAUI_DOCK_BOTTOM
-                                 || pane.dock_direction == wxAUI_DOCK_TOP;
-            sizes[&pane] = is_horizontal ? best_size.y : best_size.x;
-        }
-    }
-    // Run the custom layout engine
-    ResizeDocks(false);
-    // Update
+    ConstrainClueDocks();
     wxAuiManager::Update();
-    XWORD_CHECK_CLUE();
-    // If sizes have changed, we need to update again to see changes.
-    std::map<wxAuiPaneInfo *, int>::iterator it;
-    for (it = sizes.begin(); it != sizes.end(); ++it)
-    {
-        wxAuiPaneInfo & pane = *it->first;
-        int last_size = it->second;
-        wxSize best_size = pane.window->GetBestSize();
-        bool is_horizontal = pane.dock_direction == wxAUI_DOCK_BOTTOM
-                             || pane.dock_direction == wxAUI_DOCK_TOP;
-        if (last_size != (is_horizontal ? best_size.y : best_size.x))
-        {
-            Update();
-            return;
-        }
-    }
 }
 
 
@@ -470,7 +274,12 @@ MyAuiManager::SavePerspective()
                 pane.PaneBorder(oldPane.HasBorder());
             }
         }
+        // Save the pane's actual size instead of best size. It seems that
+        // after loading a perspective, the best size is restored.
+        wxSize old_best_size = pane.best_size;
+        pane.best_size = pane.rect.GetSize();
         result += SavePaneInfo(pane)+wxT("|");
+        pane.best_size = old_best_size;
     }
 
     // Save the cached panes
@@ -522,6 +331,12 @@ MyAuiManager::LoadPerspective(const wxString & layout, bool update)
 
     if (! wxAuiManager::LoadPerspective(processed_layout, false))
         return false;
+
+    // Old layouts had non-resizable clue prompts. For backwards compatibility,
+    // force clue prompts to always be resizable
+    wxAuiPaneInfo & clue_prompt = GetPaneByCaption("Clue Prompt");
+    if (clue_prompt.IsOk())
+        clue_prompt.Resizable();
 
     // Cache panes that are not currently present for later, and process frame_size
     m_paneCache.clear();
@@ -742,6 +557,7 @@ MyAuiManager::OnMenu(wxCommandEvent & evt)
     wxCHECK_RET(pane.IsOk(), _T("Missing wxAuiPaneInfo"));
 
     pane.Show(evt.IsChecked());
+    pane.SetFlag(userHidden, ! evt.IsChecked());
     Update();
 }
 
@@ -885,6 +701,3 @@ MyAuiManager::OnSetCursor(wxSetCursorEvent & evt)
     else
         evt.SetCursor(wxNullCursor);
 }
-
-
-#undef XWORD_CHECK_CLUE

@@ -433,7 +433,9 @@ MyFrame::MyFrame()
     SetIcon(wxIcon(xword_xpm));
 #endif // __WXMSW__ && ! __WXPM__
 
-    LoadLayout("(Previous)");
+    // Try loading the previously saved layout, otherwise default to Full View
+    if (! LoadLayout("(Previous)"))
+        LoadLayout("Full View");
 
     // Show a blank puzzle
     ShowPuzzle();
@@ -763,11 +765,6 @@ MyFrame::ClosePuzzle(bool prompt, bool update)
     SetStatus(_T("No file loaded"));
     m_puz.Clear();
 
-    // As hard as we try to save wxAUI pane info for clue lists, we can't
-    // save dock info, so we'll just save the current perspective here and
-    // then load the current perspective when we load a new puzzle.
-    SaveLayout(_T("(Current)"));
-
     ShowPuzzle(update);
 
     return true;
@@ -981,7 +978,6 @@ MyFrame::ShowMetadata()
     else
         SetTitle(puz2wx(m_puz.GetTitle()) + _T(" - ") XWORD_APP_NAME);
 
-
     // Update the metadata panels
     typedef std::vector<wxAuiPaneInfo *> pane_vector_t;
     std::map<wxAuiDockInfo *, pane_vector_t> metadata_map;
@@ -994,7 +990,7 @@ MyFrame::ShowMetadata()
         if (meta)
         {
             meta->UpdateLabel();
-            if (! meta->GetPlainLabel().IsEmpty()) {
+            if (! meta->GetPlainLabel().IsEmpty() && ! m_mgr.IsUserHidden(pane)) {
                 pane.Show();
 #if USE_MY_AUI_MANAGER
                 wxAuiDockInfo & dock = m_mgr.FindDock(pane);
@@ -1470,6 +1466,7 @@ MyFrame::ManageWindows()
                   .MinSize(50, 50)
                   .Layer(2)
                   .Top()
+                  .Resizable()
                   .Caption(_T("Clue Prompt"))
                   .Name(_T("Clue")) );
 

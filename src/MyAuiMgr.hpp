@@ -56,6 +56,7 @@ public:
     }
 
     void UpdateMenu();
+    bool IsUserHidden(wxAuiPaneInfo & pane);
 
     // Pane Cache
     //-----------
@@ -102,6 +103,7 @@ protected:
     // Close Event
     bool FireCloseEvent(wxAuiPaneInfo & pane);
     void OnPaneButton(wxAuiManagerEvent & evt);
+    void OnPaneClose(wxAuiManagerEvent & evt);
 
     // Menu
     wxMenu * m_menu;
@@ -117,7 +119,8 @@ protected:
     // Proportional resizing
     wxSize m_frameSize;
     void OnFrameSize(wxSizeEvent & evt);
-    void ResizeDocks(bool is_frame_resize);
+    void ConstrainClueDocks();
+    void ScaleDocks(double scale_x, double scale_y);
 
     // Edit Mode
     void OnLeftDown(wxMouseEvent & evt);
