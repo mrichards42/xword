@@ -49,7 +49,7 @@ extern wxPageSetupDialogData* g_pageSetupData;
 
 // Global misc
 #define XWORD_APP_NAME       _T("XWord")
-#define XWORD_COPYRIGHT_STRING _T("(C) 2013 Mike Richards <mrichards42@gmx.com>")
+#define XWORD_COPYRIGHT_STRING _T("(C) 2020 Mike Richards <mrichards42@gmx.com>")
 
 class MyApp : public wxApp
 {
