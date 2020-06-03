@@ -32,13 +32,6 @@ config.styles.progress.font.Weight = wx.wxFONTWEIGHT_BOLD
 local default_disabled = {
     "NY Times Premium",
     "NY Times PDF",
-    "Newsday",
-    "USA Today",
-    "Universal",
-    "Matt Gaffney's Weekly Crossword Contest",
-    "Matt Gaffney's Daily Crossword",
-    "Brendan Emmett Quigley",
-    "Washington Post Puzzler",
 }
 
 -- Keep a list of original keys to the config table
