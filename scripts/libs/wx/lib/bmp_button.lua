@@ -16,6 +16,9 @@ return function(parent, id, bmp)
       parent, id, "",
       wx.wxDefaultPosition, bmp.Size,
       wx.wxBORDER_NONE)
+    if parent then
+      self:SetBackgroundColour(parent:GetBackgroundColour())
+    end
     self:SetBitmap(bmp)
 
     self.bmp = bmp
