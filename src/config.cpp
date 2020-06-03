@@ -136,10 +136,10 @@ ConfigManager::Notes_t::Notes_t(ConfigManager * cfg)
 // Status bar
 ConfigManager::Status_t::Status_t(ConfigManager * cfg)
     : ConfigGroup(&cfg->m_group, _T("StatusBar")),
-      completeColor(this, _T("completeColor"), *wxGREEN),
-      incorrectColor(this, _T("incorrectColor"), *wxRED),
-      uncheckableColor(this, _T("uncheckableColor"), *wxCYAN),
-      brightnessCutoff(this, _T("brightnessCutoff"), 200),
+      completeColor(this, _T("completeColor"), wxColor(166, 245, 172)),
+      incorrectColor(this, _T("incorrectColor"), wxColor(245, 172, 166)),
+      uncheckableColor(this, _T("uncheckableColor"), wxColor(166, 238, 245)),
+      brightnessCutoff(this, _T("brightnessCutoff"), 127),
       showCompletionStatus(this, _T("showCompletionStatus"), true)
 {}
 
