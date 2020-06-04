@@ -203,7 +203,7 @@ public:
     const string_t & GetText()     const { return m_text; }
     const string_t & GetSolution() const { return m_solution; }
 
-    void SetText    (const string_t & text);
+    void SetText    (const string_t & text, bool propagate = true);
     void SetSolution(const string_t & solution);
     void SetSolution(const string_t & solution, char plain);
     void SetPlainSolution(char plain); // Leave solution rebus unchanged
@@ -262,14 +262,19 @@ public:
 
     // Flags
     //------
-    void         SetFlag (unsigned int flag) { m_flag = flag; }
+    void         SetFlag (unsigned int flag, bool propagate = true) {
+        m_flag = flag;
+        if (propagate && m_partner) {
+            m_partner->SetFlag(flag, false);
+        }
+    }
     unsigned int GetFlag() const             { return m_flag; }
     bool         HasFlag(unsigned int flag) const
         { return (m_flag & flag) != 0; }
 
     void   AddFlag     (unsigned int flag, bool doit = true)
     {
-        doit ? m_flag |= flag : m_flag &= ~ flag;
+        SetFlag(doit ? m_flag | flag : m_flag & ~ flag);
     }
     void   RemoveFlag  (unsigned int flag) { AddFlag(flag, false); }
     void   ToggleFlag  (unsigned int flag)
@@ -363,6 +368,8 @@ public:
     bool HasWord(GridDirection dir) const;
 
     bool IsBetween(const Square * start, const Square * end) const;
+
+    Square* GetPartnerSquare() const { return m_partner; }
 protected:
     // Location information
     int m_col;
@@ -378,6 +385,9 @@ protected:
 
     // Flag (GEXT)
     unsigned int m_flag;
+
+    // Partner square (for Acrostics)
+    Square* m_partner = NULL;
 
     // Linked-list
     //------------

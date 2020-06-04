@@ -301,6 +301,10 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
         }
     }
 
+    if (grid.IsAcrostic()) {
+        grid.SetupIteration();
+    }
+
     // Words
     std::map<string_t, Word> words;
     {

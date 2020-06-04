@@ -51,6 +51,8 @@
 #include "iterator.hpp"
 #include "Scrambler.hpp"
 
+#include <map>
+
 namespace puz {
 
 
@@ -126,7 +128,9 @@ Grid::SetupIteration()
     // Fill in Square members:
     //   - Row and Col
     //   - Next
+    //   - Partner (for Acrostics)
     //-------------------------------------------------------------------
+    std::map<string_t, Square*> partner_map;
     for (size_t row = 0; row < GetHeight(); ++row)
     {
         for (size_t col = 0; col < GetWidth(); ++col)
@@ -134,6 +138,17 @@ Grid::SetupIteration()
             Square & square = At(col, row);
             square.m_col = col;
             square.m_row = row;
+
+            if (IsAcrostic() && square.HasNumber()) {
+                std::map<string_t, Square*>::iterator it = partner_map.find(square.GetNumber());
+                if (it == partner_map.end()) {
+                    partner_map[square.GetNumber()] = &square;
+                } else {
+                    Square* partner = it->second;
+                    square.m_partner = partner;
+                    partner->m_partner = &square;
+                }
+            }
 
             // Special cases for width or height == 1
             if (GetHeight() == 1 && GetWidth() == 1)

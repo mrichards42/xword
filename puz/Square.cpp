@@ -384,7 +384,7 @@ void Square::RemoveColor()
 // Square text and solution
 //------------------------------------------------------------------------------
 
-void Square::SetText(const string_t & text)
+void Square::SetText(const string_t & text, bool propagate)
 {
     if (text.empty())
         m_text = Blank;
@@ -392,6 +392,9 @@ void Square::SetText(const string_t & text)
         m_text = text;
     else
         m_text = ToGrid(text);
+    if (propagate && m_partner != NULL) {
+        m_partner->SetText(text, false);
+    }
 }
 
 void Square::SetSolution(const string_t & solution)
