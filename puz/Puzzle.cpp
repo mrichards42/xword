@@ -42,6 +42,7 @@ Puzzle::DoLoad(const std::string & filename, const FileHandlerDesc * desc)
             GenerateWords();
         MarkThemeSquares();
         FixMalformattedDiagramless();
+        m_grid.FindPartnerSquares();
         TestOk();
     }
     catch (std::ios::failure &) {

@@ -366,7 +366,7 @@ XGridCtrl::GetStats(GridStats * stats) const
         {
             ++stats->black;
         }
-        else
+        else if (!square->IsMissing())
         {
             ++stats->white;
             if (square->IsBlank())
@@ -533,7 +533,7 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
 
 
 void
-XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & color)
+XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & color, bool propagate)
 {
     // Don't draw missing squares
     if (square.IsMissing())
@@ -563,6 +563,11 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
     {
         m_drawer.RemoveFlag(XGridDrawer::DRAW_OUTLINE);
         m_drawer.AddFlag(XGridDrawer::DRAW_FLAG | XGridDrawer::DRAW_NUMBER);
+    }
+
+    if (propagate && square.GetPartnerSquare()) {
+        puz::Square* partner = square.GetPartnerSquare();
+        DrawSquare(dc, *partner, GetSquareColor(*partner), false);
     }
 }
 
@@ -1855,11 +1860,14 @@ const wxColor &
 XGridCtrl::GetSquareColor(const puz::Square & square)
 {
     if (HasSelection() && IsSelected(square))
-            return GetSelectionColor();
+        return GetSelectionColor();
     else if (IsFocusedLetter(square))
         return GetFocusedLetterColor();
     else if (IsFocusedWord(square))
         return GetFocusedWordColor();
+    else if (square.GetPartnerSquare() && IsFocusedLetter(*square.GetPartnerSquare())) {
+        return GetFocusedLetterColor();
+    }
     else
         return wxNullColour; // XGridDrawer will decide
 }

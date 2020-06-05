@@ -89,6 +89,9 @@ public:
     // Algorithmically determine grid numbers
     void NumberGrid();
 
+    // Find and fill in partner squares (for Acrostics)
+    void FindPartnerSquares();
+
 public:
 
     // Size
