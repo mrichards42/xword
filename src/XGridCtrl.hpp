@@ -194,13 +194,7 @@ public:
         { SetFocusedSquare(NULL, direction); }
 
     // Drawing functions
-    void RefreshSquare(wxDC & dc, const puz::Square & square)  {
-        DrawSquare(dc, square);
-        puz::Square* partnerSquare = square.GetPartnerSquare();
-        if (partnerSquare) {
-            DrawSquare(dc, *partnerSquare);
-        }
-    }
+    void RefreshSquare(wxDC & dc, const puz::Square & square)  { DrawSquare(dc, square); }
     void RefreshSquare(const puz::Square & square)
         { wxClientDC dc(this); DoPrepareDC(dc); RefreshSquare(dc, square); }
 
