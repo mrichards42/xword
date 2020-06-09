@@ -367,6 +367,22 @@ void HtmlClueListBox::SetItemCount(size_t count)
 }
 
 // ----------------------------------------------------------------------------
+// HtmlClueListBox scrolling
+// ----------------------------------------------------------------------------
+
+void HtmlClueListBox::ScrollRowToCenter(int row)
+{
+    // Scroll this clue (approximately) to the center. Classes derived from
+    // wxVListBox scroll based on rows -- not pixels -- so the top of the
+    // selected row is always at the top of the window. Since we can only
+    // scroll by an integer number of rows, we can't perfectly center an
+    // arbitrary row. This calculation is increasingly inaccurate the more
+    // rows above the given one require wrapping, which increases their height.
+    size_t visible_count = GetVisibleRowsEnd() - GetVisibleRowsBegin();
+    ScrollToRow(std::max(0, row - int((visible_count + 0.5) / 2)));
+}
+
+// ----------------------------------------------------------------------------
 // HtmlClueListBox implementation of wxVListBox pure virtuals
 // ----------------------------------------------------------------------------
 

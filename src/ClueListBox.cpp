@@ -41,6 +41,7 @@ bool ClueListBox::SetClue(const puz::Clue * clue)
     SetSelection(index);
     if (index != wxNOT_FOUND)
     {
+        ScrollRowToCenter(index);
         RefreshRow(index);
         return true;
     }

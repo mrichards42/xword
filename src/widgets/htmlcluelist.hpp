@@ -87,6 +87,8 @@ public:
     // Color handling
     virtual bool SetForegroundColour(const wxColour & color);
 
+    void ScrollRowToCenter(int row);
+
 protected:
     // this method must be implemented in the derived class and should return
     // the body (i.e. without <html>) of the HTML for the given item
