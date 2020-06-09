@@ -654,6 +654,23 @@ static int Square_SetTheme(lua_State * L)
     square->SetTheme(doit);
     return 0;
 }
+// bool IsAnnotation()
+static int Square_IsAnnotation(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    bool returns = square->IsAnnotation();
+    lua_pushboolean(L, returns);
+    return 1;
+}
+// void SetAnnotation(bool doit = true)
+static int Square_SetAnnotation(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    int argCount = lua_gettop(L);
+    bool doit = (argCount >= 2 ? luapuz_checkboolean(L, 2) : true);
+    square->SetAnnotation(doit);
+    return 0;
+}
 // bool HasColor()
 static int Square_HasColor(lua_State * L)
 {
@@ -819,6 +836,8 @@ static const luaL_reg Squarelib[] = {
     {"SetMissing", Square_SetMissing},
     {"IsTheme", Square_IsTheme},
     {"SetTheme", Square_SetTheme},
+    {"IsAnnotation", Square_IsAnnotation},
+    {"SetAnnotation", Square_SetAnnotation},
     {"HasColor", Square_HasColor},
     {"SetColor", Square_SetColor},
     {"GetHtmlColor", Square_GetHtmlColor},

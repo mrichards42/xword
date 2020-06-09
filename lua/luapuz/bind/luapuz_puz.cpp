@@ -144,6 +144,7 @@ const luapuz_enumReg GextFlag_reg[] = {
     {"FLAG_MISSING", puz::FLAG_MISSING},
     {"FLAG_CORRECT", puz::FLAG_CORRECT},
     {"FLAG_THEME", puz::FLAG_THEME},
+    {"FLAG_ANNOTATION", puz::FLAG_ANNOTATION},
     {"FLAG_CHECK_MASK", puz::FLAG_CHECK_MASK},
     {NULL, NULL}
 };
@@ -182,6 +183,7 @@ const char * GridType_meta = "puz.GridType";
 const luapuz_enumReg GridType_reg[] = {
     {"TYPE_NORMAL", puz::TYPE_NORMAL},
     {"TYPE_DIAGRAMLESS", puz::TYPE_DIAGRAMLESS},
+    {"TYPE_ACROSTIC", puz::TYPE_ACROSTIC},
     {NULL, NULL}
 };
 

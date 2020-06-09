@@ -98,8 +98,11 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
         xml::node completion = settings.append_child("completion");
         completion.append_attribute("only-if-correct") = "true";
-        xml::SetText(completion, "Congratulations, you have solved the puzzle!");
-
+        string_t message = puz->GetMeta(puzT("completion"));
+        if (message.empty()) {
+            message = puzT("Congratulations, you have solved the puzzle!");
+        }
+        xml::SetText(completion, message);
     }
     // Timer
     applet.child("applet-settings").remove_child("timer");
@@ -127,7 +130,12 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
     xml::SetInnerXML(puzzle.append_child("instructions"), puz->GetNotes());
 
-    xml::node crossword = puzzle.append_child("crossword");
+    const char* puzzle_root_tag;
+    if (grid.IsAcrostic())
+        puzzle_root_tag = "acrostic";
+    else
+        puzzle_root_tag = "crossword";
+    xml::node crossword = puzzle.append_child(puzzle_root_tag);
 
     // Grid
     xml::node xmlgrid = crossword.append_child("grid");
@@ -151,10 +159,12 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
             cell.append_attribute("y") = square->GetRow() + 1;
             if (square->IsMissing())
                 cell.append_attribute("type") = "void";
-            else if (square->IsBlack())
+            else if (square->IsBlack() && !square->IsAnnotation())
                 cell.append_attribute("type") = "block";
             else
             {
+                if (square->IsAnnotation())
+                    cell.append_attribute("type") = "clue";
                 cell.append_attribute("solution") =
                     encode_utf8(square->GetSolution()).c_str();
                 if (square->HasNumber())
@@ -196,7 +206,7 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
             if (! square->m_mark[MARK_TR].empty())
             {
                 cell.append_attribute("top-right-number") =
-                    encode_utf8(square->m_mark[MARK_TL]).c_str();
+                    encode_utf8(square->m_mark[MARK_TR]).c_str();
             }
             if (square->m_bars[BAR_TOP])
                 cell.append_attribute("top-bar") = "true";

@@ -51,6 +51,8 @@
 #include "iterator.hpp"
 #include "Scrambler.hpp"
 
+#include <map>
+
 namespace puz {
 
 
@@ -266,6 +268,31 @@ void Grid::NumberGrid()
             square->SetNumber(clueNumber++);
         else
             square->SetNumber(puzT(""));
+    }
+}
+
+void
+Grid::FindPartnerSquares()
+{
+    if (!IsAcrostic()) return;
+    std::map<string_t, Square*> partner_map;
+    for (size_t row = 0; row < GetHeight(); ++row)
+    {
+        for (size_t col = 0; col < GetWidth(); ++col)
+        {
+            Square& square = At(col, row);
+            if (square.HasNumber()) {
+                std::map<string_t, Square*>::iterator it = partner_map.find(square.GetNumber());
+                if (it == partner_map.end()) {
+                    partner_map[square.GetNumber()] = &square;
+                }
+                else {
+                    Square* partner = it->second;
+                    square.m_partner = partner;
+                    partner->m_partner = &square;
+                }
+            }
+        }
     }
 }
 

@@ -1142,6 +1142,9 @@ MyFrame::CheckPuzzle()
             StopTimer();
             m_status->SetAlert(_T("The puzzle is filled correctly!"),
                 wxGetApp().GetConfigManager().Status.completeColor());
+            // Show completion message for acrostics since it is often the formatted quote.
+            if (m_puz.GetGrid().IsAcrostic() && m_puz.HasMeta(puzT("completion")))
+                XWordMessage(this, m_puz.GetMeta(puzT("completion")));
             break;
         case UNCHECKABLE_PUZZLE:
             StopTimer();

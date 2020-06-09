@@ -362,7 +362,7 @@ protected:
     void DrawPauseMessage(wxDC & dc);
     void DrawGrid(wxDC & dc, const wxRegion & updateRegion = wxRegion());
 
-    void DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & color);
+    void DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & color, bool propagate = true);
 
     void DrawSquare(wxDC & dc, const puz::Square & square)
         { DrawSquare(dc, square, GetSquareColor(square)); }
