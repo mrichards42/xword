@@ -143,6 +143,8 @@ const int UNDEFINED_BOX_SIZE = -1;
 
 const char * MSG_NO_INCORRECT = "No Incorrect Letters!";
 
+wxColour EraseColor; // Sentinel used to erase a square's background
+
 // Helper functions for all of the "lookup" functions that return NULL
 inline void
 SetIfExists(puz::Square * &current, puz::Square * test)
@@ -553,7 +555,7 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
         m_drawer.RemoveFlag(XGridDrawer::DRAW_FLAG | XGridDrawer::DRAW_NUMBER);
     }
 
-    if (color == wxNullColour)
+    if (color == wxNullColour || &color == &EraseColor)
         m_drawer.DrawSquare(dc, square);
     else
         m_drawer.DrawSquare(dc, square, color, GetPenColor());
@@ -567,7 +569,10 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
 
     if (propagate && square.GetPartnerSquare()) {
         puz::Square* partner = square.GetPartnerSquare();
-        DrawSquare(dc, *partner, GetSquareColor(*partner), false);
+        if (&color == &EraseColor)
+            DrawSquare(dc, *partner, EraseColor, false);
+        else
+            DrawSquare(dc, *partner, GetSquareColor(*partner), false);
     }
 }
 
@@ -647,7 +652,7 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
     {
         puz::square_iterator it;
         for (it = oldWord->begin(); it != oldWord->end(); ++it)
-            DrawSquare(dc, *it, wxNullColour);
+            DrawSquare(dc, *it, EraseColor);
         oldWord = NULL;
     }
 
@@ -675,10 +680,10 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
             {
                 puz::square_iterator it;
                 for (it = oldWord->begin(); it != oldWord->end(); ++it)
-                    DrawSquare(dc, *it, wxNullColour);
+                    DrawSquare(dc, *it, EraseColor);
             }
             else if (oldSquare)
-                DrawSquare(dc, *oldSquare, wxNullColour);
+                DrawSquare(dc, *oldSquare, EraseColor);
 
             // Draw the new focused word
             if (m_focusedWord)
