@@ -1036,7 +1036,6 @@ MyFrame::ShowMetadata()
 #endif // USE_MY_AUI_MANAGER
 }
 
-
 // Should this metadata be displayed as notes?
 // Either has "_notes_" in the name, or is one of
 // "description", or "instructions"
@@ -1056,6 +1055,23 @@ bool IsNotes(const puz::string_t & str)
     // description/instructions
     if (str == puzT("description") || str == puzT("instructions"))
         return true;
+    return false;
+}
+
+// Returns true if the puzzle has notes or any
+// notes-like metadata per IsNotes().
+bool HasNotes(const puz::Puzzle puz)
+{
+    if (!puz.GetNotes().empty()) {
+        return true;
+    }
+    const puz::Puzzle::metamap_t& meta = puz.GetMetadata();
+    puz::Puzzle::metamap_t::const_iterator it;
+    for (it = meta.begin(); it != meta.end(); ++it) {
+        if (IsNotes(it->first)) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -2443,7 +2459,7 @@ MyFrame::OnUpdateUI(wxUpdateUIEvent & evt)
         case ID_SHOW_NOTES:
             evt.Check(m_mgr.GetPane(_T("Notes")).IsShown());
             // Set the notes bitmap depending on whether there are notes or not
-            if (m_puz.GetNotes().empty())
+            if (!HasNotes(m_puz))
                 m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes"));
             else
                 m_toolMgr.SetIconName(ID_SHOW_NOTES, _T("notes_new"));
