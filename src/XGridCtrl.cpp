@@ -143,6 +143,8 @@ const int UNDEFINED_BOX_SIZE = -1;
 
 const char * MSG_NO_INCORRECT = "No Incorrect Letters!";
 
+wxColour EraseColor; // Sentinel used to erase a square's background
+
 // Helper functions for all of the "lookup" functions that return NULL
 inline void
 SetIfExists(puz::Square * &current, puz::Square * test)
@@ -366,7 +368,7 @@ XGridCtrl::GetStats(GridStats * stats) const
         {
             ++stats->black;
         }
-        else
+        else if (!square->IsMissing())
         {
             ++stats->white;
             if (square->IsBlank())
@@ -533,7 +535,7 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
 
 
 void
-XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & color)
+XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & color, bool propagate)
 {
     // Don't draw missing squares
     if (square.IsMissing())
@@ -553,7 +555,7 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
         m_drawer.RemoveFlag(XGridDrawer::DRAW_FLAG | XGridDrawer::DRAW_NUMBER);
     }
 
-    if (color == wxNullColour)
+    if (color == wxNullColour || &color == &EraseColor)
         m_drawer.DrawSquare(dc, square);
     else
         m_drawer.DrawSquare(dc, square, color, GetPenColor());
@@ -563,6 +565,14 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
     {
         m_drawer.RemoveFlag(XGridDrawer::DRAW_OUTLINE);
         m_drawer.AddFlag(XGridDrawer::DRAW_FLAG | XGridDrawer::DRAW_NUMBER);
+    }
+
+    if (propagate && square.GetPartnerSquare()) {
+        puz::Square* partner = square.GetPartnerSquare();
+        if (&color == &EraseColor)
+            DrawSquare(dc, *partner, EraseColor, false);
+        else
+            DrawSquare(dc, *partner, GetSquareColor(*partner), false);
     }
 }
 
@@ -602,15 +612,22 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
         else if (! square->HasWord(static_cast<puz::GridDirection>(direction))
             && ! m_puz->FindWord(square, direction))
         {
-            puz::GridDirection newdir
-                = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
-            if (square->HasWord(newdir))
-                direction = newdir;
+            if (GetGrid()->IsAcrostic())
+            {
+                direction = puz::ACROSS;
+            }
             else
             {
-                word = m_puz->FindWord(square, newdir);
-                if (word)
+                puz::GridDirection newdir
+                    = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
+                if (square->HasWord(newdir))
                     direction = newdir;
+                else
+                {
+                    word = m_puz->FindWord(square, newdir);
+                    if (word)
+                        direction = newdir;
+                }
             }
         }
     }
@@ -635,7 +652,7 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
     {
         puz::square_iterator it;
         for (it = oldWord->begin(); it != oldWord->end(); ++it)
-            DrawSquare(dc, *it, wxNullColour);
+            DrawSquare(dc, *it, EraseColor);
         oldWord = NULL;
     }
 
@@ -663,10 +680,10 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
             {
                 puz::square_iterator it;
                 for (it = oldWord->begin(); it != oldWord->end(); ++it)
-                    DrawSquare(dc, *it, wxNullColour);
+                    DrawSquare(dc, *it, EraseColor);
             }
             else if (oldSquare)
-                DrawSquare(dc, *oldSquare, wxNullColour);
+                DrawSquare(dc, *oldSquare, EraseColor);
 
             // Draw the new focused word
             if (m_focusedWord)
@@ -957,6 +974,9 @@ XGridCtrl::SetSquareText(puz::Square & square, const wxString & text)
     {
         GetGrid()->NumberGrid();
         Refresh();
+    }
+    else {
+        RefreshSquare(square);
     }
 
     return true;
@@ -1551,7 +1571,8 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
             // Check to see if there *should be* a (non-diagonal) word
             // in arrowDirection.
             if (! IsDiagonal(arrowDirection)
-                && m_focusedSquare->HasWord(arrowDirection))
+                && m_focusedSquare->HasWord(arrowDirection)
+                && !GetGrid()->IsAcrostic())
             {
                 SetFocusedSquare(m_focusedSquare, NULL, arrowDirection);
                 return;
@@ -1561,12 +1582,17 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
         if (! GetGrid()->IsDiagramless())
         {
             // Find the next white square in the arrow direction
+            puz::GridDirection newDirection;
+            if (GetGrid()->IsAcrostic())
+                newDirection = puz::ACROSS;
+            else
+                newDirection = arrowDirection;
             SetFocusedSquare(
                 m_grid->FindNextSquare(
                     m_focusedSquare, FIND_WHITE_SQUARE,
                     arrowDirection, puz::NO_WRAP
                 ),
-                NULL, arrowDirection
+                NULL, newDirection
             );
         }
         else // Diagramless
@@ -1839,11 +1865,14 @@ const wxColor &
 XGridCtrl::GetSquareColor(const puz::Square & square)
 {
     if (HasSelection() && IsSelected(square))
-            return GetSelectionColor();
+        return GetSelectionColor();
     else if (IsFocusedLetter(square))
         return GetFocusedLetterColor();
     else if (IsFocusedWord(square))
         return GetFocusedWordColor();
+    else if (square.GetPartnerSquare() && IsFocusedLetter(*square.GetPartnerSquare())) {
+        return GetFocusedLetterColor();
+    }
     else
         return wxNullColour; // XGridDrawer will decide
 }

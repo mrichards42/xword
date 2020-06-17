@@ -51,6 +51,7 @@ enum GextFlag
     FLAG_MISSING   = 0x200, // No square
     FLAG_CORRECT   = 0x400, // Checked/correct
     FLAG_THEME     = 0x800, // A theme square
+    FLAG_ANNOTATION      = 0x1000, // An annotation square (aka "clue" square in JPZ)
 
     // Check square options
     FLAG_CHECK_MASK = FLAG_X |
@@ -187,12 +188,12 @@ public:
     // SetSolution(Square::Black) also calls SetText(Square::Black) for
     // consistency, so if your puzzle is diagramless, you will have to
     // explicitly call SetText("") on black squares to make them empty.
-    bool IsWhite()         const { return ! IsBlack() && ! IsMissing(); }
-    bool IsBlack()         const { return m_text == Black; }
+    bool IsWhite()         const { return !IsBlack() && !IsMissing(); }
+    bool IsBlack()         const { return m_text == Black || IsAnnotation(); }
     bool IsBlank()         const { return m_text == Blank; }
     // Corresponding functions for the solution
-    bool IsSolutionWhite() const { return ! IsSolutionBlack() &&! IsMissing(); }
-    bool IsSolutionBlack() const { return m_solution == Black; }
+    bool IsSolutionWhite() const { return !IsSolutionBlack() && !IsMissing(); }
+    bool IsSolutionBlack() const { return m_solution == Black || IsAnnotation(); }
     bool IsSolutionBlank() const { return m_solution == Blank; }
 
     // Text
@@ -202,7 +203,7 @@ public:
     const string_t & GetText()     const { return m_text; }
     const string_t & GetSolution() const { return m_solution; }
 
-    void SetText    (const string_t & text);
+    void SetText    (const string_t & text, bool propagate = true);
     void SetSolution(const string_t & solution);
     void SetSolution(const string_t & solution, char plain);
     void SetPlainSolution(char plain); // Leave solution rebus unchanged
@@ -261,14 +262,19 @@ public:
 
     // Flags
     //------
-    void         SetFlag (unsigned int flag) { m_flag = flag; }
+    void         SetFlag (unsigned int flag, bool propagate = true) {
+        m_flag = flag;
+        if (propagate && m_partner) {
+            m_partner->SetFlag(flag, false);
+        }
+    }
     unsigned int GetFlag() const             { return m_flag; }
     bool         HasFlag(unsigned int flag) const
         { return (m_flag & flag) != 0; }
 
     void   AddFlag     (unsigned int flag, bool doit = true)
     {
-        doit ? m_flag |= flag : m_flag &= ~ flag;
+        SetFlag(doit ? m_flag | flag : m_flag & ~ flag);
     }
     void   RemoveFlag  (unsigned int flag) { AddFlag(flag, false); }
     void   ToggleFlag  (unsigned int flag)
@@ -284,6 +290,9 @@ public:
 
     bool IsTheme() const { return HasFlag(FLAG_THEME); }
     void SetTheme(bool doit = true) { AddFlag(FLAG_THEME, doit); }
+
+    bool IsAnnotation() const { return HasFlag(FLAG_ANNOTATION); }
+    void SetAnnotation(bool doit = true) { AddFlag(FLAG_ANNOTATION, doit); }
 
     bool HasColor() const { return HasFlag(FLAG_COLOR); }
     void SetColor(unsigned char red, unsigned char green, unsigned char blue);
@@ -359,6 +368,8 @@ public:
     bool HasWord(GridDirection dir) const;
 
     bool IsBetween(const Square * start, const Square * end) const;
+
+    Square* GetPartnerSquare() const { return m_partner; }
 protected:
     // Location information
     int m_col;
@@ -374,6 +385,9 @@ protected:
 
     // Flag (GEXT)
     unsigned int m_flag;
+
+    // Partner square (for Acrostics)
+    Square* m_partner = NULL;
 
     // Linked-list
     //------------
