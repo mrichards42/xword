@@ -1,3 +1,39 @@
+Version 0.7.0 (6/23/2020)
+==========================
+Puzzle Features
+---------------
+* Acrostic support (specially formatted .jpz)
+* Rows Garden support (.rg and .rgz files)
+* Support for barred square borders (.jpz and .ipz only)
+
+New Features
+------------
+* Option to hide percent complete and completion alerts (e.g. for tournament
+  training).
+* Option to highlight theme clues.
+* Fully supported Mac release.
+
+Improvements
+------------
+* Rewrote downloader package and updated sources.
+* Improved layout system: panes resize with the window, and clue lists are made
+  to resize together.
+* Rewrote preferences dialog.
+* Show all notes-like fields in notes pane (e.g. description or instructions)
+* Less harsh default colors.
+* Improvements to hdpi screens.
+
+Bug Fixes
+---------
+* JPZ roundtrips unknown metadata.
+* Save formatted JPZ clues in a way that is compatible with crossword solver.
+* Timer always pauses when the window is hidden.
+* Show all supported file types in "open" dialog.
+
+
+----------------------------------------------------------------------
+
+
 Version 0.6.1 (8/12/2012)
 ==========================
 New Features
