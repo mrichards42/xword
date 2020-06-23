@@ -29,8 +29,8 @@ character set.
 
 Some puzzles require multiple letters to be entered in a square.
 
-1. Enter rebus mode by pressing `INSERT`, clicking the rebus toolbar icon, or
-   selecting `Enter Multiple Letters` from the
+1. Enter rebus mode by pressing `INSERT` or `ESC`, clicking the rebus toolbar
+   icon, or selecting `Enter Multiple Letters` from the
    [`Solution`](window.html#solution_menu) menu.
 2. An expandable text box will appear in which you can type multiple letters.
 3. Press `INSERT` or `ENTER` to exit rebus mode (the cursor will become
