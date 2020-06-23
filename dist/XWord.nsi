@@ -176,7 +176,7 @@ Section "MainSection" SEC01
         File "${XWORD_TRUNK}\README.md"
         File "${XWORD_TRUNK}\AUTHORS"
         File "${XWORD_TRUNK}\COPYING"
-        File "${XWORD_TRUNK}\CHANGELOG"
+        File "${XWORD_TRUNK}\CHANGELOG.md"
 
     ; VC Redist
         File "${VC_REDIST}\Microsoft.VC120.CRT\msvcp120.dll"
@@ -300,7 +300,7 @@ Section Uninstall
         Delete "$INSTDIR\README.md"
         Delete "$INSTDIR\AUTHORS"
         Delete "$INSTDIR\COPYING"
-        Delete "$INSTDIR\CHANGELOG"
+        Delete "$INSTDIR\CHANGELOG.md"
 
         ; VC Redist
         Delete "$INSTDIR\msvcp120.dll"
