@@ -14,7 +14,10 @@ XWord Overview
     - jpz ([Crossword Solver](crosswordsolver.html) format)
     - [ipuz](http://www.ipuz.org/) (partial)
     - Across Lite [text format](http://www.litsoft.com/across/alite/man/AcrossTextFormat.pdf)
+    - [rgz](https://www.ariespuzzles.com) rows garden puzzles
 - [Diagramless](diagramless.html) puzzles
+- Acrostic puzzles
+- Marching Bands puzzles
 - [Rebus](solving.html#rebus_entries) puzzles
 - Circled and shaded squares
 - Unconventional numbering schemes

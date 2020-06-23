@@ -8,8 +8,11 @@ XWord Support for Puzzle Features
 | [Rebus](solving.html#rebus_entries) entries   |  X  |  X  |  X  |  X   |
 | Circled squares                               |  X  |  X  |  X  |  X   |
 | Squares with colored or shaded backgrounds    |     |  X  |  X  |  X   |
+| Squares with barred borders                   |     |     |  X  |  X   |
 | Background images                             |     |     |  X  |      |
 | [Diagramless](diagramless.html) puzzles       |  X  |  X  |     |      |
+| Acrostic puzzles                              |     |     |  X  |      |
+| Marching Bands puzzles                        |     |     |  X  |      |
 | Diagonal words                                |     |  X  |  X  |      |
 | Words in other directions                     |     |     |  X  |      |
 | Clues with formatted text                     |     |  X  |  X  |  X   |
