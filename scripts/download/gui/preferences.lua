@@ -261,6 +261,7 @@ return function(parent, id)
             table.insert(new_sources, source)
         end
         sources:set(new_sources)
+        config.save()
     end
 
     self:LoadConfig()

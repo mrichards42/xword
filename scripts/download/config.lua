@@ -4,6 +4,7 @@
 local _R = mod_path(...)
 
 local path = require 'pl.path'
+local makepath = require 'pl.dir'.makepath
 local tablex = require 'pl.tablex'
 local stringx = require 'pl.stringx'
 local serialize = require 'serialize'
@@ -247,6 +248,7 @@ function config.save()
     -- Get the sources configuration data
     tablex.update(data, get_sources_config())
     -- Save to a file
+    makepath(path.dirname(config.get_config_filename()))
     serialize.dump(data, config.get_config_filename())
 end
 
