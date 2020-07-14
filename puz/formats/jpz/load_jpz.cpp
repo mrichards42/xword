@@ -34,6 +34,15 @@ public:
     // Return the square from this element
     Square * GetSquare(Puzzle * puz, xml::node &);
     Square * RequireSquare(Puzzle * puz, xml::node &);
+
+private:
+    string_t GetTrimmedInnerXML(xml::node n) {
+        return puz::TrimWhitespace(GetInnerXML(n));
+    }
+
+    string_t GetTrimmedInnerXML(xml::node n, const char* name) {
+        return puz::TrimWhitespace(GetInnerXML(n, name));
+    }
 };
 
 
@@ -146,8 +155,6 @@ Word make_word(Puzzle * puz, const string_t & x, const string_t & y)
     return Word(&grid.At(x1-1, y1-1), &grid.At(x2-1, y2-1));
 }
 
-
-
 bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
 {
     Grid & grid = puz->GetGrid();
@@ -175,22 +182,22 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     for (meta = meta.first_child(); meta; meta = meta.next_sibling())
     {
         if (strcmp(meta.name(), "creator") == 0)
-            puz->SetAuthor(GetInnerXML(meta));
+            puz->SetAuthor(GetTrimmedInnerXML(meta));
         else
-            puz->SetMeta(decode_utf8(meta.name()), GetInnerXML(meta));
+            puz->SetMeta(decode_utf8(meta.name()), GetTrimmedInnerXML(meta));
         // Can be title, creator, copyright, editor, publisher, created,
         // rights, identifier, description
     }
     puz->SetNotes(GetInnerXML(puzzle, "instructions"));
 
     if (puz->GetTitle().empty())
-        puz->SetTitle(GetInnerXML(applet, "title"));
+        puz->SetTitle(GetTrimmedInnerXML(applet, "title"));
     if (puz->GetCopyright().empty())
-        puz->SetCopyright(GetInnerXML(applet, "copyright"));
+        puz->SetCopyright(GetTrimmedInnerXML(applet, "copyright"));
 
     xml::node completion = applet.child("applet-settings").child("completion");
     if (completion) {
-        puz->SetMeta(puzT("completion"), GetInnerXML(completion));
+        puz->SetMeta(puzT("completion"), GetTrimmedInnerXML(completion));
     }
 
     // Grid
