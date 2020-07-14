@@ -18,6 +18,7 @@
 #include "MyFrame.hpp"
 #include "paths.hpp"
 #include "messages.hpp"
+#include "html/parse.hpp"
 
 // For the global printing pointers and application activation / timer starting
 // and stopping.
@@ -975,8 +976,12 @@ MyFrame::ShowMetadata()
     // Set window title
     if (! m_puz.IsOk())
         SetTitle(XWORD_APP_NAME);
-    else
-        SetTitle(puz2wx(m_puz.GetTitle()) + _T(" - ") XWORD_APP_NAME);
+    else {
+        // Puzzle titles can contain HTML, so parse out the plain text.
+        PlainTextHtmlParser parser;
+        wxString title = * (wxString*) (parser.Parse(puz2wx(m_puz.GetTitle())));
+        SetTitle(title + _T(" - ") XWORD_APP_NAME);
+    }
 
     // Update the metadata panels
     typedef std::vector<wxAuiPaneInfo *> pane_vector_t;
