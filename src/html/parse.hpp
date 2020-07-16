@@ -34,3 +34,22 @@ public:
 
     virtual void InitParser(const wxString& source);
 };
+
+// Simple HTML parser which just combines all text and returns it.
+class PlainTextHtmlParser : public wxHtmlParser
+{
+public:
+    virtual void AddTag(const wxHtmlTag& tag) {
+        if (tag.HasEnding())
+            DoParsing(tag.GetBeginIter(), tag.GetEndIter1());
+    }
+    virtual void AddText(const wxString& txt) {
+        text.append(txt);
+    }
+    virtual wxObject* GetProduct() {
+        return (wxObject*) &text;
+    }
+
+private:
+    wxString text;
+};
