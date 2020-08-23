@@ -172,10 +172,17 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     if (! crossword)
     {
         crossword = puzzle.child("acrostic");
-        if (!crossword)
-            throw FileTypeError("jpz must have either <crossword> or <acrostic> tag");
-        grid.SetType(TYPE_ACROSTIC);
+        if (crossword)
+            grid.SetType(TYPE_ACROSTIC);
     }
+    if (! crossword)
+    {
+        crossword = puzzle.child("coded");
+        if (crossword)
+            grid.SetType(TYPE_CODED);
+    }
+    if (! crossword)
+        throw FileTypeError("jpz does not contain a supported puzzle type");
 
     // Metadata
     xml::node meta = puzzle.child("metadata");
@@ -377,7 +384,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             hasClueList = true;
         }
 
-        if (!hasClueList) {
+        if (!hasClueList && !grid.IsCoded()) {
             throw LoadError("Must have at least one clue list");
         }
     }

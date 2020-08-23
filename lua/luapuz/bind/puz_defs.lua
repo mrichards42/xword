@@ -71,6 +71,7 @@ enum { "GridType", header="puz/Grid.hpp",
     "TYPE_NORMAL",
     "TYPE_DIAGRAMLESS",
     "TYPE_ACROSTIC",
+    "TYPE_CODED",
 }
 
 enum { "FindOptions", header="puz/Grid.hpp",
@@ -231,6 +232,7 @@ class{"Grid", header="puz/Grid.hpp"}
 
     func{"IsDiagramless", returns="bool"}
     func{"IsAcrostic", returns="bool"}
+    func{"IsCoded", returns="bool"}
     property{"unsigned short", "Type"}
 
     func{"ScrambleSolution", returns="bool", arg("unsigned short", "key", "0")}

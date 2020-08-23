@@ -184,6 +184,7 @@ const luapuz_enumReg GridType_reg[] = {
     {"TYPE_NORMAL", puz::TYPE_NORMAL},
     {"TYPE_DIAGRAMLESS", puz::TYPE_DIAGRAMLESS},
     {"TYPE_ACROSTIC", puz::TYPE_ACROSTIC},
+    {"TYPE_CODED", puz::TYPE_CODED},
     {NULL, NULL}
 };
 
