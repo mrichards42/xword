@@ -16,7 +16,7 @@ mkdir -p $INSTALL_PATH
 echo "Building LuaJIT version $LUAJIT_VERSION"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  BUILD_COMMAND="make CC='gcc -arch x86_64'"
+  BUILD_COMMAND="make MACOSX_DEPLOYMENT_TARGET=10.7 CC='gcc -arch x86_64'"
   INSTALL_COMMAND="cp libluajit.a $INSTALL_PATH/lib/liblua51.a"
   LIBS_DIR="macosx"
 elif [[ "$OSTYPE" == "linux"* ]]; then
