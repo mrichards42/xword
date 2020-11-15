@@ -119,9 +119,12 @@ void RebusTextCtrl::OnChar(wxKeyEvent & evt)
 {
     int code = evt.GetKeyCode();
     // Don't filter special keys
-    if (code == WXK_RETURN || code == WXK_INSERT)
-        m_grid->EndRebusEntry(); // end the rebus entry
-    else if (code < WXK_SPACE || code == WXK_DELETE || code > WXK_START)
+    if (code == WXK_RETURN || code == WXK_INSERT) {
+        // End the rebus entry.
+        // CallAfter is needed to prevent a crash on Linux when destroying the window from its own
+        // event handler.
+        m_grid->CallAfter(&XGridCtrl::EndRebusEntry, true);
+    } else if (code < WXK_SPACE || code == WXK_DELETE || code > WXK_START)
         evt.Skip();
     else if (XGridCtrl::IsValidChar(code))
         m_text->WriteText(puz::Square::ToGrid(code)); // make text uppercase
