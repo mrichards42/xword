@@ -56,12 +56,9 @@ solution "XWord"
 
     configuration "macosx"
         architecture "x64"
-        -- NOTE: -mmacosx-version-min has been replaced with deployment targets in newer versions
-        -- of XCode, but premake5 doesn't support setting a deployment target yet (see
-        -- premake/premake-core#1336). Builds will work on newer versions of XCode, but the binary
-        -- will only run on the build OS, not older ones.
-        buildoptions { "-mmacosx-version-min=10.7", "-stdlib=libc++" }
-        linkoptions  { "-mmacosx-version-min=10.7", "-stdlib=libc++", "-L/usr/local/lib" }
+        systemversion "10.7"
+        buildoptions { "-stdlib=libc++" }
+        linkoptions  { "-stdlib=libc++", "-L/usr/local/lib" }
 
     configuration "linux"
         architecture "x64"

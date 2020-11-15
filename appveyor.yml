@@ -1,70 +1,125 @@
 version: '{build}'
 test: off
 
+image:
+  - Visual Studio 2015
+  - macOS
+
 configuration:
   - Debug
   - Release
 
 environment:
-  PYTHON: "C:\\Python38"
   WX_VERSION: 3.1.3
-  CURL_VERSION: 7.69.0
   LUAJIT_VERSION: 2.0.5
 
-install:
-  # For tagged builds, use the tag name as the version.
-  # Otherwise, read the version from the VERSION file.
-  - IF "%APPVEYOR_REPO_TAG%"=="true" (SET XWORD_VERSION=%APPVEYOR_REPO_TAG_NAME%) ELSE (SET /P XWORD_VERSION=< VERSION)
-  # Build and install markdown
-  - SET PATH=%PYTHON%;%PATH%
-  - IF %CONFIGURATION%==Release python -m pip install markdown
-  - call "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
-  # Build curl
-  - bash build-curl.sh %CURL_VERSION%
-  # Build LuaJIT
-  - bash build-luajit.sh %LUAJIT_VERSION%
-  # Build wxWidgets, with our custom tweaks patch
-  - bash build-wxwidgets.sh %WX_VERSION% %CONFIGURATION%
+for:
+-
+  # Windows
+  matrix:
+    only:
+      - image: Visual Studio 2015
 
-# Cache the compiled libraries so they can be used with future builds
-cache:
-  - '%USERPROFILE%\wxWidgets-%WX_VERSION%'
-  - '%USERPROFILE%\curl-%CURL_VERSION%'
-  - '%USERPROFILE%\LuaJIT-%LUAJIT_VERSION%'
+  environment:
+    CURL_VERSION: 7.69.0
+    PYTHON: "C:\\Python38"
 
-# Run premake to create the Visual Studio project
-before_build:
-  - premake5.exe --wx-prefix="%USERPROFILE%/wxWidgets-%WX_VERSION%" vs2013
+  install:
+    # For tagged builds, use the tag name as the version.
+    # Otherwise, read the version from the VERSION file.
+    - IF "%APPVEYOR_REPO_TAG%"=="true" (SET XWORD_VERSION=%APPVEYOR_REPO_TAG_NAME%) ELSE (SET /P XWORD_VERSION=< VERSION)
+    # Build and install markdown
+    - SET PATH=%PYTHON%;%PATH%
+    - IF %CONFIGURATION%==Release python -m pip install markdown
+    - call "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
+    # Build curl
+    - bash build-curl.sh %CURL_VERSION%
+    # Build LuaJIT
+    - bash build-luajit.sh %LUAJIT_VERSION%
+    # Build wxWidgets, with our custom tweaks patch
+    - bash build-wxwidgets.sh %WX_VERSION% %CONFIGURATION%
 
-# Build XWord
-build_script:
-  - msbuild build/vs2013/XWord.sln /p:Configuration=%CONFIGURATION%
-  # For release builds, also build docs and run dist steps.
-  - IF %CONFIGURATION%==Release pushd doc & make_help.cmd & popd
-  - IF %CONFIGURATION%==Release pushd dist & python gen_nsis.py > scripts.nsi & "%ProgramFiles(x86)%\NSIS\makensis.exe" /V4 XWord.nsi & popd
-  - IF %CONFIGURATION%==Release sed -e "s/{VERSION}/%XWORD_VERSION%/" -e "s/{OS_FILE}/XWord-Windows.exe/" dist/packages_template.lua > dist/packages_windows.lua
+  # Cache the compiled libraries so they can be used with future builds
+  cache:
+    - '%USERPROFILE%\wxWidgets-%WX_VERSION%'
+    - '%USERPROFILE%\curl-%CURL_VERSION%'
+    - '%USERPROFILE%\LuaJIT-%LUAJIT_VERSION%'
 
-# Zip the full build folder and make it available as an artifact.
-after_build:
-  - 7z a bin\%CONFIGURATION%\XWord-Windows.zip "%APPVEYOR_BUILD_FOLDER%\bin\%CONFIGURATION%\*" -r -x!*.exp -x!*.lib -x!*.pdb -x!*.idb -x!*.ilk -x!*.fbp
+  # Run premake to create the Visual Studio project
+  before_build:
+    - premake5.exe --wx-prefix="%USERPROFILE%/wxWidgets-%WX_VERSION%" vs2013
 
-artifacts:
-  - path: bin\%CONFIGURATION%\XWord-Windows.zip
-    name: XWord-Windows.zip
+  # Build XWord
+  build_script:
+    - msbuild build/vs2013/XWord.sln /p:Configuration=%CONFIGURATION%
+    # For release builds, also build docs and run dist steps.
+    - IF %CONFIGURATION%==Release pushd doc & make_help.cmd & popd
+    - IF %CONFIGURATION%==Release pushd dist & python gen_nsis.py > scripts.nsi & "%ProgramFiles(x86)%\NSIS\makensis.exe" /V4 XWord.nsi & popd
+    - IF %CONFIGURATION%==Release sed -e "s/{VERSION}/%XWORD_VERSION%/" -e "s/{OS_FILE}/XWord-Windows.exe/" dist/packages_template.lua > dist/packages_windows.lua
 
-  - path: dist\XWord-Windows.exe
-    name: XWord-Windows.exe
+  # Zip the full build folder and make it available as an artifact.
+  after_build:
+    - 7z a bin\%CONFIGURATION%\XWord-Windows.zip "%APPVEYOR_BUILD_FOLDER%\bin\%CONFIGURATION%\*" -r -x!*.exp -x!*.lib -x!*.pdb -x!*.idb -x!*.ilk -x!*.fbp
 
-  - path: dist\packages_windows.lua
-    name: packages_windows.lua
+  artifacts:
+    - path: bin\%CONFIGURATION%\XWord-Windows.zip
+      name: XWord-Windows.zip
+
+    - path: dist\XWord-Windows.exe
+      name: XWord-Windows.exe
+
+    - path: dist\packages_windows.lua
+      name: packages_windows.lua
+
+-
+  # Mac
+  matrix:
+    only:
+      - image: macOS
+
+  install:
+    # For tagged builds, use the tag name as the version.
+    # Otherwise, read the version from the VERSION file.
+    - if [ "$APPVEYOR_REPO_TAG" == "true" ]; then export XWORD_VERSION=$APPVEYOR_REPO_TAG_NAME; else export XWORD_VERSION=$(cat VERSION); fi
+    # Build LuaJIT
+    - bash build-luajit.sh $LUAJIT_VERSION
+    # Build and install wxWidgets, with our custom tweaks patch
+    - ./build-wxwidgets.sh $WX_VERSION $CONFIGURATION
+
+  # Cache the compiled libraries so they can be used with future builds
+  cache:
+    - $HOME/wxWidgets-$WX_VERSION
+    - $HOME/LuaJIT-$LUAJIT_VERSION
+
+  # Run premake to create the Xcode project
+  before_build:
+    - ./premake5 --wx-config-debug=$HOME/wxWidgets-$WX_VERSION/bin/wx-config --wx-config-release=$HOME/wxWidgets-$WX_VERSION/bin/wx-config xcode4
+
+  # Build XWord
+  build_script:
+    - xcodebuild -project build/xcode4/XWord.xcodeproj -configuration "$CONFIGURATION" build
+    - if [ "$CONFIGURATION" == "Release" ]; then sed -e "s/{VERSION}/${XWORD_VERSION}/" -e "s/{OS_FILE}/XWord-macOS.zip/" dist/packages_template.lua > dist/packages_mac.lua; fi
+
+  # Zip the full build folder and make it available as an artifact.
+  after_build:
+    - pushd bin/$CONFIGURATION
+    - zip -r XWord-macOS.zip XWord.app/ -x *.fbp -x "*/scripts/_*" -x "*/scripts/*debug*"
+    - popd
+
+  artifacts:
+    - path: bin/$CONFIGURATION/XWord-macOS.zip
+      name: XWord-macOS.zip
+
+    - path: dist\packages_mac.lua
+      name: packages_mac.lua
 
 # Deploy tagged release builds to GitHub Releases
 deploy:
   provider: GitHub
   auth_token:
     secure: hBIo/NQvoOmolwsGAJfq3znQKnQixzyAr6nxBLic6MGRBWLwbBLA+17glcoXO44V
-  artifact: XWord-Windows.exe,packages_windows.lua
+  artifact: XWord-Windows.exe,packages_windows.lua,XWord-macOS.zip,packages_mac.lua
   draft: true
   on:
-    appveyor_repo_tag: true
-    configuration: Release
+    APPVEYOR_REPO_TAG: true
+    CONFIGURATION: Release
