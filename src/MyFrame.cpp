@@ -3214,10 +3214,10 @@ MyFrame::OnBruteForceUnscramble(wxCommandEvent & WXUNUSED(evt))
     dlg->StartTimer();
     for (unsigned short i = 1000; i <= 9999; ++i)
     {
-        wxTheApp->Yield(); // Don't block the GUI.
         // Only update every 100 keys so rendering doesn't slow down the unscramble process.
         if (i % 100 == 0) {
             dlg->SetKey(i);
+            wxTheApp->Yield(); // Don't block the GUI.
         }
         std::string solution = scrambler.GetUnscrambledSolution(i);
         if (!solution.empty())
