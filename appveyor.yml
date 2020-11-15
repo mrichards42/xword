@@ -77,9 +77,6 @@ for:
     only:
       - image: macOS
 
-  environment:
-    PYTHON: "C:\\Python38"
-
   install:
     # For tagged builds, use the tag name as the version.
     # Otherwise, read the version from the VERSION file.
