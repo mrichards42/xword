@@ -680,18 +680,18 @@ MyFrame::DoSavePuzzle(const wxString & filename,
     m_puz.SetTime(m_time);
     m_puz.SetTimerRunning(IsTimerRunning());
 
-    std::string fn = puz::encode_utf8(wx2puz(filename));
+    std::string fn = wx2file(filename);
     if (! puz::Puzzle::CanSave(fn))
         fn.clear();
 
     if (fn.empty())
-        fn = puz::encode_utf8(wx2puz(
+        fn = wx2file(
                 wxFileSelector(
                      _T("Save Puzzle As"),
                      wxEmptyString, wxEmptyString, _T("puz"),
                      GetSaveTypeString(),
                      wxFD_SAVE | wxFD_OVERWRITE_PROMPT)
-            ));
+            );
 
     if (fn.empty())
         return;
@@ -699,7 +699,7 @@ MyFrame::DoSavePuzzle(const wxString & filename,
     wxStopWatch sw;
 
     m_puz.Save(fn, handler);
-    m_filename = puz2wx(puz::decode_utf8(fn));
+    m_filename = fn;
     m_isModified = false;
 
     EnableSave(false);
