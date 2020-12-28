@@ -277,17 +277,42 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
     {
         m_grid = &puz->GetGrid();
 
-        m_focusedSquare = FirstWhite();
+        // Attempt to find a canonical "first" clue list.
+        puz::Clues* clues = &puz->GetClues();
+        puz::ClueList* firstClueList = NULL;
+        if (clues->size() == 1) {
+            // If there's only one list, use that.
+            firstClueList = &clues->begin()->second;
+        }
+        else if (clues->find(puzT("Across")) != clues->end()) {
+            // If there's an "Across" list, use that.
+            firstClueList = &clues->GetAcross();
+        }
+
         m_focusedWord = NULL;
         m_ownsFocusedWord = false;
-        m_focusedDirection = puz::ACROSS;
-        DoSetFocusedWord(m_focusedSquare, NULL, puz::ACROSS);
+        puz::Word * firstWord = NULL;
+        if (firstClueList != NULL && !firstClueList->empty()) {
+            // If we found a canonical "first" clue list, focus on the first word in that list.
+            firstWord = &firstClueList->front().GetWord();
+            m_focusedSquare = firstWord->front();
+            m_focusedDirection = firstWord->GetDirection();
+        } else {
+            // Otherwise, focus on a word containing the first white square.
+            m_focusedSquare = FirstWhite();
+            m_focusedDirection = puz::ACROSS;
+        }
+        DoSetFocusedWord(m_focusedSquare, firstWord, m_focusedDirection);
+
         if (m_grid->IsDiagramless())
             GetGrid()->NumberGrid();
 
         ConnectEvents();
     }
     m_drawer.SetPuzzle(puz);
+    if (puz != NULL) {
+        SetFocusedSquare(m_focusedSquare);
+    }
     Scale();
 }
 
