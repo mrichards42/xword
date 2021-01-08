@@ -826,8 +826,6 @@ MyFrame::ShowGrid()
         const bool can_check = scrambled || ! m_puz.GetGrid().HasSolution();
         EnableCheck(! can_check);
         EnableReveal(! can_check);
-
-        m_XGridCtrl->SetFocusedSquare(m_XGridCtrl->FirstWhite());
     }
 
     m_XGridCtrl->SetPaused(false);
