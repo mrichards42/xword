@@ -21,6 +21,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <vector>
 #include "puzstring.hpp"
 #include "exceptions.hpp"
 
@@ -264,8 +265,9 @@ public:
     //------
     void         SetFlag (unsigned int flag, bool propagate = true) {
         m_flag = flag;
-        if (propagate && m_partner) {
-            m_partner->SetFlag(flag, false);
+        if (propagate && !m_partner.empty()) {
+            for (std::vector<Square*>::iterator it = m_partner.begin(); it != m_partner.end(); ++it)
+                (*it)->SetFlag(flag, false);
         }
     }
     unsigned int GetFlag() const             { return m_flag; }
@@ -369,7 +371,7 @@ public:
 
     bool IsBetween(const Square * start, const Square * end) const;
 
-    Square* GetPartnerSquare() const { return m_partner; }
+    std::vector<Square*> GetPartnerSquares() const { return m_partner; }
 protected:
     // Location information
     int m_col;
@@ -386,8 +388,8 @@ protected:
     // Flag (GEXT)
     unsigned int m_flag;
 
-    // Partner square (for Acrostics)
-    Square* m_partner = NULL;
+    // Partner squares (for Acrostics and Coded puzzles)
+    std::vector<Square*> m_partner;
 
     // Linked-list
     //------------

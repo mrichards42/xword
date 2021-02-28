@@ -43,6 +43,7 @@ enum GridType
     TYPE_DIAGRAMLESS = 0x0401,
     // Additional flags
     TYPE_ACROSTIC    = 0x1000,
+    TYPE_CODED       = 0x2000,
 };
 
 // Parameters for FindSquare
@@ -193,6 +194,7 @@ public:
     // Type
     bool IsDiagramless() const { return m_type == TYPE_DIAGRAMLESS; }
     bool IsAcrostic() const { return m_type == TYPE_ACROSTIC; }
+    bool IsCoded() const { return m_type == TYPE_CODED; }
     unsigned short GetType() const { return m_type; }
     void SetType(unsigned short type) { m_type = type; }
 

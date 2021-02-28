@@ -507,7 +507,7 @@ XGridCtrl::DrawGrid(wxDC & dc, const wxRegion & updateRegion)
     // If we don't have an update region, redraw all squares
     if (updateRegion.IsEmpty())
         for (square = m_grid->First(); square != NULL; square = square->Next())
-            DrawSquare(dc, *square);
+            DrawSquare(dc, *square, GetSquareColor(*square), /* propagate= */ false);
 
     // If we do have an update region, redraw all squares within the region
     else
@@ -592,12 +592,15 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
         m_drawer.AddFlag(XGridDrawer::DRAW_FLAG | XGridDrawer::DRAW_NUMBER);
     }
 
-    if (propagate && square.GetPartnerSquare()) {
-        puz::Square* partner = square.GetPartnerSquare();
-        if (&color == &EraseColor)
-            DrawSquare(dc, *partner, EraseColor, false);
-        else
-            DrawSquare(dc, *partner, GetSquareColor(*partner), false);
+    if (propagate && !square.GetPartnerSquares().empty()) {
+        std::vector<puz::Square*> partners = square.GetPartnerSquares();
+        for (std::vector<puz::Square*>::iterator it = partners.begin(); it != partners.end(); ++it) {
+            puz::Square* partner = *it;
+            if (&color == &EraseColor)
+                DrawSquare(dc, *partner, EraseColor, false);
+            else
+                DrawSquare(dc, *partner, GetSquareColor(*partner), false);
+        }
     }
 }
 
@@ -1895,11 +1898,14 @@ XGridCtrl::GetSquareColor(const puz::Square & square)
         return GetFocusedLetterColor();
     else if (IsFocusedWord(square))
         return GetFocusedWordColor();
-    else if (square.GetPartnerSquare() && IsFocusedLetter(*square.GetPartnerSquare())) {
-        return GetFocusedLetterColor();
+    else if (!square.GetPartnerSquares().empty()) {
+        std::vector<puz::Square*> partners = square.GetPartnerSquares();
+        for (std::vector<puz::Square*>::iterator it = partners.begin(); it != partners.end(); ++it) {
+            if (IsFocusedLetter(*(*it)))
+                return GetFocusedLetterColor();
+        }
     }
-    else
-        return wxNullColour; // XGridDrawer will decide
+    return wxNullColour; // XGridDrawer will decide
 }
 
 

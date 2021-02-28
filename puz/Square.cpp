@@ -392,8 +392,9 @@ void Square::SetText(const string_t & text, bool propagate)
         m_text = text;
     else
         m_text = ToGrid(text);
-    if (propagate && m_partner != NULL) {
-        m_partner->SetText(text, false);
+    if (propagate && !m_partner.empty()) {
+        for (std::vector<Square*>::iterator it = m_partner.begin(); it != m_partner.end(); ++it)
+            (*it)->SetText(text, false);
     }
 }
 
