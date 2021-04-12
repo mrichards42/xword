@@ -280,13 +280,15 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
         // Attempt to find a canonical "first" clue list.
         puz::Clues* clues = &puz->GetClues();
         puz::ClueList* firstClueList = NULL;
-        if (clues->size() == 1) {
-            // If there's only one list, use that.
-            firstClueList = &clues->begin()->second;
-        }
-        else if (clues->find(puzT("Across")) != clues->end()) {
-            // If there's an "Across" list, use that.
-            firstClueList = &clues->GetAcross();
+        if (!m_grid->IsDiagramless()) {
+            if (clues->size() == 1) {
+                // If there's only one list, use that.
+                firstClueList = &clues->begin()->second;
+            }
+            else if (clues->find(puzT("Across")) != clues->end()) {
+                // If there's an "Across" list, use that.
+                firstClueList = &clues->GetAcross();
+            }
         }
 
         m_focusedWord = NULL;
