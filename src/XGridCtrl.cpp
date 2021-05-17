@@ -281,13 +281,14 @@ XGridCtrl::SetPuzzle(puz::Puzzle * puz)
         puz::Clues* clues = &puz->GetClues();
         puz::ClueList* firstClueList = NULL;
         if (!m_grid->IsDiagramless()) {
-            if (clues->size() == 1) {
-                // If there's only one list, use that.
-                firstClueList = &clues->begin()->second;
-            }
-            else if (clues->find(puzT("Across")) != clues->end()) {
+            if (clues->find(puzT("Across")) != clues->end()) {
                 // If there's an "Across" list, use that.
                 firstClueList = &clues->GetAcross();
+            }
+            else if (!clues->empty()) {
+                // Select the first clue list - assumes that the file is likely in the intended
+                // clue list order (and that this order is retained when reading the file).
+                firstClueList = &clues->begin()->second;
             }
         }
 

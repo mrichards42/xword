@@ -184,9 +184,27 @@ bool Clues::HasWords() const
 ClueList & Clues::operator[](const string_t & direction)
 {
     iterator it = find(direction);
-    if (it == end())
-        return insert(std::make_pair(direction, ClueList(direction))).first->second;
+    if (it == end()) {
+        push_back(std::make_pair(direction, ClueList(direction)));
+        return back().second;
+    }
     return it->second;
+}
+
+std::vector<std::pair<string_t, ClueList> >::iterator Clues::find(const string_t& direction) {
+    std::vector<std::pair<string_t, ClueList> >::iterator it = begin();
+    while (it != end() && it->first != direction) {
+        it++;
+    }
+    return it;
+}
+
+std::vector<std::pair<string_t, ClueList> >::const_iterator Clues::find(const string_t& direction) const {
+    std::vector<std::pair<string_t, ClueList> >::const_iterator it = begin();
+    while (it != end() && it->first != direction) {
+        it++;
+    }
+    return it;
 }
 
 } // namespace puz
