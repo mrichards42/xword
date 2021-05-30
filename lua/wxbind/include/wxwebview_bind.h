@@ -11,7 +11,7 @@
 #include "wxbind/include/wxbinddefs.h"
 #include "wxluasetup.h"
 #include "wxbind/include/wxcore_bind.h"
-#if not defined(wxUSE_WEBVIEW)
+#if !defined(wxUSE_WEBVIEW)
     #define wxUSE_WEBVIEW 0
 #endif
 
@@ -22,9 +22,9 @@
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 35
+#if WXLUA_BINDING_VERSION > 41
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 35
+#endif //WXLUA_BINDING_VERSION > 41
 // ---------------------------------------------------------------------------
 
 // binding class

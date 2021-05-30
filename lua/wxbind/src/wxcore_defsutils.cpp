@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxProcess
 // ---------------------------------------------------------------------------
@@ -166,7 +170,15 @@ static int LUACALL wxLua_wxProcess_GetPid(lua_State *L)
     // call GetPid
     long returns = (self->GetPid());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -256,7 +268,15 @@ static int LUACALL wxLua_wxProcess_Kill(lua_State *L)
     // call Kill
     wxKillError returns = (wxProcess::Kill(pid, sig, flags));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -493,7 +513,7 @@ static int LUACALL wxLua_wxLuaProcess_Kill(lua_State *L)
     // call Kill
     wxKillError returns = (wxProcess::Kill(pid, sig, flags));
     // push the result number
-    lua_pushnumber(L, returns);
+    lua_pushinteger(L, returns);
 
     return 1;
 }
@@ -669,7 +689,15 @@ static int LUACALL wxLua_wxKeyboardState_GetModifiers(lua_State *L)
     // call GetModifiers
     int returns = (self->GetModifiers());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1003,7 +1031,15 @@ static int LUACALL wxLua_wxMouseState_GetX(lua_State *L)
     // call GetX
     wxCoord returns = (self->GetX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1019,7 +1055,15 @@ static int LUACALL wxLua_wxMouseState_GetY(lua_State *L)
     // call GetY
     wxCoord returns = (self->GetY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1809,7 +1853,15 @@ static int LUACALL wxLua_wxTimer_GetId(lua_State *L)
     // call GetId
     int returns = (self->GetId());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1825,7 +1877,15 @@ static int LUACALL wxLua_wxTimer_GetInterval(lua_State *L)
     // call GetInterval
     int returns = (self->GetInterval());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2081,7 +2141,15 @@ static int LUACALL wxLua_wxTimerEvent_GetInterval(lua_State *L)
     // call GetInterval
     int returns = (self->GetInterval());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

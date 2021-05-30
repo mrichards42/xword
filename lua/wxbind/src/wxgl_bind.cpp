@@ -22,6 +22,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxGLCanvas && wxUSE_GLCANVAS
 // ---------------------------------------------------------------------------
@@ -71,9 +75,9 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxGLCanvas_IsExtensionSupported[1] = {{ 
 static int LUACALL wxLua_wxGLCanvas_IsExtensionSupported(lua_State *L)
 {
     // const char extension
-    wxCharBuffer extension = wxlua_getstringtype(L, 1);
+    const char * extension = wxlua_getstringtype(L, 1);
     // call IsExtensionSupported
-    bool returns = (wxGLCanvas::IsExtensionSupported((const char*)extension));
+    bool returns = (wxGLCanvas::IsExtensionSupported(extension));
     // push the result flag
     lua_pushboolean(L, returns);
 
@@ -528,7 +532,15 @@ static int LUACALL wxLua_wxGLAttribsBase_GetSize(lua_State *L)
     // call GetSize
     int returns = (self->GetSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

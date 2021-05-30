@@ -22,6 +22,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxUSE_WEBVIEW
 // ---------------------------------------------------------------------------
@@ -486,7 +490,15 @@ static int LUACALL wxLua_wxWebView_Find(lua_State *L)
     // call Find
     long returns = (self->Find(text, flags));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -614,7 +626,15 @@ static int LUACALL wxLua_wxWebView_GetZoom(lua_State *L)
     // call GetZoom
     wxWebViewZoom returns = (self->GetZoom());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -630,7 +650,15 @@ static int LUACALL wxLua_wxWebView_GetZoomType(lua_State *L)
     // call GetZoomType
     wxWebViewZoomType returns = (self->GetZoomType());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if (wxLUA_USE_wxLog && wxUSE_LOG) && (wxUSE_LOGGUI)
 // ---------------------------------------------------------------------------
@@ -235,6 +239,85 @@ int wxLogWindow_methodCount = sizeof(wxLogWindow_methods)/sizeof(wxLuaBindMethod
 #endif  // (wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW)
 
 
+#if (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxSystemSettings)
+// ---------------------------------------------------------------------------
+// Bind class wxSystemAppearance
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxSystemAppearance'
+int wxluatype_wxSystemAppearance = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemAppearance_GetName[] = { &wxluatype_wxSystemAppearance, NULL };
+static int LUACALL wxLua_wxSystemAppearance_GetName(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemAppearance_GetName[1] = {{ wxLua_wxSystemAppearance_GetName, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSystemAppearance_GetName }};
+//     wxString GetName() const;
+static int LUACALL wxLua_wxSystemAppearance_GetName(lua_State *L)
+{
+    // get this
+    wxSystemAppearance * self = (wxSystemAppearance *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSystemAppearance);
+    // call GetName
+    wxString returns = (self->GetName());
+    // push the result string
+    wxlua_pushwxString(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemAppearance_IsDark[] = { &wxluatype_wxSystemAppearance, NULL };
+static int LUACALL wxLua_wxSystemAppearance_IsDark(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemAppearance_IsDark[1] = {{ wxLua_wxSystemAppearance_IsDark, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSystemAppearance_IsDark }};
+//     bool IsDark() const;
+static int LUACALL wxLua_wxSystemAppearance_IsDark(lua_State *L)
+{
+    // get this
+    wxSystemAppearance * self = (wxSystemAppearance *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSystemAppearance);
+    // call IsDark
+    bool returns = (self->IsDark());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemAppearance_IsUsingDarkBackground[] = { &wxluatype_wxSystemAppearance, NULL };
+static int LUACALL wxLua_wxSystemAppearance_IsUsingDarkBackground(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemAppearance_IsUsingDarkBackground[1] = {{ wxLua_wxSystemAppearance_IsUsingDarkBackground, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSystemAppearance_IsUsingDarkBackground }};
+//     bool IsUsingDarkBackground() const;
+static int LUACALL wxLua_wxSystemAppearance_IsUsingDarkBackground(lua_State *L)
+{
+    // get this
+    wxSystemAppearance * self = (wxSystemAppearance *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSystemAppearance);
+    // call IsUsingDarkBackground
+    bool returns = (self->IsUsingDarkBackground());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+
+
+
+void wxLua_wxSystemAppearance_delete_function(void** p)
+{
+    wxSystemAppearance* o = (wxSystemAppearance*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxSystemAppearance_methods[] = {
+    { "GetName", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSystemAppearance_GetName, 1, NULL },
+    { "IsDark", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSystemAppearance_IsDark, 1, NULL },
+    { "IsUsingDarkBackground", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSystemAppearance_IsUsingDarkBackground, 1, NULL },
+
+    { 0, 0, 0, 0 },
+};
+
+int wxSystemAppearance_methodCount = sizeof(wxSystemAppearance_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxSystemSettings)
+
+
 #if wxLUA_USE_wxSystemSettings
 // ---------------------------------------------------------------------------
 // Bind class wxSystemSettings
@@ -242,6 +325,25 @@ int wxLogWindow_methodCount = sizeof(wxLogWindow_methods)/sizeof(wxLuaBindMethod
 
 // Lua MetaTable Tag for Class 'wxSystemSettings'
 int wxluatype_wxSystemSettings = WXLUA_TUNKNOWN;
+
+#if (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxSystemSettings)
+static int LUACALL wxLua_wxSystemSettings_GetAppearance(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSystemSettings_GetAppearance[1] = {{ wxLua_wxSystemSettings_GetAppearance, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
+//     %wxchkver_3_1_3 static wxSystemAppearance GetAppearance();
+static int LUACALL wxLua_wxSystemSettings_GetAppearance(lua_State *L)
+{
+    // call GetAppearance
+    // allocate a new object using the copy constructor
+    wxSystemAppearance* returns = new wxSystemAppearance(wxSystemSettings::GetAppearance());
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxSystemAppearance);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxSystemAppearance);
+
+    return 1;
+}
+
+#endif // (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxSystemSettings)
 
 #if (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxSystemSettings)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSystemSettings_GetColour[] = { &wxluatype_TINTEGER, NULL };
@@ -302,7 +404,15 @@ static int LUACALL wxLua_wxSystemSettings_GetMetric(lua_State *L)
     // call GetMetric
     int returns = (wxSystemSettings::GetMetric(index, win));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -315,7 +425,15 @@ static int LUACALL wxLua_wxSystemSettings_GetScreenType(lua_State *L)
     // call GetScreenType
     wxSystemScreenType returns = (wxSystemSettings::GetScreenType());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -361,6 +479,10 @@ void wxLua_wxSystemSettings_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxSystemSettings_methods[] = {
+#if (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxSystemSettings)
+    { "GetAppearance", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxSystemSettings_GetAppearance, 1, NULL },
+#endif // (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxSystemSettings)
+
 #if (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxSystemSettings)
     { "GetColour", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxSystemSettings_GetColour, 1, NULL },
 #endif // (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxSystemSettings)
@@ -590,7 +712,15 @@ static int LUACALL wxLua_wxTextValidator_GetStyle(lua_State *L)
     // call GetStyle
     long returns = (self->GetStyle());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

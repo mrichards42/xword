@@ -22,6 +22,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxXML && wxUSE_XML
 // ---------------------------------------------------------------------------
@@ -282,7 +286,15 @@ static int LUACALL wxLua_wxXmlNode_GetDepth(lua_State *L)
     // call GetDepth
     int returns = (self->GetDepth(grandparent));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -301,7 +313,15 @@ static int LUACALL wxLua_wxXmlNode_GetLineNumber(lua_State *L)
     // call GetLineNumber
     int returns = (self->GetLineNumber());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -471,7 +491,15 @@ static int LUACALL wxLua_wxXmlNode_GetType(lua_State *L)
     // call GetType
     wxXmlNodeType returns = (self->GetType());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1856,7 +1884,15 @@ static int LUACALL wxLua_wxXmlDocument_GetFileType(lua_State *L)
     // call GetFileType
     wxTextFileType returns = (self->GetFileType());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

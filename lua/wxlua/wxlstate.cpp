@@ -32,8 +32,10 @@ extern "C"
     // provided by bit.c (Lua BitOp)
     int luaopen_bit(lua_State *L);
 
+#if (LUA_VERSION_NUM < 502)
     // provided by lbitlib.c for 5.1 or we use the one in 5.2 or LuaJIT.
     int luaopen_bit32 (lua_State *L);
+#endif // (LUA_VERSION_NUM < 502)
 }
 
 // ----------------------------------------------------------------------------
@@ -89,9 +91,7 @@ int LUACALL wxlua_printFunction( lua_State *L )
         s = lua_tostring(L, -1);    /* get result */
         if (s == NULL)
         {
-            // FIXME use wxlua_error here? right now wxlua_error doesn't do anything special - JL
-            return luaL_error(L, LUA_QL("tostring") " must return a string to "
-                              LUA_QL("print"));
+            return luaL_error(L, "'tostring' must return a string to 'print'");
         }
 
         if (i > 1) msg.Append(wxT("\t")); // Lua uses a tab in luaB_print
@@ -404,7 +404,7 @@ wxLuaStateRefData::~wxLuaStateRefData()
         delete m_wxlStateData;
 }
 
-bool wxLuaStateRefData::CloseLuaState(bool force)
+bool wxLuaStateRefData::CloseLuaState(bool force, bool collectGarbage)
 {
     if ((m_lua_State == NULL) || m_wxlStateData->m_is_closing || m_lua_State_coroutine)
         return true;
@@ -472,7 +472,8 @@ bool wxLuaStateRefData::CloseLuaState(bool force)
     wxlua_lreg_createtable(m_lua_State, &wxlua_lreg_debug_refs_key);
     //wxlua_lreg_createtable(m_lua_State, &wxlua_lreg_derivedmethods_key); // gc will delete them
 
-    lua_gc(m_lua_State, LUA_GCCOLLECT, 0); // round up dead refs
+    if (collectGarbage)
+        lua_gc(m_lua_State, LUA_GCCOLLECT, 0); // round up dead refs
 
     if (!m_lua_State_static)
         lua_close(m_lua_State);
@@ -710,9 +711,11 @@ bool wxLuaState::Create(lua_State* L, int state_type)
             lua_pushstring(L, "bit");
             lua_call(L, 1, 0);
 
+#if (LUA_VERSION_NUM < 502)
             lua_pushcfunction(L, luaopen_bit32);
             lua_pushstring(L, "bit32");
             lua_call(L, 1, 0);
+#endif // (LUA_VERSION_NUM < 502)
 
             RegisterBindings();
         }
@@ -743,12 +746,12 @@ void wxLuaState::Destroy()
     UnRef();
 }
 
-bool wxLuaState::CloseLuaState(bool force)
+bool wxLuaState::CloseLuaState(bool force, bool collectGarbage)
 {
     wxCHECK_MSG(Ok(), false, wxT("Invalid wxLuaState"));
     if (M_WXLSTATEDATA->m_lua_State_static) return true;
 
-    return M_WXLSTATEDATA->CloseLuaState(force);
+    return M_WXLSTATEDATA->CloseLuaState(force, collectGarbage);
 }
 
 bool wxLuaState::IsClosing() const
@@ -1864,7 +1867,13 @@ int wxLuaState::lua_PCall(int nargs, int nresults, int errfunc)
 int wxLuaState::lua_CPCall(lua_CFunction func, void *ud)
 {
     wxCHECK_MSG(Ok(), 0, wxT("Invalid wxLuaState"));
+#if LUA_VERSION_NUM >= 503
+    lua_pushcfunction(M_WXLSTATEDATA->m_lua_State, func);
+    lua_pushlightuserdata(M_WXLSTATEDATA->m_lua_State, ud);
+    return lua_pcall(M_WXLSTATEDATA->m_lua_State, 1, 0, 0);
+#else
     return lua_cpcall(M_WXLSTATEDATA->m_lua_State, func, ud);
+#endif
 }
 #if LUA_VERSION_NUM < 502
 int  wxLuaState::lua_Load(lua_Reader reader, void *dt, const char* chunkname)
@@ -2347,12 +2356,19 @@ void wxLuaState::AddLuaPath(const wxFileName& filename)
 // wxLuaEvent
 //-----------------------------------------------------------------------------
 
+#if wxCHECK_VERSION(3,0,0)
+wxDEFINE_EVENT(wxEVT_LUA_CREATION, wxLuaEvent);
+wxDEFINE_EVENT(wxEVT_LUA_PRINT, wxLuaEvent);
+wxDEFINE_EVENT(wxEVT_LUA_ERROR, wxLuaEvent);
+wxDEFINE_EVENT(wxEVT_LUA_DEBUG_HOOK, wxLuaEvent);
+#else
 DEFINE_LOCAL_EVENT_TYPE(wxEVT_LUA_CREATION)
 DEFINE_LOCAL_EVENT_TYPE(wxEVT_LUA_PRINT)
 DEFINE_LOCAL_EVENT_TYPE(wxEVT_LUA_ERROR)
 DEFINE_LOCAL_EVENT_TYPE(wxEVT_LUA_DEBUG_HOOK)
 //DEFINE_LOCAL_EVENT_TYPE(wxEVT_LUA_INIT)
 //DEFINE_LOCAL_EVENT_TYPE(wxEVT_LUA_DEBUGGERATTACHED)
+#endif
 
 wxLuaEvent::wxLuaEvent(wxEventType commandType, wxWindowID id, const wxLuaState& wxlState)
            :wxNotifyEvent(commandType, id),  m_wxlState(wxlState),

@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxApp
 // ---------------------------------------------------------------------------
@@ -79,7 +83,15 @@ static int LUACALL wxLua_wxAppConsole_FilterEvent(lua_State *L)
     // call FilterEvent
     int returns = (self->FilterEvent(*event));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -267,7 +279,7 @@ static int LUACALL wxLua_wxAppConsole_MainLoop(lua_State *L)
         returns = self->MainLoop();
 
     // push the result number
-    lua_pushnumber(L, returns);
+    lua_pushinteger(L, returns);
 
     return 1;
 }
@@ -332,7 +344,15 @@ static int LUACALL wxLua_wxAppConsole_OnExit(lua_State *L)
     // call OnExit
     int returns = (self->OnExit());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -378,7 +398,15 @@ static int LUACALL wxLua_wxAppConsole_OnRun(lua_State *L)
     // call OnRun
     int returns = (self->OnRun());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -865,7 +893,15 @@ static int LUACALL wxLua_wxApp_GetLayoutDirection(lua_State *L)
     // call GetLayoutDirection
     wxLayoutDirection returns = (self->GetLayoutDirection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1074,13 +1110,32 @@ static int LUACALL wxLua_wxApp_MainLoop(lua_State *L)
         returns = self->MainLoop();
 
     // push the result number
-    lua_pushnumber(L, returns);
+    lua_pushinteger(L, returns);
 
     return 1;
 }
 
 
 #endif // (!wxCHECK_VERSION(3,0,0)) && (wxLUA_USE_wxApp)
+
+#if (wxCHECK_VERSION(3,1,4) && defined(__WXMAC__)) && (wxLUA_USE_wxApp)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxApp_OSXEnableAutomaticTabbing[] = { &wxluatype_wxApp, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_wxApp_OSXEnableAutomaticTabbing(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxApp_OSXEnableAutomaticTabbing[1] = {{ wxLua_wxApp_OSXEnableAutomaticTabbing, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxApp_OSXEnableAutomaticTabbing }};
+//     %wxchkver_3_1_4 && %mac void OSXEnableAutomaticTabbing(bool enable);
+static int LUACALL wxLua_wxApp_OSXEnableAutomaticTabbing(lua_State *L)
+{
+    // bool enable
+    bool enable = wxlua_getbooleantype(L, 2);
+    // get this
+    wxApp * self = (wxApp *)wxluaT_getuserdatatype(L, 1, wxluatype_wxApp);
+    // call OSXEnableAutomaticTabbing
+    self->OSXEnableAutomaticTabbing(enable);
+
+    return 0;
+}
+
+#endif // (wxCHECK_VERSION(3,1,4) && defined(__WXMAC__)) && (wxLUA_USE_wxApp)
 
 #if (wxCHECK_VERSION(3,0,0) && defined(__WXMAC__)) && (wxLUA_USE_wxApp)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxApp_OSXIsGUIApplication[] = { &wxluatype_wxApp, NULL };
@@ -1449,6 +1504,10 @@ wxLuaBindMethod wxApp_methods[] = {
 #if (!wxCHECK_VERSION(3,0,0)) && (wxLUA_USE_wxApp)
     { "MainLoop", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxApp_MainLoop, 1, NULL },
 #endif // (!wxCHECK_VERSION(3,0,0)) && (wxLUA_USE_wxApp)
+
+#if (wxCHECK_VERSION(3,1,4) && defined(__WXMAC__)) && (wxLUA_USE_wxApp)
+    { "OSXEnableAutomaticTabbing", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxApp_OSXEnableAutomaticTabbing, 1, NULL },
+#endif // (wxCHECK_VERSION(3,1,4) && defined(__WXMAC__)) && (wxLUA_USE_wxApp)
 
 #if (wxCHECK_VERSION(3,0,0) && defined(__WXMAC__)) && (wxLUA_USE_wxApp)
     { "OSXIsGUIApplication", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxApp_OSXIsGUIApplication, 1, NULL },
@@ -2853,7 +2912,15 @@ static int LUACALL wxLua_wxFrame_GetStatusBarPane(lua_State *L)
     // call GetStatusBarPane
     int returns = (self->GetStatusBarPane());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3453,7 +3520,15 @@ static int LUACALL wxLua_wxStatusBarPane_GetStyle(lua_State *L)
     // call GetStyle
     int returns = (self->GetStyle());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3485,7 +3560,15 @@ static int LUACALL wxLua_wxStatusBarPane_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3655,7 +3738,15 @@ static int LUACALL wxLua_wxStatusBar_GetFieldsCount(lua_State *L)
     // call GetFieldsCount
     int returns = (self->GetFieldsCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3675,7 +3766,15 @@ static int LUACALL wxLua_wxStatusBar_GetStatusStyle(lua_State *L)
     // call GetStatusStyle
     int returns = (self->GetStatusStyle(n));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3717,7 +3816,15 @@ static int LUACALL wxLua_wxStatusBar_GetStatusWidth(lua_State *L)
     // call GetStatusWidth
     int returns = (self->GetStatusWidth(n));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

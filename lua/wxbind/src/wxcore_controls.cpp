@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxButton && wxUSE_BUTTON
 // ---------------------------------------------------------------------------
@@ -426,6 +430,764 @@ wxLuaBindMethod wxAnyButton_methods[] = {
 int wxAnyButton_methodCount = sizeof(wxAnyButton_methods)/sizeof(wxLuaBindMethod) - 1;
 
 #endif  // wxLUA_USE_wxButton && wxUSE_BUTTON
+
+
+#if (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
+// ---------------------------------------------------------------------------
+// Bind class wxHeaderCtrlEvent
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxHeaderCtrlEvent'
+int wxluatype_wxHeaderCtrlEvent = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_GetColumn[] = { &wxluatype_wxHeaderCtrlEvent, NULL };
+static int LUACALL wxLua_wxHeaderCtrlEvent_GetColumn(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_GetColumn[1] = {{ wxLua_wxHeaderCtrlEvent_GetColumn, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_GetColumn }};
+//     int GetColumn() const;
+static int LUACALL wxLua_wxHeaderCtrlEvent_GetColumn(lua_State *L)
+{
+    // get this
+    wxHeaderCtrlEvent * self = (wxHeaderCtrlEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlEvent);
+    // call GetColumn
+    int returns = (self->GetColumn());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_GetNewOrder[] = { &wxluatype_wxHeaderCtrlEvent, NULL };
+static int LUACALL wxLua_wxHeaderCtrlEvent_GetNewOrder(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_GetNewOrder[1] = {{ wxLua_wxHeaderCtrlEvent_GetNewOrder, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_GetNewOrder }};
+//     unsigned int GetNewOrder() const;
+static int LUACALL wxLua_wxHeaderCtrlEvent_GetNewOrder(lua_State *L)
+{
+    // get this
+    wxHeaderCtrlEvent * self = (wxHeaderCtrlEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlEvent);
+    // call GetNewOrder
+    unsigned int returns = (self->GetNewOrder());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_GetWidth[] = { &wxluatype_wxHeaderCtrlEvent, NULL };
+static int LUACALL wxLua_wxHeaderCtrlEvent_GetWidth(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_GetWidth[1] = {{ wxLua_wxHeaderCtrlEvent_GetWidth, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_GetWidth }};
+//     int GetWidth() const;
+static int LUACALL wxLua_wxHeaderCtrlEvent_GetWidth(lua_State *L)
+{
+    // get this
+    wxHeaderCtrlEvent * self = (wxHeaderCtrlEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlEvent);
+    // call GetWidth
+    int returns = (self->GetWidth());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_SetColumn[] = { &wxluatype_wxHeaderCtrlEvent, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxHeaderCtrlEvent_SetColumn(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_SetColumn[1] = {{ wxLua_wxHeaderCtrlEvent_SetColumn, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_SetColumn }};
+//     void SetColumn(int col);
+static int LUACALL wxLua_wxHeaderCtrlEvent_SetColumn(lua_State *L)
+{
+    // int col
+    int col = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    wxHeaderCtrlEvent * self = (wxHeaderCtrlEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlEvent);
+    // call SetColumn
+    self->SetColumn(col);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_SetNewOrder[] = { &wxluatype_wxHeaderCtrlEvent, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrlEvent_SetNewOrder(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_SetNewOrder[1] = {{ wxLua_wxHeaderCtrlEvent_SetNewOrder, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_SetNewOrder }};
+//     void SetNewOrder(unsigned int order);
+static int LUACALL wxLua_wxHeaderCtrlEvent_SetNewOrder(lua_State *L)
+{
+    // unsigned int order
+    unsigned int order = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrlEvent * self = (wxHeaderCtrlEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlEvent);
+    // call SetNewOrder
+    self->SetNewOrder(order);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_SetWidth[] = { &wxluatype_wxHeaderCtrlEvent, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxHeaderCtrlEvent_SetWidth(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_SetWidth[1] = {{ wxLua_wxHeaderCtrlEvent_SetWidth, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_SetWidth }};
+//     void SetWidth(int width);
+static int LUACALL wxLua_wxHeaderCtrlEvent_SetWidth(lua_State *L)
+{
+    // int width
+    int width = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    wxHeaderCtrlEvent * self = (wxHeaderCtrlEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlEvent);
+    // call SetWidth
+    self->SetWidth(width);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_delete[] = { &wxluatype_wxHeaderCtrlEvent, NULL };
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_delete }};
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_constructor1[] = { &wxluatype_wxHeaderCtrlEvent, NULL };
+static int LUACALL wxLua_wxHeaderCtrlEvent_constructor1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_constructor1[1] = {{ wxLua_wxHeaderCtrlEvent_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_constructor1 }};
+//     wxHeaderCtrlEvent(const wxHeaderCtrlEvent& event);
+static int LUACALL wxLua_wxHeaderCtrlEvent_constructor1(lua_State *L)
+{
+    // const wxHeaderCtrlEvent event
+    const wxHeaderCtrlEvent * event = (const wxHeaderCtrlEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlEvent);
+    // call constructor
+    wxHeaderCtrlEvent* returns = new wxHeaderCtrlEvent(*event);
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxHeaderCtrlEvent);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxHeaderCtrlEvent);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxHeaderCtrlEvent_constructor(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_constructor[1] = {{ wxLua_wxHeaderCtrlEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_constructor }};
+//     wxHeaderCtrlEvent(wxEventType commandType = wxEVT_NULL, int winid = 0);
+static int LUACALL wxLua_wxHeaderCtrlEvent_constructor(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int winid = 0
+    int winid = (argCount >= 2 ? (int)wxlua_getnumbertype(L, 2) : 0);
+    // wxEventType commandType = wxEVT_NULL
+    wxEventType commandType = (argCount >= 1 ? (wxEventType)wxlua_getnumbertype(L, 1) : wxEVT_NULL);
+    // call constructor
+    wxHeaderCtrlEvent* returns = new wxHeaderCtrlEvent(commandType, winid);
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxHeaderCtrlEvent);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxHeaderCtrlEvent);
+
+    return 1;
+}
+
+
+
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL))
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlEvent_constructor_overload[] =
+{
+    { wxLua_wxHeaderCtrlEvent_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_constructor1 },
+    { wxLua_wxHeaderCtrlEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 2, s_wxluatypeArray_wxLua_wxHeaderCtrlEvent_constructor },
+};
+static int s_wxluafunc_wxLua_wxHeaderCtrlEvent_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxHeaderCtrlEvent_constructor_overload)/sizeof(wxLuaBindCFunc);
+
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL))
+
+void wxLua_wxHeaderCtrlEvent_delete_function(void** p)
+{
+    wxHeaderCtrlEvent* o = (wxHeaderCtrlEvent*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxHeaderCtrlEvent_methods[] = {
+    { "GetColumn", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlEvent_GetColumn, 1, NULL },
+    { "GetNewOrder", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlEvent_GetNewOrder, 1, NULL },
+    { "GetWidth", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlEvent_GetWidth, 1, NULL },
+    { "SetColumn", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlEvent_SetColumn, 1, NULL },
+    { "SetNewOrder", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlEvent_SetNewOrder, 1, NULL },
+    { "SetWidth", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlEvent_SetWidth, 1, NULL },
+    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxHeaderCtrlEvent_delete, 1, NULL },
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL))
+    { "wxHeaderCtrlEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxHeaderCtrlEvent_constructor_overload, s_wxluafunc_wxLua_wxHeaderCtrlEvent_constructor_overload_count, 0 },
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL))
+
+    { 0, 0, 0, 0 },
+};
+
+int wxHeaderCtrlEvent_methodCount = sizeof(wxHeaderCtrlEvent_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
+
+
+#if (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
+// ---------------------------------------------------------------------------
+// Bind class wxHeaderCtrl
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxHeaderCtrl'
+int wxluatype_wxHeaderCtrl = WXLUA_TUNKNOWN;
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxMenu && wxUSE_MENUS)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_AddColumnsItems[] = { &wxluatype_wxHeaderCtrl, &wxluatype_wxMenu, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_AddColumnsItems(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_AddColumnsItems[1] = {{ wxLua_wxHeaderCtrl_AddColumnsItems, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxHeaderCtrl_AddColumnsItems }};
+//     void AddColumnsItems(wxMenu& menu, int idColumnsBase = 0);
+static int LUACALL wxLua_wxHeaderCtrl_AddColumnsItems(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int idColumnsBase = 0
+    int idColumnsBase = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : 0);
+    // wxMenu menu
+    wxMenu * menu = (wxMenu *)wxluaT_getuserdatatype(L, 2, wxluatype_wxMenu);
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call AddColumnsItems
+    self->AddColumnsItems(*menu, idColumnsBase);
+
+    return 0;
+}
+
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxMenu && wxUSE_MENUS)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnAt[] = { &wxluatype_wxHeaderCtrl, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnAt(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnAt[1] = {{ wxLua_wxHeaderCtrl_GetColumnAt, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnAt }};
+//     unsigned int GetColumnAt(unsigned int pos) const;
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnAt(lua_State *L)
+{
+    // unsigned int pos
+    unsigned int pos = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call GetColumnAt
+    unsigned int returns = (self->GetColumnAt(pos));
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnCount[] = { &wxluatype_wxHeaderCtrl, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnCount(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnCount[1] = {{ wxLua_wxHeaderCtrl_GetColumnCount, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnCount }};
+//     unsigned int GetColumnCount() const;
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnCount(lua_State *L)
+{
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call GetColumnCount
+    unsigned int returns = (self->GetColumnCount());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnPos[] = { &wxluatype_wxHeaderCtrl, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnPos(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnPos[1] = {{ wxLua_wxHeaderCtrl_GetColumnPos, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnPos }};
+//     unsigned int GetColumnPos(unsigned int idx) const;
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnPos(lua_State *L)
+{
+    // unsigned int idx
+    unsigned int idx = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call GetColumnPos
+    unsigned int returns = (self->GetColumnPos(idx));
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxCHECK_VERSION(3,1,3))
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnTitleWidth[] = { &wxluatype_wxHeaderCtrl, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnTitleWidth(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnTitleWidth[1] = {{ wxLua_wxHeaderCtrl_GetColumnTitleWidth, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnTitleWidth }};
+//     %wxchkver_3_1_3 int GetColumnTitleWidth(unsigned int idx);
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnTitleWidth(lua_State *L)
+{
+    // unsigned int idx
+    unsigned int idx = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call GetColumnTitleWidth
+    int returns = (self->GetColumnTitleWidth(idx));
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxCHECK_VERSION(3,1,3))
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnsOrder[] = { &wxluatype_wxHeaderCtrl, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnsOrder(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnsOrder[1] = {{ wxLua_wxHeaderCtrl_GetColumnsOrder, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrl_GetColumnsOrder }};
+//     wxArrayInt GetColumnsOrder() const;
+static int LUACALL wxLua_wxHeaderCtrl_GetColumnsOrder(lua_State *L)
+{
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call GetColumnsOrder
+    // allocate a new object using the copy constructor
+    wxArrayInt* returns = new wxArrayInt(self->GetColumnsOrder());
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxArrayInt);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxArrayInt);
+
+    return 1;
+}
+
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_IsEmpty[] = { &wxluatype_wxHeaderCtrl, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_IsEmpty(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_IsEmpty[1] = {{ wxLua_wxHeaderCtrl_IsEmpty, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrl_IsEmpty }};
+//     bool IsEmpty() const;
+static int LUACALL wxLua_wxHeaderCtrl_IsEmpty(lua_State *L)
+{
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call IsEmpty
+    bool returns = (self->IsEmpty());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_MoveColumnInOrderArray[] = { &wxluatype_wxArrayInt, &wxluatype_TINTEGER, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_MoveColumnInOrderArray(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_MoveColumnInOrderArray[1] = {{ wxLua_wxHeaderCtrl_MoveColumnInOrderArray, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 3, 3, s_wxluatypeArray_wxLua_wxHeaderCtrl_MoveColumnInOrderArray }};
+//     static void MoveColumnInOrderArray(const wxArrayInt& order, unsigned int idx, unsigned int pos);
+static int LUACALL wxLua_wxHeaderCtrl_MoveColumnInOrderArray(lua_State *L)
+{
+    // unsigned int pos
+    unsigned int pos = (unsigned int)wxlua_getuintegertype(L, 3);
+    // unsigned int idx
+    unsigned int idx = (unsigned int)wxlua_getuintegertype(L, 2);
+    // const wxArrayInt order
+    wxLuaSmartwxArrayInt order = wxlua_getwxArrayInt(L, 1);
+    // call MoveColumnInOrderArray
+    wxHeaderCtrl::MoveColumnInOrderArray(order, idx, pos);
+
+    return 0;
+}
+
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_ResetColumnsOrder[] = { &wxluatype_wxHeaderCtrl, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_ResetColumnsOrder(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_ResetColumnsOrder[1] = {{ wxLua_wxHeaderCtrl_ResetColumnsOrder, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrl_ResetColumnsOrder }};
+//     void ResetColumnsOrder();
+static int LUACALL wxLua_wxHeaderCtrl_ResetColumnsOrder(lua_State *L)
+{
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call ResetColumnsOrder
+    self->ResetColumnsOrder();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_SetColumnCount[] = { &wxluatype_wxHeaderCtrl, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_SetColumnCount(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_SetColumnCount[1] = {{ wxLua_wxHeaderCtrl_SetColumnCount, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrl_SetColumnCount }};
+//     void SetColumnCount(unsigned int count);
+static int LUACALL wxLua_wxHeaderCtrl_SetColumnCount(lua_State *L)
+{
+    // unsigned int count
+    unsigned int count = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call SetColumnCount
+    self->SetColumnCount(count);
+
+    return 0;
+}
+
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_SetColumnsOrder[] = { &wxluatype_wxHeaderCtrl, &wxluatype_wxArrayInt, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_SetColumnsOrder(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_SetColumnsOrder[1] = {{ wxLua_wxHeaderCtrl_SetColumnsOrder, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrl_SetColumnsOrder }};
+//     void SetColumnsOrder(const wxArrayInt& order);
+static int LUACALL wxLua_wxHeaderCtrl_SetColumnsOrder(lua_State *L)
+{
+    // const wxArrayInt order
+    wxLuaSmartwxArrayInt order = wxlua_getwxArrayInt(L, 2);
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call SetColumnsOrder
+    self->SetColumnsOrder(order);
+
+    return 0;
+}
+
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_ShowColumnsMenu[] = { &wxluatype_wxHeaderCtrl, &wxluatype_wxPoint, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_ShowColumnsMenu(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_ShowColumnsMenu[1] = {{ wxLua_wxHeaderCtrl_ShowColumnsMenu, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxHeaderCtrl_ShowColumnsMenu }};
+//     bool ShowColumnsMenu(const wxPoint& pt, const wxString& title = wxEmptyString);
+static int LUACALL wxLua_wxHeaderCtrl_ShowColumnsMenu(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // const wxString title = wxEmptyString
+    const wxString title = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
+    // const wxPoint pt
+    const wxPoint * pt = (const wxPoint *)wxluaT_getuserdatatype(L, 2, wxluatype_wxPoint);
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call ShowColumnsMenu
+    bool returns = (self->ShowColumnsMenu(*pt, title));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_ShowCustomizeDialog[] = { &wxluatype_wxHeaderCtrl, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_ShowCustomizeDialog(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_ShowCustomizeDialog[1] = {{ wxLua_wxHeaderCtrl_ShowCustomizeDialog, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrl_ShowCustomizeDialog }};
+//     bool ShowCustomizeDialog();
+static int LUACALL wxLua_wxHeaderCtrl_ShowCustomizeDialog(lua_State *L)
+{
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call ShowCustomizeDialog
+    bool returns = (self->ShowCustomizeDialog());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrl_UpdateColumn[] = { &wxluatype_wxHeaderCtrl, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrl_UpdateColumn(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrl_UpdateColumn[1] = {{ wxLua_wxHeaderCtrl_UpdateColumn, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrl_UpdateColumn }};
+//     void UpdateColumn(unsigned int idx);
+static int LUACALL wxLua_wxHeaderCtrl_UpdateColumn(lua_State *L)
+{
+    // unsigned int idx
+    unsigned int idx = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrl * self = (wxHeaderCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrl);
+    // call UpdateColumn
+    self->UpdateColumn(idx);
+
+    return 0;
+}
+
+
+
+
+void wxLua_wxHeaderCtrl_delete_function(void** p)
+{
+    wxHeaderCtrl* o = (wxHeaderCtrl*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxHeaderCtrl_methods[] = {
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxMenu && wxUSE_MENUS)
+    { "AddColumnsItems", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_AddColumnsItems, 1, NULL },
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxMenu && wxUSE_MENUS)
+
+    { "GetColumnAt", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnAt, 1, NULL },
+    { "GetColumnCount", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnCount, 1, NULL },
+    { "GetColumnPos", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnPos, 1, NULL },
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxCHECK_VERSION(3,1,3))
+    { "GetColumnTitleWidth", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnTitleWidth, 1, NULL },
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxCHECK_VERSION(3,1,3))
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+    { "GetColumnsOrder", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_GetColumnsOrder, 1, NULL },
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+
+    { "IsEmpty", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_IsEmpty, 1, NULL },
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+    { "MoveColumnInOrderArray", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxHeaderCtrl_MoveColumnInOrderArray, 1, NULL },
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+
+    { "ResetColumnsOrder", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_ResetColumnsOrder, 1, NULL },
+    { "SetColumnCount", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_SetColumnCount, 1, NULL },
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+    { "SetColumnsOrder", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_SetColumnsOrder, 1, NULL },
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxArrayInt)
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect)
+    { "ShowColumnsMenu", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_ShowColumnsMenu, 1, NULL },
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect)
+
+    { "ShowCustomizeDialog", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_ShowCustomizeDialog, 1, NULL },
+    { "UpdateColumn", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrl_UpdateColumn, 1, NULL },
+
+    { 0, 0, 0, 0 },
+};
+
+int wxHeaderCtrl_methodCount = sizeof(wxHeaderCtrl_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
+
+
+#if (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
+// ---------------------------------------------------------------------------
+// Bind class wxHeaderCtrlSimple
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxHeaderCtrlSimple'
+int wxluatype_wxHeaderCtrlSimple = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_DeleteColumn[] = { &wxluatype_wxHeaderCtrlSimple, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrlSimple_DeleteColumn(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlSimple_DeleteColumn[1] = {{ wxLua_wxHeaderCtrlSimple_DeleteColumn, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_DeleteColumn }};
+//     void DeleteColumn(unsigned int idx);
+static int LUACALL wxLua_wxHeaderCtrlSimple_DeleteColumn(lua_State *L)
+{
+    // unsigned int idx
+    unsigned int idx = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrlSimple * self = (wxHeaderCtrlSimple *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlSimple);
+    // call DeleteColumn
+    self->DeleteColumn(idx);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_HideColumn[] = { &wxluatype_wxHeaderCtrlSimple, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxHeaderCtrlSimple_HideColumn(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlSimple_HideColumn[1] = {{ wxLua_wxHeaderCtrlSimple_HideColumn, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_HideColumn }};
+//     void HideColumn(unsigned int idx);
+static int LUACALL wxLua_wxHeaderCtrlSimple_HideColumn(lua_State *L)
+{
+    // unsigned int idx
+    unsigned int idx = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrlSimple * self = (wxHeaderCtrlSimple *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlSimple);
+    // call HideColumn
+    self->HideColumn(idx);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_RemoveSortIndicator[] = { &wxluatype_wxHeaderCtrlSimple, NULL };
+static int LUACALL wxLua_wxHeaderCtrlSimple_RemoveSortIndicator(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlSimple_RemoveSortIndicator[1] = {{ wxLua_wxHeaderCtrlSimple_RemoveSortIndicator, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_RemoveSortIndicator }};
+//     void RemoveSortIndicator();
+static int LUACALL wxLua_wxHeaderCtrlSimple_RemoveSortIndicator(lua_State *L)
+{
+    // get this
+    wxHeaderCtrlSimple * self = (wxHeaderCtrlSimple *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlSimple);
+    // call RemoveSortIndicator
+    self->RemoveSortIndicator();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_ShowColumn[] = { &wxluatype_wxHeaderCtrlSimple, &wxluatype_TINTEGER, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_wxHeaderCtrlSimple_ShowColumn(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlSimple_ShowColumn[1] = {{ wxLua_wxHeaderCtrlSimple_ShowColumn, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_ShowColumn }};
+//     void ShowColumn(unsigned int idx, bool show = true);
+static int LUACALL wxLua_wxHeaderCtrlSimple_ShowColumn(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // bool show = true
+    bool show = (argCount >= 3 ? wxlua_getbooleantype(L, 3) : true);
+    // unsigned int idx
+    unsigned int idx = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrlSimple * self = (wxHeaderCtrlSimple *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlSimple);
+    // call ShowColumn
+    self->ShowColumn(idx, show);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_ShowSortIndicator[] = { &wxluatype_wxHeaderCtrlSimple, &wxluatype_TINTEGER, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_wxHeaderCtrlSimple_ShowSortIndicator(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlSimple_ShowSortIndicator[1] = {{ wxLua_wxHeaderCtrlSimple_ShowSortIndicator, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_ShowSortIndicator }};
+//     void ShowSortIndicator(unsigned int idx, bool sortOrder = true);
+static int LUACALL wxLua_wxHeaderCtrlSimple_ShowSortIndicator(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // bool sortOrder = true
+    bool sortOrder = (argCount >= 3 ? wxlua_getbooleantype(L, 3) : true);
+    // unsigned int idx
+    unsigned int idx = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxHeaderCtrlSimple * self = (wxHeaderCtrlSimple *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderCtrlSimple);
+    // call ShowSortIndicator
+    self->ShowSortIndicator(idx, sortOrder);
+
+    return 0;
+}
+
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_constructor1[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxHeaderCtrlSimple_constructor1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlSimple_constructor1[1] = {{ wxLua_wxHeaderCtrlSimple_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 6, s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_constructor1 }};
+//                        const wxString& name = wxHeaderCtrlNameStr);
+static int LUACALL wxLua_wxHeaderCtrlSimple_constructor1(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // const wxString name = wxHeaderCtrlNameStr
+    const wxString name = (argCount >= 6 ? wxlua_getwxStringtype(L, 6) : wxString(wxHeaderCtrlNameStr));
+    // long style = wxHD_DEFAULT_STYLE
+    long style = (argCount >= 5 ? (long)wxlua_getnumbertype(L, 5) : wxHD_DEFAULT_STYLE);
+    // const wxSize size = wxDefaultSize
+    const wxSize * size = (argCount >= 4 ? (const wxSize *)wxluaT_getuserdatatype(L, 4, wxluatype_wxSize) : &wxDefaultSize);
+    // const wxPoint pos = wxDefaultPosition
+    const wxPoint * pos = (argCount >= 3 ? (const wxPoint *)wxluaT_getuserdatatype(L, 3, wxluatype_wxPoint) : &wxDefaultPosition);
+    // wxWindowID winid = wxID_ANY
+    wxWindowID winid = (argCount >= 2 ? (wxWindowID)wxlua_getnumbertype(L, 2) : wxID_ANY);
+    // wxWindow parent
+    wxWindow * parent = (wxWindow *)wxluaT_getuserdatatype(L, 1, wxluatype_wxWindow);
+    // call constructor
+    wxHeaderCtrlSimple* returns = new wxHeaderCtrlSimple(parent, winid, *pos, *size, style, name);
+    // add to tracked window list, it will check validity
+    wxluaW_addtrackedwindow(L, returns);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxHeaderCtrlSimple);
+
+    return 1;
+}
+
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect)
+
+static int LUACALL wxLua_wxHeaderCtrlSimple_constructor(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlSimple_constructor[1] = {{ wxLua_wxHeaderCtrlSimple_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
+//     wxHeaderCtrlSimple();
+static int LUACALL wxLua_wxHeaderCtrlSimple_constructor(lua_State *L)
+{
+    // call constructor
+    wxHeaderCtrlSimple* returns = new wxHeaderCtrlSimple();
+    // add to tracked window list, it will check validity
+    wxluaW_addtrackedwindow(L, returns);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxHeaderCtrlSimple);
+
+    return 1;
+}
+
+
+
+
+#if (((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect))||((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL))
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHeaderCtrlSimple_constructor_overload[] =
+{
+
+#if ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect)
+    { wxLua_wxHeaderCtrlSimple_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 6, s_wxluatypeArray_wxLua_wxHeaderCtrlSimple_constructor1 },
+#endif // ((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect)
+    { wxLua_wxHeaderCtrlSimple_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
+};
+static int s_wxluafunc_wxLua_wxHeaderCtrlSimple_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxHeaderCtrlSimple_constructor_overload)/sizeof(wxLuaBindCFunc);
+
+#endif // (((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect))||((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL))
+
+void wxLua_wxHeaderCtrlSimple_delete_function(void** p)
+{
+    wxHeaderCtrlSimple* o = (wxHeaderCtrlSimple*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxHeaderCtrlSimple_methods[] = {
+    { "DeleteColumn", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlSimple_DeleteColumn, 1, NULL },
+    { "HideColumn", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlSimple_HideColumn, 1, NULL },
+    { "RemoveSortIndicator", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlSimple_RemoveSortIndicator, 1, NULL },
+    { "ShowColumn", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlSimple_ShowColumn, 1, NULL },
+    { "ShowSortIndicator", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHeaderCtrlSimple_ShowSortIndicator, 1, NULL },
+
+#if (((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect))||((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL))
+    { "wxHeaderCtrlSimple", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxHeaderCtrlSimple_constructor_overload, s_wxluafunc_wxLua_wxHeaderCtrlSimple_constructor_overload_count, 0 },
+#endif // (((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)) && (wxLUA_USE_wxPointSizeRect))||((wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL))
+
+    { 0, 0, 0, 0 },
+};
+
+int wxHeaderCtrlSimple_methodCount = sizeof(wxHeaderCtrlSimple_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
 
 
 #if wxLUA_USE_wxButton && wxUSE_BUTTON
@@ -1532,7 +2294,15 @@ static int LUACALL wxLua_wxCheckBox_Get3StateValue(lua_State *L)
     // call Get3StateValue
     wxCheckBoxState returns = (self->Get3StateValue());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1760,7 +2530,15 @@ static int LUACALL wxLua_wxItemContainerImmutable_FindString(lua_State *L)
     // call FindString
     int returns = (self->FindString(s, bCase));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1776,7 +2554,15 @@ static int LUACALL wxLua_wxItemContainerImmutable_GetCount(lua_State *L)
     // call GetCount
     unsigned int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1792,7 +2578,15 @@ static int LUACALL wxLua_wxItemContainerImmutable_GetSelection(lua_State *L)
     // call GetSelection
     int returns = (self->GetSelection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2015,7 +2809,15 @@ static int LUACALL wxLua_wxItemContainer_Append2(lua_State *L)
     // call Append
     int returns = (self->Append(item, clientData));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2035,7 +2837,15 @@ static int LUACALL wxLua_wxItemContainer_Append1(lua_State *L)
     // call Append
     int returns = (self->Append(item, (void*)number));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2053,7 +2863,15 @@ static int LUACALL wxLua_wxItemContainer_Append(lua_State *L)
     // call Append
     int returns = (self->Append(item));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2117,7 +2935,15 @@ static int LUACALL wxLua_wxItemContainer_GetClientData(lua_State *L)
     // call GetClientData
     wxUIntPtr returns = (wxUIntPtr)self->GetClientData(n);
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2189,7 +3015,15 @@ static int LUACALL wxLua_wxItemContainer_Insert2(lua_State *L)
     // call Insert
     int returns = (self->Insert(item, pos, clientData));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2211,7 +3045,15 @@ static int LUACALL wxLua_wxItemContainer_Insert1(lua_State *L)
     // call Insert
     int returns = (self->Insert(item, pos, (void*)number));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2231,10 +3073,38 @@ static int LUACALL wxLua_wxItemContainer_Insert(lua_State *L)
     // call Insert
     int returns = (self->Insert(item, pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
+
+
+#if ((wxLUA_USE_wxChoice || wxLUA_USE_wxComboBox || wxLUA_USE_wxListBox ) && wxUSE_CONTROLS) && (wxLUA_USE_wxArrayString)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxItemContainer_Set[] = { &wxluatype_wxItemContainer, &wxluatype_wxArrayString, NULL };
+static int LUACALL wxLua_wxItemContainer_Set(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxItemContainer_Set[1] = {{ wxLua_wxItemContainer_Set, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxItemContainer_Set }};
+//     void Set(const wxArrayString &items);
+static int LUACALL wxLua_wxItemContainer_Set(lua_State *L)
+{
+    // const wxArrayString items
+    wxLuaSmartwxArrayString items = wxlua_getwxArrayString(L, 2);
+    // get this
+    wxItemContainer * self = (wxItemContainer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxItemContainer);
+    // call Set
+    self->Set(items);
+
+    return 0;
+}
+
+#endif // ((wxLUA_USE_wxChoice || wxLUA_USE_wxComboBox || wxLUA_USE_wxListBox ) && wxUSE_CONTROLS) && (wxLUA_USE_wxArrayString)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxItemContainer_SetClientData[] = { &wxluatype_wxItemContainer, &wxluatype_TINTEGER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxItemContainer_SetClientData(lua_State *L);
@@ -2326,6 +3196,10 @@ wxLuaBindMethod wxItemContainer_methods[] = {
 #if ((wxLUA_USE_wxChoice || wxLUA_USE_wxComboBox || wxLUA_USE_wxListBox ) && wxUSE_CONTROLS)
     { "Insert", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxItemContainer_Insert_overload, s_wxluafunc_wxLua_wxItemContainer_Insert_overload_count, 0 },
 #endif // ((wxLUA_USE_wxChoice || wxLUA_USE_wxComboBox || wxLUA_USE_wxListBox ) && wxUSE_CONTROLS)
+
+#if ((wxLUA_USE_wxChoice || wxLUA_USE_wxComboBox || wxLUA_USE_wxListBox ) && wxUSE_CONTROLS) && (wxLUA_USE_wxArrayString)
+    { "Set", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxItemContainer_Set, 1, NULL },
+#endif // ((wxLUA_USE_wxChoice || wxLUA_USE_wxComboBox || wxLUA_USE_wxListBox ) && wxUSE_CONTROLS) && (wxLUA_USE_wxArrayString)
 
     { "SetClientData", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxItemContainer_SetClientData, 1, NULL },
     { "SetClientObject", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxItemContainer_SetClientObject, 1, NULL },
@@ -2451,7 +3325,15 @@ static int LUACALL wxLua_wxChoice_GetCurrentSelection(lua_State *L)
     // call GetCurrentSelection
     int returns = (self->GetCurrentSelection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2723,7 +3605,15 @@ static int LUACALL wxLua_wxComboBox_GetCurrentSelection(lua_State *L)
     // call GetCurrentSelection
     int returns = (self->GetCurrentSelection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2741,7 +3631,15 @@ static int LUACALL wxLua_wxComboBox_GetInsertionPoint(lua_State *L)
     // call GetInsertionPoint
     long returns = (self->GetInsertionPoint());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2757,7 +3655,15 @@ static int LUACALL wxLua_wxComboBox_GetLastPosition(lua_State *L)
     // call GetLastPosition
     long returns = (self->GetLastPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3101,7 +4007,15 @@ static int LUACALL wxLua_wxGauge_GetBezelFace(lua_State *L)
     // call GetBezelFace
     int returns = (self->GetBezelFace());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3119,7 +4033,15 @@ static int LUACALL wxLua_wxGauge_GetRange(lua_State *L)
     // call GetRange
     int returns = (self->GetRange());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3137,7 +4059,15 @@ static int LUACALL wxLua_wxGauge_GetShadowWidth(lua_State *L)
     // call GetShadowWidth
     int returns = (self->GetShadowWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3155,7 +4085,15 @@ static int LUACALL wxLua_wxGauge_GetValue(lua_State *L)
     // call GetValue
     int returns = (self->GetValue());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3463,7 +4401,7 @@ static int LUACALL wxLua_wxListBox_GetSelections(lua_State *L)
     // call GetSelections
     int returns = self->GetSelections(selections);
     // push the result number
-    lua_pushnumber(L, returns);
+    lua_pushinteger(L, returns);
     // push the selects as a table
     wxlua_pushwxArrayInttable(L, selections);
 
@@ -3486,7 +4424,15 @@ static int LUACALL wxLua_wxListBox_HitTest(lua_State *L)
     // call HitTest
     int returns = (self->HitTest(*point));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4111,7 +5057,15 @@ static int LUACALL wxLua_wxListCtrl_FindItem2(lua_State *L)
     // call FindItem
     long returns = (self->FindItem(start, *pt, direction));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4133,7 +5087,15 @@ static int LUACALL wxLua_wxListCtrl_FindItem1(lua_State *L)
     // call FindItem
     long returns = (self->FindItem(start, data));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4157,7 +5119,15 @@ static int LUACALL wxLua_wxListCtrl_FindItem(lua_State *L)
     // call FindItem
     long returns = (self->FindItem(start, str, partial));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4193,7 +5163,15 @@ static int LUACALL wxLua_wxListCtrl_GetColumnCount(lua_State *L)
     // call GetColumnCount
     int returns = (self->GetColumnCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4211,7 +5189,15 @@ static int LUACALL wxLua_wxListCtrl_GetColumnWidth(lua_State *L)
     // call GetColumnWidth
     int returns = (self->GetColumnWidth(col));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4227,7 +5213,15 @@ static int LUACALL wxLua_wxListCtrl_GetCountPerPage(lua_State *L)
     // call GetCountPerPage
     int returns = (self->GetCountPerPage());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4302,7 +5296,15 @@ static int LUACALL wxLua_wxListCtrl_GetItemCount(lua_State *L)
     // call GetItemCount
     int returns = (self->GetItemCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4320,7 +5322,15 @@ static int LUACALL wxLua_wxListCtrl_GetItemData(lua_State *L)
     // call GetItemData
     long returns = (self->GetItemData(item));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4433,7 +5443,15 @@ static int LUACALL wxLua_wxListCtrl_GetItemSpacing(lua_State *L)
     // call GetItemSpacing
     int returns = (self->GetItemSpacing(isSmall));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4455,7 +5473,15 @@ static int LUACALL wxLua_wxListCtrl_GetItemState(lua_State *L)
     // call GetItemState
     int returns = (self->GetItemState(item, stateMask));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4497,7 +5523,15 @@ static int LUACALL wxLua_wxListCtrl_GetNextItem(lua_State *L)
     // call GetNextItem
     long returns = (self->GetNextItem(item, geometry, state));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4513,7 +5547,15 @@ static int LUACALL wxLua_wxListCtrl_GetSelectedItemCount(lua_State *L)
     // call GetSelectedItemCount
     int returns = (self->GetSelectedItemCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4552,7 +5594,15 @@ static int LUACALL wxLua_wxListCtrl_GetTopItem(lua_State *L)
     // call GetTopItem
     long returns = (self->GetTopItem());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4594,9 +5644,9 @@ static int LUACALL wxLua_wxListCtrl_HitTest(lua_State *L)
     // call HitTest
     long returns = self->HitTest(*point, flags);
     // push the result number
-    lua_pushnumber(L, returns);
+    lua_pushinteger(L, returns);
     // push the result flags
-    lua_pushnumber(L, flags);
+    lua_pushinteger(L, flags);
     // return the number of parameters
     return 2;
 }
@@ -4625,7 +5675,15 @@ static int LUACALL wxLua_wxListCtrl_InsertColumn1(lua_State *L)
     // call InsertColumn
     long returns = (self->InsertColumn(col, heading, format, width));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4645,7 +5703,15 @@ static int LUACALL wxLua_wxListCtrl_InsertColumn(lua_State *L)
     // call InsertColumn
     long returns = (self->InsertColumn(col, *info));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4667,7 +5733,15 @@ static int LUACALL wxLua_wxListCtrl_InsertItem3(lua_State *L)
     // call InsertItem
     long returns = (self->InsertItem(index, label, imageIndex));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4687,7 +5761,15 @@ static int LUACALL wxLua_wxListCtrl_InsertItem2(lua_State *L)
     // call InsertItem
     long returns = (self->InsertItem(index, imageIndex));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4707,7 +5789,15 @@ static int LUACALL wxLua_wxListCtrl_InsertItem1(lua_State *L)
     // call InsertItem
     long returns = (self->InsertItem(index, label));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4725,7 +5815,15 @@ static int LUACALL wxLua_wxListCtrl_InsertItem(lua_State *L)
     // call InsertItem
     long returns = (self->InsertItem(*info));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4833,7 +5931,15 @@ static int LUACALL wxLua_wxListCtrl_SetItem1(lua_State *L)
     // call SetItem
     long returns = (self->SetItem(index, col, label, imageId));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5837,7 +6943,15 @@ static int LUACALL wxLua_wxListItem_GetAlign(lua_State *L)
     // call GetAlign
     wxListColumnFormat returns = (self->GetAlign());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5892,7 +7006,15 @@ static int LUACALL wxLua_wxListItem_GetColumn(lua_State *L)
     // call GetColumn
     int returns = (self->GetColumn());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5908,7 +7030,15 @@ static int LUACALL wxLua_wxListItem_GetData(lua_State *L)
     // call GetData
     long returns = (self->GetData());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5947,7 +7077,15 @@ static int LUACALL wxLua_wxListItem_GetId(lua_State *L)
     // call GetId
     long returns = (self->GetId());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5963,7 +7101,15 @@ static int LUACALL wxLua_wxListItem_GetImage(lua_State *L)
     // call GetImage
     int returns = (self->GetImage());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5979,7 +7125,15 @@ static int LUACALL wxLua_wxListItem_GetMask(lua_State *L)
     // call GetMask
     long returns = (self->GetMask());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5995,7 +7149,15 @@ static int LUACALL wxLua_wxListItem_GetState(lua_State *L)
     // call GetState
     long returns = (self->GetState());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6050,7 +7212,15 @@ static int LUACALL wxLua_wxListItem_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6435,7 +7605,15 @@ static int LUACALL wxLua_wxListEvent_GetColumn(lua_State *L)
     // call GetColumn
     int returns = (self->GetColumn());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6451,7 +7629,15 @@ static int LUACALL wxLua_wxListEvent_GetData(lua_State *L)
     // call GetData
     long returns = (self->GetData());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6467,7 +7653,15 @@ static int LUACALL wxLua_wxListEvent_GetImage(lua_State *L)
     // call GetImage
     int returns = (self->GetImage());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6483,7 +7677,15 @@ static int LUACALL wxLua_wxListEvent_GetIndex(lua_State *L)
     // call GetIndex
     long returns = (self->GetIndex());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6515,7 +7717,15 @@ static int LUACALL wxLua_wxListEvent_GetKeyCode(lua_State *L)
     // call GetKeyCode
     int returns = (self->GetKeyCode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6547,7 +7757,15 @@ static int LUACALL wxLua_wxListEvent_GetMask(lua_State *L)
     // call GetMask
     long returns = (self->GetMask());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6756,7 +7974,15 @@ static int LUACALL wxLua_wxListView_GetFirstSelected(lua_State *L)
     // call GetFirstSelected
     long returns = (self->GetFirstSelected());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6772,7 +7998,15 @@ static int LUACALL wxLua_wxListView_GetFocusedItem(lua_State *L)
     // call GetFocusedItem
     long returns = (self->GetFocusedItem());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6790,7 +8024,15 @@ static int LUACALL wxLua_wxListView_GetNextSelected(lua_State *L)
     // call GetNextSelected
     long returns = (self->GetNextSelected(item));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7049,7 +8291,15 @@ static int LUACALL wxLua_wxRadioBox_FindString(lua_State *L)
     // call FindString
     int returns = (self->FindString(string));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7065,7 +8315,15 @@ static int LUACALL wxLua_wxRadioBox_GetCount(lua_State *L)
     // call GetCount
     int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7081,7 +8339,15 @@ static int LUACALL wxLua_wxRadioBox_GetSelection(lua_State *L)
     // call GetSelection
     int returns = (self->GetSelection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7541,7 +8807,15 @@ static int LUACALL wxLua_wxScrollBar_GetPageSize(lua_State *L)
     // call GetPageSize
     int returns = (self->GetPageSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7557,7 +8831,15 @@ static int LUACALL wxLua_wxScrollBar_GetRange(lua_State *L)
     // call GetRange
     int returns = (self->GetRange());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7573,7 +8855,15 @@ static int LUACALL wxLua_wxScrollBar_GetThumbPosition(lua_State *L)
     // call GetThumbPosition
     int returns = (self->GetThumbPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7589,7 +8879,15 @@ static int LUACALL wxLua_wxScrollBar_GetThumbSize(lua_State *L)
     // call GetThumbSize
     int returns = (self->GetThumbSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7824,7 +9122,15 @@ static int LUACALL wxLua_wxSlider_GetLineSize(lua_State *L)
     // call GetLineSize
     int returns = (self->GetLineSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7840,7 +9146,15 @@ static int LUACALL wxLua_wxSlider_GetMax(lua_State *L)
     // call GetMax
     int returns = (self->GetMax());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7856,7 +9170,15 @@ static int LUACALL wxLua_wxSlider_GetMin(lua_State *L)
     // call GetMin
     int returns = (self->GetMin());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7872,7 +9194,15 @@ static int LUACALL wxLua_wxSlider_GetPageSize(lua_State *L)
     // call GetPageSize
     int returns = (self->GetPageSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7888,7 +9218,15 @@ static int LUACALL wxLua_wxSlider_GetSelEnd(lua_State *L)
     // call GetSelEnd
     int returns = (self->GetSelEnd());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7904,7 +9242,15 @@ static int LUACALL wxLua_wxSlider_GetSelStart(lua_State *L)
     // call GetSelStart
     int returns = (self->GetSelStart());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7920,7 +9266,15 @@ static int LUACALL wxLua_wxSlider_GetThumbLength(lua_State *L)
     // call GetThumbLength
     int returns = (self->GetThumbLength());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7936,7 +9290,15 @@ static int LUACALL wxLua_wxSlider_GetTickFreq(lua_State *L)
     // call GetTickFreq
     int returns = (self->GetTickFreq());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7952,7 +9314,15 @@ static int LUACALL wxLua_wxSlider_GetValue(lua_State *L)
     // call GetValue
     int returns = (self->GetValue());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8306,7 +9676,15 @@ static int LUACALL wxLua_wxSpinButton_GetMax(lua_State *L)
     // call GetMax
     int returns = (self->GetMax());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8322,7 +9700,15 @@ static int LUACALL wxLua_wxSpinButton_GetMin(lua_State *L)
     // call GetMin
     int returns = (self->GetMin());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8338,7 +9724,15 @@ static int LUACALL wxLua_wxSpinButton_GetValue(lua_State *L)
     // call GetValue
     int returns = (self->GetValue());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8492,7 +9886,15 @@ static int LUACALL wxLua_wxSpinEvent_GetPosition(lua_State *L)
     // call GetPosition
     int returns = (self->GetPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8611,6 +10013,33 @@ static int LUACALL wxLua_wxSpinCtrl_Create(lua_State *L)
 
 #endif // (wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
 
+#if (wxCHECK_VERSION(2,9,5)) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSpinCtrl_GetBase[] = { &wxluatype_wxSpinCtrl, NULL };
+static int LUACALL wxLua_wxSpinCtrl_GetBase(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSpinCtrl_GetBase[1] = {{ wxLua_wxSpinCtrl_GetBase, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSpinCtrl_GetBase }};
+//     %wxchkver_2_9_5 int GetBase() const;
+static int LUACALL wxLua_wxSpinCtrl_GetBase(lua_State *L)
+{
+    // get this
+    wxSpinCtrl * self = (wxSpinCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSpinCtrl);
+    // call GetBase
+    int returns = (self->GetBase());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+#endif // (wxCHECK_VERSION(2,9,5)) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSpinCtrl_GetMax[] = { &wxluatype_wxSpinCtrl, NULL };
 static int LUACALL wxLua_wxSpinCtrl_GetMax(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxSpinCtrl_GetMax[1] = {{ wxLua_wxSpinCtrl_GetMax, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSpinCtrl_GetMax }};
@@ -8622,7 +10051,15 @@ static int LUACALL wxLua_wxSpinCtrl_GetMax(lua_State *L)
     // call GetMax
     int returns = (self->GetMax());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8638,7 +10075,15 @@ static int LUACALL wxLua_wxSpinCtrl_GetMin(lua_State *L)
     // call GetMin
     int returns = (self->GetMin());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8654,10 +10099,40 @@ static int LUACALL wxLua_wxSpinCtrl_GetValue(lua_State *L)
     // call GetValue
     int returns = (self->GetValue());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
+
+
+#if (wxCHECK_VERSION(2,9,5)) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSpinCtrl_SetBase[] = { &wxluatype_wxSpinCtrl, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxSpinCtrl_SetBase(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSpinCtrl_SetBase[1] = {{ wxLua_wxSpinCtrl_SetBase, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxSpinCtrl_SetBase }};
+//     %wxchkver_2_9_5 bool SetBase(int base);
+static int LUACALL wxLua_wxSpinCtrl_SetBase(lua_State *L)
+{
+    // int base
+    int base = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    wxSpinCtrl * self = (wxSpinCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSpinCtrl);
+    // call SetBase
+    bool returns = (self->SetBase(base));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // (wxCHECK_VERSION(2,9,5)) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSpinCtrl_SetRange[] = { &wxluatype_wxSpinCtrl, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxSpinCtrl_SetRange(lua_State *L);
@@ -8824,9 +10299,18 @@ wxLuaBindMethod wxSpinCtrl_methods[] = {
     { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSpinCtrl_Create, 1, NULL },
 #endif // (wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
 
+#if (wxCHECK_VERSION(2,9,5)) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
+    { "GetBase", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSpinCtrl_GetBase, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,5)) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
+
     { "GetMax", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSpinCtrl_GetMax, 1, NULL },
     { "GetMin", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSpinCtrl_GetMin, 1, NULL },
     { "GetValue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSpinCtrl_GetValue, 1, NULL },
+
+#if (wxCHECK_VERSION(2,9,5)) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
+    { "SetBase", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSpinCtrl_SetBase, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,5)) && (wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL)
+
     { "SetRange", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSpinCtrl_SetRange, 1, NULL },
     { "SetSelection", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSpinCtrl_SetSelection, 1, NULL },
 
@@ -8864,7 +10348,7 @@ static int LUACALL wxLua_wxSpinDoubleEvent_GetValue(lua_State *L)
     wxSpinDoubleEvent * self = (wxSpinDoubleEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSpinDoubleEvent);
     // call GetValue
     double returns = (self->GetValue());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -8999,7 +10483,15 @@ static int LUACALL wxLua_wxSpinCtrlDouble_GetDigits(lua_State *L)
     // call GetDigits
     unsigned int returns = (self->GetDigits());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -9014,7 +10506,7 @@ static int LUACALL wxLua_wxSpinCtrlDouble_GetIncrement(lua_State *L)
     wxSpinCtrlDouble * self = (wxSpinCtrlDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSpinCtrlDouble);
     // call GetIncrement
     double returns = (self->GetIncrement());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -9030,7 +10522,7 @@ static int LUACALL wxLua_wxSpinCtrlDouble_GetMax(lua_State *L)
     wxSpinCtrlDouble * self = (wxSpinCtrlDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSpinCtrlDouble);
     // call GetMax
     double returns = (self->GetMax());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -9046,7 +10538,7 @@ static int LUACALL wxLua_wxSpinCtrlDouble_GetMin(lua_State *L)
     wxSpinCtrlDouble * self = (wxSpinCtrlDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSpinCtrlDouble);
     // call GetMin
     double returns = (self->GetMin());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -9062,7 +10554,7 @@ static int LUACALL wxLua_wxSpinCtrlDouble_GetValue(lua_State *L)
     wxSpinCtrlDouble * self = (wxSpinCtrlDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSpinCtrlDouble);
     // call GetValue
     double returns = (self->GetValue());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -9540,7 +11032,15 @@ static int LUACALL wxLua_wxTextEntry_GetInsertionPoint(lua_State *L)
     // call GetInsertionPoint
     long returns = (self->GetInsertionPoint());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -9556,7 +11056,15 @@ static int LUACALL wxLua_wxTextEntry_GetLastPosition(lua_State *L)
     // call GetLastPosition
     wxTextPos returns = (self->GetLastPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -9619,8 +11127,8 @@ static int LUACALL wxLua_wxTextEntry_GetSelection(lua_State *L)
     wxTextEntry *self = (wxTextEntry *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTextEntry);
     // call GetSelection
     self->GetSelection(&from, &to);
-    lua_pushnumber(L, from);
-    lua_pushnumber(L, to);
+    lua_pushinteger(L, from);
+    lua_pushinteger(L, to);
     // return the number of parameters
     return 2;
 }
@@ -10344,7 +11852,15 @@ static int LUACALL wxLua_wxTextCtrl_GetInsertionPoint(lua_State *L)
     // call GetInsertionPoint
     long returns = (self->GetInsertionPoint());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -10360,7 +11876,15 @@ static int LUACALL wxLua_wxTextCtrl_GetLastPosition(lua_State *L)
     // call GetLastPosition
     long returns = (self->GetLastPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -10380,7 +11904,15 @@ static int LUACALL wxLua_wxTextCtrl_GetLineLength(lua_State *L)
     // call GetLineLength
     int returns = (self->GetLineLength(lineNo));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -10414,7 +11946,15 @@ static int LUACALL wxLua_wxTextCtrl_GetNumberOfLines(lua_State *L)
     // call GetNumberOfLines
     int returns = (self->GetNumberOfLines());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -10454,8 +11994,8 @@ static int LUACALL wxLua_wxTextCtrl_GetSelection(lua_State *L)
     wxTextCtrl *self = (wxTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTextCtrl);
     // call GetSelection
     self->GetSelection(&from, &to);
-    lua_pushnumber(L, from);
-    lua_pushnumber(L, to);
+    lua_pushinteger(L, from);
+    lua_pushinteger(L, to);
     // return the number of parameters
     return 2;
 }
@@ -10538,9 +12078,9 @@ static int LUACALL wxLua_wxTextCtrl_HitTest(lua_State *L)
     // call HitTest
     wxTextCtrlHitTestResult returns = self->HitTest(*pt, &col, &row);
     // push the result number
-    lua_pushnumber(L, returns);
-    lua_pushnumber(L, row);
-    lua_pushnumber(L, col);
+    lua_pushinteger(L, returns);
+    lua_pushinteger(L, row);
+    lua_pushinteger(L, col);
 
     return 3;
 }
@@ -10562,8 +12102,8 @@ static int LUACALL wxLua_wxTextCtrl_HitTestPos(lua_State *L)
     // call HitTest
     wxTextCtrlHitTestResult returns = self->HitTest(*pt, &pos);
     // push the result number
-    lua_pushnumber(L, returns);
-    lua_pushnumber(L, pos);
+    lua_pushinteger(L, returns);
+    lua_pushinteger(L, pos);
 
     return 2;
 }
@@ -10758,8 +12298,8 @@ static int LUACALL wxLua_wxTextCtrl_PositionToXY(lua_State *L)
     bool returns = self->PositionToXY(pos, &x, &y);
     // push the result number
     lua_pushboolean(L, returns);
-    lua_pushnumber(L, x);
-    lua_pushnumber(L, y);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
     // return the number of parameters
     return 3;
 }
@@ -11095,7 +12635,15 @@ static int LUACALL wxLua_wxTextCtrl_XYToPosition(lua_State *L)
     // call XYToPosition
     long returns = (self->XYToPosition(x, y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11356,7 +12904,15 @@ static int LUACALL wxLua_wxTextAttr_GetAlignment(lua_State *L)
     // call GetAlignment
     wxTextAttrAlignment returns = (self->GetAlignment());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11395,7 +12951,15 @@ static int LUACALL wxLua_wxTextAttr_GetFlags(lua_State *L)
     // call GetFlags
     long returns = (self->GetFlags());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11434,7 +12998,15 @@ static int LUACALL wxLua_wxTextAttr_GetLeftIndent(lua_State *L)
     // call GetLeftIndent
     long returns = (self->GetLeftIndent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11450,7 +13022,15 @@ static int LUACALL wxLua_wxTextAttr_GetLeftSubIndent(lua_State *L)
     // call GetLeftSubIndent
     long returns = (self->GetLeftSubIndent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11466,7 +13046,15 @@ static int LUACALL wxLua_wxTextAttr_GetRightIndent(lua_State *L)
     // call GetRightIndent
     long returns = (self->GetRightIndent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11958,7 +13546,15 @@ static int LUACALL wxLua_wxTextUrlEvent_GetURLEnd(lua_State *L)
     // call GetURLEnd
     long returns = (self->GetURLEnd());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11974,7 +13570,15 @@ static int LUACALL wxLua_wxTextUrlEvent_GetURLStart(lua_State *L)
     // call GetURLStart
     long returns = (self->GetURLStart());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12473,7 +14077,15 @@ static int LUACALL wxLua_wxTreeCtrl_GetChildrenCount(lua_State *L)
     // call GetChildrenCount
     size_t returns = (self->GetChildrenCount(*item, recursively));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12489,7 +14101,15 @@ static int LUACALL wxLua_wxTreeCtrl_GetCount(lua_State *L)
     // call GetCount
     int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12613,7 +14233,15 @@ static int LUACALL wxLua_wxTreeCtrl_GetIndent(lua_State *L)
     // call GetIndent
     int returns = (self->GetIndent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12703,7 +14331,15 @@ static int LUACALL wxLua_wxTreeCtrl_GetItemImage(lua_State *L)
     // call GetItemImage
     int returns = (self->GetItemImage(*item, which));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12747,7 +14383,15 @@ static int LUACALL wxLua_wxTreeCtrl_GetItemState(lua_State *L)
     // call GetItemState
     int returns = (self->GetItemState(*item));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13011,6 +14655,30 @@ static int LUACALL wxLua_wxTreeCtrl_GetSelections(lua_State *L)
 }
 
 
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTreeCtrl_GetSpacing[] = { &wxluatype_wxTreeCtrl, NULL };
+static int LUACALL wxLua_wxTreeCtrl_GetSpacing(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTreeCtrl_GetSpacing[1] = {{ wxLua_wxTreeCtrl_GetSpacing, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxTreeCtrl_GetSpacing }};
+//     unsigned int GetSpacing() const;
+static int LUACALL wxLua_wxTreeCtrl_GetSpacing(lua_State *L)
+{
+    // get this
+    wxTreeCtrl * self = (wxTreeCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTreeCtrl);
+    // call GetSpacing
+    unsigned int returns = (self->GetSpacing());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
 
 #if (wxLUA_USE_wxImageList) && (wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTreeCtrl_GetStateImageList[] = { &wxluatype_wxTreeCtrl, NULL };
@@ -13053,7 +14721,7 @@ static int LUACALL wxLua_wxTreeCtrl_HitTest(lua_State *L)
 
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxTreeItemId);
-    lua_pushnumber(L, flags);
+    lua_pushinteger(L, flags);
     // return the number of parameters
     return 2;
 }
@@ -13622,6 +15290,22 @@ static int LUACALL wxLua_wxTreeCtrl_SetQuickBestSize(lua_State *L)
     return 0;
 }
 
+static wxLuaArgType s_wxluatypeArray_wxLua_wxTreeCtrl_SetSpacing[] = { &wxluatype_wxTreeCtrl, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxTreeCtrl_SetSpacing(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxTreeCtrl_SetSpacing[1] = {{ wxLua_wxTreeCtrl_SetSpacing, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxTreeCtrl_SetSpacing }};
+//     void SetSpacing(unsigned int spacing);
+static int LUACALL wxLua_wxTreeCtrl_SetSpacing(lua_State *L)
+{
+    // unsigned int spacing
+    unsigned int spacing = (unsigned int)wxlua_getuintegertype(L, 2);
+    // get this
+    wxTreeCtrl * self = (wxTreeCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxTreeCtrl);
+    // call SetSpacing
+    self->SetSpacing(spacing);
+
+    return 0;
+}
+
 
 #if (wxLUA_USE_wxImageList) && (wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxTreeCtrl_SetStateImageList[] = { &wxluatype_wxTreeCtrl, &wxluatype_wxImageList, NULL };
@@ -13956,6 +15640,7 @@ wxLuaBindMethod wxTreeCtrl_methods[] = {
     { "GetRootItem", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTreeCtrl_GetRootItem, 1, NULL },
     { "GetSelection", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTreeCtrl_GetSelection, 1, NULL },
     { "GetSelections", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTreeCtrl_GetSelections, 1, NULL },
+    { "GetSpacing", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTreeCtrl_GetSpacing, 1, NULL },
 
 #if (wxLUA_USE_wxImageList) && (wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL)
     { "GetStateImageList", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTreeCtrl_GetStateImageList, 1, NULL },
@@ -14022,6 +15707,7 @@ wxLuaBindMethod wxTreeCtrl_methods[] = {
 #endif // (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL)
 
     { "SetQuickBestSize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTreeCtrl_SetQuickBestSize, 1, NULL },
+    { "SetSpacing", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTreeCtrl_SetSpacing, 1, NULL },
 
 #if (wxLUA_USE_wxImageList) && (wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL)
     { "SetStateImageList", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxTreeCtrl_SetStateImageList, 1, NULL },
@@ -14452,7 +16138,15 @@ static int LUACALL wxLua_wxTreeEvent_GetKeyCode(lua_State *L)
     // call GetKeyCode
     int returns = (self->GetKeyCode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14764,7 +16458,15 @@ static int LUACALL wxLua_wxGenericDirCtrl_GetFilterIndex(lua_State *L)
     // call GetFilterIndex
     int returns = (self->GetFilterIndex());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15378,7 +17080,15 @@ static int LUACALL wxLua_wxTreeListCtrl_AppendColumn(lua_State *L)
     // call AppendColumn
     int returns = (self->AppendColumn(title, width, align, flags));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15663,7 +17373,15 @@ static int LUACALL wxLua_wxTreeListCtrl_GetCheckedState(lua_State *L)
     // call GetCheckedState
     wxCheckBoxState returns = (self->GetCheckedState(item));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15681,7 +17399,15 @@ static int LUACALL wxLua_wxTreeListCtrl_GetColumnCount(lua_State *L)
     // call GetColumnCount
     unsigned int returns = (self->GetColumnCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15699,7 +17425,15 @@ static int LUACALL wxLua_wxTreeListCtrl_GetColumnWidth(lua_State *L)
     // call GetColumnWidth
     int returns = (self->GetColumnWidth(col));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16292,7 +18026,15 @@ static int LUACALL wxLua_wxTreeListCtrl_WidthFor(lua_State *L)
     // call WidthFor
     int returns = (self->WidthFor(text));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16490,7 +18232,15 @@ static int LUACALL wxLua_wxTreeListEvent_GetColumn(lua_State *L)
     // call GetColumn
     unsigned int returns = (self->GetColumn());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16527,7 +18277,15 @@ static int LUACALL wxLua_wxTreeListEvent_GetOldCheckedState(lua_State *L)
     // call GetOldCheckedState
     wxCheckBoxState returns = (self->GetOldCheckedState());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16579,4 +18337,331 @@ wxLuaBindMethod wxTreeListEvent_methods[] = {
 int wxTreeListEvent_methodCount = sizeof(wxTreeListEvent_methods)/sizeof(wxLuaBindMethod) - 1;
 
 #endif  // wxLUA_USE_wxTreeListCtrl && wxUSE_TREELISTCTRL && wxCHECK_VERSION(2,9,3)
+
+
+#if wxUSE_SEARCHCTRL
+// ---------------------------------------------------------------------------
+// Bind class wxSearchCtrl
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxSearchCtrl'
+int wxluatype_wxSearchCtrl = WXLUA_TUNKNOWN;
+
+#if ((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_Create[] = { &wxluatype_wxSearchCtrl, &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_TSTRING, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxSearchCtrl_Create(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_Create[1] = {{ wxLua_wxSearchCtrl_Create, WXLUAMETHOD_METHOD, 3, 9, s_wxluatypeArray_wxLua_wxSearchCtrl_Create }};
+//                  const wxString& name = wxSearchCtrlNameStr);
+static int LUACALL wxLua_wxSearchCtrl_Create(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // const wxString name = wxSearchCtrlNameStr
+    const wxString name = (argCount >= 9 ? wxlua_getwxStringtype(L, 9) : wxString(wxSearchCtrlNameStr));
+    // const wxValidator validator = wxDefaultValidator
+    const wxValidator * validator = (argCount >= 8 ? (const wxValidator *)wxluaT_getuserdatatype(L, 8, wxluatype_wxValidator) : &wxDefaultValidator);
+    // long style = 0
+    long style = (argCount >= 7 ? (long)wxlua_getnumbertype(L, 7) : 0);
+    // const wxSize size = wxDefaultSize
+    const wxSize * size = (argCount >= 6 ? (const wxSize *)wxluaT_getuserdatatype(L, 6, wxluatype_wxSize) : &wxDefaultSize);
+    // const wxPoint pos = wxDefaultPosition
+    const wxPoint * pos = (argCount >= 5 ? (const wxPoint *)wxluaT_getuserdatatype(L, 5, wxluatype_wxPoint) : &wxDefaultPosition);
+    // const wxString value = wxEmptyString
+    const wxString value = (argCount >= 4 ? wxlua_getwxStringtype(L, 4) : wxString(wxEmptyString));
+    // wxWindowID id
+    wxWindowID id = (wxWindowID)wxlua_getnumbertype(L, 3);
+    // wxWindow parent
+    wxWindow * parent = (wxWindow *)wxluaT_getuserdatatype(L, 2, wxluatype_wxWindow);
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call Create
+    bool returns = (self->Create(parent, id, value, *pos, *size, style, *validator, name));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // ((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_GetDescriptiveText[] = { &wxluatype_wxSearchCtrl, NULL };
+static int LUACALL wxLua_wxSearchCtrl_GetDescriptiveText(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_GetDescriptiveText[1] = {{ wxLua_wxSearchCtrl_GetDescriptiveText, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSearchCtrl_GetDescriptiveText }};
+//     wxString    GetDescriptiveText() const;
+static int LUACALL wxLua_wxSearchCtrl_GetDescriptiveText(lua_State *L)
+{
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call GetDescriptiveText
+    wxString returns = (self->GetDescriptiveText());
+    // push the result string
+    wxlua_pushwxString(L, returns);
+
+    return 1;
+}
+
+
+#if (wxLUA_USE_wxMenu && wxUSE_MENUS) && (wxUSE_SEARCHCTRL)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_GetMenu[] = { &wxluatype_wxSearchCtrl, NULL };
+static int LUACALL wxLua_wxSearchCtrl_GetMenu(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_GetMenu[1] = {{ wxLua_wxSearchCtrl_GetMenu, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSearchCtrl_GetMenu }};
+//     virtual wxMenu* GetMenu();
+static int LUACALL wxLua_wxSearchCtrl_GetMenu(lua_State *L)
+{
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call GetMenu
+    wxMenu* returns = (wxMenu*)self->GetMenu();
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxMenu);
+
+    return 1;
+}
+
+#endif // (wxLUA_USE_wxMenu && wxUSE_MENUS) && (wxUSE_SEARCHCTRL)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_GetValue[] = { &wxluatype_wxSearchCtrl, NULL };
+static int LUACALL wxLua_wxSearchCtrl_GetValue(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_GetValue[1] = {{ wxLua_wxSearchCtrl_GetValue, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSearchCtrl_GetValue }};
+//     wxString GetValue() const;
+static int LUACALL wxLua_wxSearchCtrl_GetValue(lua_State *L)
+{
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call GetValue
+    wxString returns = (self->GetValue());
+    // push the result string
+    wxlua_pushwxString(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_IsCancelButtonVisible[] = { &wxluatype_wxSearchCtrl, NULL };
+static int LUACALL wxLua_wxSearchCtrl_IsCancelButtonVisible(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_IsCancelButtonVisible[1] = {{ wxLua_wxSearchCtrl_IsCancelButtonVisible, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSearchCtrl_IsCancelButtonVisible }};
+//     virtual bool IsCancelButtonVisible() const;
+static int LUACALL wxLua_wxSearchCtrl_IsCancelButtonVisible(lua_State *L)
+{
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call IsCancelButtonVisible
+    bool returns = (self->IsCancelButtonVisible());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_IsSearchButtonVisible[] = { &wxluatype_wxSearchCtrl, NULL };
+static int LUACALL wxLua_wxSearchCtrl_IsSearchButtonVisible(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_IsSearchButtonVisible[1] = {{ wxLua_wxSearchCtrl_IsSearchButtonVisible, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSearchCtrl_IsSearchButtonVisible }};
+//     virtual bool IsSearchButtonVisible() const;
+static int LUACALL wxLua_wxSearchCtrl_IsSearchButtonVisible(lua_State *L)
+{
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call IsSearchButtonVisible
+    bool returns = (self->IsSearchButtonVisible());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_SetDescriptiveText[] = { &wxluatype_wxSearchCtrl, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxSearchCtrl_SetDescriptiveText(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_SetDescriptiveText[1] = {{ wxLua_wxSearchCtrl_SetDescriptiveText, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxSearchCtrl_SetDescriptiveText }};
+//     void        SetDescriptiveText(const wxString& text);
+static int LUACALL wxLua_wxSearchCtrl_SetDescriptiveText(lua_State *L)
+{
+    // const wxString text
+    const wxString text = wxlua_getwxStringtype(L, 2);
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call SetDescriptiveText
+    self->SetDescriptiveText(text);
+
+    return 0;
+}
+
+
+#if (wxLUA_USE_wxMenu && wxUSE_MENUS) && (wxUSE_SEARCHCTRL)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_SetMenu[] = { &wxluatype_wxSearchCtrl, &wxluatype_wxMenu, NULL };
+static int LUACALL wxLua_wxSearchCtrl_SetMenu(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_SetMenu[1] = {{ wxLua_wxSearchCtrl_SetMenu, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxSearchCtrl_SetMenu }};
+//     virtual void SetMenu(%ungc wxMenu* menu);
+static int LUACALL wxLua_wxSearchCtrl_SetMenu(lua_State *L)
+{
+    // wxMenu menu
+    wxMenu * menu = (wxMenu *)wxluaT_getuserdatatype(L, 2, wxluatype_wxMenu);
+    if (wxluaO_isgcobject(L, menu)) wxluaO_undeletegcobject(L, menu);
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call SetMenu
+    self->SetMenu(menu);
+
+    return 0;
+}
+
+#endif // (wxLUA_USE_wxMenu && wxUSE_MENUS) && (wxUSE_SEARCHCTRL)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_SetValue[] = { &wxluatype_wxSearchCtrl, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxSearchCtrl_SetValue(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_SetValue[1] = {{ wxLua_wxSearchCtrl_SetValue, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxSearchCtrl_SetValue }};
+//     virtual void SetValue(const wxString& value);
+static int LUACALL wxLua_wxSearchCtrl_SetValue(lua_State *L)
+{
+    // const wxString value
+    const wxString value = wxlua_getwxStringtype(L, 2);
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call SetValue
+    self->SetValue(value);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_ShowCancelButton[] = { &wxluatype_wxSearchCtrl, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_wxSearchCtrl_ShowCancelButton(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_ShowCancelButton[1] = {{ wxLua_wxSearchCtrl_ShowCancelButton, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxSearchCtrl_ShowCancelButton }};
+//     virtual void ShowCancelButton(bool show);
+static int LUACALL wxLua_wxSearchCtrl_ShowCancelButton(lua_State *L)
+{
+    // bool show
+    bool show = wxlua_getbooleantype(L, 2);
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call ShowCancelButton
+    self->ShowCancelButton(show);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_ShowSearchButton[] = { &wxluatype_wxSearchCtrl, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_wxSearchCtrl_ShowSearchButton(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_ShowSearchButton[1] = {{ wxLua_wxSearchCtrl_ShowSearchButton, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxSearchCtrl_ShowSearchButton }};
+//     virtual void ShowSearchButton(bool show);
+static int LUACALL wxLua_wxSearchCtrl_ShowSearchButton(lua_State *L)
+{
+    // bool show
+    bool show = wxlua_getbooleantype(L, 2);
+    // get this
+    wxSearchCtrl * self = (wxSearchCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSearchCtrl);
+    // call ShowSearchButton
+    self->ShowSearchButton(show);
+
+    return 0;
+}
+
+
+#if ((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSearchCtrl_constructor1[] = { &wxluatype_wxWindow, &wxluatype_TNUMBER, &wxluatype_TSTRING, &wxluatype_wxPoint, &wxluatype_wxSize, &wxluatype_TNUMBER, &wxluatype_wxValidator, &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxSearchCtrl_constructor1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_constructor1[1] = {{ wxLua_wxSearchCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 8, s_wxluatypeArray_wxLua_wxSearchCtrl_constructor1 }};
+//                  const wxString& name = wxSearchCtrlNameStr);
+static int LUACALL wxLua_wxSearchCtrl_constructor1(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // const wxString name = wxSearchCtrlNameStr
+    const wxString name = (argCount >= 8 ? wxlua_getwxStringtype(L, 8) : wxString(wxSearchCtrlNameStr));
+    // const wxValidator validator = wxDefaultValidator
+    const wxValidator * validator = (argCount >= 7 ? (const wxValidator *)wxluaT_getuserdatatype(L, 7, wxluatype_wxValidator) : &wxDefaultValidator);
+    // long style = 0
+    long style = (argCount >= 6 ? (long)wxlua_getnumbertype(L, 6) : 0);
+    // const wxSize size = wxDefaultSize
+    const wxSize * size = (argCount >= 5 ? (const wxSize *)wxluaT_getuserdatatype(L, 5, wxluatype_wxSize) : &wxDefaultSize);
+    // const wxPoint pos = wxDefaultPosition
+    const wxPoint * pos = (argCount >= 4 ? (const wxPoint *)wxluaT_getuserdatatype(L, 4, wxluatype_wxPoint) : &wxDefaultPosition);
+    // const wxString value = wxEmptyString
+    const wxString value = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
+    // wxWindowID id
+    wxWindowID id = (wxWindowID)wxlua_getnumbertype(L, 2);
+    // wxWindow parent
+    wxWindow * parent = (wxWindow *)wxluaT_getuserdatatype(L, 1, wxluatype_wxWindow);
+    // call constructor
+    wxSearchCtrl* returns = new wxSearchCtrl(parent, id, value, *pos, *size, style, *validator, name);
+    // add to tracked window list, it will check validity
+    wxluaW_addtrackedwindow(L, returns);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxSearchCtrl);
+
+    return 1;
+}
+
+#endif // ((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL)
+
+static int LUACALL wxLua_wxSearchCtrl_constructor(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_constructor[1] = {{ wxLua_wxSearchCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
+//     wxSearchCtrl();
+static int LUACALL wxLua_wxSearchCtrl_constructor(lua_State *L)
+{
+    // call constructor
+    wxSearchCtrl* returns = new wxSearchCtrl();
+    // add to tracked window list, it will check validity
+    wxluaW_addtrackedwindow(L, returns);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxSearchCtrl);
+
+    return 1;
+}
+
+
+
+
+#if (((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL))||(wxUSE_SEARCHCTRL)
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSearchCtrl_constructor_overload[] =
+{
+
+#if ((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL)
+    { wxLua_wxSearchCtrl_constructor1, WXLUAMETHOD_CONSTRUCTOR, 2, 8, s_wxluatypeArray_wxLua_wxSearchCtrl_constructor1 },
+#endif // ((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL)
+    { wxLua_wxSearchCtrl_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
+};
+static int s_wxluafunc_wxLua_wxSearchCtrl_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxSearchCtrl_constructor_overload)/sizeof(wxLuaBindCFunc);
+
+#endif // (((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL))||(wxUSE_SEARCHCTRL)
+
+void wxLua_wxSearchCtrl_delete_function(void** p)
+{
+    wxSearchCtrl* o = (wxSearchCtrl*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxSearchCtrl_methods[] = {
+#if ((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL)
+    { "Create", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_Create, 1, NULL },
+#endif // ((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL)
+
+    { "GetDescriptiveText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_GetDescriptiveText, 1, NULL },
+
+#if (wxLUA_USE_wxMenu && wxUSE_MENUS) && (wxUSE_SEARCHCTRL)
+    { "GetMenu", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_GetMenu, 1, NULL },
+#endif // (wxLUA_USE_wxMenu && wxUSE_MENUS) && (wxUSE_SEARCHCTRL)
+
+    { "GetValue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_GetValue, 1, NULL },
+    { "IsCancelButtonVisible", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_IsCancelButtonVisible, 1, NULL },
+    { "IsSearchButtonVisible", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_IsSearchButtonVisible, 1, NULL },
+    { "SetDescriptiveText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_SetDescriptiveText, 1, NULL },
+
+#if (wxLUA_USE_wxMenu && wxUSE_MENUS) && (wxUSE_SEARCHCTRL)
+    { "SetMenu", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_SetMenu, 1, NULL },
+#endif // (wxLUA_USE_wxMenu && wxUSE_MENUS) && (wxUSE_SEARCHCTRL)
+
+    { "SetValue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_SetValue, 1, NULL },
+    { "ShowCancelButton", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_ShowCancelButton, 1, NULL },
+    { "ShowSearchButton", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSearchCtrl_ShowSearchButton, 1, NULL },
+
+#if (((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL))||(wxUSE_SEARCHCTRL)
+    { "wxSearchCtrl", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxSearchCtrl_constructor_overload, s_wxluafunc_wxLua_wxSearchCtrl_constructor_overload_count, 0 },
+#endif // (((wxLUA_USE_wxPointSizeRect) && (wxLUA_USE_wxValidator && wxUSE_VALIDATORS)) && (wxUSE_SEARCHCTRL))||(wxUSE_SEARCHCTRL)
+
+    { 0, 0, 0, 0 },
+};
+
+int wxSearchCtrl_methodCount = sizeof(wxSearchCtrl_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // wxUSE_SEARCHCTRL
 

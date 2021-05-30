@@ -34,9 +34,9 @@ extern WXDLLIMPEXP_BINDWXBASE wxDateTime::TimeZone wxLua_wxDateTime_TimeZone_Loc
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 35
+#if WXLUA_BINDING_VERSION > 41
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 35
+#endif //WXLUA_BINDING_VERSION > 41
 // ---------------------------------------------------------------------------
 
 // binding class
@@ -74,7 +74,6 @@ extern WXDLLIMPEXP_BINDWXBASE wxLuaBinding* wxLuaBinding_wxbase_init();
 #include "wx/event.h"
 #include "wx/filefn.h"
 #include "wx/iconloc.h"
-#include "wx/intl.h"
 #include "wx/mimetype.h"
 #include "wx/timer.h"
 #include "wx/tokenzr.h"
@@ -83,6 +82,10 @@ extern WXDLLIMPEXP_BINDWXBASE wxLuaBinding* wxLuaBinding_wxbase_init();
 #if wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxStandardPaths
     #include "wx/stdpaths.h"
 #endif // wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxStandardPaths
+
+#if wxLUA_USE_wxArrayDouble
+    #include "wx/dynarray.h"
+#endif // wxLUA_USE_wxArrayDouble
 
 #if wxLUA_USE_wxArrayInt
     #include "wx/dynarray.h"
@@ -163,6 +166,10 @@ extern WXDLLIMPEXP_BINDWXBASE wxLuaBinding* wxLuaBinding_wxbase_init();
     #include "wx/fswatcher.h"
 #endif // wxUSE_FSWATCHER && wxCHECK_VERSION(2,9,4)
 
+#if wxUSE_INTL
+    #include "wx/intl.h"
+#endif // wxUSE_INTL
+
 #if wxUSE_LONGLONG
     #include "wx/longlong.h"
 #endif // wxUSE_LONGLONG
@@ -182,6 +189,17 @@ extern WXDLLIMPEXP_BINDWXBASE wxLuaBinding* wxLuaBinding_wxbase_init();
 // ---------------------------------------------------------------------------
 // Lua Tag Method Values and Tables for each Class
 // ---------------------------------------------------------------------------
+
+#if (defined (__WINDOWS__ )) && (wxCHECK_VERSION(2,9,1) && wxLUA_USE_wxTranslations) && (wxUSE_INTL)
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxResourceTranslationsLoader;
+#endif // (defined (__WINDOWS__ )) && (wxCHECK_VERSION(2,9,1) && wxLUA_USE_wxTranslations) && (wxUSE_INTL)
+
+#if (wxCHECK_VERSION(2,9,1) && wxLUA_USE_wxTranslations) && (wxUSE_INTL)
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxFileTranslationsLoader;
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxMsgCatalog;
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxTranslations;
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxTranslationsLoader;
+#endif // (wxCHECK_VERSION(2,9,1) && wxLUA_USE_wxTranslations) && (wxUSE_INTL)
 
 #if (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS) && (wxUSE_STREAMS)
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxInternetFSHandler;
@@ -228,6 +246,10 @@ extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxStringTokenizer;
 #if wxCHECK_VERSION(2,9,2)
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxVersionInfo;
 #endif // wxCHECK_VERSION(2,9,2)
+
+#if wxLUA_USE_wxArrayDouble
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxArrayDouble;
+#endif // wxLUA_USE_wxArrayDouble
 
 #if wxLUA_USE_wxArrayInt
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxArrayInt;
@@ -298,6 +320,10 @@ extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxStringTokenizer;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxLogNull;
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxLogPassThrough;
 #endif // wxLUA_USE_wxLog && wxUSE_LOG
+
+#if wxLUA_USE_wxMemoryBuffer
+    extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxMemoryBuffer;
+#endif // wxLUA_USE_wxMemoryBuffer
 
 #if wxLUA_USE_wxObject
     extern WXDLLIMPEXP_DATA_BINDWXBASE(int) wxluatype_wxObject;

@@ -22,6 +22,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxMediaCtrl && wxUSE_MEDIACTRL
 // ---------------------------------------------------------------------------
@@ -81,7 +85,15 @@ static int LUACALL wxLua_wxMediaCtrl_GetDownloadProgress(lua_State *L)
     // call GetDownloadProgress
     wxFileOffset returns = (self->GetDownloadProgress());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -97,7 +109,15 @@ static int LUACALL wxLua_wxMediaCtrl_GetDownloadTotal(lua_State *L)
     // call GetDownloadTotal
     wxFileOffset returns = (self->GetDownloadTotal());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -113,7 +133,15 @@ static int LUACALL wxLua_wxMediaCtrl_GetState(lua_State *L)
     // call GetState
     wxMediaState returns = (self->GetState());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -128,7 +156,7 @@ static int LUACALL wxLua_wxMediaCtrl_GetVolume1(lua_State *L)
     wxMediaCtrl * self = (wxMediaCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMediaCtrl);
     // call GetVolume
     double returns = (self->GetVolume());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -144,7 +172,7 @@ static int LUACALL wxLua_wxMediaCtrl_GetVolume(lua_State *L)
     wxMediaCtrl * self = (wxMediaCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMediaCtrl);
     // call GetVolume
     double returns = (self->GetVolume());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -161,7 +189,15 @@ static int LUACALL wxLua_wxMediaCtrl_Length(lua_State *L)
     // call Length
     wxFileOffset returns = (self->Length());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -315,7 +351,15 @@ static int LUACALL wxLua_wxMediaCtrl_Seek(lua_State *L)
     // call Seek
     wxFileOffset returns = (self->Seek(where, mode));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -387,7 +431,15 @@ static int LUACALL wxLua_wxMediaCtrl_Tell(lua_State *L)
     // call Tell
     wxFileOffset returns = (self->Tell());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

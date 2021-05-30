@@ -19,9 +19,9 @@
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 35
+#if WXLUA_BINDING_VERSION > 41
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 35
+#endif //WXLUA_BINDING_VERSION > 41
 // ---------------------------------------------------------------------------
 
 // binding class
@@ -73,6 +73,7 @@ extern WXDLLIMPEXP_BINDWXHTML wxLuaBinding* wxLuaBinding_wxhtml_init();
     extern WXDLLIMPEXP_DATA_BINDWXHTML(int) wxluatype_wxHtmlCellEvent;
     extern WXDLLIMPEXP_DATA_BINDWXHTML(int) wxluatype_wxHtmlColourCell;
     extern WXDLLIMPEXP_DATA_BINDWXHTML(int) wxluatype_wxHtmlFontCell;
+    extern WXDLLIMPEXP_DATA_BINDWXHTML(int) wxluatype_wxHtmlLinkEvent;
     extern WXDLLIMPEXP_DATA_BINDWXHTML(int) wxluatype_wxHtmlWindowInterface;
     extern WXDLLIMPEXP_DATA_BINDWXHTML(int) wxluatype_wxSimpleHtmlListBox;
 #endif // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)

@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 // ---------------------------------------------------------------------------
 // Bind class wxPropagationDisabler
 // ---------------------------------------------------------------------------
@@ -138,7 +142,15 @@ static int LUACALL wxLua_wxCommandEvent_GetClientData(lua_State *L)
     // call GetClientData
     wxUIntPtr returns = (wxUIntPtr)self->GetClientData();
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -170,7 +182,15 @@ static int LUACALL wxLua_wxCommandEvent_GetExtraLong(lua_State *L)
     // call GetExtraLong
     long returns = (self->GetExtraLong());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -186,7 +206,15 @@ static int LUACALL wxLua_wxCommandEvent_GetInt(lua_State *L)
     // call GetInt
     int returns = (self->GetInt());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -202,7 +230,15 @@ static int LUACALL wxLua_wxCommandEvent_GetSelection(lua_State *L)
     // call GetSelection
     int returns = (self->GetSelection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1171,7 +1207,15 @@ static int LUACALL wxLua_wxKeyEvent_GetKeyCode(lua_State *L)
     // call GetKeyCode
     int returns = (self->GetKeyCode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1189,7 +1233,15 @@ static int LUACALL wxLua_wxKeyEvent_GetModifiers(lua_State *L)
     // call GetModifiers
     int returns = (self->GetModifiers());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1231,8 +1283,8 @@ static int LUACALL wxLua_wxKeyEvent_GetPositionXY(lua_State *L)
     // call GetPositionXY
     self->GetPosition(&x, &y);
     // push results
-    lua_pushnumber(L, x);
-    lua_pushnumber(L, y);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
     // return the number of parameters
     return 2;
 }
@@ -1249,7 +1301,15 @@ static int LUACALL wxLua_wxKeyEvent_GetRawKeyCode(lua_State *L)
     // call GetRawKeyCode
     wxUint32 returns = (self->GetRawKeyCode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1265,7 +1325,15 @@ static int LUACALL wxLua_wxKeyEvent_GetRawKeyFlags(lua_State *L)
     // call GetRawKeyFlags
     wxUint32 returns = (self->GetRawKeyFlags());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1281,7 +1349,15 @@ static int LUACALL wxLua_wxKeyEvent_GetUnicodeKey(lua_State *L)
     // call GetUnicodeKey
     wxChar returns = (self->GetUnicodeKey());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1297,7 +1373,15 @@ static int LUACALL wxLua_wxKeyEvent_GetX(lua_State *L)
     // call GetX
     long returns = (self->GetX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1313,7 +1397,15 @@ static int LUACALL wxLua_wxKeyEvent_GetY(lua_State *L)
     // call GetY
     long returns = (self->GetY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1665,7 +1757,15 @@ static int LUACALL wxLua_wxIdleEvent_GetMode(lua_State *L)
     // call GetMode
     wxIdleMode returns = (wxIdleEvent::GetMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2089,7 +2189,15 @@ static int LUACALL wxLua_wxMouseEvent_GetLinesPerAction(lua_State *L)
     // call GetLinesPerAction
     int returns = (self->GetLinesPerAction());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2155,8 +2263,8 @@ static int LUACALL wxLua_wxMouseEvent_GetPositionXY(lua_State *L)
     // call GetPosition
     self->GetPosition(&x, &y);
     // push results
-    lua_pushnumber(L, x);
-    lua_pushnumber(L, y);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
     // return the number of parameters
     return 2;
 }
@@ -2173,7 +2281,15 @@ static int LUACALL wxLua_wxMouseEvent_GetWheelDelta(lua_State *L)
     // call GetWheelDelta
     int returns = (self->GetWheelDelta());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2189,7 +2305,15 @@ static int LUACALL wxLua_wxMouseEvent_GetWheelRotation(lua_State *L)
     // call GetWheelRotation
     int returns = (self->GetWheelRotation());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2205,7 +2329,15 @@ static int LUACALL wxLua_wxMouseEvent_GetX(lua_State *L)
     // call GetX
     long returns = (self->GetX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2221,7 +2353,15 @@ static int LUACALL wxLua_wxMouseEvent_GetY(lua_State *L)
     // call GetY
     long returns = (self->GetY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2794,10 +2934,12 @@ int wxluatype_wxPaintEvent = WXLUA_TUNKNOWN;
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPaintEvent_delete[] = { &wxluatype_wxPaintEvent, NULL };
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPaintEvent_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxPaintEvent_delete }};
 
+
+#if !wxCHECK_VERSION(3,1,4)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxPaintEvent_constructor[] = { &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxPaintEvent_constructor(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxPaintEvent_constructor[1] = {{ wxLua_wxPaintEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxPaintEvent_constructor }};
-//     wxPaintEvent(int id = 0);
+//     !%wxchkver_3_1_4 wxPaintEvent(int id = 0);
 static int LUACALL wxLua_wxPaintEvent_constructor(lua_State *L)
 {
     // get number of arguments
@@ -2814,6 +2956,8 @@ static int LUACALL wxLua_wxPaintEvent_constructor(lua_State *L)
     return 1;
 }
 
+#endif // !wxCHECK_VERSION(3,1,4)
+
 
 
 void wxLua_wxPaintEvent_delete_function(void** p)
@@ -2825,7 +2969,11 @@ void wxLua_wxPaintEvent_delete_function(void** p)
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxPaintEvent_methods[] = {
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxPaintEvent_delete, 1, NULL },
+
+#if !wxCHECK_VERSION(3,1,4)
     { "wxPaintEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxPaintEvent_constructor, 1, NULL },
+#endif // !wxCHECK_VERSION(3,1,4)
+
     { 0, 0, 0, 0 },
 };
 
@@ -2851,7 +2999,15 @@ static int LUACALL wxLua_wxProcessEvent_GetExitCode(lua_State *L)
     // call GetExitCode
     int returns = (self->GetExitCode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2869,7 +3025,15 @@ static int LUACALL wxLua_wxProcessEvent_GetPid(lua_State *L)
     // call GetPid
     int returns = (self->GetPid());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2992,7 +3156,15 @@ static int LUACALL wxLua_wxScrollEvent_GetOrientation(lua_State *L)
     // call GetOrientation
     int returns = (self->GetOrientation());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3008,7 +3180,15 @@ static int LUACALL wxLua_wxScrollEvent_GetPosition(lua_State *L)
     // call GetPosition
     int returns = (self->GetPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3080,7 +3260,15 @@ static int LUACALL wxLua_wxScrollWinEvent_GetOrientation(lua_State *L)
     // call GetOrientation
     int returns = (self->GetOrientation());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3096,7 +3284,15 @@ static int LUACALL wxLua_wxScrollWinEvent_GetPosition(lua_State *L)
     // call GetPosition
     int returns = (self->GetPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3706,6 +3902,100 @@ int wxDisplayChangedEvent_methodCount = sizeof(wxDisplayChangedEvent_methods)/si
 
 
 
+#if wxCHECK_VERSION(3,1,3)
+// ---------------------------------------------------------------------------
+// Bind class wxDPIChangedEvent
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxDPIChangedEvent'
+int wxluatype_wxDPIChangedEvent = WXLUA_TUNKNOWN;
+
+#if (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxPointSizeRect)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxDPIChangedEvent_GetNewDPI[] = { &wxluatype_wxDPIChangedEvent, NULL };
+static int LUACALL wxLua_wxDPIChangedEvent_GetNewDPI(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDPIChangedEvent_GetNewDPI[1] = {{ wxLua_wxDPIChangedEvent_GetNewDPI, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxDPIChangedEvent_GetNewDPI }};
+//     wxSize GetNewDPI () const;
+static int LUACALL wxLua_wxDPIChangedEvent_GetNewDPI(lua_State *L)
+{
+    // get this
+    wxDPIChangedEvent * self = (wxDPIChangedEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDPIChangedEvent);
+    // call GetNewDPI
+    // allocate a new object using the copy constructor
+    wxSize* returns = new wxSize(self->GetNewDPI());
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxSize);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxSize);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxDPIChangedEvent_GetOldDPI[] = { &wxluatype_wxDPIChangedEvent, NULL };
+static int LUACALL wxLua_wxDPIChangedEvent_GetOldDPI(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDPIChangedEvent_GetOldDPI[1] = {{ wxLua_wxDPIChangedEvent_GetOldDPI, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxDPIChangedEvent_GetOldDPI }};
+//     wxSize GetOldDPI () const;
+static int LUACALL wxLua_wxDPIChangedEvent_GetOldDPI(lua_State *L)
+{
+    // get this
+    wxDPIChangedEvent * self = (wxDPIChangedEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDPIChangedEvent);
+    // call GetOldDPI
+    // allocate a new object using the copy constructor
+    wxSize* returns = new wxSize(self->GetOldDPI());
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxSize);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxSize);
+
+    return 1;
+}
+
+#endif // (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxPointSizeRect)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxDPIChangedEvent_delete[] = { &wxluatype_wxDPIChangedEvent, NULL };
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDPIChangedEvent_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxDPIChangedEvent_delete }};
+
+static int LUACALL wxLua_wxDPIChangedEvent_constructor(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDPIChangedEvent_constructor[1] = {{ wxLua_wxDPIChangedEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
+//     wxDPIChangedEvent();
+static int LUACALL wxLua_wxDPIChangedEvent_constructor(lua_State *L)
+{
+    // call constructor
+    wxDPIChangedEvent* returns = new wxDPIChangedEvent();
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxDPIChangedEvent);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxDPIChangedEvent);
+
+    return 1;
+}
+
+
+
+
+void wxLua_wxDPIChangedEvent_delete_function(void** p)
+{
+    wxDPIChangedEvent* o = (wxDPIChangedEvent*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxDPIChangedEvent_methods[] = {
+#if (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxPointSizeRect)
+    { "GetNewDPI", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDPIChangedEvent_GetNewDPI, 1, NULL },
+    { "GetOldDPI", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDPIChangedEvent_GetOldDPI, 1, NULL },
+#endif // (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxPointSizeRect)
+
+    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxDPIChangedEvent_delete, 1, NULL },
+    { "wxDPIChangedEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxDPIChangedEvent_constructor, 1, NULL },
+
+    { 0, 0, 0, 0 },
+};
+
+int wxDPIChangedEvent_methodCount = sizeof(wxDPIChangedEvent_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // wxCHECK_VERSION(3,1,3)
+
+
 #if (defined(wxHAS_POWER_EVENTS)) && (wxCHECK_VERSION(2,8,0))
 // ---------------------------------------------------------------------------
 // Bind class wxPowerEvent
@@ -3828,7 +4118,15 @@ static int LUACALL wxLua_wxSetCursorEvent_GetX(lua_State *L)
     // call GetX
     wxCoord returns = (self->GetX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3844,7 +4142,15 @@ static int LUACALL wxLua_wxSetCursorEvent_GetY(lua_State *L)
     // call GetY
     wxCoord returns = (self->GetY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4035,7 +4341,15 @@ static int LUACALL wxLua_wxUpdateUIEvent_GetMode(lua_State *L)
     // call GetMode
     wxUpdateUIMode returns = (wxUpdateUIEvent::GetMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4152,7 +4466,15 @@ static int LUACALL wxLua_wxUpdateUIEvent_GetUpdateInterval(lua_State *L)
     // call GetUpdateInterval
     long returns = (wxUpdateUIEvent::GetUpdateInterval());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4339,7 +4661,15 @@ static int LUACALL wxLua_wxHelpEvent_GetOrigin(lua_State *L)
     // call GetOrigin
     wxHelpEvent::Origin returns = (self->GetOrigin());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

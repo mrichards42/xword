@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_Geometry && wxUSE_GEOMETRY
 // ---------------------------------------------------------------------------
@@ -50,7 +54,15 @@ static int LUACALL wxLua_wxPoint2DInt_GetCrossProduct(lua_State *L)
     // call GetCrossProduct
     wxInt32 returns = (self->GetCrossProduct(*vec));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -67,7 +79,7 @@ static int LUACALL wxLua_wxPoint2DInt_GetDistance(lua_State *L)
     wxPoint2DInt * self = (wxPoint2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DInt);
     // call GetDistance
     wxDouble returns = (self->GetDistance(*pt));
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -85,7 +97,7 @@ static int LUACALL wxLua_wxPoint2DInt_GetDistanceSquare(lua_State *L)
     wxPoint2DInt * self = (wxPoint2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DInt);
     // call GetDistanceSquare
     wxDouble returns = (self->GetDistanceSquare(*pt));
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -104,7 +116,15 @@ static int LUACALL wxLua_wxPoint2DInt_GetDotProduct(lua_State *L)
     // call GetDotProduct
     wxInt32 returns = (self->GetDotProduct(*vec));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -119,7 +139,7 @@ static int LUACALL wxLua_wxPoint2DInt_GetVectorAngle(lua_State *L)
     wxPoint2DInt * self = (wxPoint2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DInt);
     // call GetVectorAngle
     wxDouble returns = (self->GetVectorAngle());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -135,7 +155,7 @@ static int LUACALL wxLua_wxPoint2DInt_GetVectorLength(lua_State *L)
     wxPoint2DInt * self = (wxPoint2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DInt);
     // call GetVectorLength
     wxDouble returns = (self->GetVectorLength());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -149,8 +169,16 @@ static int LUACALL wxLua_wxPoint2DInt_GetX(lua_State *L)
 {
     // get this
     wxPoint2DInt *self = (wxPoint2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DInt);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->m_x) == (double)(self->m_x)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->m_x);
+} else
+#endif
+{
     lua_pushnumber(L, self->m_x);
+}
     // return the number of values
     return 1;
 }
@@ -163,8 +191,16 @@ static int LUACALL wxLua_wxPoint2DInt_GetY(lua_State *L)
 {
     // get this
     wxPoint2DInt *self = (wxPoint2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DInt);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->m_y) == (double)(self->m_y)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->m_y);
+} else
+#endif
+{
     lua_pushnumber(L, self->m_y);
+}
     // return the number of values
     return 1;
 }
@@ -548,7 +584,7 @@ static int LUACALL wxLua_wxPoint2DDouble_GetCrossProduct(lua_State *L)
     wxPoint2DDouble * self = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DDouble);
     // call GetCrossProduct
     wxDouble returns = (self->GetCrossProduct(*vec));
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -566,7 +602,7 @@ static int LUACALL wxLua_wxPoint2DDouble_GetDistance(lua_State *L)
     wxPoint2DDouble * self = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DDouble);
     // call GetDistance
     wxDouble returns = (self->GetDistance(*pt));
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -584,7 +620,7 @@ static int LUACALL wxLua_wxPoint2DDouble_GetDistanceSquare(lua_State *L)
     wxPoint2DDouble * self = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DDouble);
     // call GetDistanceSquare
     wxDouble returns = (self->GetDistanceSquare(*pt));
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -602,7 +638,7 @@ static int LUACALL wxLua_wxPoint2DDouble_GetDotProduct(lua_State *L)
     wxPoint2DDouble * self = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DDouble);
     // call GetDotProduct
     wxDouble returns = (self->GetDotProduct(*vec));
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -618,7 +654,7 @@ static int LUACALL wxLua_wxPoint2DDouble_GetVectorAngle(lua_State *L)
     wxPoint2DDouble * self = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DDouble);
     // call GetVectorAngle
     wxDouble returns = (self->GetVectorAngle());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -634,7 +670,7 @@ static int LUACALL wxLua_wxPoint2DDouble_GetVectorLength(lua_State *L)
     wxPoint2DDouble * self = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DDouble);
     // call GetVectorLength
     wxDouble returns = (self->GetVectorLength());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -648,7 +684,7 @@ static int LUACALL wxLua_wxPoint2DDouble_GetX(lua_State *L)
 {
     // get this
     wxPoint2DDouble *self = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DDouble);
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, self->m_x);
     // return the number of values
     return 1;
@@ -662,7 +698,7 @@ static int LUACALL wxLua_wxPoint2DDouble_GetY(lua_State *L)
 {
     // get this
     wxPoint2DDouble *self = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint2DDouble);
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, self->m_y);
     // return the number of values
     return 1;
@@ -1121,7 +1157,7 @@ static int LUACALL wxLua_wxRect2DDouble_GetBottom(lua_State *L)
     wxRect2DDouble * self = (wxRect2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DDouble);
     // call GetBottom
     wxDouble returns = (self->GetBottom());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -1154,7 +1190,7 @@ static int LUACALL wxLua_wxRect2DDouble_GetHeight(lua_State *L)
 {
     // get this
     wxRect2DDouble *self = (wxRect2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DDouble);
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, self->m_height);
     // return the number of values
     return 1;
@@ -1170,7 +1206,7 @@ static int LUACALL wxLua_wxRect2DDouble_GetLeft(lua_State *L)
     wxRect2DDouble * self = (wxRect2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DDouble);
     // call GetLeft
     wxDouble returns = (self->GetLeft());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -1227,7 +1263,15 @@ static int LUACALL wxLua_wxRect2DDouble_GetOutCode(lua_State *L)
     // call GetOutCode
     wxOutCode returns = (self->GetOutCode(*pt));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1261,7 +1305,7 @@ static int LUACALL wxLua_wxRect2DDouble_GetRight(lua_State *L)
     wxRect2DDouble * self = (wxRect2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DDouble);
     // call GetRight
     wxDouble returns = (self->GetRight());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -1338,7 +1382,7 @@ static int LUACALL wxLua_wxRect2DDouble_GetTop(lua_State *L)
     wxRect2DDouble * self = (wxRect2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DDouble);
     // call GetTop
     wxDouble returns = (self->GetTop());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -1352,7 +1396,7 @@ static int LUACALL wxLua_wxRect2DDouble_GetWidth(lua_State *L)
 {
     // get this
     wxRect2DDouble *self = (wxRect2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DDouble);
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, self->m_width);
     // return the number of values
     return 1;
@@ -1366,7 +1410,7 @@ static int LUACALL wxLua_wxRect2DDouble_GetX(lua_State *L)
 {
     // get this
     wxRect2DDouble *self = (wxRect2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DDouble);
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, self->m_x);
     // return the number of values
     return 1;
@@ -1380,7 +1424,7 @@ static int LUACALL wxLua_wxRect2DDouble_GetY(lua_State *L)
 {
     // get this
     wxRect2DDouble *self = (wxRect2DDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DDouble);
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, self->m_y);
     // return the number of values
     return 1;
@@ -2213,7 +2257,15 @@ static int LUACALL wxLua_wxRect2DInt_GetBottom(lua_State *L)
     // call GetBottom
     wxInt32 returns = (self->GetBottom());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2245,8 +2297,16 @@ static int LUACALL wxLua_wxRect2DInt_GetHeight(lua_State *L)
 {
     // get this
     wxRect2DInt *self = (wxRect2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DInt);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->m_height) == (double)(self->m_height)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->m_height);
+} else
+#endif
+{
     lua_pushnumber(L, self->m_height);
+}
     // return the number of values
     return 1;
 }
@@ -2262,7 +2322,15 @@ static int LUACALL wxLua_wxRect2DInt_GetLeft(lua_State *L)
     // call GetLeft
     wxInt32 returns = (self->GetLeft());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2318,7 +2386,15 @@ static int LUACALL wxLua_wxRect2DInt_GetOutCode(lua_State *L)
     // call GetOutCode
     wxOutCode returns = (self->GetOutCode(*pt));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2353,7 +2429,15 @@ static int LUACALL wxLua_wxRect2DInt_GetRight(lua_State *L)
     // call GetRight
     wxInt32 returns = (self->GetRight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2430,7 +2514,15 @@ static int LUACALL wxLua_wxRect2DInt_GetTop(lua_State *L)
     // call GetTop
     wxInt32 returns = (self->GetTop());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2443,8 +2535,16 @@ static int LUACALL wxLua_wxRect2DInt_GetWidth(lua_State *L)
 {
     // get this
     wxRect2DInt *self = (wxRect2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DInt);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->m_width) == (double)(self->m_width)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->m_width);
+} else
+#endif
+{
     lua_pushnumber(L, self->m_width);
+}
     // return the number of values
     return 1;
 }
@@ -2457,8 +2557,16 @@ static int LUACALL wxLua_wxRect2DInt_GetX(lua_State *L)
 {
     // get this
     wxRect2DInt *self = (wxRect2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DInt);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->m_x) == (double)(self->m_x)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->m_x);
+} else
+#endif
+{
     lua_pushnumber(L, self->m_x);
+}
     // return the number of values
     return 1;
 }
@@ -2471,8 +2579,16 @@ static int LUACALL wxLua_wxRect2DInt_GetY(lua_State *L)
 {
     // get this
     wxRect2DInt *self = (wxRect2DInt *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect2DInt);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->m_y) == (double)(self->m_y)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->m_y);
+} else
+#endif
+{
     lua_pushnumber(L, self->m_y);
+}
     // return the number of values
     return 1;
 }

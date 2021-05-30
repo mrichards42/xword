@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxConfig && wxUSE_CONFIG
 // ---------------------------------------------------------------------------
@@ -202,7 +206,15 @@ static int LUACALL wxLua_wxConfigBase_GetEntryType(lua_State *L)
     // call GetEntryType
     wxConfigBase::EntryType returns = (self->GetEntryType(name));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -228,7 +240,7 @@ static int LUACALL wxLua_wxConfigBase_GetFirstEntry(lua_State *L)
     // push the next string
     wxlua_pushwxString(L, str);
     // push the next index
-    lua_pushnumber(L, index);
+    lua_pushinteger(L, index);
     // return the number of parameters
     return 3;
 }
@@ -255,7 +267,7 @@ static int LUACALL wxLua_wxConfigBase_GetFirstGroup(lua_State *L)
     // push the result string
     wxlua_pushwxString(L, str);
     // push the next index
-    lua_pushnumber(L, index);
+    lua_pushinteger(L, index);
     // return the number of parameters
     return 3;
 }
@@ -280,7 +292,7 @@ static int LUACALL wxLua_wxConfigBase_GetNextEntry(lua_State *L)
     // push the result string
     wxlua_pushwxString(L, str);
     // push the next index
-    lua_pushnumber(L, index);
+    lua_pushinteger(L, index);
     // return the number of parameters
     return 3;
 }
@@ -305,7 +317,7 @@ static int LUACALL wxLua_wxConfigBase_GetNextGroup(lua_State *L)
     // push the next result string
     wxlua_pushwxString(L, str);
     // push the next index
-    lua_pushnumber(L, index);
+    lua_pushinteger(L, index);
     // return the number of parameters
     return 3;
 }
@@ -326,7 +338,15 @@ static int LUACALL wxLua_wxConfigBase_GetNumberOfEntries(lua_State *L)
     // call GetNumberOfEntries
     unsigned int returns = (self->GetNumberOfEntries(bRecursive));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -346,7 +366,15 @@ static int LUACALL wxLua_wxConfigBase_GetNumberOfGroups(lua_State *L)
     // call GetNumberOfGroups
     unsigned int returns = (self->GetNumberOfGroups(bRecursive));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -473,7 +501,7 @@ static int LUACALL wxLua_wxConfigBase_ReadFloat(lua_State *L)
     // push the result bool
     lua_pushboolean(L, ret);
     // push the result number
-    lua_pushnumber(L, returns);
+    lua_pushinteger(L, returns);
     // return the number of parameters
     return 2;
 }
@@ -839,6 +867,144 @@ int wxConfig_methodCount = sizeof(wxConfig_methods)/sizeof(wxLuaBindMethod) - 1;
 // Lua MetaTable Tag for Class 'wxFileConfig'
 int wxluatype_wxFileConfig = WXLUA_TUNKNOWN;
 
+#if (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxConfig && wxUSE_CONFIG)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_DisableAutoSave[] = { &wxluatype_wxFileConfig, NULL };
+static int LUACALL wxLua_wxFileConfig_DisableAutoSave(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_DisableAutoSave[1] = {{ wxLua_wxFileConfig_DisableAutoSave, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxFileConfig_DisableAutoSave }};
+//     %wxchkver_3_1_3 void DisableAutoSave();
+static int LUACALL wxLua_wxFileConfig_DisableAutoSave(lua_State *L)
+{
+    // get this
+    wxFileConfig * self = (wxFileConfig *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFileConfig);
+    // call DisableAutoSave
+    self->DisableAutoSave();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_EnableAutoSave[] = { &wxluatype_wxFileConfig, NULL };
+static int LUACALL wxLua_wxFileConfig_EnableAutoSave(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_EnableAutoSave[1] = {{ wxLua_wxFileConfig_EnableAutoSave, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxFileConfig_EnableAutoSave }};
+//     %wxchkver_3_1_3 void EnableAutoSave();
+static int LUACALL wxLua_wxFileConfig_EnableAutoSave(lua_State *L)
+{
+    // get this
+    wxFileConfig * self = (wxFileConfig *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFileConfig);
+    // call EnableAutoSave
+    self->EnableAutoSave();
+
+    return 0;
+}
+
+#endif // (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxConfig && wxUSE_CONFIG)
+
+#if (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxLUA_USE_wxFileName)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_GetGlobalFile[] = { &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxFileConfig_GetGlobalFile(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_GetGlobalFile[1] = {{ wxLua_wxFileConfig_GetGlobalFile, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxFileConfig_GetGlobalFile }};
+//     static wxFileName GetGlobalFile(const wxString& basename);
+static int LUACALL wxLua_wxFileConfig_GetGlobalFile(lua_State *L)
+{
+    // const wxString basename
+    const wxString basename = wxlua_getwxStringtype(L, 1);
+    // call GetGlobalFile
+    // allocate a new object using the copy constructor
+    wxFileName* returns = new wxFileName(wxFileConfig::GetGlobalFile(basename));
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
+
+    return 1;
+}
+
+#endif // (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxLUA_USE_wxFileName)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_GetGlobalFileName[] = { &wxluatype_TSTRING, NULL };
+static int LUACALL wxLua_wxFileConfig_GetGlobalFileName(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_GetGlobalFileName[1] = {{ wxLua_wxFileConfig_GetGlobalFileName, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxFileConfig_GetGlobalFileName }};
+//     static wxString GetGlobalFileName(const wxString& szFile);
+static int LUACALL wxLua_wxFileConfig_GetGlobalFileName(lua_State *L)
+{
+    // const wxString szFile
+    const wxString szFile = wxlua_getwxStringtype(L, 1);
+    // call GetGlobalFileName
+    wxString returns = (wxFileConfig::GetGlobalFileName(szFile));
+    // push the result string
+    wxlua_pushwxString(L, returns);
+
+    return 1;
+}
+
+
+#if (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxLUA_USE_wxFileName)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_GetLocalFile[] = { &wxluatype_TSTRING, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxFileConfig_GetLocalFile(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_GetLocalFile[1] = {{ wxLua_wxFileConfig_GetLocalFile, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 2, s_wxluatypeArray_wxLua_wxFileConfig_GetLocalFile }};
+//     static wxFileName GetLocalFile(const wxString& basename, int style = 0);
+static int LUACALL wxLua_wxFileConfig_GetLocalFile(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int style = 0
+    int style = (argCount >= 2 ? (int)wxlua_getnumbertype(L, 2) : 0);
+    // const wxString basename
+    const wxString basename = wxlua_getwxStringtype(L, 1);
+    // call GetLocalFile
+    // allocate a new object using the copy constructor
+    wxFileName* returns = new wxFileName(wxFileConfig::GetLocalFile(basename, style));
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileName);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileName);
+
+    return 1;
+}
+
+#endif // (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxLUA_USE_wxFileName)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_GetLocalFileName[] = { &wxluatype_TSTRING, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxFileConfig_GetLocalFileName(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_GetLocalFileName[1] = {{ wxLua_wxFileConfig_GetLocalFileName, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 2, s_wxluatypeArray_wxLua_wxFileConfig_GetLocalFileName }};
+//     static wxString GetLocalFileName(const wxString& szFile, int style = 0);
+static int LUACALL wxLua_wxFileConfig_GetLocalFileName(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int style = 0
+    int style = (argCount >= 2 ? (int)wxlua_getnumbertype(L, 2) : 0);
+    // const wxString szFile
+    const wxString szFile = wxlua_getwxStringtype(L, 1);
+    // call GetLocalFileName
+    wxString returns = (wxFileConfig::GetLocalFileName(szFile, style));
+    // push the result string
+    wxlua_pushwxString(L, returns);
+
+    return 1;
+}
+
+
+#if (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_Save[] = { &wxluatype_wxFileConfig, &wxluatype_wxOutputStream, NULL };
+static int LUACALL wxLua_wxFileConfig_Save(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_Save[1] = {{ wxLua_wxFileConfig_Save, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxFileConfig_Save }};
+//     virtual bool Save(wxOutputStream& os); //, const wxMBConv& conv = wxConvAuto());
+static int LUACALL wxLua_wxFileConfig_Save(lua_State *L)
+{
+    // wxOutputStream os
+    wxOutputStream * os = (wxOutputStream *)wxluaT_getuserdatatype(L, 2, wxluatype_wxOutputStream);
+    // get this
+    wxFileConfig * self = (wxFileConfig *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFileConfig);
+    // call Save
+    bool returns = (self->Save(*os));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_SetUmask[] = { &wxluatype_wxFileConfig, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxFileConfig_SetUmask(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_SetUmask[1] = {{ wxLua_wxFileConfig_SetUmask, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxFileConfig_SetUmask }};
@@ -858,9 +1024,31 @@ static int LUACALL wxLua_wxFileConfig_SetUmask(lua_State *L)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_delete[] = { &wxluatype_wxFileConfig, NULL };
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxFileConfig_delete }};
 
+
+#if (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_constructor1[] = { &wxluatype_wxInputStream, NULL };
+static int LUACALL wxLua_wxFileConfig_constructor1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_constructor1[1] = {{ wxLua_wxFileConfig_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxFileConfig_constructor1 }};
+//     wxFileConfig(wxInputStream& is); //, const wxMBConv& conv = wxConvAuto());
+static int LUACALL wxLua_wxFileConfig_constructor1(lua_State *L)
+{
+    // wxInputStream is
+    wxInputStream * is = (wxInputStream *)wxluaT_getuserdatatype(L, 1, wxluatype_wxInputStream);
+    // call constructor
+    wxFileConfig* returns = new wxFileConfig(*is);
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxFileConfig);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxFileConfig);
+
+    return 1;
+}
+
+#endif // (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxFileConfig_constructor[] = { &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxFileConfig_constructor(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_constructor[1] = {{ wxLua_wxFileConfig_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 5, s_wxluatypeArray_wxLua_wxFileConfig_constructor }};
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_constructor[1] = {{ wxLua_wxFileConfig_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 5, s_wxluatypeArray_wxLua_wxFileConfig_constructor }};
 //     wxFileConfig(const wxString& appName = "", const wxString& vendorName = "", const wxString& localFilename = "", const wxString& globalFilename = "", long style = wxCONFIG_USE_LOCAL_FILE | wxCONFIG_USE_GLOBAL_FILE); //, wxMBConv& conv = wxConvUTF8);
 static int LUACALL wxLua_wxFileConfig_constructor(lua_State *L)
 {
@@ -889,6 +1077,20 @@ static int LUACALL wxLua_wxFileConfig_constructor(lua_State *L)
 
 
 
+#if ((wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS))||(wxLUA_USE_wxConfig && wxUSE_CONFIG)
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxFileConfig_constructor_overload[] =
+{
+
+#if (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS)
+    { wxLua_wxFileConfig_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxFileConfig_constructor1 },
+#endif // (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS)
+    { wxLua_wxFileConfig_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 5, s_wxluatypeArray_wxLua_wxFileConfig_constructor },
+};
+static int s_wxluafunc_wxLua_wxFileConfig_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxFileConfig_constructor_overload)/sizeof(wxLuaBindCFunc);
+
+#endif // ((wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS))||(wxLUA_USE_wxConfig && wxUSE_CONFIG)
+
 void wxLua_wxFileConfig_delete_function(void** p)
 {
     wxFileConfig* o = (wxFileConfig*)(*p);
@@ -897,9 +1099,33 @@ void wxLua_wxFileConfig_delete_function(void** p)
 
 // Map Lua Class Methods to C Binding Functions
 wxLuaBindMethod wxFileConfig_methods[] = {
+#if (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxConfig && wxUSE_CONFIG)
+    { "DisableAutoSave", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFileConfig_DisableAutoSave, 1, NULL },
+    { "EnableAutoSave", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFileConfig_EnableAutoSave, 1, NULL },
+#endif // (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxConfig && wxUSE_CONFIG)
+
+#if (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxLUA_USE_wxFileName)
+    { "GetGlobalFile", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxFileConfig_GetGlobalFile, 1, NULL },
+#endif // (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxLUA_USE_wxFileName)
+
+    { "GetGlobalFileName", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxFileConfig_GetGlobalFileName, 1, NULL },
+
+#if (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxLUA_USE_wxFileName)
+    { "GetLocalFile", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxFileConfig_GetLocalFile, 1, NULL },
+#endif // (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxLUA_USE_wxFileName)
+
+    { "GetLocalFileName", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxFileConfig_GetLocalFileName, 1, NULL },
+
+#if (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS)
+    { "Save", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFileConfig_Save, 1, NULL },
+#endif // (wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS)
+
     { "SetUmask", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxFileConfig_SetUmask, 1, NULL },
     { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxFileConfig_delete, 1, NULL },
-    { "wxFileConfig", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxFileConfig_constructor, 1, NULL },
+
+#if ((wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS))||(wxLUA_USE_wxConfig && wxUSE_CONFIG)
+    { "wxFileConfig", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxFileConfig_constructor_overload, s_wxluafunc_wxLua_wxFileConfig_constructor_overload_count, 0 },
+#endif // ((wxLUA_USE_wxConfig && wxUSE_CONFIG) && (wxUSE_STREAMS))||(wxLUA_USE_wxConfig && wxUSE_CONFIG)
 
     { 0, 0, 0, 0 },
 };

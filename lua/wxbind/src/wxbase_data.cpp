@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 // ---------------------------------------------------------------------------
 // Bind class wxString
 // ---------------------------------------------------------------------------
@@ -114,9 +118,9 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxString_From8BitData[1] = {{ wxLua_wxSt
 static int LUACALL wxLua_wxString_From8BitData(lua_State *L)
 {
     // const char s
-    wxCharBuffer s = wxlua_getstringtype(L, 1);
+    const char * s = wxlua_getstringtype(L, 1);
     // call From8BitData
-    wxString returns = (wxString::From8BitData((const char*)s));
+    wxString returns = (wxString::From8BitData(s));
     // push the result string
     wxlua_pushwxString(L, returns);
 
@@ -130,9 +134,9 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxString_FromUTF8[1] = {{ wxLua_wxString
 static int LUACALL wxLua_wxString_FromUTF8(lua_State *L)
 {
     // const char s
-    wxCharBuffer s = wxlua_getstringtype(L, 1);
+    const char * s = wxlua_getstringtype(L, 1);
     // call FromUTF8
-    wxString returns = (wxString::FromUTF8((const char*)s));
+    wxString returns = (wxString::FromUTF8(s));
     // push the result string
     wxlua_pushwxString(L, returns);
 
@@ -146,9 +150,9 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxString_FromUTF8Unchecked[1] = {{ wxLua
 static int LUACALL wxLua_wxString_FromUTF8Unchecked(lua_State *L)
 {
     // const char s
-    wxCharBuffer s = wxlua_getstringtype(L, 1);
+    const char * s = wxlua_getstringtype(L, 1);
     // call FromUTF8Unchecked
-    wxString returns = (wxString::FromUTF8Unchecked((const char*)s));
+    wxString returns = (wxString::FromUTF8Unchecked(s));
     // push the result string
     wxlua_pushwxString(L, returns);
 
@@ -182,7 +186,15 @@ static int LUACALL wxLua_wxString_Len(lua_State *L)
     // call Len
     size_t returns = (self->Len());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -442,7 +454,15 @@ static int LUACALL wxLua_wxString_const_iterator_op_deref(lua_State *L)
     // call op_deref
     char returns = (*(*self));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -622,7 +642,15 @@ static int LUACALL wxLua_wxString_iterator_op_deref(lua_State *L)
     // call op_deref
     char returns = (*(*self));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -773,7 +801,15 @@ static int LUACALL wxLua_wxStringTokenizer_CountTokens(lua_State *L)
     // call CountTokens
     size_t returns = (self->CountTokens());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -789,7 +825,15 @@ static int LUACALL wxLua_wxStringTokenizer_GetMode(lua_State *L)
     // call GetMode
     wxStringTokenizerMode returns = (self->GetMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -821,7 +865,15 @@ static int LUACALL wxLua_wxStringTokenizer_GetPosition(lua_State *L)
     // call GetPosition
     size_t returns = (self->GetPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1093,7 +1145,15 @@ static int LUACALL wxLua_wxClientDataContainer_GetClientData(lua_State *L)
     // call GetClientData
     wxUIntPtr returns = (wxUIntPtr)self->GetClientData();
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1439,7 +1499,15 @@ static int LUACALL wxLua_wxObjectRefData_GetRefCount(lua_State *L)
     // call GetRefCount
     int returns = (self->GetRefCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1639,7 +1707,15 @@ static int LUACALL wxLua_wxClassInfo_GetSize(lua_State *L)
     // call GetSize
     int returns = (self->GetSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1944,7 +2020,15 @@ static int LUACALL wxLua_wxList_GetCount(lua_State *L)
     // call GetCount
     int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1996,7 +2080,15 @@ static int LUACALL wxLua_wxList_IndexOf(lua_State *L)
     // call IndexOf
     int returns = (self->IndexOf(pObject));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2436,7 +2528,15 @@ static int LUACALL wxLua_wxArrayInt_GetCount(lua_State *L)
     // call GetCount
     int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2458,7 +2558,15 @@ static int LUACALL wxLua_wxArrayInt_Index(lua_State *L)
     // call Index
     int returns = (self->Index(n, searchFromEnd));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2514,7 +2622,15 @@ static int LUACALL wxLua_wxArrayInt_Item(lua_State *L)
     // call Item
     int returns = (self->Item(n));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2594,7 +2710,15 @@ static int LUACALL wxLua_wxArrayInt_op_index(lua_State *L)
     // call op_index
     int returns = ((*self)[(nIndex)]);
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2682,6 +2806,347 @@ int wxArrayInt_methodCount = sizeof(wxArrayInt_methods)/sizeof(wxLuaBindMethod) 
 #endif  // wxLUA_USE_wxArrayInt
 
 
+#if wxLUA_USE_wxArrayDouble
+// ---------------------------------------------------------------------------
+// Bind class wxArrayDouble
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxArrayDouble'
+int wxluatype_wxArrayDouble = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Add[] = { &wxluatype_wxArrayDouble, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxArrayDouble_Add(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Add[1] = {{ wxLua_wxArrayDouble_Add, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxArrayDouble_Add }};
+//     void Add(double num);
+static int LUACALL wxLua_wxArrayDouble_Add(lua_State *L)
+{
+    // double num
+    double num = (double)wxlua_getnumbertype(L, 2);
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Add
+    self->Add(num);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Alloc[] = { &wxluatype_wxArrayDouble, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxArrayDouble_Alloc(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Alloc[1] = {{ wxLua_wxArrayDouble_Alloc, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxArrayDouble_Alloc }};
+//     void Alloc(size_t count);
+static int LUACALL wxLua_wxArrayDouble_Alloc(lua_State *L)
+{
+    // size_t count
+    size_t count = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Alloc
+    self->Alloc(count);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Clear[] = { &wxluatype_wxArrayDouble, NULL };
+static int LUACALL wxLua_wxArrayDouble_Clear(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Clear[1] = {{ wxLua_wxArrayDouble_Clear, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_Clear }};
+//     void Clear();
+static int LUACALL wxLua_wxArrayDouble_Clear(lua_State *L)
+{
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Clear
+    self->Clear();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Empty[] = { &wxluatype_wxArrayDouble, NULL };
+static int LUACALL wxLua_wxArrayDouble_Empty(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Empty[1] = {{ wxLua_wxArrayDouble_Empty, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_Empty }};
+//     void Empty();
+static int LUACALL wxLua_wxArrayDouble_Empty(lua_State *L)
+{
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Empty
+    self->Empty();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_GetCount[] = { &wxluatype_wxArrayDouble, NULL };
+static int LUACALL wxLua_wxArrayDouble_GetCount(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_GetCount[1] = {{ wxLua_wxArrayDouble_GetCount, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_GetCount }};
+//     int  GetCount() const;
+static int LUACALL wxLua_wxArrayDouble_GetCount(lua_State *L)
+{
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call GetCount
+    int returns = (self->GetCount());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Index[] = { &wxluatype_wxArrayDouble, &wxluatype_TNUMBER, &wxluatype_TBOOLEAN, NULL };
+static int LUACALL wxLua_wxArrayDouble_Index(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Index[1] = {{ wxLua_wxArrayDouble_Index, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxArrayDouble_Index }};
+//     int  Index(double n, bool searchFromEnd = false);
+static int LUACALL wxLua_wxArrayDouble_Index(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // bool searchFromEnd = false
+    bool searchFromEnd = (argCount >= 3 ? wxlua_getbooleantype(L, 3) : false);
+    // double n
+    double n = (double)wxlua_getnumbertype(L, 2);
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Index
+    int returns = (self->Index(n, searchFromEnd));
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Insert[] = { &wxluatype_wxArrayDouble, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxArrayDouble_Insert(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Insert[1] = {{ wxLua_wxArrayDouble_Insert, WXLUAMETHOD_METHOD, 3, 4, s_wxluatypeArray_wxLua_wxArrayDouble_Insert }};
+//     void Insert(double num, int n, int copies = 1);
+static int LUACALL wxLua_wxArrayDouble_Insert(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int copies = 1
+    int copies = (argCount >= 4 ? (int)wxlua_getnumbertype(L, 4) : 1);
+    // int n
+    int n = (int)wxlua_getnumbertype(L, 3);
+    // double num
+    double num = (double)wxlua_getnumbertype(L, 2);
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Insert
+    self->Insert(num, n, copies);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_IsEmpty[] = { &wxluatype_wxArrayDouble, NULL };
+static int LUACALL wxLua_wxArrayDouble_IsEmpty(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_IsEmpty[1] = {{ wxLua_wxArrayDouble_IsEmpty, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_IsEmpty }};
+//     bool IsEmpty() const;
+static int LUACALL wxLua_wxArrayDouble_IsEmpty(lua_State *L)
+{
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call IsEmpty
+    bool returns = (self->IsEmpty());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Item[] = { &wxluatype_wxArrayDouble, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxArrayDouble_Item(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Item[1] = {{ wxLua_wxArrayDouble_Item, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxArrayDouble_Item }};
+//     double Item(int n);
+static int LUACALL wxLua_wxArrayDouble_Item(lua_State *L)
+{
+    // int n
+    int n = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Item
+    double returns = (self->Item(n));
+    // push the result floating point number
+    lua_pushnumber(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Remove[] = { &wxluatype_wxArrayDouble, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxArrayDouble_Remove(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Remove[1] = {{ wxLua_wxArrayDouble_Remove, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxArrayDouble_Remove }};
+//     void Remove(int n);
+static int LUACALL wxLua_wxArrayDouble_Remove(lua_State *L)
+{
+    // int n
+    int n = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Remove
+    self->Remove(n);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_RemoveAt[] = { &wxluatype_wxArrayDouble, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxArrayDouble_RemoveAt(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_RemoveAt[1] = {{ wxLua_wxArrayDouble_RemoveAt, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxArrayDouble_RemoveAt }};
+//     void RemoveAt(size_t index);
+static int LUACALL wxLua_wxArrayDouble_RemoveAt(lua_State *L)
+{
+    // size_t index
+    size_t index = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call RemoveAt
+    self->RemoveAt(index);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_Shrink[] = { &wxluatype_wxArrayDouble, NULL };
+static int LUACALL wxLua_wxArrayDouble_Shrink(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_Shrink[1] = {{ wxLua_wxArrayDouble_Shrink, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_Shrink }};
+//     void Shrink();
+static int LUACALL wxLua_wxArrayDouble_Shrink(lua_State *L)
+{
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call Shrink
+    self->Shrink();
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_ToLuaTable[] = { &wxluatype_wxArrayDouble, NULL };
+static int LUACALL wxLua_wxArrayDouble_ToLuaTable(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_ToLuaTable[1] = {{ wxLua_wxArrayDouble_ToLuaTable, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_ToLuaTable }};
+// %override wxLua_wxArrayDouble_ToLuaTable
+// int ToLuaTable() const
+static int LUACALL wxLua_wxArrayDouble_ToLuaTable(lua_State *L)
+{
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    wxlua_pushwxArrayDoubletable(L, *self);
+    return 1;
+}
+
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_delete[] = { &wxluatype_wxArrayDouble, NULL };
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_delete }};
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_op_index[] = { &wxluatype_wxArrayDouble, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxArrayDouble_op_index(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_op_index[1] = {{ wxLua_wxArrayDouble_op_index, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxArrayDouble_op_index }};
+//     double operator[](size_t nIndex);
+static int LUACALL wxLua_wxArrayDouble_op_index(lua_State *L)
+{
+    // size_t nIndex
+    size_t nIndex = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxArrayDouble * self = (wxArrayDouble *)wxluaT_getuserdatatype(L, 1, wxluatype_wxArrayDouble);
+    // call op_index
+    double returns = ((*self)[(nIndex)]);
+    // push the result floating point number
+    lua_pushnumber(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxArrayDouble_constructor1[] = { &wxluatype_wxArrayDouble, NULL };
+static int LUACALL wxLua_wxArrayDouble_constructor1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_constructor1[1] = {{ wxLua_wxArrayDouble_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_constructor1 }};
+//     wxArrayDouble(const wxArrayDouble& array);
+static int LUACALL wxLua_wxArrayDouble_constructor1(lua_State *L)
+{
+    // const wxArrayDouble array
+    wxLuaSmartwxArrayDouble array = wxlua_getwxArrayDouble(L, 1);
+    // call constructor
+    wxArrayDouble* returns = new wxArrayDouble(array);
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxArrayDouble);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxArrayDouble);
+
+    return 1;
+}
+
+static int LUACALL wxLua_wxArrayDouble_constructor(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_constructor[1] = {{ wxLua_wxArrayDouble_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
+//     wxArrayDouble();
+static int LUACALL wxLua_wxArrayDouble_constructor(lua_State *L)
+{
+    // call constructor
+    wxArrayDouble* returns = new wxArrayDouble();
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxArrayDouble);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxArrayDouble);
+
+    return 1;
+}
+
+
+
+
+#if (wxLUA_USE_wxArrayDouble)
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxArrayDouble_constructor_overload[] =
+{
+    { wxLua_wxArrayDouble_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxArrayDouble_constructor1 },
+    { wxLua_wxArrayDouble_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
+};
+static int s_wxluafunc_wxLua_wxArrayDouble_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxArrayDouble_constructor_overload)/sizeof(wxLuaBindCFunc);
+
+#endif // (wxLUA_USE_wxArrayDouble)
+
+void wxLua_wxArrayDouble_delete_function(void** p)
+{
+    wxArrayDouble* o = (wxArrayDouble*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxArrayDouble_methods[] = {
+    { "Add", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Add, 1, NULL },
+    { "Alloc", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Alloc, 1, NULL },
+    { "Clear", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Clear, 1, NULL },
+    { "Empty", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Empty, 1, NULL },
+    { "GetCount", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_GetCount, 1, NULL },
+    { "Index", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Index, 1, NULL },
+    { "Insert", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Insert, 1, NULL },
+    { "IsEmpty", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_IsEmpty, 1, NULL },
+    { "Item", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Item, 1, NULL },
+    { "Remove", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Remove, 1, NULL },
+    { "RemoveAt", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_RemoveAt, 1, NULL },
+    { "Shrink", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_Shrink, 1, NULL },
+    { "ToLuaTable", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_ToLuaTable, 1, NULL },
+    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxArrayDouble_delete, 1, NULL },
+    { "op_index", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxArrayDouble_op_index, 1, NULL },
+
+#if (wxLUA_USE_wxArrayDouble)
+    { "wxArrayDouble", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxArrayDouble_constructor_overload, s_wxluafunc_wxLua_wxArrayDouble_constructor_overload_count, 0 },
+#endif // (wxLUA_USE_wxArrayDouble)
+
+    { 0, 0, 0, 0 },
+};
+
+int wxArrayDouble_methodCount = sizeof(wxArrayDouble_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // wxLUA_USE_wxArrayDouble
+
+
 #if wxLUA_USE_wxArrayString
 // ---------------------------------------------------------------------------
 // Bind class wxArrayString
@@ -2707,7 +3172,15 @@ static int LUACALL wxLua_wxArrayString_Add(lua_State *L)
     // call Add
     size_t returns = (self->Add(str, copies));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2767,7 +3240,15 @@ static int LUACALL wxLua_wxArrayString_GetCount(lua_State *L)
     // call GetCount
     int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2791,7 +3272,15 @@ static int LUACALL wxLua_wxArrayString_Index(lua_State *L)
     // call Index
     int returns = (self->Index(sz, bCase, bFromEnd));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3210,7 +3699,15 @@ static int LUACALL wxLua_wxLongLong_GetHi(lua_State *L)
     // call GetHi
     long returns = (self->GetHi());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3226,7 +3723,15 @@ static int LUACALL wxLua_wxLongLong_GetLo(lua_State *L)
     // call GetLo
     unsigned long returns = (self->GetLo());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3241,7 +3746,7 @@ static int LUACALL wxLua_wxLongLong_ToDouble(lua_State *L)
     wxLongLong * self = (wxLongLong *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLongLong);
     // call ToDouble
     double returns = (self->ToDouble());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -3258,7 +3763,15 @@ static int LUACALL wxLua_wxLongLong_ToLong(lua_State *L)
     // call ToLong
     long returns = (self->ToLong());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3352,7 +3865,15 @@ static int LUACALL wxLua_wxULongLong_GetHi(lua_State *L)
     // call GetHi
     unsigned long returns = (self->GetHi());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3368,7 +3889,15 @@ static int LUACALL wxLua_wxULongLong_GetLo(lua_State *L)
     // call GetLo
     unsigned long returns = (self->GetLo());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3400,7 +3929,15 @@ static int LUACALL wxLua_wxULongLong_ToULong(lua_State *L)
     // call ToULong
     long returns = (self->ToULong());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3454,4 +3991,455 @@ wxLuaBindMethod wxULongLong_methods[] = {
 int wxULongLong_methodCount = sizeof(wxULongLong_methods)/sizeof(wxLuaBindMethod) - 1;
 
 #endif  // wxUSE_LONGLONG
+
+
+#if wxLUA_USE_wxMemoryBuffer
+// ---------------------------------------------------------------------------
+// Bind class wxMemoryBuffer
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxMemoryBuffer'
+int wxluatype_wxMemoryBuffer = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_AppendByte[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_AppendByte(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_AppendByte[1] = {{ wxLua_wxMemoryBuffer_AppendByte, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMemoryBuffer_AppendByte }};
+//     void  AppendByte(char data);
+static int LUACALL wxLua_wxMemoryBuffer_AppendByte(lua_State *L)
+{
+    // char data
+    char data = (char)wxlua_getnumbertype(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call AppendByte
+    self->AppendByte(data);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_AppendData[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TLIGHTUSERDATA, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_AppendData(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_AppendData[1] = {{ wxLua_wxMemoryBuffer_AppendData, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMemoryBuffer_AppendData }};
+//     void  AppendData(const void *data, size_t len);
+static int LUACALL wxLua_wxMemoryBuffer_AppendData(lua_State *L)
+{
+    // size_t len
+    size_t len = (size_t)wxlua_getuintegertype(L, 3);
+    // const void data
+    const void * data = (const void *)wxlua_touserdata(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call AppendData
+    self->AppendData(data, len);
+
+    return 0;
+}
+
+
+#if (wxCHECK_VERSION(2,9,4)) && (wxLUA_USE_wxMemoryBuffer)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_Clear[] = { &wxluatype_wxMemoryBuffer, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_Clear(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_Clear[1] = {{ wxLua_wxMemoryBuffer_Clear, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_Clear }};
+//     %wxchkver_2_9_4 void Clear();
+static int LUACALL wxLua_wxMemoryBuffer_Clear(lua_State *L)
+{
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call Clear
+    self->Clear();
+
+    return 0;
+}
+
+#endif // (wxCHECK_VERSION(2,9,4)) && (wxLUA_USE_wxMemoryBuffer)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_Fill[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TINTEGER, &wxluatype_TNUMBER, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_Fill(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_Fill[1] = {{ wxLua_wxMemoryBuffer_Fill, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxMemoryBuffer_Fill }};
+// %override wxLua_wxMemoryBuffer_Fill
+//     void Fill(unsigned char data, int start_index, size_t length);
+static int LUACALL wxLua_wxMemoryBuffer_Fill(lua_State *L)
+{
+    // size_t length
+    size_t length = (size_t)wxlua_getnumbertype(L, 4);
+    // int start_index
+    int start_index = (int)wxlua_getnumbertype(L, 3);
+    // unsigned char data
+    int data = (unsigned char)wxlua_getnumbertype(L, 2);
+    wxASSERT_MSG(start_index >= 0, "index out of range");
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    if (length <= 0)
+        return 0;  //  Do nothing
+    // get data pointer
+    unsigned char *dptr = (unsigned char *)self->GetWriteBuf(start_index + length);
+    wxASSERT_MSG(dptr != NULL, "cannot reallocate buffer");
+    memset(dptr + start_index, data, length);
+    if (self->GetDataLen() < start_index + length)
+        self->SetDataLen(start_index + length);
+    return 0;
+}
+
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_GetAppendBuf[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_GetAppendBuf(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_GetAppendBuf[1] = {{ wxLua_wxMemoryBuffer_GetAppendBuf, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMemoryBuffer_GetAppendBuf }};
+//     void *GetAppendBuf(size_t sizeNeeded);
+static int LUACALL wxLua_wxMemoryBuffer_GetAppendBuf(lua_State *L)
+{
+    // size_t sizeNeeded
+    size_t sizeNeeded = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call GetAppendBuf
+    void* returns = (void*)self->GetAppendBuf(sizeNeeded);
+    // push the result pointer
+    lua_pushlightuserdata(L, (void *)returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_GetBufSize[] = { &wxluatype_wxMemoryBuffer, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_GetBufSize(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_GetBufSize[1] = {{ wxLua_wxMemoryBuffer_GetBufSize, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_GetBufSize }};
+//     size_t GetBufSize() const;
+static int LUACALL wxLua_wxMemoryBuffer_GetBufSize(lua_State *L)
+{
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call GetBufSize
+    size_t returns = (self->GetBufSize());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_GetByte[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TNUMBER, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_GetByte(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_GetByte[1] = {{ wxLua_wxMemoryBuffer_GetByte, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxMemoryBuffer_GetByte }};
+// %override wxLua_wxMemoryBuffer_GetByte
+//     unsigned char GetByte(int index, size_t length = 1);
+static int LUACALL wxLua_wxMemoryBuffer_GetByte(lua_State *L)
+{
+    // int index
+    int index = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    if (index < 0 || (unsigned)index >= self->GetDataLen())
+        return 0;
+    // int length (optional)
+    int length = 1;
+    if (lua_gettop(L) >= 3)
+        length = (size_t)wxlua_getnumbertype(L, 3);
+    if (length <= 0)
+        return 0;
+    if ((unsigned)(index + length) > self->GetDataLen())
+        length = self->GetDataLen() - index;
+    int count = 0;
+    while (count < length) {
+        unsigned char returns = ((unsigned char *)(self->GetData()))[index + count];
+        lua_pushinteger(L, returns);
+        count++;
+    }
+    return length;
+}
+
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_GetData[] = { &wxluatype_wxMemoryBuffer, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_GetData(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_GetData[1] = {{ wxLua_wxMemoryBuffer_GetData, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_GetData }};
+//     void  *GetData() const;
+static int LUACALL wxLua_wxMemoryBuffer_GetData(lua_State *L)
+{
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call GetData
+    void* returns = (void*)self->GetData();
+    // push the result pointer
+    lua_pushlightuserdata(L, (void *)returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_GetDataLen[] = { &wxluatype_wxMemoryBuffer, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_GetDataLen(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_GetDataLen[1] = {{ wxLua_wxMemoryBuffer_GetDataLen, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_GetDataLen }};
+//     size_t GetDataLen() const;
+static int LUACALL wxLua_wxMemoryBuffer_GetDataLen(lua_State *L)
+{
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call GetDataLen
+    size_t returns = (self->GetDataLen());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_GetWriteBuf[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_GetWriteBuf(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_GetWriteBuf[1] = {{ wxLua_wxMemoryBuffer_GetWriteBuf, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMemoryBuffer_GetWriteBuf }};
+//     void *GetWriteBuf(size_t sizeNeeded);
+static int LUACALL wxLua_wxMemoryBuffer_GetWriteBuf(lua_State *L)
+{
+    // size_t sizeNeeded
+    size_t sizeNeeded = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call GetWriteBuf
+    void* returns = (void*)self->GetWriteBuf(sizeNeeded);
+    // push the result pointer
+    lua_pushlightuserdata(L, (void *)returns);
+
+    return 1;
+}
+
+
+#if (wxCHECK_VERSION(2,9,4)) && (wxLUA_USE_wxMemoryBuffer)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_IsEmpty[] = { &wxluatype_wxMemoryBuffer, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_IsEmpty(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_IsEmpty[1] = {{ wxLua_wxMemoryBuffer_IsEmpty, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_IsEmpty }};
+//     %wxchkver_2_9_4 bool IsEmpty() const;
+static int LUACALL wxLua_wxMemoryBuffer_IsEmpty(lua_State *L)
+{
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call IsEmpty
+    bool returns = (self->IsEmpty());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // (wxCHECK_VERSION(2,9,4)) && (wxLUA_USE_wxMemoryBuffer)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_SetBufSize[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_SetBufSize(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_SetBufSize[1] = {{ wxLua_wxMemoryBuffer_SetBufSize, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMemoryBuffer_SetBufSize }};
+//     void   SetBufSize(size_t size);
+static int LUACALL wxLua_wxMemoryBuffer_SetBufSize(lua_State *L)
+{
+    // size_t size
+    size_t size = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call SetBufSize
+    self->SetBufSize(size);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_SetByte[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TNUMBER, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_SetByte(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_SetByte[1] = {{ wxLua_wxMemoryBuffer_SetByte, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxMemoryBuffer_SetByte }};
+// %override wxLua_wxMemoryBuffer_SetByte
+//     void SetByte(int index, unsigned char data);
+static int LUACALL wxLua_wxMemoryBuffer_SetByte(lua_State *L)
+{
+    // int index
+    int index = (int)wxlua_getnumbertype(L, 2);
+    wxASSERT_MSG(index >= 0, "index out of range");
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // more data? (optional)
+    int length = lua_gettop(L) - 2;
+    if (length <= 0)
+        return 0;  //  Do nothing
+    // get data pointer
+    unsigned char *dptr = (unsigned char *)self->GetWriteBuf(index + length);
+    wxASSERT_MSG(dptr != NULL, "cannot reallocate buffer");
+    int count = 0;
+    while (count < length) {
+        ((unsigned char *)(self->GetData()))[index + count] = (unsigned char)wxlua_getnumbertype(L, 3 + count);
+        count++;
+    }
+    if (self->GetDataLen() < (unsigned)(index + length))
+        self->SetDataLen(index + length);
+    return 0;
+}
+
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_SetDataLen[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_SetDataLen(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_SetDataLen[1] = {{ wxLua_wxMemoryBuffer_SetDataLen, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMemoryBuffer_SetDataLen }};
+//     void   SetDataLen(size_t len);
+static int LUACALL wxLua_wxMemoryBuffer_SetDataLen(lua_State *L)
+{
+    // size_t len
+    size_t len = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call SetDataLen
+    self->SetDataLen(len);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_UngetAppendBuf[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_UngetAppendBuf(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_UngetAppendBuf[1] = {{ wxLua_wxMemoryBuffer_UngetAppendBuf, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMemoryBuffer_UngetAppendBuf }};
+//     void  UngetAppendBuf(size_t sizeUsed);
+static int LUACALL wxLua_wxMemoryBuffer_UngetAppendBuf(lua_State *L)
+{
+    // size_t sizeUsed
+    size_t sizeUsed = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call UngetAppendBuf
+    self->UngetAppendBuf(sizeUsed);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_UngetWriteBuf[] = { &wxluatype_wxMemoryBuffer, &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_UngetWriteBuf(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_UngetWriteBuf[1] = {{ wxLua_wxMemoryBuffer_UngetWriteBuf, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxMemoryBuffer_UngetWriteBuf }};
+//     void  UngetWriteBuf(size_t sizeUsed);
+static int LUACALL wxLua_wxMemoryBuffer_UngetWriteBuf(lua_State *L)
+{
+    // size_t sizeUsed
+    size_t sizeUsed = (size_t)wxlua_getuintegertype(L, 2);
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call UngetWriteBuf
+    self->UngetWriteBuf(sizeUsed);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_delete[] = { &wxluatype_wxMemoryBuffer, NULL };
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_delete }};
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_release[] = { &wxluatype_wxMemoryBuffer, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_release(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_release[1] = {{ wxLua_wxMemoryBuffer_release, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_release }};
+//     void *release();
+static int LUACALL wxLua_wxMemoryBuffer_release(lua_State *L)
+{
+    // get this
+    wxMemoryBuffer * self = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call release
+    void* returns = (void*)self->release();
+    // push the result pointer
+    lua_pushlightuserdata(L, (void *)returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_constructor1[] = { &wxluatype_wxMemoryBuffer, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_constructor1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_constructor1[1] = {{ wxLua_wxMemoryBuffer_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_constructor1 }};
+//     wxMemoryBuffer(const wxMemoryBuffer& src);
+static int LUACALL wxLua_wxMemoryBuffer_constructor1(lua_State *L)
+{
+    // const wxMemoryBuffer src
+    const wxMemoryBuffer * src = (const wxMemoryBuffer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxMemoryBuffer);
+    // call constructor
+    wxMemoryBuffer* returns = new wxMemoryBuffer(*src);
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxMemoryBuffer);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxMemoryBuffer);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMemoryBuffer_constructor[] = { &wxluatype_TINTEGER, NULL };
+static int LUACALL wxLua_wxMemoryBuffer_constructor(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_constructor[1] = {{ wxLua_wxMemoryBuffer_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_constructor }};
+//     wxMemoryBuffer(size_t size = wxMemoryBufferData::DefBufSize);
+static int LUACALL wxLua_wxMemoryBuffer_constructor(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // size_t size = wxMemoryBufferData::DefBufSize
+    size_t size = (argCount >= 1 ? (size_t)wxlua_getuintegertype(L, 1) : wxMemoryBufferData::DefBufSize);
+    // call constructor
+    wxMemoryBuffer* returns = new wxMemoryBuffer(size);
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxMemoryBuffer);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxMemoryBuffer);
+
+    return 1;
+}
+
+
+
+
+#if (wxLUA_USE_wxMemoryBuffer)
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMemoryBuffer_constructor_overload[] =
+{
+    { wxLua_wxMemoryBuffer_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_constructor1 },
+    { wxLua_wxMemoryBuffer_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 1, s_wxluatypeArray_wxLua_wxMemoryBuffer_constructor },
+};
+static int s_wxluafunc_wxLua_wxMemoryBuffer_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxMemoryBuffer_constructor_overload)/sizeof(wxLuaBindCFunc);
+
+#endif // (wxLUA_USE_wxMemoryBuffer)
+
+void wxLua_wxMemoryBuffer_delete_function(void** p)
+{
+    wxMemoryBuffer* o = (wxMemoryBuffer*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxMemoryBuffer_methods[] = {
+    { "AppendByte", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_AppendByte, 1, NULL },
+    { "AppendData", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_AppendData, 1, NULL },
+
+#if (wxCHECK_VERSION(2,9,4)) && (wxLUA_USE_wxMemoryBuffer)
+    { "Clear", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_Clear, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,4)) && (wxLUA_USE_wxMemoryBuffer)
+
+    { "Fill", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_Fill, 1, NULL },
+    { "GetAppendBuf", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_GetAppendBuf, 1, NULL },
+    { "GetBufSize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_GetBufSize, 1, NULL },
+    { "GetByte", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_GetByte, 1, NULL },
+    { "GetData", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_GetData, 1, NULL },
+    { "GetDataLen", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_GetDataLen, 1, NULL },
+    { "GetWriteBuf", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_GetWriteBuf, 1, NULL },
+
+#if (wxCHECK_VERSION(2,9,4)) && (wxLUA_USE_wxMemoryBuffer)
+    { "IsEmpty", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_IsEmpty, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,4)) && (wxLUA_USE_wxMemoryBuffer)
+
+    { "SetBufSize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_SetBufSize, 1, NULL },
+    { "SetByte", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_SetByte, 1, NULL },
+    { "SetDataLen", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_SetDataLen, 1, NULL },
+    { "UngetAppendBuf", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_UngetAppendBuf, 1, NULL },
+    { "UngetWriteBuf", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_UngetWriteBuf, 1, NULL },
+    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxMemoryBuffer_delete, 1, NULL },
+    { "release", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxMemoryBuffer_release, 1, NULL },
+
+#if (wxLUA_USE_wxMemoryBuffer)
+    { "wxMemoryBuffer", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxMemoryBuffer_constructor_overload, s_wxluafunc_wxLua_wxMemoryBuffer_constructor_overload_count, 0 },
+#endif // (wxLUA_USE_wxMemoryBuffer)
+
+    { 0, 0, 0, 0 },
+};
+
+int wxMemoryBuffer_methodCount = sizeof(wxMemoryBuffer_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // wxLUA_USE_wxMemoryBuffer
 
