@@ -253,7 +253,36 @@ string_t Trim(const string_t & str, const string_t & chars)
     return str.substr(start, end - start);
 }
 
-
+// Turn a string in snake_case into title case
+string_t TitleCase(const string_t & str)
+{
+    string_t ret(str);
+    for (size_t i = 0; i < ret.size(); ++i)
+    {
+        if (i == 0)
+        {
+#ifdef PUZ_UNICODE
+            ret[i] = towupper(str[i]);
+#else
+            ret[i] = toupper(str[i]);
+#endif
+        }
+        else if (str[i] == '_' || str[i] == ' ')
+        {
+            ret[i] = ' ';
+            ++i;
+            if (i < ret.size())
+            {
+#ifdef PUZ_UNICODE
+                ret[i] = towupper(str[i]);
+#else
+                ret[i] = toupper(str[i]);
+#endif
+            }
+        }
+    }
+    return ret;
+}
 
 std::string GetExtension(const std::string & filename)
 {

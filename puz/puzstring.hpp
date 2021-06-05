@@ -76,6 +76,9 @@ PUZ_API string_t decode_puz(const std::string & str);
 string_t Trim(const string_t & str, const string_t & chars);
 inline string_t TrimWhitespace(const string_t & str) { return Trim(str,  puzT("\n\f\r \t")); }
 
+// Turn a string in snake_case into Title Case
+PUZ_API string_t TitleCase(const string_t & str);
+
 std::string GetExtension(const std::string & filename);
 
 string_t ToString(int number);
