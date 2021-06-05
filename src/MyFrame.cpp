@@ -119,6 +119,7 @@ enum toolIds
 
     ID_TIMER,
     ID_RESET_TIMER,
+    ID_DOWNS_ONLY,
 
     //wxID_PREFERENCES,
 
@@ -312,6 +313,9 @@ MyFrame::ManageTools()
                    _handler(MyFrame::OnTimer) },
         { ID_RESET_TIMER,    wxITEM_NORMAL, _T("&Reset"), NULL, NULL,
                    _handler(MyFrame::OnResetTimer) },
+
+        { ID_DOWNS_ONLY,     wxITEM_CHECK, _T("&Downs Only"), NULL, NULL,
+                   _handler(MyFrame::OnDownsOnly) },
 
 #ifdef __WXMSW__
         { wxID_HELP_CONTENTS, wxITEM_NORMAL, _T("&Help Contents\tF1"), NULL, NULL,
@@ -941,6 +945,8 @@ MyFrame::ShowClues()
             clues->SetClueList(&it->second);
             if (no_clues)
                 clues->ClearClueList();
+            else if (label == _T("Across") && m_toolMgr.IsChecked(ID_DOWNS_ONLY))
+                clues->ClearClueList();
             m_clues[label] = clues;
         }
     }
@@ -1380,6 +1386,7 @@ MyFrame::CreateMenuBar()
         submenu = new wxMenu();
             m_toolMgr.Add(submenu, ID_CONVERT_TO_NORMAL);
         menu->AppendSubMenu(submenu, _T("&Diagramless"));
+        m_toolMgr.Add(menu, ID_DOWNS_ONLY);
     mb->Append(menu, _T("&Tools"));
 
     // Help Menu
@@ -1911,8 +1918,14 @@ MyFrame::SetFocusedDirection(short direction)
 puz::Clue *
 MyFrame::GetFocusedClue()
 {
-    if (! m_puz.IsDiagramless())
+    if (GetFocusedDirection() == puz::ACROSS && m_toolMgr.IsChecked(ID_DOWNS_ONLY))
+    {
+        return NULL;
+    }
+    else if (! m_puz.IsDiagramless())
+    {
         return m_puz.FindClue(GetFocusedWord());
+    }
     else
     {
         std::map<wxString, CluePanel*>::iterator it;
@@ -2528,6 +2541,19 @@ MyFrame::OnTimerNotify(wxTimerEvent & WXUNUSED(evt))
     else
     {
         m_XGridCtrl->SetPaused(true);
+    }
+}
+
+// Downs only
+//-----------
+
+void
+MyFrame::OnDownsOnly(wxCommandEvent & WXUNUSED(evt))
+{
+    if (m_puz.IsOk())
+    {
+        ShowClues();
+        m_cluePrompt->UpdateLabel();
     }
 }
 

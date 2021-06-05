@@ -323,6 +323,9 @@ private:
     void OnResetTimer (wxCommandEvent & WXUNUSED(evt));
     void OnTimerNotify(wxTimerEvent   & WXUNUSED(evt));
 
+    // Downs Only
+    void OnDownsOnly(wxCommandEvent & WXUNUSED(evt));
+
     // AutoSave
     void OnAutoSaveNotify(wxTimerEvent   & WXUNUSED(evt));
 
