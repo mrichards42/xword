@@ -158,9 +158,16 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
             cell.append_attribute("x") = square->GetCol() + 1; // 1-based
             cell.append_attribute("y") = square->GetRow() + 1;
             if (square->IsMissing())
+            {
                 cell.append_attribute("type") = "void";
+            }
             else if (square->IsBlack() && !square->IsAnnotation())
+            {
                 cell.append_attribute("type") = "block";
+                if (square->HasColor())
+                    cell.append_attribute("background-color") =
+                        encode_utf8(square->GetHtmlColor()).c_str();
+            }
             else
             {
                 if (square->IsAnnotation())
