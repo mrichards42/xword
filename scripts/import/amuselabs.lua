@@ -47,7 +47,7 @@ local function importJSON(p, doc)
   end
 
   -- circles, etc.
-  for _, info in ipairs(doc.cellInfos) do
+  for _, info in ipairs(doc.cellInfos or {}) do
     local s = g[{info.x + 1, info.y + 1}]
     if info.isCircled then
       s.Circle = true
