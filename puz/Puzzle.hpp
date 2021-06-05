@@ -114,6 +114,9 @@ public:
     const string_t & GetNotes() const { return GetMeta(puzT("notes")); }
     void SetNotes(const string_t & notes) { SetMeta(puzT("notes"), notes); }
 
+    // Get a vector of all notes-like metadata for display.
+    const std::vector<std::pair<string_t, string_t> > GetAllNotes() const;
+
     // Words
     const Word * FindWord(const puz::Square * square) const;
           Word * FindWord(const puz::Square * square);

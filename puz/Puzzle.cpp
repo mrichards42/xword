@@ -353,6 +353,49 @@ void Puzzle::MarkThemeSquares()
     }
 }
 
+// Should this metadata be displayed as notes?
+// Either has "_notes_" in the name, or is one of
+// "description", or "instructions"
+bool IsNotes(const puz::string_t& str)
+{
+    // str == "notes" is the real notepad
+    // Starts with "notes_"
+    if (str.compare(0, 6, puzT("notes_")) == 0)
+        return true;
+    // Ends with "_notes"
+    int start = str.length() - 6;
+    if (start >= 0 && str.compare(start, puz::string_t::npos, puzT("_notes")) == 0)
+        return true;
+    // Contains "-notes-"
+    if (str.find(puzT("_notes_")) != puz::string_t::npos)
+        return true;
+    // description/instructions
+    if (str == puzT("description") || str == puzT("instructions"))
+        return true;
+    return false;
+}
+
+const std::vector<std::pair<string_t, string_t> >
+Puzzle::GetAllNotes() const
+{
+    std::vector<std::pair<string_t, string_t> > all_notes;
+    // First, include the regular notes, if any.
+    const string_t& notes = GetNotes();
+    if (!notes.empty())
+        all_notes.push_back(std::make_pair(puzT("notes"), notes));
+
+    // Then, include any other notes-like metadata.
+    const puz::Puzzle::metamap_t& meta = GetMetadata();
+    puz::Puzzle::metamap_t::const_iterator it;
+    for (it = meta.begin(); it != meta.end(); ++it)
+    {
+        if (IsNotes(it->first))
+            all_notes.push_back(std::make_pair(it->first, it->second));
+    }
+
+    return all_notes;
+}
+
 //------------------------------------------------------------------------------
 // Find functions
 //------------------------------------------------------------------------------

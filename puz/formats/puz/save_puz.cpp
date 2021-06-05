@@ -112,7 +112,6 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
 
 static void WriteGEXT(Puzzle * puz, ostream_wrapper & f);
-static void WriteMETA(Puzzle * puz, ostream_wrapper & f);
 static void WriteCHKD(Puzzle * puz, ostream_wrapper & f);
 static void WriteLTIM(Puzzle * puz, ostream_wrapper & f);
 static void WriteRUSR(Puzzle * puz, ostream_wrapper & f);
@@ -124,7 +123,6 @@ static void WriteSection(ostream_wrapper & f,
 void SaveSections(Puzzle * puz, ostream_wrapper & f)
 {
     WriteGEXT(puz, f);
-    WriteMETA(puz, f);
     WriteCHKD(puz, f);
     WriteLTIM(puz, f);
     WriteRUSR(puz, f);
@@ -173,31 +171,6 @@ void WriteGEXT(Puzzle * puz, ostream_wrapper & f)
     }
     if (hasData)
         WriteSection(f, "GEXT", data);
-}
-
-
-void WriteMETA(Puzzle * puz, ostream_wrapper & f)
-{
-    // Additional metadata
-    // This is stored as a series of null-terminated strings
-    std::string data;
-
-    const Puzzle::metamap_t & metadata = puz->GetMetadata();
-    Puzzle::metamap_t::const_iterator it;
-    for (it = metadata.begin(); it != metadata.end(); ++it)
-    {
-        if (it->first != puzT("author")
-            && it->first != puzT("title")
-            && it->first != puzT("notes")
-            && it->first != puzT("copyright")
-            && ! it->first.empty())
-        {
-            data.append(encode_utf8(it->first)).append(1, '\0');
-            data.append(encode_utf8(it->second)).append(1, '\0');
-        }
-    }
-    if (! data.empty())
-        WriteSection(f, "META", data);
 }
 
 

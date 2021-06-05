@@ -53,9 +53,30 @@ Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
     : m_title    (encode_puz(puz.GetTitle())),
       m_author   (encode_puz(puz.GetAuthor())),
       m_copyright(encode_puz(puz.GetCopyright())),
-      m_notes    (GetPuzText(puz.GetNotes())),
       m_version  (version)
 {
+    // Notes
+    // Since puz doesn't support metadata, we store all notes-like fields in the single supported
+    // notes field, in the format:
+    // [Header, in title case]:[trailing space]
+    // [Contents]
+    // with a blank line separating each section. If there is only one section, the header is
+    // omitted.
+    // The colon and trailing space improve rendering in regular Across Lite, which doesn't
+    // render newlines.
+    const std::vector<std::pair<puz::string_t, puz::string_t> >& all_notes = puz.GetAllNotes();
+    std::vector<std::pair<puz::string_t, puz::string_t> >::const_iterator it;
+    for (it = all_notes.begin(); it != all_notes.end(); ++it)
+    {
+        if (it != all_notes.begin()) {
+            m_notes.append(" \n\n");
+        }
+        if (all_notes.size() > 1) {
+            m_notes.append(GetPuzText(TitleCase(it->first)) + ": \n");
+        }
+        m_notes.append(GetPuzText(it->second));
+    }
+
     // Solution and Text
     m_solution.reserve(puz.GetGrid().GetWidth() * puz.GetGrid().GetHeight());
     m_gridText.reserve(puz.GetGrid().GetWidth() * puz.GetGrid().GetHeight());
