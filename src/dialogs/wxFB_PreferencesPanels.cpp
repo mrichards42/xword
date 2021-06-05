@@ -70,6 +70,10 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	m_moveOnRightClick->SetValue(true);
 	sbSizer3->Add( m_moveOnRightClick, 0, wxALL, 5 );
 
+	m_swapOnDClick = new wxCheckBox( sbSizer3->GetStaticBox(), wxID_ANY, wxT("Switch direction on second click"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_swapOnDClick->SetValue(true);
+	sbSizer3->Add( m_swapOnDClick, 0, wxALL, 5 );
+
 
 	bSizer4->Add( sbSizer3, 0, wxALL|wxEXPAND, 5 );
 

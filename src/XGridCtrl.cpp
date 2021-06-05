@@ -1311,6 +1311,7 @@ XGridCtrl::ConnectEvents()
         Bind(wxEVT_KEY_DOWN, &XGridCtrl::OnKeyDown, this);
         Bind(wxEVT_CHAR, &XGridCtrl::OnChar, this);
         Bind(wxEVT_LEFT_DOWN, &XGridCtrl::OnLeftDown, this);
+        Bind(wxEVT_LEFT_DCLICK, &XGridCtrl::OnLeftDClick, this);
         Bind(wxEVT_RIGHT_DOWN, &XGridCtrl::OnRightDown, this);
         Bind(wxEVT_MOTION, &XGridCtrl::OnMouseMove, this);
     }
@@ -1326,6 +1327,7 @@ XGridCtrl::DisconnectEvents()
         Unbind(wxEVT_KEY_DOWN, &XGridCtrl::OnKeyDown, this);
         Unbind(wxEVT_CHAR, &XGridCtrl::OnChar, this);
         Unbind(wxEVT_LEFT_DOWN, &XGridCtrl::OnLeftDown, this);
+        Unbind(wxEVT_LEFT_DCLICK, &XGridCtrl::OnLeftDClick, this);
         Unbind(wxEVT_RIGHT_DOWN, &XGridCtrl::OnRightDown, this);
         Unbind(wxEVT_MOTION, &XGridCtrl::OnMouseMove, this);
 
@@ -1342,11 +1344,27 @@ XGridCtrl::OnLeftDown(wxMouseEvent & evt)
 
     wxPoint pt = evt.GetPosition();
     puz::Square * square = HitTest(pt.x, pt.y);
-    if (square != NULL && (square->IsWhite() || GetGrid()->IsDiagramless()))
-        SetFocusedSquare(square);
+    if (square != NULL && (square->IsWhite() || GetGrid()->IsDiagramless())) {
+        if (GetFocusedSquare() == square && HasStyle(SWAP_ON_DCLICK)) {
+            // swap direction
+            SetFocusedSquare(square, puz::IsVertical(m_focusedDirection) ? puz::ACROSS : puz::DOWN);
+        } else {
+            // move to square
+            SetFocusedSquare(square);
+        }
+    }
 
     // Make sure to skip this event or we don't get keyboard focus!
     evt.Skip();
+}
+
+void
+XGridCtrl::OnLeftDClick(wxMouseEvent & evt)
+{
+    // The goal for double-click is to just run the down handler twice, but
+    // LEFT_DOWN will always be sent before LEFT_DCLICK, so all we need to do
+    // here is call the LeftDown handler _once_.
+    OnLeftDown(evt);
 }
 
 void

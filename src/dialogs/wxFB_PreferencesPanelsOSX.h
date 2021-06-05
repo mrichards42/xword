@@ -50,6 +50,7 @@ class wxFB_SolvePanel : public wxPanel
 		wxCheckBox* m_blankOnNewWord;
 		wxCheckBox* m_pauseOnSwitch;
 		wxCheckBox* m_moveOnRightClick;
+		wxCheckBox* m_swapOnDClick;
 		wxCheckBox* m_useAutoSave;
 		wxStaticText* m_stAfter;
 		ScaledSpinCtrl* m_autoSave;

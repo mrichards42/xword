@@ -49,6 +49,7 @@ class wxFB_SolvePanel : public wxPanel
 		wxCheckBox* m_blankOnNewWord;
 		wxCheckBox* m_pauseOnSwitch;
 		wxCheckBox* m_moveOnRightClick;
+		wxCheckBox* m_swapOnDClick;
 		wxCheckBox* m_checkWhileTyping;
 		wxCheckBox* m_strictRebus;
 		wxCheckBox* m_showCompletionStatus

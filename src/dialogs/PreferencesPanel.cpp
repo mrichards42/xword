@@ -217,6 +217,7 @@ void SolvePanel::DoLoadConfig()
     m_blankOnNewWord  ->SetValue((gridStyle & BLANK_ON_NEW_WORD) != 0);
     m_pauseOnSwitch   ->SetValue((gridStyle & PAUSE_ON_SWITCH) != 0);
     m_moveOnRightClick->SetValue((gridStyle & MOVE_ON_RIGHT_CLICK) != 0);
+    m_swapOnDClick    ->SetValue((gridStyle & SWAP_ON_DCLICK) != 0);
     m_checkWhileTyping->SetValue((gridStyle & CHECK_WHILE_TYPING) != 0);
     m_strictRebus->SetValue((gridStyle & STRICT_REBUS) != 0);
 
@@ -256,6 +257,8 @@ void SolvePanel::DoSaveConfig()
         gridStyle |= PAUSE_ON_SWITCH;
     if (m_moveOnRightClick->GetValue())
         gridStyle |= MOVE_ON_RIGHT_CLICK;
+    if (m_swapOnDClick->GetValue())
+        gridStyle |= SWAP_ON_DCLICK;
     if (m_checkWhileTyping->GetValue())
         gridStyle |= CHECK_WHILE_TYPING;
     if (m_strictRebus->GetValue())
@@ -283,6 +286,7 @@ void SolvePanel::ConnectChangedEvents()
     BindChangedEvent(m_blankOnNewWord);
     BindChangedEvent(m_pauseOnSwitch);
     BindChangedEvent(m_moveOnRightClick);
+    BindChangedEvent(m_swapOnDClick);
     BindChangedEvent(m_checkWhileTyping);
     BindChangedEvent(m_strictRebus);
     BindChangedEvent(m_startTimer);

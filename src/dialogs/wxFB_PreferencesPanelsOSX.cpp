@@ -116,6 +116,9 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 	m_moveOnRightClick = new wxCheckBox( this, wxID_ANY, wxT("Move to mouse position on right click"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer12->Add( m_moveOnRightClick, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 
+	m_swapOnDClick = new wxCheckBox( this, wxID_ANY, wxT("Switch direction on second click"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer12->Add( m_swapOnDClick, 0, wxALL, 5 );
+
 
 	bSizer4->Add( bSizer12, 0, wxLEFT, 25 );
 

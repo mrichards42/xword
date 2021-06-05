@@ -54,6 +54,7 @@ enum GridStyle
     CHECK_WHILE_TYPING  = 0x0040,
     STRICT_REBUS        = 0x0080,
     CONTEXT_MENU        = 0x0100, // Not yet(?) implemented
+    SWAP_ON_DCLICK      = 0x0200,
 
     DEFAULT_GRID_STYLE = PAUSE_ON_SWITCH
                        | MOVE_AFTER_LETTER
@@ -69,6 +70,7 @@ enum GridStyle
                     | MOVE_ON_RIGHT_CLICK
                     | CHECK_WHILE_TYPING
                     | STRICT_REBUS
+                    | SWAP_ON_DCLICK
 };
 
 enum CorrectStatus
@@ -420,6 +422,7 @@ private:
     bool m_areEventsConnected;
 
     void OnLeftDown    (wxMouseEvent & evt);
+    void OnLeftDClick  (wxMouseEvent & evt);
     void OnRightDown   (wxMouseEvent & evt);
     void OnContextMenu (wxContextMenuEvent & evt);
     void OnMouseMove   (wxMouseEvent & evt);
