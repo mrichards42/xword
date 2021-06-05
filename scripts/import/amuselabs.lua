@@ -71,6 +71,17 @@ local function importJSON(p, doc)
     -- TODO: bars
   end
 
+  -- given squares
+  for x, col in ipairs(doc.preRevealIdxs or {}) do
+    for y, is_revealed in ipairs(col) do
+      if is_revealed then
+        local s = g[{x, y}]
+        s.Text = s.Solution
+        s:AddFlag(puz.FLAG_CORRECT)
+      end
+    end
+  end
+
   -- Clues
   local clues = {across={}, down={}}
   for i, placedWord in ipairs(doc.placedWords) do
