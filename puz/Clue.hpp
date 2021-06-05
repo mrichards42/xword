@@ -147,8 +147,18 @@ public:
 
     ClueList & SetClueList(const string_t & direction, const ClueList & cluelist)
     {
-        operator[](direction) = cluelist;
-        ClueList & ret = operator[](direction);
+        // Normalize different capitalizations of "Across" and "Down", since these have special meaning.
+        // We still retain the original direction in the title field.
+        string_t canonical_direction;
+        if (CaseInsensitiveEquals(direction, puzT("Across")))
+            canonical_direction = puzT("Across");
+        else if (CaseInsensitiveEquals(direction, puzT("Down")))
+            canonical_direction = puzT("Down");
+        else
+            canonical_direction = direction;
+
+        operator[](canonical_direction) = cluelist;
+        ClueList & ret = operator[](canonical_direction);
         if (ret.GetTitle().empty())
             ret.SetTitle(direction);
         return ret;

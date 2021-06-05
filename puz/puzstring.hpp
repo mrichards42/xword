@@ -84,6 +84,8 @@ int ToInt(const string_t & str);
 bool StartsWith(const string_t & str, const string_t & cmp);
 bool EndsWith(const string_t & str, const string_t & cmp);
 
+bool CaseInsensitiveEquals(const string_t& a, const string_t& b);
+
 // XML stuff
 enum {
     UNESCAPE_BR = 1,
