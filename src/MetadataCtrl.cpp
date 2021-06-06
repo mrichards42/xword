@@ -20,6 +20,7 @@
 #include "utils/string.hpp"
 #include "App.hpp"
 #include <wx/tokenzr.h>
+#include <map>
 #ifdef XWORD_USE_LUA
 #   include "../lua/luapuz/bind/luapuz_puz_Puzzle.hpp"
 #endif
@@ -93,6 +94,7 @@ wxString MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame,
 {
     if (! frame || ! frame->GetPuzzle().IsOk())
         return wxEmptyString;
+    std::map<wxString, wxString> metaValues;
     wxString result;
     wxStringTokenizer tok(format, _T("%"), wxTOKEN_RET_EMPTY_ALL);
     bool ismeta = false; // Is the current token a metadata value?
@@ -112,22 +114,15 @@ wxString MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame,
             }
             else // This is a metadata value
             {
-                str = GetMeta(str, frame);
+                if (metaValues.find(str) == metaValues.end())
+                    metaValues[str] = GetMeta(str, frame);
 #if XWORD_USE_LUA
                 if (useLua)
-                {
-                    if (str.empty()) {
-                        result << _T("nil");
-                    }
-                    else {
-                        str.Replace("'", "\\'");
-                        result << _T("'") << str << _T("'");
-                    }
-                }
+                    result << " meta['" << str << "'] ";
                 else // plain text
-                    result << str;
+                    result << metaValues[str];
 #else // ! XWORD_USE_LUA
-                result << str;
+                result << metaValues[str];
 #endif // XWORD_USE_LUA
             }
             ismeta = false; // The next token is plain text
@@ -142,7 +137,7 @@ wxString MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame,
     // Compile a lua function taking a puzzle argument
     if (result.Find(_T("return")) == -1) // Make sure we're returning something
         result = _T("return ") + result;
-    wxLuaCharBuffer code(wxString::Format(_T("return function (puzzle) %s end"), (const wxChar *)result.c_str()));
+    wxLuaCharBuffer code(wxString::Format(_T("return function (puzzle, meta) %s end"), (const wxChar *)result.c_str()));
     // Compile and run the code
     if (luaL_loadbuffer(L, code.GetData(), code.Length(), "") == 0)
     {
@@ -150,9 +145,22 @@ wxString MetadataCtrl::FormatLabel(const wxString & format, MyFrame * frame,
         {
             if (lua_isfunction(L, -1)) // Make sure we got a function
             {
-                // Call this function
+                // 1. puzzle
                 luapuz_pushPuzzle(L, &frame->GetPuzzle());
-                if (lua_pcall(L, 1, 1, 0) == 0)
+                // 2. meta
+                lua_newtable(L);
+                std::map<wxString, wxString>::iterator it;
+                for (it = metaValues.begin(); it != metaValues.end(); ++it)
+                {
+                    if (! it->second.empty())
+                    {
+                        lua_pushstring(L, wx2lua(it->first));
+                        lua_pushstring(L, wx2lua(it->second));
+                        lua_rawset(L, -3);
+                    }
+                }
+                // Call this function
+                if (lua_pcall(L, 2, 1, 0) == 0)
                 {
                     // Check the result
                     if (luastate.lua_IsString(-1))
