@@ -1550,7 +1550,7 @@ XGridCtrl::OnLetter(wxChar key, int mod)
 
     // Space bar always moves forward one square
     if (static_cast<int>(key) == WXK_SPACE)
-        SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare), m_focusedWord);
+        SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE), m_focusedWord);
     else
         MoveAfterLetter();
 }
@@ -1578,7 +1578,7 @@ XGridCtrl::MoveAfterLetter()
         // word.  Move to the next letter if it exists
         if (newSquare == NULL)
         {
-            newSquare = m_focusedWord->FindNextSquare(m_focusedSquare);
+            newSquare = m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE);
             // if newSquare == NULL (possibly again), it's the last square in the word,
             // and the focus won't change.
         }
@@ -1696,7 +1696,7 @@ XGridCtrl::OnBackspace(int WXUNUSED(mod))
 {
     wxASSERT(! IsEmpty());
     SetSquareText(*m_focusedSquare, _T(""));
-    SetFocusedSquare(m_focusedWord->FindPrevSquare(m_focusedSquare),
+    SetFocusedSquare(m_focusedWord->FindPrevSquare(m_focusedSquare, FIND_WHITE_SQUARE),
                      m_focusedWord);
 }
 
