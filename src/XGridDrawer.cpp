@@ -459,17 +459,24 @@ XGridDrawer::DrawSquare(wxDC & adc,
     const int x = rect.x;
     const int y = rect.y;
     // Draw the square using the square's own background color,
-    // and Black as the pen
-
-    wxPen borderPen(GetBlackSquareColor(), m_borderSize);
-    borderPen.SetJoin(wxJOIN_MITER);
-    dc.SetPen(borderPen);
+    // and Black as the pen (except for annotation squares, which
+    // are drawn without an outline).
     dc.SetBrush(wxBrush(GetSquareColor(square)));
-    const int offset = m_borderSize / 2;
-    dc.DrawRectangle(x - m_borderSize + offset,
-                     y - m_borderSize + offset,
-                     m_boxSize + m_borderSize + 1,
-                     m_boxSize + m_borderSize + 1);
+    int borderSize = m_borderSize;
+    const int offset = borderSize / 2;
+    if (square.IsAnnotation()) {
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(wxBrush(GetSquareColor(square)));
+        dc.DrawRectangle(x + offset, y + offset, m_boxSize, m_boxSize);
+    } else {
+        wxPen borderPen(GetBlackSquareColor(), borderSize);
+        borderPen.SetJoin(wxJOIN_MITER);
+        dc.SetPen(borderPen);
+        dc.DrawRectangle(x - borderSize + offset,
+            y - borderSize + offset,
+            m_boxSize + borderSize + 1,
+            m_boxSize + borderSize + 1);
+    }
 
     // Background Image
     if (square.HasImage() && m_boxSize > 2) // Prevent errors with scaling
@@ -754,7 +761,7 @@ XGridDrawer::GetSquareColor(const puz::Square & square) const
 {
     if (! HasFlag(DRAW_SOLUTION))
     {
-        if (square.IsWhite() || HasFlag(DRAW_BLANK_DIAGRAMLESS))
+        if (square.IsWhite() || HasFlag(DRAW_BLANK_DIAGRAMLESS) || square.IsAnnotation())
         {
             if (square.HasHighlight())
                 return GetHighlightColor();
