@@ -127,7 +127,7 @@ protected:
 
 
 // This class holds all of the clues
-class PUZ_API Clues : public std::map<string_t, ClueList>
+class PUZ_API Clues : public std::vector<std::pair<string_t, ClueList> >
 {
 public:
     Clues() {}
@@ -153,6 +153,9 @@ public:
             ret.SetTitle(direction);
         return ret;
     }
+
+    std::vector<std::pair<string_t, ClueList> >::iterator find(const string_t& direction);
+    std::vector<std::pair<string_t, ClueList> >::const_iterator find(const string_t& direction) const;
 };
 
 } // namespace puz

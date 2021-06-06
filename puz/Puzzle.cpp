@@ -182,8 +182,8 @@ void Puzzle::SetAllClues(const std::vector<string_t> & clues)
 {
     NumberGrid();
 
-    ClueList & across = SetClueList(puzT("Across"), ClueList());
-    ClueList & down   = SetClueList(puzT("Down"), ClueList());
+    ClueList across = ClueList();
+    ClueList down   = ClueList();
 
     std::vector<string_t>::const_iterator clue_it = clues.begin();
     std::vector<string_t>::const_iterator clue_end = clues.end();
@@ -219,6 +219,9 @@ void Puzzle::SetAllClues(const std::vector<string_t> & clues)
         if (wantsAcross || wantsDown)
             ++clueNumber;
     }
+
+    SetClueList(puzT("Across"), across);
+    SetClueList(puzT("Down"), down);
 
     if (clue_it != clue_end)
         throw InvalidClues();
