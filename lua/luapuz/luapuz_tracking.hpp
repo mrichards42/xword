@@ -18,7 +18,7 @@ extern const char * luapuz_tracked_objects_key;
 LUAPUZ_API void luapuz_track_object(lua_State * L, void * objptr);
 LUAPUZ_API void luapuz_untrack_object(lua_State * L, void * objptr);
 LUAPUZ_API bool luapuz_is_tracked_object(lua_State * L, void * objptr);
-LUAPUZ_API bool luapuz_push_tracked_object(lua_State * L, void * objptr);
+LUAPUZ_API bool luapuz_push_tracked_object(lua_State * L, void * objptr, const char * metatable);
 
 // ---------------------------------------------------------------------------
 // Enumerations

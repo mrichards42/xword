@@ -157,7 +157,7 @@ inline void [pushfunc](lua_State * L, [type] * [var], bool should_gc = false)
 {
     if (! [var])
         lua_pushnil(L);
-    else if (! [prefix]_push_tracked_object(L, [var]))
+    else if (! [prefix]_push_tracked_object(L, [var], [meta]))
         [newfunc](L, [var], should_gc);
 }
 

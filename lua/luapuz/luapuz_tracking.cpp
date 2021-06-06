@@ -9,6 +9,22 @@ extern "C" {
 }
 
 
+// This function (luaL_testudata) was added after 5.1, so copy it here
+// https://github.com/lua/lua/blob/fc6c74f1004b5f67d0503633ddb74174a3c8d6ad/lauxlib.c
+void *testudata (lua_State *L, int ud, const char *tname) {
+    void *p = lua_touserdata(L, ud);
+    if (p != NULL) {  /* value is a userdata? */
+        if (lua_getmetatable(L, ud)) {  /* does it have a metatable? */
+            luaL_getmetatable(L, tname);  /* get correct metatable */
+            if (!lua_rawequal(L, -1, -2))  /* not the same? */
+                p = NULL;  /* value is a userdata with wrong metatable */
+            lua_pop(L, 2);  /* remove both metatables */
+            return p;
+        }
+    }
+    return NULL;  /* value is not a userdata with a metatable */
+}
+
 void luapuz_registerTable(lua_State * L, const char * name)
 {
     // Create a table
@@ -112,7 +128,7 @@ LUAPUZ_API bool luapuz_is_tracked_object(lua_State * L, void * objptr)
 
 // Push the tracked userdata.
 // return false and pop the nil if the object is not tracked
-LUAPUZ_API bool luapuz_push_tracked_object(lua_State * L, void * objptr)
+LUAPUZ_API bool luapuz_push_tracked_object(lua_State * L, void * objptr, const char * metatable)
 {
     // Push the tracked objects table
     lua_getfield(L, LUA_REGISTRYINDEX, luapuz_tracked_objects_key);
@@ -124,6 +140,17 @@ LUAPUZ_API bool luapuz_push_tracked_object(lua_State * L, void * objptr)
     if (lua_isnil(L, -1))
     {
         lua_pop(L, 2); // Pop the tracked objects table and the nil.
+        return false;
+    }
+
+    // Make sure it has the right metatable. There's some race where garbage
+    // isn't always getting deleted. If this userdata has the same metatable as
+    // what's requested it's fine (since that means the userdata type and
+    // pointers match what's requested as well), but if not, all kinds of
+    // things get messed up.
+    if (! testudata(L, -1, metatable))
+    {
+        lua_pop(L, 2);
         return false;
     }
 

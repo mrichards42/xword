@@ -69,7 +69,7 @@ inline void luapuz_pushGrid(lua_State * L, puz::Grid * grid, bool should_gc = fa
 {
     if (! grid)
         lua_pushnil(L);
-    else if (! luapuz_push_tracked_object(L, grid))
+    else if (! luapuz_push_tracked_object(L, grid, Grid_meta))
         luapuz_newGrid(L, grid, should_gc);
 }
 

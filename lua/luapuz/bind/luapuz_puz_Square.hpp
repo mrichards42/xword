@@ -69,7 +69,7 @@ inline void luapuz_pushSquare(lua_State * L, puz::Square * square, bool should_g
 {
     if (! square)
         lua_pushnil(L);
-    else if (! luapuz_push_tracked_object(L, square))
+    else if (! luapuz_push_tracked_object(L, square, Square_meta))
         luapuz_newSquare(L, square, should_gc);
 }
 

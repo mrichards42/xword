@@ -69,7 +69,7 @@ inline void luapuz_pushClue(lua_State * L, puz::Clue * clue, bool should_gc = fa
 {
     if (! clue)
         lua_pushnil(L);
-    else if (! luapuz_push_tracked_object(L, clue))
+    else if (! luapuz_push_tracked_object(L, clue, Clue_meta))
         luapuz_newClue(L, clue, should_gc);
 }
 

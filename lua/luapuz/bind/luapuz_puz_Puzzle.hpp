@@ -69,7 +69,7 @@ inline void luapuz_pushPuzzle(lua_State * L, puz::Puzzle * puzzle, bool should_g
 {
     if (! puzzle)
         lua_pushnil(L);
-    else if (! luapuz_push_tracked_object(L, puzzle))
+    else if (! luapuz_push_tracked_object(L, puzzle, Puzzle_meta))
         luapuz_newPuzzle(L, puzzle, should_gc);
 }
 
