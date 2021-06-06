@@ -347,6 +347,21 @@ bool EndsWith(const string_t & str, const string_t & cmp)
            str.compare(str.size() - cmp.size(), cmp.size(), cmp) == 0;
 }
 
+bool CaseInsensitiveEquals(const string_t& a, const string_t& b)
+{
+    unsigned int sz = a.size();
+    if (b.size() != sz)
+        return false;
+    for (unsigned int i = 0; i < sz; ++i)
+#if PUZ_UNICODE
+        if (towlower(a[i]) != towlower(b[i]))
+#else
+        if (tolower(a[i]) != tolower(b[i]))
+#endif
+            return false;
+    return true;
+}
+
 //----------------------------------------------------------------------------
 // Convert between formatted / unformatted
 //----------------------------------------------------------------------------
