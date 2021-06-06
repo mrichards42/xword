@@ -254,7 +254,7 @@ local function download(puzzle)
         -- which case we should differentiate between user-called asserts
         -- (using myassert and ASSERT_ERROR), or an actual programming error.
         ASSERT_ERROR = false
-        local success, result, err = xpcall(function() return func(puzzle, curl.get, myassert, mypuz) end, debug.traceback)
+        local success, result, err = pcall(function() return func(puzzle, curl.get, myassert, mypuz) end)
         -- gc puzles
         cleanup_puzzles()
         -- Figure out what to return

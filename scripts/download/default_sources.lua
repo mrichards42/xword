@@ -24,10 +24,8 @@ return {
         days = { true, true, true, true, true, true, true },
         func = [[
     assert(curl.get(puzzle.url, puzzle.filename, puzzle.curlopts))
-    local success, p = pcall(puz.Puzzle, puzzle.filename, import.Newsday)
-    if success then
-        p:Save(puzzle.filename) -- Save this as a puz
-    end
+    local p = puz.Puzzle(puzzle.filename, import.Newsday)
+    p:Save(puzzle.filename) -- Save this as a puz
 ]]
     },
 
@@ -133,11 +131,11 @@ return {
           -- Get the crossword data
           local data = page2:match("rawc%s*=%s*'([^']+)'")
           if data then
-            -- Using the data _as_ the filename is kind of a hack, but it works
-            local success, p = pcall(puz.Puzzle, data, import.amuselabsBase64)
-            if success then
-                p:Save(puzzle.filename) -- Save this as a jpz
-            end
+            -- Using the data _as_ the input filename is kind of a hack, but it works
+            local p = puz.Puzzle(data, import.amuselabsBase64)
+            p:Save(puzzle.filename)
+          else
+            return "Unable to find puzzle data"
           end
       ]]
     },
@@ -154,10 +152,10 @@ return {
           -- Get the crossword data
           local data = page:match("rawc%s*=%s*'([^']+)'")
           if data then
-            local success, p = pcall(puz.Puzzle, data, import.amuselabsBase64)
-            if success then
-                p:Save(puzzle.filename)
-            end
+            local p = puz.Puzzle(data, import.amuselabsBase64)
+            p:Save(puzzle.filename)
+          else
+            return "Unable to find puzzle data"
           end
       ]]
     },
@@ -190,10 +188,10 @@ return {
           -- Get the crossword data
           local data = page2:match("rawc%s*=%s*'([^']+)'")
           if data then
-            local success, p = pcall(puz.Puzzle, data, import.amuselabsBase64)
-            if success then
-                p:Save(puzzle.filename)
-            end
+            local p = puz.Puzzle(data, import.amuselabsBase64)
+            p:Save(puzzle.filename)
+          else
+            return "Unable to find puzzle data"
           end
       ]]
     },
