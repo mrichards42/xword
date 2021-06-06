@@ -254,6 +254,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 else {
                     square->SetMissing(false);
                     square->SetBlack();
+                    square->SetColor(GetAttribute(cell, "background-color"));
                 }
             }
             else // type == puzT("letter") || type == puzT("clue")
