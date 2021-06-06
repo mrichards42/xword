@@ -1596,7 +1596,8 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
     {
         // Check to see if the next square is part of the current word
         if (m_focusedWord &&
-            m_focusedWord->Contains(m_focusedSquare->Next(arrowDirection)))
+            m_focusedWord->Contains(m_focusedSquare->Next(arrowDirection)) &&
+            m_focusedSquare->Next(arrowDirection)->IsWhite())
         {
             SetFocusedSquare(m_focusedSquare->Next(arrowDirection),
                              m_focusedWord);
