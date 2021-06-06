@@ -34,6 +34,15 @@ return {
         url = "http://cdn.games.arkadiumhosted.com/latimes/assets/DailyCrossword/la%y%m%d.xml",
         filename = "lat%Y%m%d.jpz",
         days = { true, true, true, true, true, true, true },
+        func = [[
+          -- Hack: strip out "format", which is used for enumerations
+          local xml = assert(curl.get(puzzle.url))
+          xml = xml:gsub('format%s*=%s*"[^"]+"', '')
+          xml = xml:gsub("format%s*=%s*'[^']+'", "")
+          local f = assert(io.open(puzzle.filename, 'wb'))
+          f:write(xml)
+          f:close()
+        ]]
     },
 
     {
