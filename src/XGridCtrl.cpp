@@ -1665,7 +1665,7 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
                  newSquare;
                  newSquare = newSquare->Next(arrowDirection))
             {
-                if ((newSquare->HasWord(focusedDirection) || m_puz->FindWord(newSquare) != NULL)
+                if ((newSquare->HasWord(focusedDirection) || m_puz->FindWord(newSquare, focusedDirection) != NULL)
                     && ! m_focusedWord->Contains(newSquare))
                 {
                     break;
