@@ -32,7 +32,7 @@ local function draw_puzzle(p)
                 dc:SetBrush(brush)
                 brush:delete()
             elseif s:HasColor() then
-                local brush = wx.wxBrush(s:GetHtmlColor(), wx.wxSOLID)
+                local brush = wx.wxBrush(wx.wxColour(s:GetHtmlColor()), wx.wxSOLID)
                 dc:SetBrush(brush)
                 brush:delete()
             else
