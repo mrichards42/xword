@@ -1654,37 +1654,26 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
     }
     else // Shift
     {
+        // If the arrow is in the focused direction, wrap around the grid.
+        unsigned int options = AreInLine(m_focusedDirection, arrowDirection) ? 0 : puz::NO_WRAP;
         puz::GridDirection focusedDirection = 
             static_cast<puz::GridDirection>(m_focusedDirection);
-        puz::Square * newSquare = NULL;
-        if (AreInLine(m_focusedDirection, arrowDirection))
+        // Move to the next white square in the arrow direction that
+        // *could* have a word.
+        puz::Square* newSquare = NULL;
+        for (newSquare = m_focusedSquare;
+            newSquare;
+            newSquare = m_grid->FindNextSquare(newSquare, FIND_WHITE_SQUARE, arrowDirection, options))
         {
-            // Move to the next white square in the arrow direction that
-            // *could* have a word.
-            for (newSquare = m_focusedSquare;
-                 newSquare;
-                 newSquare = newSquare->Next(arrowDirection))
+            if ((newSquare->HasWord(focusedDirection) || m_puz->FindWord(newSquare, focusedDirection) != NULL)
+                && !m_focusedWord->Contains(newSquare))
             {
-                if ((newSquare->HasWord(focusedDirection) || m_puz->FindWord(newSquare, focusedDirection) != NULL)
-                    && ! m_focusedWord->Contains(newSquare))
-                {
-                    break;
-                }
+                break;
             }
-            // Find the first square in the word
-            if (newSquare)
-                newSquare = newSquare->GetWordStart(focusedDirection);
         }
-        else
-        {
-            // Move to the next white square in the arrow direction
-            newSquare = m_grid->FindNextSquare(
-                m_focusedSquare,
-                FIND_WHITE_SQUARE,
-                arrowDirection,
-                puz::NO_WRAP
-            );
-        }
+        // Find the first square in the word
+        if (newSquare)
+            newSquare = newSquare->GetWordStart(focusedDirection);
         MoveFocusedSquare(newSquare, focusedDirection);
     }
 }
