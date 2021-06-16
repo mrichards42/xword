@@ -1661,19 +1661,26 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
         // Move to the next white square in the arrow direction that
         // *could* have a word.
         puz::Square* newSquare = NULL;
+        puz::Word* newWord = NULL;
         for (newSquare = m_focusedSquare;
             newSquare;
             newSquare = m_grid->FindNextSquare(newSquare, FIND_WHITE_SQUARE, arrowDirection, options))
         {
-            if ((newSquare->HasWord(focusedDirection) || m_puz->FindWord(newSquare, focusedDirection) != NULL)
+            puz::Word* word = m_puz->FindWord(newSquare, focusedDirection);
+            if ((newSquare->HasWord(focusedDirection) || word != NULL)
                 && !m_focusedWord->Contains(newSquare))
             {
+                newWord = word;
                 break;
             }
         }
         // Find the first square in the word
-        if (newSquare)
-            newSquare = newSquare->GetWordStart(focusedDirection);
+        if (newSquare) {
+            if (newWord)
+                newSquare = newWord->front();
+            else
+                newSquare = newSquare->GetWordStart(focusedDirection);
+        }
         MoveFocusedSquare(newSquare, focusedDirection);
     }
 }
