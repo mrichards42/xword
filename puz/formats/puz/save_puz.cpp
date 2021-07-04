@@ -31,6 +31,9 @@ namespace puz {
 static const int SAVE_VERSION = 13;
 static const char * SAVE_VERSION_STRING = "1.3\0";
 
+static const int UTF8_SAVE_VERSION = 20;
+static const char * UTF8_SAVE_VERSION_STRING = "2.0\0";
+
 static void SaveSections(Puzzle * puz, ostream_wrapper & f);
 
 void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
@@ -59,13 +62,58 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
         }
     }
 
+    // If any of the text strings use UTF-8, then we save as version 2.0. Otherwise, we use 1.3 for
+    // wider compatibility. For simplicity, check all metadata, even if it doesn't end up being
+    // saved in the .puz.
+    bool uses_utf8 = false;
+    Puzzle::metamap_t& meta = puz->GetMetadata();
+    Puzzle::metamap_t::iterator metamap_it;
+    for (metamap_it = meta.begin(); metamap_it != meta.end(); ++metamap_it)
+    {
+        if (!can_encode_puz(metamap_it->second)) {
+            uses_utf8 = true;
+            break;
+        }
+    }
+    if (!uses_utf8) {
+        Clues clues = puz->GetClues();
+        Clues::iterator cluelist_it;
+        for (cluelist_it = clues.begin(); cluelist_it != clues.end(); ++cluelist_it)
+        {
+            ClueList& cluelist = cluelist_it->second;
+            ClueList::iterator clue;
+            for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
+            {
+                if (!can_encode_puz(clue->GetText())) {
+                    uses_utf8 = true;
+                    break;
+                }
+            }
+            if (uses_utf8)
+                break;
+        }
+    }
+
+    int save_version;
+    const char * save_version_string;
+    if (uses_utf8)
+    {
+        save_version = UTF8_SAVE_VERSION;
+        save_version_string = UTF8_SAVE_VERSION_STRING;
+    }
+    else
+    {
+        save_version = SAVE_VERSION;
+        save_version_string = SAVE_VERSION_STRING;
+    }
+
     // Checksums
     unsigned short c_cib;
     unsigned short c_primary;
     unsigned char c_masked[8];
 
     // This will check to make sure we have no formatted clues or notes.
-    Checksummer cksum(*puz, SAVE_VERSION);
+    Checksummer cksum(*puz, save_version);
     cksum.GetChecksums(&c_cib, &c_primary, c_masked);
 
     const std::vector<std::string> & clues = cksum.GetClues();
@@ -80,7 +128,7 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     f.Write("ACROSS&DOWN\0", 12);
     f.Write(c_cib);
     f.Write(&c_masked[0], 8);
-    f.Write(SAVE_VERSION_STRING, 4);
+    f.Write(save_version_string, 4);
     f.Skip(2); // 1 unknown short
     f.Write(puz->GetGrid().GetCksum());
     f.Skip(12); // 6 noise shorts
@@ -94,12 +142,12 @@ void SavePuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     f.Write(puz->GetGrid().GetType());
     f.Write(puz->GetGrid().GetFlag());
 
-    // Puzzle data
-    f.Write(cksum.GetSolution()); // Checksummer has already calculated
-    f.Write(cksum.GetGridText()); // these, so we'll reused them.
-    f.WriteNulTerminated(encode_puz(puz->GetTitle()));
-    f.WriteNulTerminated(encode_puz(puz->GetAuthor()));
-    f.WriteNulTerminated(encode_puz(puz->GetCopyright()));
+    // Puzzle data, as already calculated by Checksummer
+    f.Write(cksum.GetSolution());
+    f.Write(cksum.GetGridText());
+    f.WriteNulTerminated(cksum.GetTitle());
+    f.WriteNulTerminated(cksum.GetAuthor());
+    f.WriteNulTerminated(cksum.GetCopyright());
 
     std::vector<std::string>::const_iterator it;
     for (it = clues.begin(); it != clues.end(); ++it)

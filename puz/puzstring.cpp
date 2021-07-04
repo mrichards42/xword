@@ -190,6 +190,39 @@ static char unicode_to_puz(unsigned int cp)
     }
 }
 
+static bool can_encode_puz(unsigned int cp)
+{
+    if (cp > 255)
+        return false;
+    else if (cp < 128 || cp >= 160)
+        return true;
+    else
+    {
+        // Search for the code point in the replacement table
+        unsigned int * result =
+            std::find(windowsTable,
+                windowsTable + sizeof(windowsTable),
+                cp);
+        return result != windowsTable + sizeof(windowsTable);
+    }
+}
+
+PUZ_API bool puz::can_encode_puz(const string_t & str) {
+    string_t::const_iterator it;
+    string_t::const_iterator begin = str.begin();
+    string_t::const_iterator end = str.end();
+    for (it = begin; it != end; ++it)
+    {
+#if PUZ_UNICODE
+        if (!can_encode_puz(static_cast<unsigned int>(*it)))
+#else
+        if (!can_encode_puz(utf8_to_unicode(it, end)))
+#endif // PUZ_UNICODE
+            return false;
+    }
+    return true;
+}
+
 static unsigned int puz_to_unicode(unsigned char ch)
 {
     if (ch < 128 || ch >= 160)
@@ -385,11 +418,11 @@ static bool IsOkForPuz(const string_t & str)
 }
 
 // Return unformatted text, and throw an exception if it is formatted.
-std::string GetPuzText(const string_t & str)
+std::string GetPuzText(const string_t & str, std::string(*encode_text)(const string_t&))
 {
     if (! IsOkForPuz(str))
         throw ConversionError("Puz format does not support XHTML formatting.");
-    return encode_puz(unescape_xml(str, UNESCAPE_ALL));
+    return encode_text(unescape_xml(str, UNESCAPE_ALL));
 }
 
 //----------------------------------------------------------------------------

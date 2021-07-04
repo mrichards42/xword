@@ -49,13 +49,18 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     f.ReadCharArray(c_masked, 8);
 
     // Version is "[major].[minor]\0"
-    // We can read puzzles of 1.[anything]
+    // We can read puzzles of 1.[anything] or 2.[anything]
     std::string versionstr = f.ReadString(4);
-    if (versionstr[0] != '1' || ! isdigit(versionstr[2]))
+    if (! isdigit(versionstr[0]) || ! isdigit(versionstr[2]) || versionstr[0] > '2')
         throw LoadError("Unknown puz version.");
 
-    const unsigned short version = 10 + versionstr[2] - 0x30;
-    (void) version; // unused
+    // 1.x uses Windows-1252; 2.x uses UTF-8.
+    const unsigned short version = 10 * (versionstr[0] - 0x30) + versionstr[2] - 0x30;
+    string_t(*decode_text)(const std::string&);
+    if (version >= 20)
+        decode_text = decode_utf8;
+    else
+        decode_text = decode_puz;
 
     f.Skip(2); // 1 unknown short
     const unsigned short c_grid = f.ReadShort();
@@ -118,9 +123,9 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     puz->NumberGrid();
 
     // General puzzle info
-    puz->SetTitle(decode_puz(f.ReadString()));
-    puz->SetAuthor(decode_puz(f.ReadString()));
-    puz->SetCopyright(decode_puz(f.ReadString()));
+    puz->SetTitle(decode_text(f.ReadString()));
+    puz->SetAuthor(decode_text(f.ReadString()));
+    puz->SetCopyright(decode_text(f.ReadString()));
 
     // Clues
     std::vector<string_t> clues;
@@ -131,14 +136,14 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     for (size_t i = 0; i < num_clues; ++i)
     {
         cksum_clues.push_back(f.ReadString());
-        clues.push_back(escape_xml(decode_puz(cksum_clues.back())));
+        clues.push_back(escape_xml(decode_text(cksum_clues.back())));
     }
 
     puz->SetAllClues(clues);
 
     // Notes
     std::string notes = f.ReadString();
-    puz->SetNotes(escape_xml(decode_puz(notes)));
+    puz->SetNotes(escape_xml(decode_text(notes)));
 
     puz->SetOk(true);
 
