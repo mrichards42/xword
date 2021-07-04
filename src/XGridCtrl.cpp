@@ -22,6 +22,7 @@
 #include <wx/tooltip.h>
 #include <list>
 #include <algorithm>
+#include <cfloat>
 #include "PuzEvent.hpp"
 #include "XGridDrawer.hpp"
 #include "messages.hpp"
