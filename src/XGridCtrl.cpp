@@ -1674,6 +1674,49 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
                 break;
             }
         }
+        // If we didn't find a square, relax the requirement that the word must be in the same
+        // direction as the current word, and instead look for a word in the same clue list.
+        if (!newSquare && !m_ownsFocusedWord) {
+            puz::Clues& clues = m_puz->GetClues();
+            puz::Clues::iterator cluelist_it;
+            for (cluelist_it = clues.begin(); cluelist_it != clues.end(); ++cluelist_it)
+            {
+                puz::ClueList& cluelist = cluelist_it->second;
+                puz::ClueList::iterator clue;
+                // See if this cluelist contains the current word.
+                for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
+                {
+                    if (&clue->GetWord() == m_focusedWord)
+                        break;
+                }
+                if (clue == cluelist.end())
+                    continue;
+                // Find the closest square in a different word and the same direction as the arrow.
+                puz::Square* closestSquare = NULL;
+                puz::Word* closestSquareWord = NULL;
+                double closestSquareDistance = DBL_MAX;
+                for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
+                {
+                    puz::Word* word = &clue->GetWord();
+                    if (word == m_focusedWord)
+                        continue;
+                    for (puz::square_iterator square_it = word->begin(); square_it != word->end(); ++square_it) {
+                        if (arrowDirection == puz::GetDirection(*m_focusedSquare, *square_it)) {
+                            double distance = std::sqrt(
+                                std::pow(m_focusedSquare->GetRow() - square_it->GetRow(), 2) +
+                                std::pow(m_focusedSquare->GetCol() - square_it->GetCol(), 2));
+                            if (distance < closestSquareDistance) {
+                                closestSquareDistance = distance;
+                                closestSquare = &*square_it;
+                                closestSquareWord = word;
+                            }
+                        }
+                    }
+                }
+                newSquare = closestSquare;
+                newWord = closestSquareWord;
+            }
+        }
         // Find the first square in the word
         if (newSquare) {
             if (newWord)
