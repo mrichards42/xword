@@ -16,6 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#include "parse/pugixml/pugixml.hpp"
 #include "puzstring.hpp"
 #include "exceptions.hpp"
 #include <algorithm>
@@ -126,34 +127,18 @@ static void unicode_to_utf8(unsigned int cp, std::string & str)
 #if PUZ_UNICODE
 string_t decode_utf8(const std::string & str)
 {
-    string_t ret;
 #else
 std::wstring to_unicode(const std::string & str)
 {
-    std::wstring ret;
 #endif // PUZ_UNICODE
-    ret.reserve(str.size());
-    std::string::const_iterator it;
-    std::string::const_iterator begin = str.begin();
-    std::string::const_iterator end = str.end();
-    for (it = begin; it != end; ++it)
-        ret.push_back(utf8_to_unicode(it, end));
-    return ret;
+    return pugi::as_wide(str);
 }
 
 
 #if PUZ_UNICODE
 std::string encode_utf8(const string_t & str)
 {
-    std::string ret;
-    ret.reserve(str.size());
-
-    string_t::const_iterator it;
-    string_t::const_iterator begin = str.begin();
-    string_t::const_iterator end = str.end();
-    for (it = begin; it != end; ++it)
-        unicode_to_utf8(static_cast<unsigned int>(*it), ret);
-    return ret;
+    return pugi::as_utf8(str);
 }
 
 
@@ -568,11 +553,17 @@ string_t unescape_xml(const string_t & str, int options)
                 if (entity_char == 0)
                     ret.append(str.substr(index, nchars));
                 else
+                {
+                    // Depending on the platform, entity_char may or may not be encoded as a single
+                    // character. So we first encode it as UTF-8, and then decode it as a string_t.
+                    std::string entity_str;
+                    unicode_to_utf8(entity_char, entity_str);
 #if PUZ_UNICODE
-                    ret.append(1, entity_char);
+                    ret.append(decode_utf8(entity_str));
 #else
-                    unicode_to_utf8(entity_char, ret);
+                    ret.append(entity_str);
 #endif
+                }
                 start = index + nchars;
             }
                 break;
