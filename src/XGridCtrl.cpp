@@ -1703,9 +1703,9 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
                         continue;
                     for (puz::square_iterator square_it = word->begin(); square_it != word->end(); ++square_it) {
                         if (arrowDirection == puz::GetDirection(*m_focusedSquare, *square_it)) {
-                            double distance = std::sqrt(
-                                std::pow(m_focusedSquare->GetRow() - square_it->GetRow(), 2) +
-                                std::pow(m_focusedSquare->GetCol() - square_it->GetCol(), 2));
+                            double distance =
+                                std::abs(m_focusedSquare->GetRow() - square_it->GetRow()) +
+                                std::abs(m_focusedSquare->GetCol() - square_it->GetCol());
                             if (distance < closestSquareDistance) {
                                 closestSquareDistance = distance;
                                 closestSquare = &*square_it;
