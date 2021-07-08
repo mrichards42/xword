@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxPointSizeRect
 // ---------------------------------------------------------------------------
@@ -45,8 +49,16 @@ static int LUACALL wxLua_wxPoint_GetX(lua_State *L)
 {
     // get this
     wxPoint *self = (wxPoint *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->x) == (double)(self->x)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->x);
+} else
+#endif
+{
     lua_pushnumber(L, self->x);
+}
     // return the number of values
     return 1;
 }
@@ -61,8 +73,8 @@ static int LUACALL wxLua_wxPoint_GetXY(lua_State *L)
     // get this
     wxPoint *self = (wxPoint *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint);
     // push the result number
-    lua_pushnumber(L, self->x);
-    lua_pushnumber(L, self->y);
+    lua_pushinteger(L, self->x);
+    lua_pushinteger(L, self->y);
     // return the number of parameters
     return 2;
 }
@@ -76,8 +88,16 @@ static int LUACALL wxLua_wxPoint_GetY(lua_State *L)
 {
     // get this
     wxPoint *self = (wxPoint *)wxluaT_getuserdatatype(L, 1, wxluatype_wxPoint);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->y) == (double)(self->y)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->y);
+} else
+#endif
+{
     lua_pushnumber(L, self->y);
+}
     // return the number of values
     return 1;
 }
@@ -520,7 +540,7 @@ static int LUACALL wxLua_wxRealPoint_GetX(lua_State *L)
 {
     // get this
     wxRealPoint *self = (wxRealPoint *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRealPoint);
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, self->x);
     // return the number of values
     return 1;
@@ -534,7 +554,7 @@ static int LUACALL wxLua_wxRealPoint_GetY(lua_State *L)
 {
     // get this
     wxRealPoint *self = (wxRealPoint *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRealPoint);
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, self->y);
     // return the number of values
     return 1;
@@ -681,7 +701,15 @@ static int LUACALL wxLua_wxSize_GetHeight(lua_State *L)
     // call GetHeight
     int returns = (self->GetHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -697,7 +725,15 @@ static int LUACALL wxLua_wxSize_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1303,7 +1339,15 @@ static int LUACALL wxLua_wxRect_GetBottom(lua_State *L)
     // call GetBottom
     int returns = (self->GetBottom());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1361,7 +1405,15 @@ static int LUACALL wxLua_wxRect_GetHeight(lua_State *L)
     // call GetHeight
     int returns = (self->GetHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1377,7 +1429,15 @@ static int LUACALL wxLua_wxRect_GetLeft(lua_State *L)
     // call GetLeft
     int returns = (self->GetLeft());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1412,7 +1472,15 @@ static int LUACALL wxLua_wxRect_GetRight(lua_State *L)
     // call GetRight
     int returns = (self->GetRight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1447,7 +1515,15 @@ static int LUACALL wxLua_wxRect_GetTop(lua_State *L)
     // call GetTop
     int returns = (self->GetTop());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1505,7 +1581,15 @@ static int LUACALL wxLua_wxRect_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1521,7 +1605,15 @@ static int LUACALL wxLua_wxRect_GetX(lua_State *L)
     // call GetX
     int returns = (self->GetX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1537,7 +1629,15 @@ static int LUACALL wxLua_wxRect_GetY(lua_State *L)
     // call GetY
     int returns = (self->GetY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1550,8 +1650,16 @@ static int LUACALL wxLua_wxRect_Get_height(lua_State *L)
 {
     // get this
     wxRect *self = (wxRect *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->height) == (double)(self->height)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->height);
+} else
+#endif
+{
     lua_pushnumber(L, self->height);
+}
     // return the number of values
     return 1;
 }
@@ -1564,8 +1672,16 @@ static int LUACALL wxLua_wxRect_Get_width(lua_State *L)
 {
     // get this
     wxRect *self = (wxRect *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->width) == (double)(self->width)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->width);
+} else
+#endif
+{
     lua_pushnumber(L, self->width);
+}
     // return the number of values
     return 1;
 }
@@ -1578,8 +1694,16 @@ static int LUACALL wxLua_wxRect_Get_x(lua_State *L)
 {
     // get this
     wxRect *self = (wxRect *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->x) == (double)(self->x)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->x);
+} else
+#endif
+{
     lua_pushnumber(L, self->x);
+}
     // return the number of values
     return 1;
 }
@@ -1592,8 +1716,16 @@ static int LUACALL wxLua_wxRect_Get_y(lua_State *L)
 {
     // get this
     wxRect *self = (wxRect *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRect);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->y) == (double)(self->y)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->y);
+} else
+#endif
+{
     lua_pushnumber(L, self->y);
+}
     // return the number of values
     return 1;
 }
@@ -2480,7 +2612,15 @@ static int LUACALL wxLua_wxRegion_Contains3(lua_State *L)
     // call Contains
     wxRegionContain returns = (self->Contains(x, y, w, h));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2500,7 +2640,15 @@ static int LUACALL wxLua_wxRegion_Contains2(lua_State *L)
     // call Contains
     wxRegionContain returns = (self->Contains(*rect));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2518,7 +2666,15 @@ static int LUACALL wxLua_wxRegion_Contains1(lua_State *L)
     // call Contains
     wxRegionContain returns = (self->Contains(*pt));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2540,7 +2696,15 @@ static int LUACALL wxLua_wxRegion_Contains(lua_State *L)
     // call Contains
     wxRegionContain returns = (self->Contains(x, y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2605,10 +2769,10 @@ static int LUACALL wxLua_wxRegion_GetBoxXYWH(lua_State *L)
     wxRegion *self = (wxRegion *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRegion);
     // call GetBox
     self->GetBox(x, y, width, height);
-    lua_pushnumber(L, x);
-    lua_pushnumber(L, y);
-    lua_pushnumber(L, width);
-    lua_pushnumber(L, height);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
+    lua_pushinteger(L, width);
+    lua_pushinteger(L, height);
     // return the number of parameters
     return 4;
 }
@@ -3316,7 +3480,15 @@ static int LUACALL wxLua_wxRegionIterator_GetHeight(lua_State *L)
     // call GetHeight
     long returns = (self->GetHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3355,7 +3527,15 @@ static int LUACALL wxLua_wxRegionIterator_GetWidth(lua_State *L)
     // call GetWidth
     long returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3371,7 +3551,15 @@ static int LUACALL wxLua_wxRegionIterator_GetX(lua_State *L)
     // call GetX
     long returns = (self->GetX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3387,7 +3575,15 @@ static int LUACALL wxLua_wxRegionIterator_GetY(lua_State *L)
     // call GetY
     long returns = (self->GetY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3634,7 +3830,15 @@ static int LUACALL wxLua_wxFontInfo_GetWeightClosestToNumericValue(lua_State *L)
     // call GetWeightClosestToNumericValue
     wxFontWeight returns = (wxFontInfo::GetWeightClosestToNumericValue(numWeight));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4024,7 +4228,15 @@ static int LUACALL wxLua_wxFont_GetDefaultEncoding(lua_State *L)
     // call GetDefaultEncoding
     wxFontEncoding returns = (wxFont::GetDefaultEncoding());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4043,7 +4255,15 @@ static int LUACALL wxLua_wxFont_GetEncoding(lua_State *L)
     // call GetEncoding
     wxFontEncoding returns = (self->GetEncoding());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4077,7 +4297,15 @@ static int LUACALL wxLua_wxFont_GetFamily(lua_State *L)
     // call GetFamily
     int returns = (self->GetFamily());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4094,7 +4322,7 @@ static int LUACALL wxLua_wxFont_GetFractionalPointSize(lua_State *L)
     wxFont * self = (wxFont *)wxluaT_getuserdatatype(L, 1, wxluatype_wxFont);
     // call GetFractionalPointSize
     float returns = (self->GetFractionalPointSize());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -4169,7 +4397,15 @@ static int LUACALL wxLua_wxFont_GetNumericWeight(lua_State *L)
     // call GetNumericWeight
     int returns = (self->GetNumericWeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4188,7 +4424,15 @@ static int LUACALL wxLua_wxFont_GetNumericWeightOf(lua_State *L)
     // call GetNumericWeightOf
     int returns = (wxFont::GetNumericWeightOf(weight));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4228,7 +4472,15 @@ static int LUACALL wxLua_wxFont_GetPointSize(lua_State *L)
     // call GetPointSize
     int returns = (self->GetPointSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4264,7 +4516,15 @@ static int LUACALL wxLua_wxFont_GetStyle(lua_State *L)
     // call GetStyle
     int returns = (self->GetStyle());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4296,7 +4556,15 @@ static int LUACALL wxLua_wxFont_GetWeight(lua_State *L)
     // call GetWeight
     int returns = (self->GetWeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5796,7 +6064,15 @@ static int LUACALL wxLua_wxNativeFontInfo_GetEncoding(lua_State *L)
     // call GetEncoding
     wxFontEncoding returns = (self->GetEncoding());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5830,7 +6106,15 @@ static int LUACALL wxLua_wxNativeFontInfo_GetFamily(lua_State *L)
     // call GetFamily
     wxFontFamily returns = (self->GetFamily());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5869,7 +6153,15 @@ static int LUACALL wxLua_wxNativeFontInfo_GetPointSize(lua_State *L)
     // call GetPointSize
     int returns = (self->GetPointSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5885,7 +6177,15 @@ static int LUACALL wxLua_wxNativeFontInfo_GetStyle(lua_State *L)
     // call GetStyle
     wxFontStyle returns = (self->GetStyle());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5917,7 +6217,15 @@ static int LUACALL wxLua_wxNativeFontInfo_GetWeight(lua_State *L)
     // call GetWeight
     wxFontWeight returns = (self->GetWeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6663,7 +6971,15 @@ static int LUACALL wxLua_wxFontMapper_CharsetToEncoding(lua_State *L)
     // call CharsetToEncoding
     wxFontEncoding returns = (self->CharsetToEncoding(charset, interactive));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6709,7 +7025,7 @@ static int LUACALL wxLua_wxFontMapper_GetAltForEncoding(lua_State *L)
     // push the result number
     lua_pushboolean(L, returns);
     // push the result encoding
-    lua_pushnumber(L, altEncoding);
+    lua_pushinteger(L, altEncoding);
     // return the number of parameters
     return 2;
 }
@@ -6743,7 +7059,15 @@ static int LUACALL wxLua_wxFontMapper_GetEncoding(lua_State *L)
     // call GetEncoding
     wxFontEncoding returns = (wxFontMapper::GetEncoding(n));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6775,7 +7099,15 @@ static int LUACALL wxLua_wxFontMapper_GetEncodingFromName(lua_State *L)
     // call GetEncodingFromName
     wxFontEncoding returns = (wxFontMapper::GetEncodingFromName(encoding));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6806,7 +7138,15 @@ static int LUACALL wxLua_wxFontMapper_GetSupportedEncodingsCount(lua_State *L)
     // call GetSupportedEncodingsCount
     size_t returns = (wxFontMapper::GetSupportedEncodingsCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6996,7 +7336,15 @@ static int LUACALL wxLua_wxColour_Alpha(lua_State *L)
     // call Alpha
     unsigned char returns = (self->Alpha());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7019,7 +7367,15 @@ static int LUACALL wxLua_wxColour_AlphaBlend(lua_State *L)
     // call AlphaBlend
     unsigned char returns = (wxColour::AlphaBlend(fg, bg, alpha));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7037,7 +7393,15 @@ static int LUACALL wxLua_wxColour_Blue(lua_State *L)
     // call Blue
     unsigned char returns = (self->Blue());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7101,7 +7465,7 @@ static int LUACALL wxLua_wxColour_GetLuminance(lua_State *L)
     wxColour * self = (wxColour *)wxluaT_getuserdatatype(L, 1, wxluatype_wxColour);
     // call GetLuminance
     double returns = (self->GetLuminance());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -7121,7 +7485,15 @@ static int LUACALL wxLua_wxColour_GetRGB(lua_State *L)
     // call GetRGB
     wxUint32 returns = (self->GetRGB());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7137,7 +7509,15 @@ static int LUACALL wxLua_wxColour_GetRGBA(lua_State *L)
     // call GetRGBA
     wxUint32 returns = (self->GetRGBA());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7155,7 +7535,15 @@ static int LUACALL wxLua_wxColour_Green(lua_State *L)
     // call Green
     unsigned char returns = (self->Green());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7249,7 +7637,15 @@ static int LUACALL wxLua_wxColour_Red(lua_State *L)
     // call Red
     unsigned char returns = (self->Red());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8012,7 +8408,15 @@ static int LUACALL wxLua_wxPen_GetCap(lua_State *L)
     // call GetCap
     wxPenCap returns = (self->GetCap());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8047,7 +8451,15 @@ static int LUACALL wxLua_wxPen_GetJoin(lua_State *L)
     // call GetJoin
     wxPenJoin returns = (self->GetJoin());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8083,7 +8495,15 @@ static int LUACALL wxLua_wxPen_GetStyle(lua_State *L)
     // call GetStyle
     wxPenStyle returns = (self->GetStyle());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8099,7 +8519,15 @@ static int LUACALL wxLua_wxPen_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8761,7 +9189,15 @@ static int LUACALL wxLua_wxBrush_GetStyle(lua_State *L)
     // call GetStyle
     int returns = (self->GetStyle());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -9668,7 +10104,15 @@ static int LUACALL wxLua_wxPalette_GetColoursCount(lua_State *L)
     // call GetColoursCount
     int returns = (self->GetColoursCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -9690,7 +10134,15 @@ static int LUACALL wxLua_wxPalette_GetPixel(lua_State *L)
     // call GetPixel
     int returns = (self->GetPixel(red, green, blue));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -9711,9 +10163,9 @@ static int LUACALL wxLua_wxPalette_GetRGB(lua_State *L)
     bool returns = self->GetRGB(pixel, &red, &green, &blue);
     // push the result number
     lua_pushboolean(L, returns);
-    lua_pushnumber(L, red);
-    lua_pushnumber(L, green);
-    lua_pushnumber(L, blue);
+    lua_pushinteger(L, red);
+    lua_pushinteger(L, green);
+    lua_pushinteger(L, blue);
     // return the number of parameters
     return 4;
 }
@@ -9786,15 +10238,15 @@ static int LUACALL wxLua_wxPalette_constructor2(lua_State *L);
 static int LUACALL wxLua_wxPalette_constructor2(lua_State *L)
 {
     // const unsigned char blue
-    wxCharBuffer blue = wxlua_getstringtype(L, 4);
+    const unsigned char * blue = (const unsigned char *)wxlua_getstringtype(L, 4);
     // const unsigned char green
-    wxCharBuffer green = wxlua_getstringtype(L, 3);
+    const unsigned char * green = (const unsigned char *)wxlua_getstringtype(L, 3);
     // const unsigned char red
-    wxCharBuffer red = wxlua_getstringtype(L, 2);
+    const unsigned char * red = (const unsigned char *)wxlua_getstringtype(L, 2);
     // int n
     int n = (int)wxlua_getnumbertype(L, 1);
     // call constructor
-    wxPalette* returns = new wxPalette(n, (const unsigned char*)(const char*)red, (const unsigned char*)(const char*)green, (const unsigned char*)(const char*)blue);
+    wxPalette* returns = new wxPalette(n, red, green, blue);
     // add to tracked memory list
     wxluaO_addgcobject(L, returns, wxluatype_wxPalette);
     // push the constructed class pointer
@@ -9927,7 +10379,15 @@ static int LUACALL wxLua_wxIcon_GetDepth(lua_State *L)
     // call GetDepth
     int returns = (self->GetDepth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -9943,7 +10403,15 @@ static int LUACALL wxLua_wxIcon_GetHeight(lua_State *L)
     // call GetHeight
     int returns = (self->GetHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -9959,7 +10427,15 @@ static int LUACALL wxLua_wxIcon_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -10841,7 +11317,15 @@ static int LUACALL wxLua_wxBitmap_GetDepth(lua_State *L)
     // call GetDepth
     int returns = (self->GetDepth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -10857,7 +11341,15 @@ static int LUACALL wxLua_wxBitmap_GetHeight(lua_State *L)
     // call GetHeight
     int returns = (self->GetHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -10912,7 +11404,7 @@ static int LUACALL wxLua_wxBitmap_GetScaleFactor(lua_State *L)
     wxBitmap * self = (wxBitmap *)wxluaT_getuserdatatype(L, 1, wxluatype_wxBitmap);
     // call GetScaleFactor
     double returns = (self->GetScaleFactor());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -10928,7 +11420,7 @@ static int LUACALL wxLua_wxBitmap_GetScaledHeight(lua_State *L)
     wxBitmap * self = (wxBitmap *)wxluaT_getuserdatatype(L, 1, wxluatype_wxBitmap);
     // call GetScaledHeight
     double returns = (self->GetScaledHeight());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -10969,7 +11461,7 @@ static int LUACALL wxLua_wxBitmap_GetScaledWidth(lua_State *L)
     wxBitmap * self = (wxBitmap *)wxluaT_getuserdatatype(L, 1, wxluatype_wxBitmap);
     // call GetScaledWidth
     double returns = (self->GetScaledWidth());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -11034,7 +11526,15 @@ static int LUACALL wxLua_wxBitmap_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11849,7 +12349,15 @@ static int LUACALL wxLua_wxCursor_GetDepth(lua_State *L)
     // call GetDepth
     int returns = (self->GetDepth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11865,7 +12373,15 @@ static int LUACALL wxLua_wxCursor_GetHeight(lua_State *L)
     // call GetHeight
     int returns = (self->GetHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11906,7 +12422,15 @@ static int LUACALL wxLua_wxCursor_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12520,7 +13044,15 @@ static int LUACALL wxLua_wxImageList_Add2(lua_State *L)
     // call Add
     int returns = (self->Add(*icon));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12543,7 +13075,15 @@ static int LUACALL wxLua_wxImageList_Add1(lua_State *L)
     // call Add
     int returns = (self->Add(*bitmap, *maskColour));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12568,7 +13108,15 @@ static int LUACALL wxLua_wxImageList_Add(lua_State *L)
     // call Add
     int returns = (self->Add(*bitmap, *mask));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12667,7 +13215,15 @@ static int LUACALL wxLua_wxImageList_GetImageCount(lua_State *L)
     // call GetImageCount
     int returns = (self->GetImageCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12689,8 +13245,8 @@ static int LUACALL wxLua_wxImageList_GetSize(lua_State *L)
     wxImageList *self = (wxImageList *)wxluaT_getuserdatatype(L, 1, wxluatype_wxImageList);
     // call GetSize
     self->GetSize(index, width, height);
-    lua_pushnumber(L, width);
-    lua_pushnumber(L, height);
+    lua_pushinteger(L, width);
+    lua_pushinteger(L, height);
     // return the number of parameters
     return 2;
 }
@@ -12895,6 +13451,419 @@ int wxImageList_methodCount = sizeof(wxImageList_methods)/sizeof(wxLuaBindMethod
 #endif  // wxLUA_USE_wxImageList
 
 
+#if (wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)
+// ---------------------------------------------------------------------------
+// Bind struct wxMatrix2D
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxMatrix2D'
+int wxluatype_wxMatrix2D = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxMatrix2D_constructor[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxMatrix2D_constructor(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxMatrix2D_constructor[1] = {{ wxLua_wxMatrix2D_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 4, s_wxluatypeArray_wxLua_wxMatrix2D_constructor }};
+//     wxMatrix2D(wxDouble v11 = 1, wxDouble v12 = 0, wxDouble v21 = 0, wxDouble v22 = 1);
+static int LUACALL wxLua_wxMatrix2D_constructor(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // wxDouble v22 = 1
+    wxDouble v22 = (argCount >= 4 ? (wxDouble)wxlua_getnumbertype(L, 4) : 1);
+    // wxDouble v21 = 0
+    wxDouble v21 = (argCount >= 3 ? (wxDouble)wxlua_getnumbertype(L, 3) : 0);
+    // wxDouble v12 = 0
+    wxDouble v12 = (argCount >= 2 ? (wxDouble)wxlua_getnumbertype(L, 2) : 0);
+    // wxDouble v11 = 1
+    wxDouble v11 = (argCount >= 1 ? (wxDouble)wxlua_getnumbertype(L, 1) : 1);
+    // call constructor
+    wxMatrix2D* returns = new wxMatrix2D(v11, v12, v21, v22);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxMatrix2D);
+
+    return 1;
+}
+
+
+
+
+void wxLua_wxMatrix2D_delete_function(void** p)
+{
+    wxMatrix2D* o = (wxMatrix2D*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxMatrix2D_methods[] = {
+    { "wxMatrix2D", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxMatrix2D_constructor, 1, NULL },
+
+    { 0, 0, 0, 0 },
+};
+
+int wxMatrix2D_methodCount = sizeof(wxMatrix2D_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // (wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)
+
+
+#if (wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)
+// ---------------------------------------------------------------------------
+// Bind class wxAffineMatrix2D
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxAffineMatrix2D'
+int wxluatype_wxAffineMatrix2D = WXLUA_TUNKNOWN;
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_Concat[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_wxAffineMatrix2D, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_Concat(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_Concat[1] = {{ wxLua_wxAffineMatrix2D_Concat, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxAffineMatrix2D_Concat }};
+//     void Concat(const wxAffineMatrix2D& t);
+static int LUACALL wxLua_wxAffineMatrix2D_Concat(lua_State *L)
+{
+    // const wxAffineMatrix2D t
+    const wxAffineMatrix2D * t = (const wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 2, wxluatype_wxAffineMatrix2D);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call Concat
+    self->Concat(*t);
+
+    return 0;
+}
+
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_Get[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_wxMatrix2D, &wxluatype_wxPoint2DDouble, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_Get(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_Get[1] = {{ wxLua_wxAffineMatrix2D_Get, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxAffineMatrix2D_Get }};
+//     void Get(wxMatrix2D* mat2D, wxPoint2DDouble* tr) const;
+static int LUACALL wxLua_wxAffineMatrix2D_Get(lua_State *L)
+{
+    // wxPoint2DDouble tr
+    wxPoint2DDouble * tr = (wxPoint2DDouble *)wxluaT_getuserdatatype(L, 3, wxluatype_wxPoint2DDouble);
+    // wxMatrix2D mat2D
+    wxMatrix2D * mat2D = (wxMatrix2D *)wxluaT_getuserdatatype(L, 2, wxluatype_wxMatrix2D);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call Get
+    self->Get(mat2D, tr);
+
+    return 0;
+}
+
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_Invert[] = { &wxluatype_wxAffineMatrix2D, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_Invert(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_Invert[1] = {{ wxLua_wxAffineMatrix2D_Invert, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxAffineMatrix2D_Invert }};
+//     bool Invert();
+static int LUACALL wxLua_wxAffineMatrix2D_Invert(lua_State *L)
+{
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call Invert
+    bool returns = (self->Invert());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_IsEqual[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_wxAffineMatrix2D, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_IsEqual(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_IsEqual[1] = {{ wxLua_wxAffineMatrix2D_IsEqual, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxAffineMatrix2D_IsEqual }};
+//     void IsEqual(const wxAffineMatrix2D& t);
+static int LUACALL wxLua_wxAffineMatrix2D_IsEqual(lua_State *L)
+{
+    // const wxAffineMatrix2D t
+    const wxAffineMatrix2D * t = (const wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 2, wxluatype_wxAffineMatrix2D);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call IsEqual
+    self->IsEqual(*t);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_IsIdentity[] = { &wxluatype_wxAffineMatrix2D, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_IsIdentity(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_IsIdentity[1] = {{ wxLua_wxAffineMatrix2D_IsIdentity, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxAffineMatrix2D_IsIdentity }};
+//     bool IsIdentity() const;
+static int LUACALL wxLua_wxAffineMatrix2D_IsIdentity(lua_State *L)
+{
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call IsIdentity
+    bool returns = (self->IsIdentity());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_Mirror[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_Mirror(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_Mirror[1] = {{ wxLua_wxAffineMatrix2D_Mirror, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxAffineMatrix2D_Mirror }};
+//     void Mirror(int direction = wxHORIZONTAL);
+static int LUACALL wxLua_wxAffineMatrix2D_Mirror(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int direction = wxHORIZONTAL
+    int direction = (argCount >= 2 ? (int)wxlua_getnumbertype(L, 2) : wxHORIZONTAL);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call Mirror
+    self->Mirror(direction);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_Rotate[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_Rotate(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_Rotate[1] = {{ wxLua_wxAffineMatrix2D_Rotate, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxAffineMatrix2D_Rotate }};
+//     void Rotate(wxDouble cRadians);
+static int LUACALL wxLua_wxAffineMatrix2D_Rotate(lua_State *L)
+{
+    // wxDouble cRadians
+    wxDouble cRadians = (wxDouble)wxlua_getnumbertype(L, 2);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call Rotate
+    self->Rotate(cRadians);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_Scale[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_Scale(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_Scale[1] = {{ wxLua_wxAffineMatrix2D_Scale, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxAffineMatrix2D_Scale }};
+//     void Scale(wxDouble xScale, wxDouble yScale);
+static int LUACALL wxLua_wxAffineMatrix2D_Scale(lua_State *L)
+{
+    // wxDouble yScale
+    wxDouble yScale = (wxDouble)wxlua_getnumbertype(L, 3);
+    // wxDouble xScale
+    wxDouble xScale = (wxDouble)wxlua_getnumbertype(L, 2);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call Scale
+    self->Scale(xScale, yScale);
+
+    return 0;
+}
+
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_Set[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_wxMatrix2D, &wxluatype_wxPoint2DDouble, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_Set(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_Set[1] = {{ wxLua_wxAffineMatrix2D_Set, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxAffineMatrix2D_Set }};
+//     void Set(const wxMatrix2D& mat2D, const wxPoint2DDouble& tr);
+static int LUACALL wxLua_wxAffineMatrix2D_Set(lua_State *L)
+{
+    // const wxPoint2DDouble tr
+    const wxPoint2DDouble * tr = (const wxPoint2DDouble *)wxluaT_getuserdatatype(L, 3, wxluatype_wxPoint2DDouble);
+    // const wxMatrix2D mat2D
+    const wxMatrix2D * mat2D = (const wxMatrix2D *)wxluaT_getuserdatatype(L, 2, wxluatype_wxMatrix2D);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call Set
+    self->Set(*mat2D, *tr);
+
+    return 0;
+}
+
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformDistance1[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_TLIGHTUSERDATA, &wxluatype_TLIGHTUSERDATA, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_TransformDistance1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_TransformDistance1[1] = {{ wxLua_wxAffineMatrix2D_TransformDistance1, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformDistance1 }};
+//     void TransformDistance(wxDouble* dx, wxDouble* dy) const;
+static int LUACALL wxLua_wxAffineMatrix2D_TransformDistance1(lua_State *L)
+{
+    // wxDouble dy
+    wxDouble * dy = (wxDouble *)wxlua_touserdata(L, 3);
+    // wxDouble dx
+    wxDouble * dx = (wxDouble *)wxlua_touserdata(L, 2);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call TransformDistance
+    self->TransformDistance(dx, dy);
+
+    return 0;
+}
+
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformDistance[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_wxPoint2DDouble, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_TransformDistance(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_TransformDistance[1] = {{ wxLua_wxAffineMatrix2D_TransformDistance, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformDistance }};
+//     wxPoint2DDouble TransformDistance(const wxPoint2DDouble& p) const;
+static int LUACALL wxLua_wxAffineMatrix2D_TransformDistance(lua_State *L)
+{
+    // const wxPoint2DDouble p
+    const wxPoint2DDouble * p = (const wxPoint2DDouble *)wxluaT_getuserdatatype(L, 2, wxluatype_wxPoint2DDouble);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call TransformDistance
+    // allocate a new object using the copy constructor
+    wxPoint2DDouble* returns = new wxPoint2DDouble(self->TransformDistance(*p));
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxPoint2DDouble);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxPoint2DDouble);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformPoint1[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_TLIGHTUSERDATA, &wxluatype_TLIGHTUSERDATA, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_TransformPoint1(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_TransformPoint1[1] = {{ wxLua_wxAffineMatrix2D_TransformPoint1, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformPoint1 }};
+//     void TransformPoint(wxDouble* x, wxDouble* y) const;
+static int LUACALL wxLua_wxAffineMatrix2D_TransformPoint1(lua_State *L)
+{
+    // wxDouble y
+    wxDouble * y = (wxDouble *)wxlua_touserdata(L, 3);
+    // wxDouble x
+    wxDouble * x = (wxDouble *)wxlua_touserdata(L, 2);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call TransformPoint
+    self->TransformPoint(x, y);
+
+    return 0;
+}
+
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformPoint[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_wxPoint2DDouble, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_TransformPoint(lua_State *L);
+// static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_TransformPoint[1] = {{ wxLua_wxAffineMatrix2D_TransformPoint, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformPoint }};
+//     wxPoint2DDouble TransformPoint(const wxPoint2DDouble& p) const;
+static int LUACALL wxLua_wxAffineMatrix2D_TransformPoint(lua_State *L)
+{
+    // const wxPoint2DDouble p
+    const wxPoint2DDouble * p = (const wxPoint2DDouble *)wxluaT_getuserdatatype(L, 2, wxluatype_wxPoint2DDouble);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call TransformPoint
+    // allocate a new object using the copy constructor
+    wxPoint2DDouble* returns = new wxPoint2DDouble(self->TransformPoint(*p));
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxPoint2DDouble);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxPoint2DDouble);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_Translate[] = { &wxluatype_wxAffineMatrix2D, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxAffineMatrix2D_Translate(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_Translate[1] = {{ wxLua_wxAffineMatrix2D_Translate, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxAffineMatrix2D_Translate }};
+//     void Translate(wxDouble dx, wxDouble dy);
+static int LUACALL wxLua_wxAffineMatrix2D_Translate(lua_State *L)
+{
+    // wxDouble dy
+    wxDouble dy = (wxDouble)wxlua_getnumbertype(L, 3);
+    // wxDouble dx
+    wxDouble dx = (wxDouble)wxlua_getnumbertype(L, 2);
+    // get this
+    wxAffineMatrix2D * self = (wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 1, wxluatype_wxAffineMatrix2D);
+    // call Translate
+    self->Translate(dx, dy);
+
+    return 0;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxAffineMatrix2D_delete[] = { &wxluatype_wxAffineMatrix2D, NULL };
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxAffineMatrix2D_delete }};
+
+static int LUACALL wxLua_wxAffineMatrix2D_constructor(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_constructor[1] = {{ wxLua_wxAffineMatrix2D_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
+//     wxAffineMatrix2D();
+static int LUACALL wxLua_wxAffineMatrix2D_constructor(lua_State *L)
+{
+    // call constructor
+    wxAffineMatrix2D* returns = new wxAffineMatrix2D();
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxAffineMatrix2D);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxAffineMatrix2D);
+
+    return 1;
+}
+
+
+
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))||(((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY))
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_TransformDistance_overload[] =
+{
+    { wxLua_wxAffineMatrix2D_TransformDistance1, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformDistance1 },
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+    { wxLua_wxAffineMatrix2D_TransformDistance, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformDistance },
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+};
+static int s_wxluafunc_wxLua_wxAffineMatrix2D_TransformDistance_overload_count = sizeof(s_wxluafunc_wxLua_wxAffineMatrix2D_TransformDistance_overload)/sizeof(wxLuaBindCFunc);
+
+// function overload table
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxAffineMatrix2D_TransformPoint_overload[] =
+{
+    { wxLua_wxAffineMatrix2D_TransformPoint1, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformPoint1 },
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+    { wxLua_wxAffineMatrix2D_TransformPoint, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxAffineMatrix2D_TransformPoint },
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+};
+static int s_wxluafunc_wxLua_wxAffineMatrix2D_TransformPoint_overload_count = sizeof(s_wxluafunc_wxLua_wxAffineMatrix2D_TransformPoint_overload)/sizeof(wxLuaBindCFunc);
+
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))||(((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY))
+
+void wxLua_wxAffineMatrix2D_delete_function(void** p)
+{
+    wxAffineMatrix2D* o = (wxAffineMatrix2D*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxAffineMatrix2D_methods[] = {
+    { "Concat", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_Concat, 1, NULL },
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+    { "Get", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_Get, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+
+    { "Invert", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_Invert, 1, NULL },
+    { "IsEqual", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_IsEqual, 1, NULL },
+    { "IsIdentity", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_IsIdentity, 1, NULL },
+    { "Mirror", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_Mirror, 1, NULL },
+    { "Rotate", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_Rotate, 1, NULL },
+    { "Scale", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_Scale, 1, NULL },
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+    { "Set", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_Set, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY)
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))||(((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY))
+    { "TransformDistance", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_TransformDistance_overload, s_wxluafunc_wxLua_wxAffineMatrix2D_TransformDistance_overload_count, 0 },
+    { "TransformPoint", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_TransformPoint_overload, s_wxluafunc_wxLua_wxAffineMatrix2D_TransformPoint_overload_count, 0 },
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))||(((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)) && (wxLUA_USE_Geometry && wxUSE_GEOMETRY))
+
+    { "Translate", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxAffineMatrix2D_Translate, 1, NULL },
+    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxAffineMatrix2D_delete, 1, NULL },
+    { "wxAffineMatrix2D", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxAffineMatrix2D_constructor, 1, NULL },
+
+    { 0, 0, 0, 0 },
+};
+
+int wxAffineMatrix2D_methodCount = sizeof(wxAffineMatrix2D_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // (wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)
+
+
 #if wxLUA_USE_wxDC
 // ---------------------------------------------------------------------------
 // Bind class wxDC
@@ -12957,6 +13926,26 @@ static int LUACALL wxLua_wxDC_CalcBoundingBox(lua_State *L)
     return 0;
 }
 
+
+#if (wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxDC_CanUseTransformMatrix[] = { &wxluatype_wxDC, NULL };
+static int LUACALL wxLua_wxDC_CanUseTransformMatrix(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDC_CanUseTransformMatrix[1] = {{ wxLua_wxDC_CanUseTransformMatrix, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxDC_CanUseTransformMatrix }};
+//     %wxchkver_2_9_2 bool CanUseTransformMatrix() const;
+static int LUACALL wxLua_wxDC_CanUseTransformMatrix(lua_State *L)
+{
+    // get this
+    wxDC * self = (wxDC *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDC);
+    // call CanUseTransformMatrix
+    bool returns = (self->CanUseTransformMatrix());
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // (wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDC_Clear[] = { &wxluatype_wxDC, NULL };
 static int LUACALL wxLua_wxDC_Clear(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDC_Clear[1] = {{ wxLua_wxDC_Clear, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxDC_Clear }};
@@ -13016,7 +14005,15 @@ static int LUACALL wxLua_wxDC_DeviceToLogicalX(lua_State *L)
     // call DeviceToLogicalX
     wxCoord returns = (self->DeviceToLogicalX(x));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13034,7 +14031,15 @@ static int LUACALL wxLua_wxDC_DeviceToLogicalXRel(lua_State *L)
     // call DeviceToLogicalXRel
     wxCoord returns = (self->DeviceToLogicalXRel(x));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13052,7 +14057,15 @@ static int LUACALL wxLua_wxDC_DeviceToLogicalY(lua_State *L)
     // call DeviceToLogicalY
     wxCoord returns = (self->DeviceToLogicalY(y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13070,7 +14083,15 @@ static int LUACALL wxLua_wxDC_DeviceToLogicalYRel(lua_State *L)
     // call DeviceToLogicalYRel
     wxCoord returns = (self->DeviceToLogicalYRel(y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13624,7 +14645,15 @@ static int LUACALL wxLua_wxDC_GetBackgroundMode(lua_State *L)
     // call GetBackgroundMode
     int returns = (self->GetBackgroundMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13660,7 +14689,15 @@ static int LUACALL wxLua_wxDC_GetCharHeight(lua_State *L)
     // call GetCharHeight
     wxCoord returns = (self->GetCharHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13676,7 +14713,15 @@ static int LUACALL wxLua_wxDC_GetCharWidth(lua_State *L)
     // call GetCharWidth
     wxCoord returns = (self->GetCharWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13697,10 +14742,10 @@ static int LUACALL wxLua_wxDC_GetClippingBox(lua_State *L)
     // call GetClippingBox
     self->GetClippingBox(&x, &y, &width, &height);
     // push results
-    lua_pushnumber(L, x);
-    lua_pushnumber(L, y);
-    lua_pushnumber(L, width);
-    lua_pushnumber(L, height);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
+    lua_pushinteger(L, width);
+    lua_pushinteger(L, height);
     // return the number of parameters
     return 4;
 }
@@ -13718,7 +14763,7 @@ static int LUACALL wxLua_wxDC_GetContentScaleFactor(lua_State *L)
     wxDC * self = (wxDC *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDC);
     // call GetContentScaleFactor
     double returns = (self->GetContentScaleFactor());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -13757,7 +14802,15 @@ static int LUACALL wxLua_wxDC_GetLayoutDirection(lua_State *L)
     // call GetLayoutDirection
     wxLayoutDirection returns = (self->GetLayoutDirection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13775,7 +14828,15 @@ static int LUACALL wxLua_wxDC_GetLogicalFunction(lua_State *L)
     // call GetLogicalFunction
     int returns = (self->GetLogicalFunction());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13791,7 +14852,15 @@ static int LUACALL wxLua_wxDC_GetMapMode(lua_State *L)
     // call GetMapMode
     int returns = (self->GetMapMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13819,9 +14888,9 @@ static int LUACALL wxLua_wxDC_GetMultiLineTextExtent(lua_State *L)
     wxDC *self = (wxDC *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDC);
     // call GetTextExtent
     self->GetMultiLineTextExtent(string, &w, &h, &heightLine, font);
-    lua_pushnumber(L, w);
-    lua_pushnumber(L, h);
-    lua_pushnumber(L, heightLine);
+    lua_pushinteger(L, w);
+    lua_pushinteger(L, h);
+    lua_pushinteger(L, heightLine);
     // return the number of parameters
     return 4;
 }
@@ -13952,8 +15021,8 @@ static int LUACALL wxLua_wxDC_GetSize(lua_State *L)
     wxDC *self = (wxDC *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDC);
     // call GetSize
     self->GetSize(&width, &height);
-    lua_pushnumber(L, width);
-    lua_pushnumber(L, height);
+    lua_pushinteger(L, width);
+    lua_pushinteger(L, height);
     // return the number of parameters
     return 2;
 }
@@ -14002,10 +15071,10 @@ static int LUACALL wxLua_wxDC_GetTextExtent(lua_State *L)
     wxDC *self = (wxDC *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDC);
     // call GetTextExtent
     self->GetTextExtent(string, &w, &h, &descent, &externalLeading, font);
-    lua_pushnumber(L, w);
-    lua_pushnumber(L, h);
-    lua_pushnumber(L, descent);
-    lua_pushnumber(L, externalLeading);
+    lua_pushinteger(L, w);
+    lua_pushinteger(L, h);
+    lua_pushinteger(L, descent);
+    lua_pushinteger(L, externalLeading);
     // return the number of parameters
     return 4;
 }
@@ -14055,6 +15124,28 @@ static int LUACALL wxLua_wxDC_GetTextForeground(lua_State *L)
 }
 
 #endif // (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxDC)
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)) && ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))
+static wxLuaArgType s_wxluatypeArray_wxLua_wxDC_GetTransformMatrix[] = { &wxluatype_wxDC, NULL };
+static int LUACALL wxLua_wxDC_GetTransformMatrix(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDC_GetTransformMatrix[1] = {{ wxLua_wxDC_GetTransformMatrix, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxDC_GetTransformMatrix }};
+//     %wxchkver_2_9_2 wxAffineMatrix2D GetTransformMatrix() const;
+static int LUACALL wxLua_wxDC_GetTransformMatrix(lua_State *L)
+{
+    // get this
+    wxDC * self = (wxDC *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDC);
+    // call GetTransformMatrix
+    // allocate a new object using the copy constructor
+    wxAffineMatrix2D* returns = new wxAffineMatrix2D(self->GetTransformMatrix());
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxAffineMatrix2D);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxAffineMatrix2D);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)) && ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDC_GetUserScale[] = { &wxluatype_wxDC, NULL };
 static int LUACALL wxLua_wxDC_GetUserScale(lua_State *L);
@@ -14155,7 +15246,15 @@ static int LUACALL wxLua_wxDC_LogicalToDeviceX(lua_State *L)
     // call LogicalToDeviceX
     wxCoord returns = (self->LogicalToDeviceX(x));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14173,7 +15272,15 @@ static int LUACALL wxLua_wxDC_LogicalToDeviceXRel(lua_State *L)
     // call LogicalToDeviceXRel
     wxCoord returns = (self->LogicalToDeviceXRel(x));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14191,7 +15298,15 @@ static int LUACALL wxLua_wxDC_LogicalToDeviceY(lua_State *L)
     // call LogicalToDeviceY
     wxCoord returns = (self->LogicalToDeviceY(y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14209,7 +15324,15 @@ static int LUACALL wxLua_wxDC_LogicalToDeviceYRel(lua_State *L)
     // call LogicalToDeviceYRel
     wxCoord returns = (self->LogicalToDeviceYRel(y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14225,7 +15348,15 @@ static int LUACALL wxLua_wxDC_MaxX(lua_State *L)
     // call MaxX
     wxCoord returns = (self->MaxX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14241,7 +15372,15 @@ static int LUACALL wxLua_wxDC_MaxY(lua_State *L)
     // call MaxY
     wxCoord returns = (self->MaxY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14257,7 +15396,15 @@ static int LUACALL wxLua_wxDC_MinX(lua_State *L)
     // call MinX
     wxCoord returns = (self->MinX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14273,7 +15420,15 @@ static int LUACALL wxLua_wxDC_MinY(lua_State *L)
     // call MinY
     wxCoord returns = (self->MinY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14291,6 +15446,24 @@ static int LUACALL wxLua_wxDC_ResetBoundingBox(lua_State *L)
 
     return 0;
 }
+
+
+#if (wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxDC_ResetTransformMatrix[] = { &wxluatype_wxDC, NULL };
+static int LUACALL wxLua_wxDC_ResetTransformMatrix(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDC_ResetTransformMatrix[1] = {{ wxLua_wxDC_ResetTransformMatrix, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxDC_ResetTransformMatrix }};
+//     %wxchkver_2_9_2 void ResetTransformMatrix();
+static int LUACALL wxLua_wxDC_ResetTransformMatrix(lua_State *L)
+{
+    // get this
+    wxDC * self = (wxDC *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDC);
+    // call ResetTransformMatrix
+    self->ResetTransformMatrix();
+
+    return 0;
+}
+
+#endif // (wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDC_SetAxisOrientation[] = { &wxluatype_wxDC, &wxluatype_TBOOLEAN, &wxluatype_TBOOLEAN, NULL };
 static int LUACALL wxLua_wxDC_SetAxisOrientation(lua_State *L);
@@ -14604,6 +15777,27 @@ static int LUACALL wxLua_wxDC_SetTextForeground(lua_State *L)
 
 #endif // (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxDC)
 
+#if ((wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)) && ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))
+static wxLuaArgType s_wxluatypeArray_wxLua_wxDC_SetTransformMatrix[] = { &wxluatype_wxDC, &wxluatype_wxAffineMatrix2D, NULL };
+static int LUACALL wxLua_wxDC_SetTransformMatrix(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDC_SetTransformMatrix[1] = {{ wxLua_wxDC_SetTransformMatrix, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxDC_SetTransformMatrix }};
+//     %wxchkver_2_9_2 bool SetTransformMatrix(const wxAffineMatrix2D& matrix);
+static int LUACALL wxLua_wxDC_SetTransformMatrix(lua_State *L)
+{
+    // const wxAffineMatrix2D matrix
+    const wxAffineMatrix2D * matrix = (const wxAffineMatrix2D *)wxluaT_getuserdatatype(L, 2, wxluatype_wxAffineMatrix2D);
+    // get this
+    wxDC * self = (wxDC *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDC);
+    // call SetTransformMatrix
+    bool returns = (self->SetTransformMatrix(*matrix));
+    // push the result flag
+    lua_pushboolean(L, returns);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)) && ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))
+
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDC_SetUserScale[] = { &wxluatype_wxDC, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
 static int LUACALL wxLua_wxDC_SetUserScale(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDC_SetUserScale[1] = {{ wxLua_wxDC_SetUserScale, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxDC_SetUserScale }};
@@ -14723,6 +15917,11 @@ void wxLua_wxDC_delete_function(void** p)
 wxLuaBindMethod wxDC_methods[] = {
     { "Blit", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_Blit, 1, NULL },
     { "CalcBoundingBox", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_CalcBoundingBox, 1, NULL },
+
+#if (wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)
+    { "CanUseTransformMatrix", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_CanUseTransformMatrix, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)
+
     { "Clear", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_Clear, 1, NULL },
     { "CrossHair", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_CrossHair, 1, NULL },
     { "DestroyClippingRegion", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_DestroyClippingRegion, 1, NULL },
@@ -14844,6 +16043,10 @@ wxLuaBindMethod wxDC_methods[] = {
     { "GetTextForeground", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_GetTextForeground, 1, NULL },
 #endif // (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxDC)
 
+#if ((wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)) && ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))
+    { "GetTransformMatrix", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_GetTransformMatrix, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)) && ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))
+
     { "GetUserScale", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_GetUserScale, 1, NULL },
 
 #if (((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxDC)) && (wxLUA_USE_wxColourPenBrush)) && (wxLUA_USE_wxPointSizeRect)
@@ -14861,6 +16064,11 @@ wxLuaBindMethod wxDC_methods[] = {
     { "MinX", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_MinX, 1, NULL },
     { "MinY", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_MinY, 1, NULL },
     { "ResetBoundingBox", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_ResetBoundingBox, 1, NULL },
+
+#if (wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)
+    { "ResetTransformMatrix", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_ResetTransformMatrix, 1, NULL },
+#endif // (wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)
+
     { "SetAxisOrientation", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_SetAxisOrientation, 1, NULL },
 
 #if (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxDC)
@@ -14899,6 +16107,10 @@ wxLuaBindMethod wxDC_methods[] = {
     { "SetTextBackground", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_SetTextBackground, 1, NULL },
     { "SetTextForeground", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_SetTextForeground, 1, NULL },
 #endif // (wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxDC)
+
+#if ((wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)) && ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))
+    { "SetTransformMatrix", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_SetTransformMatrix, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,9,2)) && (wxLUA_USE_wxDC)) && ((wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY))
 
     { "SetUserScale", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_SetUserScale, 1, NULL },
     { "StartDoc", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDC_StartDoc, 1, NULL },
@@ -15838,7 +17050,15 @@ static int LUACALL wxLua_wxCaret_GetBlinkTime(lua_State *L)
     // call GetBlinkTime
     int returns = (wxCaret::GetBlinkTime());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15880,8 +17100,8 @@ static int LUACALL wxLua_wxCaret_GetPositionXY(lua_State *L)
     // call GetPosition
     self->GetPosition(&x, &y);
     // return the number of parameters
-    lua_pushnumber(L, x);
-    lua_pushnumber(L, y);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
     // return the number of parameters
     return 2;
 }
@@ -15923,8 +17143,8 @@ static int LUACALL wxLua_wxCaret_GetSizeWH(lua_State *L)
     wxCaret *self = (wxCaret *)wxluaT_getuserdatatype(L, 1, wxluatype_wxCaret);
     // call GetSize
     self->GetSize(&x, &y);
-    lua_pushnumber(L, x);
-    lua_pushnumber(L, y);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
     // return the number of parameters
     return 2;
 }
@@ -16342,7 +17562,15 @@ static int LUACALL wxLua_wxVideoMode_GetDepth(lua_State *L)
     // call GetDepth
     int returns = (self->GetDepth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16358,7 +17586,15 @@ static int LUACALL wxLua_wxVideoMode_GetHeight(lua_State *L)
     // call GetHeight
     int returns = (self->GetHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16374,7 +17610,15 @@ static int LUACALL wxLua_wxVideoMode_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16571,7 +17815,15 @@ static int LUACALL wxLua_wxArrayVideoModes_GetCount(lua_State *L)
     // call GetCount
     int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16849,7 +18101,15 @@ static int LUACALL wxLua_wxDisplay_GetCount(lua_State *L)
     // call GetCount
     size_t returns = (wxDisplay::GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -16886,31 +18146,45 @@ static int LUACALL wxLua_wxDisplay_GetFromPoint(lua_State *L)
     // call GetFromPoint
     int returns = (wxDisplay::GetFromPoint(*pt));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
 
 #endif // (wxLUA_USE_wxDisplay && wxUSE_DISPLAY) && (wxLUA_USE_wxPointSizeRect)
 
-#if (wxCHECK_VERSION(2,8,0) || !defined(__WXGTK__)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDisplay_GetFromWindow[] = { &wxluatype_wxWindow, NULL };
 static int LUACALL wxLua_wxDisplay_GetFromWindow(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxDisplay_GetFromWindow[1] = {{ wxLua_wxDisplay_GetFromWindow, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxDisplay_GetFromWindow }};
-//     %wxchkver_2_8|!%gtk static int GetFromWindow(wxWindow* win);
+//     static int GetFromWindow(const wxWindow* win);
 static int LUACALL wxLua_wxDisplay_GetFromWindow(lua_State *L)
 {
-    // wxWindow win
-    wxWindow * win = (wxWindow *)wxluaT_getuserdatatype(L, 1, wxluatype_wxWindow);
+    // const wxWindow win
+    const wxWindow * win = (const wxWindow *)wxluaT_getuserdatatype(L, 1, wxluatype_wxWindow);
     // call GetFromWindow
     int returns = (wxDisplay::GetFromWindow(win));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
 
-#endif // (wxCHECK_VERSION(2,8,0) || !defined(__WXGTK__)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
 
 #if (wxLUA_USE_wxDisplay && wxUSE_DISPLAY) && (wxLUA_USE_wxPointSizeRect)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDisplay_GetGeometry[] = { &wxluatype_wxDisplay, NULL };
@@ -16995,6 +18269,68 @@ static int LUACALL wxLua_wxDisplay_GetPPI(lua_State *L)
 }
 
 #endif // ((wxCHECK_VERSION(3,1,2)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)) && (wxLUA_USE_wxPointSizeRect)
+
+#if (wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxDisplay_GetScaleFactor[] = { &wxluatype_wxDisplay, NULL };
+static int LUACALL wxLua_wxDisplay_GetScaleFactor(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDisplay_GetScaleFactor[1] = {{ wxLua_wxDisplay_GetScaleFactor, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxDisplay_GetScaleFactor }};
+//     %wxchkver_3_1_5 double GetScaleFactor() const;
+static int LUACALL wxLua_wxDisplay_GetScaleFactor(lua_State *L)
+{
+    // get this
+    wxDisplay * self = (wxDisplay *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDisplay);
+    // call GetScaleFactor
+    double returns = (self->GetScaleFactor());
+    // push the result floating point number
+    lua_pushnumber(L, returns);
+
+    return 1;
+}
+
+#endif // (wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
+
+#if ((wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)) && (wxLUA_USE_wxPointSizeRect)
+static int LUACALL wxLua_wxDisplay_GetStdPPI(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDisplay_GetStdPPI[1] = {{ wxLua_wxDisplay_GetStdPPI, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
+//     %wxchkver_3_1_5 static wxSize GetStdPPI();
+static int LUACALL wxLua_wxDisplay_GetStdPPI(lua_State *L)
+{
+    // call GetStdPPI
+    // allocate a new object using the copy constructor
+    wxSize* returns = new wxSize(wxDisplay::GetStdPPI());
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxSize);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxSize);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)) && (wxLUA_USE_wxPointSizeRect)
+
+#if (wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
+static int LUACALL wxLua_wxDisplay_GetStdPPIValue(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxDisplay_GetStdPPIValue[1] = {{ wxLua_wxDisplay_GetStdPPIValue, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
+//     %wxchkver_3_1_5 static int GetStdPPIValue();
+static int LUACALL wxLua_wxDisplay_GetStdPPIValue(lua_State *L)
+{
+    // call GetStdPPIValue
+    int returns = (wxDisplay::GetStdPPIValue());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
+#endif // (wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
 
 #if (!wxCHECK_VERSION(3,0,0)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxDisplay_IsOk[] = { &wxluatype_wxDisplay, NULL };
@@ -17146,9 +18482,7 @@ wxLuaBindMethod wxDisplay_methods[] = {
     { "GetFromPoint", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxDisplay_GetFromPoint, 1, NULL },
 #endif // (wxLUA_USE_wxDisplay && wxUSE_DISPLAY) && (wxLUA_USE_wxPointSizeRect)
 
-#if (wxCHECK_VERSION(2,8,0) || !defined(__WXGTK__)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
     { "GetFromWindow", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxDisplay_GetFromWindow, 1, NULL },
-#endif // (wxCHECK_VERSION(2,8,0) || !defined(__WXGTK__)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
 
 #if (wxLUA_USE_wxDisplay && wxUSE_DISPLAY) && (wxLUA_USE_wxPointSizeRect)
     { "GetGeometry", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDisplay_GetGeometry, 1, NULL },
@@ -17160,6 +18494,18 @@ wxLuaBindMethod wxDisplay_methods[] = {
 #if ((wxCHECK_VERSION(3,1,2)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)) && (wxLUA_USE_wxPointSizeRect)
     { "GetPPI", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDisplay_GetPPI, 1, NULL },
 #endif // ((wxCHECK_VERSION(3,1,2)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)) && (wxLUA_USE_wxPointSizeRect)
+
+#if (wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
+    { "GetScaleFactor", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDisplay_GetScaleFactor, 1, NULL },
+#endif // (wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
+
+#if ((wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)) && (wxLUA_USE_wxPointSizeRect)
+    { "GetStdPPI", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxDisplay_GetStdPPI, 1, NULL },
+#endif // ((wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)) && (wxLUA_USE_wxPointSizeRect)
+
+#if (wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
+    { "GetStdPPIValue", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxDisplay_GetStdPPIValue, 1, NULL },
+#endif // (wxCHECK_VERSION(3,1,5)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
 
 #if (!wxCHECK_VERSION(3,0,0)) && (wxLUA_USE_wxDisplay && wxUSE_DISPLAY)
     { "IsOk", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxDisplay_IsOk, 1, NULL },
@@ -17565,8 +18911,16 @@ static int LUACALL wxLua_wxSplitterRenderParams_Get_border(lua_State *L)
 {
     // get this
     wxSplitterRenderParams *self = (wxSplitterRenderParams *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSplitterRenderParams);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->border) == (double)(self->border)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->border);
+} else
+#endif
+{
     lua_pushnumber(L, self->border);
+}
     // return the number of values
     return 1;
 }
@@ -17593,8 +18947,16 @@ static int LUACALL wxLua_wxSplitterRenderParams_Get_widthSash(lua_State *L)
 {
     // get this
     wxSplitterRenderParams *self = (wxSplitterRenderParams *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSplitterRenderParams);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->widthSash) == (double)(self->widthSash)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->widthSash);
+} else
+#endif
+{
     lua_pushnumber(L, self->widthSash);
+}
     // return the number of values
     return 1;
 }
@@ -17685,8 +19047,16 @@ static int LUACALL wxLua_wxHeaderButtonParams_Get_m_labelAlignment(lua_State *L)
 {
     // get this
     wxHeaderButtonParams *self = (wxHeaderButtonParams *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHeaderButtonParams);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->m_labelAlignment) == (double)(self->m_labelAlignment)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->m_labelAlignment);
+} else
+#endif
+{
     lua_pushnumber(L, self->m_labelAlignment);
+}
     // return the number of values
     return 1;
 }
@@ -18045,8 +19415,16 @@ static int LUACALL wxLua_wxRendererVersion_Get_age(lua_State *L)
 {
     // get this
     wxRendererVersion *self = (wxRendererVersion *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRendererVersion);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->age) == (double)(self->age)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->age);
+} else
+#endif
+{
     lua_pushnumber(L, self->age);
+}
     // return the number of values
     return 1;
 }
@@ -18059,8 +19437,16 @@ static int LUACALL wxLua_wxRendererVersion_Get_version(lua_State *L)
 {
     // get this
     wxRendererVersion *self = (wxRendererVersion *)wxluaT_getuserdatatype(L, 1, wxluatype_wxRendererVersion);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->version) == (double)(self->version)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->version);
+} else
+#endif
+{
     lua_pushnumber(L, self->version);
+}
     // return the number of values
     return 1;
 }
@@ -18246,7 +19632,15 @@ static int LUACALL wxLua_wxRendererNative_DrawHeaderButton(lua_State *L)
     // call DrawHeaderButton
     int returns = (self->DrawHeaderButton(win, *dc, *rect, flags, sortArrow, params));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -18276,7 +19670,15 @@ static int LUACALL wxLua_wxRendererNative_DrawHeaderButtonContents(lua_State *L)
     // call DrawHeaderButtonContents
     int returns = (self->DrawHeaderButtonContents(win, *dc, *rect, flags, sortArrow, params));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -18459,7 +19861,15 @@ static int LUACALL wxLua_wxRendererNative_GetHeaderButtonHeight(lua_State *L)
     // call GetHeaderButtonHeight
     int returns = (self->GetHeaderButtonHeight(win));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

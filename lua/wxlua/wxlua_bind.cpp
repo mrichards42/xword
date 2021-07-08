@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 // ---------------------------------------------------------------------------
 // Bind class wxLuaState
 // ---------------------------------------------------------------------------
@@ -73,7 +77,15 @@ static int LUACALL wxLua_wxLuaObject_GetAllocationFlag(lua_State *L)
     // call GetAllocationFlag
     int returns = (self->GetAllocationFlag());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -187,7 +199,15 @@ static int LUACALL wxLua_wxLuaEvent_GetLineNum(lua_State *L)
     // call GetLineNum
     int returns = (self->GetLineNum());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1334,7 +1354,15 @@ static int LUACALL wxLua_function_iswxluatype(lua_State *L)
     // call wxlua_iswxluatype
     int returns = (wxlua_iswxluatype(luatype, wxluaarg_tag));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

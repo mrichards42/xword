@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_wxDateTime && wxUSE_DATETIME
 // ---------------------------------------------------------------------------
@@ -48,7 +52,15 @@ static int LUACALL wxLua_wxDateTime_TimeZone_GetOffset(lua_State *L)
     // call GetOffset
     long returns = (self->GetOffset());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -178,7 +190,15 @@ static int LUACALL wxLua_wxDateTime_ConvertYearToBC(lua_State *L)
     // call ConvertYearToBC
     int returns = (wxDateTime::ConvertYearToBC(year));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -328,7 +348,15 @@ static int LUACALL wxLua_wxDateTime_GetAsDOS(lua_State *L)
     // call GetAsDOS
     unsigned long returns = (self->GetAsDOS());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -371,7 +399,15 @@ static int LUACALL wxLua_wxDateTime_GetCentury1(lua_State *L)
     // call GetCentury
     int returns = (self->GetCentury(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -387,7 +423,15 @@ static int LUACALL wxLua_wxDateTime_GetCentury(lua_State *L)
     // call GetCentury
     int returns = (wxDateTime::GetCentury(year));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -400,7 +444,15 @@ static int LUACALL wxLua_wxDateTime_GetCountry(lua_State *L)
     // call GetCountry
     wxDateTime::Country returns = (wxDateTime::GetCountry());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -418,7 +470,15 @@ static int LUACALL wxLua_wxDateTime_GetCurrentMonth(lua_State *L)
     // call GetCurrentMonth
     wxDateTime::Month returns = (wxDateTime::GetCurrentMonth(cal));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -436,7 +496,15 @@ static int LUACALL wxLua_wxDateTime_GetCurrentYear(lua_State *L)
     // call GetCurrentYear
     int returns = (wxDateTime::GetCurrentYear(cal));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -475,7 +543,15 @@ static int LUACALL wxLua_wxDateTime_GetDay(lua_State *L)
     // call GetDay
     wxDateTime::wxDateTime_t returns = (self->GetDay(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -495,7 +571,15 @@ static int LUACALL wxLua_wxDateTime_GetDayOfYear(lua_State *L)
     // call GetDayOfYear
     wxDateTime::wxDateTime_t returns = (self->GetDayOfYear(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -538,7 +622,15 @@ static int LUACALL wxLua_wxDateTime_GetHour(lua_State *L)
     // call GetHour
     wxDateTime::wxDateTime_t returns = (self->GetHour(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -553,7 +645,7 @@ static int LUACALL wxLua_wxDateTime_GetJDN(lua_State *L)
     wxDateTime * self = (wxDateTime *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDateTime);
     // call GetJDN
     double returns = (self->GetJDN());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -569,7 +661,7 @@ static int LUACALL wxLua_wxDateTime_GetJulianDayNumber(lua_State *L)
     wxDateTime * self = (wxDateTime *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDateTime);
     // call GetJulianDayNumber
     double returns = (self->GetJulianDayNumber());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -637,7 +729,7 @@ static int LUACALL wxLua_wxDateTime_GetMJD(lua_State *L)
     wxDateTime * self = (wxDateTime *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDateTime);
     // call GetMJD
     double returns = (self->GetMJD());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -658,7 +750,15 @@ static int LUACALL wxLua_wxDateTime_GetMillisecond(lua_State *L)
     // call GetMillisecond
     wxDateTime::wxDateTime_t returns = (self->GetMillisecond(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -678,7 +778,15 @@ static int LUACALL wxLua_wxDateTime_GetMinute(lua_State *L)
     // call GetMinute
     wxDateTime::wxDateTime_t returns = (self->GetMinute(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -693,7 +801,7 @@ static int LUACALL wxLua_wxDateTime_GetModifiedJulianDayNumber(lua_State *L)
     wxDateTime * self = (wxDateTime *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDateTime);
     // call GetModifiedJulianDayNumber
     double returns = (self->GetModifiedJulianDayNumber());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -714,7 +822,15 @@ static int LUACALL wxLua_wxDateTime_GetMonth(lua_State *L)
     // call GetMonth
     wxDateTime::Month returns = (self->GetMonth(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -777,7 +893,15 @@ static int LUACALL wxLua_wxDateTime_GetNumberOfDays1(lua_State *L)
     // call GetNumberOfDays
     wxDateTime::wxDateTime_t returns = (wxDateTime::GetNumberOfDays(month, year, cal));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -797,7 +921,15 @@ static int LUACALL wxLua_wxDateTime_GetNumberOfDays(lua_State *L)
     // call GetNumberOfDays
     wxDateTime::wxDateTime_t returns = (wxDateTime::GetNumberOfDays(year, cal));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -833,7 +965,7 @@ static int LUACALL wxLua_wxDateTime_GetRataDie(lua_State *L)
     wxDateTime * self = (wxDateTime *)wxluaT_getuserdatatype(L, 1, wxluatype_wxDateTime);
     // call GetRataDie
     double returns = (self->GetRataDie());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -854,7 +986,15 @@ static int LUACALL wxLua_wxDateTime_GetSecond(lua_State *L)
     // call GetSecond
     wxDateTime::wxDateTime_t returns = (self->GetSecond(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -870,7 +1010,15 @@ static int LUACALL wxLua_wxDateTime_GetTicks1(lua_State *L)
     // call GetTicks
     time_t returns = (self->GetTicks());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -886,7 +1034,15 @@ static int LUACALL wxLua_wxDateTime_GetTicks(lua_State *L)
     // call GetTicks
     long returns = (self->GetTicks());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -935,7 +1091,15 @@ static int LUACALL wxLua_wxDateTime_GetWeekDay1(lua_State *L)
     // call GetWeekDay
     wxDateTime::WeekDay returns = (self->GetWeekDay(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1027,7 +1191,15 @@ static int LUACALL wxLua_wxDateTime_GetWeekOfMonth(lua_State *L)
     // call GetWeekOfMonth
     wxDateTime::wxDateTime_t returns = (self->GetWeekOfMonth(flags, *tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1049,7 +1221,15 @@ static int LUACALL wxLua_wxDateTime_GetWeekOfYear(lua_State *L)
     // call GetWeekOfYear
     wxDateTime::wxDateTime_t returns = (self->GetWeekOfYear(flags, *tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1069,7 +1249,15 @@ static int LUACALL wxLua_wxDateTime_GetYear(lua_State *L)
     // call GetYear
     int returns = (self->GetYear(*tz));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1150,7 +1338,15 @@ static int LUACALL wxLua_wxDateTime_IsDST(lua_State *L)
     // call IsDST
     int returns = (self->IsDST(country));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3514,7 +3710,15 @@ static int LUACALL wxLua_wxDateTimeArray_GetCount(lua_State *L)
     // call GetCount
     int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3828,7 +4032,15 @@ static int LUACALL wxLua_wxTimeSpan_GetDays(lua_State *L)
     // call GetDays
     int returns = (self->GetDays());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3844,7 +4056,15 @@ static int LUACALL wxLua_wxTimeSpan_GetHours(lua_State *L)
     // call GetHours
     int returns = (self->GetHours());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3883,7 +4103,15 @@ static int LUACALL wxLua_wxTimeSpan_GetMinutes(lua_State *L)
     // call GetMinutes
     int returns = (self->GetMinutes());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3941,7 +4169,15 @@ static int LUACALL wxLua_wxTimeSpan_GetWeeks(lua_State *L)
     // call GetWeeks
     int returns = (self->GetWeeks());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4458,7 +4694,15 @@ static int LUACALL wxLua_wxDateSpan_GetDays(lua_State *L)
     // call GetDays
     int returns = (self->GetDays());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4474,7 +4718,15 @@ static int LUACALL wxLua_wxDateSpan_GetMonths(lua_State *L)
     // call GetMonths
     int returns = (self->GetMonths());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4490,7 +4742,15 @@ static int LUACALL wxLua_wxDateSpan_GetTotalDays(lua_State *L)
     // call GetTotalDays
     int returns = (self->GetTotalDays());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4506,7 +4766,15 @@ static int LUACALL wxLua_wxDateSpan_GetWeeks(lua_State *L)
     // call GetWeeks
     int returns = (self->GetWeeks());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4522,7 +4790,15 @@ static int LUACALL wxLua_wxDateSpan_GetYears(lua_State *L)
     // call GetYears
     int returns = (self->GetYears());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4923,7 +5199,15 @@ static int LUACALL wxLua_wxDateTimeHolidayAuthority_GetHolidaysInRange(lua_State
     // call GetHolidaysInRange
     size_t returns = (wxDateTimeHolidayAuthority::GetHolidaysInRange(*dtStart, *dtEnd, *holidays));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5085,7 +5369,15 @@ static int LUACALL wxLua_wxStopWatch_Time(lua_State *L)
     // call Time
     long returns = (self->Time());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5132,970 +5424,4 @@ wxLuaBindMethod wxStopWatch_methods[] = {
 int wxStopWatch_methodCount = sizeof(wxStopWatch_methods)/sizeof(wxLuaBindMethod) - 1;
 
 #endif  // wxLUA_USE_wxStopWatch && wxUSE_STOPWATCH
-
-
-#if wxUSE_INTL
-// ---------------------------------------------------------------------------
-// Bind struct wxLanguageInfo
-// ---------------------------------------------------------------------------
-
-// Lua MetaTable Tag for Class 'wxLanguageInfo'
-int wxluatype_wxLanguageInfo = WXLUA_TUNKNOWN;
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_Get_CanonicalName[] = { &wxluatype_wxLanguageInfo, NULL };
-static int LUACALL wxLua_wxLanguageInfo_Get_CanonicalName(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_Get_CanonicalName[1] = {{ wxLua_wxLanguageInfo_Get_CanonicalName, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLanguageInfo_Get_CanonicalName }};
-//     wxString CanonicalName;         // Canonical name, e.g. fr_FR
-static int LUACALL wxLua_wxLanguageInfo_Get_CanonicalName(lua_State *L)
-{
-    // get this
-    wxLanguageInfo *self = (wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    // push the result string
-    wxlua_pushwxString(L, self->CanonicalName);
-    // return the number of values
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_Get_Description[] = { &wxluatype_wxLanguageInfo, NULL };
-static int LUACALL wxLua_wxLanguageInfo_Get_Description(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_Get_Description[1] = {{ wxLua_wxLanguageInfo_Get_Description, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLanguageInfo_Get_Description }};
-//     wxString Description;           // human-readable name of the language
-static int LUACALL wxLua_wxLanguageInfo_Get_Description(lua_State *L)
-{
-    // get this
-    wxLanguageInfo *self = (wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    // push the result string
-    wxlua_pushwxString(L, self->Description);
-    // return the number of values
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_Get_Language[] = { &wxluatype_wxLanguageInfo, NULL };
-static int LUACALL wxLua_wxLanguageInfo_Get_Language(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_Get_Language[1] = {{ wxLua_wxLanguageInfo_Get_Language, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLanguageInfo_Get_Language }};
-//     int Language;                   // wxLanguage id
-static int LUACALL wxLua_wxLanguageInfo_Get_Language(lua_State *L)
-{
-    // get this
-    wxLanguageInfo *self = (wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    // push the result number
-    lua_pushnumber(L, self->Language);
-    // return the number of values
-    return 1;
-}
-
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_Get_LayoutDirection[] = { &wxluatype_wxLanguageInfo, NULL };
-static int LUACALL wxLua_wxLanguageInfo_Get_LayoutDirection(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_Get_LayoutDirection[1] = {{ wxLua_wxLanguageInfo_Get_LayoutDirection, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLanguageInfo_Get_LayoutDirection }};
-//     %wxchkver_2_8 wxLayoutDirection LayoutDirection;
-static int LUACALL wxLua_wxLanguageInfo_Get_LayoutDirection(lua_State *L)
-{
-    // get this
-    wxLanguageInfo *self = (wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    // push the result number
-    lua_pushnumber(L, self->LayoutDirection);
-    // return the number of values
-    return 1;
-}
-
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_Set_CanonicalName[] = { &wxluatype_wxLanguageInfo, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLanguageInfo_Set_CanonicalName(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_Set_CanonicalName[1] = {{ wxLua_wxLanguageInfo_Set_CanonicalName, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLanguageInfo_Set_CanonicalName }};
-//     wxString CanonicalName;         // Canonical name, e.g. fr_FR
-static int LUACALL wxLua_wxLanguageInfo_Set_CanonicalName(lua_State *L)
-{
-    // get the string value
-    wxString val = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLanguageInfo *self = (wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    self->CanonicalName = val;
-    // return the number of values
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_Set_Description[] = { &wxluatype_wxLanguageInfo, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLanguageInfo_Set_Description(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_Set_Description[1] = {{ wxLua_wxLanguageInfo_Set_Description, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLanguageInfo_Set_Description }};
-//     wxString Description;           // human-readable name of the language
-static int LUACALL wxLua_wxLanguageInfo_Set_Description(lua_State *L)
-{
-    // get the string value
-    wxString val = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLanguageInfo *self = (wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    self->Description = val;
-    // return the number of values
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_Set_Language[] = { &wxluatype_wxLanguageInfo, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_wxLanguageInfo_Set_Language(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_Set_Language[1] = {{ wxLua_wxLanguageInfo_Set_Language, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLanguageInfo_Set_Language }};
-//     int Language;                   // wxLanguage id
-static int LUACALL wxLua_wxLanguageInfo_Set_Language(lua_State *L)
-{
-    // get the number value
-    int val = (int)wxlua_getnumbertype(L, 2);
-    // get this
-    wxLanguageInfo *self = (wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    self->Language = val;
-    // return the number of values
-    return 0;
-}
-
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_Set_LayoutDirection[] = { &wxluatype_wxLanguageInfo, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_wxLanguageInfo_Set_LayoutDirection(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_Set_LayoutDirection[1] = {{ wxLua_wxLanguageInfo_Set_LayoutDirection, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLanguageInfo_Set_LayoutDirection }};
-//     %wxchkver_2_8 wxLayoutDirection LayoutDirection;
-static int LUACALL wxLua_wxLanguageInfo_Set_LayoutDirection(lua_State *L)
-{
-    // get the enum value
-    wxLayoutDirection val = (wxLayoutDirection)wxlua_getenumtype(L, 2);
-    // get this
-    wxLanguageInfo *self = (wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    self->LayoutDirection = val;
-    // return the number of values
-    return 0;
-}
-
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLanguageInfo_delete[] = { &wxluatype_wxLanguageInfo, NULL };
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxLanguageInfo_delete }};
-
-static int LUACALL wxLua_wxLanguageInfo_constructor(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLanguageInfo_constructor[1] = {{ wxLua_wxLanguageInfo_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxLanguageInfo(); // you must set all the values by hand
-static int LUACALL wxLua_wxLanguageInfo_constructor(lua_State *L)
-{
-    // call constructor
-    wxLanguageInfo* returns = new wxLanguageInfo();
-    // add to tracked memory list
-    wxluaO_addgcobject(L, returns, wxluatype_wxLanguageInfo);
-    // push the constructed class pointer
-    wxluaT_pushuserdatatype(L, returns, wxluatype_wxLanguageInfo);
-
-    return 1;
-}
-
-
-
-
-void wxLua_wxLanguageInfo_delete_function(void** p)
-{
-    wxLanguageInfo* o = (wxLanguageInfo*)(*p);
-    delete o;
-}
-
-// Map Lua Class Methods to C Binding Functions
-wxLuaBindMethod wxLanguageInfo_methods[] = {
-    { "CanonicalName", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_wxLanguageInfo_Set_CanonicalName, 1, NULL },
-    { "CanonicalName", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_wxLanguageInfo_Get_CanonicalName, 1, NULL },
-    { "Description", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_wxLanguageInfo_Set_Description, 1, NULL },
-    { "Description", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_wxLanguageInfo_Get_Description, 1, NULL },
-    // %member    { "Get_CanonicalName", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLanguageInfo_Get_CanonicalName, 1, NULL },
-    // %member    { "Get_Description", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLanguageInfo_Get_Description, 1, NULL },
-    // %member    { "Get_Language", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLanguageInfo_Get_Language, 1, NULL },
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-    // %member    { "Get_LayoutDirection", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLanguageInfo_Get_LayoutDirection, 1, NULL },
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-    { "Language", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_wxLanguageInfo_Set_Language, 1, NULL },
-    { "Language", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_wxLanguageInfo_Get_Language, 1, NULL },
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-    { "LayoutDirection", WXLUAMETHOD_SETPROP, s_wxluafunc_wxLua_wxLanguageInfo_Set_LayoutDirection, 1, NULL },
-    { "LayoutDirection", WXLUAMETHOD_GETPROP, s_wxluafunc_wxLua_wxLanguageInfo_Get_LayoutDirection, 1, NULL },
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-    // %member    { "Set_CanonicalName", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLanguageInfo_Set_CanonicalName, 1, NULL },
-    // %member    { "Set_Description", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLanguageInfo_Set_Description, 1, NULL },
-    // %member    { "Set_Language", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLanguageInfo_Set_Language, 1, NULL },
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-    // %member    { "Set_LayoutDirection", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLanguageInfo_Set_LayoutDirection, 1, NULL },
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxLanguageInfo_delete, 1, NULL },
-    { "wxLanguageInfo", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxLanguageInfo_constructor, 1, NULL },
-
-    { 0, 0, 0, 0 },
-};
-
-int wxLanguageInfo_methodCount = sizeof(wxLanguageInfo_methods)/sizeof(wxLuaBindMethod) - 1;
-
-#endif  // wxUSE_INTL
-
-
-#if wxUSE_INTL
-// ---------------------------------------------------------------------------
-// Bind class wxLocale
-// ---------------------------------------------------------------------------
-
-// Lua MetaTable Tag for Class 'wxLocale'
-int wxluatype_wxLocale = WXLUA_TUNKNOWN;
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_AddCatalog1[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, &wxluatype_TINTEGER, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_AddCatalog1(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_AddCatalog1[1] = {{ wxLua_wxLocale_AddCatalog1, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxLocale_AddCatalog1 }};
-//     bool AddCatalog(const wxString& szDomain, wxLanguage msgIdLanguage, const wxString& msgIdCharset);
-static int LUACALL wxLua_wxLocale_AddCatalog1(lua_State *L)
-{
-    // const wxString msgIdCharset
-    const wxString msgIdCharset = wxlua_getwxStringtype(L, 4);
-    // wxLanguage msgIdLanguage
-    wxLanguage msgIdLanguage = (wxLanguage)wxlua_getenumtype(L, 3);
-    // const wxString szDomain
-    const wxString szDomain = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call AddCatalog
-    bool returns = (self->AddCatalog(szDomain, msgIdLanguage, msgIdCharset));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_AddCatalog[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_AddCatalog(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_AddCatalog[1] = {{ wxLua_wxLocale_AddCatalog, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLocale_AddCatalog }};
-//     bool AddCatalog(const wxString& szDomain);
-static int LUACALL wxLua_wxLocale_AddCatalog(lua_State *L)
-{
-    // const wxString szDomain
-    const wxString szDomain = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call AddCatalog
-    bool returns = (self->AddCatalog(szDomain));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_AddCatalogLookupPathPrefix[] = { &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_AddCatalogLookupPathPrefix(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_AddCatalogLookupPathPrefix[1] = {{ wxLua_wxLocale_AddCatalogLookupPathPrefix, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxLocale_AddCatalogLookupPathPrefix }};
-//     static void AddCatalogLookupPathPrefix(const wxString& prefix);
-static int LUACALL wxLua_wxLocale_AddCatalogLookupPathPrefix(lua_State *L)
-{
-    // const wxString prefix
-    const wxString prefix = wxlua_getwxStringtype(L, 1);
-    // call AddCatalogLookupPathPrefix
-    wxLocale::AddCatalogLookupPathPrefix(prefix);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_AddLanguage[] = { &wxluatype_wxLanguageInfo, NULL };
-static int LUACALL wxLua_wxLocale_AddLanguage(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_AddLanguage[1] = {{ wxLua_wxLocale_AddLanguage, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxLocale_AddLanguage }};
-//     static void AddLanguage(const wxLanguageInfo& info);
-static int LUACALL wxLua_wxLocale_AddLanguage(lua_State *L)
-{
-    // const wxLanguageInfo info
-    const wxLanguageInfo * info = (const wxLanguageInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLanguageInfo);
-    // call AddLanguage
-    wxLocale::AddLanguage(*info);
-
-    return 0;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_FindLanguageInfo[] = { &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_FindLanguageInfo(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_FindLanguageInfo[1] = {{ wxLua_wxLocale_FindLanguageInfo, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxLocale_FindLanguageInfo }};
-//     static const wxLanguageInfo *FindLanguageInfo(const wxString& locale);
-static int LUACALL wxLua_wxLocale_FindLanguageInfo(lua_State *L)
-{
-    // const wxString locale
-    const wxString locale = wxlua_getwxStringtype(L, 1);
-    // call FindLanguageInfo
-    const wxLanguageInfo* returns = (const wxLanguageInfo*)wxLocale::FindLanguageInfo(locale);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_wxLanguageInfo);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetCanonicalName[] = { &wxluatype_wxLocale, NULL };
-static int LUACALL wxLua_wxLocale_GetCanonicalName(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetCanonicalName[1] = {{ wxLua_wxLocale_GetCanonicalName, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLocale_GetCanonicalName }};
-//     wxString GetCanonicalName() const;
-static int LUACALL wxLua_wxLocale_GetCanonicalName(lua_State *L)
-{
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetCanonicalName
-    wxString returns = (self->GetCanonicalName());
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetHeaderValue[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_GetHeaderValue(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetHeaderValue[1] = {{ wxLua_wxLocale_GetHeaderValue, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxLocale_GetHeaderValue }};
-//     wxString GetHeaderValue(const wxString& szHeader, const wxString& szDomain = "") const;
-static int LUACALL wxLua_wxLocale_GetHeaderValue(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // const wxString szDomain = ""
-    const wxString szDomain = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-    // const wxString szHeader
-    const wxString szHeader = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetHeaderValue
-    wxString returns = (self->GetHeaderValue(szHeader, szDomain));
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetInfo[] = { &wxluatype_TINTEGER, &wxluatype_TINTEGER, NULL };
-static int LUACALL wxLua_wxLocale_GetInfo(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetInfo[1] = {{ wxLua_wxLocale_GetInfo, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 2, 2, s_wxluatypeArray_wxLua_wxLocale_GetInfo }};
-//     static wxString GetInfo(wxLocaleInfo index, wxLocaleCategory cat);
-static int LUACALL wxLua_wxLocale_GetInfo(lua_State *L)
-{
-    // wxLocaleCategory cat
-    wxLocaleCategory cat = (wxLocaleCategory)wxlua_getenumtype(L, 2);
-    // wxLocaleInfo index
-    wxLocaleInfo index = (wxLocaleInfo)wxlua_getenumtype(L, 1);
-    // call GetInfo
-    wxString returns = (wxLocale::GetInfo(index, cat));
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetLanguage[] = { &wxluatype_wxLocale, NULL };
-static int LUACALL wxLua_wxLocale_GetLanguage(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetLanguage[1] = {{ wxLua_wxLocale_GetLanguage, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLocale_GetLanguage }};
-//     int GetLanguage() const;
-static int LUACALL wxLua_wxLocale_GetLanguage(lua_State *L)
-{
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetLanguage
-    int returns = (self->GetLanguage());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetLanguageInfo[] = { &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_wxLocale_GetLanguageInfo(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetLanguageInfo[1] = {{ wxLua_wxLocale_GetLanguageInfo, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxLocale_GetLanguageInfo }};
-//     static const wxLanguageInfo *GetLanguageInfo(int lang);
-static int LUACALL wxLua_wxLocale_GetLanguageInfo(lua_State *L)
-{
-    // int lang
-    int lang = (int)wxlua_getnumbertype(L, 1);
-    // call GetLanguageInfo
-    const wxLanguageInfo* returns = (const wxLanguageInfo*)wxLocale::GetLanguageInfo(lang);
-    // push the result datatype
-    wxluaT_pushuserdatatype(L, returns, wxluatype_wxLanguageInfo);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetLanguageName[] = { &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_wxLocale_GetLanguageName(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetLanguageName[1] = {{ wxLua_wxLocale_GetLanguageName, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxLocale_GetLanguageName }};
-//     static wxString GetLanguageName(int lang);
-static int LUACALL wxLua_wxLocale_GetLanguageName(lua_State *L)
-{
-    // int lang
-    int lang = (int)wxlua_getnumbertype(L, 1);
-    // call GetLanguageName
-    wxString returns = (wxLocale::GetLanguageName(lang));
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetLocale[] = { &wxluatype_wxLocale, NULL };
-static int LUACALL wxLua_wxLocale_GetLocale(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetLocale[1] = {{ wxLua_wxLocale_GetLocale, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLocale_GetLocale }};
-//     wxString GetLocale() const;
-static int LUACALL wxLua_wxLocale_GetLocale(lua_State *L)
-{
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetLocale
-    wxString returns = (self->GetLocale());
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetName[] = { &wxluatype_wxLocale, NULL };
-static int LUACALL wxLua_wxLocale_GetName(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetName[1] = {{ wxLua_wxLocale_GetName, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLocale_GetName }};
-//     const wxString& GetName() const;
-static int LUACALL wxLua_wxLocale_GetName(lua_State *L)
-{
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetName
-    wxString returns = (self->GetName());
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-
-#if (!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetString3[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TINTEGER, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_GetString3(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetString3[1] = {{ wxLua_wxLocale_GetString3, WXLUAMETHOD_METHOD, 4, 5, s_wxluatypeArray_wxLua_wxLocale_GetString3 }};
-//     !%wxchkver_2_9 virtual wxString GetString(const wxString& szOrigString, const wxString& szOrigString2, size_t n, const wxChar* szDomain = NULL) const;
-static int LUACALL wxLua_wxLocale_GetString3(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // const wxChar szDomain = NULL
-    wxString  szDomain = (argCount >= 5 ? wxlua_getwxStringtype(L, 5) : wxString(wxEmptyString));
-    // size_t n
-    size_t n = (size_t)wxlua_getuintegertype(L, 4);
-    // const wxString szOrigString2
-    const wxString szOrigString2 = wxlua_getwxStringtype(L, 3);
-    // const wxString szOrigString
-    const wxString szOrigString = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetString
-    wxString returns = (self->GetString(szOrigString, szOrigString2, n, szDomain.IsEmpty() ? NULL : szDomain.c_str()));
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-#endif // (!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-
-#if (wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetString2[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TINTEGER, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_GetString2(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetString2[1] = {{ wxLua_wxLocale_GetString2, WXLUAMETHOD_METHOD, 4, 5, s_wxluatypeArray_wxLua_wxLocale_GetString2 }};
-//     %wxchkver_2_9  virtual wxString GetString(const wxString& szOrigString, const wxString& szOrigString2, size_t n, const wxString& szDomain = "") const;
-static int LUACALL wxLua_wxLocale_GetString2(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // const wxString szDomain = ""
-    const wxString szDomain = (argCount >= 5 ? wxlua_getwxStringtype(L, 5) : wxString(wxEmptyString));
-    // size_t n
-    size_t n = (size_t)wxlua_getuintegertype(L, 4);
-    // const wxString szOrigString2
-    const wxString szOrigString2 = wxlua_getwxStringtype(L, 3);
-    // const wxString szOrigString
-    const wxString szOrigString = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetString
-    wxString returns = (self->GetString(szOrigString, szOrigString2, n, szDomain));
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-#endif // (wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-
-#if (!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetString1[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_GetString1(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetString1[1] = {{ wxLua_wxLocale_GetString1, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxLocale_GetString1 }};
-//     !%wxchkver_2_9 virtual wxString GetString(const wxString& szOrigString, const wxChar* szDomain = NULL) const;
-static int LUACALL wxLua_wxLocale_GetString1(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // const wxChar szDomain = NULL
-    wxString  szDomain = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-    // const wxString szOrigString
-    const wxString szOrigString = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetString
-    wxString returns = (self->GetString(szOrigString, szDomain.IsEmpty() ? NULL : szDomain.c_str()));
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-#endif // (!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-
-#if (wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetString[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_GetString(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetString[1] = {{ wxLua_wxLocale_GetString, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxLocale_GetString }};
-//     %wxchkver_2_9  virtual wxString GetString(const wxString& szOrigString, const wxString& szDomain = "") const;
-static int LUACALL wxLua_wxLocale_GetString(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // const wxString szDomain = ""
-    const wxString szDomain = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-    // const wxString szOrigString
-    const wxString szOrigString = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetString
-    wxString returns = (self->GetString(szOrigString, szDomain));
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-#endif // (wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_GetSysName[] = { &wxluatype_wxLocale, NULL };
-static int LUACALL wxLua_wxLocale_GetSysName(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetSysName[1] = {{ wxLua_wxLocale_GetSysName, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLocale_GetSysName }};
-//     wxString GetSysName() const;
-static int LUACALL wxLua_wxLocale_GetSysName(lua_State *L)
-{
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call GetSysName
-    wxString returns = (self->GetSysName());
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-static int LUACALL wxLua_wxLocale_GetSystemEncoding(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetSystemEncoding[1] = {{ wxLua_wxLocale_GetSystemEncoding, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static wxFontEncoding GetSystemEncoding();
-static int LUACALL wxLua_wxLocale_GetSystemEncoding(lua_State *L)
-{
-    // call GetSystemEncoding
-    wxFontEncoding returns = (wxLocale::GetSystemEncoding());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static int LUACALL wxLua_wxLocale_GetSystemEncodingName(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetSystemEncodingName[1] = {{ wxLua_wxLocale_GetSystemEncodingName, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static wxString GetSystemEncodingName();
-static int LUACALL wxLua_wxLocale_GetSystemEncodingName(lua_State *L)
-{
-    // call GetSystemEncodingName
-    wxString returns = (wxLocale::GetSystemEncodingName());
-    // push the result string
-    wxlua_pushwxString(L, returns);
-
-    return 1;
-}
-
-static int LUACALL wxLua_wxLocale_GetSystemLanguage(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetSystemLanguage[1] = {{ wxLua_wxLocale_GetSystemLanguage, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 0, 0, g_wxluaargtypeArray_None }};
-//     static int GetSystemLanguage();
-static int LUACALL wxLua_wxLocale_GetSystemLanguage(lua_State *L)
-{
-    // call GetSystemLanguage
-    int returns = (wxLocale::GetSystemLanguage());
-    // push the result number
-    lua_pushnumber(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_Init2[] = { &wxluatype_wxLocale, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_wxLocale_Init2(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_Init2[1] = {{ wxLua_wxLocale_Init2, WXLUAMETHOD_METHOD, 1, 3, s_wxluatypeArray_wxLua_wxLocale_Init2 }};
-//     bool Init(int language = wxLANGUAGE_DEFAULT, int flags = wxLOCALE_LOAD_DEFAULT);
-static int LUACALL wxLua_wxLocale_Init2(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // int flags = wxLOCALE_LOAD_DEFAULT
-    int flags = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : wxLOCALE_LOAD_DEFAULT);
-    // int language = wxLANGUAGE_DEFAULT
-    int language = (argCount >= 2 ? (int)wxlua_getnumbertype(L, 2) : wxLANGUAGE_DEFAULT);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call Init
-    bool returns = (self->Init(language, flags));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_Init1[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_wxLocale_Init1(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_Init1[1] = {{ wxLua_wxLocale_Init1, WXLUAMETHOD_METHOD, 2, 5, s_wxluatypeArray_wxLua_wxLocale_Init1 }};
-//     %wxchkver_2_8 bool Init(const wxString &szName, const wxString &szShort = "", const wxString &szLocale = "", bool bLoadDefault = true);
-static int LUACALL wxLua_wxLocale_Init1(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // bool bLoadDefault = true
-    bool bLoadDefault = (argCount >= 5 ? wxlua_getbooleantype(L, 5) : true);
-    // const wxString szLocale = ""
-    const wxString szLocale = (argCount >= 4 ? wxlua_getwxStringtype(L, 4) : wxString(wxEmptyString));
-    // const wxString szShort = ""
-    const wxString szShort = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-    // const wxString szName
-    const wxString szName = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call Init
-    bool returns = (self->Init(szName, szShort, szLocale, bLoadDefault));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-#if (!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_Init[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TBOOLEAN, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_wxLocale_Init(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_Init[1] = {{ wxLua_wxLocale_Init, WXLUAMETHOD_METHOD, 2, 6, s_wxluatypeArray_wxLua_wxLocale_Init }};
-//     !%wxchkver_2_9 || %wxcompat_2_8 bool Init(const wxString &szName, const wxString &szShort = "", const wxString &szLocale = "", bool bLoadDefault = true, bool bConvertEncoding = false);
-static int LUACALL wxLua_wxLocale_Init(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // bool bConvertEncoding = false
-    bool bConvertEncoding = (argCount >= 6 ? wxlua_getbooleantype(L, 6) : false);
-    // bool bLoadDefault = true
-    bool bLoadDefault = (argCount >= 5 ? wxlua_getbooleantype(L, 5) : true);
-    // const wxString szLocale = ""
-    const wxString szLocale = (argCount >= 4 ? wxlua_getwxStringtype(L, 4) : wxString(wxEmptyString));
-    // const wxString szShort = ""
-    const wxString szShort = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-    // const wxString szName
-    const wxString szName = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call Init
-    bool returns = (self->Init(szName, szShort, szLocale, bLoadDefault, bConvertEncoding));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-#endif // (!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_IsAvailable[] = { &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_wxLocale_IsAvailable(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_IsAvailable[1] = {{ wxLua_wxLocale_IsAvailable, WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, 1, 1, s_wxluatypeArray_wxLua_wxLocale_IsAvailable }};
-//     %wxchkver_2_8 static bool IsAvailable(int lang);
-static int LUACALL wxLua_wxLocale_IsAvailable(lua_State *L)
-{
-    // int lang
-    int lang = (int)wxlua_getnumbertype(L, 1);
-    // call IsAvailable
-    bool returns = (wxLocale::IsAvailable(lang));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_IsLoaded[] = { &wxluatype_wxLocale, &wxluatype_TSTRING, NULL };
-static int LUACALL wxLua_wxLocale_IsLoaded(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_IsLoaded[1] = {{ wxLua_wxLocale_IsLoaded, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLocale_IsLoaded }};
-//     bool IsLoaded(const wxString& szDomain) const;
-static int LUACALL wxLua_wxLocale_IsLoaded(lua_State *L)
-{
-    // const wxString szDomain
-    const wxString szDomain = wxlua_getwxStringtype(L, 2);
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call IsLoaded
-    bool returns = (self->IsLoaded(szDomain));
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_IsOk[] = { &wxluatype_wxLocale, NULL };
-static int LUACALL wxLua_wxLocale_IsOk(lua_State *L);
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_IsOk[1] = {{ wxLua_wxLocale_IsOk, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxLocale_IsOk }};
-//     bool IsOk() const;
-static int LUACALL wxLua_wxLocale_IsOk(lua_State *L)
-{
-    // get this
-    wxLocale * self = (wxLocale *)wxluaT_getuserdatatype(L, 1, wxluatype_wxLocale);
-    // call IsOk
-    bool returns = (self->IsOk());
-    // push the result flag
-    lua_pushboolean(L, returns);
-
-    return 1;
-}
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_delete[] = { &wxluatype_wxLocale, NULL };
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxLocale_delete }};
-
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_constructor3[] = { &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
-static int LUACALL wxLua_wxLocale_constructor3(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_constructor3[1] = {{ wxLua_wxLocale_constructor3, WXLUAMETHOD_CONSTRUCTOR, 1, 2, s_wxluatypeArray_wxLua_wxLocale_constructor3 }};
-//     wxLocale(int language, int flags = wxLOCALE_LOAD_DEFAULT);
-static int LUACALL wxLua_wxLocale_constructor3(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // int flags = wxLOCALE_LOAD_DEFAULT
-    int flags = (argCount >= 2 ? (int)wxlua_getnumbertype(L, 2) : wxLOCALE_LOAD_DEFAULT);
-    // int language
-    int language = (int)wxlua_getnumbertype(L, 1);
-    // call constructor
-    wxLocale* returns = new wxLocale(language, flags);
-    // add to tracked memory list
-    wxluaO_addgcobject(L, returns, wxluatype_wxLocale);
-    // push the constructed class pointer
-    wxluaT_pushuserdatatype(L, returns, wxluatype_wxLocale);
-
-    return 1;
-}
-
-
-#if ((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_constructor2[] = { &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_wxLocale_constructor2(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_constructor2[1] = {{ wxLua_wxLocale_constructor2, WXLUAMETHOD_CONSTRUCTOR, 1, 4, s_wxluatypeArray_wxLua_wxLocale_constructor2 }};
-//     %wxchkver_2_8 wxLocale(const wxString& szName, const wxString& szShort = "", const wxString& szLocale = "", bool bLoadDefault = true);
-static int LUACALL wxLua_wxLocale_constructor2(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // bool bLoadDefault = true
-    bool bLoadDefault = (argCount >= 4 ? wxlua_getbooleantype(L, 4) : true);
-    // const wxString szLocale = ""
-    const wxString szLocale = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-    // const wxString szShort = ""
-    const wxString szShort = (argCount >= 2 ? wxlua_getwxStringtype(L, 2) : wxString(wxEmptyString));
-    // const wxString szName
-    const wxString szName = wxlua_getwxStringtype(L, 1);
-    // call constructor
-    wxLocale* returns = new wxLocale(szName, szShort, szLocale, bLoadDefault);
-    // add to tracked memory list
-    wxluaO_addgcobject(L, returns, wxluatype_wxLocale);
-    // push the constructed class pointer
-    wxluaT_pushuserdatatype(L, returns, wxluatype_wxLocale);
-
-    return 1;
-}
-
-#endif // ((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)) && (wxUSE_INTL)
-
-#if ((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)) && (wxUSE_INTL)
-static wxLuaArgType s_wxluatypeArray_wxLua_wxLocale_constructor1[] = { &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TSTRING, &wxluatype_TBOOLEAN, &wxluatype_TBOOLEAN, NULL };
-static int LUACALL wxLua_wxLocale_constructor1(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_constructor1[1] = {{ wxLua_wxLocale_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 5, s_wxluatypeArray_wxLua_wxLocale_constructor1 }};
-//     !%wxchkver_2_9 || %wxcompat_2_8 wxLocale(const wxString& szName, const wxString& szShort = "", const wxString& szLocale = "", bool bLoadDefault = true, bool bConvertEncoding = false);
-static int LUACALL wxLua_wxLocale_constructor1(lua_State *L)
-{
-    // get number of arguments
-    int argCount = lua_gettop(L);
-    // bool bConvertEncoding = false
-    bool bConvertEncoding = (argCount >= 5 ? wxlua_getbooleantype(L, 5) : false);
-    // bool bLoadDefault = true
-    bool bLoadDefault = (argCount >= 4 ? wxlua_getbooleantype(L, 4) : true);
-    // const wxString szLocale = ""
-    const wxString szLocale = (argCount >= 3 ? wxlua_getwxStringtype(L, 3) : wxString(wxEmptyString));
-    // const wxString szShort = ""
-    const wxString szShort = (argCount >= 2 ? wxlua_getwxStringtype(L, 2) : wxString(wxEmptyString));
-    // const wxString szName
-    const wxString szName = wxlua_getwxStringtype(L, 1);
-    // call constructor
-    wxLocale* returns = new wxLocale(szName, szShort, szLocale, bLoadDefault, bConvertEncoding);
-    // add to tracked memory list
-    wxluaO_addgcobject(L, returns, wxluatype_wxLocale);
-    // push the constructed class pointer
-    wxluaT_pushuserdatatype(L, returns, wxluatype_wxLocale);
-
-    return 1;
-}
-
-#endif // ((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)) && (wxUSE_INTL)
-
-static int LUACALL wxLua_wxLocale_constructor(lua_State *L);
-// static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_constructor[1] = {{ wxLua_wxLocale_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None }};
-//     wxLocale();
-static int LUACALL wxLua_wxLocale_constructor(lua_State *L)
-{
-    // call constructor
-    wxLocale* returns = new wxLocale();
-    // add to tracked memory list
-    wxluaO_addgcobject(L, returns, wxluatype_wxLocale);
-    // push the constructed class pointer
-    wxluaT_pushuserdatatype(L, returns, wxluatype_wxLocale);
-
-    return 1;
-}
-
-
-
-
-#if (wxUSE_INTL)
-// function overload table
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_AddCatalog_overload[] =
-{
-    { wxLua_wxLocale_AddCatalog1, WXLUAMETHOD_METHOD, 4, 4, s_wxluatypeArray_wxLua_wxLocale_AddCatalog1 },
-    { wxLua_wxLocale_AddCatalog, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxLocale_AddCatalog },
-};
-static int s_wxluafunc_wxLua_wxLocale_AddCatalog_overload_count = sizeof(s_wxluafunc_wxLua_wxLocale_AddCatalog_overload)/sizeof(wxLuaBindCFunc);
-
-#endif // (wxUSE_INTL)
-
-#if ((!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL))||((wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL))
-// function overload table
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_GetString_overload[] =
-{
-
-#if (!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-    { wxLua_wxLocale_GetString3, WXLUAMETHOD_METHOD, 4, 5, s_wxluatypeArray_wxLua_wxLocale_GetString3 },
-#endif // (!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-
-#if (wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-    { wxLua_wxLocale_GetString2, WXLUAMETHOD_METHOD, 4, 5, s_wxluatypeArray_wxLua_wxLocale_GetString2 },
-#endif // (wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-
-#if (!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-    { wxLua_wxLocale_GetString1, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxLocale_GetString1 },
-#endif // (!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-
-#if (wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-    { wxLua_wxLocale_GetString, WXLUAMETHOD_METHOD, 2, 3, s_wxluatypeArray_wxLua_wxLocale_GetString },
-#endif // (wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL)
-};
-static int s_wxluafunc_wxLua_wxLocale_GetString_overload_count = sizeof(s_wxluafunc_wxLua_wxLocale_GetString_overload)/sizeof(wxLuaBindCFunc);
-
-#endif // ((!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL))||((wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL))
-
-#if (wxUSE_INTL)||((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL))||((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL))
-// function overload table
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_Init_overload[] =
-{
-    { wxLua_wxLocale_Init2, WXLUAMETHOD_METHOD, 1, 3, s_wxluatypeArray_wxLua_wxLocale_Init2 },
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-    { wxLua_wxLocale_Init1, WXLUAMETHOD_METHOD, 2, 5, s_wxluatypeArray_wxLua_wxLocale_Init1 },
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-#if (!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)
-    { wxLua_wxLocale_Init, WXLUAMETHOD_METHOD, 2, 6, s_wxluatypeArray_wxLua_wxLocale_Init },
-#endif // (!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)
-};
-static int s_wxluafunc_wxLua_wxLocale_Init_overload_count = sizeof(s_wxluafunc_wxLua_wxLocale_Init_overload)/sizeof(wxLuaBindCFunc);
-
-#endif // (wxUSE_INTL)||((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL))||((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL))
-
-#if (wxUSE_INTL)||(((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)) && (wxUSE_INTL))||(((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)) && (wxUSE_INTL))
-// function overload table
-static wxLuaBindCFunc s_wxluafunc_wxLua_wxLocale_constructor_overload[] =
-{
-    { wxLua_wxLocale_constructor3, WXLUAMETHOD_CONSTRUCTOR, 1, 2, s_wxluatypeArray_wxLua_wxLocale_constructor3 },
-
-#if ((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)) && (wxUSE_INTL)
-    { wxLua_wxLocale_constructor2, WXLUAMETHOD_CONSTRUCTOR, 1, 4, s_wxluatypeArray_wxLua_wxLocale_constructor2 },
-#endif // ((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)) && (wxUSE_INTL)
-
-#if ((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)) && (wxUSE_INTL)
-    { wxLua_wxLocale_constructor1, WXLUAMETHOD_CONSTRUCTOR, 1, 5, s_wxluatypeArray_wxLua_wxLocale_constructor1 },
-#endif // ((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)) && (wxUSE_INTL)
-    { wxLua_wxLocale_constructor, WXLUAMETHOD_CONSTRUCTOR, 0, 0, g_wxluaargtypeArray_None },
-};
-static int s_wxluafunc_wxLua_wxLocale_constructor_overload_count = sizeof(s_wxluafunc_wxLua_wxLocale_constructor_overload)/sizeof(wxLuaBindCFunc);
-
-#endif // (wxUSE_INTL)||(((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)) && (wxUSE_INTL))||(((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)) && (wxUSE_INTL))
-
-void wxLua_wxLocale_delete_function(void** p)
-{
-    wxLocale* o = (wxLocale*)(*p);
-    delete o;
-}
-
-// Map Lua Class Methods to C Binding Functions
-wxLuaBindMethod wxLocale_methods[] = {
-#if (wxUSE_INTL)
-    { "AddCatalog", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_AddCatalog_overload, s_wxluafunc_wxLua_wxLocale_AddCatalog_overload_count, 0 },
-#endif // (wxUSE_INTL)
-
-    { "AddCatalogLookupPathPrefix", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_AddCatalogLookupPathPrefix, 1, NULL },
-    { "AddLanguage", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_AddLanguage, 1, NULL },
-    { "FindLanguageInfo", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_FindLanguageInfo, 1, NULL },
-    { "GetCanonicalName", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_GetCanonicalName, 1, NULL },
-    { "GetHeaderValue", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_GetHeaderValue, 1, NULL },
-    { "GetInfo", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_GetInfo, 1, NULL },
-    { "GetLanguage", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_GetLanguage, 1, NULL },
-    { "GetLanguageInfo", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_GetLanguageInfo, 1, NULL },
-    { "GetLanguageName", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_GetLanguageName, 1, NULL },
-    { "GetLocale", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_GetLocale, 1, NULL },
-    { "GetName", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_GetName, 1, NULL },
-
-#if ((!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL))||((wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL))
-    { "GetString", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_GetString_overload, s_wxluafunc_wxLua_wxLocale_GetString_overload_count, 0 },
-#endif // ((!wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL))||((wxCHECK_VERSION(2,9,0)) && (wxUSE_INTL))
-
-    { "GetSysName", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_GetSysName, 1, NULL },
-    { "GetSystemEncoding", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_GetSystemEncoding, 1, NULL },
-    { "GetSystemEncodingName", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_GetSystemEncodingName, 1, NULL },
-    { "GetSystemLanguage", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_GetSystemLanguage, 1, NULL },
-
-#if (wxUSE_INTL)||((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL))||((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL))
-    { "Init", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_Init_overload, s_wxluafunc_wxLua_wxLocale_Init_overload_count, 0 },
-#endif // (wxUSE_INTL)||((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL))||((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL))
-
-#if (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-    { "IsAvailable", WXLUAMETHOD_METHOD|WXLUAMETHOD_STATIC, s_wxluafunc_wxLua_wxLocale_IsAvailable, 1, NULL },
-#endif // (wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)
-
-    { "IsLoaded", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_IsLoaded, 1, NULL },
-    { "IsOk", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxLocale_IsOk, 1, NULL },
-    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxLocale_delete, 1, NULL },
-
-#if (wxUSE_INTL)||(((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)) && (wxUSE_INTL))||(((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)) && (wxUSE_INTL))
-    { "wxLocale", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxLocale_constructor_overload, s_wxluafunc_wxLua_wxLocale_constructor_overload_count, 0 },
-#endif // (wxUSE_INTL)||(((wxCHECK_VERSION(2,8,0)) && (wxUSE_INTL)) && (wxUSE_INTL))||(((!wxCHECK_VERSION(2,9,0) || (defined(WXWIN_COMPATIBILITY_2_8) && WXWIN_COMPATIBILITY_2_8)) && (wxUSE_INTL)) && (wxUSE_INTL))
-
-    { 0, 0, 0, 0 },
-};
-
-int wxLocale_methodCount = sizeof(wxLocale_methods)/sizeof(wxLuaBindMethod) - 1;
-
-#endif  // wxUSE_INTL
 

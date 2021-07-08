@@ -19,9 +19,9 @@
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 35
+#if WXLUA_BINDING_VERSION > 41
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 35
+#endif //WXLUA_BINDING_VERSION > 41
 // ---------------------------------------------------------------------------
 
 // binding class
@@ -105,6 +105,10 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
     #include "wx/gbsizer.h"
 #endif // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxSizer)
 
+#if (wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)
+    #include "wx/affinematrix2d.h"
+#endif // (wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)
+
 #if (wxLUA_USE_wxBitmapButton && wxUSE_BMPBUTTON) && (wxLUA_USE_wxButton && wxUSE_BUTTON)
     #include "wx/bmpbuttn.h"
 #endif // (wxLUA_USE_wxBitmapButton && wxUSE_BMPBUTTON) && (wxLUA_USE_wxButton && wxUSE_BUTTON)
@@ -112,6 +116,10 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
 #if (wxLUA_USE_wxBitmapButton && wxUSE_BMPBUTTON) && (wxLUA_USE_wxHelpController && wxUSE_HELP)
     #include "wx/cshelp.h"
 #endif // (wxLUA_USE_wxBitmapButton && wxUSE_BMPBUTTON) && (wxLUA_USE_wxHelpController && wxUSE_HELP)
+
+#if (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
+    #include "wx/headerctrl.h"
+#endif // (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
 
 #if (wxLUA_USE_wxCheckListBox && wxUSE_CHECKLISTBOX) && (wxLUA_USE_wxListBox && wxUSE_LISTBOX)
     #include "wx/checklst.h"
@@ -184,6 +192,10 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
 #if wxCHECK_VERSION(2,8,0) && wxUSE_TREEBOOK && wxLUA_USE_wxTreebook
     #include "wx/treebook.h"
 #endif // wxCHECK_VERSION(2,8,0) && wxUSE_TREEBOOK && wxLUA_USE_wxTreebook
+
+#if wxCHECK_VERSION(3,1,3)
+    #include "wx/event.h"
+#endif // wxCHECK_VERSION(3,1,3)
 
 #if wxLUA_USE_Geometry && wxUSE_GEOMETRY
     #include "wx/geometry.h"
@@ -543,6 +555,10 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
     #include "wx/progdlg.h"
 #endif // wxUSE_PROGRESSDLG && wxLUA_USE_wxProgressDialog
 
+#if wxUSE_SEARCHCTRL
+    #include "wx/srchctrl.h"
+#endif // wxUSE_SEARCHCTRL
+
 #if wxUSE_STREAMS && wxUSE_FILESYSTEM
     #include "wx/fs_mem.h"
 #endif // wxUSE_STREAMS && wxUSE_FILESYSTEM
@@ -654,6 +670,11 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxStaticBoxSizer;
 #endif // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxSizer) && (wxUSE_STATBOX)
 
+#if (wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxAffineMatrix2D;
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxMatrix2D;
+#endif // (wxCHECK_VERSION(2,9,2)) && (wxUSE_GEOMETRY)
+
 #if (wxCHECK_VERSION(3,1,1)) && (wxLUA_USE_wxColourPenBrush)
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxPenInfo;
 #endif // (wxCHECK_VERSION(3,1,1)) && (wxLUA_USE_wxColourPenBrush)
@@ -661,6 +682,10 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
 #if (wxCHECK_VERSION(3,1,1)) && (wxUSE_GRAPHICS_CONTEXT)
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxGraphicsPenInfo;
 #endif // (wxCHECK_VERSION(3,1,1)) && (wxUSE_GRAPHICS_CONTEXT)
+
+#if (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxSystemSettings)
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxSystemAppearance;
+#endif // (wxCHECK_VERSION(3,1,3)) && (wxLUA_USE_wxSystemSettings)
 
 #if (wxLUA_USE_wxBitmapButton && wxUSE_BMPBUTTON) && (wxLUA_USE_wxButton && wxUSE_BUTTON)
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxBitmapButton;
@@ -673,6 +698,12 @@ extern WXDLLIMPEXP_BINDWXCORE wxLuaBinding* wxLuaBinding_wxcore_init();
 #if (wxLUA_USE_wxBrushList) && (wxLUA_USE_wxColourPenBrush)
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxBrushList;
 #endif // (wxLUA_USE_wxBrushList) && (wxLUA_USE_wxColourPenBrush)
+
+#if (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxHeaderCtrl;
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxHeaderCtrlEvent;
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxHeaderCtrlSimple;
+#endif // (wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxUSE_HEADERCTRL)
 
 #if (wxLUA_USE_wxCheckListBox && wxUSE_CHECKLISTBOX) && (wxLUA_USE_wxListBox && wxUSE_LISTBOX)
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxCheckListBox;
@@ -833,6 +864,10 @@ extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxWindowUpdateLocker;
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxTreebook;
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxTreebookEvent;
 #endif // wxCHECK_VERSION(2,8,0) && wxUSE_TREEBOOK && wxLUA_USE_wxTreebook
+
+#if wxCHECK_VERSION(3,1,3)
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxDPIChangedEvent;
+#endif // wxCHECK_VERSION(3,1,3)
 
 #if wxLUA_USE_Geometry && wxUSE_GEOMETRY
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxPoint2DDouble;
@@ -1306,6 +1341,10 @@ extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxWindowUpdateLocker;
 #if wxUSE_PROGRESSDLG && wxLUA_USE_wxProgressDialog
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxProgressDialog;
 #endif // wxUSE_PROGRESSDLG && wxLUA_USE_wxProgressDialog
+
+#if wxUSE_SEARCHCTRL
+    extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxSearchCtrl;
+#endif // wxUSE_SEARCHCTRL
 
 #if wxUSE_STREAMS && wxUSE_FILESYSTEM
     extern WXDLLIMPEXP_DATA_BINDWXCORE(int) wxluatype_wxMemoryFSHandler;

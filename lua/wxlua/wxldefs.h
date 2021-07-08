@@ -40,12 +40,14 @@ extern "C"
         #endif
 
         // These are #defined with LUA_COMPAT_ALL (but we don't require that)
-        #ifndef lua_strlen 
+        #ifndef lua_strlen
             #define lua_strlen(L,i)             lua_rawlen(L, (i))
             #define lua_objlen(L,i)             lua_rawlen(L, (i))
             #define lua_equal(L,idx1,idx2)      lua_compare(L,(idx1),(idx2),LUA_OPEQ)
             #define lua_lessthan(L,idx1,idx2)   lua_compare(L,(idx1),(idx2),LUA_OPLT)
+        #endif
 
+        #ifndef lua_cpcall
             #define lua_cpcall(L,f,u)           (lua_pushcfunction(L, (f)), \
                                                 lua_pushlightuserdata(L,(u)), \
                                                 lua_pcall(L,1,0,0))
@@ -128,7 +130,9 @@ extern "C"
 
 // initializes a lua_debug by nulling everything before use since the
 //  functions that take it do not initialize it properly
-#if LUA_VERSION_NUM >= 502 // 5.2
+#if LUA_VERSION_NUM >= 504 // 5.4
+#define INIT_LUA_DEBUG { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, 0 }
+#elif LUA_VERSION_NUM >= 502 // 5.2
     #define INIT_LUA_DEBUG { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, 0 }
 #else // 501, 5.1
     #define INIT_LUA_DEBUG { 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, 0 }

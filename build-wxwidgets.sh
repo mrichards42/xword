@@ -17,10 +17,11 @@ mkdir -p $INSTALL_PATH
 WX_CONFIGURE_FLAGS="\
   --disable-shared \
   --enable-compat28 \
-  --with-macosx-version-min=10.7 \
+  --with-macosx-version-min=10.10 \
   --with-libpng=builtin \
   --with-libjpeg=builtin \
   --with-libtiff=builtin \
+  --with-liblzma=builtin \
   CFLAGS=-fvisibility-inlines-hidden \
   CXXFLAGS='-fvisibility-inlines-hidden -stdlib=libc++' \
   CPPFLAGS='-fvisibility-inlines-hidden -stdlib=libc++' \
@@ -58,7 +59,6 @@ if [ ! -d "$INSTALL_PATH/lib" ]; then
   tar -xjf wxWidgets-$WX_VERSION.tar.bz2
   cd wxWidgets-$WX_VERSION
   patch -p1 -i ../wxaui-tweaks.patch
-  patch -p1 -i ../wxWidgets-osx-private-build-fix.patch
   eval $BUILD_COMMAND
 else
   echo "Using cached directory."

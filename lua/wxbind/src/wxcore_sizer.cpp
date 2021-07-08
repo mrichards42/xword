@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxSizer)
 // ---------------------------------------------------------------------------
@@ -222,7 +226,15 @@ static int LUACALL wxLua_wxSizerFlags_GetBorderInPixels(lua_State *L)
     // call GetBorderInPixels
     int returns = (self->GetBorderInPixels());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -235,7 +247,15 @@ static int LUACALL wxLua_wxSizerFlags_GetDefaultBorder(lua_State *L)
     // call GetDefaultBorder
     int returns = (wxSizerFlags::GetDefaultBorder());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -251,7 +271,15 @@ static int LUACALL wxLua_wxSizerFlags_GetFlags(lua_State *L)
     // call GetFlags
     int returns = (self->GetFlags());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -267,7 +295,15 @@ static int LUACALL wxLua_wxSizerFlags_GetProportion(lua_State *L)
     // call GetProportion
     int returns = (self->GetProportion());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -635,7 +671,15 @@ static int LUACALL wxLua_wxSizerItem_GetBorder(lua_State *L)
     // call GetBorder
     int returns = (self->GetBorder());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -651,7 +695,15 @@ static int LUACALL wxLua_wxSizerItem_GetFlag(lua_State *L)
     // call GetFlag
     int returns = (self->GetFlag());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -728,7 +780,15 @@ static int LUACALL wxLua_wxSizerItem_GetProportion(lua_State *L)
     // call GetProportion
     int returns = (self->GetProportion());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -743,7 +803,7 @@ static int LUACALL wxLua_wxSizerItem_GetRatio(lua_State *L)
     wxSizerItem * self = (wxSizerItem *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSizerItem);
     // call GetRatio
     float returns = (self->GetRatio());
-    // push the result number
+    // push the result floating point number
     lua_pushnumber(L, returns);
 
     return 1;
@@ -2001,6 +2061,30 @@ static int LUACALL wxLua_wxSizer_GetItem(lua_State *L)
     return 1;
 }
 
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSizer_GetItemCount[] = { &wxluatype_wxSizer, NULL };
+static int LUACALL wxLua_wxSizer_GetItemCount(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSizer_GetItemCount[1] = {{ wxLua_wxSizer_GetItemCount, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSizer_GetItemCount }};
+//     size_t GetItemCount() const;
+static int LUACALL wxLua_wxSizer_GetItemCount(lua_State *L)
+{
+    // get this
+    wxSizer * self = (wxSizer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSizer);
+    // call GetItemCount
+    size_t returns = (self->GetItemCount());
+    // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
+    lua_pushnumber(L, returns);
+}
+
+    return 1;
+}
+
 
 #if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxSizer)) && (wxLUA_USE_wxPointSizeRect)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxSizer_GetMinSize[] = { &wxluatype_wxSizer, NULL };
@@ -2325,6 +2409,22 @@ static int LUACALL wxLua_wxSizer_InsertStretchSpacer(lua_State *L)
     wxSizerItem* returns = (wxSizerItem*)self->InsertStretchSpacer(index, prop);
     // push the result datatype
     wxluaT_pushuserdatatype(L, returns, wxluatype_wxSizerItem);
+
+    return 1;
+}
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxSizer_IsEmpty[] = { &wxluatype_wxSizer, NULL };
+static int LUACALL wxLua_wxSizer_IsEmpty(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxSizer_IsEmpty[1] = {{ wxLua_wxSizer_IsEmpty, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxSizer_IsEmpty }};
+//     bool IsEmpty() const;
+static int LUACALL wxLua_wxSizer_IsEmpty(lua_State *L)
+{
+    // get this
+    wxSizer * self = (wxSizer *)wxluaT_getuserdatatype(L, 1, wxluatype_wxSizer);
+    // call IsEmpty
+    bool returns = (self->IsEmpty());
+    // push the result flag
+    lua_pushboolean(L, returns);
 
     return 1;
 }
@@ -3125,6 +3225,8 @@ wxLuaBindMethod wxSizer_methods[] = {
     { "GetItem", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSizer_GetItem_overload, s_wxluafunc_wxLua_wxSizer_GetItem_overload_count, 0 },
 #endif // ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxSizer))
 
+    { "GetItemCount", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSizer_GetItemCount, 1, NULL },
+
 #if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxSizer)) && (wxLUA_USE_wxPointSizeRect)
     { "GetMinSize", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSizer_GetMinSize, 1, NULL },
     { "GetPosition", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSizer_GetPosition, 1, NULL },
@@ -3141,6 +3243,7 @@ wxLuaBindMethod wxSizer_methods[] = {
 
     { "InsertSpacer", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSizer_InsertSpacer, 1, NULL },
     { "InsertStretchSpacer", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSizer_InsertStretchSpacer, 1, NULL },
+    { "IsEmpty", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSizer_IsEmpty, 1, NULL },
 
 #if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxSizer))
     { "IsShown", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxSizer_IsShown_overload, s_wxluafunc_wxLua_wxSizer_IsShown_overload_count, 0 },
@@ -3236,7 +3339,15 @@ static int LUACALL wxLua_wxBoxSizer_GetOrientation(lua_State *L)
     // call GetOrientation
     int returns = (self->GetOrientation());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3298,7 +3409,15 @@ static int LUACALL wxLua_wxGridSizer_GetCols(lua_State *L)
     // call GetCols
     int returns = (self->GetCols());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3314,7 +3433,15 @@ static int LUACALL wxLua_wxGridSizer_GetHGap(lua_State *L)
     // call GetHGap
     int returns = (self->GetHGap());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3330,7 +3457,15 @@ static int LUACALL wxLua_wxGridSizer_GetRows(lua_State *L)
     // call GetRows
     int returns = (self->GetRows());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3346,7 +3481,15 @@ static int LUACALL wxLua_wxGridSizer_GetVGap(lua_State *L)
     // call GetVGap
     int returns = (self->GetVGap());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3525,7 +3668,15 @@ static int LUACALL wxLua_wxFlexGridSizer_GetFlexibleDirection(lua_State *L)
     // call GetFlexibleDirection
     int returns = (self->GetFlexibleDirection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3541,7 +3692,15 @@ static int LUACALL wxLua_wxFlexGridSizer_GetNonFlexibleGrowMode(lua_State *L)
     // call GetNonFlexibleGrowMode
     wxFlexSizerGrowMode returns = (self->GetNonFlexibleGrowMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4418,7 +4577,15 @@ static int LUACALL wxLua_wxGBPosition_GetCol(lua_State *L)
     // call GetCol
     int returns = (self->GetCol());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4434,7 +4601,15 @@ static int LUACALL wxLua_wxGBPosition_GetRow(lua_State *L)
     // call GetRow
     int returns = (self->GetRow());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4592,7 +4767,15 @@ static int LUACALL wxLua_wxGBSpan_GetColspan(lua_State *L)
     // call GetColspan
     int returns = (self->GetColspan());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4608,7 +4791,15 @@ static int LUACALL wxLua_wxGBSpan_GetRowspan(lua_State *L)
     // call GetRowspan
     int returns = (self->GetRowspan());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4768,8 +4959,8 @@ static int LUACALL wxLua_wxGBSizerItem_GetEndPos(lua_State *L)
     wxGBSizerItem * self = (wxGBSizerItem *)wxluaT_getuserdatatype(L, 1, wxluatype_wxGBSizerItem);
     // call GetEndPos
     self->GetEndPos(row, col);
-    lua_pushnumber(L, row);
-    lua_pushnumber(L, col);
+    lua_pushinteger(L, row);
+    lua_pushinteger(L, col);
     return 2;
 }
 

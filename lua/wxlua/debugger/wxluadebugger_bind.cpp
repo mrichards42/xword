@@ -22,6 +22,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 // ---------------------------------------------------------------------------
 // Bind class wxLuaDebuggerServer
 // ---------------------------------------------------------------------------
@@ -148,7 +152,15 @@ static int LUACALL wxLua_wxLuaDebuggerServer_GetDebuggeeProcessId(lua_State *L)
     // call GetDebuggeeProcessId
     long returns = (self->GetDebuggeeProcessId());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -262,7 +274,15 @@ static int LUACALL wxLua_wxLuaDebuggerServer_StartClient(lua_State *L)
     // call StartClient
     long returns = (self->StartClient());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -439,7 +459,15 @@ static int LUACALL wxLua_wxLuaDebuggerEvent_GetLineNumber(lua_State *L)
     // call GetLineNumber
     int returns = (self->GetLineNumber());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -471,7 +499,15 @@ static int LUACALL wxLua_wxLuaDebuggerEvent_GetReference(lua_State *L)
     // call GetReference
     int returns = (self->GetReference());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

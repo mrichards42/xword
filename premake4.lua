@@ -56,7 +56,7 @@ solution "XWord"
 
     configuration "macosx"
         architecture "x64"
-        systemversion "10.7"
+        systemversion "10.10"
         buildoptions { "-stdlib=libc++" }
         linkoptions  { "-stdlib=libc++", "-L/usr/local/lib" }
 

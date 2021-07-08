@@ -22,6 +22,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if (wxCHECK_VERSION(3,1,2)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
 // ---------------------------------------------------------------------------
@@ -295,7 +299,15 @@ static int LUACALL wxLua_wxHtmlSelection_GetFromCharacterPos(lua_State *L)
     // call GetFromCharacterPos
     wxCoord returns = (self->GetFromCharacterPos());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -350,7 +362,15 @@ static int LUACALL wxLua_wxHtmlSelection_GetToCharacterPos(lua_State *L)
     // call GetToCharacterPos
     wxCoord returns = (self->GetToCharacterPos());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -590,7 +610,15 @@ static int LUACALL wxLua_wxHtmlRenderingState_GetBgMode(lua_State *L)
     // call GetBgMode
     int returns = (self->GetBgMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -626,7 +654,15 @@ static int LUACALL wxLua_wxHtmlRenderingState_GetSelectionState(lua_State *L)
     // call GetSelectionState
     wxHtmlSelectionState returns = (self->GetSelectionState());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -835,7 +871,7 @@ static int LUACALL wxLua_wxHtmlCell_AdjustPagebreak(lua_State *L)
     // push the result number
     lua_pushboolean(L, returns);
     //
-    lua_pushnumber(L, pagebreak);
+    lua_pushinteger(L, pagebreak);
     // return the number of parameters
     return 2;
 }
@@ -854,7 +890,7 @@ static int LUACALL wxLua_wxHtmlCell_AdjustPagebreak(lua_State *L)
     // push the result number
     lua_pushboolean(L, returns);
     //
-    lua_pushnumber(L, pagebreak);
+    lua_pushinteger(L, pagebreak);
     // return the number of parameters
     return 2;
 }
@@ -875,7 +911,7 @@ static int LUACALL wxLua_wxHtmlCell_AdjustPagebreak(lua_State *L)
     // push the result number
     lua_pushboolean(L, returns);
     //
-    lua_pushnumber(L, pagebreak);
+    lua_pushinteger(L, pagebreak);
     // return the number of parameters
     return 2;
 }
@@ -894,7 +930,7 @@ static int LUACALL wxLua_wxHtmlCell_AdjustPagebreak(lua_State *L)
     // push the result number
     lua_pushboolean(L, returns);
     //
-    lua_pushnumber(L, pagebreak);
+    lua_pushinteger(L, pagebreak);
     // return the number of parameters
     return 2;
 }
@@ -1054,7 +1090,15 @@ static int LUACALL wxLua_wxHtmlCell_GetDescent(lua_State *L)
     // call GetDescent
     int returns = (self->GetDescent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1086,7 +1130,15 @@ static int LUACALL wxLua_wxHtmlCell_GetHeight(lua_State *L)
     // call GetHeight
     int returns = (self->GetHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1223,7 +1275,15 @@ static int LUACALL wxLua_wxHtmlCell_GetPosX(lua_State *L)
     // call GetPosX
     int returns = (self->GetPosX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1239,7 +1299,15 @@ static int LUACALL wxLua_wxHtmlCell_GetPosY(lua_State *L)
     // call GetPosY
     int returns = (self->GetPosY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1255,7 +1323,15 @@ static int LUACALL wxLua_wxHtmlCell_GetWidth(lua_State *L)
     // call GetWidth
     int returns = (self->GetWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1561,7 +1637,15 @@ static int LUACALL wxLua_wxHtmlContainerCell_GetAlignHor(lua_State *L)
     // call GetAlignHor
     int returns = (self->GetAlignHor());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1577,7 +1661,15 @@ static int LUACALL wxLua_wxHtmlContainerCell_GetAlignVer(lua_State *L)
     // call GetAlignVer
     int returns = (self->GetAlignVer());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1618,7 +1710,15 @@ static int LUACALL wxLua_wxHtmlContainerCell_GetIndent(lua_State *L)
     // call GetIndent
     int returns = (self->GetIndent(ind));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1636,7 +1736,15 @@ static int LUACALL wxLua_wxHtmlContainerCell_GetIndentUnits(lua_State *L)
     // call GetIndentUnits
     int returns = (self->GetIndentUnits(ind));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2199,6 +2307,88 @@ int wxHtmlCellEvent_methodCount = sizeof(wxHtmlCellEvent_methods)/sizeof(wxLuaBi
 #endif  // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
 
 
+#if (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+// ---------------------------------------------------------------------------
+// Bind class wxHtmlLinkEvent
+// ---------------------------------------------------------------------------
+
+// Lua MetaTable Tag for Class 'wxHtmlLinkEvent'
+int wxluatype_wxHtmlLinkEvent = WXLUA_TUNKNOWN;
+
+#if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHtmlLinkEvent_GetLinkInfo[] = { &wxluatype_wxHtmlLinkEvent, NULL };
+static int LUACALL wxLua_wxHtmlLinkEvent_GetLinkInfo(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHtmlLinkEvent_GetLinkInfo[1] = {{ wxLua_wxHtmlLinkEvent_GetLinkInfo, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxHtmlLinkEvent_GetLinkInfo }};
+//     const wxHtmlLinkInfo& GetLinkInfo() const;
+static int LUACALL wxLua_wxHtmlLinkEvent_GetLinkInfo(lua_State *L)
+{
+    // get this
+    wxHtmlLinkEvent * self = (wxHtmlLinkEvent *)wxluaT_getuserdatatype(L, 1, wxluatype_wxHtmlLinkEvent);
+    // call GetLinkInfo
+    const wxHtmlLinkInfo* returns = (const wxHtmlLinkInfo*)&self->GetLinkInfo();
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxHtmlLinkInfo);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHtmlLinkEvent_delete[] = { &wxluatype_wxHtmlLinkEvent, NULL };
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHtmlLinkEvent_delete[1] = {{ wxlua_userdata_delete, WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, 1, 1, s_wxluatypeArray_wxLua_wxHtmlLinkEvent_delete }};
+
+
+#if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+static wxLuaArgType s_wxluatypeArray_wxLua_wxHtmlLinkEvent_constructor[] = { &wxluatype_TNUMBER, &wxluatype_wxHtmlLinkInfo, NULL };
+static int LUACALL wxLua_wxHtmlLinkEvent_constructor(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxHtmlLinkEvent_constructor[1] = {{ wxLua_wxHtmlLinkEvent_constructor, WXLUAMETHOD_CONSTRUCTOR, 2, 2, s_wxluatypeArray_wxLua_wxHtmlLinkEvent_constructor }};
+//     wxHtmlLinkEvent(int id, const wxHtmlLinkInfo &linkinfo);
+static int LUACALL wxLua_wxHtmlLinkEvent_constructor(lua_State *L)
+{
+    // const wxHtmlLinkInfo linkinfo
+    const wxHtmlLinkInfo * linkinfo = (const wxHtmlLinkInfo *)wxluaT_getuserdatatype(L, 2, wxluatype_wxHtmlLinkInfo);
+    // int id
+    int id = (int)wxlua_getnumbertype(L, 1);
+    // call constructor
+    wxHtmlLinkEvent* returns = new wxHtmlLinkEvent(id, *linkinfo);
+    // add to tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxHtmlLinkEvent);
+    // push the constructed class pointer
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxHtmlLinkEvent);
+
+    return 1;
+}
+
+#endif // ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+
+
+
+void wxLua_wxHtmlLinkEvent_delete_function(void** p)
+{
+    wxHtmlLinkEvent* o = (wxHtmlLinkEvent*)(*p);
+    delete o;
+}
+
+// Map Lua Class Methods to C Binding Functions
+wxLuaBindMethod wxHtmlLinkEvent_methods[] = {
+#if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+    { "GetLinkInfo", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxHtmlLinkEvent_GetLinkInfo, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+
+    { "delete", WXLUAMETHOD_METHOD|WXLUAMETHOD_DELETE, s_wxluafunc_wxLua_wxHtmlLinkEvent_delete, 1, NULL },
+
+#if ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+    { "wxHtmlLinkEvent", WXLUAMETHOD_CONSTRUCTOR, s_wxluafunc_wxLua_wxHtmlLinkEvent_constructor, 1, NULL },
+#endif // ((wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+
+    { 0, 0, 0, 0 },
+};
+
+int wxHtmlLinkEvent_methodCount = sizeof(wxHtmlLinkEvent_methods)/sizeof(wxLuaBindMethod) - 1;
+
+#endif  // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+
+
 #if wxLUA_USE_wxHTML && wxUSE_HTML
 // ---------------------------------------------------------------------------
 // Bind class wxHtmlLinkInfo
@@ -2359,7 +2549,15 @@ static int LUACALL wxLua_wxHtmlTag_GetBeginPos(lua_State *L)
     // call GetBeginPos
     int returns = (self->GetBeginPos());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2375,7 +2573,15 @@ static int LUACALL wxLua_wxHtmlTag_GetEndPos1(lua_State *L)
     // call GetEndPos1
     int returns = (self->GetEndPos1());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2391,7 +2597,15 @@ static int LUACALL wxLua_wxHtmlTag_GetEndPos2(lua_State *L)
     // call GetEndPos2
     int returns = (self->GetEndPos2());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2476,7 +2690,7 @@ static int LUACALL wxLua_wxHtmlTag_GetParamAsInt(lua_State *L)
     // push the result number
     lua_pushboolean(L, returns);
     //
-    lua_pushnumber(L, value);
+    lua_pushinteger(L, value);
     // return the number of parameters
     return 2;
 }
@@ -3534,7 +3748,15 @@ static int LUACALL wxLua_wxHtmlWinParser_GetAlign(lua_State *L)
     // call GetAlign
     int returns = (self->GetAlign());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3550,7 +3772,15 @@ static int LUACALL wxLua_wxHtmlWinParser_GetCharHeight(lua_State *L)
     // call GetCharHeight
     int returns = (self->GetCharHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3566,7 +3796,15 @@ static int LUACALL wxLua_wxHtmlWinParser_GetCharWidth(lua_State *L)
     // call GetCharWidth
     int returns = (self->GetCharWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3618,7 +3856,15 @@ static int LUACALL wxLua_wxHtmlWinParser_GetFontBold(lua_State *L)
     // call GetFontBold
     int returns = (self->GetFontBold());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3650,7 +3896,15 @@ static int LUACALL wxLua_wxHtmlWinParser_GetFontFixed(lua_State *L)
     // call GetFontFixed
     int returns = (self->GetFontFixed());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3666,7 +3920,15 @@ static int LUACALL wxLua_wxHtmlWinParser_GetFontItalic(lua_State *L)
     // call GetFontItalic
     int returns = (self->GetFontItalic());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3682,7 +3944,15 @@ static int LUACALL wxLua_wxHtmlWinParser_GetFontSize(lua_State *L)
     // call GetFontSize
     int returns = (self->GetFontSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3698,7 +3968,15 @@ static int LUACALL wxLua_wxHtmlWinParser_GetFontUnderlined(lua_State *L)
     // call GetFontUnderlined
     int returns = (self->GetFontUnderlined());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4433,7 +4711,15 @@ static int LUACALL wxLua_wxSimpleHtmlListBox_Append3(lua_State *L)
     // call Append
     int returns = (self->Append(item, clientData));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4453,7 +4739,15 @@ static int LUACALL wxLua_wxSimpleHtmlListBox_Append2(lua_State *L)
     // call Append
     int returns = (self->Append(item, (void*)number));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4471,7 +4765,15 @@ static int LUACALL wxLua_wxSimpleHtmlListBox_Append1(lua_State *L)
     // call Append
     int returns = (self->Append(item));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4575,7 +4877,15 @@ static int LUACALL wxLua_wxSimpleHtmlListBox_GetCount(lua_State *L)
     // call GetCount
     unsigned int returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4591,7 +4901,15 @@ static int LUACALL wxLua_wxSimpleHtmlListBox_GetSelection(lua_State *L)
     // call GetSelection
     int returns = (self->GetSelection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4821,7 +5139,15 @@ static int LUACALL wxLua_wxHtmlDCRenderer_FindNextPageBreak(lua_State *L)
     // call FindNextPageBreak
     int returns = (self->FindNextPageBreak(pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4839,7 +5165,15 @@ static int LUACALL wxLua_wxHtmlDCRenderer_GetTotalHeight(lua_State *L)
     // call GetTotalHeight
     int returns = (self->GetTotalHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4855,7 +5189,15 @@ static int LUACALL wxLua_wxHtmlDCRenderer_GetTotalWidth(lua_State *L)
     // call GetTotalWidth
     int returns = (self->GetTotalWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4887,7 +5229,15 @@ static int LUACALL wxLua_wxHtmlDCRenderer_Render1(lua_State *L)
     // call Render
     int returns = (self->Render(x, y, *known_pagebreaks, from, dont_render, to));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5966,6 +6316,12 @@ wxLuaBindEvent* wxLuaGetEventList_wxhtml(size_t &count)
 {
     static wxLuaBindEvent eventList[] =
     {
+#if (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+        { "wxEVT_HTML_CELL_CLICKED", WXLUA_GET_wxEventType_ptr(wxEVT_HTML_CELL_CLICKED), &wxluatype_wxHtmlCellEvent },
+        { "wxEVT_HTML_CELL_HOVER", WXLUA_GET_wxEventType_ptr(wxEVT_HTML_CELL_HOVER), &wxluatype_wxHtmlCellEvent },
+        { "wxEVT_HTML_LINK_CLICKED", WXLUA_GET_wxEventType_ptr(wxEVT_HTML_LINK_CLICKED), &wxluatype_wxHtmlLinkEvent },
+#endif // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+
 #if (wxLUA_USE_wxHTML && wxUSE_HTML) && (wxLUA_USE_wxLuaHtmlWindow)
         { "wxEVT_HTML_TAG_HANDLER", WXLUA_GET_wxEventType_ptr(wxEVT_HTML_TAG_HANDLER), &wxluatype_wxLuaHtmlWinTagEvent },
 #endif // (wxLUA_USE_wxHTML && wxUSE_HTML) && (wxLUA_USE_wxLuaHtmlWindow)
@@ -6113,6 +6469,7 @@ static const char* wxluaclassname_wxHtmlEasyPrinting = "wxHtmlEasyPrinting";
 static const char* wxluaclassname_wxHtmlFontCell = "wxHtmlFontCell";
 static const char* wxluaclassname_wxHtmlHelpController = "wxHtmlHelpController";
 static const char* wxluaclassname_wxHtmlHelpData = "wxHtmlHelpData";
+static const char* wxluaclassname_wxHtmlLinkEvent = "wxHtmlLinkEvent";
 static const char* wxluaclassname_wxHtmlLinkInfo = "wxHtmlLinkInfo";
 static const char* wxluaclassname_wxHtmlParser = "wxHtmlParser";
 static const char* wxluaclassname_wxHtmlPrintout = "wxHtmlPrintout";
@@ -6151,6 +6508,8 @@ static const char* wxluabaseclassnames_wxHtmlHelpController[] = { wxluaclassname
 static wxLuaBindClass* wxluabaseclassbinds_wxHtmlHelpController[] = { NULL };
 static const char* wxluabaseclassnames_wxHtmlHelpData[] = { wxluaclassname_wxObject, NULL };
 static wxLuaBindClass* wxluabaseclassbinds_wxHtmlHelpData[] = { NULL };
+static const char* wxluabaseclassnames_wxHtmlLinkEvent[] = { wxluaclassname_wxCommandEvent, NULL };
+static wxLuaBindClass* wxluabaseclassbinds_wxHtmlLinkEvent[] = { NULL };
 static const char* wxluabaseclassnames_wxHtmlParser[] = { wxluaclassname_wxObject, NULL };
 static wxLuaBindClass* wxluabaseclassbinds_wxHtmlParser[] = { NULL };
 static const char* wxluabaseclassnames_wxHtmlPrintout[] = { wxluaclassname_wxPrintout, NULL };
@@ -6181,6 +6540,9 @@ static wxLuaBindClass* wxluabaseclassbinds_wxSimpleHtmlListBox[] = { NULL, NULL 
     extern wxLuaBindMethod wxHtmlFontCell_methods[];
     extern int wxHtmlFontCell_methodCount;
     extern void wxLua_wxHtmlFontCell_delete_function(void** p);
+    extern wxLuaBindMethod wxHtmlLinkEvent_methods[];
+    extern int wxHtmlLinkEvent_methodCount;
+    extern void wxLua_wxHtmlLinkEvent_delete_function(void** p);
     extern wxLuaBindMethod wxHtmlWindowInterface_methods[];
     extern int wxHtmlWindowInterface_methodCount;
     extern wxLuaBindNumber wxHtmlWindowInterface_enums[];
@@ -6292,6 +6654,10 @@ wxLuaBindClass* wxLuaGetClassList_wxhtml(size_t &count)
         { wxluaclassname_wxHtmlHelpController, wxHtmlHelpController_methods, wxHtmlHelpController_methodCount, CLASSINFO(wxHtmlHelpController), &wxluatype_wxHtmlHelpController, wxluabaseclassnames_wxHtmlHelpController, wxluabaseclassbinds_wxHtmlHelpController, NULL, NULL, NULL, 0, &wxLua_wxHtmlHelpController_delete_function, }, 
         { wxluaclassname_wxHtmlHelpData, wxHtmlHelpData_methods, wxHtmlHelpData_methodCount, CLASSINFO(wxHtmlHelpData), &wxluatype_wxHtmlHelpData, wxluabaseclassnames_wxHtmlHelpData, wxluabaseclassbinds_wxHtmlHelpData, NULL, NULL, NULL, 0, &wxLua_wxHtmlHelpData_delete_function, }, 
 #endif // (wxLUA_USE_wxHTML && wxUSE_HTML) && (wxLUA_USE_wxHtmlHelpController && wxUSE_WXHTML_HELP)
+
+#if (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
+        { wxluaclassname_wxHtmlLinkEvent, wxHtmlLinkEvent_methods, wxHtmlLinkEvent_methodCount, CLASSINFO(wxHtmlLinkEvent), &wxluatype_wxHtmlLinkEvent, wxluabaseclassnames_wxHtmlLinkEvent, wxluabaseclassbinds_wxHtmlLinkEvent, NULL, NULL, NULL, 0, &wxLua_wxHtmlLinkEvent_delete_function, }, 
+#endif // (wxCHECK_VERSION(2,8,0)) && (wxLUA_USE_wxHTML && wxUSE_HTML)
 
 #if wxLUA_USE_wxHTML && wxUSE_HTML
         { wxluaclassname_wxHtmlLinkInfo, wxHtmlLinkInfo_methods, wxHtmlLinkInfo_methodCount, NULL, &wxluatype_wxHtmlLinkInfo, NULL, NULL, NULL, NULL, NULL, 0, &wxLua_wxHtmlLinkInfo_delete_function, }, 

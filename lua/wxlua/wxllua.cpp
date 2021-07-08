@@ -983,13 +983,15 @@ const wxLuaBindClass* LUACALL wxluaT_getclass(lua_State* L, const char* class_na
 bool wxluaT_isuserdatatype(lua_State* L, int stack_idx, int wxl_type)
 {
     int stack_type = wxluaT_type(L, stack_idx);
-
+    
     if (wxlua_iswxuserdatatype(stack_type) &&
         ((wxluatype_NULL == stack_type) || // FIXME, how to check when NULL is valid or not?
-        ((wxl_type == WXLUA_TSTRING) && (wxluaT_isderivedtype(L, stack_type, *p_wxluatype_wxString) >= 0)) ||
+        ((wxl_type == WXLUA_TSTRING) &&
+         ((wxluaT_isderivedtype(L, stack_type, *p_wxluatype_wxString) >= 0) ||
+          (wxluaT_isderivedtype(L, stack_type, *p_wxluatype_wxMemoryBuffer) >= 0))) ||
         (wxluaT_isderivedtype(L, stack_type, wxl_type) >= 0)))
         return true;
-
+        
     return false;
 }
 
@@ -1325,6 +1327,8 @@ int LUACALL wxlua_iswxluatype(int luatype, int wxl_type, lua_State* L /* = NULL 
             ret = 1;
         else if (wxluaT_isderivedclass(wxlClass, wxluaT_getclass(L, "wxArrayInt")) >= 0)
             ret = 1;
+        else if (wxluaT_isderivedclass(wxlClass, wxluaT_getclass(L, "wxArrayDouble")) >= 0)
+            ret = 1;
     }
 
     return ret;
@@ -1395,10 +1399,10 @@ bool wxlua_iswxstringtype(lua_State* L, int stack_idx)
     return false;
 }
 
-const char* LUACALL wxlua_getstringtype(lua_State *L, int stack_idx)
+const char* LUACALL wxlua_getstringtypelen(lua_State *L, int stack_idx, size_t *len)
 {
     if (wxlua_isstringtype(L, stack_idx))
-        return lua_tostring(L, stack_idx);
+        return lua_tolstring(L, stack_idx, len);
     else if (wxlua_iswxuserdata(L, stack_idx))
     {
         int stack_type = wxluaT_type(L, stack_idx);
@@ -1407,13 +1411,29 @@ const char* LUACALL wxlua_getstringtype(lua_State *L, int stack_idx)
         {
             wxString* wxstr = (wxString*)wxlua_touserdata(L, stack_idx, false);
             wxCHECK_MSG(wxstr, NULL, wxT("Invalid userdata wxString"));
-            return wx2lua(*wxstr);
+            const char *retp = (const char *)wx2lua(*wxstr);
+            if (len != NULL)
+                *len = strlen(retp);
+            return retp;
+        }
+        else if (wxluaT_isderivedtype(L, stack_type, *p_wxluatype_wxMemoryBuffer) >= 0)
+        {
+            wxMemoryBuffer * wxmem = (wxMemoryBuffer *)wxluaT_getuserdatatype(L, stack_idx, *p_wxluatype_wxMemoryBuffer);
+            const char *datap = (const char *)wxmem->GetData();
+            if (len != NULL)
+                *len = wxmem->GetDataLen();
+            return datap;
         }
     }
 
     wxlua_argerror(L, stack_idx, wxT("a 'string' or 'wxString'"));
 
     return NULL;
+}
+
+const char* LUACALL wxlua_getstringtype(lua_State *L, int stack_idx)
+{
+    return wxlua_getstringtypelen(L, stack_idx, NULL);
 }
 
 wxString LUACALL wxlua_getwxStringtype(lua_State *L, int stack_idx)
@@ -1736,6 +1756,59 @@ wxLuaSmartwxArrayInt LUACALL wxlua_getwxArrayInt(lua_State* L, int stack_idx)
     return arr;
 }
 
+wxLuaSmartwxArrayDouble LUACALL wxlua_getwxArrayDouble(lua_State* L, int stack_idx)
+{
+    wxLuaSmartwxArrayDouble arr(NULL, true); // will be replaced
+    int count = -1;                       // used to check for failure
+
+    if (lua_istable(L, stack_idx))
+    {
+        count = 0;
+
+        while(1)
+        {
+            lua_rawgeti(L, stack_idx, count+1);
+
+            if (wxlua_isnumbertype(L, -1))
+            {
+                ((wxArrayDouble&)arr).Add(lua_tonumber(L, -1));
+                ++count;
+
+                lua_pop(L, 1);
+            }
+            else if (lua_isnil(L, -1))
+            {
+                lua_pop(L, 1);
+                break;
+            }
+            else
+            {
+                wxlua_argerror(L, stack_idx, wxT("a 'wxArrayDouble' or a table array of integers"));
+                return arr;
+            }
+        }
+    }
+    else if (wxlua_iswxuserdata(L, stack_idx))
+    {
+        int arrdouble_wxltype = wxluaT_gettype(L, "wxArrayDouble");
+
+        if (wxluaT_isuserdatatype(L, stack_idx, arrdouble_wxltype))
+        {
+            wxArrayDouble *arrDouble = (wxArrayDouble *)wxluaT_getuserdatatype(L, stack_idx, arrdouble_wxltype);
+            if (arrDouble)
+            {
+                arr = wxLuaSmartwxArrayDouble(arrDouble, false); // replace
+                count = arrDouble->GetCount();
+            }
+        }
+    }
+
+    if (count < 0)
+        wxlua_argerror(L, stack_idx, wxT("a 'wxArrayDouble' or a table array of numbers"));
+
+    return arr;
+}
+
 wxLuaSharedPtr<std::vector<wxPoint> > LUACALL wxlua_getwxPointArray(lua_State* L, int stack_idx)
 {
     wxLuaSharedPtr<std::vector<wxPoint> > pointArray(new std::vector<wxPoint>);
@@ -1836,6 +1909,84 @@ wxLuaSharedPtr<std::vector<wxPoint> > LUACALL wxlua_getwxPointArray(lua_State* L
     return pointArray;
 }
 
+wxLuaSharedPtr<std::vector<wxPoint2DDouble> > LUACALL wxlua_getwxPoint2DDoubleArray(lua_State* L, int stack_idx)
+{
+    wxLuaSharedPtr<std::vector<wxPoint2DDouble> > pointArray(new std::vector<wxPoint2DDouble>);
+    int count = -1;       // used to check for failure
+    int is_xy_table = -1; // is it a table with x,y fields or a number array {1,2}
+    
+    if (lua_istable(L, stack_idx))
+    {
+        count = lua_objlen(L, stack_idx); /* get size of table */
+        
+        double x, y;
+        for (int i = 1; i <= count; ++i)
+        {
+            lua_rawgeti(L, stack_idx, i); /* get next point as {x,y} */
+            int t = wxluaT_type(L, -1);
+            if (t == WXLUA_TTABLE)
+            {
+                // First time, check how it was formatted
+                if (is_xy_table == -1)
+                {
+                    lua_rawgeti(L, -1, 1);
+                    is_xy_table = (lua_isnumber(L, -1) == 0) ? 1 : 0;
+                    lua_pop(L, 1);
+                }
+                
+                if (is_xy_table == 1)
+                {
+                    lua_pushstring(L, "x");
+                    lua_rawget(L, -2);
+                    if (!lua_isnumber(L, -1))
+                        wxlua_argerror(L, stack_idx, wxT("a 'number' for x-coordinate of a wxPoint2DDouble array, valid tables are {{1,2},...}, {{x=1,y=2},...}, or {wx.wxPoint2DDouble(1,2),,...}."));
+                    x = lua_tonumber(L, -1);
+                    lua_pop(L, 1);
+                    
+                    lua_pushstring(L, "y");
+                    lua_rawget(L, -2);
+                    if (!lua_isnumber(L, -1))
+                        wxlua_argerror(L, stack_idx, wxT("a 'number' for y-coordinate of a wxPoint2DDouble array, valid tables are {{1,2},...}, {{x=1,y=2},...}, or {wx.wxPoint2DDouble(1,2),,...}."));
+                    y = lua_tonumber(L, -1);
+                    lua_pop(L, 1);
+                }
+                else
+                {
+                    lua_rawgeti(L, -1, 1);
+                    if (!lua_isnumber(L, -1))
+                        wxlua_argerror(L, stack_idx, wxT("a 'number' for [1] index (x-coordinate) of a wxPoint2DDouble array, valid tables {{1,2},...}, {{x=1,y=2},...}, or {wx.wxPoint2DDouble(1,2),,...}."));
+                    x = lua_tonumber(L, -1);
+                    lua_pop(L, 1);
+                    
+                    lua_rawgeti(L, -1, 2);
+                    if (!lua_isnumber(L, -1))
+                        wxlua_argerror(L, stack_idx, wxT("a 'number' for [2] index (y-coordinate) of a wxPoint2DDouble array, valid tables {{1,2},...}, {{x=1,y=2},...}, or {wx.wxPoint2DDouble(1,2),,...}."));
+                    y = lua_tonumber(L,-1);
+                    lua_pop(L, 1);
+                }
+                
+                pointArray->push_back(wxPoint2DDouble(x, y));
+            }
+            else if (t == *p_wxluatype_wxPoint2DDouble)
+            {
+                const wxPoint* point = (const wxPoint *)wxluaT_getuserdatatype(L, -1, *p_wxluatype_wxPoint);
+                pointArray->push_back(*point);
+            }
+            else
+            {
+                wxlua_argerror(L, stack_idx, wxT("a Lua table of 'wxPoint2DDoubles', valid tables {{1,2},...}, {{x=1,y=2},...}, or {wx.wxPoint2DDouble(1,2),,...}."));
+                return pointArray;
+            }
+            
+            lua_pop(L, 1);
+        }
+    }
+    if (count < 0)
+        wxlua_argerror(L, stack_idx, wxT("a Lua table of 'wxPoint2DDoubles', valid tables {{1,2},...}, {{x=1,y=2},...}, or {wx.wxPoint2DDouble(1,2),,...}."));
+    
+    return pointArray;
+}
+
 int LUACALL wxlua_pushwxArrayStringtable(lua_State *L, const wxArrayString &strArray)
 {
     size_t idx, count = strArray.GetCount();
@@ -1856,7 +2007,24 @@ int LUACALL wxlua_pushwxArrayInttable(lua_State *L, const wxArrayInt &intArray)
 
     for (idx = 0; idx < count; ++idx)
     {
+#if LUA_VERSION_NUM >= 503
+        lua_pushinteger(L, intArray[idx]);
+#else
         lua_pushnumber(L, intArray[idx]);
+#endif
+        lua_rawseti(L, -2, idx + 1);
+    }
+    return idx;
+}
+
+int LUACALL wxlua_pushwxArrayDoubletable(lua_State *L, const wxArrayDouble &doubleArray)
+{
+    size_t idx, count = doubleArray.GetCount();
+    lua_createtable(L, count, 0);
+
+    for (idx = 0; idx < count; ++idx)
+    {
+        lua_pushnumber(L, doubleArray[idx]);
         lua_rawseti(L, -2, idx + 1);
     }
     return idx;

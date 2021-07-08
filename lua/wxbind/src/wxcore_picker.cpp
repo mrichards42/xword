@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker
 // ---------------------------------------------------------------------------
@@ -48,7 +52,15 @@ static int LUACALL wxLua_wxPickerBase_GetInternalMargin(lua_State *L)
     // call GetInternalMargin
     int returns = (self->GetInternalMargin());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -80,7 +92,15 @@ static int LUACALL wxLua_wxPickerBase_GetPickerCtrlProportion(lua_State *L)
     // call GetPickerCtrlProportion
     int returns = (self->GetPickerCtrlProportion());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -116,7 +136,15 @@ static int LUACALL wxLua_wxPickerBase_GetTextCtrlProportion(lua_State *L)
     // call GetTextCtrlProportion
     int returns = (self->GetTextCtrlProportion());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1658,7 +1686,15 @@ static int LUACALL wxLua_wxFontPickerCtrl_GetMaxPointSize(lua_State *L)
     // call GetMaxPointSize
     unsigned int returns = (self->GetMaxPointSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

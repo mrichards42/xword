@@ -28,6 +28,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 
 #if wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE
 // ---------------------------------------------------------------------------
@@ -1437,7 +1441,15 @@ static int LUACALL wxLua_wxDocManager_GetHistoryFilesCount(lua_State *L)
     // call GetHistoryFilesCount
     size_t returns = (self->GetHistoryFilesCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1471,7 +1483,15 @@ static int LUACALL wxLua_wxDocManager_GetMaxDocsOpen(lua_State *L)
     // call GetMaxDocsOpen
     int returns = (self->GetMaxDocsOpen());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1489,7 +1509,15 @@ static int LUACALL wxLua_wxDocManager_GetNoHistoryFiles(lua_State *L)
     // call GetNoHistoryFiles
     int returns = (self->GetNoHistoryFiles());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2115,7 +2143,15 @@ static int LUACALL wxLua_wxDocTemplate_GetFlags(lua_State *L)
     // call GetFlags
     long returns = (self->GetFlags());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3488,7 +3524,15 @@ static int LUACALL wxLua_wxCommandProcessor_GetMaxCommands(lua_State *L)
     // call GetMaxCommands
     int returns = (self->GetMaxCommands());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3975,7 +4019,15 @@ static int LUACALL wxLua_wxFileHistory_GetCount(lua_State *L)
     // call GetCount
     size_t returns = (self->GetCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4009,7 +4061,15 @@ static int LUACALL wxLua_wxFileHistory_GetMaxFiles(lua_State *L)
     // call GetMaxFiles
     int returns = (self->GetMaxFiles());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }

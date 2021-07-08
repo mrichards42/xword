@@ -23,6 +23,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 // ---------------------------------------------------------------------------
 // Bind class PrintInfo
 // ---------------------------------------------------------------------------
@@ -80,8 +84,16 @@ static int LUACALL wxLua_PrintInfo_Get_grid_options(lua_State *L)
 {
     // get this
     PrintInfo *self = (PrintInfo *)wxluaT_getuserdatatype(L, 1, wxluatype_PrintInfo);
-    // push the result number
+    // push the result integer? number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)(self->grid_options) == (double)(self->grid_options)) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, self->grid_options);
+} else
+#endif
+{
     lua_pushnumber(L, self->grid_options);
+}
     // return the number of values
     return 1;
 }
@@ -481,7 +493,15 @@ static int LUACALL wxLua_MyFrame_GetTime(lua_State *L)
     // call GetTime
     int returns = (self->GetTime());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1119,7 +1139,7 @@ int wxLua_function_GetFrame(lua_State *L)
     if (frame)
         wxluaT_pushuserdatatype(L, frame, wxluatype_MyFrame);
     else
-        lua_pushnil(L);        
+        lua_pushnil(L);
     return 1; // One object on the stack for lua.
 }
 

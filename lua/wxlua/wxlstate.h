@@ -77,7 +77,7 @@ public:
 
     // destroy and cleanup the lua_State, returns success
     // if 'force' = true then make sure all wxWindows are destroyed.
-    bool CloseLuaState(bool force);
+    bool CloseLuaState(bool force, bool collectGarbage = true);
     // clear all wxLuaEventCallbacks and wxLuaWinDestroyCallbacks on destruction
     void ClearCallbacks();
 
@@ -178,7 +178,7 @@ public:
     //   if !force then popup a dialog to ask if all wxWindows should be destroyed.
     // Only calls lua_close(L) if this is the last refed state and this was
     //  created without the wxLUASTATE_STATICSTATE flag.
-    bool CloseLuaState(bool force);
+    bool CloseLuaState(bool force, bool collectGarbage = true);
     // Are we currently being closed? Used when the garbage collector is running when
     //  we don't care about cleaning Lua up so just delete the data. (internal use)
     bool IsClosing() const;
@@ -792,6 +792,17 @@ public:
     lua_Debug *m_lua_Debug;
 };
 
+#if wxCHECK_VERSION(3,0,0)
+// A wxLuaState is being created, sent at the end of
+//   wxLuaState(wxEvtHandler, win id) or Create(wxEvtHandler, win id)
+wxDECLARE_EVENT(wxEVT_LUA_CREATION, wxLuaEvent);
+// Lua's print(...) statements and such, check GetString()
+wxDECLARE_EVENT(wxEVT_LUA_PRINT, wxLuaEvent);
+// an error in Lua has occurred, check GetString() for message
+wxDECLARE_EVENT(wxEVT_LUA_ERROR, wxLuaEvent);
+// see LuaDebugHook function
+wxDECLARE_EVENT(wxEVT_LUA_DEBUG_HOOK, wxLuaEvent);
+#else
 BEGIN_DECLARE_EVENT_TYPES()
     // A wxLuaState is being created, sent at the end of
     //   wxLuaState(wxEvtHandler, win id) or Create(wxEvtHandler, win id)
@@ -806,6 +817,7 @@ BEGIN_DECLARE_EVENT_TYPES()
     //DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WXLUA, wxEVT_LUA_INIT,       0)
     //DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WXLUA, wxEVT_LUA_DEBUGGERATTACHED,   0)
 END_DECLARE_EVENT_TYPES()
+#endif
 
 typedef void (wxEvtHandler::*wxLuaEventFunction)(wxLuaEvent&);
 

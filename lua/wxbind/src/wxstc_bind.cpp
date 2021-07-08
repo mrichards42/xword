@@ -22,6 +22,10 @@
     #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif // __GNUC__
 
+#if LUA_VERSION_NUM < 503
+#define lua_pushinteger lua_pushnumber
+#endif
+
 // ---------------------------------------------------------------------------
 // Bind class wxStyledTextCtrl
 // ---------------------------------------------------------------------------
@@ -62,12 +66,39 @@ static int LUACALL wxLua_wxStyledTextCtrl_AddSelection(lua_State *L)
     // call AddSelection
     int returns = (self->AddSelection(caret, anchor));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
 
 #endif // wxCHECK_VERSION(2,9,5)
+
+#if wxLUA_USE_wxMemoryBuffer
+static wxLuaArgType s_wxluatypeArray_wxLua_wxStyledTextCtrl_AddStyledText[] = { &wxluatype_wxStyledTextCtrl, &wxluatype_wxMemoryBuffer, NULL };
+static int LUACALL wxLua_wxStyledTextCtrl_AddStyledText(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_AddStyledText[1] = {{ wxLua_wxStyledTextCtrl_AddStyledText, WXLUAMETHOD_METHOD, 2, 2, s_wxluatypeArray_wxLua_wxStyledTextCtrl_AddStyledText }};
+//     void AddStyledText(const wxMemoryBuffer& data);
+static int LUACALL wxLua_wxStyledTextCtrl_AddStyledText(lua_State *L)
+{
+    // const wxMemoryBuffer data
+    const wxMemoryBuffer * data = (const wxMemoryBuffer *)wxluaT_getuserdatatype(L, 2, wxluatype_wxMemoryBuffer);
+    // get this
+    wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
+    // call AddStyledText
+    self->AddStyledText(*data);
+
+    return 0;
+}
+
+#endif // wxLUA_USE_wxMemoryBuffer
 
 #if wxCHECK_VERSION(3,1,0)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxStyledTextCtrl_AddTabStop[] = { &wxluatype_wxStyledTextCtrl, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
@@ -117,11 +148,11 @@ static int LUACALL wxLua_wxStyledTextCtrl_AddTextRaw(lua_State *L)
     // int length = -1
     int length = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : -1);
     // const char text
-    wxCharBuffer text = wxlua_getstringtype(L, 2);
+    const char * text = wxlua_getstringtype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call AddTextRaw
-    self->AddTextRaw((const char*)text, length);
+    self->AddTextRaw(text, length);
 
     return 0;
 }
@@ -179,7 +210,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AllocateExtendedStyles(lua_State *L)
     // call AllocateExtendedStyles
     int returns = (self->AllocateExtendedStyles(numberStyles));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -199,7 +238,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AllocateSubStyles(lua_State *L)
     // call AllocateSubStyles
     int returns = (self->AllocateSubStyles(styleBase, numberStyles));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -250,7 +297,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AnnotationGetLines(lua_State *L)
     // call AnnotationGetLines
     int returns = (self->AnnotationGetLines(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -268,7 +323,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AnnotationGetStyle(lua_State *L)
     // call AnnotationGetStyle
     int returns = (self->AnnotationGetStyle(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -284,7 +347,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AnnotationGetStyleOffset(lua_State *L)
     // call AnnotationGetStyleOffset
     int returns = (self->AnnotationGetStyleOffset());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -336,7 +407,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AnnotationGetVisible(lua_State *L)
     // call AnnotationGetVisible
     int returns = (self->AnnotationGetVisible());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -456,11 +535,11 @@ static int LUACALL wxLua_wxStyledTextCtrl_AppendTextRaw(lua_State *L)
     // int length = -1
     int length = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : -1);
     // const char text
-    wxCharBuffer text = wxlua_getstringtype(L, 2);
+    const char * text = wxlua_getstringtype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call AppendTextRaw
-    self->AppendTextRaw((const char*)text, length);
+    self->AppendTextRaw(text, length);
 
     return 0;
 }
@@ -554,7 +633,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompGetCaseInsensitiveBehaviour(lu
     // call AutoCompGetCaseInsensitiveBehaviour
     int returns = (self->AutoCompGetCaseInsensitiveBehaviour());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -588,7 +675,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompGetCurrent(lua_State *L)
     // call AutoCompGetCurrent
     int returns = (self->AutoCompGetCurrent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -656,7 +751,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompGetMaxHeight(lua_State *L)
     // call AutoCompGetMaxHeight
     int returns = (self->AutoCompGetMaxHeight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -672,7 +775,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompGetMaxWidth(lua_State *L)
     // call AutoCompGetMaxWidth
     int returns = (self->AutoCompGetMaxWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -690,7 +801,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompGetMulti(lua_State *L)
     // call AutoCompGetMulti
     int returns = (self->AutoCompGetMulti());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -706,7 +825,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompGetOrder(lua_State *L)
     // call AutoCompGetOrder
     int returns = (self->AutoCompGetOrder());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -724,7 +851,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompGetSeparator(lua_State *L)
     // call AutoCompGetSeparator
     int returns = (self->AutoCompGetSeparator());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -740,7 +875,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompGetTypeSeparator(lua_State *L)
     // call AutoCompGetTypeSeparator
     int returns = (self->AutoCompGetTypeSeparator());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -756,7 +899,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_AutoCompPosStart(lua_State *L)
     // call AutoCompPosStart
     int returns = (self->AutoCompPosStart());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1147,7 +1298,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_BraceMatch1(lua_State *L)
     // call BraceMatch
     int returns = (self->BraceMatch(pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1172,7 +1331,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_BraceMatch(lua_State *L)
     // call BraceMatch
     int returns = (self->BraceMatch(pos, maxReStyle));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1220,7 +1387,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_CallTipPosAtStart(lua_State *L)
     // call CallTipPosAtStart
     int returns = (self->CallTipPosAtStart());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1472,7 +1647,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_ChangeLexerState(lua_State *L)
     // call ChangeLexerState
     int returns = (self->ChangeLexerState(start, end));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1538,7 +1721,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_CharPositionFromPoint(lua_State *L)
     // call CharPositionFromPoint
     int returns = (self->CharPositionFromPoint(x, y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1558,7 +1749,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_CharPositionFromPointClose(lua_State *
     // call CharPositionFromPointClose
     int returns = (self->CharPositionFromPointClose(x, y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1834,7 +2033,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_ContractedFoldNext(lua_State *L)
     // call ContractedFoldNext
     int returns = (self->ContractedFoldNext(lineStart));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -1942,7 +2149,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_CountCharacters(lua_State *L)
     // call CountCharacters
     int returns = (self->CountCharacters(startPos, endPos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2149,7 +2364,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_DistanceToSecondaryStyles(lua_State *L
     // call DistanceToSecondaryStyles
     int returns = (self->DistanceToSecondaryStyles());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2205,7 +2428,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_DocLineFromVisible(lua_State *L)
     // call DocLineFromVisible
     int returns = (self->DocLineFromVisible(lineDisplay));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2411,7 +2642,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_FindColumn(lua_State *L)
     // call FindColumn
     int returns = (self->FindColumn(line, column));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2437,7 +2676,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_FindText(lua_State *L)
     // call FindText
     int returns = (self->FindText(minPos, maxPos, text, flags));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2561,7 +2808,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_FormatRange(lua_State *L)
     // call FormatRange
     int returns = (self->FormatRange(doDraw, startPos, endPos, draw, target, *renderRect, *pageRect));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2651,7 +2906,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetAdditionalSelAlpha(lua_State *L)
     // call GetAdditionalSelAlpha
     int returns = (self->GetAdditionalSelAlpha());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2701,7 +2964,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetAnchor(lua_State *L)
     // call GetAnchor
     int returns = (self->GetAnchor());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2719,7 +2990,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetAutomaticFold(lua_State *L)
     // call GetAutomaticFold
     int returns = (self->GetAutomaticFold());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2815,7 +3094,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCaretLineBackAlpha(lua_State *L)
     // call GetCaretLineBackAlpha
     int returns = (self->GetCaretLineBackAlpha());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2891,7 +3178,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCaretPeriod(lua_State *L)
     // call GetCaretPeriod
     int returns = (self->GetCaretPeriod());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2909,7 +3204,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCaretSticky(lua_State *L)
     // call GetCaretSticky
     int returns = (self->GetCaretSticky());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2925,7 +3228,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCaretStyle(lua_State *L)
     // call GetCaretStyle
     int returns = (self->GetCaretStyle());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2943,7 +3254,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCaretWidth(lua_State *L)
     // call GetCaretWidth
     int returns = (self->GetCaretWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2961,7 +3280,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCharAt(lua_State *L)
     // call GetCharAt
     int returns = (self->GetCharAt(pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2977,7 +3304,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCodePage(lua_State *L)
     // call GetCodePage
     int returns = (self->GetCodePage());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -2995,7 +3330,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetColumn(lua_State *L)
     // call GetColumn
     int returns = (self->GetColumn(pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3011,7 +3354,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetControlCharSymbol(lua_State *L)
     // call GetControlCharSymbol
     int returns = (self->GetControlCharSymbol());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3030,11 +3381,31 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCurLine(lua_State *L)
     wxString returns = self->GetCurLine(&linePos);
     // push the result string
     lua_pushstring(L, wx2lua(returns));
-    lua_pushnumber(L, linePos);
+    lua_pushinteger(L, linePos);
     // return the number of parameters
     return 2;
 }
 
+
+static wxLuaArgType s_wxluatypeArray_wxLua_wxStyledTextCtrl_GetCurLineRaw[] = { &wxluatype_wxStyledTextCtrl, &wxluatype_TLIGHTUSERDATA, NULL };
+static int LUACALL wxLua_wxStyledTextCtrl_GetCurLineRaw(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_GetCurLineRaw[1] = {{ wxLua_wxStyledTextCtrl_GetCurLineRaw, WXLUAMETHOD_METHOD, 1, 2, s_wxluatypeArray_wxLua_wxStyledTextCtrl_GetCurLineRaw }};
+//     wxCharBuffer GetCurLineRaw(int* linePos=NULL);
+static int LUACALL wxLua_wxStyledTextCtrl_GetCurLineRaw(lua_State *L)
+{
+    // get number of arguments
+    int argCount = lua_gettop(L);
+    // int linePos = NULL
+    int * linePos = (argCount >= 2 ? (int *)wxlua_touserdata(L, 2) : NULL);
+    // get this
+    wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
+    // call GetCurLineRaw
+    wxCharBuffer returns = (self->GetCurLineRaw(linePos));
+    // push the result string
+    lua_pushstring(L, returns.data());
+
+    return 1;
+}
 
 static wxLuaArgType s_wxluatypeArray_wxLua_wxStyledTextCtrl_GetCurrentLine[] = { &wxluatype_wxStyledTextCtrl, NULL };
 static int LUACALL wxLua_wxStyledTextCtrl_GetCurrentLine(lua_State *L);
@@ -3047,7 +3418,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCurrentLine(lua_State *L)
     // call GetCurrentLine
     int returns = (self->GetCurrentLine());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3063,7 +3442,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetCurrentPos(lua_State *L)
     // call GetCurrentPos
     int returns = (self->GetCurrentPos());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3131,7 +3518,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetEOLMode(lua_State *L)
     // call GetEOLMode
     int returns = (self->GetEOLMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3170,7 +3565,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetEdgeColumn(lua_State *L)
     // call GetEdgeColumn
     int returns = (self->GetEdgeColumn());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3186,7 +3589,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetEdgeMode(lua_State *L)
     // call GetEdgeMode
     int returns = (self->GetEdgeMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3218,7 +3629,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetEndStyled(lua_State *L)
     // call GetEndStyled
     int returns = (self->GetEndStyled());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3236,7 +3655,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetExtraAscent(lua_State *L)
     // call GetExtraAscent
     int returns = (self->GetExtraAscent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3252,7 +3679,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetExtraDescent(lua_State *L)
     // call GetExtraDescent
     int returns = (self->GetExtraDescent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3270,7 +3705,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetFirstVisibleLine(lua_State *L)
     // call GetFirstVisibleLine
     int returns = (self->GetFirstVisibleLine());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3306,7 +3749,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetFoldLevel(lua_State *L)
     // call GetFoldLevel
     int returns = (self->GetFoldLevel(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3324,7 +3775,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetFoldParent(lua_State *L)
     // call GetFoldParent
     int returns = (self->GetFoldParent(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3342,7 +3801,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetFontQuality(lua_State *L)
     // call GetFontQuality
     int returns = (self->GetFontQuality());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3361,7 +3828,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetGapPosition(lua_State *L)
     // call GetGapPosition
     int returns = (self->GetGapPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3379,7 +3854,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetHighlightGuide(lua_State *L)
     // call GetHighlightGuide
     int returns = (self->GetHighlightGuide());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3473,7 +3956,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetIMEInteraction(lua_State *L)
     // call GetIMEInteraction
     int returns = (self->GetIMEInteraction());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3492,7 +3983,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetIdentifier(lua_State *L)
     // call GetIdentifier
     int returns = (self->GetIdentifier());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3511,7 +4010,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetIdleStyling(lua_State *L)
     // call GetIdleStyling
     int returns = (self->GetIdleStyling());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3529,7 +4036,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetIndent(lua_State *L)
     // call GetIndent
     int returns = (self->GetIndent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3566,7 +4081,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetIndentationGuides(lua_State *L)
     // call GetIndentationGuides
     int returns = (self->GetIndentationGuides());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3585,7 +4108,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetIndicatorCurrent(lua_State *L)
     // call GetIndicatorCurrent
     int returns = (self->GetIndicatorCurrent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3601,7 +4132,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetIndicatorValue(lua_State *L)
     // call GetIndicatorValue
     int returns = (self->GetIndicatorValue());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3642,7 +4181,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLastChild(lua_State *L)
     // call GetLastChild
     int returns = (self->GetLastChild(line, level));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3674,7 +4221,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLayoutCache(lua_State *L)
     // call GetLayoutCache
     int returns = (self->GetLayoutCache());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3690,7 +4245,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLength(lua_State *L)
     // call GetLength
     int returns = (self->GetLength());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3706,7 +4269,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLexer(lua_State *L)
     // call GetLexer
     int returns = (self->GetLexer());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3779,7 +4350,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineCount(lua_State *L)
     // call GetLineCount
     int returns = (self->GetLineCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3797,7 +4376,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineEndPosition(lua_State *L)
     // call GetLineEndPosition
     int returns = (self->GetLineEndPosition(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3815,7 +4402,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineEndTypesActive(lua_State *L)
     // call GetLineEndTypesActive
     int returns = (self->GetLineEndTypesActive());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3831,7 +4426,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineEndTypesAllowed(lua_State *L)
     // call GetLineEndTypesAllowed
     int returns = (self->GetLineEndTypesAllowed());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3847,7 +4450,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineEndTypesSupported(lua_State *L)
     // call GetLineEndTypesSupported
     int returns = (self->GetLineEndTypesSupported());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3867,7 +4478,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineIndentPosition(lua_State *L)
     // call GetLineIndentPosition
     int returns = (self->GetLineIndentPosition(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3885,7 +4504,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineIndentation(lua_State *L)
     // call GetLineIndentation
     int returns = (self->GetLineIndentation(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3921,7 +4548,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineSelEndPosition(lua_State *L)
     // call GetLineSelEndPosition
     int returns = (self->GetLineSelEndPosition(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3939,7 +4574,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineSelStartPosition(lua_State *L)
     // call GetLineSelStartPosition
     int returns = (self->GetLineSelStartPosition(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3957,7 +4600,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetLineState(lua_State *L)
     // call GetLineState
     int returns = (self->GetLineState(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -3993,7 +4644,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMainSelection(lua_State *L)
     // call GetMainSelection
     int returns = (self->GetMainSelection());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4036,7 +4695,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarginCount(lua_State *L)
     // call GetMarginCount
     int returns = (self->GetMarginCount());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4057,7 +4724,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarginCursor(lua_State *L)
     // call GetMarginCursor
     int returns = (self->GetMarginCursor(margin));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4075,7 +4750,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarginLeft(lua_State *L)
     // call GetMarginLeft
     int returns = (self->GetMarginLeft());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4093,7 +4776,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarginMask(lua_State *L)
     // call GetMarginMask
     unsigned int returns = (self->GetMarginMask(margin));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4111,7 +4802,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarginOptions(lua_State *L)
     // call GetMarginOptions
     int returns = (self->GetMarginOptions());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4129,7 +4828,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarginRight(lua_State *L)
     // call GetMarginRight
     int returns = (self->GetMarginRight());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4165,7 +4872,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarginType(lua_State *L)
     // call GetMarginType
     int returns = (self->GetMarginType(margin));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4183,7 +4898,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarginWidth(lua_State *L)
     // call GetMarginWidth
     int returns = (self->GetMarginWidth(margin));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4203,7 +4926,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMarkerSymbolDefined(lua_State *L)
     // call GetMarkerSymbolDefined
     int returns = (self->GetMarkerSymbolDefined(markerNumber));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4221,7 +4952,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMaxLineState(lua_State *L)
     // call GetMaxLineState
     int returns = (self->GetMaxLineState());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4237,7 +4976,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetModEventMask(lua_State *L)
     // call GetModEventMask
     int returns = (self->GetModEventMask());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4285,7 +5032,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMouseDwellTime(lua_State *L)
     // call GetMouseDwellTime
     int returns = (self->GetMouseDwellTime());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4341,7 +5096,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetMultiPaste(lua_State *L)
     // call GetMultiPaste
     int returns = (self->GetMultiPaste());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4380,7 +5143,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetNextTabStop(lua_State *L)
     // call GetNextTabStop
     int returns = (self->GetNextTabStop(line, x));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4432,7 +5203,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetPhasesDraw(lua_State *L)
     // call GetPhasesDraw
     int returns = (self->GetPhasesDraw());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4451,7 +5230,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetPositionCacheSize(lua_State *L)
     // call GetPositionCacheSize
     int returns = (self->GetPositionCacheSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4472,7 +5259,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetPrimaryStyleFromStyle(lua_State *L)
     // call GetPrimaryStyleFromStyle
     int returns = (self->GetPrimaryStyleFromStyle(style));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4490,7 +5285,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetPrintColourMode(lua_State *L)
     // call GetPrintColourMode
     int returns = (self->GetPrintColourMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4506,7 +5309,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetPrintMagnification(lua_State *L)
     // call GetPrintMagnification
     int returns = (self->GetPrintMagnification());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4522,7 +5333,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetPrintWrapMode(lua_State *L)
     // call GetPrintWrapMode
     int returns = (self->GetPrintWrapMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4578,7 +5397,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetPropertyInt1(lua_State *L)
     // call GetPropertyInt
     int returns = (self->GetPropertyInt(key));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4603,7 +5430,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetPropertyInt(lua_State *L)
     // call GetPropertyInt
     int returns = (self->GetPropertyInt(key, defaultValue));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4658,7 +5493,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetRectangularSelectionAnchor(lua_Stat
     // call GetRectangularSelectionAnchor
     int returns = (self->GetRectangularSelectionAnchor());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4674,7 +5517,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetRectangularSelectionAnchorVirtualSp
     // call GetRectangularSelectionAnchorVirtualSpace
     int returns = (self->GetRectangularSelectionAnchorVirtualSpace());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4690,7 +5541,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetRectangularSelectionCaret(lua_State
     // call GetRectangularSelectionCaret
     int returns = (self->GetRectangularSelectionCaret());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4706,7 +5565,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetRectangularSelectionCaretVirtualSpa
     // call GetRectangularSelectionCaretVirtualSpace
     int returns = (self->GetRectangularSelectionCaretVirtualSpace());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4722,7 +5589,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetRectangularSelectionModifier(lua_St
     // call GetRectangularSelectionModifier
     int returns = (self->GetRectangularSelectionModifier());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4761,7 +5636,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSTCCursor(lua_State *L)
     // call GetSTCCursor
     int returns = (self->GetSTCCursor());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4793,7 +5676,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetScrollWidth(lua_State *L)
     // call GetScrollWidth
     int returns = (self->GetScrollWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4829,7 +5720,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSearchFlags(lua_State *L)
     // call GetSearchFlags
     int returns = (self->GetSearchFlags());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4847,7 +5746,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelAlpha(lua_State *L)
     // call GetSelAlpha
     int returns = (self->GetSelAlpha());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4919,8 +5826,8 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelection(lua_State *L)
     // call GetSelection
     self->GetSelection(&startPos, &endPos);
     // push results
-    lua_pushnumber(L, startPos);
-    lua_pushnumber(L, endPos);
+    lua_pushinteger(L, startPos);
+    lua_pushinteger(L, endPos);
     // return the number of parameters
     return 2;
 }
@@ -4957,7 +5864,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionEnd(lua_State *L)
     // call GetSelectionEnd
     int returns = (self->GetSelectionEnd());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4973,7 +5888,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionMode(lua_State *L)
     // call GetSelectionMode
     int returns = (self->GetSelectionMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -4993,7 +5916,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionNAnchor(lua_State *L)
     // call GetSelectionNAnchor
     int returns = (self->GetSelectionNAnchor(selection));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5011,7 +5942,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionNAnchorVirtualSpace(lua_St
     // call GetSelectionNAnchorVirtualSpace
     int returns = (self->GetSelectionNAnchorVirtualSpace(selection));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5029,7 +5968,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionNCaret(lua_State *L)
     // call GetSelectionNCaret
     int returns = (self->GetSelectionNCaret(selection));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5047,7 +5994,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionNCaretVirtualSpace(lua_Sta
     // call GetSelectionNCaretVirtualSpace
     int returns = (self->GetSelectionNCaretVirtualSpace(selection));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5065,7 +6020,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionNEnd(lua_State *L)
     // call GetSelectionNEnd
     int returns = (self->GetSelectionNEnd(selection));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5083,7 +6046,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionNStart(lua_State *L)
     // call GetSelectionNStart
     int returns = (self->GetSelectionNStart(selection));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5101,7 +6072,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelectionStart(lua_State *L)
     // call GetSelectionStart
     int returns = (self->GetSelectionStart());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5119,7 +6098,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSelections(lua_State *L)
     // call GetSelections
     int returns = (self->GetSelections());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5137,7 +6124,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetStatus(lua_State *L)
     // call GetStatus
     int returns = (self->GetStatus());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5155,7 +6150,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetStyleAt(lua_State *L)
     // call GetStyleAt
     int returns = (self->GetStyleAt(pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5173,7 +6176,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetStyleBits1(lua_State *L)
     // call GetStyleBits
     int returns = (self->GetStyleBits());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5189,7 +6200,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetStyleBits(lua_State *L)
     // call GetStyleBits
     int returns = (self->GetStyleBits());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5205,7 +6224,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetStyleBitsNeeded1(lua_State *L)
     // call GetStyleBitsNeeded
     int returns = (self->GetStyleBitsNeeded());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5221,7 +6248,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetStyleBitsNeeded(lua_State *L)
     // call GetStyleBitsNeeded
     int returns = (self->GetStyleBitsNeeded());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5242,11 +6277,48 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetStyleFromSubStyle(lua_State *L)
     // call GetStyleFromSubStyle
     int returns = (self->GetStyleFromSubStyle(subStyle));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
 
+#endif // wxCHECK_VERSION(3,1,0)
+
+#if wxLUA_USE_wxMemoryBuffer
+static wxLuaArgType s_wxluatypeArray_wxLua_wxStyledTextCtrl_GetStyledText[] = { &wxluatype_wxStyledTextCtrl, &wxluatype_TNUMBER, &wxluatype_TNUMBER, NULL };
+static int LUACALL wxLua_wxStyledTextCtrl_GetStyledText(lua_State *L);
+static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_GetStyledText[1] = {{ wxLua_wxStyledTextCtrl_GetStyledText, WXLUAMETHOD_METHOD, 3, 3, s_wxluatypeArray_wxLua_wxStyledTextCtrl_GetStyledText }};
+//     wxMemoryBuffer GetStyledText(int startPos, int endPos);
+static int LUACALL wxLua_wxStyledTextCtrl_GetStyledText(lua_State *L)
+{
+    // int endPos
+    int endPos = (int)wxlua_getnumbertype(L, 3);
+    // int startPos
+    int startPos = (int)wxlua_getnumbertype(L, 2);
+    // get this
+    wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
+    // call GetStyledText
+    // allocate a new object using the copy constructor
+    wxMemoryBuffer* returns = new wxMemoryBuffer(self->GetStyledText(startPos, endPos));
+    // add the new object to the tracked memory list
+    wxluaO_addgcobject(L, returns, wxluatype_wxMemoryBuffer);
+    // push the result datatype
+    wxluaT_pushuserdatatype(L, returns, wxluatype_wxMemoryBuffer);
+
+    return 1;
+}
+
+#endif // wxLUA_USE_wxMemoryBuffer
+
+#if wxCHECK_VERSION(3,1,0)
 static wxLuaArgType s_wxluatypeArray_wxLua_wxStyledTextCtrl_GetSubStyleBases[] = { &wxluatype_wxStyledTextCtrl, NULL };
 static int LUACALL wxLua_wxStyledTextCtrl_GetSubStyleBases(lua_State *L);
 static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_GetSubStyleBases[1] = {{ wxLua_wxStyledTextCtrl_GetSubStyleBases, WXLUAMETHOD_METHOD, 1, 1, s_wxluatypeArray_wxLua_wxStyledTextCtrl_GetSubStyleBases }};
@@ -5276,7 +6348,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSubStylesLength(lua_State *L)
     // call GetSubStylesLength
     int returns = (self->GetSubStylesLength(styleBase));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5294,7 +6374,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetSubStylesStart(lua_State *L)
     // call GetSubStylesStart
     int returns = (self->GetSubStylesStart(styleBase));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5313,7 +6401,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetTabDrawMode(lua_State *L)
     // call GetTabDrawMode
     int returns = (self->GetTabDrawMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5347,7 +6443,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetTabWidth(lua_State *L)
     // call GetTabWidth
     int returns = (self->GetTabWidth());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5385,7 +6489,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetTargetEnd(lua_State *L)
     // call GetTargetEnd
     int returns = (self->GetTargetEnd());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5401,7 +6513,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetTargetStart(lua_State *L)
     // call GetTargetStart
     int returns = (self->GetTargetStart());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5457,7 +6577,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetTechnology(lua_State *L)
     // call GetTechnology
     int returns = (self->GetTechnology());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5491,7 +6619,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetTextLength(lua_State *L)
     // call GetTextLength
     int returns = (self->GetTextLength());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5695,7 +6831,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetViewWhiteSpace(lua_State *L)
     // call GetViewWhiteSpace
     int returns = (self->GetViewWhiteSpace());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5713,7 +6857,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetVirtualSpaceOptions(lua_State *L)
     // call GetVirtualSpaceOptions
     int returns = (self->GetVirtualSpaceOptions());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5745,7 +6897,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetWhitespaceSize(lua_State *L)
     // call GetWhitespaceSize
     int returns = (self->GetWhitespaceSize());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5777,7 +6937,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetWrapIndentMode(lua_State *L)
     // call GetWrapIndentMode
     int returns = (self->GetWrapIndentMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5795,7 +6963,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetWrapMode(lua_State *L)
     // call GetWrapMode
     int returns = (self->GetWrapMode());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5811,7 +6987,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetWrapStartIndent(lua_State *L)
     // call GetWrapStartIndent
     int returns = (self->GetWrapStartIndent());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5827,7 +7011,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetWrapVisualFlags(lua_State *L)
     // call GetWrapVisualFlags
     int returns = (self->GetWrapVisualFlags());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5843,7 +7035,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetWrapVisualFlagsLocation(lua_State *
     // call GetWrapVisualFlagsLocation
     int returns = (self->GetWrapVisualFlagsLocation());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5859,7 +7059,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetXOffset(lua_State *L)
     // call GetXOffset
     int returns = (self->GetXOffset());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -5875,7 +7083,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_GetZoom(lua_State *L)
     // call GetZoom
     int returns = (self->GetZoom());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6059,7 +7275,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorAllOnFor(lua_State *L)
     // call IndicatorAllOnFor
     int returns = (self->IndicatorAllOnFor(position));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6097,7 +7321,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorEnd(lua_State *L)
     // call IndicatorEnd
     int returns = (self->IndicatorEnd(indicator, position));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6133,7 +7365,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorGetAlpha(lua_State *L)
     // call IndicatorGetAlpha
     int returns = (self->IndicatorGetAlpha(indicator));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6154,7 +7394,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorGetFlags(lua_State *L)
     // call IndicatorGetFlags
     int returns = (self->IndicatorGetFlags(indic));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6223,7 +7471,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorGetHoverStyle(lua_State *L)
     // call IndicatorGetHoverStyle
     int returns = (self->IndicatorGetHoverStyle(indic));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6244,7 +7500,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorGetOutlineAlpha(lua_State *L)
     // call IndicatorGetOutlineAlpha
     int returns = (self->IndicatorGetOutlineAlpha(indicator));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6264,7 +7528,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorGetStyle(lua_State *L)
     // call IndicatorGetStyle
     int returns = (self->IndicatorGetStyle(indic));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6467,7 +7739,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorStart(lua_State *L)
     // call IndicatorStart
     int returns = (self->IndicatorStart(indicator, position));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6487,7 +7767,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_IndicatorValueAt(lua_State *L)
     // call IndicatorValueAt
     int returns = (self->IndicatorValueAt(indicator, position));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6519,13 +7807,13 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_InsertTextRaw[1] = {{ w
 static int LUACALL wxLua_wxStyledTextCtrl_InsertTextRaw(lua_State *L)
 {
     // const char text
-    wxCharBuffer text = wxlua_getstringtype(L, 3);
+    const char * text = wxlua_getstringtype(L, 3);
     // int pos
     int pos = (int)wxlua_getnumbertype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call InsertTextRaw
-    self->InsertTextRaw(pos, (const char*)text);
+    self->InsertTextRaw(pos, text);
 
     return 0;
 }
@@ -6763,7 +8051,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_LineFromPosition(lua_State *L)
     // call LineFromPosition
     int returns = (self->LineFromPosition(pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6781,7 +8077,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_LineLength(lua_State *L)
     // call LineLength
     int returns = (self->LineLength(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -6913,7 +8217,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_LinesOnScreen(lua_State *L)
     // call LinesOnScreen
     int returns = (self->LinesOnScreen());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7001,7 +8313,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_MarginGetStyle(lua_State *L)
     // call MarginGetStyle
     int returns = (self->MarginGetStyle(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7017,7 +8337,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_MarginGetStyleOffset(lua_State *L)
     // call MarginGetStyleOffset
     int returns = (self->MarginGetStyleOffset());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7159,7 +8487,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_MarkerAdd(lua_State *L)
     // call MarkerAdd
     int returns = (self->MarkerAdd(line, markerNumber));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7283,13 +8619,13 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_MarkerDefineRGBAImage[1
 static int LUACALL wxLua_wxStyledTextCtrl_MarkerDefineRGBAImage(lua_State *L)
 {
     // const unsigned char pixels
-    wxCharBuffer pixels = wxlua_getstringtype(L, 3);
+    const unsigned char * pixels = (const unsigned char *)wxlua_getstringtype(L, 3);
     // int markerNumber
     int markerNumber = (int)wxlua_getnumbertype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call MarkerDefineRGBAImage
-    self->MarkerDefineRGBAImage(markerNumber, (const unsigned char*)(const char*)pixels);
+    self->MarkerDefineRGBAImage(markerNumber, pixels);
 
     return 0;
 }
@@ -7379,7 +8715,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_MarkerGet(lua_State *L)
     // call MarkerGet
     unsigned int returns = (self->MarkerGet(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7397,7 +8741,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_MarkerLineFromHandle(lua_State *L)
     // call MarkerLineFromHandle
     int returns = (self->MarkerLineFromHandle(handle));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7417,7 +8769,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_MarkerNext(lua_State *L)
     // call MarkerNext
     int returns = (self->MarkerNext(lineStart, markerMask));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7437,7 +8797,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_MarkerPrevious(lua_State *L)
     // call MarkerPrevious
     int returns = (self->MarkerPrevious(lineStart, markerMask));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7845,7 +9213,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_PositionAfter(lua_State *L)
     // call PositionAfter
     int returns = (self->PositionAfter(pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7863,7 +9239,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_PositionBefore(lua_State *L)
     // call PositionBefore
     int returns = (self->PositionBefore(pos));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7881,7 +9265,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_PositionFromLine(lua_State *L)
     // call PositionFromLine
     int returns = (self->PositionFromLine(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7901,7 +9293,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_PositionFromPoint1(lua_State *L)
     // call PositionFromPoint
     int returns = (self->PositionFromPoint(*pt));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7922,7 +9322,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_PositionFromPoint(lua_State *L)
     // call PositionFromPoint
     int returns = (self->PositionFromPoint(pt));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7944,7 +9352,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_PositionFromPointClose(lua_State *L)
     // call PositionFromPointClose
     int returns = (self->PositionFromPointClose(x, y));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -7966,7 +9382,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_PositionRelative(lua_State *L)
     // call PositionRelative
     int returns = (self->PositionRelative(pos, relative));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8026,7 +9450,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_PropertyType(lua_State *L)
     // call PropertyType
     int returns = (self->PropertyType(name));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8175,13 +9607,13 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_RegisterRGBAImage[1] = 
 static int LUACALL wxLua_wxStyledTextCtrl_RegisterRGBAImage(lua_State *L)
 {
     // const unsigned char pixels
-    wxCharBuffer pixels = wxlua_getstringtype(L, 3);
+    const unsigned char * pixels = (const unsigned char *)wxlua_getstringtype(L, 3);
     // int type
     int type = (int)wxlua_getnumbertype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call RegisterRGBAImage
-    self->RegisterRGBAImage(type, (const unsigned char*)(const char*)pixels);
+    self->RegisterRGBAImage(type, pixels);
 
     return 0;
 }
@@ -8246,11 +9678,11 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_ReplaceSelectionRaw[1] 
 static int LUACALL wxLua_wxStyledTextCtrl_ReplaceSelectionRaw(lua_State *L)
 {
     // const char text
-    wxCharBuffer text = wxlua_getstringtype(L, 2);
+    const char * text = wxlua_getstringtype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call ReplaceSelectionRaw
-    self->ReplaceSelectionRaw((const char*)text);
+    self->ReplaceSelectionRaw(text);
 
     return 0;
 }
@@ -8270,7 +9702,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_ReplaceTarget(lua_State *L)
     // call ReplaceTarget
     int returns = (self->ReplaceTarget(text));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8288,7 +9728,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_ReplaceTargetRE(lua_State *L)
     // call ReplaceTargetRE
     int returns = (self->ReplaceTargetRE(text));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8306,13 +9754,21 @@ static int LUACALL wxLua_wxStyledTextCtrl_ReplaceTargetRERaw(lua_State *L)
     // int length = -1
     int length = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : -1);
     // const char text
-    wxCharBuffer text = wxlua_getstringtype(L, 2);
+    const char * text = wxlua_getstringtype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call ReplaceTargetRERaw
-    int returns = (self->ReplaceTargetRERaw((const char*)text, length));
+    int returns = (self->ReplaceTargetRERaw(text, length));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8328,13 +9784,21 @@ static int LUACALL wxLua_wxStyledTextCtrl_ReplaceTargetRaw(lua_State *L)
     // int length = -1
     int length = (argCount >= 3 ? (int)wxlua_getnumbertype(L, 3) : -1);
     // const char text
-    wxCharBuffer text = wxlua_getstringtype(L, 2);
+    const char * text = wxlua_getstringtype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call ReplaceTargetRaw
-    int returns = (self->ReplaceTargetRaw((const char*)text, length));
+    int returns = (self->ReplaceTargetRaw(text, length));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8493,7 +9957,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_SearchInTarget(lua_State *L)
     // call SearchInTarget
     int returns = (self->SearchInTarget(text));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8513,7 +9985,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_SearchNext(lua_State *L)
     // call SearchNext
     int returns = (self->SearchNext(flags, text));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8533,7 +10013,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_SearchPrev(lua_State *L)
     // call SearchPrev
     int returns = (self->SearchPrev(flags, text));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -8601,7 +10089,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_SendMsg(lua_State *L)
     // call SendMsg
     long returns = (self->SendMsg(msg, wp, lp));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -10994,11 +12490,11 @@ static wxLuaBindCFunc s_wxluafunc_wxLua_wxStyledTextCtrl_SetTextRaw[1] = {{ wxLu
 static int LUACALL wxLua_wxStyledTextCtrl_SetTextRaw(lua_State *L)
 {
     // const char text
-    wxCharBuffer text = wxlua_getstringtype(L, 2);
+    const char * text = wxlua_getstringtype(L, 2);
     // get this
     wxStyledTextCtrl * self = (wxStyledTextCtrl *)wxluaT_getuserdatatype(L, 1, wxluatype_wxStyledTextCtrl);
     // call SetTextRaw
-    self->SetTextRaw((const char*)text);
+    self->SetTextRaw(text);
 
     return 0;
 }
@@ -11670,7 +13166,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_StyleGetCase(lua_State *L)
     // call StyleGetCase
     int returns = (self->StyleGetCase(style));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11706,7 +13210,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_StyleGetCharacterSet(lua_State *L)
     // call StyleGetCharacterSet
     int returns = (self->StyleGetCharacterSet(style));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11847,7 +13359,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_StyleGetSize(lua_State *L)
     // call StyleGetSize
     int returns = (self->StyleGetSize(style));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11865,7 +13385,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_StyleGetSizeFractional(lua_State *L)
     // call StyleGetSizeFractional
     int returns = (self->StyleGetSizeFractional(style));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -11919,7 +13447,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_StyleGetWeight(lua_State *L)
     // call StyleGetWeight
     int returns = (self->StyleGetWeight(style));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12389,7 +13925,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_TextHeight(lua_State *L)
     // call TextHeight
     int returns = (self->TextHeight(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12409,7 +13953,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_TextWidth(lua_State *L)
     // call TextWidth
     int returns = (self->TextWidth(style, text));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12684,7 +14236,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_VisibleFromDocLine(lua_State *L)
     // call VisibleFromDocLine
     int returns = (self->VisibleFromDocLine(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12704,7 +14264,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_WordEndPosition(lua_State *L)
     // call WordEndPosition
     int returns = (self->WordEndPosition(pos, onlyWordCharacters));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12892,7 +14460,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_WordStartPosition(lua_State *L)
     // call WordStartPosition
     int returns = (self->WordStartPosition(pos, onlyWordCharacters));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -12910,7 +14486,15 @@ static int LUACALL wxLua_wxStyledTextCtrl_WrapCount(lua_State *L)
     // call WrapCount
     int returns = (self->WrapCount(line));
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -13246,6 +14830,10 @@ wxLuaBindMethod wxStyledTextCtrl_methods[] = {
     { "AddSelection", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_AddSelection, 1, NULL },
 #endif // wxCHECK_VERSION(2,9,5)
 
+#if wxLUA_USE_wxMemoryBuffer
+    { "AddStyledText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_AddStyledText, 1, NULL },
+#endif // wxLUA_USE_wxMemoryBuffer
+
 #if wxCHECK_VERSION(3,1,0)
     { "AddTabStop", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_AddTabStop, 1, NULL },
 #endif // wxCHECK_VERSION(3,1,0)
@@ -13576,6 +15164,7 @@ wxLuaBindMethod wxStyledTextCtrl_methods[] = {
     { "GetColumn", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetColumn, 1, NULL },
     { "GetControlCharSymbol", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetControlCharSymbol, 1, NULL },
     { "GetCurLine", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetCurLine, 1, NULL },
+    { "GetCurLineRaw", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetCurLineRaw, 1, NULL },
     { "GetCurrentLine", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetCurrentLine, 1, NULL },
     { "GetCurrentPos", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetCurrentPos, 1, NULL },
 
@@ -13837,6 +15426,13 @@ wxLuaBindMethod wxStyledTextCtrl_methods[] = {
 
 #if wxCHECK_VERSION(3,1,0)
     { "GetStyleFromSubStyle", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetStyleFromSubStyle, 1, NULL },
+#endif // wxCHECK_VERSION(3,1,0)
+
+#if wxLUA_USE_wxMemoryBuffer
+    { "GetStyledText", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetStyledText, 1, NULL },
+#endif // wxLUA_USE_wxMemoryBuffer
+
+#if wxCHECK_VERSION(3,1,0)
     { "GetSubStyleBases", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetSubStyleBases, 1, NULL },
     { "GetSubStylesLength", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetSubStylesLength, 1, NULL },
     { "GetSubStylesStart", WXLUAMETHOD_METHOD, s_wxluafunc_wxLua_wxStyledTextCtrl_GetSubStylesStart, 1, NULL },
@@ -14752,7 +16348,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetAnnotationsLinesAdded(lua_State *L
     // call GetAnnotationsLinesAdded
     int returns = (self->GetAnnotationsLinesAdded());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14804,7 +16408,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetDragFlags(lua_State *L)
     // call GetDragFlags
     int returns = (self->GetDragFlags());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14823,7 +16435,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetDragResult(lua_State *L)
     // call GetDragResult
     wxDragResult returns = (self->GetDragResult());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14857,7 +16477,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetFoldLevelNow(lua_State *L)
     // call GetFoldLevelNow
     int returns = (self->GetFoldLevelNow());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14873,7 +16501,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetFoldLevelPrev(lua_State *L)
     // call GetFoldLevelPrev
     int returns = (self->GetFoldLevelPrev());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14889,7 +16525,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetKey(lua_State *L)
     // call GetKey
     int returns = (self->GetKey());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14905,7 +16549,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetLParam(lua_State *L)
     // call GetLParam
     int returns = (self->GetLParam());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14921,7 +16573,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetLength(lua_State *L)
     // call GetLength
     int returns = (self->GetLength());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14937,7 +16597,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetLine(lua_State *L)
     // call GetLine
     int returns = (self->GetLine());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14953,7 +16621,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetLinesAdded(lua_State *L)
     // call GetLinesAdded
     int returns = (self->GetLinesAdded());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14969,7 +16645,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetListType(lua_State *L)
     // call GetListType
     int returns = (self->GetListType());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -14985,7 +16669,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetMargin(lua_State *L)
     // call GetMargin
     int returns = (self->GetMargin());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15001,7 +16693,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetMessage(lua_State *L)
     // call GetMessage
     int returns = (self->GetMessage());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15017,7 +16717,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetModificationType(lua_State *L)
     // call GetModificationType
     int returns = (self->GetModificationType());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15033,7 +16741,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetModifiers(lua_State *L)
     // call GetModifiers
     int returns = (self->GetModifiers());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15049,7 +16765,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetPosition(lua_State *L)
     // call GetPosition
     int returns = (self->GetPosition());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15099,7 +16823,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetToken(lua_State *L)
     // call GetToken
     int returns = (self->GetToken());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15115,7 +16847,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetUpdated(lua_State *L)
     // call GetUpdated
     int returns = (self->GetUpdated());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15133,7 +16873,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetWParam(lua_State *L)
     // call GetWParam
     int returns = (self->GetWParam());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15149,7 +16897,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetX(lua_State *L)
     // call GetX
     int returns = (self->GetX());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
@@ -15165,7 +16921,15 @@ static int LUACALL wxLua_wxStyledTextEvent_GetY(lua_State *L)
     // call GetY
     int returns = (self->GetY());
     // push the result number
+#if LUA_VERSION_NUM >= 503
+if ((double)(lua_Integer)returns == (double)returns) {
+    // Exactly representable as lua_Integer
+    lua_pushinteger(L, returns);
+} else
+#endif
+{
     lua_pushnumber(L, returns);
+}
 
     return 1;
 }
