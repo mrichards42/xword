@@ -22,6 +22,7 @@
 #include <wx/tooltip.h>
 #include <list>
 #include <algorithm>
+#include <cfloat>
 #include "PuzEvent.hpp"
 #include "XGridDrawer.hpp"
 #include "messages.hpp"
@@ -1654,36 +1655,75 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
     }
     else // Shift
     {
+        // If the arrow is in the focused direction, wrap around the grid.
+        unsigned int options = AreInLine(m_focusedDirection, arrowDirection) ? 0 : puz::NO_WRAP;
         puz::GridDirection focusedDirection = 
             static_cast<puz::GridDirection>(m_focusedDirection);
-        puz::Square * newSquare = NULL;
-        if (AreInLine(m_focusedDirection, arrowDirection))
+        // Move to the next white square in the arrow direction that
+        // *could* have a word.
+        puz::Square* newSquare = NULL;
+        puz::Word* newWord = NULL;
+        for (newSquare = m_focusedSquare;
+            newSquare;
+            newSquare = m_grid->FindNextSquare(newSquare, FIND_WHITE_SQUARE, arrowDirection, options))
         {
-            // Move to the next white square in the arrow direction that
-            // *could* have a word.
-            for (newSquare = m_focusedSquare;
-                 newSquare;
-                 newSquare = newSquare->Next(arrowDirection))
+            puz::Word* word = m_puz->FindWord(newSquare, focusedDirection);
+            if ((newSquare->HasWord(focusedDirection) || word != NULL)
+                && !m_focusedWord->Contains(newSquare))
             {
-                if (newSquare->HasWord(focusedDirection)
-                    && ! m_focusedWord->Contains(newSquare))
-                {
-                    break;
-                }
+                newWord = word;
+                break;
             }
-            // Find the first square in the word
-            if (newSquare)
-                newSquare = newSquare->GetWordStart(focusedDirection);
         }
-        else
-        {
-            // Move to the next white square in the arrow direction
-            newSquare = m_grid->FindNextSquare(
-                m_focusedSquare,
-                FIND_WHITE_SQUARE,
-                arrowDirection,
-                puz::NO_WRAP
-            );
+        // If we didn't find a square, relax the requirement that the word must be in the same
+        // direction as the current word, and instead look for a word in the same clue list.
+        if (!newSquare && !m_ownsFocusedWord) {
+            puz::Clues& clues = m_puz->GetClues();
+            puz::Clues::iterator cluelist_it;
+            for (cluelist_it = clues.begin(); cluelist_it != clues.end(); ++cluelist_it)
+            {
+                puz::ClueList& cluelist = cluelist_it->second;
+                puz::ClueList::iterator clue;
+                // See if this cluelist contains the current word.
+                for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
+                {
+                    if (&clue->GetWord() == m_focusedWord)
+                        break;
+                }
+                if (clue == cluelist.end())
+                    continue;
+                // Find the closest square in a different word and the same direction as the arrow.
+                puz::Square* closestSquare = NULL;
+                puz::Word* closestSquareWord = NULL;
+                double closestSquareDistance = DBL_MAX;
+                for (clue = cluelist.begin(); clue != cluelist.end(); ++clue)
+                {
+                    puz::Word* word = &clue->GetWord();
+                    if (word == m_focusedWord)
+                        continue;
+                    for (puz::square_iterator square_it = word->begin(); square_it != word->end(); ++square_it) {
+                        if (arrowDirection == puz::GetDirection(*m_focusedSquare, *square_it)) {
+                            double distance =
+                                std::abs(m_focusedSquare->GetRow() - square_it->GetRow()) +
+                                std::abs(m_focusedSquare->GetCol() - square_it->GetCol());
+                            if (distance < closestSquareDistance) {
+                                closestSquareDistance = distance;
+                                closestSquare = &*square_it;
+                                closestSquareWord = word;
+                            }
+                        }
+                    }
+                }
+                newSquare = closestSquare;
+                newWord = closestSquareWord;
+            }
+        }
+        // Find the first square in the word
+        if (newSquare) {
+            if (newWord)
+                newSquare = newWord->front();
+            else
+                newSquare = newSquare->GetWordStart(focusedDirection);
         }
         MoveFocusedSquare(newSquare, focusedDirection);
     }
