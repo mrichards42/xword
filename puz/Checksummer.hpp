@@ -76,6 +76,9 @@ public:
         SetClueLength(m_clues.size());
     }
 
+    const std::string & GetTitle() const { return m_title; }
+    const std::string & GetAuthor() const { return m_author; }
+    const std::string & GetCopyright() const { return m_copyright; }
     const std::string & GetNotes() const { return m_notes; }
     const cluelist_t & GetClues() const { return m_clues; }
 

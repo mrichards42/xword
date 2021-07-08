@@ -23,7 +23,7 @@
 namespace puz {
 
 // Return clues in order
-static void GetClueList(const Puzzle & puz, std::vector<std::string> * clues)
+static void GetClueList(const Puzzle & puz, std::vector<std::string> * clues, std::string(*encode_text)(const string_t&))
 {
     // Assemble the clues list from across and down
     ClueList::const_iterator across_it = puz.GetClueList(puzT("Across")).begin();
@@ -36,12 +36,12 @@ static void GetClueList(const Puzzle & puz, std::vector<std::string> * clues)
     {
         if (square->SolutionWantsClue(ACROSS))
         {
-            clues->push_back(GetPuzText(across_it->GetText()));
+            clues->push_back(GetPuzText(across_it->GetText(), encode_text));
             ++across_it;
         }
         if (square->SolutionWantsClue(DOWN))
         {
-            clues->push_back(GetPuzText(down_it->GetText()));
+            clues->push_back(GetPuzText(down_it->GetText(), encode_text));
             ++down_it;
         }
     }
@@ -50,11 +50,18 @@ static void GetClueList(const Puzzle & puz, std::vector<std::string> * clues)
 }
 
 Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
-    : m_title    (encode_puz(puz.GetTitle())),
-      m_author   (encode_puz(puz.GetAuthor())),
-      m_copyright(encode_puz(puz.GetCopyright())),
-      m_version  (version)
+    : m_version  (version)
 {
+    std::string(*encode_text)(const string_t&);
+    if (version >= 20)
+        encode_text = encode_utf8;
+    else
+        encode_text = encode_puz;
+
+    m_title = encode_text(puz.GetTitle());
+    m_author = encode_text(puz.GetAuthor());
+    m_copyright = encode_text(puz.GetCopyright());
+
     // Notes
     // Since puz doesn't support metadata, we store all notes-like fields in the single supported
     // notes field, in the format:
@@ -72,9 +79,9 @@ Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
             m_notes.append(" \n\n");
         }
         if (all_notes.size() > 1) {
-            m_notes.append(GetPuzText(TitleCase(it->first)) + ": \n");
+            m_notes.append(GetPuzText(TitleCase(it->first), encode_text) + ": \n");
         }
-        m_notes.append(GetPuzText(it->second));
+        m_notes.append(GetPuzText(it->second, encode_text));
     }
 
     // Solution and Text
@@ -108,7 +115,7 @@ Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
     }
 
     cluelist_t clues;
-    GetClueList(puz, &clues);
+    GetClueList(puz, &clues, encode_text);
     SetClues(clues);
 
     // Setup CIB manually

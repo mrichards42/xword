@@ -72,6 +72,9 @@ namespace puz {
 PUZ_API std::string encode_puz(const string_t & str);
 PUZ_API string_t decode_puz(const std::string & str);
 
+// Whether the given string can be encoded with windows-1252.
+PUZ_API bool can_encode_puz(const string_t & str);
+
 // Utility functions
 string_t Trim(const string_t & str, const string_t & chars);
 inline string_t TrimWhitespace(const string_t & str) { return Trim(str,  puzT("\n\f\r \t")); }
@@ -100,7 +103,7 @@ enum {
 string_t escape_xml(const string_t & str);
 string_t unescape_xml(const string_t & str, int options = 0);
 
-std::string GetPuzText(const string_t & str);
+std::string GetPuzText(const string_t & str, std::string(*encode_text)(const string_t&));
 } // namespace puz
 
 #endif // PUZ_STRING_H
