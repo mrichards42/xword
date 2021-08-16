@@ -51,7 +51,7 @@ void MyHtmlParser::InitParser(const wxString& source)
                          GetWindowInterface()
                             ? GetWindowInterface()->GetHTMLBackgroundColour()
                             : windowColour,
-                         wxHTML_CLR_BACKGROUND
+                         wxHTML_CLR_TRANSPARENT_BACKGROUND
                        )
                   );
 
