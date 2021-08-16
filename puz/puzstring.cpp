@@ -177,9 +177,7 @@ static char unicode_to_puz(unsigned int cp)
 
 static bool can_encode_puz(unsigned int cp)
 {
-    if (cp > 255)
-        return false;
-    else if (cp < 128 || cp >= 160)
+    if (cp < 128 || (cp >= 160 && cp <= 255))
         return true;
     else
     {
