@@ -1656,7 +1656,8 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
     else // Shift
     {
         // If the arrow is in the focused direction, wrap around the grid.
-        unsigned int options = AreInLine(m_focusedDirection, arrowDirection) ? 0 : puz::NO_WRAP;
+        bool sameDirection = AreInLine(m_focusedDirection, arrowDirection);
+        unsigned int options = sameDirection ? 0 : puz::NO_WRAP;
         puz::GridDirection focusedDirection = 
             static_cast<puz::GridDirection>(m_focusedDirection);
         // Move to the next white square in the arrow direction that
@@ -1718,8 +1719,8 @@ XGridCtrl::OnArrow(puz::GridDirection arrowDirection, int mod)
                 newWord = closestSquareWord;
             }
         }
-        // Find the first square in the word
-        if (newSquare) {
+        // If the arrow is in the focused direction, find the first square in the word.
+        if (newSquare && sameDirection) {
             if (newWord)
                 newSquare = newWord->front();
             else
