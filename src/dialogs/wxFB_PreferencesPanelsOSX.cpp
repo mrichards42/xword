@@ -101,6 +101,22 @@ wxFB_SolvePanel::wxFB_SolvePanel( wxWindow* parent, wxWindowID id, const wxPoint
 
 	bSizer12->Add( bSizer13, 0, wxLEFT, 25 );
 
+	m_staticText16 = new wxStaticText( this, wxID_ANY, wxT("When pressing space"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText16->Wrap( -1 );
+	bSizer12->Add( m_staticText16, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
+
+	wxBoxSizer* bSizer25;
+	bSizer25 = new wxBoxSizer( wxVERTICAL );
+
+	m_insertBlankOnSpace = new wxRadioButton( this, wxID_ANY, wxT("Insert a blank"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer25->Add( m_insertBlankOnSpace, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
+
+	m_switchDirectionsOnSpace = new wxRadioButton( this, wxID_ANY, wxT("Switch directions"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer25->Add( m_switchDirectionsOnSpace, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
+
+
+	bSizer12->Add( bSizer25, 1, wxLEFT, 25 );
+
 	m_blankOnDirection = new wxCheckBox( this, wxID_ANY, wxT("Move to blank after switching direction"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_blankOnDirection->SetValue(true);
 	bSizer12->Add( m_blankOnDirection, 0, wxTOP|wxRIGHT|wxLEFT, 5 );

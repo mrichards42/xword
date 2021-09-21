@@ -46,6 +46,9 @@ class wxFB_SolvePanel : public wxPanel
 		wxCheckBox* m_moveAfterLetter;
 		wxRadioButton* m_nextSquare;
 		wxRadioButton* m_nextBlank;
+		wxStaticText* m_staticText16;
+		wxRadioButton* m_insertBlankOnSpace;
+		wxRadioButton* m_switchDirectionsOnSpace;
 		wxCheckBox* m_blankOnDirection;
 		wxCheckBox* m_blankOnNewWord;
 		wxCheckBox* m_pauseOnSwitch;
