@@ -55,6 +55,7 @@ enum GridStyle
     STRICT_REBUS        = 0x0080,
     CONTEXT_MENU        = 0x0100, // Not yet(?) implemented
     SWAP_ON_DCLICK      = 0x0200,
+    SWAP_ON_SPACE       = 0x0400,
 
     DEFAULT_GRID_STYLE = PAUSE_ON_SWITCH
                        | MOVE_AFTER_LETTER
@@ -71,6 +72,7 @@ enum GridStyle
                     | CHECK_WHILE_TYPING
                     | STRICT_REBUS
                     | SWAP_ON_DCLICK
+                    | SWAP_ON_SPACE
 };
 
 enum CorrectStatus

@@ -1545,15 +1545,40 @@ XGridCtrl::OnLetter(wxChar key, int mod)
     wxASSERT(! IsRebusEntry());
 
     if (static_cast<int>(key) == WXK_SPACE)
-        SetSquareText(*m_focusedSquare, _T(""));
-    else
+    {
+        if (HasStyle(SWAP_ON_SPACE))
+        {
+            if (m_focusedDirection == puz::ACROSS)
+            {
+                SetFocusedSquare(m_focusedSquare, NULL, puz::DOWN);
+            }
+            else
+            {
+                SetFocusedSquare(m_focusedSquare, NULL, puz::ACROSS);
+            }
+        }
+        else
+        {
+            SetSquareText(*m_focusedSquare, _T(""));
+        }
+    }
+	else
+	{
         SetSquareText(*m_focusedSquare, key);
+	}
 
     // Space bar always moves forward one square
     if (static_cast<int>(key) == WXK_SPACE)
-        SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE), m_focusedWord);
+    {
+        if (!HasStyle(SWAP_ON_SPACE))
+        {
+            SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE), m_focusedWord);
+        }
+    }
     else
+    {
         MoveAfterLetter();
+    }
 }
 
 
