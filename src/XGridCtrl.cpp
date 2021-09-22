@@ -620,6 +620,32 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
 //-------------------------------------------------------
 // Focus functions
 //-------------------------------------------------------
+short
+XGridCtrl::OppositeFocusDirection(puz::Square * square,
+                                puz::Word * word,
+                                short direction)
+{
+    if (GetGrid()->IsAcrostic())
+    {
+        direction = puz::ACROSS;
+    }
+    else
+    {
+        puz::GridDirection newdir
+            = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
+        if (square->HasWord(newdir))
+            direction = newdir;
+        else
+        {
+            word = m_puz->FindWord(square, newdir);
+            if (word)
+                direction = newdir;
+        }
+    }
+
+    return direction;
+}
+
 puz::Square *
 XGridCtrl::SetFocusedSquare(puz::Square * square,
                             puz::Word * word,
@@ -644,23 +670,7 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
         else if (! square->HasWord(static_cast<puz::GridDirection>(direction))
             && ! m_puz->FindWord(square, direction))
         {
-            if (GetGrid()->IsAcrostic())
-            {
-                direction = puz::ACROSS;
-            }
-            else
-            {
-                puz::GridDirection newdir
-                    = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
-                if (square->HasWord(newdir))
-                    direction = newdir;
-                else
-                {
-                    word = m_puz->FindWord(square, newdir);
-                    if (word)
-                        direction = newdir;
-                }
-            }
+            direction = OppositeFocusDirection(square, word, direction);
         }
     }
     // Save old state
@@ -1548,14 +1558,8 @@ XGridCtrl::OnLetter(wxChar key, int mod)
     {
         if (HasStyle(SWAP_ON_SPACE))
         {
-            if (m_focusedDirection == puz::ACROSS)
-            {
-                SetFocusedSquare(m_focusedSquare, NULL, puz::DOWN);
-            }
-            else
-            {
-                SetFocusedSquare(m_focusedSquare, NULL, puz::ACROSS);
-            }
+            const short direction = OppositeFocusDirection(m_focusedSquare, NULL, m_focusedDirection);
+            SetFocusedSquare(m_focusedSquare, NULL, direction);
         }
         else
         {

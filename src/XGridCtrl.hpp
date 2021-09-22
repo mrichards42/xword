@@ -169,6 +169,8 @@ public:
 
     bool UnscrambleSolution(unsigned short key);
 
+    short OppositeFocusDirection(puz::Square* square, puz::Word * word, short direction);
+
     // Set* functions trigger an event.
     // Move* functions check BLANK_ON_NEW_WORD
     // Essentially this is SetFocusedSquare([square, ][word, ][direction])
