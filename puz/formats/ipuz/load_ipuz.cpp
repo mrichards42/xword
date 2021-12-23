@@ -146,9 +146,6 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
 {
     json::Map * doc = root->AsMap();
     try {
-        // Check version
-        if (doc->PopString(puzT("version")) != puzT("http://ipuz.org/v1"))
-            throw LoadError("Unreadable ipuz version");
         // Check kind
         string_t kind = doc->PopArray(puzT("kind"))->at(0)->AsString();
         if (kind.substr(kind.size() - 2) == puzT("#1"))
