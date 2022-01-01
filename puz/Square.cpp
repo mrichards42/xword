@@ -181,6 +181,36 @@ bool Square::IsValidString(const string_t & str)
 //------------------------------------------------------------------------------
 // Word start and end
 //------------------------------------------------------------------------------
+
+// Whether there is a bar in the given direction from the current square.
+// This is either a bar in this square, or the next square (in the opposite direction).
+// Preconditions: Not at the end of the grid (i.e. a next square exists in this direction).
+bool HasBarInDirection(const Square* square, GridDirection dir)
+{
+    int thisSquareBarDirection, nextSquareBarDirection;
+    switch (dir) {
+    case GridDirection::RIGHT:
+        thisSquareBarDirection = puz::BAR_RIGHT;
+        nextSquareBarDirection = puz::BAR_LEFT;
+        break;
+    case GridDirection::LEFT:
+        thisSquareBarDirection = puz::BAR_LEFT;
+        nextSquareBarDirection = puz::BAR_RIGHT;
+        break;
+    case GridDirection::DOWN:
+        thisSquareBarDirection = puz::BAR_BOTTOM;
+        nextSquareBarDirection = puz::BAR_TOP;
+        break;
+    case GridDirection::UP:
+        thisSquareBarDirection = puz::BAR_TOP;
+        nextSquareBarDirection = puz::BAR_BOTTOM;
+        break;
+    default:
+        return false;
+    }
+    return square->m_bars[thisSquareBarDirection] || square->Next(dir)->m_bars[nextSquareBarDirection];
+}
+
 const Square * Square::FindWordBoundary(const Square * square, GridDirection dir)
 {
     // Only white squares have a word
@@ -188,7 +218,7 @@ const Square * Square::FindWordBoundary(const Square * square, GridDirection dir
     if (! square->IsWhite() || (dir % 45) != 0)
         return NULL;
 
-    // Iterate until the grid edge or a black/missing square.
+    // Iterate until the grid edge, a black/missing square, or a bar.
     for (;;)
     {
         // Not a white square (one past the end)
@@ -196,6 +226,9 @@ const Square * Square::FindWordBoundary(const Square * square, GridDirection dir
             return square->Prev(dir);
         // Edge of the grid
         if (square->IsLast(dir))
+            return square;
+        // Bar
+        if (HasBarInDirection(square, dir))
             return square;
         square = square->Next(dir);
     }
@@ -217,20 +250,9 @@ const Square * Square::FindSolutionWordBoundary(const Square * square, GridDirec
         // Edge of the grid
         if (square->IsLast(dir))
             return square;
-        // Bar (either right/bottom edge of this square, or left/top edge of the next square).
-        if (dir == GridDirection::ACROSS || dir == GridDirection::DOWN) {
-            int thisSquareBarDirection, nextSquareBarDirection;
-            if (dir == GridDirection::ACROSS) {
-                thisSquareBarDirection = puz::BAR_RIGHT;
-                nextSquareBarDirection = puz::BAR_LEFT;
-            }
-            else {
-                thisSquareBarDirection = puz::BAR_BOTTOM;
-                nextSquareBarDirection = puz::BAR_TOP;
-            }
-            if (square->m_bars[thisSquareBarDirection] || square->Next(dir)->m_bars[nextSquareBarDirection])
-                return square;
-        }
+        // Bar
+        if (HasBarInDirection(square, dir))
+            return square;
         square = square->Next(dir);
     }
 }
