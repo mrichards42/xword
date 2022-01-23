@@ -150,8 +150,15 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
         string_t kind = doc->PopArray(puzT("kind"))->at(0)->AsString();
         if (kind.substr(kind.size() - 2) == puzT("#1"))
             kind = kind.substr(0, kind.size() - 2);
-        if (kind != puzT("http://ipuz.org/crossword"))
-            throw LoadError("Not a crossword puzzle");
+        if (kind == puzT("http://ipuz.org/crossword") ||
+            kind == puzT("http://ipuz.org/crossword/crypticcrossword")) {
+            // Regular crossword
+        } else if (kind == puzT("http://ipuz.org/crossword/diagramless")) {
+            // Diagramless crossword
+            puz->GetGrid().SetType(TYPE_DIAGRAMLESS);
+        } else {
+            throw LoadError("Unsupported ipuz kind");
+        }
     }
     catch (json::BaseError &) {
         throw FileTypeError("ipuz");
