@@ -70,7 +70,7 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
     xml::node applet = doc.append_child("crossword-compiler-applet");
     applet.append_attribute("xmlns") =
-        "http://crossword.info/xml/crossword-compiler";
+        "http://crossword.info/xml/crossword-compiler-applet";
 
     // Read settings from the saved XML Doc, otherwise provide default
     // settings.
