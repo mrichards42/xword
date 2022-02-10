@@ -58,9 +58,9 @@ Checksummer::Checksummer(const Puzzle & puz, unsigned short version)
     else
         encode_text = encode_puz;
 
-    m_title = encode_text(puz.GetTitle());
-    m_author = encode_text(puz.GetAuthor());
-    m_copyright = encode_text(puz.GetCopyright());
+    m_title = GetPuzText(puz.GetTitle(), encode_text);
+    m_author = GetPuzText(puz.GetAuthor(), encode_text);
+    m_copyright = GetPuzText(puz.GetCopyright(), encode_text);
 
     // Notes
     // Since puz doesn't support metadata, we store all notes-like fields in the single supported

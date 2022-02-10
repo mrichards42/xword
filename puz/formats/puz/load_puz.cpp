@@ -123,9 +123,9 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     puz->NumberGrid();
 
     // General puzzle info
-    puz->SetTitle(decode_text(f.ReadString()));
-    puz->SetAuthor(decode_text(f.ReadString()));
-    puz->SetCopyright(decode_text(f.ReadString()));
+    puz->SetTitle(escape_xml(decode_text(f.ReadString())));
+    puz->SetAuthor(escape_xml(decode_text(f.ReadString())));
+    puz->SetCopyright(escape_xml(decode_text(f.ReadString())));
 
     // Clues
     std::vector<string_t> clues;
