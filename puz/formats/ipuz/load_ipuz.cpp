@@ -138,7 +138,23 @@ void ipuzParser::SetStyle(Square & square, json::Value * style_value)
     if (barred.find(puzT("B")) != string_t::npos)
         square.m_bars[BAR_BOTTOM] = true;
 
-    // TODO: colors
+    // Color
+    string_t color = style->GetString(puzT("color"), puzT(""));
+    if (!color.empty()) {
+        if (color.length() == 6) {
+            // Six-digit hex value.
+            square.SetColor(color);
+        }
+        else {
+            // Integer indicating an arbitrary app-defined color.
+            // The spec recommends supporting "at least 16", with 0 as black and others as non-black.
+            // For now, just support 0 and treat others as "highlight".
+            if (color == puzT("0"))
+                square.SetColor(0, 0, 0);
+            else
+                square.SetHighlight();
+        }
+    }
 }
 
 
