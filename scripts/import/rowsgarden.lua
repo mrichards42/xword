@@ -31,8 +31,18 @@ local function getBloomType(x, y)
     return math.floor((y + y_offset - 1) / 2) % 3
 end
 
+local function escapeXml(text)
+    local escaped = text:gsub('&', '&amp;')
+    escaped = escaped:gsub('<', '&lt;')
+    escaped = escaped:gsub('>', '&gt;')
+    return escaped
+end
+
 local function formatClue(word)
     local clue = word.clue
+
+    -- Escape XML characters
+    clue = escapeXml(clue)
 
     -- Replace *{title}* with <i>title</i>.
     clue = clue:gsub('%*([^%*]+)%*', '<i>%1</i>')
@@ -92,15 +102,15 @@ local function rowsGarden(p, contents)
     end
 
     -- Metadata
-    p.Title = doc.title
-    p.Author = doc.author
+    p.Title = escapeXml(doc.title)
+    p.Author = escapeXml(doc.author)
 
-    p.Copyright = doc.copyright
+    p.Copyright = escapeXml(doc.copyright)
     -- Add the copyright symbol (utf8)
     if #p.Copyright > 0 then p.Copyright = "\194\169 " .. p.Copyright end
 
     if type(doc.notes) == "string" then
-        p.Notes = doc.notes
+        p.Notes = escapeXml(doc.notes)
     end
 
     -- Grid and clues
