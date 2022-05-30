@@ -125,7 +125,7 @@ return {
       name = "The New Yorker",
       url = "https://www.newyorker.com/puzzles-and-games-dept/crossword/%Y/%m/%d",
       filename = "nyer%Y%m%d.jpz",
-      days = { true, false, true, false, true, false, false },
+      days = { true, true, true, true, true, false, false },
       func = [[
           -- Download the page with the puzzle
           local page = assert(curl.get(puzzle.url))
