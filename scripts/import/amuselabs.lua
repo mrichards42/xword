@@ -110,7 +110,7 @@ function decode_rawc(data)
   local result = {}
   local pos = 1
   local i = 0
-  while pos < #payload do
+  while pos <= #payload do
     local len = key[i % #key + 1]
     table.insert(result, payload:sub(pos, pos + len - 1):reverse())
     pos = pos + len
