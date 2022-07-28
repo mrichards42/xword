@@ -189,22 +189,22 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
     for (meta = meta.first_child(); meta; meta = meta.next_sibling())
     {
         if (strcmp(meta.name(), "creator") == 0)
-            puz->SetAuthor(GetTrimmedInnerXML(meta));
+            puz->SetAuthor(GetTrimmedInnerXML(meta), /* is_html */ true);
         else
-            puz->SetMeta(decode_utf8(meta.name()), GetTrimmedInnerXML(meta));
+            puz->SetMeta(decode_utf8(meta.name()), GetTrimmedInnerXML(meta), /* is_html */ true);
         // Can be title, creator, copyright, editor, publisher, created,
         // rights, identifier, description
     }
-    puz->SetNotes(GetInnerXML(puzzle, "instructions"));
+    puz->SetNotes(GetInnerXML(puzzle, "instructions"), /* is_html */ true);
 
     if (puz->GetTitle().empty())
-        puz->SetTitle(GetTrimmedInnerXML(applet, "title"));
+        puz->SetTitle(GetTrimmedInnerXML(applet, "title"), /* is_html */ true);
     if (puz->GetCopyright().empty())
-        puz->SetCopyright(GetTrimmedInnerXML(applet, "copyright"));
+        puz->SetCopyright(GetTrimmedInnerXML(applet, "copyright"), /* is_html */ true);
 
     xml::node completion = applet.child("applet-settings").child("completion");
     if (completion) {
-        puz->SetMeta(puzT("completion"), GetTrimmedInnerXML(completion));
+        puz->SetMeta(puzT("completion"), GetTrimmedInnerXML(completion), /* is_html */ true);
     }
 
     // Grid
@@ -379,7 +379,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                 if (! format.empty())
                     text.append(puzT(" (")).append(format).append(puzT(")"));
                 string_t number = GetAttribute(clue, "number");
-                list.push_back(Clue(number, text, it->second));
+                list.push_back(Clue(number, text, it->second, /* is_html */ true));
             }
             puz->SetClueList(key, list);
             hasClueList = true;

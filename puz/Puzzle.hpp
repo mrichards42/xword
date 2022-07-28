@@ -92,27 +92,37 @@ public:
         metamap_t::const_iterator it = m_metadata.find(name);
         return it != m_metadata.end();
     }
-    void SetMeta(const string_t & name, const string_t & value)
+    void SetMeta(const string_t & name, const string_t & value, const bool is_html = false)
     {
         if (value.empty())
             m_metadata.erase(name);
-        else
+        else if (is_html)
             m_metadata[name] = value;
+        else
+            m_metadata[name] = escape_xml(value);
     }
     const metamap_t & GetMetadata() const { return m_metadata; }
     metamap_t & GetMetadata() { return m_metadata; }
 
     const string_t & GetTitle() const { return GetMeta(puzT("title")); }
-    void SetTitle(const string_t & title) { SetMeta(puzT("title"), title); }
+    void SetTitle(const string_t & title, const bool is_html = false) {
+        SetMeta(puzT("title"), title, is_html);
+    }
 
     const string_t & GetAuthor() const { return GetMeta(puzT("author")); }
-    void SetAuthor(const string_t & author) { SetMeta(puzT("author"), author); }
+    void SetAuthor(const string_t & author, const bool is_html = false) {
+        SetMeta(puzT("author"), author, is_html);
+    }
 
     const string_t & GetCopyright() const { return GetMeta(puzT("copyright")); }
-    void SetCopyright(const string_t & copyright) { SetMeta(puzT("copyright"), copyright); }
+    void SetCopyright(const string_t & copyright, const bool is_html = false) {
+        SetMeta(puzT("copyright"), copyright, is_html);
+    }
 
     const string_t & GetNotes() const { return GetMeta(puzT("notes")); }
-    void SetNotes(const string_t & notes) { SetMeta(puzT("notes"), notes); }
+    void SetNotes(const string_t & notes, const bool is_html = false) {
+        SetMeta(puzT("notes"), notes, is_html);
+    }
 
     // Get a vector of all notes-like metadata for display.
     const std::vector<std::pair<string_t, string_t> > GetAllNotes() const;
@@ -162,6 +172,7 @@ public:
     // and all clue numbers have a matching square number
     void GenerateWords();
     // Writes the clues in "Across Lite" order given a vector of clues.
+    // Note: This assumes plaintext clues, not HTML.
     void SetAllClues(const std::vector<string_t> & clues);
     // Was this puzzle set up with NumberGrid and NumberClues?
     // Clues may only be "Across" and "Down", words must start and end

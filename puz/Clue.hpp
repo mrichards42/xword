@@ -37,37 +37,40 @@ class PUZ_API Clue
     friend class ClueList;
 public:
     explicit Clue(const string_t & num_ = puzT(""),
-                  const string_t & text_ = puzT(""))
+                  const string_t & text_ = puzT(""),
+                  const bool is_html_ = false)
     {
         SetNumber(num_);
-        SetText(text_);
+        SetText(text_, is_html_);
     }
 
     explicit Clue(const string_t & num_,
                   const string_t & text_,
-                  Word word_)
+                  Word word_,
+                  const bool is_html_ = false)
         : word(word_)
     {
         SetNumber(num_);
-        SetText(text_);
+        SetText(text_, is_html_);
     }
 
-    explicit Clue(int num_, const string_t & text_ = puzT(""))
+    explicit Clue(int num_, const string_t & text_ = puzT(""), const bool is_html_ = false)
     {
         SetNumber(num_);
-        SetText(text_);
+        SetText(text_, is_html_);
     }
 
     explicit Clue(int num_,
                   const string_t & text_,
-                  Word word_)
+                  Word word_,
+                  const bool is_html_ = false)
         : word(word_)
     {
         SetNumber(num_);
-        SetText(text_);
+        SetText(text_, is_html_);
     }
 
-    void SetText  (const string_t & text_);
+    void SetText(const string_t & text_, const bool is_html_ = false);
     void SetNumber(const string_t & num_);
     void SetNumber(int num_);
     void SetWord(const Word & word_) { word = word_; }

@@ -37,9 +37,12 @@ void Clue::SetNumber(int _number)
     number = ToString(_number);
 }
 
-void Clue::SetText(const string_t & _text)
+void Clue::SetText(const string_t & _text, const bool _is_html)
 {
-    text = unescape_xml(_text);
+    if (_is_html)
+        text = _text;
+    else
+        text = escape_xml(_text);
 }
 
 // ---------------------------------------------------------------------------

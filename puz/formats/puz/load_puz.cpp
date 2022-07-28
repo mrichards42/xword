@@ -136,7 +136,7 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     for (size_t i = 0; i < num_clues; ++i)
     {
         cksum_clues.push_back(f.ReadString());
-        clues.push_back(escape_xml(decode_text(cksum_clues.back())));
+        clues.push_back(decode_text(cksum_clues.back()));
     }
 
     puz->SetAllClues(clues);
