@@ -8,7 +8,7 @@ local function find_next_blank(square)
     return grid:FindSquare(
         square or grid:First(),
         function(s)
-            return s:IsBlank()
+            return s:IsBlank() and s:IsWhite()
         end
     )
 end
