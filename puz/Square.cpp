@@ -120,7 +120,7 @@ char Square::ToPlain(const string_t & str)
 
 char_t Square::ToGrid(int ch)
 {
-    if (ch == Black[0] || ch == puzT('[') || ch == puzT('*'))
+    if (ch == Black[0] || ch == puzT('['))
         return 0;
 
 #if PUZ_UNICODE
@@ -426,8 +426,11 @@ void Square::SetText(const string_t & text, bool propagate)
         m_text = Blank;
     else if (text == Black || IsSymbol(text))
         m_text = text;
-    else
+    else {
         m_text = ToGrid(text);
+        if (m_text.empty())
+            m_text = Blank;
+    }
     if (propagate && !m_partner.empty()) {
         for (std::vector<Square*>::iterator it = m_partner.begin(); it != m_partner.end(); ++it)
             (*it)->SetText(text, false);
@@ -468,8 +471,11 @@ void Square::SetSolutionRebus(const string_t & rebus)
              rebus == Black ||
              IsSymbol(rebus))
         m_solution = rebus;
-    else
+    else {
         m_solution = ToGrid(rebus);
+        if (m_solution.empty())
+            m_solution = Blank;
+    }
 }
 
 void Square::SetSolutionSymbol(unsigned char symbol)
