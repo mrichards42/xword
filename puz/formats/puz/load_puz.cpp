@@ -123,9 +123,9 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     puz->NumberGrid();
 
     // General puzzle info
-    puz->SetTitle(escape_xml(decode_text(f.ReadString())));
-    puz->SetAuthor(escape_xml(decode_text(f.ReadString())));
-    puz->SetCopyright(escape_xml(decode_text(f.ReadString())));
+    puz->SetTitle(decode_text(f.ReadString()));
+    puz->SetAuthor(decode_text(f.ReadString()));
+    puz->SetCopyright(decode_text(f.ReadString()));
 
     // Clues
     std::vector<string_t> clues;
@@ -136,14 +136,14 @@ void LoadPuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     for (size_t i = 0; i < num_clues; ++i)
     {
         cksum_clues.push_back(f.ReadString());
-        clues.push_back(escape_xml(decode_text(cksum_clues.back())));
+        clues.push_back(decode_text(cksum_clues.back()));
     }
 
     puz->SetAllClues(clues);
 
     // Notes
     std::string notes = f.ReadString();
-    puz->SetNotes(escape_xml(decode_text(notes)));
+    puz->SetNotes(decode_text(notes));
 
     puz->SetOk(true);
 

@@ -181,14 +181,14 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
     }
 
     // Metadata
-    puz->SetTitle(doc->PopString(puzT("title"), puzT("")));
-    puz->SetAuthor(doc->PopString(puzT("author"), puzT("")));
-    puz->SetCopyright(doc->PopString(puzT("copyright"), puzT("")));
+    puz->SetTitle(doc->PopString(puzT("title"), puzT("")), /* is_html */ true);
+    puz->SetAuthor(doc->PopString(puzT("author"), puzT("")), /* is_html */ true);
+    puz->SetCopyright(doc->PopString(puzT("copyright"), puzT("")), /* is_html */ true);
     string_t notes = doc->PopString(puzT("notes"), puzT(""));
     if (! notes.empty())
-        puz->SetNotes(notes);
+        puz->SetNotes(notes, /* is_html */ true);
     else
-        puz->SetNotes(doc->PopString(puzT("intro"), puzT("")));
+        puz->SetNotes(doc->PopString(puzT("intro"), puzT("")), /* is_html */ true);
 
     // Read the styles into a style map
     if (doc->Contains(puzT("styles")))
@@ -318,12 +318,13 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
             {
                 json::Value * clueVal = (*clue_it);
                 if (clueVal->IsSimple())
-                    cluelist.push_back(Clue(puzT(""), clueVal->AsString()));
+                    cluelist.push_back(Clue(puzT(""), clueVal->AsString(), /* is_html */ true));
                 else if (clueVal->IsArray())
                 {
                     json::Array * clue = (*clue_it)->AsArray();
                     cluelist.push_back(Clue(clue->GetString(0),
-                                            clue->GetString(1)));
+                                            clue->GetString(1),
+                                            /* is_html */ true));
                 }
                 else
                 {
@@ -340,7 +341,8 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
 
                     cluelist.push_back(Clue(
                         clue->GetString(puzT("number"), puzT("")),
-                        text
+                        text,
+                        /* is_html */ true
                     ));
                 }
             }

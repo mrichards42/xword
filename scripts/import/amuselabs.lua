@@ -22,8 +22,8 @@ local function importJSON(p, doc)
   end
 
   -- Metadata
-  p.Title = doc.title
-  p.Author = doc.author
+  p:SetTitle(doc.title, --[[ is_html ]] true)
+  p:SetAuthor(doc.author, --[[ is_html ]] true)
 
   -- Grid
   local g = p.Grid
@@ -89,7 +89,8 @@ local function importJSON(p, doc)
     table.insert(clues[clue_k], {
         number = placedWord.clueNum,
         text = placedWord.clue.clue,
-        word = make_word(g, placedWord)
+        word = make_word(g, placedWord),
+        is_html = true
       })
   end
   p:SetClueList("Across", clues.across)

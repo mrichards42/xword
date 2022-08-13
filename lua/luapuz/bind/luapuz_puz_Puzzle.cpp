@@ -326,13 +326,15 @@ static int Puzzle_GetMeta(lua_State * L)
     luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetMeta(puz::string_t name, puz::string_t value)
+// void SetMeta(puz::string_t name, puz::string_t value, bool is_html = false)
 static int Puzzle_SetMeta(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    int argCount = lua_gettop(L);
     puz::string_t name = luapuz_checkstring_t(L, 2);
     puz::string_t value = luapuz_checkstring_t(L, 3);
-    puzzle->SetMeta(name, value);
+    bool is_html = (argCount >= 4 ? luapuz_checkboolean(L, 4) : false);
+    puzzle->SetMeta(name, value, is_html);
     return 0;
 }
 // bool HasMeta(puz::string_t name)
@@ -352,12 +354,14 @@ static int Puzzle_GetAuthor(lua_State * L)
     luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetAuthor(puz::string_t author)
+// void SetAuthor(puz::string_t author, bool is_html = false)
 static int Puzzle_SetAuthor(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    int argCount = lua_gettop(L);
     puz::string_t author = luapuz_checkstring_t(L, 2);
-    puzzle->SetAuthor(author);
+    bool is_html = (argCount >= 3 ? luapuz_checkboolean(L, 3) : false);
+    puzzle->SetAuthor(author, is_html);
     return 0;
 }
 // puz::string_t GetTitle()
@@ -368,12 +372,14 @@ static int Puzzle_GetTitle(lua_State * L)
     luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetTitle(puz::string_t title)
+// void SetTitle(puz::string_t title, bool is_html = false)
 static int Puzzle_SetTitle(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    int argCount = lua_gettop(L);
     puz::string_t title = luapuz_checkstring_t(L, 2);
-    puzzle->SetTitle(title);
+    bool is_html = (argCount >= 3 ? luapuz_checkboolean(L, 3) : false);
+    puzzle->SetTitle(title, is_html);
     return 0;
 }
 // puz::string_t GetCopyright()
@@ -384,12 +390,14 @@ static int Puzzle_GetCopyright(lua_State * L)
     luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetCopyright(puz::string_t copyright)
+// void SetCopyright(puz::string_t copyright, bool is_html = false)
 static int Puzzle_SetCopyright(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    int argCount = lua_gettop(L);
     puz::string_t copyright = luapuz_checkstring_t(L, 2);
-    puzzle->SetCopyright(copyright);
+    bool is_html = (argCount >= 3 ? luapuz_checkboolean(L, 3) : false);
+    puzzle->SetCopyright(copyright, is_html);
     return 0;
 }
 // puz::string_t GetNotes()
@@ -400,12 +408,14 @@ static int Puzzle_GetNotes(lua_State * L)
     luapuz_pushstring_t(L, returns);
     return 1;
 }
-// void SetNotes(puz::string_t notes)
+// void SetNotes(puz::string_t notes, bool is_html = false)
 static int Puzzle_SetNotes(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    int argCount = lua_gettop(L);
     puz::string_t notes = luapuz_checkstring_t(L, 2);
-    puzzle->SetNotes(notes);
+    bool is_html = (argCount >= 3 ? luapuz_checkboolean(L, 3) : false);
+    puzzle->SetNotes(notes, is_html);
     return 0;
 }
 // int GetTime()

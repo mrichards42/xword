@@ -102,15 +102,15 @@ local function rowsGarden(p, contents)
     end
 
     -- Metadata
-    p.Title = escapeXml(doc.title)
-    p.Author = escapeXml(doc.author)
+    p.Title = doc.title
+    p.Author = doc.author
 
-    p.Copyright = escapeXml(doc.copyright)
+    p.Copyright = doc.copyright
     -- Add the copyright symbol (utf8)
     if #p.Copyright > 0 then p.Copyright = "\194\169 " .. p.Copyright end
 
     if type(doc.notes) == "string" then
-        p.Notes = escapeXml(doc.notes)
+        p.Notes = doc.notes
     end
 
     -- Grid and clues
@@ -168,6 +168,7 @@ local function rowsGarden(p, contents)
                         number = s.Number,
                         text = row_clue,
                         word = row_word,
+                        is_html = true
                     })
                 end
 
@@ -183,7 +184,8 @@ local function rowsGarden(p, contents)
                         word = {
                             g[{x - 2, y}], g[{x - 1, y}], g[{x, y}],
                             g[{x, y + 1}], g[{x - 1, y + 1}], g[{x - 2, y + 1}]
-                        }
+                        },
+                        is_html = true
                     })
                 end
             end

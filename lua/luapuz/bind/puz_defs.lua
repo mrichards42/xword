@@ -283,12 +283,18 @@ class{"Puzzle", header="puz/Puzzle.hpp", cppheader="luapuz_puz_Puzzle_helpers.hp
     property{"Grid &", "Grid"}
     func{"GetMetadata", returns="Puzzle::metamap_t"}
     func{"GetMeta", arg("puz::string_t", "name"), returns="puz::string_t"}
-    func{"SetMeta", arg("puz::string_t", "name"), arg("puz::string_t", "value")}
+    func{"SetMeta", arg("puz::string_t", "name"),
+                    arg("puz::string_t", "value"),
+                    arg("bool", "is_html", "false")}
     func{"HasMeta", arg("puz::string_t", "name"), returns="bool"}
-    property{"puz::string_t", "Author"}
-    property{"puz::string_t", "Title"}
-    property{"puz::string_t", "Copyright"}
-    property{"puz::string_t", "Notes"}
+    func{"GetAuthor", returns="puz::string_t"}
+    func{"SetAuthor", arg("puz::string_t", "author"), arg("bool", "is_html", "false")}
+    func{"GetTitle", returns="puz::string_t"}
+    func{"SetTitle", arg("puz::string_t", "title"), arg("bool", "is_html", "false")}
+    func{"GetCopyright", returns="puz::string_t"}
+    func{"SetCopyright", arg("puz::string_t", "copyright"), arg("bool", "is_html", "false")}
+    func{"GetNotes", returns="puz::string_t"}
+    func{"SetNotes", arg("puz::string_t", "notes"), arg("bool", "is_html", "false")}
     property{"int", "Time"}
     func{"IsTimerRunning", returns="bool"}
     func{"SetTimerRunning", arg("bool", "running")}
