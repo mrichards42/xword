@@ -339,11 +339,27 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
                             .append(enum_)
                             .append(puzT(")"));
 
-                    cluelist.push_back(Clue(
+                    Clue outClue(
                         clue->GetString(puzT("number"), puzT("")),
                         text,
                         /* is_html */ true
-                    ));
+                    );
+
+                    if (clue->Contains(puzT("cells"))) {
+                        json::Array * cells = clue->GetArray(puzT("cells"));
+                        Word word;
+                        json::Array::iterator cell_it;
+                        for (cell_it = cells->begin(); cell_it != cells->end(); ++cell_it) {
+                            json::Array * cellVal = (*cell_it)->AsArray();
+                            word.push_back(&puz->GetGrid().At(
+                                // ipuz coordinates are 1-based.
+                                ToInt(cellVal->GetNumber(0)) - 1,
+                                ToInt(cellVal->GetNumber(1)) - 1));
+                        }
+                        outClue.SetWord(word);
+                    }
+
+                    cluelist.push_back(outClue);
                 }
             }
             puz->SetClueList(cl_it->first, cluelist);
