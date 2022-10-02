@@ -15,6 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include <iostream>
+
 #include "App.hpp"
 #include <wx/cmdline.h>
 #include "MyFrame.hpp"
@@ -157,9 +159,20 @@ bool MyApp::OnInit()
         if (has_script)
         {
             if (! FindLuaScript(script, &script))
+            {
+                // script contains the error if this failed
+                std::cerr << script << std::endl;
                 return false;
-            if (! luaL_loadfile(L, wx2lua(script))) // Load the file
+            }
+            if (! luaL_loadfile(L, wx2lua(script)))
+            {
+                std::cerr << "Error loading lua script " << script << std::endl;
+                const char * error = lua_tostring(L, -1);
+                if (error != NULL) {
+                    std::cerr << error << std::endl;
+                }
                 return false;
+            }
             // Call with <count> arguments, func already on the stack
             lua_pcall(L, count, 0, 0);
         }
