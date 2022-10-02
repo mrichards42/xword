@@ -1,6 +1,7 @@
 local base64 = require 'base64'
 local yajl = require 'luayajl'
 local date = require 'date'
+local decode_rawc = require 'import.amuse-rawc.decode'.decode_rawc
 
 local function make_word(grid, placedWord)
   local word = {}
@@ -97,29 +98,6 @@ local function importJSON(p, doc)
   p:SetClueList("Down", clues.down)
 end
 
-function decode_rawc(data)
-  local pivot = data:find(".", 0, true)
-  if not pivot then
-    return pcall(base64.decode, data)
-  end
-  -- Obfuscated format
-  local payload = data:sub(1, pivot - 1)
-  local key = {}
-  for c in data:sub(pivot + 1):gmatch(".") do
-    table.insert(key, 1, tonumber(c, 16) + 2)
-  end
-  local result = {}
-  local pos = 1
-  local i = 0
-  while pos <= #payload do
-    local len = key[i % #key + 1]
-    table.insert(result, payload:sub(pos, pos + len - 1):reverse())
-    pos = pos + len
-    i = i + 1
-  end
-  return pcall(base64.decode, table.concat(result))
-end
-
 function import.amuselabsJSON(p, filename)
     local f = assert(io.open(filename))
     local success, doc = pcall(yajl.to_value, f:read('*a'))
@@ -129,7 +107,7 @@ end
 
 function import.amuselabsBase64(p, data)
   local success, json, doc
-  success, json = decode_rawc(data)
+  success, json = pcall(decode_rawc, data)
   if success then
     success, doc = pcall(yajl.to_value, json)
     if success then
