@@ -129,37 +129,37 @@ bool MyApp::OnInit()
             AllocConsole();
         freopen( "CON", "w", stdout );
     #endif // __WXMSW__
+        lua_State * L = m_lua.GetLuaState();
+        // Set the "arg" global for the script
+        size_t count = cmd.GetParamCount();
+        lua_newtable(L);
+        // XWord path
+        lua_pushstring(L, wx2lua(argv[0]));
+        lua_rawseti(L, -2, -1);
+        // script path
+        lua_pushstring(L, wx2lua(script));
+        lua_rawseti(L, -2, 0);
+        // parameters
+        for (size_t i = 0; i < count; ++i)
+        {
+            lua_pushstring(L, wx2lua(cmd.GetParam(i)));
+            lua_rawseti(L, -2, i + 1);
+        }
+        lua_setglobal(L, "arg");
+        // arguments to pass to the script (...)
+        for (size_t i = 0; i < count; ++i)
+        {
+            lua_pushstring(L, wx2lua(cmd.GetParam(i)));
+        }
         // Don't initialize the xword package here
         if (has_statement)
             m_lua.RunString(statement);
         if (has_script)
         {
-            lua_State * L = m_lua.GetLuaState();
             if (! FindLuaScript(script, &script))
                 return false;
             if (! luaL_loadfile(L, wx2lua(script))) // Load the file
                 return false;
-            size_t count = cmd.GetParamCount();
-            // Set the "arg" global for the script
-            lua_newtable(L);
-            // XWord path
-            lua_pushstring(L, wx2lua(argv[0]));
-            lua_rawseti(L, -2, -1);
-            // script path
-            lua_pushstring(L, wx2lua(script));
-            lua_rawseti(L, -2, 0);
-            // parameters
-            for (size_t i = 0; i < count; ++i)
-            {
-                lua_pushstring(L, wx2lua(cmd.GetParam(i)));
-                lua_rawseti(L, -2, i + 1);
-            }
-            lua_setglobal(L, "arg");
-            // arguments to pass to the script (...)
-            for (size_t i = 0; i < count; ++i)
-            {
-                lua_pushstring(L, wx2lua(cmd.GetParam(i)));
-            }
             // Call with <count> arguments, func already on the stack
             lua_pcall(L, count, 0, 0);
         }
