@@ -40,7 +40,7 @@ local function importJSON(p, doc)
       end
       -- clue number
       local number = doc.clueNums[x][y]
-      if number > 0 then
+      if number and number ~= yajl.null and number ~= 0 then
         s.Number = number
       end
     end
