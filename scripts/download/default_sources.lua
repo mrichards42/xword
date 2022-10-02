@@ -31,19 +31,28 @@ return {
 
     {
         name = "LA Times",
-        url = "http://cdn.games.arkadiumhosted.com/latimes/assets/DailyCrossword/la%y%m%d.xml",
+        url = "https://cdn4.amuselabs.com/lat/crossword?id=tca%y%m%d&set=latimes",
         filename = "lat%Y%m%d.jpz",
         days = { true, true, true, true, true, true, true },
         func = [[
-          -- Hack: strip out "format", which is used for enumerations
-          local xml = assert(curl.get(puzzle.url))
-          xml = xml:gsub('format%s*=%s*"[^"]+"', '')
-          xml = xml:gsub("format%s*=%s*'[^']+'", "")
-          local f = assert(io.open(puzzle.filename, 'wb'))
-          f:write(xml)
-          f:close()
-        ]]
+    local picker = assert(curl.get("https://cdn4.amuselabs.com/lat/date-picker?style=1&embed=1&heightReduction=30&set=latimes"))
+    local param_str = picker:match("pickerParams.rawsps%s*=%s*'([^']+)'")
+    if not param_str then
+        return "Unable to find puzzle"
+    end
+    local params = json.to_value(base64.decode(param_str))
+
+    local page = assert(curl.get(puzzle.url .. "&pickerToken=" .. params.pickerToken))
+
+    local data = page:match("rawc%s*=%s*'([^']+)'")
+    if not data then
+        return "Unable to find puzzle data"
+    end
+    local p = puz.Puzzle(data, import.amuselabsBase64)
+    p:Save(puzzle.filename)
+]]
     },
+
 
     {
         name = "USA Today",

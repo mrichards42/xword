@@ -9,8 +9,10 @@ require 'import' -- Additional puzzle file types
 -- Messages
 local mgr = require 'download.manager'
 
--- Expose pl.path for custom functions
+-- Expose a few libraries for custom functions
 path = require 'pl.path'
+json = require 'luayajl'
+base64 = require 'base64'
 
 -- Allow custom functions to set the statusbar text in the download manager
 function set_status(text)
