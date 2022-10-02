@@ -21,6 +21,9 @@ end
 -- Set global variables (should include package.path/cpath)
 update(_G, deserialize(globals) or {})
 
+-- Setup fennel
+require 'xword.init-fennel'
+
 -- Load the task library
 -- The C task library loads itself into package.loaded.
 -- Move it to package.loaded['c-task'] so that we can load the lua library

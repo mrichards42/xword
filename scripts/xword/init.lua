@@ -76,6 +76,8 @@ xword.OnCleanup(function()
     end
 end)
 
+-- Setup fennel
+require 'xword.init-fennel'
 
 -- Require the xword packages
 require 'xword.archives'
