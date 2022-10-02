@@ -1,201 +1,154 @@
---[[
+-- Slightly modified version from https://github.com/tongson/omniajit/blob/master/vendor/lua/base64.lua
+-- Original version https://github.com/jsolman/luajit-mime-base64/blob/master/mime_base64.lua
 
- base64 -- v1.5.1 public domain Lua base64 encoder/decoder
- no warranty implied; use at your own risk
+--- MIME BASE64 Encoding and Decoding Routines
+-- Copyright 2013 Jeff Solinsky
+--
+-- Licensed under the Apache License, Version 2.0 (the "License");
+-- you may not use this file except in compliance with the License.
+-- You may obtain a copy of the License at
+--
+-- http://www.apache.org/licenses/LICENSE-2.0
+--
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
 
- Needs bit32.extract function. If not present it's implemented using BitOp
- or Lua 5.3 native bit operators. For Lua 5.1 fallbacks to pure Lua
- implementation inspired by Rici Lake's post:
-   http://ricilake.blogspot.co.uk/2007/10/iterating-bits-in-lua.html
+local escape = {}
 
- author: Ilya Kolbin (iskolbin@gmail.com)
- url: github.com/iskolbin/lbase64
+local ffi = require'ffi'
+local bit = require'bit'
+local rshift = bit.rshift
+local lshift = bit.lshift
+local bor = bit.bor
+local band = bit.band
+local floor = math.floor
 
- COMPATIBILITY
+local mime64chars = ffi.new("uint8_t[64]",
+ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+local mime64lookup = ffi.new("uint8_t[256]")
+ffi.fill(mime64lookup, 256, 0xFF)
+for i=0,63 do
+    mime64lookup[mime64chars[i]]=i
+end
 
- Lua 5.1, 5.2, 5.3, LuaJIT
+local u8arr= ffi.typeof'uint8_t[?]'
+local u8ptr=ffi.typeof'uint8_t*'
 
- LICENSE
-
- See end of file for license information.
-
---]]
-
-
-local base64 = {}
-
-local extract = _G.bit32 and _G.bit32.extract
-if not extract then
-	if _G.bit then
-		local shl, shr, band = _G.bit.lshift, _G.bit.rshift, _G.bit.band
-		extract = function( v, from, width )
-			return band( shr( v, from ), shl( 1, width ) - 1 )
-		end
-	elseif _G._VERSION >= "Lua 5.3" then
-		extract = load[[return function( v, from, width )
-			return ( v >> from ) & ((1 << width) - 1)
-		end]]()
-	else
-		extract = function( v, from, width )
-			local w = 0
-			local flag = 2^from
-			for i = 0, width-1 do
-				local flag2 = flag + flag
-				if v % flag2 >= flag then
-					w = w + 2^i
-				end
-				flag = flag2
-			end
-			return w
-		end
-	end
+--- Base64 decode a string or a FFI char *.
+-- @param str (String or char*) Bytearray to decode.
+-- @param sz (Number) Length of string to decode, optional if str is a Lua string
+-- @return (String) Decoded string.
+function escape.decode(str, sz)
+    if (type(str)=="string") and (sz == nil) then sz=#str end
+    local m64, b1 -- value 0 to 63, partial byte
+    local bin_arr=ffi.new(u8arr, floor(bit.rshift(sz*3,2)))
+    local mptr = ffi.cast(u8ptr,bin_arr) -- position in binary mime64 output array
+    local bptr = ffi.cast(u8ptr,str)
+    local i = 0
+    while true do
+        repeat
+            if i >= sz then goto done end
+            m64 = mime64lookup[bptr[i]]
+            i=i+1
+        until m64 ~= 0xFF -- skip non-mime characters like newlines
+        b1=lshift(m64, 2)
+        repeat
+            if i >= sz then goto done end
+            m64 = mime64lookup[bptr[i]]
+            i=i+1
+        until m64 ~= 0xFF -- skip non-mime characters like newlines
+        mptr[0] = bor(b1,rshift(m64, 4)); mptr=mptr+1
+        b1 = lshift(m64,4)
+        repeat
+            if i >= sz then goto done end
+            m64 = mime64lookup[bptr[i]]
+            i=i+1
+        until m64 ~= 0xFF -- skip non-mime characters like newlines
+        mptr[0] = bor(b1,rshift(m64, 2)); mptr=mptr+1
+        b1 = lshift(m64,6)
+        repeat
+            if i >= sz then goto done end
+            m64 = mime64lookup[bptr[i]]
+            i=i+1
+        until m64 ~= 0xFF -- skip non-mime characters like newlines
+        mptr[0] = bor(b1, m64); mptr=mptr+1
+    end
+::done::
+    return ffi.string(bin_arr, (mptr-bin_arr))
 end
 
 
-function base64.makeencoder( s62, s63, spad )
-	local encoder = {}
-	for b64code, char in pairs{[0]='A','B','C','D','E','F','G','H','I','J',
-		'K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y',
-		'Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n',
-		'o','p','q','r','s','t','u','v','w','x','y','z','0','1','2',
-		'3','4','5','6','7','8','9',s62 or '+',s63 or'/',spad or'='} do
-		encoder[b64code] = char:byte()
-	end
-	return encoder
+local mime64shorts=ffi.new('uint16_t[4096]')
+for i=0,63 do
+    for j=0,63 do
+        local v
+        if ffi.abi("le") then
+            v=mime64chars[j]*256+mime64chars[i]
+        else
+            v=mime64chars[i]*256+mime64chars[j]
+        end
+        mime64shorts[i*64+j]=v
+    end
 end
 
-function base64.makedecoder( s62, s63, spad )
-	local decoder = {}
-	for b64code, charcode in pairs( base64.makeencoder( s62, s63, spad )) do
-		decoder[charcode] = b64code
-	end
-	return decoder
+local u16arr = ffi.typeof"uint16_t[?]"
+local crlf16 = ffi.new("uint16_t[1]")
+if ffi.abi("le") then
+    crlf16[0] = (0x0A*256)+0x0D
+else
+    crlf16[0] = (0x0D*256)+0x0A
+end
+local eq=string.byte('=')
+--- Base64 encode binary data of a string or a FFI char *.
+-- @param str (String or char*) Bytearray to encode.
+-- @param sz (Number) Length of string to encode, optional if str is a Lua string
+-- @param enable_break (Bool) Break result with newlines, optional
+-- @return (String) Encoded base64 string.
+function escape.encode(str, sz, enable_break)
+    if (type(str)=="string") and (sz == nil) then sz=#str end
+    local outlen = floor(sz*2/3)
+    outlen = outlen + floor(outlen/19)+3
+    local m64arr=ffi.new(u16arr,outlen)
+    local l,p,v=0,0
+    local bptr = ffi.cast(u8ptr,str)
+    local c = enable_break and 38 or -1 -- put a new line after every 76 characters
+    local i,k=0,0
+    ::while_3bytes::
+        if i+3>sz then goto break3 end
+        v=bor(lshift(bptr[i],16),lshift(bptr[i+1],8),bptr[i+2])
+        i=i+3
+        ::encode_last3::
+        if c==k then
+            m64arr[k]=crlf16[0]
+            k=k+1
+            c=k+38 -- 76 /2 = 38
+        end
+        m64arr[k]=mime64shorts[rshift(v,12)]
+        m64arr[k+1]=mime64shorts[band(v,4095)]
+        k=k+2
+        goto while_3bytes
+    ::break3::
+    if l>0 then
+        -- Add trailing equal sign padding
+        if l==1 then
+            -- 1 byte encoded needs two trailing equal signs
+            m64arr[k-1]=bor(lshift(eq,8),eq)
+        else
+            -- 2 bytes encoded needs one trailing equal sign
+            (ffi.cast(u8ptr,m64arr))[lshift(k,1)-1]=eq
+        end
+    else
+        l=sz-i -- get remaining len (1 or 2 bytes)
+        if l>0 then
+            v=lshift(bptr[i],16)
+            if l==2 then v=bor(v,lshift(bptr[i+1],8)) end
+            goto encode_last3
+        end
+    end
+    return ffi.string(m64arr,lshift(k,1))
 end
 
-local DEFAULT_ENCODER = base64.makeencoder()
-local DEFAULT_DECODER = base64.makedecoder()
-
-local char, concat = string.char, table.concat
-
-function base64.encode( str, encoder, usecaching )
-	encoder = encoder or DEFAULT_ENCODER
-	local t, k, n = {}, 1, #str
-	local lastn = n % 3
-	local cache = {}
-	for i = 1, n-lastn, 3 do
-		local a, b, c = str:byte( i, i+2 )
-		local v = a*0x10000 + b*0x100 + c
-		local s
-		if usecaching then
-			s = cache[v]
-			if not s then
-				s = char(encoder[extract(v,18,6)], encoder[extract(v,12,6)], encoder[extract(v,6,6)], encoder[extract(v,0,6)])
-				cache[v] = s
-			end
-		else
-			s = char(encoder[extract(v,18,6)], encoder[extract(v,12,6)], encoder[extract(v,6,6)], encoder[extract(v,0,6)])
-		end
-		t[k] = s
-		k = k + 1
-	end
-	if lastn == 2 then
-		local a, b = str:byte( n-1, n )
-		local v = a*0x10000 + b*0x100
-		t[k] = char(encoder[extract(v,18,6)], encoder[extract(v,12,6)], encoder[extract(v,6,6)], encoder[64])
-	elseif lastn == 1 then
-		local v = str:byte( n )*0x10000
-		t[k] = char(encoder[extract(v,18,6)], encoder[extract(v,12,6)], encoder[64], encoder[64])
-	end
-	return concat( t )
-end
-
-function base64.decode( b64, decoder, usecaching )
-	decoder = decoder or DEFAULT_DECODER
-	local pattern = '[^%w%+%/%=]'
-	if decoder then
-		local s62, s63
-		for charcode, b64code in pairs( decoder ) do
-			if b64code == 62 then s62 = charcode
-			elseif b64code == 63 then s63 = charcode
-			end
-		end
-		pattern = ('[^%%w%%%s%%%s%%=]'):format( char(s62), char(s63) )
-	end
-	b64 = b64:gsub( pattern, '' )
-	local cache = usecaching and {}
-	local t, k = {}, 1
-	local n = #b64
-	local padding = b64:sub(-2) == '==' and 2 or b64:sub(-1) == '=' and 1 or 0
-	for i = 1, padding > 0 and n-4 or n, 4 do
-		local a, b, c, d = b64:byte( i, i+3 )
-		local s
-		if usecaching then
-			local v0 = a*0x1000000 + b*0x10000 + c*0x100 + d
-			s = cache[v0]
-			if not s then
-				local v = decoder[a]*0x40000 + decoder[b]*0x1000 + decoder[c]*0x40 + decoder[d]
-				s = char( extract(v,16,8), extract(v,8,8), extract(v,0,8))
-				cache[v0] = s
-			end
-		else
-			local v = decoder[a]*0x40000 + decoder[b]*0x1000 + decoder[c]*0x40 + decoder[d]
-			s = char( extract(v,16,8), extract(v,8,8), extract(v,0,8))
-		end
-		t[k] = s
-		k = k + 1
-	end
-	if padding == 1 then
-		local a, b, c = b64:byte( n-3, n-1 )
-		local v = decoder[a]*0x40000 + decoder[b]*0x1000 + decoder[c]*0x40
-		t[k] = char( extract(v,16,8), extract(v,8,8))
-	elseif padding == 2 then
-		local a, b = b64:byte( n-3, n-2 )
-		local v = decoder[a]*0x40000 + decoder[b]*0x1000
-		t[k] = char( extract(v,16,8))
-	end
-	return concat( t )
-end
-
-return base64
-
---[[
-------------------------------------------------------------------------------
-This software is available under 2 licenses -- choose whichever you prefer.
-------------------------------------------------------------------------------
-ALTERNATIVE A - MIT License
-Copyright (c) 2018 Ilya Kolbin
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-------------------------------------------------------------------------------
-ALTERNATIVE B - Public Domain (www.unlicense.org)
-This is free and unencumbered software released into the public domain.
-Anyone is free to copy, modify, publish, use, compile, sell, or distribute this
-software, either in source code form or as a compiled binary, for any purpose,
-commercial or non-commercial, and by any means.
-In jurisdictions that recognize copyright laws, the author or authors of this
-software dedicate any and all copyright interest in the software to the public
-domain. We make this dedication for the benefit of the public at large and to
-the detriment of our heirs and successors. We intend this dedication to be an
-overt act of relinquishment in perpetuity of all present and future rights to
-this software under copyright law.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-------------------------------------------------------------------------------
---]]
+return escape
