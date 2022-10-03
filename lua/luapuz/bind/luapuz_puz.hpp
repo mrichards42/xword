@@ -20,12 +20,12 @@ extern "C" {
 // namespace puz
 // ---------------------------------------------------------------------------
 
+#include <algorithm>
+#include "puz/Clue.hpp"
+#include "puz/Grid.hpp"
 #include "puz/Puzzle.hpp"
 #include "puz/Square.hpp"
 #include "puz/Word.hpp"
-#include "puz/Grid.hpp"
-#include <algorithm>
-#include "puz/Clue.hpp"
 
 // enum GridDirection
 //------------

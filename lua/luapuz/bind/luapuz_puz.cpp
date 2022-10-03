@@ -17,11 +17,11 @@ extern "C" {
 // namespace puz
 // ---------------------------------------------------------------------------
 
-#include "luapuz_puz_Square.hpp"
-#include "luapuz_puz.hpp"
 #include "luapuz_puz_Puzzle.hpp"
+#include "luapuz_puz_Square.hpp"
 #include "luapuz_puz_Grid.hpp"
 #include "luapuz_puz_Clue.hpp"
+#include "luapuz_puz.hpp"
 // GridDirection ConstrainDirection(unsigned short dir)
 static int puz_ConstrainDirection(lua_State * L)
 {

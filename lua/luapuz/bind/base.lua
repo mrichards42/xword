@@ -167,6 +167,15 @@ function mt:get_hppheaders()
             table.insert(ret, header)
         end
     end
+    table.sort(ret, function (a, b)
+        if a:find("<") and not b:find("<") then
+            return true
+        elseif b:find("<") and not a:find("<") then
+            return false
+        else
+            return a < b
+        end
+    end)
     return ret
 end
 
@@ -272,7 +281,7 @@ extern "C" {
         defname=defname,
     }))
 
-    getmetatable(f).endfile = function()
+    mt.endhpp = function(_, f)
         f:write(string.format([[
 #endif // %s
 ]], defname))
@@ -305,7 +314,7 @@ extern "C" {
         filename=filename,
     }))
 
-    getmetatable(f).endfile = function()
+    mt.endcpp = function(_, f)
         f:close()
     end
     return f
@@ -322,11 +331,11 @@ function mt:writefiles()
         -- Write hpp file
         f = self:newhppfile()
         self:writehpp(f)
-        f.endfile()
+        self:endhpp(f)
         -- Write cpp file
         f = self:newcppfile()
         self:writecpp(f)
-        f.endfile()
+        self:endcpp(f)
     end
 
     -- Write contained classes
