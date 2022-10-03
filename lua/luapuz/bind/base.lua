@@ -234,6 +234,15 @@ function mt:get_cppheaders()
             table.insert(ret, header)
         end
     end
+    table.sort(ret, function (a, b)
+        if a:find("<") and not b:find("<") then
+            return true
+        elseif b:find("<") and not a:find("<") then
+            return false
+        else
+            return a < b
+        end
+    end)
     return ret
 end
 

@@ -36,9 +36,21 @@ local entities = {
     amp = "&"
 }
 
+local function replace_entity(entity)
+    if entities[entity] then
+        return entities[entity]
+    end
+    local decimal = entity:match("#(%d+)")
+    if decimal then
+        return string.char(tonumber(decimal))
+    else
+        return entity
+    end
+end
+
 local function decode_entities(str)
     -- Decode entities and replace XHTML tags
-    return str:gsub("&(.-);", entities):gsub("&lt;([^%s]-)&gt;", "<%1>")
+    return str:gsub("&(.-);", replace_entity):gsub("&lt;([^%s]-)&gt;", "<%1>")
 end
 
 
@@ -53,6 +65,7 @@ function import.xwordinfoJSON(p, filename)
     end
 
     -- Metadata
+    local title = decode_entities(doc.title)
     if ornil(doc.type) then
         -- Add the variety type to the title
         local variety_type
@@ -61,28 +74,28 @@ function import.xwordinfoJSON(p, filename)
         else
             variety_type = doc.type:upper()
         end
-        if doc.title:find(variety_type) then
-            p.Title = doc.title
+        if title:find(variety_type) then
+            p:SetTitle(title, --[[ is_html ]] true)
         else
-            p.Title = doc.title .. " " .. variety_type
+            p:SetTitle(title .. " " .. variety_type, --[[ is_html ]] true)
         end
     else
         -- Sunday puzzles have a real title without the date, so add the date
         if doc.dow == "Sunday" then
-            p.Title = date(doc.date):fmt("NY Times, %a, %b %d, %Y ") .. doc.title
+            p:SetTitle(date(doc.date):fmt("NY Times, %a, %b %d, %Y ") .. title, --[[ is_html ]] true)
         else
-            p.Title = doc.title
+            p:SetTitle(title, --[[ is_html ]] true)
         end
     end
-    p.Author = doc.author
+    p:SetAuthor(doc.author, --[[ is_html ]] true)
     p.Copyright = doc.copyright
     if doc.editor then
-        p:SetMeta("editor", doc.editor)
+        p:SetMeta("editor", doc.editor, --[[ is_html ]] true)
     end
 
     -- Add the copyright symbol (utf8)
     if #p.Copyright > 0 then p.Copyright = "\194\169 " .. p.Copyright end
-    p.Notes = ornil(doc.notepad) or ""
+    p:SetNotes(decode_entities(ornil(doc.notepad) or ""), --[[ is_html ]] true)
 
     -- Grid
     local g = p.Grid
@@ -116,7 +129,10 @@ function import.xwordinfoJSON(p, filename)
         local list = {}
         for _, clue in ipairs(clues) do
             local number, text = clue:match("(.-)%. (.*)")
-            list[tonumber(number)] = decode_entities(text)
+            list[tonumber(number)] = {
+                text = decode_entities(text),
+                is_html = true
+            }
         end
         p:SetClueList(name == "across" and "Across" or "Down", list)
     end
