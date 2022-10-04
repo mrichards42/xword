@@ -43,12 +43,7 @@ return {
     local params = json.to_value(base64.decode(param_str))
 
     local page = assert(curl.get(puzzle.url .. "&pickerToken=" .. params.pickerToken))
-
-    local data = page:match("rawc%s*=%s*'([^']+)'")
-    if not data then
-        return "Unable to find puzzle data"
-    end
-    local p = puz.Puzzle(data, import.amuselabsBase64)
+    local p = puz.Puzzle(page, import.amuselabsHtml)
     p:Save(puzzle.filename)
 ]]
     },
@@ -146,15 +141,8 @@ return {
           end
           local page2 = assert(curl.get(amuse_url))
 
-          -- Get the crossword data
-          local data = page2:match("rawc%s*=%s*'([^']+)'")
-          if data then
-            -- Using the data _as_ the input filename is kind of a hack, but it works
-            local p = puz.Puzzle(data, import.amuselabsBase64)
-            p:Save(puzzle.filename)
-          else
-            return "Unable to find puzzle data"
-          end
+          local p = puz.Puzzle(page2, import.amuselabsHtml)
+          p:Save(puzzle.filename)
       ]]
     },
 
@@ -164,17 +152,9 @@ return {
       filename = "atlantic%Y%m%d.jpz",
       days = { true, true, true, true, true, false, true },
       func = [[
-          -- Download the page with the puzzle
           local page = assert(curl.get(puzzle.url))
-
-          -- Get the crossword data
-          local data = page:match("rawc%s*=%s*'([^']+)'")
-          if data then
-            local p = puz.Puzzle(data, import.amuselabsBase64)
-            p:Save(puzzle.filename)
-          else
-            return "Unable to find puzzle data"
-          end
+          local p = puz.Puzzle(page, import.amuselabsHtml)
+          p:Save(puzzle.filename)
       ]]
     },
 
