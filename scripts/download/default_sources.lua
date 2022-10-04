@@ -147,6 +147,27 @@ return {
     },
 
     {
+      name = "The New Yorker Cryptic",
+      url = "https://www.newyorker.com/puzzles-and-games-dept/cryptic-crossword/%Y/%m/%d",
+      filename = "nyer-cryptic%Y%m%d.jpz",
+      days = { false, false, false, false, false, false, true },
+      func = [[
+          -- Download the page with the puzzle
+          local page = assert(curl.get(puzzle.url))
+
+          -- Search for the app code
+          local amuse_url = page:match('http[^ ]*amuselabs.com/[^ ]+embed=1')
+          if not amuse_url then
+              return "No puzzle"
+          end
+          local page2 = assert(curl.get(amuse_url))
+
+          local p = puz.Puzzle(page2, import.amuselabsHtml)
+          p:Save(puzzle.filename)
+      ]]
+    },
+
+    {
       name = "The Atlantic",
       url = "https://cdn3.amuselabs.com/atlantic/crossword?id=atlantic_%Y%m%d&set=atlantic&embed=1",
       filename = "atlantic%Y%m%d.jpz",
