@@ -36,6 +36,7 @@ public:
 };
 
 void LoadIpuz(Puzzle * puz, const std::string & filename, void * /* dummy */);
+void LoadIpuzString(Puzzle * puz, const std::string & data);
 
 } // namespace puz
 

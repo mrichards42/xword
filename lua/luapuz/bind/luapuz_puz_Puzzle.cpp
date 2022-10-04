@@ -216,6 +216,14 @@ int Puzzle_Save(lua_State * L)
     lua_error(L); // We should have returned by now
     return 0;
 }
+// void LoadIpuzString(const char * data)
+static int Puzzle_LoadIpuzString(lua_State * L)
+{
+    puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
+    const char * data = luaL_checkstring(L, 2);
+    puzzle->LoadIpuzString(data);
+    return 0;
+}
 // static bool CanLoad(const char * filename)
 static int Puzzle_CanLoad(lua_State * L)
 {
@@ -556,6 +564,7 @@ static int Puzzle_GenerateWords(lua_State * L)
 static const luaL_reg Puzzlelib[] = {
     {"Load", Puzzle_Load},
     {"Save", Puzzle_Save},
+    {"LoadIpuzString", Puzzle_LoadIpuzString},
     {"CanLoad", Puzzle_CanLoad},
     {"CanSave", Puzzle_CanSave},
     {"Clear", Puzzle_Clear},

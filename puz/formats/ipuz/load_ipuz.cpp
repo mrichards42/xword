@@ -17,6 +17,7 @@
 
 #include "ipuz.hpp"
 
+#include <sstream>
 #include "Puzzle.hpp"
 #include "puzstring.hpp"
 #include "parse/json.hpp"
@@ -33,9 +34,8 @@ public:
     std::map<string_t, string_t> m_color_map;
 };
 
-void LoadIpuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
+void LoadIpuzStream(Puzzle * puz, const std::string & filename, std::istream & stream)
 {
-    std::ifstream stream(filename.c_str());
     if (stream.fail())
         throw FileError(filename);
     // Throw away "ipuz("
@@ -47,6 +47,20 @@ void LoadIpuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
     // Load the file
     ipuzParser parser;
     parser.LoadPuzzle(puz, stream);
+}
+
+void LoadIpuz(Puzzle * puz, const std::string & filename, void * /* dummy */)
+{
+    std::ifstream stream(filename.c_str());
+    LoadIpuzStream(puz, filename, stream);
+}
+
+
+void LoadIpuzString(Puzzle * puz, const std::string & data)
+{
+    std::istringstream stream(data);
+    std::string filename("<json>");
+    LoadIpuzStream(puz, filename, stream);
 }
 
 // Parse an ipuz enumeration value and return a string to append to

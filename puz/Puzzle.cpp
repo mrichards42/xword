@@ -101,6 +101,12 @@ Puzzle::Load(const std::string & filename, const FileHandlerDesc * desc)
     }
 }
 
+void
+Puzzle::LoadIpuzString(const std::string & data)
+{
+    puz::LoadIpuzString(this, data);
+}
+
 
 // -----------------------------------------------------------------------
 // Save functions

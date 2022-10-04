@@ -58,6 +58,9 @@ public:
     void Load(const std::string & filename,
               const FileHandlerDesc * handler = NULL);
 
+    // For lua, to simplify puzzle loading
+    void LoadIpuzString(const std::string & data);
+
     void Save(const std::string & filename,
               const FileHandlerDesc * handler = NULL);
 

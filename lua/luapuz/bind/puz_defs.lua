@@ -267,6 +267,8 @@ class{"Puzzle", header="puz/Puzzle.hpp", cppheader="luapuz_puz_Puzzle_helpers.hp
     func{"Load", override=overrides.Puzzle_Load}
     func{"Save", override=overrides.Puzzle_Save}
 
+    func{"LoadIpuzString", arg("const char *", "data")}
+
     func{"CanLoad", static=true, returns="bool", arg("const char *", "filename")}
     func{"CanSave", static=true, returns="bool", arg("const char *", "filename")}
 
