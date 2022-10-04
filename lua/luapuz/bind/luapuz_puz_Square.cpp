@@ -103,6 +103,47 @@ static int Square_GetRow(lua_State * L)
     lua_pushnumber(L, returns);
     return 1;
 }
+// Map<T|B|R|L, true/false> GetBars()
+static int Square_GetBars(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+
+    lua_newtable(L);
+
+    lua_pushboolean(L, square->m_bars[puz::BAR_TOP]);
+    lua_setfield(L, -2, "T");
+
+    lua_pushboolean(L, square->m_bars[puz::BAR_LEFT]);
+    lua_setfield(L, -2, "L");
+
+    lua_pushboolean(L, square->m_bars[puz::BAR_RIGHT]);
+    lua_setfield(L, -2, "R");
+
+    lua_pushboolean(L, square->m_bars[puz::BAR_BOTTOM]);
+    lua_setfield(L, -2, "B");
+
+    return 1;
+}
+// void SetBars(Map<T|B|R|L, true/false>)
+static int Square_SetBars(lua_State * L)
+{
+    puz::Square * square = luapuz_checkSquare(L, 1);
+    luaL_checktype(L, 2, LUA_TTABLE);
+
+    lua_getfield(L, 2, "T");
+    square->m_bars[puz::BAR_TOP] = lua_toboolean(L, -1);
+
+    lua_getfield(L, 2, "L");
+    square->m_bars[puz::BAR_LEFT] = lua_toboolean(L, -1);
+
+    lua_getfield(L, 2, "R");
+    square->m_bars[puz::BAR_RIGHT] = lua_toboolean(L, -1);
+
+    lua_getfield(L, 2, "B");
+    square->m_bars[puz::BAR_BOTTOM] = lua_toboolean(L, -1);
+
+    return 0;
+}
 // bool IsWhite()
 static int Square_IsWhite(lua_State * L)
 {
@@ -797,6 +838,8 @@ static int Square_IsBetween(lua_State * L)
 static const luaL_reg Squarelib[] = {
     {"GetCol", Square_GetCol},
     {"GetRow", Square_GetRow},
+    {"GetBars", Square_GetBars},
+    {"SetBars", Square_SetBars},
     {"IsWhite", Square_IsWhite},
     {"IsBlack", Square_IsBlack},
     {"IsBlank", Square_IsBlank},

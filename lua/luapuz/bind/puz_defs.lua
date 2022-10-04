@@ -87,6 +87,8 @@ enum { "FindOptions", header="puz/Grid.hpp",
 class{"Square", header="puz/Square.hpp"}
     func{"GetCol", override=overrides.Square_GetCol}
     func{"GetRow", override=overrides.Square_GetRow}
+    func{"GetBars", override=overrides.Square_GetBars}
+    func{"SetBars", override=overrides.Square_SetBars}
 
     func{"IsWhite", returns="bool"}
     func{"IsBlack", returns="bool"}
