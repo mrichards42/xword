@@ -13,7 +13,7 @@ configuration "windows"
     }
 
     -- Determine the version by looking at the directory
-    local v1, v2 = _OPTIONS["wx-prefix"]:match("wxWidgets%-(%d+)%.(%d%+)")
+    local v1, v2 = _OPTIONS["wx-prefix"]:match("wxWidgets%-(%d+)%.(%d+)")
     local version
     if v1 and v2 then
         version = v1 .. v2
