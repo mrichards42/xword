@@ -64,7 +64,7 @@
        (transpose
         (icollect-2d [x y solution box]
           (let [info (or (?. cellInfos x y) {})
-                color-hex (string.match (or info.bgColor "") "#?(%x%x%x%x%x%x")]
+                color-hex (string.match (or info.bgColor "") "#?(%x%x%x%x%x%x)")]
             {:cell (if (= black (. solution-grid x y))
                      black
                      (or (?. json.clueNums x y)
@@ -73,7 +73,8 @@
                      :highlight (if (and info.bgColor
                                          (< 0 (length info.bgColor))
                                          (not color-hex))
-                                  true) :color color-hex
+                                  true)
+                     :color color-hex
                      :barred (table.concat [(if info.topWall "T" "")
                                             (if info.bottomWall "B" "")
                                             (if info.leftWall "L" "")
