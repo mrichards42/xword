@@ -16,8 +16,6 @@
 #define js_check_generator(L, narg) \
     (yajl_gen*)luaL_checkudata((L), (narg), "yajl.generator.meta")
 
-static void* js_null;
-
 static int js_generator(lua_State *L);
 static int js_generator_value(lua_State *L);
 static void js_parser_assert(lua_State* L,
@@ -756,9 +754,12 @@ static int js_generator_value(lua_State *L) {
     case LUA_TSTRING:
         return js_generator_string(L);
     case LUA_TUSERDATA:
-        if ( lua_topointer(L, 2) == js_null ) { 
+        lua_getfield(L, LUA_REGISTRYINDEX, "yajl.null");
+        if (lua_rawequal(L, 2, -1)) {
+            lua_pop(L, 1);
             return js_generator_null(L);
         }
+        lua_pop(L, 1);
     case LUA_TLIGHTUSERDATA:
     case LUA_TTABLE:
     case LUA_TFUNCTION:
@@ -1051,7 +1052,7 @@ LUALIB_API int luaopen_luayajl(lua_State *L) {
     lua_pushcfunction(L, js_generator);
     lua_setfield(L, -2, "generator");
 
-    js_null = lua_newuserdata(L, 0);
+    lua_newuserdata(L, 0);
     luaL_getmetatable(L, "yajl.null.meta");
     lua_setmetatable(L, -2);
 
