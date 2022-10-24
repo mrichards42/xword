@@ -1,3 +1,60 @@
+Next Version
+==========================
+Puzzle Features
+---------------
+* Add support for ipuz files with custom cells aka words (#199)
+* Add support for cryptic and diagramless ipuz files (#181)
+* Add support for cell background colors in ipuz files (#187)
+* Add support for coded crosswords (aka "codewords") (#124)
+* Preliminary support for puz v2 with support for utf-8 (#155)
+* Support alternate background color for black squares (#148)
+* Allow asterisk (`*`) in the solution -- this must be entered as a rebus since
+  pressing `*` adds a circle to a square (#195)
+* Remove version check from ipuz reader -- allows loading ipuz v2 files (#173)
+
+New Features
+------------
+* Option to change direction when clicking on the current square (436ab09)
+* Downs only tool (3f18eeb)
+
+Improvements
+------------
+* HTML is stripped from the window title (#118)
+* More intuitive initial cursor positioning on non-standard grids (#136 #138 #141)
+* Annotation squares use a white background by default (instead of black) (#151)
+* When converting to puz format, all notes-like fields are saved to the puz
+  "Notes" field (#145)
+* Better support for HTML in metadata fields (#193)
+
+Puzzle Sources
+--------------
+* New Yorker updated to be every weekday
+* Added New Yorker Cryptic
+* Removed extraneous enumerations from LA Times
+
+Bug Fixes
+---------
+* Downloader settings can be saved (8af9e02)
+* Fix italics getting cut off (#159)
+* Extra whitespace no longer breaks metadata display (#119 #149)
+* Fix crash when saving rebus entry on Linux (#130)
+* Fix save behavior on Windows for files with accents (#135)
+* Improve handling of different capitalizations of "Across" and "Down" (#143)
+* Fix several navigation edge cases (#147 #152 #153 #162 #194)
+* Fix word length issue with barred borders (#175)
+* Fix crash on latest MacOS version (note that this also changes the window
+  style on macs) (#150)
+* Fix crash entering a rebus in a square with no solution (#195)
+* Fix namespace when saving JPZ files (#177)
+* Fix issue with downloader puzzle popup and shared squares (1461066)
+
+
+
+
+
+----------------------------------------------------------------------
+
+
 Version 0.7.0 (6/23/2020)
 ==========================
 Puzzle Features
