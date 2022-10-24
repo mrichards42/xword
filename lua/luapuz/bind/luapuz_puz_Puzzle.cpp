@@ -221,7 +221,13 @@ static int Puzzle_LoadIpuzString(lua_State * L)
 {
     puz::Puzzle * puzzle = luapuz_checkPuzzle(L, 1);
     const char * data = luaL_checkstring(L, 2);
-    puzzle->LoadIpuzString(data);
+    try {
+        puzzle->LoadIpuzString(data);
+        return 0;
+    } catch (...) {
+        luapuz_handleExceptions(L);
+    }
+    lua_error(L);
     return 0;
 }
 // static bool CanLoad(const char * filename)
