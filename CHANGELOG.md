@@ -31,6 +31,7 @@ Puzzle Sources
 * New Yorker updated to be every weekday
 * Added New Yorker Cryptic
 * Added Vulture 10x10
+* Fixed NY Mag
 * Removed extraneous enumerations from LA Times
 
 Bug Fixes

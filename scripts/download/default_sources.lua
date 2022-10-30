@@ -181,37 +181,39 @@ return {
 
     {
       name = "New York Magazine",
-      url = "https://cdn3.amuselabs.com/nymag/date-picker?set=nymag&theme=nymag&embed=1&limit=100",
+      url = "https://nymag.com/crossword",
       filename = "nym%Y%m%d.jpz",
       days = { false, false, false, false, false, false, true },
       func = [[
           -- Download the puzzle list
-          local page = assert(curl.get(puzzle.url))
-          local puz_datestr = puzzle.date:fmt('%d %B %Y'):gsub('^0', '')
+          local puzzle_page_url
+          for start=0,20,20 do
+              print(puzzle.url .. "?start=" .. start)
+              local page = assert(curl.get(puzzle.url .. "?start=" .. start))
 
-          -- Find the url for this date
-          local amuse_url
-          for id, datestr in page:gmatch('data%-id="(.-)".-<strong>(.-)</strong>') do
-            if datestr == puz_datestr then
-              amuse_url = "https://cdn3.amuselabs.com/nymag/crossword?id=" .. id .. "&set=nymag&embed=1"
-              break
-            end
+              local datestr = puzzle.date:fmt('%b%%S* %d,? %Y'):gsub(" 0", " ")
+
+              puzzle_page_url = page:match(datestr .. '.-href="([^"]+)".-[Cc]rossword')
+              if puzzle_page_url then break end
           end
-          if not amuse_url then
+          if not puzzle_page_url then
             return "No Puzzle"
           end
+          puzzle_page_url = puzzle_page_url:gsub("^//", "https://")
+          print("nymag", puzzle_page_url)
 
-          -- Download the puzzle page
-          local page2 = assert(curl.get(amuse_url))
-
-          -- Get the crossword data
-          local data = page2:match("rawc%s*=%s*'([^']+)'")
-          if data then
-            local p = puz.Puzzle(data, import.amuselabsBase64)
-            p:Save(puzzle.filename)
-          else
-            return "Unable to find puzzle data"
+          local page2 = assert(curl.get(puzzle_page_url))
+          local amuse_url = page2:match('data%-crossword%-url%s*=%s*"([^"]+)"')
+          if not amuse_url then
+              return "No puzzle"
           end
+          print("nymag amuse", amuse_url)
+
+          local decoded_url = amuse_url:gsub("&#x3[dD];", "="):gsub("&amp;", "&"):gsub(" ", "+")
+          local page3 = assert(curl.get(decoded_url))
+
+          local p = puz.Puzzle(page3, import.amuselabsHtml)
+          p:Save(puzzle.filename)
       ]]
     },
     {
