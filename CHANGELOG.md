@@ -49,9 +49,7 @@ Bug Fixes
 * Fix crash entering a rebus in a square with no solution (#195)
 * Fix namespace when saving JPZ files (#177)
 * Fix issue with downloader puzzle popup and shared squares (1461066)
-
-
-
+* Fix issue with annotation squares not drawing on printouts (#202)
 
 
 ----------------------------------------------------------------------
