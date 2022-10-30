@@ -135,7 +135,7 @@ return {
           local page = assert(curl.get(puzzle.url))
 
           -- Search for the app code
-          local amuse_url = page:match('http[^ ]*amuselabs.com/[^ ]+embed=1')
+          local amuse_url = page:match('http[^ ]*amuselabs.com/[^ ]-embed=1')
           if not amuse_url then
               return "No puzzle"
           end
@@ -156,7 +156,7 @@ return {
           local page = assert(curl.get(puzzle.url))
 
           -- Search for the app code
-          local amuse_url = page:match('http[^ ]*amuselabs.com/[^ ]+embed=1')
+          local amuse_url = page:match('http[^ ]*amuselabs.com/[^ ]-embed=1')
           if not amuse_url then
               return "No puzzle"
           end
@@ -212,6 +212,31 @@ return {
           else
             return "Unable to find puzzle data"
           end
+      ]]
+    },
+    {
+      name = "Vulture",
+      url = "https://www.vulture.com/%Y/%m/daily-crossword-puzzle-%B-%d.html",
+      filename = "nym%Y%m%d.jpz",
+      days = { true, true, true, true, true, false, false },
+      func = [[
+          local page = curl.get(puzzle.url:gsub("0(%d.html)", "%1"):lower())
+          if not page then
+            alt_url = puzzle.date:fmt("https://www.vulture.com/%Y/%m/daily-crossword-puzzle-%A-%B-%d.html")
+            page = assert(curl.get(alt_url:gsub("0(%d.html)", "%1"):lower()))
+          end
+
+          local amuse_url = page:match('data%-crossword%-url%s*=%s*"([^"]+)"')
+          if not amuse_url then
+              return "No puzzle"
+          end
+
+          -- a little html decoding and url encoding
+          local decoded_url = amuse_url:gsub("&#x3[dD];", "="):gsub("&amp;", "&"):gsub(" ", "+")
+          local page2 = assert(curl.get(decoded_url))
+
+          local p = puz.Puzzle(page2, import.amuselabsHtml)
+          p:Save(puzzle.filename)
       ]]
     },
 }
