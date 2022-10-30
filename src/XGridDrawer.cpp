@@ -652,13 +652,14 @@ XGridDrawer::DrawSquare(wxDC & adc,
 
     // Draw square's text (bottom and center to avoid conflicts with numbers)
     if ((HasFlag(DRAW_USER_TEXT) && ! square.IsBlank()) ||
-        (HasFlag(DRAW_SOLUTION) && ! square.IsSolutionBlank()))
+        (HasFlag(DRAW_SOLUTION) && ! square.IsSolutionBlank()) ||
+        square.IsAnnotation())
     {
         dc.SetTextForeground(textColor);
         wxString text;
         bool isSymbol = false;
         // User Text
-        if (HasFlag(DRAW_USER_TEXT))
+        if (HasFlag(DRAW_USER_TEXT) || square.IsAnnotation())
         {
             if (square.HasTextSymbol())
             {
