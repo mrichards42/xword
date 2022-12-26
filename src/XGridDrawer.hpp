@@ -171,7 +171,8 @@ public:
 
     void DrawSquare(wxDC & dc, const puz::Square & square,
                     const wxColour & bgColor,
-                    const wxColour & textColor);
+                    const wxColour & textColor,
+                    const bool blendBackground = false);
 
     void DrawSquare(wxDC & dc, const puz::Square & square);
 

@@ -587,7 +587,7 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
     if (color == wxNullColour || &color == &EraseColor)
         m_drawer.DrawSquare(dc, square);
     else
-        m_drawer.DrawSquare(dc, square, color, GetPenColor());
+        m_drawer.DrawSquare(dc, square, color, GetPenColor(), /* blendBackground= */ true);
 
     // Reset the drawing mode
     if (drawOutline)

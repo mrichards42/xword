@@ -409,11 +409,23 @@ XGridDrawer::DrawSquare(wxDC & dc, const puz::Square & square)
     DrawSquare(dc, square, GetSquareColor(square), GetPenColor());
 }
 
+// Blend the foreground color and the background color.
+wxColour
+blendColors(const wxColour& foreground, const wxColour& background) {
+    // We average the background and foreground colors, but we darken the background
+    // color somewhat to improve the contrast with other selected squares.
+    return wxColour(
+        (std::max(background.Red() - 50, 0) + foreground.Red()) / 2,
+        (std::max(background.Green() - 50, 0) + foreground.Green()) / 2,
+        (std::max(background.Blue() - 50, 0) + foreground.Blue()) / 2);
+}
+
 void
 XGridDrawer::DrawSquare(wxDC & adc,
-                           const puz::Square & square,
-                           const wxColour & bgColor,
-                           const wxColour & textColor_)
+                        const puz::Square & square,
+                        const wxColour & bgColor_,
+                        const wxColour & textColor_,
+                        const bool blendBackground)
 {
     if (square.IsMissing())
         return;
@@ -432,6 +444,17 @@ XGridDrawer::DrawSquare(wxDC & adc,
     // If we are supposed to draw the outline, we'll draw the square with
     // the default square background, and then draw the outline using the
     // bgColor.
+
+    // If the caller wants us to blend the square's inherent color with the given color (e.g. this
+    // is a selected/highlighted square), do so as long as the given color is non-white. This keeps
+    // the standard highlight color consistent with the user selection most of the time, while
+    // providing a visible contrast for selected cells with different backgrounds against other
+    // selected cells.
+    wxColour bgColor = bgColor_;
+    wxColour squareColor = GetSquareColor(square);
+    if (blendBackground && squareColor != GetWhiteSquareColor()) {
+        bgColor = blendColors(bgColor, squareColor);
+    }
 
     // Check the square background to see if this text color works
     wxColour textColor = textColor_;
