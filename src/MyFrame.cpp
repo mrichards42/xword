@@ -1434,6 +1434,8 @@ MyFrame::ManageWindows()
                   .Hide()
                   .Caption(_T("Notes"))
                   .Name(_T("Notes")));
+
+    ShowClues();
 }
 
 
