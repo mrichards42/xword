@@ -176,17 +176,29 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
 {
     json::Map * doc = root->AsMap();
     try {
-        // Check kind
-        string_t kind = doc->PopArray(puzT("kind"))->at(0)->AsString();
-        if (kind.substr(kind.size() - 2) == puzT("#1"))
-            kind = kind.substr(0, kind.size() - 2);
-        if (kind == puzT("http://ipuz.org/crossword") ||
-            kind == puzT("http://ipuz.org/crossword/crypticcrossword")) {
-            // Regular crossword
-        } else if (kind == puzT("http://ipuz.org/crossword/diagramless")) {
-            // Diagramless crossword
-            puz->GetGrid().SetType(TYPE_DIAGRAMLESS);
-        } else {
+        // Check kind from most to least specific until we find a match
+        json::Array * kinds = doc->PopArray(puzT("kind"));
+        std::vector<json::Value*>::iterator i = kinds->end();
+        bool known_type = false;
+        while (i != kinds->begin() && !known_type) {
+            string_t kind = (*(--i))->AsString();
+            if (kind.substr(kind.size() - 2) == puzT("#1"))
+                kind = kind.substr(0, kind.size() - 2);
+            if (kind == puzT("http://ipuz.org/crossword") ||
+                kind == puzT("http://ipuz.org/crossword/crypticcrossword")) {
+                // Regular crossword
+                known_type = true;
+            } else if (kind == puzT("http://ipuz.org/crossword/diagramless")) {
+                // Diagramless crossword
+                known_type = true;
+                puz->GetGrid().SetType(TYPE_DIAGRAMLESS);
+            } else if (kind == puzT("http://crosswordnexus.com/ipuz/coded")) {
+                // Coded crossword
+                known_type = true;
+                puz->GetGrid().SetType(TYPE_CODED);
+            }
+        }
+        if (!known_type) {
             throw LoadError("Unsupported ipuz kind");
         }
     }
