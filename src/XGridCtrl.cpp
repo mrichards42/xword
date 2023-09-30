@@ -340,23 +340,23 @@ XGridCtrl::UnscrambleSolution(unsigned short key)
 // Helper for IsCorrect and GetStats
 CorrectStatus GetCorrectStatus(const puz::Grid * grid, bool correct)
 {
-    // We *can* test scrambled puzzles!  Not sure why I didn't think of
-    // this before.  (Inspired by Alex Boisvert:
-    // http://alexboisvert.com/software.html#check)
-    if (correct)
+    if (!grid->HasSolution())
+    {
+        return UNCHECKABLE_PUZZLE;
+    }
+    else if (correct)
     {
         return CORRECT_PUZZLE;
     }
     else if (grid->IsScrambled())
     {
+        // We *can* test scrambled puzzles!  Not sure why I didn't think of
+        // this before.  (Inspired by Alex Boisvert:
+        // http://alexboisvert.com/software.html#check)
         if (grid->CheckScrambledGrid())
             return CORRECT_PUZZLE;
         else
             return INCORRECT_PUZZLE;
-    }
-    else if (! grid->HasSolution())
-    {
-        return UNCHECKABLE_PUZZLE;
     }
     else
     {
@@ -403,7 +403,7 @@ XGridCtrl::GetStats(GridStats * stats) const
             if (square->IsBlank())
             {
                 ++stats->blank;
-                if (square->IsSolutionBlank())
+                if (m_grid->HasSolution() && square->IsSolutionBlank())
                     ++stats->blank_correct;
             }
             // If the puzzle is correct so far, and without blanks (that do

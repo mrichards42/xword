@@ -309,6 +309,10 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
             }
         });
     }
+    else
+    {
+        puz->GetGrid().SetFlag(FLAG_NO_SOLUTION);
+    }
 
     // User grid
     if (doc->Contains(puzT("saved")))
