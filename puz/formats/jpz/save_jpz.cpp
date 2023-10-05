@@ -61,8 +61,6 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
     if (grid.IsScrambled())
         throw ConversionError("Jpz does not support scrambled puzzles");
-    if (! grid.HasSolution())
-        throw ConversionError("Jpz does not support puzzles without a solution");
     if (grid.GetType() == TYPE_DIAGRAMLESS)
         throw ConversionError("Can't save a diagramless puzzle as jpz.");
 
@@ -88,16 +86,21 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
 
         xml::node actions = settings.append_child("actions");
         actions.append_attribute("buttons-layout") = "below";
-        actions.append_child("check").append_attribute("label") = "Check";
-        actions.append_child("reveal-letter").append_attribute("label") =
-                                                                "Reveal Letter";
-        actions.append_child("reveal-word").append_attribute("label") =
-                                                                "Reveal Word";
         actions.append_child("revert").append_attribute("label") = "Clear All";
-        actions.append_child("solution").append_attribute("label") = "Solution";
-
         xml::node completion = settings.append_child("completion");
-        completion.append_attribute("only-if-correct") = "true";
+        if (grid.HasSolution()) {
+            actions.append_child("check").append_attribute("label") = "Check";
+            actions.append_child("reveal-letter").append_attribute("label") =
+                "Reveal Letter";
+            actions.append_child("reveal-word").append_attribute("label") =
+                "Reveal Word";
+            actions.append_child("solution").append_attribute("label") = "Solution";
+            completion.append_attribute("only-if-correct") = "true";
+        }
+        else {
+            completion.append_attribute("only-if-correct") = "false";
+        }
+
         string_t message = puz->GetMeta(puzT("completion"));
         if (message.empty()) {
             message = puzT("Congratulations, you have solved the puzzle!");
@@ -172,8 +175,9 @@ void SaveJpz(Puzzle * puz, const std::string & filename, void * /* dummy */)
             {
                 if (square->IsAnnotation())
                     cell.append_attribute("type") = "clue";
-                cell.append_attribute("solution") =
-                    encode_utf8(square->GetSolution()).c_str();
+                if (grid.HasSolution())
+                    cell.append_attribute("solution") =
+                        encode_utf8(square->GetSolution()).c_str();
                 if (square->HasNumber())
                     cell.append_attribute("number") =
                         encode_utf8(square->GetNumber()).c_str();
