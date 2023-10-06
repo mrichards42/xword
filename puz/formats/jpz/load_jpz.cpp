@@ -226,6 +226,7 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
         }
 
         // Grid cells
+        bool has_solution = false;
         xml::node cell = RequireChild(grid_node, "cell");
         for (; cell; cell = cell.next_sibling("cell"))
         {
@@ -260,7 +261,10 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
             else // type == puzT("letter") || type == puzT("clue")
             {
                 square->SetMissing(false);
-                square->SetSolution(GetAttribute(cell, "solution"));
+                string_t solution = GetAttribute(cell, "solution");
+                square->SetSolution(solution);
+                if (!solution.empty())
+                    has_solution = true;
                 square->SetText(GetAttribute(cell, "solve-state"));
                 if (type == puzT("clue"))
                     square->SetAnnotation(true);
@@ -314,6 +318,9 @@ bool jpzParser::DoLoadPuzzle(Puzzle * puz, xml::document & doc)
                     image.child_value("encoded-image"));
             }
         }
+
+        if (!has_solution)
+            grid.SetFlag(FLAG_NO_SOLUTION);
     }
 
     // Words
