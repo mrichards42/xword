@@ -100,7 +100,8 @@
 (fn import.amuselabsJSON [p data]
   (let [json (yajl.to_value data)
         ipuz (amuse->ipuz json)]
-    (when (= json.set "tny-new-cryptic")
+    (when (and (json.title:match "[Cc]ryptic")
+               (json.endMessage:match "newyorker"))
       (add-checker-highlight! ipuz))
     (p:LoadIpuzString (yajl.to_string ipuz))))
 
@@ -109,7 +110,9 @@
 
 (fn import.amuselabsHtml [p html]
   (match (html:match "rawc%s*=%s*'([^']+)'")
-    rawc (import.amuselabsBase64 p rawc)))
+    rawc (import.amuselabsBase64 p rawc)
+    _ (match (html:match "\"rawc\"%s*:%s*\"([^\"]+)\"")
+        rawc (import.amuselabsBase64 p rawc))))
 
 (import.addHandler import.amuselabsJSON :json "amuselabs JSON")
 (import.addHandler import.amuselabsHtml :html "amuselabs HTML")
