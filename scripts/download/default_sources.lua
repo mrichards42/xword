@@ -38,7 +38,10 @@ return {
     local picker = assert(curl.get("https://cdn4.amuselabs.com/lat/date-picker?style=1&embed=1&heightReduction=30&set=latimes"))
     local param_str = picker:match("pickerParams.rawsps%s*=%s*'([^']+)'")
     if not param_str then
-        return "Unable to find puzzle"
+        param_str = picker:match('"rawsps"%s*:%s*"([^"]+)"')
+        if not param_str then
+            return "Unable to find puzzle"
+        end
     end
     local params = json.to_value(base64.decode(param_str))
 
