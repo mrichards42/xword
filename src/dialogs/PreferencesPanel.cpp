@@ -215,6 +215,10 @@ void SolvePanel::DoLoadConfig()
         m_nextSquare->SetValue(1);
     m_blankOnDirection->SetValue((gridStyle & BLANK_ON_DIRECTION) != 0);
     m_blankOnNewWord  ->SetValue((gridStyle & BLANK_ON_NEW_WORD) != 0);
+    if (gridStyle & SWAP_ON_SPACE)
+        m_switchDirectionsOnSpace->SetValue(1);
+    else
+        m_insertBlankOnSpace->SetValue(1);
     m_pauseOnSwitch   ->SetValue((gridStyle & PAUSE_ON_SWITCH) != 0);
     m_moveOnRightClick->SetValue((gridStyle & MOVE_ON_RIGHT_CLICK) != 0);
     m_swapOnDClick    ->SetValue((gridStyle & SWAP_ON_DCLICK) != 0);
@@ -253,6 +257,8 @@ void SolvePanel::DoSaveConfig()
         gridStyle |= BLANK_ON_DIRECTION;
     if (m_blankOnNewWord->GetValue())
         gridStyle |= BLANK_ON_NEW_WORD;
+    if (m_switchDirectionsOnSpace->GetValue())
+        gridStyle |= SWAP_ON_SPACE;
     if(m_pauseOnSwitch->GetValue())
         gridStyle |= PAUSE_ON_SWITCH;
     if (m_moveOnRightClick->GetValue())
@@ -284,6 +290,8 @@ void SolvePanel::ConnectChangedEvents()
     BindChangedEvent(m_nextBlank);
     BindChangedEvent(m_blankOnDirection);
     BindChangedEvent(m_blankOnNewWord);
+    BindChangedEvent(m_insertBlankOnSpace);
+    BindChangedEvent(m_switchDirectionsOnSpace);
     BindChangedEvent(m_pauseOnSwitch);
     BindChangedEvent(m_moveOnRightClick);
     BindChangedEvent(m_swapOnDClick);

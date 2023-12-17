@@ -620,6 +620,32 @@ XGridCtrl::DrawSquare(wxDC & dc, const puz::Square & square, const wxColour & co
 //-------------------------------------------------------
 // Focus functions
 //-------------------------------------------------------
+short
+XGridCtrl::OppositeFocusDirection(puz::Square * square,
+                                puz::Word * word,
+                                short direction)
+{
+    if (GetGrid()->IsAcrostic())
+    {
+        direction = puz::ACROSS;
+    }
+    else
+    {
+        puz::GridDirection newdir
+            = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
+        if (square->HasWord(newdir))
+            direction = newdir;
+        else
+        {
+            word = m_puz->FindWord(square, newdir);
+            if (word)
+                direction = newdir;
+        }
+    }
+
+    return direction;
+}
+
 puz::Square *
 XGridCtrl::SetFocusedSquare(puz::Square * square,
                             puz::Word * word,
@@ -644,23 +670,7 @@ XGridCtrl::SetFocusedSquare(puz::Square * square,
         else if (! square->HasWord(static_cast<puz::GridDirection>(direction))
             && ! m_puz->FindWord(square, direction))
         {
-            if (GetGrid()->IsAcrostic())
-            {
-                direction = puz::ACROSS;
-            }
-            else
-            {
-                puz::GridDirection newdir
-                    = puz::IsVertical(direction) ? puz::ACROSS : puz::DOWN;
-                if (square->HasWord(newdir))
-                    direction = newdir;
-                else
-                {
-                    word = m_puz->FindWord(square, newdir);
-                    if (word)
-                        direction = newdir;
-                }
-            }
+            direction = OppositeFocusDirection(square, word, direction);
         }
     }
     // Save old state
@@ -1545,15 +1555,34 @@ XGridCtrl::OnLetter(wxChar key, int mod)
     wxASSERT(! IsRebusEntry());
 
     if (static_cast<int>(key) == WXK_SPACE)
-        SetSquareText(*m_focusedSquare, _T(""));
-    else
+    {
+        if (HasStyle(SWAP_ON_SPACE))
+        {
+            const short direction = OppositeFocusDirection(m_focusedSquare, NULL, m_focusedDirection);
+            SetFocusedSquare(m_focusedSquare, NULL, direction);
+        }
+        else
+        {
+            SetSquareText(*m_focusedSquare, _T(""));
+        }
+    }
+	else
+	{
         SetSquareText(*m_focusedSquare, key);
+	}
 
     // Space bar always moves forward one square
     if (static_cast<int>(key) == WXK_SPACE)
-        SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE), m_focusedWord);
+    {
+        if (!HasStyle(SWAP_ON_SPACE))
+        {
+            SetFocusedSquare(m_focusedWord->FindNextSquare(m_focusedSquare, FIND_WHITE_SQUARE), m_focusedWord);
+        }
+    }
     else
+    {
         MoveAfterLetter();
+    }
 }
 
 
