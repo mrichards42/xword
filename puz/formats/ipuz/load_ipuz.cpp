@@ -282,6 +282,7 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
                 val = map->GetString(puzT("cell"), empty_str);
                 if (map->Contains(puzT("style")))
                     SetStyle(square, map->Get(puzT("style")));
+                square.SetText(map->GetString(puzT("value"), puzT("")));
             }
             if (val == block_str)
                 square.SetSolution(square.Black);
