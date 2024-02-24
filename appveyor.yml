@@ -97,6 +97,7 @@ for:
 
   # Build XWord
   build_script:
+    - sudo xcode-select -s /Applications/Xcode-13.4.1.app
     - xcodebuild -project build/xcode4/XWord.xcodeproj -configuration "$CONFIGURATION" build
     - if [ "$CONFIGURATION" == "Release" ]; then sed -e "s/{VERSION}/${XWORD_VERSION}/" -e "s/{OS_FILE}/XWord-macOS.zip/" dist/packages_template.lua > dist/packages_mac.lua; fi
 
