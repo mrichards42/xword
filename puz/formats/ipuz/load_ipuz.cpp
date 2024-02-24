@@ -152,6 +152,18 @@ void ipuzParser::SetStyle(Square & square, json::Value * style_value)
     if (barred.find(puzT("B")) != string_t::npos)
         square.m_bars[BAR_BOTTOM] = true;
 
+    if (style->Contains(puzT("mark"))) {
+        json::Map* mark = style->GetMap(puzT("mark"));
+        if (mark->Contains(puzT("TL")))
+            square.m_mark[MARK_TL] = mark->GetString(puzT("TL"), puzT(""));
+        if (mark->Contains(puzT("TR")))
+            square.m_mark[MARK_TR] = mark->GetString(puzT("TR"), puzT(""));
+        if (mark->Contains(puzT("BL")))
+            square.m_mark[MARK_BL] = mark->GetString(puzT("BL"), puzT(""));
+        if (mark->Contains(puzT("BR")))
+            square.m_mark[MARK_BR] = mark->GetString(puzT("BR"), puzT(""));
+    }
+
     // Color
     string_t color = style->GetString(puzT("color"), puzT(""));
     if (!color.empty()) {
