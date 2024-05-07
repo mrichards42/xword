@@ -250,6 +250,9 @@ public:
         Add(grid.numberFont, "Number", FontDesc(FP_DEFAULT & ~FP_POINTSIZE));
         Add(grid.penColor, "Text");
         Add(grid.backgroundColor, "Background");
+        Add(grid.correctFlagColor, "Correct dot");
+        Add(grid.checkedFlagColor, "Incorrect triangle");
+        Add(grid.revealedFlagColor, "Revealed triangle");
     }
 };
 

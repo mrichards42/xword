@@ -252,6 +252,12 @@ public:
         { m_drawer.SetWhiteSquareColor(color); if (! IsEmpty()) Refresh(); }
     void SetBlackSquareColor(const wxColor & color)  
         { m_drawer.SetBlackSquareColor(color); if (! IsEmpty()) Refresh(); }
+    void SetCorrectColor(const wxColor & color)
+        { m_drawer.SetCorrectColor(color); if (! IsEmpty()) Refresh(); }
+    void SetCheckedColor(const wxColor & color)
+        { m_drawer.SetCheckedColor(color); if (! IsEmpty()) Refresh(); }
+    void SetRevealedColor(const wxColor & color)
+        { m_drawer.SetRevealedColor(color); if (! IsEmpty()) Refresh(); }
     void ShowThemeHighlight(bool doit = true)
         { m_drawer.ShowThemeHighlight(doit); if (! IsEmpty()) Refresh(); }
     void SetThemeSquareColor(const wxColor & color)  
@@ -268,6 +274,12 @@ public:
         { return m_drawer.GetWhiteSquareColor(); }
     const wxColor & GetBlackSquareColor()   const
         { return m_drawer.GetBlackSquareColor(); }
+    const wxColor & GetCorrectColor() const
+        { return m_drawer.GetCorrectColor(); }
+    const wxColor & GetCheckedColor() const
+        { return m_drawer.GetCheckedColor(); }
+    const wxColor & GetRevealedColor() const
+        { return m_drawer.GetRevealedColor(); }
     const wxColor & GetThemeSquareColor()   const
         { return m_drawer.GetThemeColor(); }
     const wxColor & GetPenColor()           const
