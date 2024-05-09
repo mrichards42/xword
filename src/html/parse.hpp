@@ -50,6 +50,12 @@ public:
         return (wxObject*) &text;
     }
 
+    static wxString StripTags (const wxString & input) {
+        PlainTextHtmlParser parser;
+        wxString text = * (wxString*) parser.Parse(input);
+        return text;
+    }
+
 private:
     wxString text;
 };

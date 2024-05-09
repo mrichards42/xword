@@ -982,8 +982,7 @@ MyFrame::ShowMetadata()
         SetTitle(XWORD_APP_NAME);
     else {
         // Puzzle titles can contain HTML, so parse out the plain text.
-        PlainTextHtmlParser parser;
-        wxString title = * (wxString*) (parser.Parse(puz2wx(m_puz.GetTitle())));
+        wxString title = PlainTextHtmlParser::StripTags(puz2wx(m_puz.GetTitle()));
         SetTitle(title + _T(" - ") XWORD_APP_NAME);
     }
 
@@ -1095,8 +1094,10 @@ MyFrame::CheckPuzzle()
             m_status->SetAlert(_T("The puzzle is filled correctly!"),
                 wxGetApp().GetConfigManager().Status.completeColor());
             // Show completion message for acrostics since it is often the formatted quote.
-            if (m_puz.GetGrid().IsAcrostic() && m_puz.HasMeta(puzT("completion")))
-                XWordMessage(this, m_puz.GetMeta(puzT("completion")));
+            if (m_puz.GetGrid().IsAcrostic() && m_puz.HasMeta(puzT("completion"))) {
+                wxString message = PlainTextHtmlParser::StripTags(puz2wx(m_puz.GetMeta(puzT("completion"))));
+                XWordMessage(this, message);
+            }
             break;
         case UNCHECKABLE_PUZZLE:
             StopTimer();
