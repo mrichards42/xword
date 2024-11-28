@@ -83,6 +83,9 @@ public:
         ConfigColor focusedWordColor;
         ConfigColor whiteSquareColor;
         ConfigColor blackSquareColor;
+        ConfigColor correctFlagColor;
+        ConfigColor checkedFlagColor;
+        ConfigColor revealedFlagColor;
         ConfigBool highlightTheme;
         ConfigColor themeSquareColor;
         ConfigColor selectionColor;

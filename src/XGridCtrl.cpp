@@ -204,6 +204,9 @@ void XGridCtrl::Init()
     grid.backgroundColor.AddCallback(this, &XGridCtrl::SetBackgroundColour);
     grid.whiteSquareColor.AddCallback(this, &XGridCtrl::SetWhiteSquareColor);
     grid.blackSquareColor.AddCallback(this, &XGridCtrl::SetBlackSquareColor);
+    grid.correctFlagColor.AddCallback(this, &XGridCtrl::SetCorrectColor);
+    grid.checkedFlagColor.AddCallback(this, &XGridCtrl::SetCheckedColor);
+    grid.revealedFlagColor.AddCallback(this, &XGridCtrl::SetRevealedColor);
     grid.highlightTheme.AddCallback(this, &XGridCtrl::ShowThemeHighlight);
     grid.themeSquareColor.AddCallback(this, &XGridCtrl::SetThemeSquareColor);
     grid.selectionColor.AddCallback(this, &XGridCtrl::SetSelectionColor);
