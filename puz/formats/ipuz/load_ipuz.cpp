@@ -183,6 +183,69 @@ void ipuzParser::SetStyle(Square & square, json::Value * style_value)
     }
 }
 
+/**
+ * Returns whether any clues contain custom words.
+ *
+ * Note that we cannot use Clues.HasWords() yet because constructing valid ClueLists requires
+ * knowing whether we're using 0-based or 1-based coordinates.
+ */
+bool HasWords(json::Map* cluelists) {
+    json::Map::iterator cl_it;
+    for (cl_it = cluelists->begin(); cl_it != cluelists->end(); ++cl_it)
+    {
+        ClueList cluelist;
+        json::Array* clues = cl_it->second->AsArray();
+        json::Array::iterator clue_it;
+        for (clue_it = clues->begin(); clue_it != clues->end(); ++clue_it)
+        {
+            json::Value* clueVal = (*clue_it);
+            if (!clueVal->IsSimple() && !clueVal->IsArray())
+            {
+                json::Map* clue = (*clue_it)->AsMap();
+                if (clue->Contains(puzT("cells"))) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/** Returns whether any cell is invalid when applying the given offset to cell coordinates. */
+bool AnyCellIsInvalid(Grid& grid, json::Map* cluelists, int offset) {
+    json::Map::iterator cl_it;
+    for (cl_it = cluelists->begin(); cl_it != cluelists->end(); ++cl_it)
+    {
+        ClueList cluelist;
+        json::Array* clues = cl_it->second->AsArray();
+        json::Array::iterator clue_it;
+        for (clue_it = clues->begin(); clue_it != clues->end(); ++clue_it)
+        {
+            json::Value* clueVal = (*clue_it);
+            if (!clueVal->IsSimple() && !clueVal->IsArray())
+            {
+                json::Map* clue = (*clue_it)->AsMap();
+                if (clue->Contains(puzT("cells"))) {
+                    json::Array* cells = clue->GetArray(puzT("cells"));
+                    json::Array::iterator cell_it;
+                    for (cell_it = cells->begin(); cell_it != cells->end(); ++cell_it) {
+                        json::Array* cellVal = (*cell_it)->AsArray();
+                        int x = ToInt(cellVal->GetNumber(0)) + offset;
+                        int y = ToInt(cellVal->GetNumber(1)) + offset;
+                        if (x < 0 || x > grid.GetWidth() - 1 || y < 0 || y > grid.GetHeight() - 1) {
+                            return true;
+                        }
+                        Square& square = grid.At(x, y);
+                        if (square.IsBlack() || square.IsMissing()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
 
 bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
 {
@@ -350,6 +413,23 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
 
     // Clues
     json::Map * cluelists = doc->GetMap(puzT("clues"));
+
+    // Heuristically determine whether this puzzle uses 0-based or 1-based coordinates.
+    // Due to an ambiguity in the ipuz specification, both coordinate systems have appeared in the
+    // wild. We can apply some heuristics to guess the right basis. A future version of the ipuz
+    // spec should resolve the ambiguity.
+    int offset = -1;
+    if (HasWords(cluelists)) {
+        bool hasInvalid0Coordinates = AnyCellIsInvalid(puz->GetGrid(), cluelists, 0);
+        bool hasInvalid1Coordinates = AnyCellIsInvalid(puz->GetGrid(), cluelists, -1);
+        // If the coordinates are all valid with 0-based indexing and invalid with 1-based indexing,
+        // we use 0-based indexing. In any other case, we default to 1-based indexing as we used
+        // before.
+        if (!hasInvalid0Coordinates && hasInvalid1Coordinates) {
+            offset = 0;
+        }
+    }
+
     {
         json::Map::iterator cl_it;
         for (cl_it = cluelists->begin(); cl_it != cluelists->end(); ++cl_it)
@@ -395,9 +475,8 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
                         for (cell_it = cells->begin(); cell_it != cells->end(); ++cell_it) {
                             json::Array * cellVal = (*cell_it)->AsArray();
                             word.push_back(&puz->GetGrid().At(
-                                // ipuz coordinates are 1-based.
-                                ToInt(cellVal->GetNumber(0)) - 1,
-                                ToInt(cellVal->GetNumber(1)) - 1));
+                                ToInt(cellVal->GetNumber(0)) + offset,
+                                ToInt(cellVal->GetNumber(1)) + offset));
                         }
                         outClue.SetWord(word);
                     }
