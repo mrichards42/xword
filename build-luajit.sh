@@ -31,9 +31,8 @@ fi
 
 # Check to see if the cache directory is empty
 if [ ! -d "$INSTALL_PATH/lib" ]; then
-  curl -fsSL -o LuaJIT-$LUAJIT_VERSION.tar.gz https://luajit.org/download/LuaJIT-2.0.5.tar.gz
-  tar -xzf LuaJIT-$LUAJIT_VERSION.tar.gz
-  cd LuaJIT-$LUAJIT_VERSION/src
+  git clone -b v$LUAJIT_VERSION --depth 1 https://github.com/LuaJIT/LuaJIT.git
+  cd LuaJIT/src
   eval $BUILD_COMMAND
   mkdir -p $INSTALL_PATH/lib
   eval $INSTALL_COMMAND
