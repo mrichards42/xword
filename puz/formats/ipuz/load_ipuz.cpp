@@ -405,7 +405,14 @@ bool ipuzParser::DoLoadPuzzle(Puzzle * puz, json::Value * root)
                     cluelist.push_back(outClue);
                 }
             }
-            puz->SetClueList(cl_it->first, cluelist);
+            // Directions can optionally specify a display string, after a ':'.
+            int colon_pos = cl_it->first.find(':');
+            if (colon_pos == std::string::npos) {
+                puz->SetClueList(cl_it->first, cluelist);
+            } else {
+                cluelist.SetTitle(cl_it->first.substr(colon_pos + 1));
+                puz->SetClueList(cl_it->first.substr(0, colon_pos), cluelist);
+            }
         }
     }
 

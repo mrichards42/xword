@@ -244,7 +244,7 @@ MyPrintout::GetHTML()
         html << _T("<table cellspacing=0 cellpadding=1 border=0>");
         // Heading
         html << _T("<tr><th colspan=2 align=\"left\"><font size=\"+1\"><b>")
-                    << BreakLine(dc, puz2wx(clues_it->first), m_columnWidth)
+                    << BreakLine(dc, puz2wx(clues_it->second.GetTitle()), m_columnWidth)
                << _T("</b></font></th></tr>");
         puz::ClueList::const_iterator it;
         for (it = clues_it->second.begin(); it != clues_it->second.end(); ++it)

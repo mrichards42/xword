@@ -188,12 +188,12 @@ void SaveXPF(Puzzle * puz, const std::string & filename, void * /* dummy */)
                 }
                 else // diagramless
                 {
-                    puz::string_t title = cluelist.GetTitle();
-                    if (title == puzT("Across"))
+                    puz::string_t direction = clues_it->first;
+                    if (direction == puzT("Across"))
                         clue.append_attribute("Dir") = "Across";
-                    else if (title == puzT("Down"))
+                    else if (direction == puzT("Down"))
                         clue.append_attribute("Dir") = "Down";
-                    else if (title == puzT("Diagonal"))
+                    else if (direction == puzT("Diagonal"))
                         clue.append_attribute("Dir") = "Diagonal";
                     else
                         throw ConversionError("XPF clues must be Across, Down, or Diagonal");
